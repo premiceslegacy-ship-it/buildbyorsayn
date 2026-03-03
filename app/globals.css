@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --animate-fade-up: fade-up 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  --animate-fade-out: fade-out 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  --animate-fade-in: fade-in 0.2s ease-out forwards;
+  --animate-reveal: reveal 600ms ease-out forwards;
+}
+
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
