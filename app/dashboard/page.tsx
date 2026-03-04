@@ -12,9 +12,7 @@ import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
-
-// 🔗 Remplace ce lien par ton URL WhatsApp ou Telegram privé
-const COMMUNITY_LINK = "https://t.me/+I6sEhv2eFDo5OWFk";
+import { getCommunityLink } from "@/app/actions/getCommunityLink";
 
 const ICONS: Record<string, any> = {
   "1": Workflow,
@@ -37,6 +35,7 @@ export default function DashboardHub() {
   const [displayEmail, setDisplayEmail] = useState("");
   const [initials, setInitials] = useState("?");
   const [hasPaid, setHasPaid] = useState<boolean>(false);
+  const [communityLink, setCommunityLink] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -62,7 +61,11 @@ export default function DashboardHub() {
         .select("has_paid")
         .eq("id", user.id)
         .single();
-      setHasPaid(profile?.has_paid === true);
+      if (profile?.has_paid === true) {
+        setHasPaid(true);
+        const link = await getCommunityLink();
+        setCommunityLink(link);
+      }
     };
     fetchUser();
   }, [router]);
@@ -277,7 +280,7 @@ export default function DashboardHub() {
         {hasPaid === true && (
           <div className="mt-6">
             <a
-              href={COMMUNITY_LINK}
+              href={communityLink ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="group block"

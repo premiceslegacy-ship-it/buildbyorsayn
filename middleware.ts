@@ -2,13 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl;
-
-    // On ne protège que les routes du dashboard (et sous-routes)
-    if (!pathname.startsWith("/dashboard")) {
-        return NextResponse.next();
-    }
-
     // Créer une réponse mutable pour que @supabase/ssr puisse rafraîchir les cookies
     let response = NextResponse.next({
         request: { headers: request.headers },
@@ -68,5 +61,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*"],
+    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/fin", "/intro"],
 };
