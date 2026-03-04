@@ -1,8 +1,8 @@
-// File: /Users/useersm/Desktop/BUILD FILES/buildbyorsayn/app/blocs/[id]/page.tsx
-import * as entry from '../../../../../app/blocs/[id]/page.js'
+// File: /Users/useersm/Desktop/BUILD FILES/buildbyorsayn/app/sources/page.tsx
+import * as entry from '../../../../app/sources/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../../app/blocs/[id]/page.js')
+type TEntry = typeof import('../../../../app/sources/page.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

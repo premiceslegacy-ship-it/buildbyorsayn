@@ -8,6 +8,7 @@ import { BLOCS_DATA } from "@/lib/mockData";
 import { useProgress } from "@/hooks/useProgress";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
+import { LinkifiedText } from "@/components/ui/linkified-text";
 
 function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
@@ -159,7 +160,9 @@ export default function BlocPage() {
                         return <CodeBlock key={segIdx} code={code} />;
                       }
                       return segment.trim().split("\n\n").filter(Boolean).map((para, paraIdx) => (
-                        <p key={`${segIdx}-${paraIdx}`}>{para}</p>
+                        <p key={`${segIdx}-${paraIdx}`}>
+                          <LinkifiedText text={para} />
+                        </p>
                       ));
                     });
                   })()}
@@ -170,11 +173,10 @@ export default function BlocPage() {
                       className="group flex items-center gap-4 text-left cursor-pointer w-fit"
                     >
                       <div
-                        className={`flex-shrink-0 w-5 h-5 rounded-[4px] border flex items-center justify-center transition-all duration-300 ${
-                          checkedItems.includes(section.id)
+                        className={`flex-shrink-0 w-5 h-5 rounded-[4px] border flex items-center justify-center transition-all duration-300 ${checkedItems.includes(section.id)
                             ? "bg-[#e8d5b0] border-[#e8d5b0] shadow-[0_0_12px_rgba(232,213,176,0.3)]"
                             : "border-white/20 bg-black/20 group-hover:border-white/40"
-                        }`}
+                          }`}
                       >
                         {checkedItems.includes(section.id) && (
                           <Check
@@ -184,11 +186,10 @@ export default function BlocPage() {
                         )}
                       </div>
                       <span
-                        className={`text-[15px] transition-colors duration-300 font-medium ${
-                          checkedItems.includes(section.id)
+                        className={`text-[15px] transition-colors duration-300 font-medium ${checkedItems.includes(section.id)
                             ? "text-[#e8d5b0]"
                             : "text-white/50 group-hover:text-white/80"
-                        }`}
+                          }`}
                       >
                         J'ai assimilé cette partie
                       </span>
@@ -210,20 +211,18 @@ export default function BlocPage() {
                 <div
                   className="h-full bg-gradient-to-r from-[#e8d5b0]/40 to-[#e8d5b0] rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(232,213,176,0.3)]"
                   style={{
-                    width: `${
-                      (completedSectionsInBloc.length / bloc.sections.length) *
+                    width: `${(completedSectionsInBloc.length / bloc.sections.length) *
                       100
-                    }%`,
+                      }%`,
                   }}
                 />
               </div>
 
               <div
-                className={`transition-all duration-500 ease-out relative z-10 ${
-                  isBlocCompleted
+                className={`transition-all duration-500 ease-out relative z-10 ${isBlocCompleted
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-4 pointer-events-none absolute"
-                }`}
+                  }`}
               >
                 {hasNextBloc ? (
                   <Link href={`/blocs/${nextBlocId}`} className="w-full sm:w-auto">
@@ -264,11 +263,10 @@ export default function BlocPage() {
                   <a
                     key={section.id}
                     href={`#${section.id}`}
-                    className={`text-[14px] leading-snug transition-all duration-300 ${
-                      isActive
+                    className={`text-[14px] leading-snug transition-all duration-300 ${isActive
                         ? "text-[#e8d5b0] border-l-2 border-[#e8d5b0] pl-3 font-medium"
                         : "text-white/40 border-l-2 border-white/10 pl-3 hover:text-white/70"
-                    }`}
+                      }`}
                   >
                     {section.title}
                   </a>

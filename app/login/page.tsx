@@ -21,12 +21,6 @@ export default function LoginPage() {
       <div className="flex flex-col items-center space-y-12 relative z-10 w-full max-w-[400px]">
         <LiquidCard className="w-full p-8">
           <div className="flex flex-col space-y-8 relative z-10">
-            <div className="flex flex-col space-y-2 text-center">
-              <h1 className="text-2xl font-medium tracking-tightest text-[#f0ede8]">
-                Accéder au système BUILD
-              </h1>
-            </div>
-
             <LoginForm />
           </div>
         </LiquidCard>
