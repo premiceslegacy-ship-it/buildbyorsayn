@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye } from "lucide-react";
+import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -11,6 +11,10 @@ import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { motion } from "motion/react";
+import { createClient } from "@/lib/supabase/client";
+
+// 🔗 Remplace ce lien par ton URL WhatsApp ou Telegram privé
+const COMMUNITY_LINK = "https://t.me/+I6sEhv2eFDo5OWFk";
 
 const ICONS: Record<string, any> = {
   "1": Workflow,
@@ -19,14 +23,49 @@ const ICONS: Record<string, any> = {
   "4": FileCode,
   "5": Briefcase,
   "6": Eye,
+  "7": Flag,
 };
 
 export default function DashboardHub() {
   const router = useRouter();
   const { globalProgress, getBlocProgress, isLoaded, lastVisitedBloc } = useProgress();
-  
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [displayName, setDisplayName] = useState("...");
+  const [displayEmail, setDisplayEmail] = useState("");
+  const [initials, setInitials] = useState("?");
+  const [hasPaid, setHasPaid] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
+        console.error("Session invalide:", error?.message);
+        router.push("/login");
+        return;
+      }
+      const email = user.email ?? "";
+      const firstName =
+        (user.user_metadata?.first_name as string) ||
+        (user.user_metadata?.full_name as string)?.split(" ")[0] ||
+        email.split("@")[0];
+      setDisplayName(firstName);
+      setDisplayEmail(email);
+      setInitials(firstName.substring(0, 2).toUpperCase());
+
+      // Récupérer has_paid depuis la table profiles
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("has_paid")
+        .eq("id", user.id)
+        .single();
+      setHasPaid(profile?.has_paid === true);
+    };
+    fetchUser();
+  }, [router]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -62,25 +101,32 @@ export default function DashboardHub() {
           <Link href="/sources" className="text-white/40 hover:text-white/80 transition-colors">
             La stack
           </Link>
-          
+
           {/* Dropdown Profil */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
             >
-              SA
+              {initials}
             </button>
 
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50 animate-fade-in">
                 <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">
-                  Samuel
+                  {displayName}
                 </div>
                 <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">
-                  samuel@orsayn.fr
+                  {displayEmail}
                 </div>
-                <button className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors">
+                <button
+                  className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors"
+                  onClick={async () => {
+                    const supabase = createClient();
+                    await supabase.auth.signOut();
+                    router.push("/login");
+                  }}
+                >
                   Se déconnecter
                 </button>
               </div>
@@ -90,7 +136,7 @@ export default function DashboardHub() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24 relative z-10">
-        
+
         {/* 1. En-tête de page (Welcome & Global Progress) */}
         <header className="flex flex-col gap-4 pt-8 mb-12">
           <h1 className="text-3xl text-[#f0ede8] font-semibold tracking-tight">
@@ -99,7 +145,7 @@ export default function DashboardHub() {
           <p className="text-[rgba(240,237,232,0.60)] text-[16px]">
             Tu en es à {displayProgress}% du système. {displayProgress === 100 ? "Système intégralement implémenté." : displayProgress === 0 ? "Commence le système pour atteindre ta situation désirée." : "Continue sur ta lancée."}
           </p>
-          
+
           {/* Barre de progression globale large */}
           <div className="w-full max-w-2xl mt-4 h-2 bg-white/5 rounded-full overflow-hidden">
             <div
@@ -110,7 +156,7 @@ export default function DashboardHub() {
         </header>
 
         {/* 2. Carte "Reprendre" (Resume Action) */}
-        <LiquidCard 
+        <LiquidCard
           className="p-8 md:p-10 mb-16 animate-reveal flex flex-col h-full min-h-[200px] group cursor-pointer transition-all"
           onClick={() => router.push(`/blocs/${resumeBloc.id}`)}
         >
@@ -122,9 +168,9 @@ export default function DashboardHub() {
               {resumeBloc.titre}
             </h2>
           </div>
-          
+
           <div className="relative z-10 mt-auto flex justify-end pt-6">
-            <LiquidButton 
+            <LiquidButton
               size="xl"
               className="pointer-events-none group-hover:scale-105 transition-transform duration-300"
             >
@@ -133,12 +179,12 @@ export default function DashboardHub() {
           </div>
         </LiquidCard>
 
-        {/* 3. La Grille des Blocs (Le Menu) */}
+        {/* 3. La Grille des Blocs (Le Menu) — blocs 1 à 6 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {BLOCS_DATA.map((bloc) => {
+          {BLOCS_DATA.filter((b) => b.id !== "7").map((bloc) => {
             const Icon = ICONS[bloc.id] || Workflow;
             const progress = isLoaded ? getBlocProgress(bloc.id) : 0;
-            
+
             return (
               <Link
                 href={`/blocs/${bloc.id}`}
@@ -154,11 +200,11 @@ export default function DashboardHub() {
                     <div className="relative w-12 h-12 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.2)] transition-all duration-500 mb-6">
                       <AnimatedIcon icon={Icon} className="w-6 h-6 text-[#e8d5b0] drop-shadow-[0_0_10px_rgba(232,213,176,0.8)]" strokeWidth={1.5} />
                     </div>
-                    
+
                     <h3 className="relative text-xl font-semibold text-[#f0ede8] mb-4 tracking-tight">
                       {bloc.titre}
                     </h3>
-                    
+
                     <div className="relative mt-auto pt-4 w-full">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-xs text-white/40 uppercase tracking-wider font-medium">
@@ -169,7 +215,7 @@ export default function DashboardHub() {
                         </span>
                       </div>
                       <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-gradient-to-r from-[#e8d5b0]/40 to-[#e8d5b0] rounded-full transition-all duration-500"
                           style={{ width: `${progress}%` }}
                         />
@@ -181,7 +227,89 @@ export default function DashboardHub() {
             );
           })}
         </div>
-        
+
+        {/* 3b. Bloc 7 Récapitulatif — pleine largeur, layout horizontal */}
+        {(() => {
+          const recap = BLOCS_DATA.find((b) => b.id === "7");
+          if (!recap) return null;
+          const Icon = ICONS["7"] || Flag;
+          const progress = isLoaded ? getBlocProgress("7") : 0;
+          return (
+            <div className="mt-6">
+              <Link href="/blocs/7" className="group block">
+                <motion.div whileHover="hover">
+                  <LiquidCard className="p-8 md:p-10 transition-all duration-500 cursor-pointer">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+
+                    <div className="relative flex flex-col sm:flex-row items-start gap-10">
+                      {/* Icône */}
+                      <div className="flex-shrink-0 w-14 h-14 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.2)] transition-all duration-500">
+                        <AnimatedIcon icon={Icon} className="w-7 h-7 text-[#e8d5b0] drop-shadow-[0_0_10px_rgba(232,213,176,0.8)]" strokeWidth={1.5} />
+                      </div>
+
+                      {/* Texte */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0] font-medium mb-2">
+                          Synthèse finale
+                        </p>
+                        <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-3">
+                          {recap.titre}
+                        </h2>
+                        <div className="flex items-center gap-4 mt-1">
+                          <div className="flex-1 max-w-xs h-1.5 bg-black/40 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-[#e8d5b0]/40 to-[#e8d5b0] rounded-full transition-all duration-500"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-[#e8d5b0] font-medium flex-shrink-0">{progress}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </LiquidCard>
+                </motion.div>
+              </Link>
+            </div>
+          );
+        })()}
+
+        {/* 4. Bloc Communauté — affiché uniquement si has_paid est strictement true */}
+        {hasPaid === true && (
+          <div className="mt-6">
+            <a
+              href={COMMUNITY_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block"
+            >
+              <LiquidCard className="p-8 md:p-10 transition-all duration-300 cursor-pointer">
+                <div className="relative flex flex-col sm:flex-row items-start gap-10">
+                  {/* Icône */}
+                  <div className="flex-shrink-0 w-14 h-14 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.2)] transition-all duration-500">
+                    <Users className="w-7 h-7 text-[#e8d5b0] drop-shadow-[0_0_10px_rgba(232,213,176,0.8)]" strokeWidth={1.5} />
+                  </div>
+
+                  {/* Texte + Flèche */}
+                  <div className="flex flex-1 min-w-0 items-start justify-between">
+                    <div>
+                      <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0] font-medium mb-2">
+                        Espace membres
+                      </p>
+                      <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-1">
+                        Rejoindre la communauté privée
+                      </h2>
+                      <p className="text-sm text-white/50 mt-2">
+                        Accède au groupe réservé aux builders qui ont le système.
+                      </p>
+                    </div>
+                    <ArrowRight className="flex-shrink-0 w-5 h-5 text-[#e8d5b0] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 hidden sm:block ml-4 mt-1" />
+                  </div>
+                </div>
+              </LiquidCard>
+            </a>
+          </div>
+        )}
+
       </div>
     </main>
   );

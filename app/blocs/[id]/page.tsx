@@ -1,13 +1,39 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Copy } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { BLOCS_DATA } from "@/lib/mockData";
 import { useProgress } from "@/hooks/useProgress";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
+
+function CodeBlock({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div className="relative group">
+      <pre className="bg-black/40 border border-white/10 rounded-xl p-5 text-[13px] font-mono text-[rgba(240,237,232,0.75)] overflow-x-auto whitespace-pre-wrap leading-relaxed">
+        {code}
+      </pre>
+      <button
+        onClick={handleCopy}
+        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg p-1.5 text-white/60 hover:text-[#e8d5b0] cursor-pointer"
+        title="Copier"
+      >
+        {copied
+          ? <Check className="w-3.5 h-3.5 text-[#e8d5b0]" strokeWidth={2.5} />
+          : <Copy className="w-3.5 h-3.5" />
+        }
+      </button>
+    </div>
+  );
+}
 
 export default function BlocPage() {
   const params = useParams();
@@ -123,9 +149,20 @@ export default function BlocPage() {
                   <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
                     {section.title}
                   </h2>
-                  {section.content.split("\n\n").map((paragraph, idx) => (
-                    <p key={idx}>{paragraph}</p>
-                  ))}
+                  {(() => {
+                    const segments = section.content.split(/(```[\s\S]*?```)/g);
+                    return segments.map((segment, segIdx) => {
+                      if (segment.startsWith("```") && segment.endsWith("```")) {
+                        const inner = segment.slice(3, -3);
+                        const firstNewline = inner.indexOf("\n");
+                        const code = firstNewline === -1 ? inner.trim() : inner.slice(firstNewline + 1);
+                        return <CodeBlock key={segIdx} code={code} />;
+                      }
+                      return segment.trim().split("\n\n").filter(Boolean).map((para, paraIdx) => (
+                        <p key={`${segIdx}-${paraIdx}`}>{para}</p>
+                      ));
+                    });
+                  })()}
 
                   <div className="pt-6 mt-6 border-t border-white/5">
                     <button
