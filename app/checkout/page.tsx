@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, Lock, Zap, Layers, Users } from "lucide-react";
+import { BetaCodeForm } from "./BetaCodeForm";
 
 // 🔗 Remplace cette URL par ton vrai lien produit Lemon Squeezy
 const LEMON_SQUEEZY_BASE_URL = "https://buildbyorsayn.lemonsqueezy.com/checkout/buy/a314765a-b572-4f72-a1a7-19aeb93899c0";
@@ -90,6 +91,8 @@ export default async function CheckoutPage() {
                     <p className="text-center text-xs text-white/25 mt-4">
                         Paiement sécurisé via Lemon Squeezy · Satisfait ou remboursé 30 jours
                     </p>
+
+                    <BetaCodeForm />
                 </div>
             </div>
         </main>
