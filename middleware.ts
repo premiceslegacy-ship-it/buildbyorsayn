@@ -44,22 +44,30 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    // 2. Vérifier has_paid dans la table profiles
-    const { data: profile } = await supabase
-        .from("profiles")
-        .select("has_paid")
-        .eq("id", user.id)
-        .single();
+    // 2. Vérifier has_paid uniquement pour les routes vraiment payantes
+    // /dashboard et /blocs/:path* sont accessibles à tous les utilisateurs connectés
+    const pathname = request.nextUrl.pathname;
+    const requiresPayment =
+        pathname === "/sources" ||
+        pathname === "/fin" ||
+        pathname === "/intro" ||
+        pathname.startsWith("/admin");
 
-    if (!profile || profile.has_paid !== true) {
-        // Pas payé → page checkout
-        const checkoutUrl = new URL("/checkout", request.url);
-        return NextResponse.redirect(checkoutUrl);
+    if (requiresPayment) {
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("has_paid")
+            .eq("id", user.id)
+            .single();
+
+        if (!profile || profile.has_paid !== true) {
+            return NextResponse.redirect(new URL("/checkout", request.url));
+        }
     }
 
     return response;
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/fin", "/intro"],
+    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/fin", "/intro", "/admin/:path*"],
 };

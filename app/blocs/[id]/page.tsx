@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Check, Copy } from "lucide-react";
+import { ArrowLeft, Check, Copy, Lock, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -48,6 +48,8 @@ export default function BlocPage() {
   const [activeSection, setActiveSection] = useState<string>("");
   const [isBlocMarked, setIsBlocMarked] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
+  const [hasPaid, setHasPaid] = useState<boolean | null>(null);
+  const [checkoutUserId, setCheckoutUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (blocId) {
@@ -60,13 +62,15 @@ export default function BlocPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      setCheckoutUserId(user.id);
       const { data: profile } = await supabase
         .from("profiles")
-        .select("completed_blocks")
+        .select("completed_blocks, has_paid")
         .eq("id", user.id)
         .single();
       const blocks: number[] = profile?.completed_blocks ?? [];
       setIsBlocMarked(blocks.includes(Number(blocId)));
+      setHasPaid(profile?.has_paid === true);
     };
     fetchCompletedBlocs();
   }, [blocId]);
@@ -154,6 +158,14 @@ export default function BlocPage() {
   const nextBlocId = String(Number(blocId) + 1);
   const hasNextBloc = BLOCS_DATA.some((b) => b.id === nextBlocId);
 
+  const LEMON_URL = "https://buildbyorsayn.lemonsqueezy.com/checkout/buy/a314765a-b572-4f72-a1a7-19aeb93899c0";
+  const checkoutUrl = checkoutUserId
+    ? `${LEMON_URL}?checkout[custom][user_id]=${checkoutUserId}`
+    : LEMON_URL;
+  const blocIdNum = Number(blocId);
+  const showPaywall = hasPaid === false && blocIdNum > 1;
+  const showContent = hasPaid === true || blocIdNum === 1;
+
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] font-sans relative selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
       {/* Background Halos */}
@@ -177,6 +189,72 @@ export default function BlocPage() {
               {bloc.titre}
             </h1>
 
+            {/* Skeleton — chargement en cours pour blocs > 1 */}
+            {hasPaid === null && blocIdNum > 1 && (
+              <div className="mt-16 space-y-8 animate-pulse">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="space-y-3">
+                    <div className="h-5 bg-white/[0.08] rounded-lg w-2/5" />
+                    <div className="h-4 bg-white/[0.05] rounded w-full" />
+                    <div className="h-4 bg-white/[0.05] rounded w-5/6" />
+                    <div className="h-4 bg-white/[0.05] rounded w-4/5" />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Paywall — blocs 2-7 pour non-payants */}
+            {showPaywall && (
+              <div className="mt-8">
+                {/* Aperçu flouté */}
+                <div className="relative overflow-hidden rounded-2xl max-h-[300px]">
+                  <div className="blur-sm opacity-30 pointer-events-none select-none space-y-10 p-2">
+                    {bloc.sections.slice(0, 3).map((section) => (
+                      <div key={section.id} className="space-y-3">
+                        <h2 className="text-xl font-semibold text-[#f0ede8]">{section.title}</h2>
+                        <p className="text-[rgba(240,237,232,0.7)] text-[17px] leading-relaxed">
+                          {section.content.split("\n\n")[0]?.substring(0, 280)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0e0e0f]/60 to-[#0e0e0f]" />
+                </div>
+
+                {/* CTA */}
+                <div className="mt-10 max-w-md mx-auto">
+                  <div className="bg-white/[0.04] backdrop-blur-2xl border border-white/10 rounded-3xl p-10 text-center shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
+                    <div className="w-16 h-16 bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(232,213,176,0.1)]">
+                      <Lock className="w-7 h-7 text-[#e8d5b0]" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-[#f0ede8] mb-3 tracking-tight">
+                      Méthode complète
+                    </h2>
+                    <p className="text-white/50 text-sm mb-6 leading-relaxed">
+                      Débloque les 6 blocs de la méthode, la communauté privée, et toutes les mises à jour à vie.
+                    </p>
+                    <div className="flex items-baseline justify-center gap-2 mb-8">
+                      <span className="text-3xl font-bold text-[#e8d5b0]">67€</span>
+                      <span className="text-white/40 text-sm">· accès à vie</span>
+                    </div>
+                    <a
+                      href={checkoutUrl}
+                      className="group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]"
+                    >
+                      🔒 Débloquer la méthode complète
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    </a>
+                    <p className="text-center text-xs text-white/25 mt-4">
+                      Paiement sécurisé via Lemon Squeezy · Satisfait ou remboursé 30 jours
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Contenu normal */}
+            {showContent && (
+            <>
             <div className="space-y-20 text-[rgba(240,237,232,0.7)] leading-relaxed text-[17px]">
               {bloc.sections.map((section) => (
                 <section key={section.id} id={section.id} className="space-y-6 scroll-mt-24">
@@ -304,8 +382,10 @@ export default function BlocPage() {
                 )}
               </button>
             </div>
+            </>)}
           </div>
 
+          {showContent && (
           <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-24">
             <h3 className="text-[11px] uppercase tracking-widest text-white/40 mb-6 font-semibold">
               Sur cette page
@@ -328,6 +408,7 @@ export default function BlocPage() {
               })}
             </nav>
           </aside>
+          )}
         </div>
       </div>
     </main>

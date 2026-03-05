@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag } from "lucide-react";
+import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -34,7 +34,7 @@ export default function DashboardHub() {
   const [displayName, setDisplayName] = useState("...");
   const [displayEmail, setDisplayEmail] = useState("");
   const [initials, setInitials] = useState("?");
-  const [hasPaid, setHasPaid] = useState<boolean>(false);
+  const [hasPaid, setHasPaid] = useState<boolean | null>(null);
   const [communityLink, setCommunityLink] = useState<string | null>(null);
   const [completedBlocsCount, setCompletedBlocsCount] = useState<number>(0);
 
@@ -66,6 +66,8 @@ export default function DashboardHub() {
         setHasPaid(true);
         const link = await getCommunityLink();
         setCommunityLink(link);
+      } else {
+        setHasPaid(false);
       }
       setCompletedBlocsCount((profile?.completed_blocks ?? []).length);
     };
@@ -222,6 +224,19 @@ export default function DashboardHub() {
                     {/* Glow background on hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
 
+                    {/* Badge accès */}
+                    {hasPaid === false && bloc.id !== "1" && (
+                      <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-2.5 py-1">
+                        <Lock className="w-3 h-3 text-white/30" />
+                        <span className="text-[11px] text-white/30 font-medium">Premium</span>
+                      </div>
+                    )}
+                    {hasPaid === false && bloc.id === "1" && (
+                      <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1">
+                        <span className="text-[11px] text-emerald-400 font-medium">Gratuit</span>
+                      </div>
+                    )}
+
                     {/* Icône Fintech illuminée */}
                     <div className="relative w-12 h-12 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.2)] transition-all duration-500 mb-6">
                       <AnimatedIcon icon={Icon} className="w-6 h-6 text-[#e8d5b0] drop-shadow-[0_0_10px_rgba(232,213,176,0.8)]" strokeWidth={1.5} />
@@ -266,6 +281,12 @@ export default function DashboardHub() {
                 <motion.div whileHover="hover">
                   <LiquidCard className="p-8 md:p-10 transition-all duration-500 cursor-pointer">
                     <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+                    {hasPaid === false && (
+                      <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-2.5 py-1">
+                        <Lock className="w-3 h-3 text-white/30" />
+                        <span className="text-[11px] text-white/30 font-medium">Premium</span>
+                      </div>
+                    )}
 
                     <div className="relative flex flex-col sm:flex-row items-start gap-10">
                       {/* Icône */}
