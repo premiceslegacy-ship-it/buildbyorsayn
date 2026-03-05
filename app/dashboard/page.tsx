@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock, ShieldCheck } from "lucide-react";
