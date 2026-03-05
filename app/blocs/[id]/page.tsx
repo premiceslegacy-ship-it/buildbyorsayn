@@ -46,8 +46,6 @@ export default function BlocPage() {
 
   const { checkedItems, toggleItem, globalProgress, isLoaded, setLastVisitedBloc } = useProgress();
   const [activeSection, setActiveSection] = useState<string>("");
-  const [isBlocMarked, setIsBlocMarked] = useState(false);
-  const [isToggling, setIsToggling] = useState(false);
   const [hasPaid, setHasPaid] = useState<boolean | null>(null);
   const [checkoutUserId, setCheckoutUserId] = useState<string | null>(null);
 
@@ -58,35 +56,20 @@ export default function BlocPage() {
   }, [blocId, setLastVisitedBloc]);
 
   useEffect(() => {
-    const fetchCompletedBlocs = async () => {
+    const fetchProfile = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       setCheckoutUserId(user.id);
       const { data: profile } = await supabase
         .from("profiles")
-        .select("completed_blocks, has_paid")
+        .select("has_paid")
         .eq("id", user.id)
         .single();
-      const blocks: number[] = profile?.completed_blocks ?? [];
-      setIsBlocMarked(blocks.includes(Number(blocId)));
       setHasPaid(profile?.has_paid === true);
     };
-    fetchCompletedBlocs();
+    fetchProfile();
   }, [blocId]);
-
-  const handleToggleBloc = async () => {
-    setIsToggling(true);
-    const optimistic = !isBlocMarked;
-    setIsBlocMarked(optimistic);
-    const result = await toggleBlocCompletion(Number(blocId));
-    if (result.success) {
-      setIsBlocMarked(result.completedBlocks.includes(Number(blocId)));
-    } else {
-      setIsBlocMarked(!optimistic);
-    }
-    setIsToggling(false);
-  };
 
   useEffect(() => {
     if (bloc && bloc.sections.length > 0) {
@@ -336,11 +319,12 @@ export default function BlocPage() {
                   }`}
               >
                 {hasNextBloc ? (
-                  <Link href={`/blocs/${nextBlocId}`} className="w-full sm:w-auto">
-                    <LiquidButton
-                      className="w-full sm:w-auto"
-                      size="xl"
-                    >
+                  <Link
+                    href={`/blocs/${nextBlocId}`}
+                    className="w-full sm:w-auto"
+                    onClick={() => { toggleBlocCompletion(Number(blocId)); }}
+                  >
+                    <LiquidButton className="w-full sm:w-auto" size="xl">
                       Valider le bloc et passer à la suite
                     </LiquidButton>
                   </Link>
@@ -349,6 +333,7 @@ export default function BlocPage() {
                     disabled={globalProgress === 100}
                     className="w-full sm:w-auto"
                     size="xl"
+                    onClick={() => { if (globalProgress !== 100) toggleBlocCompletion(Number(blocId)); }}
                   >
                     {globalProgress === 100 ? "Redirection en cours..." : "Terminer le système"}
                   </LiquidButton>
@@ -361,30 +346,6 @@ export default function BlocPage() {
                 </p>
               )}
             </LiquidCard>
-            {/* Bouton Marquer le bloc comme terminé */}
-            <div className="mt-8 flex justify-center">
-              <button
-                onClick={handleToggleBloc}
-                disabled={isToggling}
-                className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-medium text-[15px] transition-all duration-300 backdrop-blur-md border shadow-[0_8px_32px_rgba(0,0,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isBlocMarked
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
-                    : "bg-white/5 border-white/10 text-[#e8d5b0] hover:bg-[#e8d5b0]/10 hover:border-[#e8d5b0]/30 hover:shadow-[0_0_20px_rgba(232,213,176,0.15)]"
-                }`}
-              >
-                {isBlocMarked ? (
-                  <>
-                    <Check className="w-5 h-5" strokeWidth={2.5} />
-                    <span>Bloc terminé · Annuler</span>
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-5 h-5" strokeWidth={2} />
-                    <span>Marquer ce bloc comme terminé</span>
-                  </>
-                )}
-              </button>
-            </div>
             </>)}
           </div>
 

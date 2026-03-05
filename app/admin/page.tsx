@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -67,6 +69,13 @@ export default async function AdminPage() {
       <div className="max-w-6xl mx-auto px-6 md:px-10 py-12">
         {/* Header */}
         <div className="mb-10 flex flex-col gap-1">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-sm text-white/30 hover:text-white/60 transition-colors mb-4 w-fit"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Retour au Dashboard
+          </Link>
           <p className="text-xs uppercase tracking-[0.15em] text-white/30 font-semibold">
             Admin · Accès restreint
           </p>

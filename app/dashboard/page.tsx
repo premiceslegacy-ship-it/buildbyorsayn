@@ -26,7 +26,7 @@ const ICONS: Record<string, any> = {
 
 export default function DashboardHub() {
   const router = useRouter();
-  const { getBlocProgress, isLoaded, lastVisitedBloc } = useProgress();
+  const { getBlocProgress, globalProgress, isLoaded, lastVisitedBloc } = useProgress();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -36,7 +36,6 @@ export default function DashboardHub() {
   const [initials, setInitials] = useState("?");
   const [hasPaid, setHasPaid] = useState<boolean | null>(null);
   const [communityLink, setCommunityLink] = useState<string | null>(null);
-  const [completedBlocsCount, setCompletedBlocsCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -69,7 +68,6 @@ export default function DashboardHub() {
       } else {
         setHasPaid(false);
       }
-      setCompletedBlocsCount((profile?.completed_blocks ?? []).length);
     };
     fetchUser();
   }, [router]);
@@ -85,7 +83,7 @@ export default function DashboardHub() {
   }, []);
 
   // Avoid hydration mismatch by not rendering progress until loaded
-  const displayProgress = Math.round((completedBlocsCount / BLOCS_DATA.length) * 100);
+  const displayProgress = isLoaded ? globalProgress : 0;
 
   // Find the bloc to resume: either the last visited, or the first incomplete, or default to bloc 1
   const firstIncompleteBlocId = BLOCS_DATA.find(b => getBlocProgress(b.id) < 100)?.id || "1";
