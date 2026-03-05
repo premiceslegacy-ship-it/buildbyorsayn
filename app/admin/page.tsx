@@ -133,7 +133,7 @@ export default async function AdminPage() {
               <tbody>
                 {users.map((u, i) => {
                   const blocks = u.completed_blocks ?? [];
-                  const pct = Math.round((blocks.length / TOTAL_BLOCS) * 100);
+                  const pct = Math.round((blocks.length / 7) * 100);
                   return (
                     <tr
                       key={u.id}

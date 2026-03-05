@@ -1,5 +1,14 @@
 {
-  "node": {},
+  "node": {
+    "ea555c41387a3f87c75e2e3db73ba56ffa58fb98": {
+      "workers": {
+        "app/dashboard/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fuseersm%2FDesktop%2FBUILD%20FILES%2Fbuildbyorsayn%2Fapp%2Factions%2FgetCommunityLink.ts%22%2C%5B%22getCommunityLink%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/dashboard/page": "action-browser"
+      }
+    }
+  },
   "edge": {},
-  "encryptionKey": "VvyHO3JYKsePkhWmfZh36jZ3Nlkw7BsGFxu/a9Vpjdo="
+  "encryptionKey": "owoC44EjXCgAD/XFIQ3wo3sfbcWVHGNEe3ajxymG5jc="
 }
