@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock } from "lucide-react";
+import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -26,7 +26,7 @@ const ICONS: Record<string, any> = {
 
 export default function DashboardHub() {
   const router = useRouter();
-  const { globalProgress, getBlocProgress, isLoaded, lastVisitedBloc } = useProgress();
+  const { getBlocProgress, isLoaded, lastVisitedBloc } = useProgress();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -85,7 +85,7 @@ export default function DashboardHub() {
   }, []);
 
   // Avoid hydration mismatch by not rendering progress until loaded
-  const displayProgress = isLoaded ? globalProgress : 0;
+  const displayProgress = Math.round((completedBlocsCount / BLOCS_DATA.length) * 100);
 
   // Find the bloc to resume: either the last visited, or the first incomplete, or default to bloc 1
   const firstIncompleteBlocId = BLOCS_DATA.find(b => getBlocProgress(b.id) < 100)?.id || "1";
@@ -108,6 +108,16 @@ export default function DashboardHub() {
           <Link href="/sources" className="text-white/40 hover:text-white/80 transition-colors">
             La stack
           </Link>
+
+          {displayEmail === "mbebourasam@gmail.com" && (
+            <Link
+              href="/admin"
+              title="Administration"
+              className="text-white/30 hover:text-[#e8d5b0] transition-colors"
+            >
+              <ShieldCheck className="w-4 h-4" />
+            </Link>
+          )}
 
           {/* Dropdown Profil */}
           <div className="relative" ref={dropdownRef}>
@@ -161,26 +171,6 @@ export default function DashboardHub() {
             />
           </div>
 
-          {/* Blocs terminés */}
-          <div className="w-full max-w-2xl mt-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white/50">Blocs terminés</span>
-              <span className="text-sm font-medium text-emerald-400">
-                {completedBlocsCount} / {BLOCS_DATA.length}
-              </span>
-            </div>
-            <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-emerald-500/60 to-emerald-400 h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_12px_rgba(52,211,153,0.3)]"
-                style={{ width: `${(completedBlocsCount / BLOCS_DATA.length) * 100}%` }}
-              />
-            </div>
-            <p className="mt-2 text-xs text-white/30">
-              {completedBlocsCount === BLOCS_DATA.length
-                ? "Tous les blocs ont été marqués comme terminés."
-                : `${BLOCS_DATA.length - completedBlocsCount} bloc${BLOCS_DATA.length - completedBlocsCount > 1 ? "s" : ""} restant${BLOCS_DATA.length - completedBlocsCount > 1 ? "s" : ""}`}
-            </p>
-          </div>
         </header>
 
         {/* 2. Carte "Reprendre" (Resume Action) */}

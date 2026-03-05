@@ -241,7 +241,7 @@ export default function BlocPage() {
                       href={checkoutUrl}
                       className="group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]"
                     >
-                      🔒 Débloquer la méthode complète
+                      Débloquer la méthode complète
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                     </a>
                     <p className="text-center text-xs text-white/25 mt-4">
@@ -378,7 +378,10 @@ export default function BlocPage() {
                     <span>Bloc terminé · Annuler</span>
                   </>
                 ) : (
-                  <span>✅ Marquer ce bloc comme terminé</span>
+                  <>
+                    <Check className="w-5 h-5" strokeWidth={2} />
+                    <span>Marquer ce bloc comme terminé</span>
+                  </>
                 )}
               </button>
             </div>
