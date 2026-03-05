@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AlertCircle, MailCheck } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { createClient } from "@/lib/supabase/client";
@@ -149,6 +150,16 @@ export function LoginForm() {
               <div className="flex items-center gap-2 text-red-400 text-xs mt-1 animate-fade-in">
                 <AlertCircle className="w-3 h-3" />
                 <span>{errors.password}</span>
+              </div>
+            )}
+            {!isSignup && (
+              <div className="flex justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="text-[12px] text-white/30 hover:text-[#e8d5b0]/70 transition-colors duration-200"
+                >
+                  Mot de passe oublié ?
+                </Link>
               </div>
             )}
           </div>

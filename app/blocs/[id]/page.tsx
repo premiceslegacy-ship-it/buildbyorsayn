@@ -319,21 +319,28 @@ export default function BlocPage() {
                   }`}
               >
                 {hasNextBloc ? (
-                  <Link
-                    href={`/blocs/${nextBlocId}`}
+                  <LiquidButton
                     className="w-full sm:w-auto"
-                    onClick={() => { toggleBlocCompletion(Number(blocId)); }}
+                    size="xl"
+                    onClick={async () => {
+                      await toggleBlocCompletion(Number(blocId));
+                      router.refresh();
+                      router.push(`/blocs/${nextBlocId}`);
+                    }}
                   >
-                    <LiquidButton className="w-full sm:w-auto" size="xl">
-                      Valider le bloc et passer à la suite
-                    </LiquidButton>
-                  </Link>
+                    Valider le bloc et passer à la suite
+                  </LiquidButton>
                 ) : (
                   <LiquidButton
                     disabled={globalProgress === 100}
                     className="w-full sm:w-auto"
                     size="xl"
-                    onClick={() => { if (globalProgress !== 100) toggleBlocCompletion(Number(blocId)); }}
+                    onClick={async () => {
+                      if (globalProgress !== 100) {
+                        await toggleBlocCompletion(Number(blocId));
+                        router.refresh();
+                      }
+                    }}
                   >
                     {globalProgress === 100 ? "Redirection en cours..." : "Terminer le système"}
                   </LiquidButton>

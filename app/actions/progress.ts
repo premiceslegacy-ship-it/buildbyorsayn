@@ -37,9 +37,7 @@ export async function toggleBlocCompletion(
 
   if (error) return { success: false, completedBlocks: current };
 
-  revalidatePath("/dashboard", "layout");
-  revalidatePath("/admin", "page");
-  revalidatePath("/blocs", "layout");
+  revalidatePath("/", "layout");
 
   return { success: true, completedBlocks: updated };
 }
