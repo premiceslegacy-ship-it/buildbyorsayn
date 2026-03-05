@@ -125,7 +125,7 @@ export default function DashboardHub() {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
             >
-              {initials}
+              {initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
             </button>
 
             {isDropdownOpen && (

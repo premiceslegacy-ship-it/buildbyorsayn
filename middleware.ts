@@ -1,51 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
-    // Créer une réponse mutable pour que @supabase/ssr puisse rafraîchir les cookies
-    let response = NextResponse.next({
-        request: { headers: request.headers },
-    });
+    let supabaseResponse = NextResponse.next({ request });
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookies: {
-                get(name: string) {
-                    return request.cookies.get(name)?.value;
+                getAll() {
+                    return request.cookies.getAll();
                 },
-                set(name: string, value: string, options: CookieOptions) {
-                    request.cookies.set({ name, value, ...options } as any);
-                    response = NextResponse.next({
-                        request: { headers: request.headers },
-                    });
-                    response.cookies.set({ name, value, ...options } as any);
-                },
-                remove(name: string, options: CookieOptions) {
-                    request.cookies.set({ name, value: "", ...options } as any);
-                    response = NextResponse.next({
-                        request: { headers: request.headers },
-                    });
-                    response.cookies.set({ name, value: "", ...options } as any);
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value }) =>
+                        request.cookies.set(name, value)
+                    );
+                    supabaseResponse = NextResponse.next({ request });
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                        supabaseResponse.cookies.set(name, value, options)
+                    );
                 },
             },
         }
     );
 
-    // 1. Vérifier la session (authentification)
+    // IMPORTANT : ne pas écrire de logique entre createServerClient et getUser()
     const {
         data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-        // Non connecté → page de login
         const loginUrl = new URL("/login", request.url);
         return NextResponse.redirect(loginUrl);
     }
 
-    // 2. Vérifier has_paid uniquement pour les routes vraiment payantes
-    // /dashboard et /blocs/:path* sont accessibles à tous les utilisateurs connectés
+    // Vérifier has_paid uniquement pour les routes payantes
     const pathname = request.nextUrl.pathname;
     const requiresPayment =
         pathname === "/sources" ||
@@ -65,7 +55,8 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    return response;
+    // IMPORTANT : toujours retourner supabaseResponse pour propager les cookies
+    return supabaseResponse;
 }
 
 export const config = {

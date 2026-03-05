@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
@@ -35,5 +36,10 @@ export async function toggleBlocCompletion(
     .eq("id", user.id);
 
   if (error) return { success: false, completedBlocks: current };
+
+  revalidatePath("/dashboard", "layout");
+  revalidatePath("/admin", "page");
+  revalidatePath("/blocs", "layout");
+
   return { success: true, completedBlocks: updated };
 }
