@@ -36,6 +36,7 @@ export default function DashboardHub() {
   const [initials, setInitials] = useState("?");
   const [hasPaid, setHasPaid] = useState<boolean>(false);
   const [communityLink, setCommunityLink] = useState<string | null>(null);
+  const [completedBlocsCount, setCompletedBlocsCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -55,10 +56,10 @@ export default function DashboardHub() {
       setDisplayEmail(email);
       setInitials(firstName.substring(0, 2).toUpperCase());
 
-      // Récupérer has_paid depuis la table profiles
+      // Récupérer has_paid et completed_blocks depuis la table profiles
       const { data: profile } = await supabase
         .from("profiles")
-        .select("has_paid")
+        .select("has_paid, completed_blocks")
         .eq("id", user.id)
         .single();
       if (profile?.has_paid === true) {
@@ -66,6 +67,7 @@ export default function DashboardHub() {
         const link = await getCommunityLink();
         setCommunityLink(link);
       }
+      setCompletedBlocsCount((profile?.completed_blocks ?? []).length);
     };
     fetchUser();
   }, [router]);
@@ -155,6 +157,27 @@ export default function DashboardHub() {
               className="bg-gradient-to-r from-[#e8d5b0]/60 to-[#e8d5b0] h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_12px_rgba(232,213,176,0.3)]"
               style={{ width: `${displayProgress}%` }}
             />
+          </div>
+
+          {/* Blocs terminés */}
+          <div className="w-full max-w-2xl mt-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-white/50">Blocs terminés</span>
+              <span className="text-sm font-medium text-emerald-400">
+                {completedBlocsCount} / {BLOCS_DATA.length}
+              </span>
+            </div>
+            <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-emerald-500/60 to-emerald-400 h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_12px_rgba(52,211,153,0.3)]"
+                style={{ width: `${(completedBlocsCount / BLOCS_DATA.length) * 100}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-white/30">
+              {completedBlocsCount === BLOCS_DATA.length
+                ? "Tous les blocs ont été marqués comme terminés."
+                : `${BLOCS_DATA.length - completedBlocsCount} bloc${BLOCS_DATA.length - completedBlocsCount > 1 ? "s" : ""} restant${BLOCS_DATA.length - completedBlocsCount > 1 ? "s" : ""}`}
+            </p>
           </div>
         </header>
 
