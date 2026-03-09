@@ -141,10 +141,9 @@ export default function BlocPage() {
   const nextBlocId = String(Number(blocId) + 1);
   const hasNextBloc = BLOCS_DATA.some((b) => b.id === nextBlocId);
 
-  const LEMON_URL = "https://buildbyorsayn.lemonsqueezy.com/checkout/buy/a314765a-b572-4f72-a1a7-19aeb93899c0";
   const checkoutUrl = checkoutUserId
-    ? `${LEMON_URL}?checkout[custom][user_id]=${checkoutUserId}`
-    : LEMON_URL;
+    ? `https://buy.stripe.com/dRm28s2lo59vdRyaqc5AQ01?client_reference_id=${checkoutUserId}`
+    : "https://buy.stripe.com/dRm28s2lo59vdRyaqc5AQ01";
   const blocIdNum = Number(blocId);
   const showPaywall = hasPaid === false && blocIdNum > 1;
   const showContent = hasPaid === true || blocIdNum === 1;
@@ -228,7 +227,7 @@ export default function BlocPage() {
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                     </a>
                     <p className="text-center text-xs text-white/25 mt-4">
-                      Paiement sécurisé via Lemon Squeezy · Satisfait ou remboursé 30 jours
+                      Paiement sécurisé via Stripe · Satisfait ou remboursé 30 jours
                     </p>
                   </div>
                 </div>
