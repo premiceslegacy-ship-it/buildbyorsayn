@@ -3,8 +3,7 @@ import { Logo } from "@/components/Logo";
 import { ArrowRight, Lock, Zap, Layers, Users } from "lucide-react";
 import { BetaCodeForm } from "./BetaCodeForm";
 
-// 🔗 Remplace cette URL par ton vrai lien produit Lemon Squeezy
-const LEMON_SQUEEZY_BASE_URL = "https://buildbyorsayn.lemonsqueezy.com/checkout/buy/a314765a-b572-4f72-a1a7-19aeb93899c0";
+const STRIPE_BASE_URL = "https://buy.stripe.com/dRm28s2lo59vdRyaqc5AQ01";
 
 const FEATURES = [
     { icon: Layers, label: "6 blocs de système complets" },
@@ -18,11 +17,9 @@ export default async function CheckoutPage() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Construction de l'URL de checkout avec le user_id en paramètre custom
-    let checkoutUrl = LEMON_SQUEEZY_BASE_URL;
-    if (user?.id) {
-        checkoutUrl += `?checkout[custom][user_id]=${user.id}`;
-    }
+    const checkoutUrl = user?.id
+        ? `${STRIPE_BASE_URL}?client_reference_id=${user.id}`
+        : STRIPE_BASE_URL;
 
     return (
         <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans flex flex-col items-center justify-center relative overflow-hidden px-6">
@@ -89,7 +86,7 @@ export default async function CheckoutPage() {
                     </a>
 
                     <p className="text-center text-xs text-white/25 mt-4">
-                        Paiement sécurisé via Lemon Squeezy · Satisfait ou remboursé 30 jours
+                        Paiement sécurisé via Stripe · Satisfait ou remboursé 30 jours
                     </p>
 
                     <BetaCodeForm />

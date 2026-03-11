@@ -166,7 +166,7 @@ export default function BlocPage() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-16 items-start">
-          <div className="flex-1 w-full max-w-3xl">
+          <div className={showPaywall ? "w-full max-w-3xl mx-auto" : "flex-1 w-full max-w-3xl"}>
             <h1 className="text-4xl md:text-5xl font-bold mb-16 tracking-tight text-[#f0ede8]">
               {bloc.titre}
             </h1>
@@ -210,10 +210,10 @@ export default function BlocPage() {
                       <Lock className="w-7 h-7 text-[#e8d5b0]" />
                     </div>
                     <h2 className="text-2xl font-bold text-[#f0ede8] mb-3 tracking-tight">
-                      Méthode complète
+                      Le système pour construire ton business
                     </h2>
                     <p className="text-white/50 text-sm mb-6 leading-relaxed">
-                      Débloque les 6 blocs de la méthode, la communauté privée, et toutes les mises à jour à vie.
+                      6 méthodes complètes pour créer, vendre et scaler. Communauté privée de builders actifs + toutes les mises à jour à vie incluses.
                     </p>
                     <div className="flex items-baseline justify-center gap-2 mb-8">
                       <span className="text-3xl font-bold text-[#e8d5b0]">67€</span>
@@ -223,7 +223,7 @@ export default function BlocPage() {
                       href={checkoutUrl}
                       className="group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]"
                     >
-                      Débloquer la méthode complète
+                      Je veux le système complet
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                     </a>
                     <p className="text-center text-xs text-white/25 mt-4">
