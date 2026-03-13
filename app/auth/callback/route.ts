@@ -3,10 +3,48 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Allowed redirect paths after auth callback (prevents open redirect)
+const ALLOWED_REDIRECT_PREFIXES = [
+  "/dashboard",
+  "/update-password",
+  "/blocs",
+  "/sources",
+  "/fin",
+  "/intro",
+  "/admin",
+  "/checkout",
+];
+
+function sanitizeRedirectPath(rawPath: string): string {
+  // Default fallback
+  const fallback = "/dashboard";
+
+  // Block protocol-relative URLs (//evil.com), absolute URLs (http://), and empty strings
+  if (
+    !rawPath ||
+    !rawPath.startsWith("/") ||
+    rawPath.startsWith("//") ||
+    rawPath.includes("://") ||
+    rawPath.includes("\\")
+  ) {
+    return fallback;
+  }
+
+  // Only allow paths that match our known route prefixes
+  const isAllowed = ALLOWED_REDIRECT_PREFIXES.some((prefix) =>
+    rawPath.startsWith(prefix)
+  );
+
+  return isAllowed ? rawPath : fallback;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const rawNext = searchParams.get("next") ?? "/dashboard";
+
+  // Sanitize the redirect target to prevent open redirect attacks
+  const next = sanitizeRedirectPath(rawNext);
 
   if (code) {
     const cookieStore = cookies();
@@ -21,7 +59,12 @@ export async function GET(request: NextRequest) {
           setAll(cookiesToSet) {
             try {
               cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
+                cookieStore.set(name, value, {
+                  ...options,
+                  secure: true,
+                  sameSite: "lax",
+                  httpOnly: true,
+                })
               );
             } catch {}
           },

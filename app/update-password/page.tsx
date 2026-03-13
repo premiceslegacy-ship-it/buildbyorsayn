@@ -24,6 +24,18 @@ export default function UpdatePasswordPage() {
       setError("Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
+    if (!/[A-Z]/.test(password)) {
+      setError("Le mot de passe doit contenir au moins une majuscule.");
+      return;
+    }
+    if (!/[a-z]/.test(password)) {
+      setError("Le mot de passe doit contenir au moins une minuscule.");
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setError("Le mot de passe doit contenir au moins un chiffre.");
+      return;
+    }
     setError("");
     setIsLoading(true);
 

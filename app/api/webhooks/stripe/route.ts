@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err) {
-    console.error("Stripe webhook signature verification failed:", err);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    console.error("Webhook verification failed");
+    return NextResponse.json({ error: "Verification failed" }, { status: 400 });
   }
 
   if (event.type === "checkout.session.completed") {
@@ -41,8 +41,8 @@ export async function POST(req: NextRequest) {
         .eq("id", userId);
 
       if (error) {
-        console.error("Supabase update error:", error);
-        return NextResponse.json({ error: "Database update failed" }, { status: 500 });
+        console.error("Profile update failed for session:", session.id);
+        return NextResponse.json({ error: "Processing failed" }, { status: 500 });
       }
 
       revalidatePath("/", "layout");

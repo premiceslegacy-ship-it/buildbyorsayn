@@ -14,7 +14,17 @@ export async function redeemBetaCode(
 ): Promise<BetaCodeState> {
     const code = (formData.get("beta_code") as string)?.trim();
 
-    if (!code || code !== process.env.BETA_ACCESS_CODE) {
+    // Input validation: reject empty, too-long, or non-string inputs
+    if (!code || typeof code !== "string" || code.length > 100) {
+        return { error: "Code invalide. Vérifie et réessaie." };
+    }
+
+    // Constant-time comparison to prevent timing attacks
+    const expectedCode = process.env.BETA_ACCESS_CODE ?? "";
+    if (
+        code.length !== expectedCode.length ||
+        !timingSafeEqual(code, expectedCode)
+    ) {
         return { error: "Code invalide. Vérifie et réessaie." };
     }
 
@@ -41,4 +51,17 @@ export async function redeemBetaCode(
     }
 
     redirect("/dashboard");
+}
+
+/**
+ * Constant-time string comparison to prevent timing attacks.
+ * Both strings must be the same length (check before calling).
+ */
+function timingSafeEqual(a: string, b: string): boolean {
+    if (a.length !== b.length) return false;
+    let result = 0;
+    for (let i = 0; i < a.length; i++) {
+        result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    }
+    return result === 0;
 }

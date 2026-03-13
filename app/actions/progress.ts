@@ -7,6 +7,16 @@ import { createClient } from "@/lib/supabase/server";
 export async function toggleBlocCompletion(
   blocId: number
 ): Promise<{ success: boolean; completedBlocks: number[] }> {
+  // Input validation: blocId must be a positive integer within expected range
+  if (
+    typeof blocId !== "number" ||
+    !Number.isInteger(blocId) ||
+    blocId < 1 ||
+    blocId > 1000
+  ) {
+    return { success: false, completedBlocks: [] };
+  }
+
   const supabase = createClient();
   const {
     data: { user },

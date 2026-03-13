@@ -38,9 +38,20 @@ export function LoginForm() {
     if (!password) {
       newErrors.password = "Le code d'accès est manquant.";
       hasError = true;
-    } else if (isSignup && password.length < 8) {
-      newErrors.password = "Le mot de passe doit contenir au moins 8 caractères.";
-      hasError = true;
+    } else if (isSignup) {
+      if (password.length < 8) {
+        newErrors.password = "Le mot de passe doit contenir au moins 8 caractères.";
+        hasError = true;
+      } else if (!/[A-Z]/.test(password)) {
+        newErrors.password = "Le mot de passe doit contenir au moins une majuscule.";
+        hasError = true;
+      } else if (!/[a-z]/.test(password)) {
+        newErrors.password = "Le mot de passe doit contenir au moins une minuscule.";
+        hasError = true;
+      } else if (!/[0-9]/.test(password)) {
+        newErrors.password = "Le mot de passe doit contenir au moins un chiffre.";
+        hasError = true;
+      }
     }
 
     setErrors(newErrors);
