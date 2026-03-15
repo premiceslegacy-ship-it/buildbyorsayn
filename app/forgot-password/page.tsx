@@ -38,8 +38,8 @@ export default function ForgotPasswordPage() {
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otp || otp.length !== 6) {
-      setError("Saisis le code à 6 chiffres reçu par email.");
+    if (!otp || otp.length !== 8) {
+      setError("Saisis le code à 8 chiffres reçu par email.");
       return;
     }
     setError("");
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
               <p className="text-[13px] text-white/40 leading-relaxed">
                 {step === "email"
                   ? "Saisis ton email pour recevoir un code de vérification."
-                  : `Un code à 6 chiffres a été envoyé à ${email}.`}
+                  : `Un code à 8 chiffres a été envoyé à ${email}.`}
               </p>
             </div>
 
@@ -130,10 +130,10 @@ export default function ForgotPasswordPage() {
                     type="text"
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    maxLength={6}
+                    maxLength={8}
                     autoComplete="one-time-code"
                     value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 8))}
                     placeholder="123456"
                     className={`w-full bg-transparent border rounded-[10px] px-4 py-3 text-[20px] text-[#f0ede8] placeholder:text-[#f0ede8]/20 focus:outline-none transition-colors duration-200 tracking-[0.4em] text-center font-mono ${
                       error
