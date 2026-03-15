@@ -18,7 +18,30 @@ type Profile = {
 
 type EnrichedUser = Profile & {
   email: string;
+  lastSignIn: string | null;
 };
+
+function formatLastSeen(dateStr: string | null): { label: string; style: "online" | "never" | "default" } {
+  if (!dateStr) return { label: "Jamais connecté", style: "never" };
+
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const s = Math.floor(diffMs / 1000);
+  const m = Math.floor(s / 60);
+  const h = Math.floor(m / 60);
+  const d = Math.floor(h / 24);
+  const w = Math.floor(d / 7);
+  const mo = Math.floor(d / 30);
+
+  if (s < 60)  return { label: "En ligne",           style: "online" };
+  if (m < 60)  return { label: `Il y a ${m} min`,    style: "default" };
+  if (h < 24)  return { label: `Il y a ${h}h`,       style: "default" };
+  if (d === 1) return { label: "Hier",                style: "default" };
+  if (d < 7)   return { label: `Il y a ${d} jours`,  style: "default" };
+  if (w === 1) return { label: "Il y a 1 semaine",   style: "default" };
+  if (w < 4)   return { label: `Il y a ${w} sem.`,   style: "default" };
+  if (mo === 1)return { label: "Il y a 1 mois",      style: "default" };
+  return         { label: `Il y a ${mo} mois`,       style: "default" };
+}
 
 export default async function AdminPage() {
   // ── 1. Vérification identité ──────────────────────────────────────────────
@@ -45,10 +68,14 @@ export default async function AdminPage() {
   const emailMap = new Map<string, string>(
     (authData?.users ?? []).map((u) => [u.id, u.email ?? "—"])
   );
+  const lastSignInMap = new Map<string, string | null>(
+    (authData?.users ?? []).map((u) => [u.id, u.last_sign_in_at ?? null])
+  );
 
   const users: EnrichedUser[] = (profiles ?? []).map((p: Profile) => ({
     ...p,
     email: emailMap.get(p.id) ?? p.id,
+    lastSignIn: lastSignInMap.get(p.id) ?? null,
   }));
 
   const paidCount = users.filter((u) => u.has_paid).length;
@@ -125,6 +152,9 @@ export default async function AdminPage() {
                     Statut
                   </th>
                   <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
+                    Dernière connexion
+                  </th>
+                  <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
                     Blocs terminés
                   </th>
                   <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold text-right">
@@ -136,6 +166,7 @@ export default async function AdminPage() {
                 {users.map((u, i) => {
                   const blocks = u.completed_blocks ?? [];
                   const pct = Math.round((blocks.length / 7) * 100);
+                  const seen = formatLastSeen(u.lastSignIn);
                   return (
                     <tr
                       key={u.id}
@@ -164,6 +195,20 @@ export default async function AdminPage() {
                           />
                           {u.has_paid ? "Payant" : "Gratuit"}
                         </span>
+                      </td>
+
+                      {/* Dernière connexion */}
+                      <td className="px-5 py-4">
+                        {seen.style === "online" ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                            En ligne
+                          </span>
+                        ) : seen.style === "never" ? (
+                          <span className="text-white/25 text-[13px]">—</span>
+                        ) : (
+                          <span className="text-white/40 text-[13px]">{seen.label}</span>
+                        )}
                       </td>
 
                       {/* Blocs chips */}
@@ -208,7 +253,7 @@ export default async function AdminPage() {
                 {users.length === 0 && (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={5}
                       className="px-5 py-10 text-center text-white/30 text-sm"
                     >
                       Aucun utilisateur trouvé.
