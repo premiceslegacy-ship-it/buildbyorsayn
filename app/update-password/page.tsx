@@ -43,7 +43,7 @@ export default function UpdatePasswordPage() {
     const { error: updateError } = await supabase.auth.updateUser({ password });
 
     if (updateError) {
-      setError("Une erreur est survenue. Le lien est peut-être expiré.");
+      setError("Une erreur est survenue. Le code est peut-être expiré, recommence depuis le début.");
       setIsLoading(false);
       return;
     }

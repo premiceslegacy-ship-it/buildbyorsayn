@@ -2,19 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MailCheck, AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { createClient } from "@/lib/supabase/client";
 
+type Step = "email" | "otp";
+
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState<Step>("email");
   const [isLoading, setIsLoading] = useState(false);
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
       setError("Renseigne ton adresse email.");
@@ -24,13 +29,36 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     const supabase = createClient();
-    await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/update-password`,
-    });
+    await supabase.auth.resetPasswordForEmail(email);
 
     // Ne jamais confirmer si le compte existe (sécurité)
     setIsLoading(false);
-    setSent(true);
+    setStep("otp");
+  };
+
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp || otp.length !== 6) {
+      setError("Saisis le code à 6 chiffres reçu par email.");
+      return;
+    }
+    setError("");
+    setIsLoading(true);
+
+    const supabase = createClient();
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email,
+      token: otp,
+      type: "recovery",
+    });
+
+    if (verifyError) {
+      setError("Code invalide ou expiré. Vérifie ton email et réessaie.");
+      setIsLoading(false);
+      return;
+    }
+
+    router.push("/update-password");
   };
 
   return (
@@ -49,21 +77,14 @@ export default function ForgotPasswordPage() {
                 Mot de passe oublié
               </h1>
               <p className="text-[13px] text-white/40 leading-relaxed">
-                Saisis ton email pour recevoir un lien de réinitialisation.
+                {step === "email"
+                  ? "Saisis ton email pour recevoir un code de vérification."
+                  : `Un code à 6 chiffres a été envoyé à ${email}.`}
               </p>
             </div>
 
-            {sent ? (
-              <div className="flex flex-col items-center gap-4 py-4 text-center">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <MailCheck className="w-5 h-5 text-emerald-400" />
-                </div>
-                <p className="text-[14px] text-white/70 leading-relaxed">
-                  Si ce compte existe, un lien vous a été envoyé.
-                </p>
-              </div>
-            ) : (
-              <form className="flex flex-col space-y-6" onSubmit={handleSubmit} noValidate>
+            {step === "email" ? (
+              <form className="flex flex-col space-y-6" onSubmit={handleEmailSubmit} noValidate>
                 <div className="flex flex-col space-y-2">
                   <label
                     htmlFor="email"
@@ -92,8 +113,53 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 <LiquidButton type="submit" className="w-full" size="xl" disabled={isLoading}>
-                  {isLoading ? "Envoi en cours…" : "Envoyer le lien"}
+                  {isLoading ? "Envoi en cours…" : "Envoyer le code"}
                 </LiquidButton>
+              </form>
+            ) : (
+              <form className="flex flex-col space-y-6" onSubmit={handleOtpSubmit} noValidate>
+                <div className="flex flex-col space-y-2">
+                  <label
+                    htmlFor="otp"
+                    className="text-[13px] text-[#f0ede8]/60 uppercase tracking-[0.06em] font-medium"
+                  >
+                    Code de vérification
+                  </label>
+                  <input
+                    id="otp"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    autoComplete="one-time-code"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    placeholder="123456"
+                    className={`w-full bg-transparent border rounded-[10px] px-4 py-3 text-[20px] text-[#f0ede8] placeholder:text-[#f0ede8]/20 focus:outline-none transition-colors duration-200 tracking-[0.4em] text-center font-mono ${
+                      error
+                        ? "border-red-500/50 focus:border-red-500/80"
+                        : "border-white/10 focus:border-[#e8d5b0]/40"
+                    }`}
+                  />
+                  {error && (
+                    <div className="flex items-center gap-2 text-red-400 text-xs mt-1">
+                      <AlertCircle className="w-3 h-3" />
+                      <span>{error}</span>
+                    </div>
+                  )}
+                </div>
+
+                <LiquidButton type="submit" className="w-full" size="xl" disabled={isLoading}>
+                  {isLoading ? "Vérification…" : "Vérifier le code"}
+                </LiquidButton>
+
+                <button
+                  type="button"
+                  onClick={() => { setStep("email"); setError(""); setOtp(""); }}
+                  className="text-center text-[13px] text-white/30 hover:text-white/60 transition-colors duration-200"
+                >
+                  Renvoyer le code
+                </button>
               </form>
             )}
 
