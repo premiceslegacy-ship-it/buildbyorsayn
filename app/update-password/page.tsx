@@ -43,11 +43,20 @@ export default function UpdatePasswordPage() {
     const { error: updateError } = await supabase.auth.updateUser({ password });
 
     if (updateError) {
-      setError("Une erreur est survenue. Le code est peut-être expiré, recommence depuis le début.");
+      const isSamePassword =
+        updateError.message.includes("same_password") ||
+        updateError.message.includes("different from the old password");
+      setError(
+        isSamePassword
+          ? "Ce mot de passe est identique à l'ancien. Choisis un mot de passe différent."
+          : "Une erreur est survenue. Le code est peut-être expiré, recommence depuis le début."
+      );
       setIsLoading(false);
       return;
     }
 
+    // Refresh pour que le middleware voit la nouvelle session avant la redirection
+    router.refresh();
     router.push("/dashboard");
   };
 
