@@ -101,6 +101,7 @@ export function LoginForm() {
         }
       }
 
+      router.refresh();
       router.push("/dashboard");
     } catch {
       setErrors((prev) => ({

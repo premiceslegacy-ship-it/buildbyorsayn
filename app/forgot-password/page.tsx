@@ -58,6 +58,7 @@ export default function ForgotPasswordPage() {
       return;
     }
 
+    router.refresh();
     router.push("/update-password");
   };
 
