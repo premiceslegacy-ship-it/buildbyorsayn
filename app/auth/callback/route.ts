@@ -66,7 +66,9 @@ export async function GET(request: NextRequest) {
                   httpOnly: true,
                 })
               );
-            } catch {}
+            } catch (err) {
+              console.warn("[auth/callback] setAll failed:", err);
+            }
           },
         },
       }
@@ -76,6 +78,7 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
+    console.error("[auth/callback] exchangeCodeForSession failed:", error.message);
   }
 
   return NextResponse.redirect(`${origin}/login?error=lien_invalide_ou_expire`);

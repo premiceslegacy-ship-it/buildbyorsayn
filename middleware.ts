@@ -11,6 +11,32 @@ const SECURITY_HEADERS: Record<string, string> = {
     "Cross-Origin-Opener-Policy": "same-origin",
 };
 
+/**
+ * Crée une réponse redirect en copiant les cookies Supabase depuis supabaseResponse.
+ * Critique : quand getUser() échoue sur une session expirée, Supabase appelle setAll()
+ * pour nettoyer les tokens. Si on retourne un redirect sans ces cookies, le navigateur
+ * garde les vieux tokens indéfiniment → l'utilisateur est bloqué définitivement.
+ */
+function createRedirectWithCookies(
+    url: URL,
+    supabaseResponse: NextResponse,
+    headers: Record<string, string>
+): NextResponse {
+    const response = NextResponse.redirect(url);
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+        response.cookies.set(cookie.name, cookie.value, {
+            secure: true,
+            sameSite: "lax",
+            httpOnly: true,
+            path: "/",
+        });
+    });
+    Object.entries(headers).forEach(([key, value]) => {
+        response.headers.set(key, value);
+    });
+    return response;
+}
+
 export async function middleware(request: NextRequest) {
     let supabaseResponse = NextResponse.next({ request });
 
@@ -47,12 +73,7 @@ export async function middleware(request: NextRequest) {
 
     if (!user) {
         const loginUrl = new URL("/login", request.url);
-        const response = NextResponse.redirect(loginUrl);
-        // Apply security headers to redirect responses too
-        Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-            response.headers.set(key, value);
-        });
-        return response;
+        return createRedirectWithCookies(loginUrl, supabaseResponse, SECURITY_HEADERS);
     }
 
     // Vérifier has_paid uniquement pour les routes payantes
@@ -72,11 +93,7 @@ export async function middleware(request: NextRequest) {
 
         if (!profile || profile.has_paid !== true) {
             const checkoutUrl = new URL("/checkout", request.url);
-            const response = NextResponse.redirect(checkoutUrl);
-            Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-                response.headers.set(key, value);
-            });
-            return response;
+            return createRedirectWithCookies(checkoutUrl, supabaseResponse, SECURITY_HEADERS);
         }
     }
 

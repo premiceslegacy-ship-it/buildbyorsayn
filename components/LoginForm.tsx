@@ -87,6 +87,8 @@ export function LoginForm() {
           return;
         }
       } else {
+        // Nettoyer toute session stale avant de tenter la connexion
+        await supabase.auth.signOut({ scope: "local" });
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
           const msg =
@@ -101,8 +103,9 @@ export function LoginForm() {
         }
       }
 
-      router.refresh();
-      router.push("/dashboard");
+      // Navigation complète pour garantir que les cookies sont envoyés au serveur
+      window.location.href = "/dashboard";
+      return;
     } catch {
       setErrors((prev) => ({
         ...prev,
