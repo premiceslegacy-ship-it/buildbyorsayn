@@ -142,8 +142,8 @@ export default function BlocPage() {
   const hasNextBloc = BLOCS_DATA.some((b) => b.id === nextBlocId);
 
   const checkoutUrl = checkoutUserId
-    ? `https://buy.stripe.com/dRm28s2lo59vdRyaqc5AQ01?client_reference_id=${checkoutUserId}`
-    : "https://buy.stripe.com/dRm28s2lo59vdRyaqc5AQ01";
+    ? `https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02?client_reference_id=${checkoutUserId}`
+    : "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02";
   const blocIdNum = Number(blocId);
   const showPaywall = hasPaid === false && blocIdNum > 1;
   const showContent = hasPaid === true || blocIdNum === 1;
@@ -216,7 +216,7 @@ export default function BlocPage() {
                       6 méthodes complètes pour créer, vendre et scaler. Communauté privée de builders actifs + toutes les mises à jour à vie incluses.
                     </p>
                     <div className="flex items-baseline justify-center gap-2 mb-8">
-                      <span className="text-3xl font-bold text-[#e8d5b0]">67€</span>
+                      <span className="text-3xl font-bold text-[#e8d5b0]">100€</span>
                       <span className="text-white/40 text-sm">· accès à vie</span>
                     </div>
                     <a

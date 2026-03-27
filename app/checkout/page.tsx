@@ -3,7 +3,7 @@ import { Logo } from "@/components/Logo";
 import { ArrowRight, Lock, Zap, Layers, Users } from "lucide-react";
 import { BetaCodeForm } from "./BetaCodeForm";
 
-const STRIPE_BASE_URL = "https://buy.stripe.com/dRm28s2lo59vdRyaqc5AQ01";
+const STRIPE_BASE_URL = "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02";
 
 const FEATURES = [
     { icon: Layers, label: "6 blocs de système complets" },
@@ -72,7 +72,7 @@ export default async function CheckoutPage() {
                     <div className="flex items-baseline justify-between mb-6">
                         <span className="text-white/40 text-sm">Accès à vie</span>
                         <div className="flex items-baseline gap-1">
-                            <span className="text-3xl font-bold text-[#f0ede8]">67€</span>
+                            <span className="text-3xl font-bold text-[#f0ede8]">100€</span>
                             <span className="text-white/40 text-sm">TTC</span>
                         </div>
                     </div>
