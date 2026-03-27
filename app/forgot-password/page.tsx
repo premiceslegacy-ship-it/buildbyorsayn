@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
@@ -12,7 +11,6 @@ import { createClient } from "@/lib/supabase/client";
 type Step = "email" | "otp";
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<Step>("email");
@@ -58,8 +56,7 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    router.refresh();
-    router.push("/update-password");
+    window.location.href = "/update-password";
   };
 
   return (

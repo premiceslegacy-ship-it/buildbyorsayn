@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
@@ -9,7 +8,6 @@ import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { createClient } from "@/lib/supabase/client";
 
 export default function UpdatePasswordPage() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,8 +54,7 @@ export default function UpdatePasswordPage() {
     }
 
     // Refresh pour que le middleware voit la nouvelle session avant la redirection
-    router.refresh();
-    router.push("/dashboard");
+    window.location.href = "/dashboard";
   };
 
   return (
