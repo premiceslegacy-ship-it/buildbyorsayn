@@ -259,6 +259,14 @@ export default function BlocPage() {
                       ));
                     });
                   })()}
+                  {"skillContent" in section && Array.isArray((section as { skillContent?: { title: string; raw: string }[] }).skillContent) &&
+                    (section as { skillContent: { title: string; raw: string }[] }).skillContent.map((skill, idx) => (
+                      <div key={idx} className="space-y-3 pt-2">
+                        <p className="text-[15px] font-semibold text-[#e8d5b0] tracking-tight">{skill.title}</p>
+                        <CodeBlock code={skill.raw} />
+                      </div>
+                    ))
+                  }
 
                   <div className="pt-6 mt-6 border-t border-white/5">
                     <button
