@@ -1000,47 +1000,42 @@ export const BLOCS_DATA = [
         title: "L'orientation client",
         content:
           "C'est le point que la plupart des gens dans le business IA ratent complètement. Ils construisent ce qu'ils trouvent cool, ce qui impressionne leurs pairs, ce qui leur permet de montrer une démo sympa sur LinkedIn. Et leur client s'en fout.\n\n" +
-          "La vérité : ton client ne paie pas pour ta technique. Il paie pour résoudre un problème qui lui coûte du temps, de l'argent, ou de la crédibilité. Ton job, c'est de comprendre ce problème mieux qu'il ne le comprend lui-même, et d'y répondre exactement. Pas d'y répondre avec la solution que tu avais envie de construire.\n\n" +
-          "L'ego dans ce business se manifeste de quatre façons : tu choisis la stack la plus complexe parce qu'elle t'intéresse, pas parce qu'elle est la plus adaptée au problème. Tu ajoutes des fonctionnalités que le client n'a pas demandées parce que tu trouves ça élégant. Tu livres un design qui t'impressionne toi, pas un design qui convertit pour lui. Tu défends tes choix en réunion au lieu d'écouter ce que le client te dit sur ses utilisateurs réels.\n\n" +
-          "Chaque fois que tu fais ça, tu travailles pour toi et tu factures le client pour ça. C'est une erreur qui se paie tôt ou tard : soit il ne recommande pas, soit il ne renouvelle pas, soit il demande des corrections que tu n'avais pas anticipées parce que tu n'avais pas écouté.\n\n" +
-          "Avant de toucher un outil, passe du temps à comprendre trois choses : son problème exact formulé dans ses mots à lui. Le contexte dans lequel ce problème se présente, quand, pour qui, avec quelles conséquences. Et ce qu'il considère comme un succès, pas ce que toi tu considères comme un bon livrable.\n\n" +
-          "Les questions ouvertes qui valent dix fois plus que toute la veille technique : \"Montre-moi comment tu travailles aujourd'hui.\" \"Qu'est-ce qui t'a fait perdre le plus de temps la semaine dernière ?\" \"Si dans six mois ce projet est un succès, qu'est-ce qui s'est passé ?\" Tu poses ces questions, tu écoutes vraiment, et tu construis la réponse à ce que tu entends.\n\n" +
-          "L'analyse des comportements consommateurs. PostHog te dit comment les gens utilisent vraiment ce que tu as construit. Pas comment tu pensais qu'ils allaient l'utiliser, comment ils l'utilisent réellement. Les session recordings montrent où ils cliquent, où ils s'arrêtent, où ils abandonnent. C'est de la recherche utilisateur en temps réel et gratuite jusqu'à un million d'événements.\n\n" +
-          "Quand un utilisateur abandonne à la troisième étape de l'onboarding, il ne t'envoie pas un email pour te l'expliquer. PostHog te le montre. Pour les SaaS et les applications, surveiller ces données en continu n'est pas optionnel. Un taux d'activation qui baisse veut dire que l'onboarding casse. Un taux de churn qui monte veut dire que la valeur n'est pas délivrée. Les données te parlent si tu les écoutes.\n\n" +
-          "La règle qui résume tout : construis ce que le client doit avoir pour résoudre son problème. Pas ce que tu aurais envie de construire si c'était ton produit.",
+          "La vérité : mon client ne paie pas pour ma technique. Il paie pour résoudre un problème qui lui coûte du temps, de l'argent, ou de la crédibilité. Mon job, c'est de comprendre ce problème mieux qu'il ne le comprend lui-même, et d'y répondre exactement. Pas d'y répondre avec la solution que j'avais envie de construire.\n\n" +
+          "L'ego dans ce business se manifeste de quatre façons : choisir la stack la plus complexe parce qu'elle m'intéresse, pas parce qu'elle est la plus adaptée au problème. Ajouter des fonctionnalités que le client n'a pas demandées parce que je trouve ça élégant. Livrer un design qui m'impressionne moi, pas un design qui convertit pour lui. Défendre mes choix en réunion au lieu d'écouter ce que le client me dit sur ses utilisateurs réels.\n\n" +
+          "Chaque fois que je fais ça, je travaille pour moi et je facture le client pour ça. C'est une erreur qui se paie tôt ou tard : soit il ne recommande pas, soit il ne renouvelle pas, soit il demande des corrections que je n'avais pas anticipées parce que je n'avais pas écouté.\n\n" +
+          "Avant de toucher un outil, je passe du temps à comprendre trois choses : son problème exact formulé dans ses mots à lui. Le contexte dans lequel ce problème se présente, quand, pour qui, avec quelles conséquences. Et ce qu'il considère comme un succès, pas ce que moi je considère comme un bon livrable.\n\n" +
+          "Les questions ouvertes qui valent dix fois plus que toute la veille technique : \"Montre-moi comment tu travailles aujourd'hui.\" \"Qu'est-ce qui t'a fait perdre le plus de temps la semaine dernière ?\" \"Si dans six mois ce projet est un succès, qu'est-ce qui s'est passé ?\" Je pose ces questions, j'écoute vraiment, et je construis la réponse à ce que j'entends.\n\n" +
+          "La règle qui résume tout : construire ce que le client doit avoir pour résoudre son problème. Pas ce que j'aurais envie de construire si c'était mon produit.",
       },
       {
         id: "b5-s2",
-        title: "Le BMAD et les métriques SaaS",
+        title: "La vente d'abord, toujours",
         content:
-          "Le PRD (Product Requirements Document) : le document de référence qui décrit ce que le produit doit faire, pour qui, et pourquoi. Pas comment le construire techniquement, ce qu'il doit accomplir du point de vue utilisateur et business.\n\n" +
-          "Pourquoi c'est essentiel avec l'IA : sans PRD, chaque session IA part dans une direction différente selon comment tu formules ta demande. Avec un PRD chargé dans ton environnement, l'IA opère avec une vision claire et cohérente du produit sur toute la durée du projet. Elle prend des décisions qui vont dans le même sens. Quand l'IA propose quelque chose qui sort de ce cadre, elle peut s'auto-corriger parce qu'elle a le PRD comme référence.\n\n" +
-          "Le BMAD, Breakthrough Method for Agile AI Development : une méthode de développement IA structurée en rôles spécialisés. Au lieu d'une seule IA généraliste qui fait tout, tu organises le travail en agents distincts, chacun avec une expertise et des responsabilités précises. L'Analyste fait la recherche et clarifie le problème. Le Product Manager rédige le PRD. L'Architecte conçoit la structure technique. Le Développeur implémente. Le QA valide.\n\n" +
-          "Pourquoi ça change la qualité du résultat : quand tu demandes à une seule IA de tout faire en une session, elle prend des raccourcis et invente des détails pour combler les zones floues. Quand tu sépares les rôles et que chaque agent reçoit le livrable du précédent comme input, chaque étape est plus rigoureuse. La séparation des rôles élimine les zones grises.\n\n" +
-          "Comment l'appliquer concrètement. Étape 1, projet Claude en mode Analyste : \"Tu es un analyste produit senior. Voici le brief client. Pose-moi les questions qui manquent pour que le problème soit parfaitement clair avant qu'on construise quoi que ce soit.\"\n\n" +
-          "Étape 2, même projet en mode PM : \"À partir des réponses, rédige un PRD complet avec les fonctionnalités priorisées et les critères d'acceptation.\" Ce PRD devient le document de référence.\n\n" +
-          "Étape 3, projet Claude en mode Architecte : \"À partir de ce PRD, propose l'architecture technique, le schéma de données, et les routes API. Pas de code encore, l'architecture d'abord.\"\n\n" +
-          "Étape 4, IDE avec Claude Code en partant de l'architecture validée, PRD et parcours utilisateurs chargés en contexte. Étape 5, projet Claude en mode QA : \"Voici le PRD et voici le code livré. Identifie les écarts entre ce qui était demandé et ce qui a été produit.\"\n\n" +
-          "Les métriques SaaS : ton cockpit si tu construis un SaaS. MRR (Monthly Recurring Revenue) : la somme des revenus récurrents mensuels. L'indicateur de santé numéro un de tout SaaS.\n\n" +
-          "Churn Rate : le pourcentage de MRR perdu chaque mois. Objectif sous 5% mensuel en B2B. Au-dessus de 10%, c'est un problème structurel urgent, le produit ne délivre pas de valeur suffisante pour que les clients restent.\n\n" +
-          "CAC (Customer Acquisition Cost) : coût total sales et marketing divisé par le nombre de nouveaux clients. Doit être récupéré en moins de 12 mois. LTV (Lifetime Value) : ce qu'un client rapporte sur toute la durée de la relation. Objectif LTV supérieur à 3 fois le CAC.\n\n" +
-          "Activation Rate : le pourcentage d'inscrits qui accomplissent l'action clé dans les 7 premiers jours. Un produit qui n'active pas ses utilisateurs ne les retient pas. NRR (Net Revenue Retention) : est-ce que les clients existants dépensent plus au fil du temps. NRR supérieur à 100% signifie que l'expansion compense le churn, c'est très sain.",
+          "La vente, c'est le sang du business. Pas de clients, pas de business. Avant le code, avant les outils, avant les automatisations, il y a quelqu'un qui dit oui et qui paie. Tout commence et finit là.\n\n" +
+          "Dans ma pratique, j'aborde la vente avec une logique simple : une niche précise, une compréhension profonde du problème, un positionnement clair, et du volume. Je ne vends pas à tout le monde. Je choisis un secteur, je comprends ses problèmes mieux que ses acteurs eux-mêmes, et je me positionne comme la seule solution logique pour ce secteur.\n\n" +
+          "L'outreach, c'est la pratique concrète. Cold call, cold email, messages directs sur LinkedIn ou Instagram selon la niche. Le principe est toujours le même : on contacte en volume, on observe ce qui répond, on ajuste le message, on recommence. Un refus n'est pas un échec. C'est une donnée. Chaque \"non\" ou \"pas intéressé\" me dit quelque chose sur mon message, mon ciblage ou mon timing. Je collecte, j'analyse, j'itère.\n\n" +
+          "Un exemple concret : quand je prospecte des restaurateurs pour un système de réservation en ligne, les premiers messages parlent de \"solution digitale innovante\". Personne ne répond. Je change de message, je parle de \"tables vides le vendredi soir\". Les réponses arrivent. C'est ça la vente par itération : on ne cherche pas le message parfait du premier coup, on le trouve en terrain réel.\n\n" +
+          "La vente s'améliore comme le code : par itérations successives. La question à se poser avant chaque campagne d'outreach : quel est le problème exact que cette personne a aujourd'hui, formulé dans ses mots à elle ? Si tu ne peux pas y répondre, tu n'es pas encore prêt à prospecter.",
       },
       {
         id: "b5-s3",
-        title: "L'offre, le pricing et les erreurs fatales",
+        title: "Le feedback terrain comme moteur",
         content:
-          "On ne vend pas du temps. On ne vend pas de la technologie. On vend des résultats, des transformations, des systèmes qui fonctionnent.\n\n" +
-          "Structure d'offre en trois niveaux maximum. Un niveau d'entrée pour tester. Un niveau principal qui est l'offre coeur. Un niveau premium pour ceux qui veulent tout déléguer. Plus de trois niveaux et le client ne décide pas, il part.\n\n" +
-          "La facturation horaire est le piège du débutant. Elle plafonne les revenus, crée une relation tendue avec le client, et ne reflète pas la valeur livrée. Avec l'IA, tu livres en 20 heures ce qu'une agence met 3 mois à faire. Si tu factures à l'heure, tu te pénalises toi-même. On facture à la valeur, au projet, ou à l'abonnement mensuel. Jamais à l'heure.\n\n" +
-          "Le modèle de maintenance : revenu récurrent sans SaaS. Chaque projet livré devient une source de revenu récurrent si tu structures bien ton offre. Une maintenance mensuelle entre 200 euros et 500 euros selon la complexité, qui couvre les mises à jour, la sécurité, et les ajustements mineurs. Sur dix clients, c'est entre 2 000 euros et 5 000 euros par mois de revenu prévisible.\n\n" +
-          "L'A/B testing transforme les hypothèses en données. Chaque décision de design ou de copywriting est une hypothèse, pas une vérité. Des SaaS ont triplé leur MRR en changeant un seul mot dans leur CTA. Basecamp a augmenté ses signups en retirant le pricing de sa homepage. Ce qui semble logique dans une réunion est souvent faux dans la réalité du comportement utilisateur.\n\n" +
-          "La formule d'une hypothèse d'A/B test : \"Nous pensons que [CHANGEMENT] pour [UTILISATEUR] produira [RÉSULTAT MESURABLE] parce que [RAISON].\" Cette formule force la rigueur et évite les tests au hasard.\n\n" +
-          "Les priorités à tester en premier : le CTA principal de la landing page. Le formulaire d'inscription (nombre de champs, labels). La page de pricing (structure, mise en avant du plan). L'email de bienvenue (objet, preview text, bouton). L'écran d'onboarding. PostHog permet de faire tout ça dans un seul outil.\n\n" +
-          "Ta roadmap selon ton profil. Tu démarres de zéro : mois 1, positionnement plus 20 contacts ciblés plus premier projet. Mois 2-3, premier projet livré, témoignage, étude de cas. Mois 4-6, deuxième projet au tarif plein, premières maintenances récurrentes. Mois 7-12, spécialisation, montée en gamme, première idée de produit.\n\n" +
-          "Tu es déjà freelance : mois 1, intégrer la stack, mesurer le gain de vitesse, revoir le pricing à la hausse. Mois 2-3, boilerplate complet, skills repo, revenus récurrents. Mois 4-6, productisation, offres packagées. Mois 7-12, modèle hybride prestation plus produit.\n\n" +
-          "Tu as déjà lancé des choses : semaine 1-2, auditer le système existant avec les checklists de ce système, identifier les gaps. Semaine 3-4, design system et sécurité si manquants. Mois 2-3, scaling du système, délégation ou accélération produit.\n\n" +
-          "Les erreurs qui tuent les projets. Construire avant de valider : un produit parfait sans client n'est pas un produit, c'est une idée qui coûte cher. Vends avant de construire. Vendre à l'heure : la facturation horaire plafonne les revenus et pénalise l'efficacité, facture à la valeur. La stack de trop : 25 outils utilisés à 20% chacun, la dispersion est l'ennemi de la profondeur, maîtrise avant d'ajouter. La sécurité pour plus tard : les vrais utilisateurs arrivent avec de vraies données, une faille découverte en production coûte dix fois plus cher à corriger. Construire pour son ego : le client paie pour son problème résolu, pas pour ta vitrine technique, écoute avant de construire. Confondre l'activité et la progression : beaucoup de travail, peu de résultats mesurables, sans métriques tu pilotes à l'aveugle, définis des objectifs mesurables à 30, 90, 365 jours.",
+          "Je reviens systématiquement vers le terrain. En vente, chaque échange me donne des données. En delivery, chaque mise en production me donne des données. Le point commun : je ne suppose pas, je mesure.\n\n" +
+          "Pour les produits et les SaaS, PostHog est mon outil de base. Il me montre comment les vrais utilisateurs se comportent, pas comment je pensais qu'ils allaient se comporter. Les session recordings montrent exactement où les gens s'arrêtent, où ils abandonnent, où ils cliquent là où je ne l'avais pas prévu. Un utilisateur qui abandonne à l'étape 3 de l'onboarding ne m'envoie pas un email pour m'expliquer pourquoi. PostHog me le montre.\n\n" +
+          "Le principe que j'applique : shipper vite, mesurer, ajuster. Un produit imparfait en production qui reçoit du feedback vaut cent fois plus qu'un produit parfait en développement qui n'a jamais été vu par un vrai utilisateur. Amazon, Apple, tous les grands produits qu'on utilise aujourd'hui étaient imparfaits au lancement. Ce qui les a rendus bons, c'est la vitesse d'itération après le lancement, pas la perfection avant.\n\n" +
+          "Concrètement : je définis 2 ou 3 métriques clés avant chaque mise en ligne (taux d'activation, taux de complétion de l'onboarding, taux de conversion sur la page de pricing). Je les surveille la première semaine. Je cherche les anomalies. Quand quelque chose ne se passe pas comme prévu, je creuse. Je regarde les sessions. Je parle à un ou deux utilisateurs. Je corrige. Je remesure.\n\n" +
+          "Ce que je pensais être bon ne l'est pas toujours. Ce que je pensais être un problème n'en est parfois pas un. Les données tranchent.",
+      },
+      {
+        id: "b5-s4",
+        title: "Les erreurs graves à éviter vs les erreurs normales",
+        content:
+          "Il y a des erreurs qu'on peut accepter dans un produit en construction, et des erreurs qu'on ne peut pas se permettre. Savoir distinguer les deux, c'est ce qui sépare un développeur qui avance de celui qui reste bloqué par la peur de mal faire.\n\n" +
+          "Les erreurs acceptables : une interface pas encore parfaite, un onboarding qui manque d'une étape, une feature absente qui sera ajoutée plus tard, un design mobile perfectible, un message d'erreur générique. Ces erreurs-là, un vrai utilisateur peut les vivre. Il peut revenir malgré elles. Elles n'endommagent pas ses données, ne compromettent pas son compte, ne coûtent rien à l'entreprise.\n\n" +
+          "Les erreurs inacceptables : elles forment une ligne rouge à ne jamais franchir. Une clé API dans le code front (n'importe qui peut l'inspecter et l'utiliser). Pas de validation des inputs utilisateur (injection SQL, scripts malveillants). Pas de rate limiting sur les routes publiques (un bot peut spammer ou abuser ton API). La clé service_role Supabase utilisée côté client (elle bypass toutes les politiques de sécurité, c'est une porte d'entrée ouverte sur toute ta base de données). Pas d'authentification sur des routes qui modifient des données.\n\n" +
+          "La règle que j'applique : avant chaque mise en ligne, je passe le skill-security. Si un point CRITIQUE remonte, le produit ne sort pas. Peu importe la deadline, peu importe la pression client. Les failles de sécurité en production coûtent dix fois plus cher à corriger qu'un retard de livraison.\n\n" +
+          "Exemple pratique : j'ai récemment audité un projet où la route de paiement Stripe n'était pas protégée par une vérification côté serveur. N'importe qui pouvait appeler la route directement et déclencher un accès premium sans payer. C'est une erreur CRITIQUE. L'interface était belle, le produit fonctionnait bien en apparence, mais cette faille suffisait à le rendre non livrable.",
       },
     ],
   },
@@ -1050,103 +1045,37 @@ export const BLOCS_DATA = [
     sections: [
       {
         id: "b6-s1",
-        title: "Le Prompt Master",
+        title: "Ce qu'est ORACLE",
         content:
-          "Le Prompt Master est la première chose à mettre en place. Avant de toucher à Stitch, avant d'ouvrir Cursor, avant de créer un projet Claude. C'est la fondation de tout ce qui suit.\n\n" +
-          "Concrètement : un LLM à qui tu donnes un rôle très précis, transformer ce que tu lui décris en langage naturel en un prompt de haute qualité, directement utilisable dans un autre LLM ou un projet/Gem dédié. Il ne produit pas de contenu sur ton projet. Il produit le prompt qui va permettre à un autre LLM de produire du contenu de qualité sur ton projet.\n\n" +
-          "La qualité d'un prompt détermine la qualité de tout ce qui suit dans la chaîne. Un prompt générique produit un BRAND-SYSTEM générique. Un BRAND-SYSTEM générique produit un PROMPT-SYSTEM générique. Un PROMPT-SYSTEM générique produit du code qui ressemble à n'importe quel autre projet généré par IA. La chaîne se casse toujours au maillon le plus faible, et le premier maillon c'est le prompt.\n\n" +
-          "Le Prompt Master applique trois frameworks en synergie. CRAC (Contexte, Rôle, Action, Contrôle) : il analyse la situation globale, définit le rôle exact que l'IA doit incarner, décrit précisément la mission et les livrables, et prévoit les critères d'évaluation du résultat.\n\n" +
-          "CRSIPE (Contexte, Rôle, Structure, Input, Process, Output, Évaluation) : il y ajoute la structure logique du prompt, ce que tu dois fournir à l'IA pour qu'elle travaille efficacement, la méthode de raisonnement que l'IA doit suivre, le format final attendu, et les critères pour mesurer si le résultat est optimal.\n\n" +
-          "ROLEPLAY : il fait vivre le rôle à l'IA. Chaque prompt que tu proposes doit la faire entrer dans un état d'incarnation total, comme un acteur dans son rôle. Elle doit penser, parler et agir comme l'expert ultime de son domaine, avec une exagération maîtrisée du rôle pour atteindre l'excellence absolue.\n\n" +
-          "Comment ça s'utilise dans la pratique : tu ouvres ChatGPT, tu crées une nouvelle conversation, et tu colles le prompt de l'Architecte Suprême. Tu lui décris ton projet en langage naturel, pas besoin d'être parfait, c'est son job de structurer. Il te pose des questions. Tu réponds avec précision. Il produit le master prompt. Tu copies ce master prompt dans un projet Claude ou Gem dédié, et c'est là que la construction des documents commence.\n\n" +
-          "Les expertises à demander et ce que tu fais si tu ne les connais pas : c'est une des clés que la plupart des gens ratent. Quand tu décris ton projet à l'Architecte, tu lui précises les expertises à embarquer. Pour un site artisan : Lead Product Designer spécialisé en artisanat local, expert SEO local France, UX researcher spécialisé PME service local, développeur Next.js senior. Plus tu es précis, plus le master prompt est chirurgical.\n\n" +
-          "Si tu ne sais pas quelles expertises demander, c'est lui qui te le dit. Tu lui décris ton projet et tu lui demandes directement. Il va lister les profils les plus pertinents selon le type de produit, le secteur, et les contraintes techniques. Tu n'as pas besoin de connaître le monde de l'ingénierie de prompt, lui le connaît. Utilise-le.\n\n" +
-          "Voici le prompt de l'Architecte Suprême à coller directement dans ChatGPT :\n\n" +
-          "```\n" +
-          "Rôle :\n" +
-          "Tu es l'Architecte Suprême des Prompts, un expert en ingénierie de langage qui maîtrise à la perfection les frameworks CRAC, CRSIPE et ROLEPLAY.\n" +
-          "Tu construis pour moi les meilleurs prompts IA de tous les temps, hyper-structurés, ultra-ciblés, et sur-mesure selon le contexte.\n" +
-          "Ton objectif : chaque prompt que tu me livres doit transformer n'importe quelle IA (ChatGPT, Gemini, Claude, etc.) en spécialiste absolu du domaine visé.\n" +
-          "\n" +
-          "1. Méthodologie hybride des frameworks :\n" +
-          "\n" +
-          "CRAC (Contexte - Rôle - Action - Contrôle)\n" +
-          "- Contexte : analyse la situation globale, mes objectifs, mon environnement, mes contraintes.\n" +
-          "- Rôle : définit le rôle exact que l'IA doit incarner (expert, coach, consultant, créateur, stratège...).\n" +
-          "- Action : décrit précisément la mission, les livrables et le ton attendu.\n" +
-          "- Contrôle : prévoit les critères d'évaluation du résultat (qualité, profondeur, style, format).\n" +
-          "\n" +
-          "CRSIPE (Contexte - Rôle - Structure - Input - Process - Output - Évaluation)\n" +
-          "Tu y ajoutes :\n" +
-          "- Structure : modèle logique du prompt (sections, formats, étapes).\n" +
-          "- Input : ce que je dois fournir à l'IA pour qu'elle travaille efficacement.\n" +
-          "- Process : la méthode de raisonnement ou de génération que l'IA doit suivre.\n" +
-          "- Output : le format final attendu (ex : texte structuré, plan, code, fichier .md, etc.).\n" +
-          "- Évaluation : critères pour mesurer si le résultat est optimal.\n" +
-          "\n" +
-          "ROLEPLAY\n" +
-          "- Tu fais vivre le rôle à l'IA.\n" +
-          "- Chaque prompt que tu me proposes doit la faire entrer dans un état d'incarnation total, comme un acteur de théâtre dans son rôle.\n" +
-          "- Elle doit penser, parler et agir comme l'expert ultime de son domaine, avec une exagération maîtrisée du rôle pour atteindre l'excellence absolue.\n" +
-          "\n" +
-          "2. Ta mission :\n" +
-          "À chaque fois que je te demande un prompt, tu dois :\n" +
-          "1. Me poser les questions essentielles pour comprendre le contexte (objectif, cible, résultat attendu, ton, contraintes, expertises requises).\n" +
-          "2. Me livrer le prompt final complet, directement copiable-collable.\n" +
-          "3. Ce prompt doit :\n" +
-          "   - Utiliser les 3 frameworks en synergie,\n" +
-          "   - Créer une IA experte exagérément compétente,\n" +
-          "   - Générer un résultat sur-mesure, opérationnel et orienté performance,\n" +
-          "   - Être clair, fluide, sans jargon inutile.\n" +
-          "\n" +
-          "3. Format attendu de tes réponses :\n" +
-          "Quand je te demande un prompt, tu répondras toujours en 3 blocs :\n" +
-          "\n" +
-          "[1] Analyse du Contexte\n" +
-          "Résume en 3 lignes ce que tu comprends de ma demande et l'objectif à atteindre.\n" +
-          "\n" +
-          "[2] Framework combiné\n" +
-          "Explique en 5-6 lignes comment tu combines CRAC, CRSIPE et ROLEPLAY dans ce cas précis.\n" +
-          "\n" +
-          "[3] Prompt Final à copier-coller\n" +
-          "Le prompt intégral, déjà prêt à être utilisé dans une autre IA.\n" +
-          "\n" +
-          "Règle d'Or\n" +
-          "Chaque prompt que tu conçois doit me faire dire :\n" +
-          "\"Wow. Cette IA travaille comme si c'était un véritable expert humain au sommet de son art.\"\n" +
-          "\n" +
-          "Je vais maintenant te décrire mon projet et les expertises dont j'ai besoin. Commence par me poser toutes les questions nécessaires avant de produire quoi que ce soit.\n" +
-          "```\n\n" +
-          "Et si tu ne connais pas les expertises à embarquer, ajoute cette question après avoir décrit ton projet :\n\n" +
-          "```\n" +
-          "Quelles sont les expertises que je devrais embarquer dans ce master prompt pour obtenir le meilleur résultat sur ce type de projet ? Propose-moi 3 à 5 profils experts précis, avec leur spécialisation, et explique pourquoi chacun est utile sur ce projet spécifique.\n" +
-          "```",
+          "ORACLE est mon framework de construction de A à Z. Pas un outil, pas un prompt. Un process structuré en couches qui fonctionne sur chaque projet, du site artisan au SaaS multi-tenant.\n\n" +
+          "La logique de base : chaque couche produit quelque chose de concret qui alimente la couche suivante. On ne saute pas une couche. On ne revient pas en arrière.\n\n" +
+          "Couche 1, l'interview de démarrage : le skill ORACLE conduit lui-même l'interview. Il pose des questions, écoute, reformule, confirme. Tu n'as pas besoin de préparer un brief parfait. Tu décris ton projet comme tu l'as dans la tête, ORACLE structure. Si tu dis \"je veux une app pour les restaurateurs\", il te demande pour quel type de restaurateurs, dans quelle ville, quel problème précis, qui utilise l'app. Il ne laisse pas passer les zones floues.\n\n" +
+          "Couche 2, les documents fondateurs : dans l'ordre strict. BRIEF (qui, quoi, pourquoi, pour qui, avec quelles contraintes). BRAND-SYSTEM (l'âme du produit avant son apparence, délégué au sous-skill ux-ui-design). DESIGN-SYSTEM (les règles visuelles en tokens réutilisables, délégué à ux-ui-design). PRD (ce que le produit fait, priorisé P1/P2/P3, avec critères d'acceptation binaires). PARCOURS-UTILISATEURS (chaque action, chaque état, chaque émotion). PROMPT-SYSTEM (la synthèse de tout, le cerveau qui va dans l'IDE). Pour un SaaS ou une app, un document supplémentaire : le DATA-MODEL, qui définit le schéma de base de données, les politiques RLS, les triggers et les migrations.\n\n" +
+          "Couche 3, les décisions structurantes : architecture technique, intégrations, décisions sécurité, décisions business. On prend les décisions difficiles avant d'ouvrir l'IDE. Ce qui prend 20 minutes en conversation ici prend des semaines à corriger dans le code.\n\n" +
+          "Couche 4, l'exécution dans l'IDE : Claude Code charge le PROMPT-SYSTEM depuis /docs et construit dans l'ordre du PRD, P1 d'abord entièrement avant de regarder P2. La première instruction de chaque session est toujours la même : \"Charge et lis /docs/PROMPT-SYSTEM.md. Confirme que tu as tout compris avant de commencer.\"\n\n" +
+          "Couche 5, les audits : qualité, sécurité, architecture. Dans cet ordre. Un point CRITIQUE dans l'un des trois audits bloque la livraison. Toujours.\n\n" +
+          "L'ordre n'est pas arbitraire. C'est la même logique qu'une maison : on ne peint pas avant que le béton soit sec.",
       },
       {
         id: "b6-s2",
-        title: "Le process ORACLE : les 5 couches",
+        title: "Les sous-skills qui composent ORACLE",
         content:
-          "Voici le process appliqué sur chaque projet. Comme construire une maison : on ne pose pas les fenêtres avant les murs, on ne peint pas avant que le béton soit sec. Chaque couche a son moment. Aucune n'est optionnelle.\n\n" +
-          "Avant de commencer, une règle d'or sur l'inspiration : tu collectes les références visuelles AVANT d'écrire une seule ligne de description à l'Architecte Suprême, pas après. 20 à 30 minutes à regarder ce qui existe. \"Je veux quelque chose dans le style de ce Dribbble\" est cent fois plus puissant que \"je veux quelque chose de moderne et épuré\".\n\n" +
-          "Dribbble pour l'inspiration UI premium : tu cherches par mots-clés précis selon ton projet. Pour un site artisan : \"local service business\", \"contractor landing page\". Pour un e-commerce mode : \"luxury fashion ecommerce\", \"old money aesthetic\". Pour un SaaS B2B : \"productivity app UI\", \"B2B platform design\". Tu regardes la hiérarchie des informations sur la homepage, les CTA, les couleurs dominantes, la densité d'information. Tu sauvegardes 5 à 10 références.\n\n" +
-          "Mobbin pour les patterns UX réels : Dribbble montre des concepts, Mobbin montre comment des vraies apps fonctionnent. Des screenshots réels, des flows complets, tous les états d'un écran. Indispensable pour les apps et les SaaS. Tu cherches par type d'écran (onboarding, login, dashboard, pricing, checkout) et par app de référence. Pour un SaaS B2B tu regardes Loom, Notion, Linear.\n\n" +
-          "Les librairies de composants : tu les explores pendant la Couche 3 quand tu as tes maquettes devant toi, pas pendant que tu codes. 21st.dev pour les composants React premium, niveau de finition souvent supérieur à shadcn sur les composants visuellement complexes. shadcn/ui pour la base fondamentale, accessible, cohérent, entièrement customisable. Aceternity UI pour les effets dark premium : spotlight cards, beam effects, à utiliser chirurgicalement. Magic UI pour les shimmer buttons, animated gradients, pour les moments de célébration ou les CTA principaux.\n\n" +
-          "Couche 1, Structuration avec l'Architecte Suprême : tu décris ton projet en langage naturel dans ChatGPT. L'Architecte te pose ses questions, expert par expert, couche par couche. Tu réponds précisément. Il produit le master prompt avec les expertises du Conseil, le rôle de l'IA, le contexte complet du projet. Tu ne passes pas à la Couche 2 avec un brief flou. Si ton projet est nouveau pour toi et que tu ne sais pas quelles expertises embarquer, demande-lui.\n\n" +
-          "Couche 2, Architecture documentaire dans un Projet/Gem dédié : tu colles le master prompt comme instruction système. Tu demandes chaque document dans l'ordre strict : BRIEF.md, BRAND-SYSTEM.md, DESIGN-SYSTEM.md, PRD.md, PARCOURS-UTILISATEURS.md, PROMPT-SYSTEM.md. Chaque document nourrit le suivant. L'ordre n'est pas arbitraire. Si tu sautes une étape ou tu changes l'ordre, le résultat perd en cohérence. Le projet LLM garde tout en mémoire, tu n'expliques jamais deux fois.\n\n" +
-          "Couche 3, Conception spécialisée et maquettes visuelles : tu règles les questions structurantes avant de toucher au code. Architecture technique, choix de stack, schéma de données, décisions sécurité (RLS, webhooks, auth), décisions business (pricing, plans). Ces décisions coûtent 20 minutes de conversation ici. Elles coûtent des semaines à corriger en Couche 4. Puis tu génères les maquettes avec Stitch ou AI Studio depuis le prompt visuel produit par le projet dédié. Un écran non validé maintenant coûte dix fois plus cher à corriger dans le code.\n\n" +
-          "Couche 4, Exécution dans l'IDE : tu exportes le repo GitHub depuis AI Studio ou tu l'initialises depuis GitHub. Tu clones dans Antigravity ou Cursor. Tu crées /docs et tu y glisses tous tes fichiers .md. La première instruction de chaque session est toujours la même : \"Charge et lis /docs/PROMPT-SYSTEM.md. Confirme que tu as tout compris avant de commencer.\" Tu construis feature par feature dans l'ordre strict du PRD, P1 d'abord entièrement avant de regarder P2. Claude Code applique les skills à chaque fichier qu'il génère.\n\n" +
-          "Couche 5, Validation complète : trois audits dans l'ordre, aucun optionnel. Audit qualité et fonctionnel : le PRD est-il respecté, les 4 états couverts partout, les cas d'erreur gérés. Audit sécurité avec le skill-security.md : CRITIQUES cherchés en premier, failles d'accès, secrets exposés, inputs non validés. Audit architecture avec le skill-architecture.md : structure, séparation des responsabilités, absence de duplication.\n\n" +
-          "Un CRITIQUE dans l'un des trois audits bloque la mise en ligne. Toujours. Une faille en production coûte cent fois plus cher qu'un retard de livraison.",
+          "ORACLE n'essaie pas de tout faire seul. Il orchestre. Les sous-skills exécutent dans leur domaine. C'est cette séparation qui garantit la qualité à chaque couche.\n\n" +
+          "ux-ui-design : tout ce qui est visuel. Identité de marque, palette de couleurs, typographie, système de composants, maquettes. Ce skill a son propre ADN visuel : Apple-level premium, dark, liquid glass quand c'est justifié. Il reçoit le BRIEF et produit le BRAND-SYSTEM et le DESIGN-SYSTEM. Il génère aussi les prompts visuels pour Stitch ou AI Studio. Tu ne lui demandes pas \"fais quelque chose de beau\". Tu lui fournis le contexte du projet et il définit l'identité visuelle avec précision.\n\n" +
+          "expert-backend : architecture, sécurité, patterns de code. Appelé pour les décisions techniques lourdes : schéma de base de données, choix de l'architecture d'auth, stratégie de rate limiting, RLS Supabase. Ce skill connaît les erreurs qui coûtent cher. Il ne laisse pas passer une clé API dans le front ou une route non protégée.\n\n" +
+          "Comment ça s'utilise concrètement : quand je lance ORACLE sur un nouveau projet, il conduit l'interview. Dès qu'il faut définir le BRAND-SYSTEM, il passe la main à ux-ui-design avec le contexte complet. Quand une décision d'architecture se pose, il consulte expert-backend. Il récupère les livrables, les intègre dans le flux, et continue. Je ne réexplique jamais le projet d'un skill à l'autre, ORACLE transmet le contexte.\n\n" +
+          "Les librairies de composants à connaître : 21st.dev pour les composants React premium, shadcn/ui pour la base fondamentale, accessible et entièrement customisable, Aceternity UI pour les effets dark premium à utiliser chirurgicalement, Magic UI pour les animations de CTA et éléments de célébration. Ces librairies s'explorent en Couche 3, quand les maquettes sont devant toi, pas pendant le code.\n\n" +
+          "Le principe derrière tout ça : je construis une fois, je réutilise partout. Chaque nouveau projet bénéficie de tout ce que j'ai encodé dans ces skills. Je ne repars pas de zéro. Je capitalise.",
       },
       {
         id: "b6-s3",
         title: "Trois projets réels : Marc, Blanchot, Synapse",
         content:
-          "Tu as les frameworks. Tu as les templates. Tu as la stack. Ce bloc, c'est la mise en pratique totale : trois projets réels, trois secteurs différents, un process identique. Tous les prompts utilisés sur chaque projet sont ici, complets, copiables directement.\n\n" +
+          "J'ai appliqué ORACLE sur trois projets réels, trois secteurs différents, un process identique. Dans chaque cas, ORACLE m'a interviewé, a posé les bonnes questions, et a produit les documents fondateurs dans l'ordre. Tous les prompts utilisés sont ici, complets, copiables directement.\n\n" +
           "---\n\n" +
           "ÉTUDE DE CAS 1 : Marc Delval — Plombier Artisan à Bordeaux\n\n" +
-          "Site vitrine 5 pages + Calendly. Marc perd des clients parce qu'il n'existe pas sur Google. On construit un site Next.js avec SEO local, Calendly, et une grille de réalisations mise à jour via un fichier JSON dans GitHub — pas de CMS, pas de base de données.\n\n" +
-          "Couche 1 — Architecte Suprême :\n\n" +
+          "Site vitrine 5 pages + Calendly. Marc perd des clients parce qu'il n'existe pas sur Google. ORACLE m'a interviewé sur le projet, a posé les questions sur la cible, le problème exact, les contraintes techniques. Il a structuré le brief et produit les documents dans l'ordre. On construit un site Next.js avec SEO local, Calendly, et une grille de réalisations mise à jour via un fichier JSON dans GitHub, pas de CMS, pas de base de données.\n\n" +
+          "Couche 1 — ORACLE conduit l'interview, produit le contexte pour l'Architecte :\n\n" +
           "```\n" +
           "Architecte, j'ai besoin d'un master prompt pour un projet de site web pour un artisan plombier. Voici le contexte :\n" +
           "\n" +
@@ -1383,8 +1312,8 @@ export const BLOCS_DATA = [
           "```\n\n" +
           "---\n\n" +
           "ÉTUDE DE CAS 2 : Blanchot — Chemises en Lin Old Money\n\n" +
-          "E-commerce premium Next.js + Stripe. Cible : hommes 28-45 ans, revenus aisés. Ils n'achètent pas une chemise, ils achètent l'appartenance à une certaine idée d'eux-mêmes. Design old money éditorial — Sézane Homme meets A.P.C.\n\n" +
-          "Couche 1 — Architecte Suprême :\n\n" +
+          "E-commerce premium Next.js + Stripe. Cible : hommes 28-45 ans, revenus aisés. Ils n'achètent pas une chemise, ils achètent l'appartenance à une certaine idée d'eux-mêmes. ORACLE m'a interviewé sur la marque, le positionnement, les objections d'achat, l'esthétique voulue. Il a orienté les choix vers une identité old money éditoriale avant de passer la main à ux-ui-design pour le BRAND-SYSTEM et à expert-backend pour les décisions Stripe et Supabase.\n\n" +
+          "Couche 1 — ORACLE conduit l'interview, produit le contexte pour l'Architecte :\n\n" +
           "```\n" +
           "Architecte, j'ai besoin d'un master prompt pour un e-commerce de mode premium. Voici le contexte :\n" +
           "\n" +
@@ -1669,8 +1598,8 @@ export const BLOCS_DATA = [
           "```\n\n" +
           "---\n\n" +
           "ÉTUDE DE CAS 3 : Synapse — SaaS B2B Productivité IA\n\n" +
-          "App complète : auth + dashboard + abonnement Stripe + intégrations OpenAI. Le cas le plus complexe. On utilise le Conseil d'Experts (4 expertises distinctes) plutôt que l'Expert Unique.\n\n" +
-          "Couche 1 — Architecte Suprême (Conseil d'Experts) :\n\n" +
+          "App complète : auth + dashboard + abonnement Stripe + intégrations OpenAI. Le cas le plus complexe. ORACLE m'a interviewé en profondeur sur le modèle freemium, la cible B2B, les contraintes sécurité liées aux données de réunions professionnelles. Sur ce projet, il a mobilisé quatre expertises distinctes plutôt qu'une seule, parce que la complexité l'exigeait : CPO SaaS, Engineering Lead, Growth engineer, Expert sécurité. Les désaccords entre experts ont été explicités, ce qui a forcé des décisions structurantes avant d'ouvrir l'IDE.\n\n" +
+          "Couche 1 — ORACLE conduit l'interview, mobilise le Conseil d'Experts :\n\n" +
           "```\n" +
           "Architecte, j'ai besoin d'un master prompt pour un SaaS B2B. C'est le projet le plus complexe donc j'ai besoin d'un Conseil d'Experts, pas d'un Expert Unique. Voici le contexte :\n" +
           "\n" +
@@ -1946,33 +1875,51 @@ export const BLOCS_DATA = [
     sections: [
       {
         id: "b7-s1",
-        title: "De l'idée à la première ligne de code",
+        title: "Tout processiser",
         content:
-          "C'est la phase où 90% des projets échouent. Pas parce que le code est mauvais, mais parce que les fondations ne sont pas posées. Tu construis ici tout ce qui va permettre à l'IA de travailler avec toi au lieu de travailler à côté de toi.\n\n" +
-          "Étape 1, structurer avec l'Architecte Suprême : tu décris ton projet en langage naturel dans ChatGPT. L'Architecte Suprême te pose ses questions, expert par expert, couche par couche. Il produit le master prompt : la définition précise de qui doit être dans la pièce pour construire ce projet. Site vitrine : 2 à 3 experts. SaaS B2B : 5 à 7 experts avec des spécialisations précises. Si tu ne sais pas quelles expertises demander, il te les suggère sur description de ton projet. Outil : ChatGPT avec le prompt Architecte Suprême. Output : master prompt complet.\n\n" +
-          "Étape 2, produire les 6 documents fondateurs : tu ouvres un Projet Claude ou un Gem Google, tu colles le master prompt comme instruction système, tu demandes chaque document dans l'ordre strict. BRIEF.md : qui, quoi, pourquoi, pour qui, avec quelles contraintes. BRAND-SYSTEM.md : l'âme du produit avant son apparence. DESIGN-SYSTEM.md : les règles visuelles en tokens réutilisables. PRD.md : ce que le produit fait, pourquoi, priorisé P1/P2/P3 avec critères d'acceptation binaires. PARCOURS-UTILISATEURS.md : chaque action, chaque état, chaque émotion. PROMPT-SYSTEM.md : le cerveau de l'IDE, synthèse des 5 précédents. Outil : Projet Claude ou Gem dédié. Output : 6 fichiers .md sauvegardés localement.\n\n" +
-          "Étape 3, décisions structurantes et maquettes : avant de toucher à l'IDE, tu règles les questions qui coûteraient des semaines à corriger après. Architecture technique, décisions sécurité, décisions business (pricing, freemium, plans). Puis tu génères les maquettes avec Stitch ou AI Studio depuis le prompt visuel produit par le projet dédié. Un écran non validé maintenant coûte dix fois plus cher à corriger dans le code. Outil : Projet Claude/Gem pour les décisions, Google Stitch ou AI Studio pour les maquettes. Output : maquettes validées et décisions documentées.",
+          "Je documente tout ce que je fais plus de deux fois. C'est une règle simple qui a changé ma façon de travailler.\n\n" +
+          "Une SOP (Standard Operating Procedure), c'est un document court qui décrit comment faire une action précise. Le contexte (pourquoi on fait ça et dans quelle situation), les étapes dans l'ordre (numérotées, sans ambiguïté), les pièges à éviter (ce qui peut mal tourner et comment le prévenir), et le résultat attendu (à quoi ressemble un travail bien fait).\n\n" +
+          "Exemple concret : à chaque fois que je déploie un nouveau projet sur Vercel, je fais les mêmes vérifications. Variables d'environnement, domaine connecté, Sentry activé, Google Search Console configurée. J'ai documenté ça en une SOP de 12 étapes. Elle prend 15 minutes à suivre. Elle m'évite d'oublier un point critique et d'avoir à y revenir en urgence le lendemain.\n\n" +
+          "Le test pour savoir si une SOP est utile : est-ce que quelqu'un d'autre pourrait suivre ces instructions et obtenir le même résultat sans me demander quoi que ce soit ? Si oui, la SOP est bonne. Si non, elle a besoin de plus de précision.\n\n" +
+          "Quand je délègue une tâche à un collaborateur ou à un skill IA, la SOP devient l'instruction. Je n'explique plus, je fournis le document. C'est ça la scalabilité réelle : pas les outils, la documentation.",
       },
       {
         id: "b7-s2",
-        title: "Du premier écran au MVP",
+        title: "L'audit avant l'automatisation",
         content:
-          "Le MVP (Minimum Viable Product), c'est la version la plus petite du produit qui délivre de la valeur réelle à un utilisateur réel. Pas une démo. Pas un prototype. Un produit fonctionnel sur les fonctionnalités P1.\n\n" +
-          "Étape 4, initialisation du repo : tu exportes le repo depuis AI Studio ou tu l'initialises depuis GitHub. Tu crées le dossier /docs et tu y glisses tous tes fichiers .md. Tu connectes le repo à Vercel, chaque push génère une preview URL automatiquement. Outil : GitHub et Vercel. Output : repo connecté, PROMPT-SYSTEM.md dans /docs, preview fonctionnelle.\n\n" +
-          "Étape 5, construction feature par feature dans l'IDE : tu ouvres Cursor ou Antigravity. Claude Code charge le contexte depuis /docs/PROMPT-SYSTEM.md. À chaque session, la première instruction est toujours la même : \"Charge et lis /docs/PROMPT-SYSTEM.md. Confirme que tu as tout compris avant de commencer.\" Tu construis dans l'ordre strict du PRD : P1 d'abord, entièrement, avant de regarder P2. Chaque feature est complète avec ses 4 états avant de passer à la suivante. Une feature à 80% plus une feature à 80%, ça fait 0 feature livrable. Outil : Cursor ou Antigravity avec Claude Code, Skills chargés depuis /docs. Output : MVP avec toutes les P1 fonctionnelles et testées.\n\n" +
-          "Étape 6, validation du MVP : avant de montrer le produit à qui que ce soit, tu passes les trois audits dans l'ordre. Audit qualité et fonctionnel : le PRD est-il respecté, les 4 états couverts partout, les cas d'erreur gérés. Audit sécurité : le skill-security.md dans Claude Code cherche les CRITIQUES, failles d'accès, secrets exposés, inputs non validés. Un CRITIQUE : pas de mise en ligne. Audit architecture : le skill-architecture.md vérifie la structure, la séparation des responsabilités, l'absence de duplication. Outil : Claude Code avec skill-security.md et skill-architecture.md. Output : MVP propre, sécurisé, audité. Prêt à être montré.",
+          "Avant d'implémenter l'IA ou une automatisation chez un client, je cartographie d'abord. Quels sont les flux actuels, tels qu'ils existent vraiment, pas tels qu'ils sont supposés exister ? Où est la friction réelle ? Quel est le vrai problème derrière le problème qu'on me décrit ?\n\n" +
+          "L'outil vient après la compréhension. Jamais avant. Une automatisation mal posée sur un mauvais process ne fait qu'accélérer les erreurs. Si le process de facturation est chaotique, automatiser la facturation ne règle pas le chaos, il le produit plus vite.\n\n" +
+          "Ma méthode concrète avant tout projet d'automatisation : je passe une heure à interviewer le client sur comment il travaille aujourd'hui. Je ne lui demande pas ce qu'il veut, je lui demande de me montrer ce qu'il fait. \"Montre-moi comment tu traites une commande client de A à Z.\" La réponse à cette question contient toujours les vrais problèmes, ceux qu'il n'aurait pas pensé à mentionner.\n\n" +
+          "Ensuite je cartographie. Je note chaque étape, chaque outil, chaque transfert de données. Je cherche les goulots d'étranglement (une personne qui fait tout à la main), les redondances (la même information saisie dans deux outils), et les risques (des données client stockées dans un tableur non protégé).\n\n" +
+          "C'est seulement après cet audit que je propose un outil. Make, n8n, Supabase, une intégration API. L'outil répond à un problème identifié, pas à une envie de moderniser.",
       },
       {
         id: "b7-s3",
-        title: "Du MVP au produit final",
+        title: "Les skills comme infrastructure de connaissance",
         content:
-          "Le MVP prouve que le produit existe et qu'il délivre de la valeur. Le produit final prouve qu'il tient dans la durée, qu'il scale, et qu'il peut être confié à des utilisateurs réels sans surveillance permanente.\n\n" +
-          "Étape 7, mise en ligne et premiers retours : tu déploies sur Vercel en production. Tu connectes le domaine. Tu vérifies les variables d'environnement (jamais dans le code, uniquement dans Vercel). Tu actives Sentry pour les erreurs en production. Tu connectes Google Search Console pour le SEO. Tu montres le produit à tes premiers utilisateurs réels, pas à des amis bienveillants, à des gens qui ont le problème que tu résous. Leur comportement réel vaut plus que dix mille lignes de code.\n\n" +
-          "Étape 8, itération sur les P2 : le feedback réel t'a montré ce qui manque, ce qui freine, ce qui surprend. Tu priorises les P2 selon ce que les utilisateurs font réellement, pas selon ce que tu pensais qu'ils feraient. Chaque itération suit le même process : feature définie précisément, construite avec Claude Code, auditée, déployée. La règle : une feature à la fois. Le multitasking en développement est un mythe. Il produit des features à moitié faites et des bugs difficiles à tracer.\n\n" +
-          "Étape 9, renforcement des skills sur-mesure : à ce stade tu connais ton projet réellement, ses failles réelles, ses points de friction réels, ses décisions d'architecture qui ont tenu ou non. Tu charges les références mondiales (OWASP complet, Twelve-Factor App, docs officielles de ta stack) dans NotebookLM. Tu interroges en profondeur sur ton projet spécifique. Tu produis un skill-security et un skill-architecture calibrés exactement sur ce que ton produit est devenu, pas sur ce que tu pensais qu'il serait.\n\n" +
-          "Étape 10, le produit final : un produit final ce n'est pas un produit \"terminé\", ça n'existe pas. C'est un produit qui tient sans toi. Qui gère les erreurs sans te réveiller la nuit. Qui peut accueillir de nouveaux utilisateurs sans que tu rajoutes du code d'urgence. Qui peut être repris par quelqu'un d'autre sans que tout soit à réapprendre.\n\n" +
-          "La question simple : si tu ne touches pas au code pendant 30 jours, est-ce que le produit fonctionne toujours pour ses utilisateurs ? Si oui, tu as un produit.\n\n" +
-          "Tu n'as pas besoin de tout maîtriser avant de commencer. Tu as besoin de commencer pour commencer à maîtriser. L'étape 1 est toujours la même : décris ton projet à l'Architecte Suprême.",
+          "Chaque fois que je repère un process répétitif dans mes projets, je l'encode dans un skill. Le skill devient un collaborateur permanent qui connaît mes règles, mes standards, mes préférences. Je n'explique plus deux fois la même chose.\n\n" +
+          "Un skill, c'est un package de compétence. Il contient le contexte (qui il est, pour quoi il existe, dans quel cadre il intervient), les règles critiques (ce qu'il ne fait jamais, ce qu'il vérifie toujours), et les instructions (comment il travaille, dans quel ordre, avec quels livrables).\n\n" +
+          "On crée un skill dès qu'on repère un pattern répétitif. Pas besoin de grand chose : un fichier SKILL.md avec un frontmatter YAML valide, les règles critiques en haut, et les instructions. Si j'audite la sécurité de chaque projet que je livre, j'encode cet audit dans skill-security.md. La prochaine fois, Claude Code charge le skill et applique les mêmes critères avec la même rigueur.\n\n" +
+          "L'avantage compétitif réel dans le business IA, ce ne sont pas les outils. Les outils changent tous les six mois. Ce sont les systèmes. Un système de skills bien encodé, c'est une connaissance capitalisée qui s'améliore avec chaque projet. La première version du skill-security était basique. Après cinq projets, il couvre des cas d'usage que je n'avais pas anticipés au départ.\n\n" +
+          "Question pratique : quelles sont les trois actions que tu répètes sur chaque projet ? Si tu peux les lister, tu peux les encoder. C'est ton point de départ.",
+      },
+      {
+        id: "b7-s4",
+        title: "Itérer en continu",
+        content:
+          "Les systèmes ne sont jamais finis. Un skill s'améliore avec l'usage. Une SOP évolue avec la pratique. Un produit change avec les retours clients. Ce qui compte, c'est d'avoir une cadence d'itération.\n\n" +
+          "Dans ma pratique, je fais un bilan rapide chaque semaine. Qu'est-ce qui a frotté dans les projets de la semaine ? Quelle étape a pris plus de temps que prévu ? Quelle erreur j'ai faite que j'avais déjà faite avant ? Quelle décision j'ai dû prendre en urgence parce qu'elle n'était pas documentée ?\n\n" +
+          "Chaque réponse à ces questions devient une action : mettre à jour une SOP, enrichir un skill, corriger un document de référence. Ça prend 20 minutes. Sur un an, ça représente des dizaines d'itérations sur des dizaines de documents. Le résultat : un système qui devient meilleur tout seul, par accumulation.\n\n" +
+          "La distinction que j'essaie de garder en tête : un système vivant versus une documentation morte. La documentation morte, c'est ce qu'on écrit une fois, qu'on ne relit jamais, et qui devient faux en six mois. Un système vivant, c'est ce qu'on consulte réellement, qu'on corrige quand c'est faux, et qu'on enrichit quand c'est incomplet.\n\n" +
+          "Ce qui sépare les deux : la cadence d'itération. Pas la qualité initiale du document. Un document parfait au premier jet mais jamais mis à jour est mort au bout de trois mois. Un document imparfait mais revu chaque semaine devient précieux.\n\n" +
+          "---\n\n" +
+          "RÉCAP : Ce que tu sais maintenant faire\n\n" +
+          "Blocs 1 à 4 t'ont donné la stack et l'environnement de travail. Les outils, les librairies, la logique de construction. Ce sont les fondations techniques.\n\n" +
+          "Bloc 5 t'a montré que le business commence par la vente, que le client prime sur l'ego technique, que le feedback terrain est non-négociable, et qu'il existe une ligne rouge entre les erreurs acceptables et celles qui bloquent la livraison.\n\n" +
+          "Bloc 6 t'a présenté ORACLE : le framework de construction de A à Z. L'interview interne, les documents fondateurs, les sous-skills qui exécutent dans leur domaine (ux-ui-design pour le visuel, expert-backend pour l'architecture et la sécurité), et trois projets réels qui montrent le process appliqué sur un site artisan, une marque mode et un SaaS.\n\n" +
+          "Bloc 7 t'a donné les outils pour tenir dans la durée. Processiser ce qu'on fait plus de deux fois. Auditer avant d'automatiser. Encoder les process répétitifs dans des skills. Itérer chaque semaine plutôt que construire une documentation parfaite une seule fois.\n\n" +
+          "Ce que tout ça forme ensemble : un système de travail complet. De la vente au delivery, de l'idée au produit en production, de la première version à l'itération continue. Tu n'as pas besoin de tout maîtriser avant de commencer. Tu as besoin de commencer pour commencer à maîtriser.\n\n" +
+          "La question maintenant : quel est ton prochain projet ? Lance ORACLE. Décris-le. Commence.",
       },
     ],
   },
