@@ -59,12 +59,7 @@ export async function GET(request: NextRequest) {
           setAll(cookiesToSet) {
             try {
               cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, {
-                  ...options,
-                  secure: true,
-                  sameSite: "lax",
-                  httpOnly: true,
-                })
+                cookieStore.set(name, value, options)
               );
             } catch (err) {
               console.warn("[auth/callback] setAll failed:", err);

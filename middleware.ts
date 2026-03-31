@@ -27,7 +27,6 @@ function createRedirectWithCookies(
         response.cookies.set(cookie.name, cookie.value, {
             secure: true,
             sameSite: "lax",
-            httpOnly: true,
             path: "/",
         });
     });
@@ -54,12 +53,7 @@ export async function middleware(request: NextRequest) {
                     );
                     supabaseResponse = NextResponse.next({ request });
                     cookiesToSet.forEach(({ name, value, options }) =>
-                        supabaseResponse.cookies.set(name, value, {
-                            ...options,
-                            secure: true,
-                            sameSite: "lax",
-                            httpOnly: true,
-                        })
+                        supabaseResponse.cookies.set(name, value, options)
                     );
                 },
             },
