@@ -6,13 +6,14 @@ import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { BLOCS_DATA } from "@/lib/mockData";
+import { setUserTier } from "@/app/actions/setUserTier";
 
 const ADMIN_EMAIL = "mbebourasam@gmail.com";
 const TOTAL_BLOCS = BLOCS_DATA.length;
 
 type Profile = {
   id: string;
-  has_paid: boolean;
+  tier: string | null;
   completed_blocks: number[] | null;
 };
 
@@ -43,6 +44,31 @@ function formatLastSeen(dateStr: string | null): { label: string; style: "online
   return         { label: `Il y a ${mo} mois`,       style: "default" };
 }
 
+function TierBadge({ tier }: { tier: string | null }) {
+  if (tier === "full") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+        Complet
+      </span>
+    );
+  }
+  if (tier === "beginner") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-[#e8d5b0]/15 text-[#e8d5b0] border border-[#e8d5b0]/20">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#e8d5b0]" />
+        Fondations
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-red-500/10 text-red-400 border border-red-500/15">
+      <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+      Gratuit
+    </span>
+  );
+}
+
 export default async function AdminPage() {
   // ── 1. Vérification identité ──────────────────────────────────────────────
   const supabase = createClient();
@@ -61,7 +87,7 @@ export default async function AdminPage() {
   );
 
   const [{ data: profiles }, { data: authData }] = await Promise.all([
-    supabaseAdmin.from("profiles").select("id, has_paid, completed_blocks").order("id"),
+    supabaseAdmin.from("profiles").select("id, tier, completed_blocks").order("id"),
     supabaseAdmin.auth.admin.listUsers({ perPage: 1000 }),
   ]);
 
@@ -78,7 +104,10 @@ export default async function AdminPage() {
     lastSignIn: lastSignInMap.get(p.id) ?? null,
   }));
 
-  const paidCount = users.filter((u) => u.has_paid).length;
+  const fullCount = users.filter((u) => u.tier === "full").length;
+  const beginnerCount = users.filter((u) => u.tier === "beginner").length;
+  const paidCount = fullCount + beginnerCount;
+
   const avgBlocs =
     users.length === 0
       ? 0
@@ -114,18 +143,13 @@ export default async function AdminPage() {
         </div>
 
         {/* KPI cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
           {[
             { label: "Utilisateurs", value: users.length },
-            { label: "Accès payants", value: paidCount },
-            {
-              label: "Taux conversion",
-              value:
-                users.length === 0
-                  ? "—"
-                  : `${Math.round((paidCount / users.length) * 100)}%`,
-            },
-            { label: "Blocs moy. terminés", value: `${avgBlocs} / ${TOTAL_BLOCS}` },
+            { label: "Gratuits", value: users.length - paidCount },
+            { label: "Fondations", value: beginnerCount },
+            { label: "Complet", value: fullCount },
+            { label: "Blocs moy.", value: `${avgBlocs} / ${TOTAL_BLOCS}` },
           ].map((kpi) => (
             <div
               key={kpi.label}
@@ -149,7 +173,10 @@ export default async function AdminPage() {
                     Email
                   </th>
                   <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
-                    Statut
+                    Tier
+                  </th>
+                  <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
+                    Modifier
                   </th>
                   <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
                     Dernière connexion
@@ -179,22 +206,60 @@ export default async function AdminPage() {
                         {u.email}
                       </td>
 
-                      {/* has_paid badge */}
+                      {/* Tier badge */}
                       <td className="px-5 py-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium ${
-                            u.has_paid
-                              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
-                              : "bg-red-500/10 text-red-400 border border-red-500/15"
-                          }`}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              u.has_paid ? "bg-emerald-400" : "bg-red-400"
-                            }`}
-                          />
-                          {u.has_paid ? "Payant" : "Gratuit"}
-                        </span>
+                        <TierBadge tier={u.tier} />
+                      </td>
+
+                      {/* Tier selector */}
+                      <td className="px-5 py-4">
+                        <div className="flex gap-1.5">
+                          <form action={async () => {
+                            "use server";
+                            await setUserTier(u.id, null);
+                          }}>
+                            <button
+                              type="submit"
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
+                                u.tier === null
+                                  ? "bg-red-500/20 text-red-300 border border-red-500/30"
+                                  : "bg-white/5 text-white/30 border border-white/10 hover:bg-white/10"
+                              }`}
+                            >
+                              Gratuit
+                            </button>
+                          </form>
+                          <form action={async () => {
+                            "use server";
+                            await setUserTier(u.id, "beginner");
+                          }}>
+                            <button
+                              type="submit"
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
+                                u.tier === "beginner"
+                                  ? "bg-[#e8d5b0]/20 text-[#e8d5b0] border border-[#e8d5b0]/30"
+                                  : "bg-white/5 text-white/30 border border-white/10 hover:bg-white/10"
+                              }`}
+                            >
+                              Fondations
+                            </button>
+                          </form>
+                          <form action={async () => {
+                            "use server";
+                            await setUserTier(u.id, "full");
+                          }}>
+                            <button
+                              type="submit"
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
+                                u.tier === "full"
+                                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                  : "bg-white/5 text-white/30 border border-white/10 hover:bg-white/10"
+                              }`}
+                            >
+                              Complet
+                            </button>
+                          </form>
+                        </div>
                       </td>
 
                       {/* Dernière connexion */}
@@ -253,7 +318,7 @@ export default async function AdminPage() {
                 {users.length === 0 && (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-5 py-10 text-center text-white/30 text-sm"
                     >
                       Aucun utilisateur trouvé.
