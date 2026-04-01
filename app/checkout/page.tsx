@@ -108,7 +108,6 @@ export default async function CheckoutPage() {
                             Passer au complet
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                         </a>
-                        <p className="text-center text-xs text-white/25 mt-4">Paiement sécurisé via Stripe · Satisfait ou remboursé 30 jours</p>
                     </div>
                 ) : (
                     /* Standard flow — 2 options */
