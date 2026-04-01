@@ -102,11 +102,11 @@ export default function DashboardHub() {
         <Logo layout="horizontal" className="h-6" hideText={false} />
         <div className="flex items-center gap-6 text-sm">
           <Link href="/dashboard" className="text-[#f0ede8] font-medium">
-            Le hub
+            Tableau de bord
           </Link>
           {(tier === "beginner" || tier === "full") && (
             <Link href="/beginner" className="text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5">
-              <GraduationCap className="w-3.5 h-3.5" /> Débutant
+              <GraduationCap className="w-3.5 h-3.5" /> Fondations
             </Link>
           )}
           {tier === "full" && (

@@ -3,7 +3,7 @@ import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import {
     ArrowRight, BookOpen, Cpu, Image, Rocket, Compass,
-    ChevronRight, Zap, Code2
+    ChevronRight, Code2
 } from "lucide-react";
 
 const MODULES = [
@@ -56,7 +56,7 @@ const MODULES = [
             {
                 subtitle: "Prompt basique vs prompt structuré",
                 content:
-                    "❌ Basique : \"Fais-moi un site e-commerce\"\n✅ Structuré : \"Tu es un expert Next.js. Génère la page d'accueil d'un site e-commerce pour sneakers de luxe. Hero avec texte centré, grille de 3 produits, palette sombre, police moderne. Pas de Tailwind, vanilla CSS uniquement.\"\n\nLe delta de résultat est massif. La précision de ton prompt = la précision de l'output.",
+                    "Basique : \"Fais-moi un site e-commerce\"\nStructuré : \"Tu es un expert Next.js. Génère la page d'accueil d'un site e-commerce pour sneakers de luxe. Hero avec texte centré, grille de 3 produits, palette sombre, police moderne. Pas de Tailwind, vanilla CSS uniquement.\"\n\nLe delta de résultat est massif. La précision de ton prompt = la précision de l'output.",
             },
             {
                 subtitle: "Créer un projet dédié (Claude / Gem Gemini)",
@@ -124,7 +124,7 @@ const MODULES = [
             },
         ],
         cta: {
-            label: "💡 Dans la partie complète de Build, tu verras comment architecturer tout ça pour que ça tienne, que ça scale, et que ça convertisse.",
+            label: "Dans la partie complète de Build, tu verras comment architecturer tout ça pour que ça tienne, que ça scale, et que ça convertisse.",
         },
     },
     {
@@ -139,7 +139,7 @@ const MODULES = [
             {
                 subtitle: "Ce que tu ne sais pas encore",
                 content:
-                    "✗ Penser ton projet avec un framework avant de construire\n✗ Créer une identité visuelle qui reste\n✗ Structurer un site qui convertit (pas juste qui est beau)\n✗ Architecture backend qui tient dans le temps\n✗ SEO/GEO pour être trouvé\n✗ Logique business derrière les choix techniques",
+                    "Penser ton projet avec un framework avant de construire\nCréer une identité visuelle qui reste\nStructurer un site qui convertit (pas juste qui est beau)\nArchitecture backend qui tient dans le temps\nSEO/GEO pour être trouvé\nLogique business derrière les choix techniques",
             },
             {
                 subtitle: "C'est exactement ce que les Blocs 1 à 7 apportent",
@@ -148,7 +148,7 @@ const MODULES = [
             },
         ],
         cta: {
-            label: "Passe au système complet — 70€ de complément",
+            label: "Passer au système complet pour 70€ de complément",
             href: "/checkout",
         },
     },
@@ -158,6 +158,7 @@ export default async function BeginnerPage() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
+    let tier: string | null = null;
     let displayName = "Builder";
     if (user) {
         const firstName =
@@ -166,7 +167,16 @@ export default async function BeginnerPage() {
             user.email?.split("@")[0] ||
             "Builder";
         displayName = firstName;
+
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("tier")
+            .eq("id", user.id)
+            .single();
+        tier = profile?.tier ?? null;
     }
+
+    const isFull = tier === "full";
 
     return (
         <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans relative overflow-hidden">
@@ -178,21 +188,18 @@ export default async function BeginnerPage() {
             <nav className="w-full max-w-4xl mx-auto flex items-center justify-between py-6 px-6 relative z-20">
                 <Logo layout="horizontal" className="h-6" hideText={false} />
                 <Link href="/dashboard" className="flex items-center gap-1.5 text-sm text-white/40 hover:text-white/80 transition-colors">
-                    ← Le hub
+                    Tableau de bord
                 </Link>
             </nav>
 
             <div className="max-w-4xl mx-auto px-6 pb-24 relative z-10">
                 {/* Header */}
                 <header className="pt-8 mb-16">
-                    <span className="inline-flex items-center gap-2 text-xs font-medium text-[#e8d5b0] bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-full px-3 py-1 mb-6">
-                        <Zap className="w-3 h-3" /> Build Débutant
-                    </span>
                     <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-[#f0ede8] mb-4">
-                        Les bases pour construire
+                        Les fondations
                     </h1>
                     <p className="text-[rgba(240,237,232,0.55)] text-lg leading-relaxed max-w-2xl">
-                        5 modules pour passer de zéro à un site en ligne — et comprendre ce dont tu as besoin pour aller plus loin.
+                        5 modules pour passer de zéro à un site en ligne et comprendre ce dont tu as besoin pour aller plus loin.
                     </p>
 
                     {/* Progress bar placeholder */}
@@ -210,6 +217,7 @@ export default async function BeginnerPage() {
                 <div className="space-y-8">
                     {MODULES.map((module) => {
                         const Icon = module.icon;
+                        const isUpgradeCta = module.cta && "href" in module.cta;
                         return (
                             <div
                                 key={module.id}
@@ -261,16 +269,16 @@ export default async function BeginnerPage() {
 
                                 {/* CTA */}
                                 {module.cta && (
-                                    <div className={`px-8 pb-8 ${module.cta.href ? "" : "pt-2"}`}>
-                                        {module.cta.href ? (
+                                    <div className={`px-8 pb-8 ${isUpgradeCta ? "" : "pt-2"}`}>
+                                        {isUpgradeCta && !isFull ? (
                                             <Link
-                                                href={module.cta.href}
+                                                href={(module.cta as { label: string; href: string }).href}
                                                 className="group flex items-center justify-between w-full bg-[#e8d5b0]/10 hover:bg-[#e8d5b0]/15 border border-[#e8d5b0]/20 hover:border-[#e8d5b0]/35 rounded-xl px-6 py-4 transition-all duration-200"
                                             >
                                                 <span className="text-sm font-medium text-[#e8d5b0]">{module.cta.label}</span>
                                                 <ArrowRight className="w-4 h-4 text-[#e8d5b0] group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0 ml-3" />
                                             </Link>
-                                        ) : (
+                                        ) : isUpgradeCta && isFull ? null : (
                                             <div className="bg-white/[0.03] border border-white/[0.07] rounded-xl px-6 py-4">
                                                 <p className="text-xs text-white/40 leading-relaxed">{module.cta.label}</p>
                                             </div>
@@ -283,17 +291,29 @@ export default async function BeginnerPage() {
                 </div>
 
                 {/* Final CTA */}
-                <div className="mt-16 text-center">
-                    <p className="text-white/30 text-sm mb-6">Tu as terminé le contenu débutant.</p>
-                    <Link
-                        href="/checkout"
-                        className="group inline-flex items-center gap-2 py-4 px-8 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]"
-                    >
-                        Passer au système complet — 70€
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                    </Link>
-                    <p className="text-white/20 text-xs mt-4">Blocs 1–7 · Sources · Communauté Telegram</p>
-                </div>
+                {!isFull && (
+                    <div className="mt-16 text-center">
+                        <p className="text-white/30 text-sm mb-6">Tu as terminé le contenu des fondations.</p>
+                        <Link
+                            href="/checkout"
+                            className="group inline-flex items-center gap-2 py-4 px-8 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]"
+                        >
+                            Passer au système complet
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                        </Link>
+                        <p className="text-white/20 text-xs mt-4">Blocs 1–7 · Sources · Communauté Telegram</p>
+                    </div>
+                )}
+
+                {isFull && (
+                    <div className="mt-16 text-center">
+                        <p className="text-white/30 text-sm">Tu as accès à l&apos;ensemble du système.</p>
+                        <Link href="/dashboard" className="inline-flex items-center gap-2 mt-4 text-sm text-[#e8d5b0] hover:text-[#f0dfc0] transition-colors">
+                            Retour au tableau de bord
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </div>
+                )}
             </div>
         </main>
     );
