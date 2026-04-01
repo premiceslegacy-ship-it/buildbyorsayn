@@ -13,11 +13,11 @@ export async function getCommunityLink(): Promise<string | null> {
 
     const { data: profile } = await supabase
         .from("profiles")
-        .select("has_paid")
+        .select("tier")
         .eq("id", user.id)
         .single();
 
-    if (!profile || profile.has_paid !== true) return null;
+    if (!profile || profile.tier !== "full") return null;
 
     return process.env.COMMUNITY_LINK ?? null;
 }

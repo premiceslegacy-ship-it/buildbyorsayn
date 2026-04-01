@@ -5,49 +5,76 @@ import { revalidatePath } from "next/cache";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+function determineTier(priceId: string | null | undefined): "beginner" | "full" {
+    if (priceId === process.env.STRIPE_BEGINNER_PRICE_ID) return "beginner";
+    // FULL (100€) and UPGRADE (70€) both grant full access
+    return "full";
+}
+
 export async function POST(req: NextRequest) {
-  const body = await req.text();
-  const signature = req.headers.get("stripe-signature");
+    const body = await req.text();
+    const signature = req.headers.get("stripe-signature");
 
-  if (!signature) {
-    return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 });
-  }
-
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err) {
-    console.error("Webhook verification failed");
-    return NextResponse.json({ error: "Verification failed" }, { status: 400 });
-  }
-
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const userId = session.client_reference_id;
-
-    if (userId) {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      );
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({ has_paid: true })
-        .eq("id", userId);
-
-      if (error) {
-        console.error("Profile update failed for session:", session.id);
-        return NextResponse.json({ error: "Processing failed" }, { status: 500 });
-      }
-
-      revalidatePath("/", "layout");
+    if (!signature) {
+        return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 });
     }
-  }
 
-  return NextResponse.json({ received: true }, { status: 200 });
+    let event: Stripe.Event;
+    try {
+        event = stripe.webhooks.constructEvent(
+            body,
+            signature,
+            process.env.STRIPE_WEBHOOK_SECRET!
+        );
+    } catch (err) {
+        console.error("Webhook verification failed");
+        return NextResponse.json({ error: "Verification failed" }, { status: 400 });
+    }
+
+    if (event.type === "checkout.session.completed") {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const userId = session.client_reference_id;
+
+        if (userId) {
+            const supabase = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.SUPABASE_SERVICE_ROLE_KEY!
+            );
+
+            // Retrieve line items to identify which price was purchased
+            let priceId: string | null = null;
+            try {
+                const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 });
+                priceId = lineItems.data[0]?.price?.id ?? null;
+            } catch (e) {
+                console.error("Could not retrieve line items:", e);
+            }
+
+            const tier = determineTier(priceId);
+
+            // If user is upgrading from beginner to full, always set full
+            // If already full, keep full (upsert-safe)
+            const { data: existingProfile } = await supabase
+                .from("profiles")
+                .select("tier")
+                .eq("id", userId)
+                .single();
+
+            const finalTier = existingProfile?.tier === "full" ? "full" : tier;
+
+            const { error } = await supabase
+                .from("profiles")
+                .update({ tier: finalTier })
+                .eq("id", userId);
+
+            if (error) {
+                console.error("Profile update failed for session:", session.id);
+                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+            }
+
+            revalidatePath("/", "layout");
+        }
+    }
+
+    return NextResponse.json({ received: true }, { status: 200 });
 }

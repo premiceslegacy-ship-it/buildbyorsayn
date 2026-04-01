@@ -46,7 +46,7 @@ export default function BlocPage() {
 
   const { checkedItems, toggleItem, globalProgress, isLoaded, setLastVisitedBloc } = useProgress();
   const [activeSection, setActiveSection] = useState<string>("");
-  const [hasPaid, setHasPaid] = useState<boolean | null>(null);
+  const [tier, setTier] = useState<string | null>(null);
   const [checkoutUserId, setCheckoutUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,10 +63,10 @@ export default function BlocPage() {
       setCheckoutUserId(user.id);
       const { data: profile } = await supabase
         .from("profiles")
-        .select("has_paid")
+        .select("tier")
         .eq("id", user.id)
         .single();
-      setHasPaid(profile?.has_paid === true);
+      setTier(profile?.tier ?? null);
     };
     fetchProfile();
   }, [blocId]);
@@ -145,8 +145,8 @@ export default function BlocPage() {
     ? `https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02?client_reference_id=${checkoutUserId}`
     : "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02";
   const blocIdNum = Number(blocId);
-  const showPaywall = hasPaid === false && blocIdNum > 1;
-  const showContent = hasPaid === true || blocIdNum === 1;
+  const showPaywall = tier !== "full" && tier !== null && blocIdNum > 1;
+  const showContent = tier === "full" || blocIdNum === 1;
 
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] font-sans relative selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
@@ -172,7 +172,7 @@ export default function BlocPage() {
             </h1>
 
             {/* Skeleton — chargement en cours pour blocs > 1 */}
-            {hasPaid === null && blocIdNum > 1 && (
+            {tier === null && blocIdNum > 1 && (
               <div className="mt-16 space-y-8 animate-pulse">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="space-y-3">

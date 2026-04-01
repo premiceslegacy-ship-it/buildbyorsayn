@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock, ShieldCheck } from "lucide-react";
+import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock, ShieldCheck, GraduationCap } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -36,7 +36,7 @@ export default function DashboardHub() {
   const [displayName, setDisplayName] = useState("...");
   const [displayEmail, setDisplayEmail] = useState("");
   const [initials, setInitials] = useState("?");
-  const [hasPaid, setHasPaid] = useState<boolean | null>(null);
+  const [tier, setTier] = useState<string | null>(null);
   const [communityLink, setCommunityLink] = useState<string | null>(null);
 
   useEffect(() => {
@@ -57,18 +57,17 @@ export default function DashboardHub() {
       setDisplayEmail(email);
       setInitials(firstName.substring(0, 2).toUpperCase());
 
-      // Récupérer has_paid et completed_blocks depuis la table profiles
+      // Récupérer tier depuis la table profiles
       const { data: profile } = await supabase
         .from("profiles")
-        .select("has_paid, completed_blocks")
+        .select("tier, completed_blocks")
         .eq("id", user.id)
         .single();
-      if (profile?.has_paid === true) {
-        setHasPaid(true);
+      const userTier = profile?.tier ?? null;
+      setTier(userTier);
+      if (userTier === "full") {
         const link = await getCommunityLink();
         setCommunityLink(link);
-      } else {
-        setHasPaid(false);
       }
     };
     fetchUser();
@@ -105,9 +104,16 @@ export default function DashboardHub() {
           <Link href="/dashboard" className="text-[#f0ede8] font-medium">
             Le hub
           </Link>
-          <Link href="/sources" className="text-white/40 hover:text-white/80 transition-colors">
-            La stack
-          </Link>
+          {(tier === "beginner" || tier === "full") && (
+            <Link href="/beginner" className="text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5">
+              <GraduationCap className="w-3.5 h-3.5" /> Débutant
+            </Link>
+          )}
+          {tier === "full" && (
+            <Link href="/sources" className="text-white/40 hover:text-white/80 transition-colors">
+              La stack
+            </Link>
+          )}
 
           {displayEmail === "mbebourasam@gmail.com" && (
             <Link
@@ -171,6 +177,18 @@ export default function DashboardHub() {
             />
           </div>
 
+          {/* CTA upgrade pour les beginners */}
+          {tier === "beginner" && (
+            <div className="mt-2 flex items-center justify-between bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-xl px-5 py-4">
+              <div>
+                <p className="text-sm font-medium text-[#e8d5b0]">Passe au système complet</p>
+                <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs, les sources et la communauté pour 70€.</p>
+              </div>
+              <Link href="/checkout" className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all px-4 py-2 rounded-lg ml-4">
+                Upgrader <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          )}
         </header>
 
         {/* 2. Carte "Reprendre" (Resume Action) */}
@@ -215,13 +233,13 @@ export default function DashboardHub() {
                     <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
 
                     {/* Badge accès */}
-                    {hasPaid === false && bloc.id !== "1" && (
+                    {tier !== "full" && bloc.id !== "1" && (
                       <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-2.5 py-1">
                         <Lock className="w-3 h-3 text-white/30" />
                         <span className="text-[11px] text-white/30 font-medium">Premium</span>
                       </div>
                     )}
-                    {hasPaid === false && bloc.id === "1" && (
+                    {tier !== "full" && bloc.id === "1" && (
                       <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1">
                         <span className="text-[11px] text-emerald-400 font-medium">Gratuit</span>
                       </div>
@@ -271,7 +289,7 @@ export default function DashboardHub() {
                 <motion.div whileHover="hover">
                   <LiquidCard className="p-8 md:p-10 transition-all duration-500 cursor-pointer">
                     <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
-                    {hasPaid === false && (
+                    {tier !== "full" && (
                       <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-2.5 py-1">
                         <Lock className="w-3 h-3 text-white/30" />
                         <span className="text-[11px] text-white/30 font-medium">Premium</span>
@@ -310,8 +328,8 @@ export default function DashboardHub() {
           );
         })()}
 
-        {/* 4. Bloc Communauté — affiché uniquement si has_paid est strictement true */}
-        {hasPaid === true && (
+        {/* 4. Bloc Communauté — affiché uniquement pour tier = 'full' */}
+        {tier === "full" && (
           <div className="mt-6">
             <a
               href={communityLink ?? "#"}

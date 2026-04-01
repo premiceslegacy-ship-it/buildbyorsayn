@@ -43,7 +43,7 @@ export async function redeemBetaCode(
 
     const { error: updateError } = await supabaseAdmin
         .from("profiles")
-        .update({ has_paid: true })
+        .update({ tier: "full" })
         .eq("id", user.id);
 
     if (updateError) {

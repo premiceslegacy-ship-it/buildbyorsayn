@@ -70,22 +70,33 @@ export async function middleware(request: NextRequest) {
         return createRedirectWithCookies(loginUrl, supabaseResponse, SECURITY_HEADERS);
     }
 
-    // Vérifier has_paid uniquement pour les routes payantes
     const pathname = request.nextUrl.pathname;
-    const requiresPayment =
+
+    // Routes réservées aux membres full (100€)
+    const requiresFull =
         pathname === "/sources" ||
         pathname === "/fin" ||
         pathname === "/intro" ||
         pathname.startsWith("/admin");
 
-    if (requiresPayment) {
+    // Route réservée aux membres beginner ET full (30€+)
+    const requiresBeginner = pathname === "/beginner";
+
+    if (requiresFull || requiresBeginner) {
         const { data: profile } = await supabase
             .from("profiles")
-            .select("has_paid")
+            .select("tier")
             .eq("id", user.id)
             .single();
 
-        if (!profile || profile.has_paid !== true) {
+        const tier = profile?.tier;
+
+        if (requiresFull && tier !== "full") {
+            const checkoutUrl = new URL("/checkout", request.url);
+            return createRedirectWithCookies(checkoutUrl, supabaseResponse, SECURITY_HEADERS);
+        }
+
+        if (requiresBeginner && tier !== "beginner" && tier !== "full") {
             const checkoutUrl = new URL("/checkout", request.url);
             return createRedirectWithCookies(checkoutUrl, supabaseResponse, SECURITY_HEADERS);
         }
@@ -101,5 +112,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/fin", "/intro", "/admin/:path*"],
+    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/fin", "/intro", "/admin/:path*", "/beginner"],
 };
