@@ -33,14 +33,32 @@ export async function POST(req: NextRequest) {
 
     if (event.type === "checkout.session.completed") {
         const session = event.data.object as Stripe.Checkout.Session;
-        const userId = session.client_reference_id;
+        let userId = session.client_reference_id;
+        const customerEmail = session.customer_details?.email;
+
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        // Si on n'a pas de client_reference_id (paiement hors plateforme, ex: lien email)
+        // On essaie de retrouver l'utilisateur via son adresse email
+        if (!userId && customerEmail) {
+            const { data: profile } = await supabase
+                .from("profiles")
+                .select("id")
+                .eq("email", customerEmail)
+                .single();
+            
+            if (profile) {
+                userId = profile.id;
+            } else {
+                console.error(`Paiement reçu pour ${customerEmail} mais aucun compte trouvé dans la BDD.`);
+                // On pourrait créer un compte ici, ou envoyer un mail d'erreur à l'admin
+            }
+        }
 
         if (userId) {
-            const supabase = createClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                process.env.SUPABASE_SERVICE_ROLE_KEY!
-            );
-
             // Retrieve line items to identify which price was purchased
             let priceId: string | null = null;
             try {
