@@ -16,7 +16,7 @@ export function Section3() {
           Le "AI slop", c'est ce rendu générique, lisse, sur-saturé et artificiel que produisent les IA par défaut. Un utilisateur le repère en une fraction de seconde, et ça détruit instantanément la crédibilité de ton site.
         </p>
         <p className="text-sm text-white/60 leading-relaxed">
-          La solution ? <strong className="text-white">Le contexte visuel.</strong> Ne demande jamais à une IA de "faire un beau design". Va d'abord sur Pinterest, Dribbble ou Awwwards. Prends des captures d'écran des sites, des couleurs, des typos, des ambiances photographiques qui te plaisent. Donne ces images de référence à ton IA (Claude, ChatGPT). C'est ce qui transforme un rendu amateur en rendu premium.
+          La solution ? <strong className="text-white">Le contexte visuel.</strong> Ne demande jamais à une IA de "faire un beau design". Va d'abord sur Pinterest, Dribbble ou Awwwards. Prends des captures d'écran des sites, des couleurs, des typos, des ambiances photographiques qui te plaisent. Donne ces images de référence à ton IA. C'est ce qui transforme un rendu amateur en rendu premium.
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export function Section3() {
             },
             {
               name: "Higgsfield",
-              desc: "Un 'wrapper d'IA' regroupant tout un tas d'outils au même endroit. Confort absolu pour centraliser ta création visuelle.",
+              desc: "Un 'wrapper d'IA' regroupant tout un tas d'outils au même endroit. Confort absolu pour centraliser ta création visuelle. (faut du budget)",
             },
           ].map(({ name, desc }) => (
             <div key={name} className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5">

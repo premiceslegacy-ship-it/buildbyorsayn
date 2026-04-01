@@ -9,7 +9,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">L'angle mort</h2>
       </div>
       <p className="text-white/60 text-base leading-relaxed mb-10">
-        Jusqu'ici, on a vu 20% du travail. Ça suffit pour faire un "beau site". Ça ne suffit pas pour créer un système qui génère de l'argent.
+        Jusqu'ici, on a vu 20% du travail. Ça suffit pour faire un "beau site". Ça ne suffit pas pour créer de vrais systèmes.
       </p>
 
       {/* Les 4 piliers */}
@@ -17,20 +17,20 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
         {[
           {
-            title: "Le système ORACLE",
-            desc: "La base de données et l'authentification (ce que je fais avec Supabase). Sans ça, tu n'as pas d'utilisateurs, juste des visiteurs anonymes.",
+            title: "Le framework ORACLE",
+            desc: "Ma méthode pour construire un projet de A à Z avec l'IA. Il remplace le prompt hasardeux par une structure de documents (BRIEF, BRAND-SYSTEM, DESIGN-SYSTEM, PRD, PARCOURS-UTILISATEURS, PROMPT-SYSTEM) qui permettent à l'IA d'avoir un contexte extrêmement précis. Chaque document nourrit le suivant. Le résultat final n'a rien à voir avec ce que tu obtiens en tapant crée moi un site dans Lovable.",
           },
           {
             title: "La logique business",
-            desc: "Le code qui connecte tout. Comment on gère un abonnement Stripe ? Comment on restreint l'accès au contenu selon le paiement ?",
+            desc: "Comment choisir une niche, se positionner, vendre avant de construire, itérer sur le feedback terrain. La technique c’est que 10% de l’équation, le plus dur c’est de vendre et faire de l’argent.",
           },
           {
-            title: "L'identité visuelle radicale",
-            desc: "Au-delà des belles images de Midjourney, il faut un Design System (Tailwind) cohérent qui s'applique à chaque bouton et chaque texte.",
+            title: "L'identité visuelle forte",
+            desc: "la différence entre un site qu'on oublie 10 secondes après l'avoir vu et un site qui installe une perception de marque. Ce n'est pas une question de budget, c'est une question de système.",
           },
           {
             title: "L'ingénierie des Skills",
-            desc: "Au-delà d'un prompt basique, comment on construit un système complet pour Cursor ou Claude qu'on charge en un clic ?",
+            desc: "Au-delà d'un prompt basique, comment on construit un système complet de skills qu'on charge en un clic ?",
           },
         ].map(({ title, desc }) => (
           <div key={title} className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5">

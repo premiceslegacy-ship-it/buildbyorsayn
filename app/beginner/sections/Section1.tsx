@@ -61,7 +61,7 @@ export function Section1() {
       <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Pourquoi une IA seule ne suffit pas</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
-          Beaucoup de gens pensent qu'il suffit de demander à ChatGPT ou Claude "crée-moi un site pour un plombier" pour avoir un résultat professionnel. En théorie c'est possible. En pratique, le résultat sera générique, sans personnalité, sans compréhension du vrai problème du client.
+          Beaucoup de gens pensent qu'il suffit de demander à l'IA "crée-moi un site pour un plombier" pour avoir un résultat professionnel. En théorie c'est possible. En pratique, le résultat sera générique, sans personnalité, sans compréhension du vrai problème du client.
         </p>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
           L'IA est un outil d'exécution extraordinaire. Mais elle a besoin d'un chef de projet qui sait ce qu'il veut. Mon rôle, ce n'est pas d'écrire du code. Mon rôle est de comprendre le problème, prendre les bonnes décisions de structure, et donner à l'IA un contexte suffisamment précis pour qu'elle produise quelque chose qui tient. <strong className="text-[#f0ede8]">L'IA fait l'exécution. Moi je fais le jugement.</strong>
