@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock, ShieldCheck, GraduationCap } from "lucide-react";
+import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock, ShieldCheck, GraduationCap, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -15,6 +15,7 @@ import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
 import { getCommunityLink } from "@/app/actions/getCommunityLink";
+import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 
 const ICONS: Record<string, any> = {
   "1": Workflow,
@@ -38,6 +39,12 @@ export default function DashboardHub() {
   const [initials, setInitials] = useState("?");
   const [tier, setTier] = useState<string | null>(null);
   const [communityLink, setCommunityLink] = useState<string | null>(null);
+  const [modal, setModal] = useState<null | "foundations" | "both">(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [checkoutUrls, setCheckoutUrls] = useState<{ beginner: string | null; full: string }>({
+    beginner: null,
+    full: "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02",
+  });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -56,6 +63,11 @@ export default function DashboardHub() {
       setDisplayName(firstName);
       setDisplayEmail(email);
       setInitials(firstName.substring(0, 2).toUpperCase());
+      setUserId(user.id);
+
+      // Fetch checkout URLs via server action
+      const urls = await getCheckoutUrls();
+      setCheckoutUrls(urls);
 
       // Récupérer tier depuis la table profiles
       const { data: profile } = await supabase
@@ -104,15 +116,25 @@ export default function DashboardHub() {
           <Link href="/dashboard" className="text-[#f0ede8] font-medium">
             Tableau de bord
           </Link>
-          {(tier === "beginner" || tier === "full") && (
+          {/* Fondations — toujours visible, comportement selon tier */}
+          {(tier === "beginner" || tier === "full") ? (
             <Link href="/beginner" className="text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5">
               <GraduationCap className="w-3.5 h-3.5" /> Fondations
             </Link>
+          ) : (
+            <button onClick={() => setModal("foundations")} className="text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5 cursor-pointer bg-transparent border-none font-[inherit] text-sm">
+              <GraduationCap className="w-3.5 h-3.5" /> Fondations
+            </button>
           )}
-          {tier === "full" && (
+          {/* Stack — toujours visible */}
+          {tier === "full" ? (
             <Link href="/sources" className="text-white/40 hover:text-white/80 transition-colors">
               La stack
             </Link>
+          ) : (
+            <button onClick={() => setModal("both")} className="text-white/40 hover:text-white/80 transition-colors cursor-pointer bg-transparent border-none font-[inherit] text-sm">
+              La stack
+            </button>
           )}
 
           {displayEmail === "mbebourasam@gmail.com" && (
@@ -217,15 +239,16 @@ export default function DashboardHub() {
 
         {/* 3. La Grille des Blocs (Le Menu) — blocs 1 à 6 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {BLOCS_DATA.filter((b) => b.id !== "7").map((bloc) => {
+        {BLOCS_DATA.filter((b) => b.id !== "7").map((bloc) => {
             const Icon = ICONS[bloc.id] || Workflow;
             const progress = isLoaded ? getBlocProgress(bloc.id) : 0;
+            const isLocked = tier !== "full" && bloc.id !== "1";
 
             return (
-              <Link
-                href={`/blocs/${bloc.id}`}
+              <div
                 key={bloc.id}
                 className="group cursor-pointer animate-reveal block h-full"
+                onClick={() => isLocked ? setModal("both") : router.push(`/blocs/${bloc.id}`)}
               >
                 <motion.div whileHover="hover" className="h-full">
                   <LiquidCard className="p-6 text-left transition-all duration-500 flex flex-col h-full min-h-[220px]">
@@ -272,7 +295,7 @@ export default function DashboardHub() {
                     </div>
                   </LiquidCard>
                 </motion.div>
-              </Link>
+              </div>
             );
           })}
         </div>
@@ -285,7 +308,10 @@ export default function DashboardHub() {
           const progress = isLoaded ? getBlocProgress("7") : 0;
           return (
             <div className="mt-6">
-              <Link href="/blocs/7" className="group block">
+              <div
+                className="group block cursor-pointer"
+                onClick={() => tier === "full" ? router.push("/blocs/7") : setModal("both")}
+              >
                 <motion.div whileHover="hover">
                   <LiquidCard className="p-8 md:p-10 transition-all duration-500 cursor-pointer">
                     <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
@@ -323,7 +349,7 @@ export default function DashboardHub() {
                     </div>
                   </LiquidCard>
                 </motion.div>
-              </Link>
+              </div>
             </div>
           );
         })()}
@@ -366,6 +392,88 @@ export default function DashboardHub() {
         )}
 
       </div>
+
+      {/* Pricing Modal */}
+      {modal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm px-6"
+          onClick={() => setModal(null)}
+        >
+          <div className="relative w-full max-w-2xl" onClick={(e) => e.stopPropagation()}>
+            {/* Close button */}
+            <button
+              onClick={() => setModal(null)}
+              className="absolute -top-10 right-0 text-white/40 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className={modal === "both" ? "grid grid-cols-1 md:grid-cols-2 gap-5" : "max-w-sm mx-auto"}>
+              {/* Fondations card - toujours affichée */}
+              <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 flex flex-col backdrop-blur-xl">
+                <div className="mb-5">
+                  <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Fondations</span>
+                  <div className="flex items-baseline gap-1 mt-2 mb-1">
+                    <span className="text-3xl font-bold text-[#f0ede8]">30€</span>
+                    <span className="text-white/40 text-sm">TTC</span>
+                  </div>
+                  <p className="text-white/40 text-xs">Accès à vie aux fondations</p>
+                </div>
+                <ul className="space-y-2 mb-6 flex-1">
+                  {["5 modules pour construire", "De zéro à un site en ligne", "IA, GitHub, IDE, Vercel"].map((f) => (
+                    <li key={f} className="text-xs text-white/55 flex items-center gap-2">
+                      <span className="w-1 h-1 rounded-full bg-[#e8d5b0]/50 flex-shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={checkoutUrls.beginner
+                    ? `${checkoutUrls.beginner}${userId ? `?client_reference_id=${userId}` : ""}`
+                    : "/checkout"
+                  }
+                  className="flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm"
+                >
+                  Démarrer pour 30€
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              {/* Accès complet - uniquement modal "both" */}
+              {modal === "both" && (
+                <div className="bg-white/[0.04] border border-[#e8d5b0]/25 rounded-2xl p-6 flex flex-col relative backdrop-blur-xl">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] rounded-full px-3 py-1">Recommandé</span>
+                  </div>
+                  <div className="mb-5">
+                    <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Complet</span>
+                    <div className="flex items-baseline gap-1 mt-2 mb-1">
+                      <span className="text-3xl font-bold text-[#f0ede8]">100€</span>
+                      <span className="text-white/40 text-sm">TTC</span>
+                    </div>
+                    <p className="text-white/40 text-xs">Accès à vie à tout le système</p>
+                  </div>
+                  <ul className="space-y-2 mb-6 flex-1">
+                    {["7 blocs de système complets", "Méthodes actionnables", "Communauté privée", "Fondations incluses"].map((f) => (
+                      <li key={f} className="text-xs text-white/55 flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-[#e8d5b0]/50 flex-shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href={`${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`}
+                    className="flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] text-sm"
+                  >
+                    Débloquer l&apos;accès complet
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
