@@ -3,17 +3,17 @@
   "/api/webhooks/stripe/route": "app/api/webhooks/stripe/route.js",
   "/auth/callback/route": "app/auth/callback/route.js",
   "/beginner/page": "app/beginner/page.js",
-  "/checkout/page": "app/checkout/page.js",
-  "/blocs/[id]/page": "app/blocs/[id]/page.js",
   "/fin/page": "app/fin/page.js",
-  "/intro/page": "app/intro/page.js",
+  "/blocs/[id]/page": "app/blocs/[id]/page.js",
+  "/checkout/page": "app/checkout/page.js",
   "/forgot-password/page": "app/forgot-password/page.js",
   "/page": "app/page.js",
   "/opengraph-image.png/route": "app/opengraph-image.png/route.js",
-  "/twitter-image.png/route": "app/twitter-image.png/route.js",
+  "/intro/page": "app/intro/page.js",
   "/sources/page": "app/sources/page.js",
   "/update-password/page": "app/update-password/page.js",
+  "/twitter-image.png/route": "app/twitter-image.png/route.js",
+  "/dashboard/page": "app/dashboard/page.js",
   "/login/page": "app/login/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
+  "/admin/page": "app/admin/page.js"
 }

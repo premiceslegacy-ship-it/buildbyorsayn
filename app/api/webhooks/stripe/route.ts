@@ -6,9 +6,16 @@ import { revalidatePath } from "next/cache";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 function determineTier(priceId: string | null | undefined): "beginner" | "full" {
+    if (!priceId) return "beginner"; // Sécurité : si priceId inconnu, on ne promeut pas au-delà de beginner
     if (priceId === process.env.STRIPE_BEGINNER_PRICE_ID) return "beginner";
-    // FULL (100€) and UPGRADE (70€) both grant full access
-    return "full";
+    // FULL (100€) et UPGRADE (70€) donnent tous les deux l'accès complet
+    if (
+        priceId === process.env.STRIPE_FULL_PRICE_ID ||
+        priceId === process.env.STRIPE_UPGRADE_PRICE_ID
+    ) return "full";
+    // Price inconnue : on ne promeut pas
+    console.error(`[Webhook] Price ID inconnu reçu : ${priceId}`);
+    return "beginner";
 }
 
 export async function POST(req: NextRequest) {
