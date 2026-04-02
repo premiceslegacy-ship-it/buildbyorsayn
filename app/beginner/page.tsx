@@ -56,9 +56,9 @@ export default function BeginnerPage() {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-5 blur-[120px] w-[600px] h-[300px] rounded-full pointer-events-none z-0" />
 
       {/* Nav */}
-      <nav className="w-full max-w-7xl mx-auto flex items-center justify-between py-6 px-6 md:px-12 relative z-20">
+      <nav className="w-full max-w-7xl mx-auto flex flex-wrap gap-y-4 items-center justify-between py-4 md:py-6 px-4 md:px-12 relative z-20">
         <Logo layout="horizontal" className="h-6" hideText={false} />
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] sm:text-sm">
           <Link href="/dashboard" className="text-white/40 hover:text-white/80 transition-colors">Tableau de bord</Link>
           <Link href="/beginner" className="text-[#f0ede8] font-medium flex items-center gap-1.5">
             <GraduationCap className="w-3.5 h-3.5" /> Fondations
@@ -93,7 +93,7 @@ export default function BeginnerPage() {
         </div>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-6 md:px-8 pb-32 relative z-10">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 pb-32 relative z-10">
         {/* Progress */}
         <div className="pt-6 mb-10">
           <div className="flex items-center justify-between mb-3">

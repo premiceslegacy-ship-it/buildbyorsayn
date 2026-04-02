@@ -124,7 +124,7 @@ export default async function AdminPage() {
       {/* Halos */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-4 blur-[160px] w-[700px] h-[250px] rounded-full pointer-events-none" />
 
-      <div className="max-w-full mx-auto px-6 md:px-10 py-12">
+      <div className="max-w-full mx-auto px-4 sm:px-6 md:px-10 py-8 md:py-12">
         {/* Header */}
         <div className="mb-10 flex flex-col gap-1">
           <Link

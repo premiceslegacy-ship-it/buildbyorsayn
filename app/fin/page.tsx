@@ -24,7 +24,7 @@ export default function FinPage() {
         </h1>
 
         {/* Carte Centrale (Liquid Glass Niveau 3) */}
-        <LiquidCard className="pt-16 pb-10 px-10 md:pt-24 md:pb-14 md:px-14 w-full text-center shadow-[0_32px_64px_rgba(0,0,0,0.6)]">
+        <LiquidCard className="pt-12 pb-8 px-6 md:pt-24 md:pb-14 md:px-14 w-full text-center shadow-[0_32px_64px_rgba(0,0,0,0.6)]">
           <p className="text-[rgba(240,237,232,0.8)] leading-relaxed text-lg md:text-xl relative z-10">
             Tu as maintenant un système, des frameworks, des templates. Une stack. Une logique business. Ce qui va faire la différence entre toi et quelqu'un qui a lu le même document sans agir, c'est une seule chose. L'exécution. L'exécution imparfaite aujourd'hui bat la perfection théorique indéfiniment.
           </p>

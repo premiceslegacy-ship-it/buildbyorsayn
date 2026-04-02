@@ -154,7 +154,7 @@ export default function BlocPage() {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-5 blur-[120px] w-[600px] h-[300px] rounded-full pointer-events-none" />
       <div className="fixed bottom-0 right-0 bg-blue-500 opacity-5 blur-[120px] w-[400px] h-[400px] rounded-full pointer-events-none" />
 
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12 py-8 relative z-10">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-12 py-6 sm:py-8 relative z-10">
         <div className="mb-12">
           <Link
             href="/dashboard"
@@ -167,7 +167,7 @@ export default function BlocPage() {
 
         <div className="flex flex-col lg:flex-row gap-16 items-start">
           <div className={showPaywall ? "w-full max-w-3xl mx-auto" : "flex-1 w-full max-w-3xl"}>
-            <h1 className="text-4xl md:text-5xl font-bold mb-16 tracking-tight text-[#f0ede8]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-10 md:mb-16 tracking-tight text-[#f0ede8]">
               {bloc.titre}
             </h1>
 
@@ -205,7 +205,7 @@ export default function BlocPage() {
 
                 {/* CTA */}
                 <div className="mt-10 max-w-md mx-auto">
-                  <div className="bg-white/[0.04] backdrop-blur-2xl border border-white/10 rounded-3xl p-10 text-center shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
+                  <div className="bg-white/[0.04] backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-10 text-center shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
                     <div className="w-16 h-16 bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(232,213,176,0.1)]">
                       <Lock className="w-7 h-7 text-[#e8d5b0]" />
                     </div>
@@ -300,7 +300,7 @@ export default function BlocPage() {
               ))}
             </div>
 
-            <LiquidCard className="p-8 md:p-10 mt-24 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+            <LiquidCard className="p-6 md:p-10 mt-16 sm:mt-24 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
               <div className="flex items-center justify-between mb-8 relative z-10">
                 <p className="text-white/60 text-[15px]">Progression du bloc</p>
                 <span className="text-[#e8d5b0] font-medium text-[15px]">

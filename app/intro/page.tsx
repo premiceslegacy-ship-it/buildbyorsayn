@@ -62,7 +62,7 @@ export default function IntroPage() {
         <Logo layout="horizontal" />
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12 py-24 relative z-10">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-12 py-16 md:py-24 relative z-10">
         
         {/* Hero Section */}
         <section className="min-h-[80vh] flex flex-col justify-center mb-24">
@@ -71,7 +71,7 @@ export default function IntroPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-[#f0ede8] to-white/40 leading-[1.05]">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-[#f0ede8] to-white/40 leading-[1.05]">
               Avant de commencer.
             </h1>
             
@@ -170,7 +170,7 @@ export default function IntroPage() {
             whileHover="hover"
           >
             <LiquidCard 
-              className="p-12 md:p-20 flex flex-col items-center text-center relative overflow-hidden group cursor-pointer"
+              className="p-8 sm:p-12 md:p-20 flex flex-col items-center text-center relative overflow-hidden group cursor-pointer"
               onClick={() => router.push('/dashboard')}
             >
               

@@ -110,9 +110,9 @@ export default function DashboardHub() {
       <div className="absolute bottom-0 right-0 bg-blue-500 opacity-5 blur-[120px] w-[400px] h-[400px] rounded-full pointer-events-none" />
 
       {/* Top Navigation */}
-      <nav className="w-full max-w-7xl mx-auto flex items-center justify-between py-6 px-6 md:px-12 relative z-20">
+      <nav className="w-full max-w-7xl mx-auto flex flex-wrap gap-y-4 items-center justify-between py-4 md:py-6 px-4 md:px-12 relative z-20">
         <Logo layout="horizontal" className="h-6" hideText={false} />
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] sm:text-sm">
           <Link href="/dashboard" className="text-[#f0ede8] font-medium">
             Tableau de bord
           </Link>
@@ -180,7 +180,7 @@ export default function DashboardHub() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-12 pb-24 relative z-10">
 
         {/* 1. En-tête de page (Welcome & Global Progress) */}
         <header className="flex flex-col gap-4 pt-8 mb-12">
@@ -396,7 +396,7 @@ export default function DashboardHub() {
       {/* Pricing Modal */}
       {modal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm px-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 sm:p-6"
           onClick={() => setModal(null)}
         >
           <div className="relative w-full max-w-2xl" onClick={(e) => e.stopPropagation()}>

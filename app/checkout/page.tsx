@@ -52,7 +52,7 @@ export default async function CheckoutPage() {
     const alreadyFull = currentTier === "full";
 
     return (
-        <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans flex flex-col items-center justify-center relative overflow-hidden px-6">
+        <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans flex flex-col items-center justify-center relative overflow-hidden px-4 sm:px-6">
             {/* Halos */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-5 blur-[120px] w-[600px] h-[300px] rounded-full pointer-events-none" />
             <div className="absolute bottom-0 right-0 bg-blue-500 opacity-5 blur-[120px] w-[400px] h-[400px] rounded-full pointer-events-none" />
@@ -78,7 +78,7 @@ export default async function CheckoutPage() {
 
                 {alreadyFull ? (
                     /* Already full — show dashboard link */
-                    <div className="bg-white/[0.04] border border-[#e8d5b0]/20 rounded-2xl p-8 backdrop-blur-xl text-center">
+                    <div className="bg-white/[0.04] border border-[#e8d5b0]/20 rounded-2xl p-6 sm:p-8 backdrop-blur-xl text-center">
                         <p className="text-white/50 text-sm mb-6">Retourne au tableau de bord pour accéder à tes blocs, tes sources et la communauté.</p>
                         <a href="/dashboard" className="group inline-flex items-center justify-center gap-2 py-4 px-8 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)]">
                             Tableau de bord
