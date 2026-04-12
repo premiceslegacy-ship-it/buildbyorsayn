@@ -14,7 +14,7 @@ export default function Icon() {
       <svg
         width="32"
         height="32"
-        viewBox="0 0 200 200"
+        viewBox="-5 25 200 165"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >

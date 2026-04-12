@@ -26,9 +26,9 @@ export default async function Image() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyItems: 'center', gap: '30px' }}>
           <div style={{ display: 'flex' }}>
             <svg 
-              width="300" 
-              height="300" 
-              viewBox="0 0 200 200" 
+              width="450" 
+              height="350" 
+              viewBox="-5 25 200 165" 
               fill="none" 
               xmlns="http://www.w3.org/2000/svg"
             >
