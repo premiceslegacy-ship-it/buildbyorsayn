@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     siteName: "BUILD",
     images: [
       {
-        url: "/og-image.png",
+        url: "/open-graph-build.png",
         width: 1200,
         height: 630,
         alt: "BUILD by Orsayn",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "BUILD by Orsayn — Le système pour vendre dans le business IA",
     description: "BUILD est le système complet conçu par Orsayn pour construire, positionner et vendre vos offres d'agence IA. Méthode, outils et communauté.",
-    images: ["/og-image.png"],
+    images: ["/open-graph-build.png"],
   },
   icons: {
     icon: "/icon.png",
