@@ -6,12 +6,12 @@ import { AuthProvider } from "@/components/AuthProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BUILD",
-  description: "Le système complet pour construire et vendre dans le business IA.",
+  title: "BUILD by Orsayn — Le système pour vendre dans le business IA",
+  description: "BUILD est le système complet conçu par Orsayn pour construire, positionner et vendre vos offres d'agence IA. Méthode, outils et communauté.",
   metadataBase: new URL("https://buildbyorsayn.com"),
   openGraph: {
-    title: "BUILD",
-    description: "Le système complet pour construire et vendre dans le business IA.",
+    title: "BUILD by Orsayn — Le système pour vendre dans le business IA",
+    description: "BUILD est le système complet conçu par Orsayn pour construire, positionner et vendre vos offres d'agence IA. Méthode, outils et communauté.",
     url: "https://buildbyorsayn.com",
     siteName: "BUILD",
     locale: "fr_FR",
@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BUILD",
-    description: "Le système complet pour construire et vendre dans le business IA.",
+    title: "BUILD by Orsayn — Le système pour vendre dans le business IA",
+    description: "BUILD est le système complet conçu par Orsayn pour construire, positionner et vendre vos offres d'agence IA. Méthode, outils et communauté.",
   },
   icons: {
     icon: "/icon.png",
