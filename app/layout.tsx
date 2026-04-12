@@ -14,14 +14,6 @@ export const metadata: Metadata = {
     description: "Le système complet pour construire et vendre dans le business IA.",
     url: "https://buildbyorsayn.com",
     siteName: "BUILD",
-    images: [
-      {
-        url: "/opengraph-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BUILD - Preview Image",
-      },
-    ],
     locale: "fr_FR",
     type: "website",
   },
@@ -29,11 +21,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "BUILD",
     description: "Le système complet pour construire et vendre dans le business IA.",
-    images: ["/twitter-image.png"],
   },
   icons: {
-    icon: "/opengraph-image.png",
-    apple: "/opengraph-image.png",
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
   },
 };
 
