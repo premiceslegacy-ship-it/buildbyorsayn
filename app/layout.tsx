@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "BUILD by Orsayn — Le système pour vendre dans le business IA",
   description: "BUILD est le système complet conçu par Orsayn pour construire, positionner et vendre vos offres d'agence IA. Méthode, outils et communauté.",
-  metadataBase: new URL("https://buildbyorsayn.com"),
+  metadataBase: new URL("https://build-system-three.vercel.app"),
   openGraph: {
     title: "BUILD by Orsayn — Le système pour vendre dans le business IA",
     description: "BUILD est le système complet conçu par Orsayn pour construire, positionner et vendre vos offres d'agence IA. Méthode, outils et communauté.",
