@@ -14,6 +14,14 @@ export const metadata: Metadata = {
     description: "BUILD est le système complet conçu par Orsayn pour construire, positionner et vendre vos offres d'agence IA. Méthode, outils et communauté.",
     url: "https://buildbyorsayn.com",
     siteName: "BUILD",
+    images: [
+      {
+        url: "https://buildbyorsayn.com/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "BUILD by Orsayn",
+      },
+    ],
     locale: "fr_FR",
     type: "website",
   },
@@ -21,6 +29,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "BUILD by Orsayn — Le système pour vendre dans le business IA",
     description: "BUILD est le système complet conçu par Orsayn pour construire, positionner et vendre vos offres d'agence IA. Méthode, outils et communauté.",
+    images: ["https://buildbyorsayn.com/og-image.png"],
   },
   icons: {
     icon: "/icon.png",
