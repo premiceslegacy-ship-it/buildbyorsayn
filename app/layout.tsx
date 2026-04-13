@@ -31,10 +31,6 @@ export const metadata: Metadata = {
     description: "BUILD est le système complet conçu par Orsayn pour construire, positionner et vendre vos offres d'agence IA. Méthode, outils et communauté.",
     images: ["/open-graph-build.png"],
   },
-  icons: {
-    icon: "/icon.png",
-    apple: "/apple-icon.png",
-  },
 };
 
 export default function RootLayout({
