@@ -130,7 +130,7 @@ export function Section4() {
           Vidéo liée à cette section
         </p>
         <Link
-          href="/videos"
+          href="/videos#fondations"
           className="inline-flex items-center gap-3 group"
         >
           <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.15)] transition-all duration-300">
