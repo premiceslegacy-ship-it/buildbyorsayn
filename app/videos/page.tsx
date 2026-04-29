@@ -8,22 +8,50 @@ import { VideoCard } from "@/components/VideoCard";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 
-// Vidéos des fondations (accessibles à tous les tiers)
 const FONDATIONS_VIDEOS: { title: string; youtubeId: string; description?: string }[] = [
-  // Ajoute tes vidéos ici quand elles sont prêtes
   // { title: "...", youtubeId: "...", description: "..." },
 ];
 
+function PaywallBanner({
+  label,
+  description,
+  ctaLabel,
+  ctaHref,
+}: {
+  label: string;
+  description: string;
+  ctaLabel: string;
+  ctaHref: string;
+}) {
+  return (
+    <div className="flex items-center gap-4 bg-white/[0.03] border border-white/[0.07] rounded-xl p-5 w-fit">
+      <div className="w-10 h-10 rounded-xl bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 flex items-center justify-center flex-shrink-0">
+        <Lock className="w-4 h-4 text-[#e8d5b0]" />
+      </div>
+      <div>
+        <p className="text-[15px] font-medium text-white/70">{label}</p>
+        <p className="text-[13px] text-white/35 mt-0.5">
+          {description}{" "}
+          <a href={ctaHref} className="text-[#e8d5b0] hover:underline">
+            {ctaLabel} →
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function VideosPage() {
-  const [tier, setTier] = useState<string | null>(null);
+  const [tier, setTier] = useState<string | null | "loading">("loading");
+  const [beginnerUrl, setBeginnerUrl] = useState<string>("#");
   const [upgradeUrl, setUpgradeUrl] = useState<string>("#");
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTier = async () => {
+    const fetchData = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) { setTier(null); return; }
       setUserId(user.id);
       const { data: profile } = await supabase
         .from("profiles")
@@ -32,16 +60,20 @@ export default function VideosPage() {
         .single();
       setTier(profile?.tier ?? null);
       const urls = await getCheckoutUrls();
+      if (urls.beginner) setBeginnerUrl(`${urls.beginner}?client_reference_id=${user.id}`);
       if (urls.upgrade) setUpgradeUrl(`${urls.upgrade}?client_reference_id=${user.id}`);
     };
-    fetchTier();
+    fetchData();
   }, []);
 
   const isFull = tier === "full";
+  const isBeginner = tier === "beginner";
+  const hasNoAccess = tier === null;
+
   const blocsWithVideos = BLOCS_DATA.filter((b) => (b as any).videos?.length > 0);
   const hasFondationsVideos = FONDATIONS_VIDEOS.length > 0;
-  const hasBlocsVideos = blocsWithVideos.length > 0;
-  const hasAnyContent = hasFondationsVideos || hasBlocsVideos;
+
+  if (tier === "loading") return null;
 
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] font-sans relative selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
@@ -73,80 +105,103 @@ export default function VideosPage() {
 
         <div className="space-y-20">
 
-          {/* Section Fondations — visible par tous */}
+          {/* Section Fondations */}
           <section id="fondations" className="scroll-mt-8">
             <div className="mb-8">
               <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
-                Gratuit
+                Fondations — 30€
               </p>
               <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
-                Fondations
+                Le flow : de l'idée à l'URL en ligne
               </h2>
             </div>
 
-            {hasFondationsVideos ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {FONDATIONS_VIDEOS.map((video) => (
-                  <VideoCard key={video.youtubeId} {...video} />
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center gap-4 bg-white/[0.03] border border-white/[0.07] rounded-xl p-5 w-fit">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                  <Play className="w-4 h-4 text-white/30" />
+            {(isBeginner || isFull) ? (
+              hasFondationsVideos ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {FONDATIONS_VIDEOS.map((video) => (
+                    <VideoCard key={video.youtubeId} {...video} />
+                  ))}
                 </div>
-                <p className="text-[15px] text-white/40">Les vidéos fondations arrivent bientôt.</p>
-              </div>
+              ) : (
+                <div className="flex items-center gap-4 bg-white/[0.03] border border-white/[0.07] rounded-xl p-5 w-fit">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                    <Play className="w-4 h-4 text-white/30" />
+                  </div>
+                  <p className="text-[15px] text-white/40">Les vidéos fondations arrivent bientôt.</p>
+                </div>
+              )
+            ) : (
+              <PaywallBanner
+                label="Accès Fondations requis"
+                description="Ces vidéos font partie des Fondations (30€)."
+                ctaLabel="Accéder aux Fondations"
+                ctaHref={beginnerUrl}
+              />
             )}
 
-            {(hasBlocsVideos || !hasAnyContent) && (
-              <div className="mt-16 border-t border-white/5" />
-            )}
+            <div className="mt-16 border-t border-white/5" />
           </section>
 
-          {/* Sections blocs — full uniquement */}
-          {isFull ? (
-            blocsWithVideos.map((bloc) => {
-              const videos = (bloc as any).videos as { title: string; youtubeId: string; description?: string }[];
-              return (
-                <section key={bloc.id} id={`bloc-${bloc.id}`} className="scroll-mt-8">
-                  <div className="mb-8">
-                    <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
-                      Bloc {bloc.id}
-                    </p>
-                    <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
-                      {bloc.titre.replace(/^Bloc \d+ : /, "")}
-                    </h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {videos.map((video) => (
-                      <VideoCard key={video.youtubeId} {...video} />
-                    ))}
-                  </div>
-                  <div className="mt-16 border-t border-white/5" />
-                </section>
-              );
-            })
-          ) : (
-            hasBlocsVideos && (
-              <section>
-                <div className="flex items-center gap-4 bg-white/[0.03] border border-white/[0.07] rounded-xl p-5 w-fit">
-                  <div className="w-10 h-10 rounded-xl bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 flex items-center justify-center flex-shrink-0">
-                    <Lock className="w-4 h-4 text-[#e8d5b0]" />
-                  </div>
-                  <div>
-                    <p className="text-[15px] font-medium text-white/70">Vidéos du système complet</p>
-                    <p className="text-[13px] text-white/35 mt-0.5">
-                      Accès réservé aux membres du système complet.{" "}
-                      <a href={upgradeUrl} className="text-[#e8d5b0] hover:underline">
-                        Débloquer →
-                      </a>
-                    </p>
-                  </div>
+          {/* Section Système complet */}
+          <section id="systeme" className="scroll-mt-8">
+            <div className="mb-8">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
+                Système complet — 100€
+              </p>
+              <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
+                Les blocs
+              </h2>
+            </div>
+
+            {isFull ? (
+              blocsWithVideos.length > 0 ? (
+                <div className="space-y-16">
+                  {blocsWithVideos.map((bloc) => {
+                    const videos = (bloc as any).videos as { title: string; youtubeId: string; description?: string }[];
+                    return (
+                      <div key={bloc.id} id={`bloc-${bloc.id}`} className="scroll-mt-8">
+                        <div className="mb-6">
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-semibold mb-1">
+                            Bloc {bloc.id}
+                          </p>
+                          <h3 className="text-xl font-semibold text-[#f0ede8] tracking-tight">
+                            {bloc.titre.replace(/^Bloc \d+ : /, "")}
+                          </h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {videos.map((video) => (
+                            <VideoCard key={video.youtubeId} {...video} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </section>
-            )
-          )}
+              ) : (
+                <div className="flex items-center gap-4 bg-white/[0.03] border border-white/[0.07] rounded-xl p-5 w-fit">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                    <Play className="w-4 h-4 text-white/30" />
+                  </div>
+                  <p className="text-[15px] text-white/40">Les vidéos du système arrivent bientôt.</p>
+                </div>
+              )
+            ) : isBeginner ? (
+              <PaywallBanner
+                label="Accès système complet requis"
+                description="Ces vidéos font partie du système complet (70€ de plus)."
+                ctaLabel="Passer au système complet"
+                ctaHref={upgradeUrl}
+              />
+            ) : (
+              <PaywallBanner
+                label="Accès système complet requis"
+                description="Ces vidéos font partie du système complet (100€)."
+                ctaLabel="Accéder au système complet"
+                ctaHref={`https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02${userId ? `?client_reference_id=${userId}` : ""}`}
+              />
+            )}
+          </section>
 
         </div>
       </div>
