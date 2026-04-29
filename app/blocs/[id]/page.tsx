@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Check, Copy, Lock, ArrowRight } from "lucide-react";
+import { ArrowLeft, Check, Copy, Lock, ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -299,6 +299,29 @@ export default function BlocPage() {
                 </section>
               ))}
             </div>
+
+            {/* Encart vidéos liées */}
+            {(bloc as any).videos?.length > 0 && (
+              <div className="mt-16 pt-8 border-t border-white/5">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-semibold mb-4">
+                  Vidéos liées à ce bloc
+                </p>
+                <Link
+                  href={`/videos#bloc-${blocId}`}
+                  className="inline-flex items-center gap-3 group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.15)] transition-all duration-300">
+                    <Play className="w-4 h-4 text-[#e8d5b0]" />
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-medium text-[#f0ede8] group-hover:text-[#e8d5b0] transition-colors duration-300">
+                      {(bloc as any).videos.length} vidéo{(bloc as any).videos.length > 1 ? "s" : ""} disponible{(bloc as any).videos.length > 1 ? "s" : ""}
+                    </p>
+                    <p className="text-[13px] text-white/40">Voir dans la bibliothèque →</p>
+                  </div>
+                </Link>
+              </div>
+            )}
 
             <LiquidCard className="p-6 md:p-10 mt-16 sm:mt-24 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
               <div className="flex items-center justify-between mb-8 relative z-10">

@@ -26,7 +26,6 @@ export default function BeginnerPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [tier, setTier] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [upgradeUrl, setUpgradeUrl] = useState<string>("#");
   const [displayEmail, setDisplayEmail] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -36,7 +35,6 @@ export default function BeginnerPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/login"); return; }
-      setUserId(user.id);
       setDisplayEmail(user.email ?? "");
       const { data: profile } = await supabase
         .from("profiles").select("tier").eq("id", user.id).single();

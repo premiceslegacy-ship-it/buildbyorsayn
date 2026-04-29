@@ -50,6 +50,13 @@ export const BLOCS_DATA = [
           "La valeur se crée dans la profondeur, pas dans la diversité des outils. Maîtrise un modèle, exécute-le à fond, mesure les résultats, améliore. Puis, et seulement ensuite, tu ajoutes une couche. C'est cette discipline qui fait la différence entre un projet abandonné et un business qui tient dans la durée.",
       },
     ],
+    videos: [
+      {
+        title: "À venir — Bloc 1",
+        youtubeId: "dQw4w9WgXcQ",
+        description: "Vidéo de présentation du bloc à venir.",
+      },
+    ],
   },
   {
     id: "2",
@@ -118,6 +125,7 @@ export const BLOCS_DATA = [
           "La logique business : tu crées un process, par exemple la semi-automatisation des articles de ton site. Tu en fais un Skill. Tu l'utilises à chaque fois que tu veux publier des articles, tu ne repars pas de zéro. L'IA répète ce process sur demande, en suivant chaque étape comme un SOP. C'est de la scalabilité sans recrutement.",
       },
     ],
+    videos: [],
   },
   {
     id: "3",
@@ -402,6 +410,7 @@ export const BLOCS_DATA = [
           "```",
       },
     ],
+    videos: [],
   },
   {
     id: "4",
@@ -992,6 +1001,7 @@ export const BLOCS_DATA = [
           "```",
       },
     ],
+    videos: [],
   },
   {
     id: "5",
@@ -1040,6 +1050,7 @@ export const BLOCS_DATA = [
           "Exemple pratique : j'ai récemment audité un projet où la route de paiement Stripe n'était pas protégée par une vérification côté serveur. N'importe qui pouvait appeler la route directement et déclencher un accès premium sans payer. C'est une erreur CRITIQUE. L'interface était belle, le produit fonctionnait bien en apparence, mais cette faille suffisait à le rendre non livrable.",
       },
     ],
+    videos: [],
   },
   {
     id: "6",
@@ -1086,6 +1097,7 @@ export const BLOCS_DATA = [
         ],
       },
     ],
+    videos: [],
   },
   {
     id: "7",
@@ -1140,5 +1152,6 @@ export const BLOCS_DATA = [
           "La question maintenant : quel est ton prochain projet ? Lance ORACLE. Décris-le. Commence.",
       },
     ],
+    videos: [],
   },
 ];
