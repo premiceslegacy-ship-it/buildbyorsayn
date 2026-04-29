@@ -6,6 +6,7 @@ import Link from "next/link";
 import { BLOCS_DATA } from "@/lib/mockData";
 import { VideoCard } from "@/components/VideoCard";
 import { createClient } from "@/lib/supabase/client";
+import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 
 // Vidéos des fondations (accessibles à tous les tiers)
 const FONDATIONS_VIDEOS: { title: string; youtubeId: string; description?: string }[] = [
@@ -15,18 +16,23 @@ const FONDATIONS_VIDEOS: { title: string; youtubeId: string; description?: strin
 
 export default function VideosPage() {
   const [tier, setTier] = useState<string | null>(null);
+  const [upgradeUrl, setUpgradeUrl] = useState<string>("#");
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTier = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      setUserId(user.id);
       const { data: profile } = await supabase
         .from("profiles")
         .select("tier")
         .eq("id", user.id)
         .single();
       setTier(profile?.tier ?? null);
+      const urls = await getCheckoutUrls();
+      if (urls.upgrade) setUpgradeUrl(`${urls.upgrade}?client_reference_id=${user.id}`);
     };
     fetchTier();
   }, []);
@@ -132,9 +138,9 @@ export default function VideosPage() {
                     <p className="text-[15px] font-medium text-white/70">Vidéos du système complet</p>
                     <p className="text-[13px] text-white/35 mt-0.5">
                       Accès réservé aux membres du système complet.{" "}
-                      <Link href="/dashboard" className="text-[#e8d5b0] hover:underline">
+                      <a href={upgradeUrl} className="text-[#e8d5b0] hover:underline">
                         Débloquer →
-                      </Link>
+                      </a>
                     </p>
                   </div>
                 </div>
