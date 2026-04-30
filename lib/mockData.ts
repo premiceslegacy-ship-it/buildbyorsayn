@@ -52,9 +52,9 @@ export const BLOCS_DATA = [
     ],
     videos: [
       {
-        title: "La logique du système — Atelier comme POC",
-        youtubeId: "JyxB35qJmXvlRtvz",
-        description: "BRIEF initial vs réalité actuelle : comment le modèle business d'Atelier a évolué avant même que le code soit écrit.",
+        title: "Arrête de vendre de l'IA",
+        youtubeId: "uhp4L3y_Jco",
+        description: "L'approche one-shot est une impasse. Comment passer d'exécutant technique à architecte de systèmes — et déployer un OS complet pour une niche en 30 minutes.",
       },
     ],
   },
