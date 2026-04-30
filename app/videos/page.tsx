@@ -68,9 +68,10 @@ export default function VideosPage() {
 
   const isFull = tier === "full";
   const isBeginner = tier === "beginner";
-  const hasNoAccess = tier === null;
 
-  const blocsWithVideos = BLOCS_DATA.filter((b) => (b as any).videos?.length > 0);
+  const bloc1 = BLOCS_DATA.find((b) => b.id === "1");
+  const bloc1Videos = (bloc1 as any)?.videos as { title: string; youtubeId: string; description?: string }[] ?? [];
+  const blocsWithVideos = BLOCS_DATA.filter((b) => b.id !== "1" && (b as any).videos?.length > 0);
   const hasFondationsVideos = FONDATIONS_VIDEOS.length > 0;
 
   if (tier === "loading") return null;
@@ -142,6 +143,26 @@ export default function VideosPage() {
 
             <div className="mt-16 border-t border-white/5" />
           </section>
+
+          {/* Bloc 1 — gratuit, visible par tous */}
+          {bloc1Videos.length > 0 && (
+            <section id="bloc-1" className="scroll-mt-8">
+              <div className="mb-8">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
+                  Gratuit — Bloc 1
+                </p>
+                <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
+                  La logique du système
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {bloc1Videos.map((video) => (
+                  <VideoCard key={video.youtubeId} {...video} />
+                ))}
+              </div>
+              <div className="mt-16 border-t border-white/5" />
+            </section>
+          )}
 
           {/* Section Système complet */}
           <section id="systeme" className="scroll-mt-8">

@@ -52,9 +52,9 @@ export const BLOCS_DATA = [
     ],
     videos: [
       {
-        title: "À venir — Bloc 1",
-        youtubeId: "dQw4w9WgXcQ",
-        description: "Vidéo de présentation du bloc à venir.",
+        title: "La logique du système — Atelier comme POC",
+        youtubeId: "JyxB35qJmXvlRtvz",
+        description: "BRIEF initial vs réalité actuelle : comment le modèle business d'Atelier a évolué avant même que le code soit écrit.",
       },
     ],
   },
