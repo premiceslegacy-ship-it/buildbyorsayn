@@ -66,6 +66,7 @@ export default function VideosPage() {
     fetchData();
   }, []);
 
+  const isLoading = tier === "loading";
   const isFull = tier === "full";
   const isBeginner = tier === "beginner";
 
@@ -73,8 +74,6 @@ export default function VideosPage() {
   const bloc1Videos = (bloc1 as any)?.videos as { title: string; youtubeId: string; description?: string }[] ?? [];
   const blocsWithVideos = BLOCS_DATA.filter((b) => b.id !== "1" && (b as any).videos?.length > 0);
   const hasFondationsVideos = FONDATIONS_VIDEOS.length > 0;
-
-  if (tier === "loading") return null;
 
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] font-sans relative selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
@@ -117,7 +116,9 @@ export default function VideosPage() {
               </h2>
             </div>
 
-            {(isBeginner || isFull) ? (
+            {isLoading ? (
+              <div className="h-12 w-64 bg-white/5 rounded-xl animate-pulse" />
+            ) : (isBeginner || isFull) ? (
               hasFondationsVideos ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {FONDATIONS_VIDEOS.map((video) => (
@@ -175,7 +176,9 @@ export default function VideosPage() {
               </h2>
             </div>
 
-            {isFull ? (
+            {isLoading ? (
+              <div className="h-12 w-64 bg-white/5 rounded-xl animate-pulse" />
+            ) : isFull ? (
               blocsWithVideos.length > 0 ? (
                 <div className="space-y-16">
                   {blocsWithVideos.map((bloc) => {
