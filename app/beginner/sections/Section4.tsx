@@ -18,7 +18,7 @@ const STEPS = [
         <div className="bg-black/20 border border-white/5 rounded-xl p-4 mt-auto">
           <p className="text-[11px] font-semibold text-white/30 uppercase tracking-widest mb-2">La limite du no-code</p>
           <p className="text-xs text-white/45 leading-relaxed">
-            Dès que tu veux des comptes utilisateurs, des paiements Stripe, une vraie base de données, ces outils bloquent. C'est là qu'on passe à un vrai éditeur (IDE).
+            Dès que tu veux des comptes utilisateurs, des paiements en ligne, une vraie base de données, ces outils bloquent. C'est là qu'on passe à un vrai éditeur (IDE).
           </p>
         </div>
       </>

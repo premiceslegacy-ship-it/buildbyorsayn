@@ -18,7 +18,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
         {[
           {
             title: "Le framework ORACLE",
-            desc: "Ma méthode pour construire un projet de A à Z avec l'IA. Il remplace le prompt hasardeux par une structure de documents (BRIEF, BRAND-SYSTEM, DESIGN-SYSTEM, PRD, PARCOURS-UTILISATEURS, PROMPT-SYSTEM) qui permettent à l'IA d'avoir un contexte extrêmement précis. Chaque document nourrit le suivant. Le résultat final n'a rien à voir avec ce que tu obtiens en tapant crée moi un site dans Lovable.",
+            desc: "Ma méthode pour construire un projet de A à Z avec l'IA. Il remplace le prompt hasardeux par une structure de documents (BRIEF, BRAND-SYSTEM, DESIGN-SYSTEM, PRD, PARCOURS-UTILISATEURS, PROMPT-SYSTEM) qui permettent à l'IA d'avoir un contexte extrêmement précis. Chaque document nourrit le suivant. Le résultat final n'a rien à voir avec ce que tu obtiens en tapant « crée-moi un site » dans Lovable.",
           },
           {
             title: "La logique business",
@@ -26,7 +26,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
           },
           {
             title: "L'identité visuelle forte",
-            desc: "la différence entre un site qu'on oublie 10 secondes après l'avoir vu et un site qui installe une perception de marque. Ce n'est pas une question de budget, c'est une question de système.",
+            desc: "La différence entre un site qu'on oublie 10 secondes après l'avoir vu et un site qui installe une perception de marque. Ce n'est pas une question de budget, c'est une question de système.",
           },
           {
             title: "L'ingénierie des Skills",
@@ -50,7 +50,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
             </div>
             <h3 className="text-xl font-semibold text-[#f0ede8] mb-4">La suite logique</h3>
             <p className="text-sm text-white/60 leading-relaxed mb-8">
-              Tu as les fondations. Le système d'apprentissage complet (ORACLE, Stripe, Tailwind avancé, Supabase) est dans l'accès total.
+              Tu as les fondations. Le système complet pour construire des produits complexes, automatiser ton exécution et scaler tes revenus t'attend dans l'accès total.
             </p>
 
             <Link

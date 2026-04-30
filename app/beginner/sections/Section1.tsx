@@ -13,7 +13,7 @@ export function Section1() {
       <div className="mb-10">
         <h3 className="text-lg font-semibold text-[#f0ede8] mb-6">Les questions vitales</h3>
         <p className="text-white/55 text-sm leading-relaxed mb-8">
-          Chaque fois que je commence un projet — site vitrine, app ou outil interne — je réponds à ces questions avant d'ouvrir quoi que ce soit.
+          Chaque fois que je commence un projet (site vitrine, app ou outil interne) je réponds à ces questions avant d'ouvrir quoi que ce soit.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
@@ -27,11 +27,11 @@ export function Section1() {
             },
             {
               q: "Quelles API vont entrer en jeu ?",
-              a: "Une API, c'est une connexion entre deux services. Si le site doit envoyer un email quand un formulaire est rempli, c'est une API. Si l'app doit se connecter à Stripe pour un paiement, c'est une API. Je liste toutes ces connexions dès le départ car elles influencent directement la stack technique.",
+              a: "Une API, c'est une connexion entre deux services. Si le site doit envoyer un email quand un formulaire est rempli, c'est une API. Si l'application doit se connecter à un service de paiement, c'est une API. Je liste toutes ces connexions dès le départ car elles influencent directement la stack technique.",
             },
             {
               q: "Quel backend ?",
-              a: "Pour un site vitrine simple, il n'y a pas besoin de backend. Pour un site avec un espace membre, une BDD, des abonnements, c'est une autre histoire. Je décide ici si j'ai besoin de Supabase, de serverless functions, ou de rien du tout.",
+              a: "Pour un site vitrine simple, il n'y a pas besoin de backend. Pour un site avec un espace membre, une BDD, des abonnements, c'est une autre histoire. Je décide ici si j'ai besoin d'une base de données robuste, de logique côté serveur, ou d'une structure simple.",
             },
             {
               q: "Quel CTA principal ?",

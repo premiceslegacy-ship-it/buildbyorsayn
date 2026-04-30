@@ -45,7 +45,7 @@ export function Section2() {
             <ArrowRight className="w-3 h-3 flex-shrink-0" />
             <span className="whitespace-nowrap">API</span>
             <ArrowRight className="w-3 h-3 flex-shrink-0" />
-            <span className="whitespace-nowrap">Service (Stripe)</span>
+            <span className="whitespace-nowrap">Service externe</span>
             <ArrowRight className="w-3 h-3 flex-shrink-0" />
             <span className="whitespace-nowrap">API</span>
             <ArrowRight className="w-3 h-3 flex-shrink-0" />
