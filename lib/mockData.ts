@@ -54,7 +54,7 @@ export const BLOCS_DATA = [
       {
         title: "Arrête de vendre de l'IA",
         youtubeId: "uhp4L3y_Jco",
-        description: "L'approche one-shot est une impasse. Comment passer d'exécutant technique à architecte de systèmes — et déployer un OS complet pour une niche en 30 minutes.",
+        description: "L'approche one-shot est une impasse. Comment passer d'exécutant technique à architecte de systèmes et déployer un OS complet pour une niche en 30 minutes.",
       },
     ],
   },
@@ -125,7 +125,13 @@ export const BLOCS_DATA = [
           "La logique business : tu crées un process, par exemple la semi-automatisation des articles de ton site. Tu en fais un Skill. Tu l'utilises à chaque fois que tu veux publier des articles, tu ne repars pas de zéro. L'IA répète ce process sur demande, en suivant chaque étape comme un SOP. C'est de la scalabilité sans recrutement.",
       },
     ],
-    videos: [],
+    videos: [
+      {
+        title: "La stack complète",
+        youtubeId: "6kTB2MAQthk",
+        description: "Présentation des outils, pourquoi cette stack fixe, et comment les utiliser ensemble pour construire vite et bien.",
+      },
+    ],
   },
   {
     id: "3",
