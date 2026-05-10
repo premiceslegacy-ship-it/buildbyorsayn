@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Check, Copy, Lock, ArrowRight, Play } from "lucide-react";
+import { ArrowLeft, Check, Copy, Lock, ArrowRight, Play, Download, FileText } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -259,11 +259,32 @@ export default function BlocPage() {
                       ));
                     });
                   })()}
-                  {"skillContent" in section && Array.isArray((section as { skillContent?: { title: string; raw: string }[] }).skillContent) &&
-                    (section as { skillContent: { title: string; raw: string }[] }).skillContent.map((skill, idx) => (
-                      <div key={idx} className="space-y-3 pt-2">
-                        <p className="text-[15px] font-semibold text-[#e8d5b0] tracking-tight">{skill.title}</p>
-                        <CodeBlock code={skill.raw} />
+                  {"skillFiles" in section && Array.isArray((section as { skillFiles?: { slug: string; title: string; description: string }[] }).skillFiles) &&
+                    (section as { skillFiles: { slug: string; title: string; description: string }[] }).skillFiles.map((skill) => (
+                      <div key={skill.slug} className="pt-2">
+                        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6">
+                          <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/5 to-transparent pointer-events-none" />
+                          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-5">
+                            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 shadow-[0_4px_16px_rgba(0,0,0,0.2)]">
+                              <FileText className="w-6 h-6 text-[#e8d5b0]" strokeWidth={1.5} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-lg font-semibold tracking-tight text-[#f0ede8]">
+                                {skill.title}
+                              </p>
+                              <p className="text-sm text-white/45 leading-relaxed mt-1">
+                                {skill.description}
+                              </p>
+                            </div>
+                            <a
+                              href={`/api/skills/${skill.slug}`}
+                              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-all duration-200 hover:bg-[#f0dfc0] shadow-[0_0_24px_rgba(232,213,176,0.18)]"
+                            >
+                              <Download className="w-4 h-4" />
+                              Télécharger
+                            </a>
+                          </div>
+                        </div>
                       </div>
                     ))
                   }

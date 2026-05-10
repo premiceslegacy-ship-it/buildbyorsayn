@@ -64,6 +64,7 @@ export default function BeginnerPage() {
           {tier === "full" && (
             <Link href="/sources" className="text-white/40 hover:text-white/80 transition-colors">La stack</Link>
           )}
+          <Link href="/skills" className="text-white/40 hover:text-white/80 transition-colors">Skills</Link>
           {displayEmail === "mbebourasam@gmail.com" && (
             <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors">
               <ShieldCheck className="w-4 h-4" />

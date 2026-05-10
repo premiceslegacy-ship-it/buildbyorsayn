@@ -136,6 +136,9 @@ export default function DashboardHub() {
               La stack
             </button>
           )}
+          <Link href="/skills" className="text-white/40 hover:text-white/80 transition-colors">
+            Skills
+          </Link>
           {/* Vidéos — toujours visible */}
           <Link href="/videos" className="text-white/40 hover:text-white/80 transition-colors">
             Vidéos
