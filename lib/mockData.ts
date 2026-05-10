@@ -1,5 +1,3 @@
-import { ORACLE_SAAS_RAW, ORACLE_SITEWEB_RAW } from "./skillsData";
-
 export const BLOCS_DATA = [
   {
     id: "1",
@@ -139,281 +137,79 @@ export const BLOCS_DATA = [
     sections: [
       {
         id: "b3-s1",
-        title: "Le workflow et le brief produit",
+        title: "Le bon ordre avant de construire",
         content:
-          "Voici le workflow dans l'ordre. Chaque phase a un rôle précis. On ne saute pas d'étape.\n\n" +
+          "Ce bloc n'est pas une liste de frameworks abstraits. C'est l'ordre mental à respecter avant de demander à l'IA de construire un site web. La plupart des mauvais résultats viennent d'un problème simple : on demande du code alors qu'on n'a pas encore cadré le projet.\n\n" +
+          "Un site web se construit dans cet ordre : comprendre, positionner, structurer, designer, développer, vérifier. Si tu inverses l'ordre, l'IA remplit les trous avec du générique. Elle invente une marque moyenne, un design moyen, un message moyen, puis elle code proprement quelque chose qui n'a pas de direction.\n\n" +
+          "Le flux de travail propre pour un site web :\n\n" +
           "```\n" +
-          "PHASE 1 — RECHERCHE ET CONTEXTE\n" +
-          "   Perplexity : veille marché, analyse concurrents\n" +
-          "   NotebookLM : agrégation de sources sectorielles\n" +
-          "   LLM dédié (projet Claude/Gem) : brief produit\n" +
+          "1. BRIEF\n" +
+          "   Qui est le site ? Pour qui ? Quel problème résout-il ?\n" +
+          "   Quelle action principale doit être déclenchée ?\n" +
           "\n" +
-          "PHASE 2 — DESIGN MVP\n" +
-          "   Google Stitch : génération des écrans complets\n" +
-          "   Export vers Figma, AI Studio, ou Antigravity via MCP\n" +
-          "   AI Studio : affinage interactif des écrans complexes\n" +
+          "2. POSITIONNEMENT\n" +
+          "   Pourquoi ce site existe ? Pourquoi maintenant ?\n" +
+          "   Qu'est-ce qu'il refuse d'être ?\n" +
           "\n" +
-          "PHASE 3 — INITIALISATION\n" +
-          "   GitHub : repo + structure de branches\n" +
+          "3. STRUCTURE DE CONVERSION\n" +
+          "   Quelles sections ? Dans quel ordre ?\n" +
+          "   Quelle objection chaque section doit-elle lever ?\n" +
           "\n" +
-          "PHASE 4 — DÉVELOPPEMENT\n" +
-          "   Antigravity ou Cursor avec Claude Code\n" +
-          "   MCP connectés\n" +
-          "   Skills chargés — on code.\n" +
+          "4. DIRECTION VISUELLE\n" +
+          "   Quelle sensation en 2 secondes ?\n" +
+          "   Quelles références, quels interdits, quelles ressources visuelles ?\n" +
           "\n" +
-          "PHASE 5 — VALIDATION ET DÉPLOIEMENT\n" +
-          "   Vercel : connexion repo, preview automatique\n" +
-          "   Variables d'environnement configurées\n" +
-          "   Preview Vercel sur chaque push\n" +
-          "   Checklists de validation\n" +
-          "   Merge sur main uniquement quand validé\n" +
+          "5. DESIGN SYSTEM\n" +
+          "   Couleurs, typographies, composants, états, règles d'affichage mobile.\n" +
+          "\n" +
+          "6. SEO/GEO\n" +
+          "   Intentions de recherche, structure des pages, titres, FAQ,\n" +
+          "   métadonnées, données structurées, llms.txt si pertinent.\n" +
+          "\n" +
+          "7. SÉCURITÉ ET BACKEND\n" +
+          "   Routes API, formulaires, secrets, auth, permissions, RLS,\n" +
+          "   middleware, validation serveur, risques OWASP.\n" +
+          "\n" +
+          "8. PLAN TECHNIQUE\n" +
+          "   Modèle puissant en mode plan : architecture, risques,\n" +
+          "   étapes d'exécution, points de contrôle.\n" +
+          "\n" +
+          "9. DÉVELOPPEMENT\n" +
+          "   Seulement maintenant : IDE, npm install, npm run dev, code.\n" +
+          "\n" +
+          "10. VALIDATION\n" +
+          "   Responsive, performance, accessibilité, sécurité, SEO/GEO,\n" +
+          "   formulaires, liens, domaine, variables d'environnement.\n" +
           "```\n\n" +
-          "Un brief produit n'est pas un cahier des charges de 40 pages. C'est un document d'une à deux pages qui répond à sept questions précises. Si tu ne peux pas y répondre, le projet n'est pas prêt à être construit.\n\n" +
-          "Les 7 questions du brief produit : 1. Qui est l'utilisateur principal et quel est son contexte ? 2. Quel est le problème qu'il a en arrivant sur ce site ou cette app ? 3. Quelle est l'action principale qu'on veut qu'il fasse ? 4. Quels sont les trois messages clés qu'il doit retenir ? 5. Qui sont les concurrents directs et comment se différencie-t-on ? 6. Quelles sont les contraintes techniques ou business non-négociables ? 7. Comment mesure-t-on le succès à 30 jours et 90 jours ? Si tu ne peux pas répondre à une de ces questions, le projet n'est pas prêt.\n\n" +
-          "Le framework projet LLM : la méthode des projets spécialisés. Un LLM généraliste répond à tout mais excelle rarement. Un projet Claude ou Gem spécialisé répond moins de choses mais les fait beaucoup mieux, parce qu'il a le bon contexte chargé en permanence. À chaque conversation, il part avec tout le contexte disponible sans que tu aies à réexpliquer.\n\n" +
-          "Les trois projets LLM fondamentaux à créer. Projet Brand et Copy : spécialisé dans l'identité verbale et le copywriting d'un projet spécifique. Il connaît la mission, le vocabulaire autorisé, les personas, le ton. Il produit du texte cohérent dès le premier draft. Projet Architecture : spécialisé dans les décisions techniques, stack, schéma de données, routes API, décisions de sécurité. Tu lui poses les questions structurantes avant d'ouvrir l'IDE. Projet UX : spécialisé dans les parcours utilisateurs, les états d'interface, les messages d'erreur. Il simule l'utilisateur et identifie les frictions avant qu'elles soient codées.\n\n" +
-          "Plus le prompt système d'un projet est précis, moins tu expliques à chaque session. Le projet LLM garde tout en mémoire, tu n'expliques jamais deux fois.\n\n" +
-          "La structure minimale d'un projet LLM spécialisé :\n\n" +
-          "```\n" +
-          "RÔLE\n" +
-          "[Qui est l'IA — expert en quoi, spécialisé dans quel secteur]\n" +
-          "\n" +
-          "PROJET\n" +
-          "[Nom, contexte, problème résolu, utilisateur cible]\n" +
-          "\n" +
-          "STACK\n" +
-          "[Technologies utilisées]\n" +
-          "\n" +
-          "RÈGLES\n" +
-          "[Ce que l'IA fait et ne fait jamais sur ce projet]\n" +
-          "```",
+          "Ce flux de travail est volontairement proche d'ORACLE Site Web, mais en version compréhensible avant le système complet. ORACLE Site Web automatise et structure tout ça dans un skill. Ici, tu apprends la logique pour comprendre pourquoi le skill fonctionne.\n\n" +
+          "Les sept questions du brief web : 1. Qui est l'utilisateur principal ? 2. Quel problème ou désir l'amène sur le site ? 3. Quelle action principale veut-on provoquer ? 4. Quelle promesse doit être comprise en moins de 5 secondes ? 5. Quelles objections bloquent la conversion ? 6. Quelles ressources existent déjà : logo, photos, témoignages, offres ? 7. Comment mesure-t-on le succès : demandes de contact, réservations, ventes, inscriptions, appels ?\n\n" +
+          "Tant que ces réponses sont floues, tu ne dois pas encore générer le site. Tu peux explorer, maquetter, poser des questions. Mais tu ne dois pas figer le code.",
       },
       {
         id: "b3-s2",
-        title: "Brand System, Design System et Parcours utilisateurs",
+        title: "Les trois frameworks qui donnent une direction",
         content:
-          "La plupart des gens sautent directement au design system : les couleurs, les polices, le logo. C'est l'erreur. Un design system sans brand system, c'est des règles visuelles sans âme. Le résultat : quelque chose de propre, mais qui pourrait être n'importe quelle autre marque. La brand architecture répond à une question avant tout : qui es-tu, et comment ça se voit et s'entend dans chaque détail du produit ?\n\n" +
-          "Le brand system se construit en quatre couches dans l'ordre. Couche 1, la fondation : la mission (ce que tu fais concrètement pour qui, pas une phrase inspirante mais une action précise), l'anti-mission (ce que tu refuses d'être, souvent plus révélateur que la mission, elle définit tes frontières), et la tension de marque (le paradoxe que tu résous : \"Technique ET humain\", \"Premium ET accessible\"). C'est ce qui rend une marque mémorable, elle tient ensemble deux choses que le marché pensait incompatibles.\n\n" +
-          "Couche 2, la personnalité : cinq adjectifs maximum. Chaque adjectif a une définition pratique et un opposé à éviter. Rigoureux ne veut pas dire froid. Direct ne veut pas dire brutal. Confiant ne veut pas dire arrogant. Pour le B2B premium, quatre archétypes fonctionnent : le Sage (autorité par la connaissance), le Souverain (autorité par le statut), le Gardien (autorité par la protection), le Créateur (autorité par l'innovation). Un dominant, un secondaire maximum. Pas les quatre à la fois.\n\n" +
-          "Couche 3, l'identité verbale : la voix est constante, c'est le caractère de la marque. Le ton s'adapte au contexte, plus formel dans un contrat, plus direct dans un email d'onboarding. Ce qu'on applique systématiquement : phrases courtes, vocabulaire précis, parler du client plutôt que de soi, éviter les superlatifs et les adverbes d'intensité. \"Vraiment\", \"extrêmement\", \"incroyable\" sonnent creux. Les faits convainquent, pas les adjectifs.\n\n" +
-          "Couche 4, l'intégration dans le prompt système : une fois les trois couches définies, elles rentrent dans le prompt système du projet. Pas juste les couleurs hex. Le positionnement, les cinq adjectifs de personnalité, le guide verbal, les mots autorisés et interdits. L'IA génère alors du contenu qui ressemble à la marque dès le départ. Sans ce contexte : copywriting générique à réécrire entièrement. Avec ce contexte : premier draft dans le bon registre à affiner à la marge.\n\n" +
-          "Le design system repose sur quatre piliers. Sans design system documenté, l'IA produit ce qu'elle connaît le mieux : le template SaaS bleu et blanc générique qu'elle a vu dix mille fois. Avec un design system, chaque composant respecte les mêmes règles. La cohérence devient une contrainte structurelle, pas un effort.\n\n" +
-          "Couleurs : couleur primaire (dominante, porteur de l'identité), couleur secondaire (accents, hover states), couleur neutre (fond, texte, structure), couleur sémantique (succès, erreur, avertissement). Règle d'usage : 60% primaire, 30% secondaire, 10% sémantique.\n\n" +
-          "Typographies : deux fontes maximum. Une pour les titres (autorité, personnalité), une pour le corps (lisibilité absolue). Trois fontes ou plus signalent l'indécision. L'espacement : système basé sur une unité de 8px. L'espacement généreux est le marqueur visuel le plus puissant d'un design premium. Un site institutionnel qui respire communique la confiance. L'iconographie : une seule librairie par projet. Dans notre stack : Lucide React, intégré nativement dans shadcn/ui. Jamais de mélange entre librairies.\n\n" +
-          "Les styles de design, six registres au total. Le minimalisme : espace négatif comme élément de design, typographie principale, palette réduite. Pour les cabinets de conseil, les marques premium, les portfolios. L'Apple Aesthetics : clarté absolue, matériaux qui semblent physiques, animations fluides, attention aux détails. Pour les produits tech grand public. Le Glassmorphism : effet de verre dépoli, background blur, opacité partielle. Pour les dashboards et les apps data. Fonctionne uniquement avec une palette sombre ou très claire, pas sur du blanc cassé. Le Flat Design : formes géométriques, couleurs vives et franches, ombres minimales. Pour les apps éducatives, les outils productivité, les interfaces très denses. Le Neumorphism : relief subtil sur fond monochrome, ombres internes et externes. Pour les interfaces audio, les apps de méditation, les outils créatifs. Très difficile à réussir sur mobile. Le Dark Premium : fonds sombres proches du noir, typographie lumineuse, accents néon ou or. Pour les outils professionnels, les dashboards IA, les plateformes financières. La règle : chaque style est un outil. On choisit le registre qui correspond à l'identité de la marque, pas celui qu'on trouve le plus beau ce matin.\n\n" +
-          "Le parcours utilisateur, c'est la cartographie complète de tout ce qu'un utilisateur fait, pense, ressent, et décide depuis le moment où il entend parler du produit jusqu'au moment où il accomplit son objectif. Ce n'est pas un luxe de grande entreprise. C'est la fondation qui détermine si l'application sera utilisée ou abandonnée.\n\n" +
-          "Trois niveaux à définir. Niveau 1, le parcours macro : toutes les étapes depuis la découverte jusqu'à la fidélisation. Découverte, considération, inscription, activation, valeur, habitude, expansion, fidélisation. Niveau 2, les User Flows : le détail précis de chaque action importante. Pour chaque action clé : chaque écran, chaque décision, chaque alternative, chaque cas d'erreur. Niveau 3, la carte d'empathie : ce que l'utilisateur fait, pense, ressent, dit, et entend pendant son parcours. Nourrit directement les décisions d'interface et les microcopy.\n\n" +
-          "Sur chaque composant data, quatre états obligatoires. L'état loading : un skeleton ou spinner pendant le chargement, jamais une page blanche. L'état vide : un message clair quand il n'y a pas encore de données, avec un CTA vers l'action correspondante. L'état erreur : un message compréhensible par un humain, jamais \"Error 500\" ou un stack trace brut. L'état chargé : les données affichées proprement. Sans ces quatre états, le composant n'est pas fini. Pas d'exception.",
+          "Pour qu'un site web généré par IA ait une vraie direction, il faut trois frameworks avant le code : le framework de message, le framework de structure, et le framework visuel. Ce sont eux qui empêchent le rendu générique.\n\n" +
+          "Framework 1 : le message. Un bon site ne commence pas par une section d'accueil jolie. Il commence par une phrase claire : pour qui, quel résultat, pourquoi c'est différent. Si le H1 pourrait être posé sur dix sites concurrents, il est trop vague. Le message doit parler du problème ou du désir du visiteur, pas de l'ego de la marque.\n\n" +
+          "La formule utile : [Résultat concret] pour [cible précise] sans [friction principale]. Exemple : \"Un site clair et premium pour transformer vos visiteurs en demandes de devis, sans dépendre d'une agence à chaque modification.\" Ce n'est pas encore parfait, mais c'est testable. On sait qui, quoi, et quelle friction disparaît.\n\n" +
+          "Framework 2 : la structure de conversion. Chaque section a un rôle. Section d'accueil : clarifier et donner envie. Preuves : rendre crédible. Offre : expliquer ce qui est inclus. Processus : réduire l'incertitude. Témoignages ou réalisations : réduire le risque. FAQ : lever les objections. CTA final : demander l'action. Si une section ne répond à aucune question utilisateur, elle décore. Et une section décorative doit être supprimée ou repensée.\n\n" +
+          "Framework 3 : la direction visuelle. Le design n'est pas seulement une affaire de couleurs, de police et de logo. C'est la sensation que le visiteur reçoit avant même de lire. Un cabinet juridique ne doit pas provoquer la même impression qu'une marque de mode, un artisan local ou une app IA. Avant de générer, il faut définir : sensation cible, références, anti-références, palette, typographie, niveau d'image, densité, mobile first.\n\n" +
+          "C'est là que le skill ux-ui-design devient puissant dans le système complet. Il transforme ces décisions en BRAND-SYSTEM, DESIGN-SYSTEM, prompts visuels, critères de validation et règles de copywriting d'interface. Dans les Fondations, tu apprends la logique. Dans le système complet, le skill applique cette logique avec beaucoup plus de précision.\n\n" +
+          "La règle à retenir : un design system sans message donne une belle coquille vide. Un message sans structure ne convertit pas. Une structure sans direction visuelle ressemble à un template. Les trois doivent avancer ensemble.",
       },
       {
         id: "b3-s3",
-        title: "Sécurité, Architecture et SEO",
+        title: "Le framework technique avant l'IDE",
         content:
-          "La règle absolue en sécurité : Secure by design est supérieur à Secure by review est supérieur à Secure by patch. La sécurité intégrée dès l'architecture coûte dix fois moins cher que la sécurité ajoutée après coup, et cent fois moins qu'une faille en production.\n\n" +
-          "Tu n'as pas besoin d'être développeur backend pour comprendre la sécurité. Tu as besoin de comprendre les principes fondamentaux et de savoir comment les faire appliquer par l'IA correctement. Va dans le détail de la sécurité pour chercher toutes les failles possibles et inimaginables. Plus tu donnes de contexte pour la sécu, plus tu es safe.\n\n" +
-          "OWASP Top 10 : la référence universelle des dix catégories de vulnérabilités web les plus critiques. Broken Access Control : un utilisateur accède à des ressources qui ne lui appartiennent pas. Exemple concret, un client modifie l'URL /portal/user/123 en /portal/user/456 et voit les données de quelqu'un d'autre. Solution : toujours vérifier les droits côté serveur, jamais uniquement côté interface.\n\n" +
-          "Injection : du code malveillant injecté via un champ de formulaire et exécuté par le serveur. Solution dans notre stack : utiliser les méthodes Supabase typées plutôt que des requêtes SQL construites à la main. Valider tous les inputs avec Zod.\n\n" +
-          "Cryptographic Failures : des mots de passe stockés en clair, des communications non chiffrées. Solution : Supabase Auth gère le hachage des mots de passe automatiquement. HTTPS est forcé par Vercel par défaut. Security Misconfiguration : des clés API dans le code, des messages d'erreur qui révèlent la structure du serveur, des permissions trop larges. Solution : variables d'environnement dans Vercel uniquement, jamais dans le code.\n\n" +
-          "Les règles non-négociables quelle que soit la nature du produit. Jamais de secret dans le code ou dans le repo GitHub, même privé. Clés API, mots de passe, tokens : uniquement dans les variables d'environnement Vercel. HTTPS actif sur tous les environnements. Validation des données côté serveur sur chaque formulaire et chaque route API. Messages d'erreur génériques côté utilisateur, les erreurs techniques vont dans Sentry. Pour les apps et SaaS : Row Level Security sur toutes les tables Supabase, et vérification des droits côté serveur sur chaque route API.\n\n" +
-          "La vision avancée : construire ses propres experts sécurité et architecture sur-mesure. Les skills génériques couvrent le cas moyen. Un skill sur-mesure couvre ton cas exact, avec les vecteurs d'attaque spécifiques à tes features. C'est la différence entre un médecin généraliste et un spécialiste qui a ton dossier complet devant lui.\n\n" +
-          "La méthode en quatre étapes. Étape 1 : charge les références mondiales dans NotebookLM ou Perplexity. Pour la sécurité : la documentation OWASP Top 10 complète, les guides de sécurité Supabase sur le Row Level Security, les bonnes pratiques de sécurité Next.js officiels. Si ton projet a Stripe : la documentation des webhooks Stripe et leur validation de signature. Si ton projet a des utilisateurs : les recommandations RGPD pour les données personnelles en France.\n\n" +
-          "Étape 2 : interroge en profondeur avant de créer le skill. Une fois les sources chargées, tu poses des questions précises sur ton projet. Pour un SaaS avec authentification, plans d'abonnement Stripe, et appels OpenAI, quelles sont les 15 failles les plus probables selon l'OWASP ? Plus tu es précis sur tes features réelles, plus les réponses sont chirurgicales.\n\n" +
-          "Étape 3 : crée un Projet Claude expert avec tout ce contexte accumulé. Il produit deux fichiers .md calibrés sur ton projet exact. Étape 4 : charge ces fichiers depuis /docs dans l'IDE. Claude Code les applique sur chaque session. Il ne part jamais d'une page blanche sur la sécurité de ce projet.\n\n" +
-          "En architecture, la règle numéro 1 : centralise tous les appels Supabase dans /lib/data/. Ne mélange jamais le \"comment ça s'affiche\" avec le \"comment on récupère les données\". Si tu changes de base de données dans 6 mois, tu veux n'avoir qu'un seul dossier à toucher, pas 40 fichiers éparpillés.\n\n" +
-          "Les sept règles d'architecture à encoder dans ton skill. Separation of Concerns : un fichier fait une chose, un composant affiche, une fonction récupère, une route API traite, jamais les trois en même temps. DRY (Don't Repeat Yourself) : toute logique dupliquée dans plusieurs endroits doit être extraite en fonction ou hook partagé, tu corriges un bug une fois pas dix. Taille des fichiers limitée à 300 lignes : au-delà c'est le signal que le fichier fait trop de choses. Les 4 états sur chaque composant data sans exception. Configuration via variables d'environnement uniquement, aucune valeur hardcodée. Stateless par défaut : Next.js sur Vercel fonctionne en serverless, zéro état stocké en mémoire entre les requêtes, tout ce qui doit persister va dans Supabase. Monolithe modulaire d'abord : n'over-engineer pas avant que le MRR le justifie, les micro-services c'est pour quand tu embauches un DevOps.\n\n" +
-          "SEO et GEO : deux disciplines distinctes. Le SEO pour la visibilité sur Google, le GEO (Generative Engine Optimization) pour la visibilité dans les LLM comme Claude, ChatGPT, Perplexity. Ils ne s'ajoutent pas après le lancement, ils s'intègrent pendant la conception et le développement.\n\n" +
-          "Le minimum vital SEO : métadonnées uniques sur chaque page (title et description précis avec mots-clés naturellement intégrés, jamais de titres génériques \"Accueil\"). Schema.org pour le balisage sémantique : LocalBusiness pour un artisan, Product avec prix et disponibilité pour de l'e-commerce, Article avec auteur et date pour du contenu. Sitemap.xml généré automatiquement avec Next.js. Core Web Vitals au-dessus de 75 sur mobile, une page à 40/100 ne sera pas bien référencée peu importe la qualité du contenu.\n\n" +
-          "Le llms.txt : fichier texte placé à la racine du site (comme robots.txt). Il dit aux LLM ce qu'est le site, ce qu'il fait, ce qu'il ne fait pas, et comment le citer correctement. Format standard émergent, déjà lu par Perplexity et certains crawlers IA. Vingt minutes de travail à la fin de chaque projet, pas trois jours d'optimisation.\n\n" +
-          "Voici la structure de base d'un skill-security.md à créer dans /docs de chaque projet :\n\n" +
-          "```\n" +
-          "# Skill : Sécurité Backend\n" +
-          "\n" +
-          "## Rôle\n" +
-          "Tu es un ingénieur sécurité senior sur la stack Next.js + Supabase.\n" +
-          "Tu appliques ces vérifications sur chaque Route Handler et chaque composant qui gère des données utilisateur.\n" +
-          "Si jamais il y a d'autres failles visibles, tu les mentionnes et tu les règles.\n" +
-          "\n" +
-          "## Checklist sur chaque Route Handler\n" +
-          "1. Authentification vérifiée en premier\n" +
-          "2. Autorisation vérifiée en second (l'utilisateur a-t-il le droit ?)\n" +
-          "3. Inputs validés avec Zod\n" +
-          "4. Rate limiting si la route est sensible\n" +
-          "5. Réponse sans données superflues ni stack trace\n" +
-          "\n" +
-          "## Anti-patterns à détecter immédiatement\n" +
-          "- Clé SUPABASE_SERVICE_ROLE_KEY dans un fichier client\n" +
-          "- Requêtes SQL construites par concaténation de strings\n" +
-          "- Absence de vérification d'autorisation sur une route API\n" +
-          "- dangerouslySetInnerHTML avec du contenu utilisateur non sanitisé\n" +
-          "- Math.random() pour générer des tokens (prévisible)\n" +
-          "\n" +
-          "## Règles absolues\n" +
-          "- Jamais de secret dans le code ou le repo\n" +
-          "- Toujours valider côté serveur, jamais uniquement côté client\n" +
-          "- Erreurs techniques dans les logs (Sentry), pas dans la réponse utilisateur\n" +
-          "```\n\n" +
-          "Et voici le prompt d'audit sécurité à lancer en fin de projet depuis l'IDE :\n\n" +
-          "```\n" +
-          "Tu es un ingénieur sécurité senior. Charge le skill-security.md depuis /docs et effectue un audit complet du projet.\n" +
-          "\n" +
-          "Pour chaque point de la checklist du skill :\n" +
-          "1. Vérifie si le point est respecté dans le code\n" +
-          "2. Si non : identifie le fichier exact et la ligne concernée\n" +
-          "3. Classe la criticité : CRITIQUE / IMPORTANTE / MINEURE\n" +
-          "4. Propose le correctif exact, pas seulement le diagnostic\n" +
-          "\n" +
-          "Commence par les points CRITIQUES. Ne passe pas à la suite tant qu'un point critique n'est pas résolu.\n" +
-          "\n" +
-          "Liens à vérifier en priorité :\n" +
-          "- Toutes les Route Handlers dans /app/api/\n" +
-          "- Toutes les fonctions dans /lib/data/\n" +
-          "- Toutes les pages avec formulaires\n" +
-          "- Le fichier de configuration des webhooks Stripe (si présent)\n" +
-          "- Les règles RLS dans Supabase (demande-moi de les partager si nécessaire)\n" +
-          "```\n\n" +
-          "La règle numéro 1 en architecture : centralise tous les appels Supabase dans /lib/data/. La séparation est non-négociable — elle va dans ton PROMPT-SYSTEM.md dès le début du projet.\n\n" +
-          "```\n" +
-          "/lib\n" +
-          "  /data\n" +
-          "    users.ts       → toutes les fonctions liées aux utilisateurs\n" +
-          "    orders.ts      → toutes les fonctions liées aux commandes\n" +
-          "    products.ts    → toutes les fonctions liées aux produits\n" +
-          "  /stripe\n" +
-          "    client.ts      → initialisation Stripe\n" +
-          "    webhooks.ts    → traitement des webhooks\n" +
-          "  /openai\n" +
-          "    client.ts      → initialisation OpenAI\n" +
-          "```\n\n" +
-          "Voici le skill-architecture.md à créer dans /docs de chaque projet :\n\n" +
-          "```\n" +
-          "# Skill : Architecture\n" +
-          "\n" +
-          "## Rôle\n" +
-          "Tu es un architecte logiciel senior spécialisé sur la stack Next.js 14 App Router + Supabase + Vercel.\n" +
-          "Tu appliques ces principes sur chaque fichier que tu génères ou modifies.\n" +
-          "Si tu détectes une violation de ces principes dans le code existant, tu le signales.\n" +
-          "\n" +
-          "## Règles non-négociables\n" +
-          "\n" +
-          "1. Separation of Concerns\n" +
-          "   - Tous les appels Supabase dans /lib/data/ uniquement\n" +
-          "   - Les composants React n'interrogent jamais la BDD directement\n" +
-          "   - Les Route Handlers API ne contiennent pas de logique métier complexe\n" +
-          "\n" +
-          "2. DRY — Don't Repeat Yourself\n" +
-          "   - Toute logique présente plus de deux fois → extraire en fonction/hook partagé\n" +
-          "   - Les types TypeScript définis une seule fois dans /types/\n" +
-          "\n" +
-          "3. Taille des fichiers\n" +
-          "   - Maximum 300 lignes par fichier\n" +
-          "   - Au-delà → signal de refactoring nécessaire, proposer la découpe\n" +
-          "\n" +
-          "4. Les 4 états sur chaque composant data\n" +
-          "   - loading : skeleton ou spinner approprié\n" +
-          "   - empty : message humain + CTA pertinent\n" +
-          "   - error : message humain (jamais de stack trace), action de récupération\n" +
-          "   - loaded : le contenu\n" +
-          "\n" +
-          "5. Configuration externalisée\n" +
-          "   - Zéro valeur hardcodée qui appartient à l'environnement\n" +
-          "   - Toutes les clés, URLs, secrets → variables d'environnement Vercel\n" +
-          "\n" +
-          "6. Stateless\n" +
-          "   - Zéro état stocké en mémoire sur le serveur entre les requêtes\n" +
-          "   - L'état persistant appartient à Supabase\n" +
-          "\n" +
-          "## Anti-patterns à détecter et corriger\n" +
-          "- Appel Supabase dans un composant React ou une page\n" +
-          "- Logique métier dans un composant UI\n" +
-          "- Même bloc de code copié à deux endroits différents\n" +
-          "- Fichier de plus de 300 lignes sans proposition de découpe\n" +
-          "- Valeur d'environnement hardcodée dans le code\n" +
-          "\n" +
-          "## Checklist avant de valider un fichier\n" +
-          "- [ ] Ce fichier fait-il une seule chose ?\n" +
-          "- [ ] Les appels BDD sont-ils dans /lib/data/ ?\n" +
-          "- [ ] Les 4 états sont-ils couverts si le composant gère de la data ?\n" +
-          "- [ ] Y a-t-il de la duplication visible ?\n" +
-          "- [ ] Le fichier fait-il moins de 300 lignes ?\n" +
-          "```\n\n" +
-          "Pour construire des experts sécurité et architecture sur-mesure, voici les prompts à utiliser dans NotebookLM ou un projet Claude dédié après avoir chargé les références mondiales.\n\n" +
-          "Prompt d'interrogation sécurité :\n\n" +
-          "```\n" +
-          "Pour un SaaS avec authentification utilisateur, plans d'abonnement Stripe,\n" +
-          "dashboard personnel, et appels à l'API OpenAI, quelles sont les 15 failles\n" +
-          "de sécurité les plus probables et les plus critiques selon l'OWASP ?\n" +
-          "Pour chacune, donne-moi le vecteur d'attaque exact et la contre-mesure\n" +
-          "spécifique dans Next.js 14 + Supabase.\n" +
-          "```\n\n" +
-          "Prompt d'interrogation architecture :\n\n" +
-          "```\n" +
-          "Pour une application Next.js 14 App Router avec Supabase, Stripe webhooks,\n" +
-          "et génération de PDF, quelles sont les règles d'architecture les plus\n" +
-          "importantes à encoder dans un PROMPT-SYSTEM pour qu'une IA génère\n" +
-          "du code maintenable et scalable ? Base-toi sur le Twelve-Factor App\n" +
-          "et les best practices Next.js officiels.\n" +
-          "```\n\n" +
-          "Prompt pour créer ton projet Claude expert sur-mesure :\n\n" +
-          "```\n" +
-          "Tu es un expert en sécurité backend et en architecture logicielle,\n" +
-          "spécialisé sur la stack suivante : Next.js 14 App Router, Supabase,\n" +
-          "Stripe, OpenAI API, Vercel.\n" +
-          "\n" +
-          "Tu as chargé et assimilé :\n" +
-          "- L'OWASP Top 10\n" +
-          "- Les guides de sécurité Supabase (RLS, Auth)\n" +
-          "- Le Twelve-Factor App\n" +
-          "- Les best practices Next.js 14 officiels\n" +
-          "\n" +
-          "Mon projet est [description précise].\n" +
-          "Il a les features suivantes : [liste].\n" +
-          "Les données sensibles traitées sont : [liste].\n" +
-          "\n" +
-          "Ta mission : m'aider à créer un skill-security.md et un\n" +
-          "skill-architecture.md ultra-précis, calibrés exactement sur ce projet.\n" +
-          "Commence par me poser les questions dont tu as besoin.\n" +
-          "```\n\n" +
-          "Le llms.txt — à placer à la racine de chaque projet en fin de développement :\n\n" +
-          "```\n" +
-          "# llms.txt\n" +
-          "\n" +
-          "> [Description du site en 2 phrases]\n" +
-          "\n" +
-          "## Pages principales\n" +
-          "- [Accueil](URL) : [description courte]\n" +
-          "- [Services](URL) : [description courte]\n" +
-          "- [Contact](URL) : [description courte]\n" +
-          "\n" +
-          "## Sujets d'autorité\n" +
-          "- [Sujet 1 sur lequel le site fait référence]\n" +
-          "- [Sujet 2]\n" +
-          "\n" +
-          "## Citation préférée\n" +
-          "[Nom de l'organisation ou du créateur], [URL principale]\n" +
-          "```\n\n" +
-          "Et voici le prompt d'audit architecture à lancer en fin de projet depuis l'IDE :\n\n" +
-          "```\n" +
-          "Tu es un architecte logiciel senior. Charge le skill-architecture.md\n" +
-          "depuis /docs et effectue un audit d'architecture complet du projet.\n" +
-          "\n" +
-          "Pour chaque règle du skill :\n" +
-          "1. Vérifie si la règle est respectée dans la structure du code\n" +
-          "2. Si non : identifie les fichiers concernés\n" +
-          "3. Classe l'impact : DETTE TECHNIQUE HAUTE / MOYENNE / FAIBLE\n" +
-          "4. Propose le refactoring exact si la dette est haute\n" +
-          "\n" +
-          "Points spécifiques à vérifier :\n" +
-          "- Y a-t-il des appels Supabase en dehors de /lib/data/ ?\n" +
-          "- Y a-t-il des composants React qui dépassent 300 lignes ?\n" +
-          "- Y a-t-il de la logique dupliquée visible entre plusieurs fichiers ?\n" +
-          "- Les 4 états (loading/empty/error/loaded) sont-ils couverts\n" +
-          "  sur chaque composant data ?\n" +
-          "- Les variables d'environnement sont-elles correctement externalisées ?\n" +
-          "\n" +
-          "Donne-moi le rapport en deux parties :\n" +
-          "1. Ce qui doit être corrigé avant la mise en ligne (dette haute)\n" +
-          "2. Ce qui peut attendre la V2 mais doit être noté (dette moyenne/faible)\n" +
-          "```",
+          "Le framework technique ne commence pas quand le site est terminé. Il commence avant l'IDE. C'est là qu'on décide comment le site sera trouvé, protégé, maintenu et déployé. Si tu attends la fin pour penser SEO, sécurité ou architecture, tu demandes à l'IA de réparer une maison déjà construite.\n\n" +
+          "Pilier 1 : SEO/GEO dès le cadrage. Le référencement ne se colle pas à la fin comme une couche de peinture. Il influence la structure des pages, les titres, les sections, les FAQ, les contenus, les URL, les métadonnées, le maillage interne et les données structurées. Le GEO ajoute une logique supplémentaire : le site doit être compréhensible et citable par les moteurs IA. Donc dès le brief, tu dois savoir quelles intentions de recherche viser, quelles questions le site doit traiter, quelles entités doivent être cohérentes, et quelles pages méritent d'exister.\n\n" +
+          "Pilier 2 : architecture maintenable. Les contenus réutilisables vont dans des fichiers de données ou des composants clairs, pas copiés-collés partout. Une section fait une chose. Un composant fait une chose. Si une page devient énorme, on la découpe. Le but n'est pas de faire de l'architecture pour faire sérieux. Le but est de pouvoir modifier le site sans tout casser.\n\n" +
+          "Pilier 3 : sécurité dès la conception. La référence à connaître, c'est l'OWASP : contrôle d'accès, injections, mauvaises configurations, exposition de données sensibles, erreurs trop bavardes. Même sur un site web, tu peux avoir des routes API, des formulaires, un espace membre, des webhooks, des paiements ou une base de données. Chaque entrée utilisateur doit être validée côté serveur. Aucune clé API ne va dans le code. Les erreurs techniques vont dans les logs, pas dans l'interface. Les routes sensibles vérifient l'authentification et l'autorisation.\n\n" +
+          "Pilier 4 : backend et accès. Dès qu'un projet touche à l'authentification, aux rôles, aux permissions, à Supabase, aux RLS, au middleware, aux routes API, aux webhooks ou aux données client, ce n'est plus un détail visuel. Il faut une vraie réflexion backend. Les RLS ne sont pas une option décorative : elles empêchent un utilisateur de lire ou modifier les données d'un autre. Le middleware ne doit pas être bricolé au hasard : il protège les routes et gère les redirections sans casser la session.\n\n" +
+          "C'est précisément le rôle du skill expert-backend-v2 dans le système complet. ORACLE garde la vision globale, mais expert-backend-v2 prend les décisions sensibles : architecture serveur, sécurité, Supabase/Postgres/RLS, middleware, validation Zod, routes API, webhooks, migrations, performance et audits. Il existe parce que l'IA classique peut faire un joli écran et oublier une faille critique derrière.\n\n" +
+          "Il faut aussi être lucide : c'est très rare qu'une IA réussisse tout ça en un seul prompt. Le bon workflow, c'est de séparer le plan et l'exécution. Pour le plan, tu utilises un modèle puissant avec un mode de réflexion élevé : par exemple OPUS 4.7 en mode plan, ou GPT-5.5 en mode plan avec Thinking High. Tu lui demandes de lire le contexte, d'identifier les risques, de proposer l'architecture, les routes, les règles de sécurité, les points SEO/GEO, puis de produire un plan clair.\n\n" +
+          "Ensuite seulement, tu passes à l'exécution. Tu ouvres une session fraîche, tu donnes le plan validé, et tu peux utiliser un modèle plus léger pour implémenter étape par étape. Résultat : tu brûles moins de tokens, tu gardes un contexte propre, et tu obtiens souvent un meilleur code parce que l'IA n'est pas en train de réfléchir, exécuter, corriger et se contredire dans la même conversation.\n\n" +
+          "La règle à retenir : modèle puissant pour penser, modèle adapté pour exécuter, session fraîche pour construire. Le plan coûte un peu plus cher au départ, mais il évite les semaines de correction après.",
       },
     ],
     videos: [],
@@ -1064,41 +860,62 @@ export const BLOCS_DATA = [
     sections: [
       {
         id: "b6-s1",
-        title: "Ce qu'est ORACLE",
+        title: "Ce qu'est vraiment ORACLE by Orsayn",
         content:
-          "ORACLE est mon framework de construction de A à Z. Pas un outil, pas un prompt. Un process structuré en couches qui fonctionne sur chaque projet, du site artisan au SaaS multi-tenant.\n\n" +
-          "La logique de base : chaque couche produit quelque chose de concret qui alimente la couche suivante. On ne saute pas une couche. On ne revient pas en arrière.\n\n" +
-          "Couche 1, l'interview de démarrage : le skill ORACLE conduit lui-même l'interview. Il pose des questions, écoute, reformule, confirme. Tu n'as pas besoin de préparer un brief parfait. Tu décris ton projet comme tu l'as dans la tête, ORACLE structure. Si tu dis \"je veux une app pour les restaurateurs\", il te demande pour quel type de restaurateurs, dans quelle ville, quel problème précis, qui utilise l'app. Il ne laisse pas passer les zones floues.\n\n" +
-          "Couche 2, les documents fondateurs : dans l'ordre strict. BRIEF (qui, quoi, pourquoi, pour qui, avec quelles contraintes). BRAND-SYSTEM (l'âme du produit avant son apparence, délégué au sous-skill ux-ui-design). DESIGN-SYSTEM (les règles visuelles en tokens réutilisables, délégué à ux-ui-design). PRD (ce que le produit fait, priorisé P1/P2/P3, avec critères d'acceptation binaires). PARCOURS-UTILISATEURS (chaque action, chaque état, chaque émotion). PROMPT-SYSTEM (la synthèse de tout, le cerveau qui va dans l'IDE). Pour un SaaS ou une app, un document supplémentaire : le DATA-MODEL, qui définit le schéma de base de données, les politiques RLS, les triggers et les migrations.\n\n" +
-          "Couche 3, les décisions structurantes : architecture technique, intégrations, décisions sécurité, décisions business. On prend les décisions difficiles avant d'ouvrir l'IDE. Ce qui prend 20 minutes en conversation ici prend des semaines à corriger dans le code.\n\n" +
-          "Couche 4, l'exécution dans l'IDE : Claude Code charge le PROMPT-SYSTEM depuis /docs et construit dans l'ordre du PRD, P1 d'abord entièrement avant de regarder P2. La première instruction de chaque session est toujours la même : \"Charge et lis /docs/PROMPT-SYSTEM.md. Confirme que tu as tout compris avant de commencer.\"\n\n" +
-          "Couche 5, les audits : qualité, sécurité, architecture. Dans cet ordre. Un point CRITIQUE dans l'un des trois audits bloque la livraison. Toujours.\n\n" +
-          "L'ordre n'est pas arbitraire. C'est la même logique qu'une maison : on ne peint pas avant que le béton soit sec.",
+          "ORACLE by Orsayn n'est pas un prompt magique. C'est le chef d'orchestre du projet : il transforme une idée floue en projet cadré, documenté, priorisé et livrable, avec assez de contexte pour que l'IA ne construise pas au hasard.\n\n" +
+          "La philosophie est simple : l'utilisateur n'a pas besoin de parler comme un architecte technique. Il décrit son projet avec ses mots. ORACLE écoute, clarifie, traduit, puis choisit le bon mode de construction : projet per-client, SaaS multi-tenant, AaaS intégré, cockpit opérateur, outil interne ou modèle hybride.\n\n" +
+          "ORACLE fonctionne par couches. Il commence par comprendre le produit, puis il produit les documents fondateurs, puis il force les décisions structurantes avant le code. Son rôle n'est pas de tout faire lui-même. Son rôle est de savoir quoi décider, dans quel ordre, et quel sous-skill doit prendre la main.\n\n" +
+          "C'est important parce qu'on ne construit pas tous les produits avec la même logique. Une app interne pour un client unique, un SaaS avec abonnements, un portail métier avec données sensibles et un cockpit qui orchestre des agents IA n'ont pas les mêmes risques, les mêmes documents, ni les mêmes décisions de déploiement.\n\n" +
+          "ORACLE impose donc un sas de cadrage avant le reste : ORSAYN-PROJECT.md. Ce document décide le mode, la criticité, la stack pressentie, les exceptions possibles et les skills à déléguer. Il évite le piège classique : ouvrir l'IDE trop tôt et demander à l'IA de deviner toute la stratégie.\n\n" +
+          "Autre principe clé : les agents IA ne sont pas vendus comme des jouets autonomes. Dans la philosophie Orsayn, ils sont intégrés dans l'interface comme assistants, automatisations, recommandations ou workflows discrets. L'utilisateur voit un produit utile, pas une démonstration technique.",
       },
       {
         id: "b6-s2",
-        title: "Les sous-skills qui composent ORACLE",
+        title: "Comment ORACLE orchestre le projet",
         content:
-          "ORACLE n'essaie pas de tout faire seul. Il orchestre. Les sous-skills exécutent dans leur domaine. C'est cette séparation qui garantit la qualité à chaque couche.\n\n" +
-          "ux-ui-design : tout ce qui est visuel. Identité de marque, palette de couleurs, typographie, système de composants, maquettes. Ce skill a son propre ADN visuel : Apple-level premium, dark, liquid glass quand c'est justifié. Il reçoit le BRIEF et produit le BRAND-SYSTEM et le DESIGN-SYSTEM. Il génère aussi les prompts visuels pour Stitch ou AI Studio. Tu ne lui demandes pas \"fais quelque chose de beau\". Tu lui fournis le contexte du projet et il définit l'identité visuelle avec précision.\n\n" +
-          "expert-backend : architecture, sécurité, patterns de code. Appelé pour les décisions techniques lourdes : schéma de base de données, choix de l'architecture d'auth, stratégie de rate limiting, RLS Supabase. Ce skill connaît les erreurs qui coûtent cher. Il ne laisse pas passer une clé API dans le front ou une route non protégée.\n\n" +
-          "Comment ça s'utilise concrètement : quand je lance ORACLE sur un nouveau projet, il conduit l'interview. Dès qu'il faut définir le BRAND-SYSTEM, il passe la main à ux-ui-design avec le contexte complet. Quand une décision d'architecture se pose, il consulte expert-backend. Il récupère les livrables, les intègre dans le flux, et continue. Je ne réexplique jamais le projet d'un skill à l'autre, ORACLE transmet le contexte.\n\n" +
-          "Les librairies de composants à connaître : 21st.dev pour les composants React premium, shadcn/ui pour la base fondamentale, accessible et entièrement customisable, Aceternity UI pour les effets dark premium à utiliser chirurgicalement, Magic UI pour les animations de CTA et éléments de célébration. Ces librairies s'explorent en Couche 3, quand les maquettes sont devant toi, pas pendant le code.\n\n" +
-          "Le principe derrière tout ça : je construis une fois, je réutilise partout. Chaque nouveau projet bénéficie de tout ce que j'ai encodé dans ces skills. Je ne repars pas de zéro. Je capitalise.",
+          "Couche 1 : l'interview. ORACLE commence par une écoute libre, puis pose des questions simples. Pas plus de trois questions à la fois. L'objectif n'est pas d'impressionner avec du jargon, mais de comprendre le produit, l'utilisateur, le problème, le modèle économique, l'isolation des données, l'IA, les intégrations et les contraintes de déploiement.\n\n" +
+          "Couche 2 : les documents fondateurs. L'ordre est strict : ORSAYN-PROJECT.md, BRIEF.md, BRAND-SYSTEM.md, DESIGN-SYSTEM.md, DATA-MODEL.md, SECURITY-MODEL.md, PRD.md, USER-FLOWS.md, puis PROMPT-SYSTEM.md. Chaque document nourrit le suivant. Le PROMPT-SYSTEM devient ensuite le cerveau chargé dans l'IDE.\n\n" +
+          "Couche 3 : les délégations. Dès qu'une décision touche l'identité visuelle, l'UX, les maquettes ou le copywriting d'interface, ORACLE délègue à ux-ui-design. Dès qu'une décision touche le backend, la base de données, la sécurité, l'auth, les webhooks ou le déploiement, ORACLE délègue à expert-backend-v2. ORACLE garde la cohérence globale, les sous-skills apportent l'expertise profonde.\n\n" +
+          "Couche 4 : les décisions structurantes. Avant de coder, ORACLE force les décisions qui coûtent cher si elles sont prises trop tard : architecture, auth, paiements, intégrations, sécurité, hébergement, automatisations, données modifiables, SEO/GEO. Vingt minutes ici peuvent éviter deux semaines de correction après.\n\n" +
+          "Couche 5 : l'exécution dans l'IDE. Claude Code, Cursor ou Codex chargent le PROMPT-SYSTEM et construisent dans l'ordre du PRD. P1 complet avant P2. Les secrets restent dans les variables d'environnement. Les appels BDD/API restent dans /lib. Les composants data ont toujours leurs quatre états : loading, empty, error, success.\n\n" +
+          "Couche 6 : les audits. Qualité, sécurité, architecture. Un point critique bloque la livraison. Toujours. Une deadline ne justifie jamais une route non protégée, un service_role côté client, une donnée sensible exposée ou un produit impossible à maintenir.\n\n" +
+          "Ce qui rend ORACLE puissant, ce n'est pas seulement la liste des documents. C'est la discipline : ne pas laisser l'IA improviser les fondations d'un produit qui doit être vendu, utilisé et maintenu.",
       },
       {
         id: "b6-s3",
-        title: "Les deux skills ORACLE",
+        title: "Les sous-skills délégués par ORACLE",
         content:
-          "Un skill, c'est plus qu'un prompt. C'est un package de compétence complet : le contexte, les règles critiques, l'identité de l'expert, les instructions dans l'ordre. Quand je charge un skill dans Claude Code ou dans un projet Claude, je n'explique plus le projet depuis zéro. Le skill sait déjà.\n\nJ'ai construit oracle-site-web et oracle-saas parce que je construisais les mêmes types de projets en boucle. À chaque nouveau site, je réexpliquais les mêmes principes. À chaque nouveau SaaS, je redéfinissais les mêmes règles de sécurité. Au bout d'un moment, j'ai encodé tout ça. La première version était basique. Avec chaque projet, le skill s'est enrichi.\n\nSur la sécurité spécifiquement : je n'avais pas toutes ces connaissances au départ. J'ai dû me confronter aux erreurs, lire la doc OWASP, comprendre ce que signifie RLS sur Supabase, ce que ça veut dire qu'une route n'est pas protégée. Ce qui a vraiment accéléré ma compréhension, c'est NotebookLM. Je prenais les meilleures ressources techniques que je trouvais (tutos backend senior, doc officielle, articles OWASP) et je les chargeais dans un notebook. Ensuite je questionnais en profondeur sur mes cas précis. Ce n'est plus juste lire une doc, c'est apprendre avec un expert qui a lu toute la doc pour toi. C'est un cheat code pour monter en compétence vite.\n\nLa logique de délégation dans ces skills : ORACLE orchestre, mais il ne fait pas tout. Tout ce qui est visuel (BRAND-SYSTEM, DESIGN-SYSTEM, maquettes) est délégué au skill ux-ui-design. Toute décision technique lourde (architecture BDD, RLS, patterns sécurité) est déléguée au skill expert-backend. ORACLE reçoit leurs livrables, les intègre, et continue. On ne réinvente pas la roue à chaque projet.\n\nLes skills ci-dessous sont les versions actuelles. Ils continueront d'évoluer. Un skill est vivant : il s'améliore avec l'usage, avec les projets, avec ce qu'on apprend. Ce que tu copies aujourd'hui n'est pas la version finale. C'est le point de départ.",
-        skillContent: [
+          "ORACLE ne remplace pas les spécialistes. Il les déclenche au bon moment. C'est la différence entre un gros prompt qui essaye de tout couvrir et un système de construction qui sait déléguer.\n\n" +
+          "ux-ui-design est le sous-skill visuel. Dans le dossier complet, tu trouves SKILL.md, des références de direction artistique, une spec Liquid Glass, des règles copywriting système 1, des templates de sortie, des quality gates, un agent YAML et des images de référence. Il intervient sur BRAND-SYSTEM.md, DESIGN-SYSTEM.md, prompts visuels, maquettes, audits UX/UI, assets, iconographie, micro-interactions et copy d'interface.\n\n" +
+          "expert-backend-v2 est le sous-skill backend. Il intervient sur DATA-MODEL.md, SECURITY-MODEL.md, l'architecture /lib, Supabase/Postgres/RLS, auth, permissions, webhooks, migrations, performance, tests, déploiement et audits. Il est réservé au système complet, parce qu'il touche aux décisions qui peuvent casser un produit ou exposer des données.\n\n" +
+          "Le fonctionnement est toujours le même : ORACLE cadre le projet, identifie le besoin, donne le contexte au sous-skill, récupère le livrable, puis l'intègre dans la suite du système. Le sous-skill ne part pas dans sa direction. Il sert la stratégie globale définie par ORACLE.",
+        skillFiles: [
           {
-            title: "oracle-site-web — Copier le skill complet",
-            raw: ORACLE_SITEWEB_RAW,
+            slug: "ux-ui-design",
+            title: "UX/UI Design Premium",
+            description:
+              "Dossier complet du sous-skill visuel : SKILL.md, références, quality gates, agent YAML et assets de direction artistique.",
           },
           {
-            title: "oracle-saas — Copier le skill complet",
-            raw: ORACLE_SAAS_RAW,
+            slug: "expert-backend-v2",
+            title: "Expert Backend v2",
+            description:
+              "Sous-skill backend du système complet : architecture, sécurité, Supabase/RLS, webhooks, migrations, tests et déploiement.",
+          },
+        ],
+      },
+      {
+        id: "b6-s4",
+        title: "Télécharger le skill ORACLE complet",
+        content:
+          "Le fichier ci-dessous contient la version actuelle du skill ORACLE by Orsayn. Tu peux le télécharger directement, puis le placer dans ton environnement IA ou dans le dossier de contexte de ton projet.\n\n" +
+          "Ne le traite pas comme un document figé. Un skill est vivant : il s'améliore avec les projets, les erreurs rencontrées, les audits, les contraintes clients et les nouveaux patterns que tu découvres. Le but n'est pas de collectionner des fichiers. Le but est de capitaliser ton jugement pour ne plus repartir de zéro.",
+        skillFiles: [
+          {
+            slug: "oracle-by-orsayn",
+            title: "ORACLE by Orsayn",
+            description:
+              "Framework App, SaaS, AaaS intégré et Cockpit pour cadrer, déléguer, construire et auditer un projet complet.",
           },
         ],
       },
@@ -1115,7 +932,7 @@ export const BLOCS_DATA = [
         content:
           "Je documente tout ce que je fais plus de deux fois. C'est une règle simple qui a changé ma façon de travailler.\n\n" +
           "Une SOP (Standard Operating Procedure), c'est un document court qui décrit comment faire une action précise. Le contexte (pourquoi on fait ça et dans quelle situation), les étapes dans l'ordre (numérotées, sans ambiguïté), les pièges à éviter (ce qui peut mal tourner et comment le prévenir), et le résultat attendu (à quoi ressemble un travail bien fait).\n\n" +
-          "Exemple concret : à chaque fois que je déploie un nouveau projet sur Vercel, je fais les mêmes vérifications. Variables d'environnement, domaine connecté, Sentry activé, Google Search Console configurée. J'ai documenté ça en une SOP de 12 étapes. Elle prend 15 minutes à suivre. Elle m'évite d'oublier un point critique et d'avoir à y revenir en urgence le lendemain.\n\n" +
+          "Exemple concret : sur le projet Atelier, j'utilise un fichier deploiement-client.md comme SOP de livraison. Il liste les vérifications à faire avant de remettre le projet au client : environnement propre, variables configurées, domaine connecté, derniers tests effectués, accès transmis, points sensibles documentés. Je n'ai pas besoin de me souvenir de tout à chaque livraison. Je suis le process, dans l'ordre, et je réduis le risque d'oublier un détail critique.\n\n" +
           "Le test pour savoir si une SOP est utile : est-ce que quelqu'un d'autre pourrait suivre ces instructions et obtenir le même résultat sans me demander quoi que ce soit ? Si oui, la SOP est bonne. Si non, elle a besoin de plus de précision.\n\n" +
           "Quand je délègue une tâche à un collaborateur ou à un skill IA, la SOP devient l'instruction. Je n'explique plus, je fournis le document. C'est ça la scalabilité réelle : pas les outils, la documentation.",
       },
@@ -1127,7 +944,7 @@ export const BLOCS_DATA = [
           "L'outil vient après la compréhension. Jamais avant. Une automatisation mal posée sur un mauvais process ne fait qu'accélérer les erreurs. Si le process de facturation est chaotique, automatiser la facturation ne règle pas le chaos, il le produit plus vite.\n\n" +
           "Ma méthode concrète avant tout projet d'automatisation : je passe une heure à interviewer le client sur comment il travaille aujourd'hui. Je ne lui demande pas ce qu'il veut, je lui demande de me montrer ce qu'il fait. \"Montre-moi comment tu traites une commande client de A à Z.\" La réponse à cette question contient toujours les vrais problèmes, ceux qu'il n'aurait pas pensé à mentionner.\n\n" +
           "Ensuite je cartographie. Je note chaque étape, chaque outil, chaque transfert de données. Je cherche les goulots d'étranglement (une personne qui fait tout à la main), les redondances (la même information saisie dans deux outils), et les risques (des données client stockées dans un tableur non protégé).\n\n" +
-          "C'est seulement après cet audit que je propose un outil. Make, n8n, Supabase, une intégration API. L'outil répond à un problème identifié, pas à une envie de moderniser.",
+          "C'est seulement après cet audit que je propose une solution. Ça peut être une automatisation, une intégration API, un outil interne, ou parfois simplement une meilleure façon d'organiser le process. La solution répond à un problème identifié, pas à une envie de moderniser.",
       },
       {
         id: "b7-s3",
@@ -1152,7 +969,7 @@ export const BLOCS_DATA = [
           "RÉCAP : Ce que tu sais maintenant faire\n\n" +
           "Blocs 1 à 4 t'ont donné la stack et l'environnement de travail. Les outils, les librairies, la logique de construction. Ce sont les fondations techniques.\n\n" +
           "Bloc 5 t'a montré que le business commence par la vente, que le client prime sur l'ego technique, que le feedback terrain est non-négociable, et qu'il existe une ligne rouge entre les erreurs acceptables et celles qui bloquent la livraison.\n\n" +
-          "Bloc 6 t'a présenté ORACLE : le framework de construction de A à Z. L'interview interne, les documents fondateurs, les sous-skills qui exécutent dans leur domaine (ux-ui-design pour le visuel, expert-backend pour l'architecture et la sécurité), et trois projets réels qui montrent le process appliqué sur un site artisan, une marque mode et un SaaS.\n\n" +
+          "Bloc 6 t'a présenté ORACLE by Orsayn : le framework de construction de A à Z. L'interview interne, ORSAYN-PROJECT.md, les documents fondateurs, les sous-skills qui exécutent dans leur domaine, et la logique de téléchargement du skill comme fichier vivant.\n\n" +
           "Bloc 7 t'a donné les outils pour tenir dans la durée. Processiser ce qu'on fait plus de deux fois. Auditer avant d'automatiser. Encoder les process répétitifs dans des skills. Itérer chaque semaine plutôt que construire une documentation parfaite une seule fois.\n\n" +
           "Ce que tout ça forme ensemble : un système de travail complet. De la vente au delivery, de l'idée au produit en production, de la première version à l'itération continue. Tu n'as pas besoin de tout maîtriser avant de commencer. Tu as besoin de commencer pour commencer à maîtriser.\n\n" +
           "La question maintenant : quel est ton prochain projet ? Lance ORACLE. Décris-le. Commence.",

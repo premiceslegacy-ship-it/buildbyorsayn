@@ -52,8 +52,21 @@ const STEPS = [
     body: (
       <>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
-          On "clone" (télécharge) le code sur notre ordinateur dans un IDE comme <strong className="text-white">Cursor</strong> ou <strong className="text-white">Antigravity</strong>. C'est là que la vraie IA de codage entre en jeu.
+          On "clone" (télécharge) le code sur notre ordinateur dans un IDE comme <strong className="text-white">Cursor</strong>, <strong className="text-white">Codex</strong> ou <strong className="text-white">Antigravity</strong>. C'est là que la vraie IA de codage entre en jeu.
         </p>
+        <div className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-xl p-4 mb-3">
+          <p className="text-[11px] font-semibold text-[#e8d5b0]/80 uppercase tracking-widest mb-2">Premier lancement local</p>
+          <p className="text-xs text-white/50 leading-relaxed mb-3">
+            Après avoir récupéré un MVP depuis Lovable, Bolt ou AI Studio, il faut installer les dépendances une fois avant de lancer le site.
+          </p>
+          <div className="font-mono text-xs text-[#e8d5b0] space-y-1">
+            <p><span className="text-white/30">1. </span>npm install</p>
+            <p><span className="text-white/30">2. </span>npm run dev</p>
+          </div>
+          <p className="text-xs text-white/40 leading-relaxed mt-3">
+            Sans <code>npm install</code>, le projet peut être présent dans l'IDE mais ne pas s'afficher correctement quand tu lances <code>npm run dev</code>.
+          </p>
+        </div>
         <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-4 mb-3">
           <p className="text-[11px] font-semibold text-emerald-400/80 uppercase tracking-widest mb-2">Les 3 commandes</p>
           <div className="font-mono text-xs text-[#e8d5b0] space-y-1">
@@ -79,7 +92,7 @@ const STEPS = [
         <p className="text-sm text-white/55 leading-relaxed mb-4">
           <strong className="text-white">Vercel</strong>, c'est l'hébergeur magique. Il transforme ton code en un vrai site accessible partout dans le monde.
         </p>
-        <ul className="space-y-3 text-sm text-white/55 leading-relaxed mt-auto">
+        <ul className="space-y-3 text-sm text-white/55 leading-relaxed">
           <li className="flex gap-2"><span className="text-[#e8d5b0] flex-shrink-0">•</span><span><strong className="text-white/80">Connexion :</strong> Crée un compte Vercel, clique sur "Importer", lie-le à ton GitHub.</span></li>
           <li className="flex gap-2"><span className="text-[#e8d5b0] flex-shrink-0">•</span><span><strong className="text-white/80">Déploiement auto :</strong> À chaque <code>git push</code>, Vercel met ton site à jour en 60 secondes.</span></li>
           <li className="flex gap-2"><span className="text-[#e8d5b0] flex-shrink-0">•</span><span><strong className="text-white/80">Variables :</strong> Configure tes secrets dans les paramètres Vercel → "Environment Variables".</span></li>

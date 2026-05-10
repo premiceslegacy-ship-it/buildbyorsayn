@@ -6,7 +6,7 @@ export function Section3() {
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Générer des visuels pro</h2>
       </div>
       <p className="text-white/60 text-base leading-relaxed mb-10">
-        Cette section s'adresse particulièrement à ceux qui construisent des sites vitrines ou e-commerce où l'image est centrale.
+        Cette section sert surtout à construire de meilleurs sites web : landing pages, sites vitrines, pages d'offre, portfolios ou pages produit. L'objectif n'est pas de générer de jolies images au hasard, mais de créer une direction visuelle cohérente avec le message, la conversion et le design system.
       </p>
 
       {/* Le danger de l'AI Slop */}
@@ -16,7 +16,7 @@ export function Section3() {
           Le "AI slop", c'est ce rendu générique, lisse, sur-saturé et artificiel que produisent les IA par défaut. Un utilisateur le repère en une fraction de seconde, et ça détruit instantanément la crédibilité de ton site.
         </p>
         <p className="text-sm text-white/60 leading-relaxed">
-          La solution ? <strong className="text-white">Le contexte visuel.</strong> Ne demande jamais à une IA de "faire un beau design". Va d'abord sur Pinterest, Dribbble ou Awwwards. Prends des captures d'écran des sites, des couleurs, des typos, des ambiances photographiques qui te plaisent. Donne ces images de référence à ton IA. C'est ce qui transforme un rendu amateur en rendu premium.
+          La solution ? <strong className="text-white">Le contexte visuel.</strong> Ne demande jamais à une IA de "faire un beau design". Va d'abord sur Pinterest, Dribbble ou Awwwards. Prends des captures d'écran des sites, des couleurs, des typos, des ambiances photographiques qui te plaisent. C'est exactement la logique d'ORACLE Site Web : définir le brief, le message, la direction artistique et le design system avant de générer.
         </p>
       </div>
 
@@ -28,6 +28,10 @@ export function Section3() {
             {
               name: "Nano Banana",
               desc: "Mon outil de prédilection pour créer des ambiances qui s'intègrent parfaitement à ton design, sans passer des heures sur Photoshop.",
+            },
+            {
+              name: "GPT IMAGE 2.0",
+              desc: "Très utile pour produire des visuels propres à partir d'un brief précis : images de hero, variations d'ambiance, assets éditoriaux et éléments cohérents avec une page web.",
             },
             {
               name: "Kling",
@@ -94,6 +98,16 @@ export function Section3() {
             </li>
           ))}
         </ul>
+      </div>
+
+      <div className="mt-6 bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-2xl p-6 md:p-8">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Le niveau au-dessus : ux-ui-design</h3>
+        <p className="text-sm text-white/55 leading-relaxed mb-4">
+          Dans le système complet, j'utilise un skill dédié à l'UX/UI. Il ne se contente pas de dire "fais un beau site" : il force une direction artistique, un BRAND-SYSTEM, un DESIGN-SYSTEM, des règles de copywriting, des quality gates et des prompts visuels précis.
+        </p>
+        <p className="text-sm text-white/55 leading-relaxed">
+          C'est ce qui crée l'écart entre une page correcte générée par IA et un site qui ressemble à un vrai produit : cohérent, premium, lisible, mobile first et pensé pour convertir.
+        </p>
       </div>
     </div>
   );
