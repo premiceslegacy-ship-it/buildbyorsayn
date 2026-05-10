@@ -14,7 +14,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     title: "ORACLE Site Web",
     description:
       "Le skill site web que j'ai configuré pour mon écosystème : cadrage, conversion, SEO/GEO, design system et livraison propre. Tu peux l'adapter à tes propres clients et projets.",
-    access: "free",
+    access: "beginner",
     fileName: "oracle-site-web.md",
   },
   {
