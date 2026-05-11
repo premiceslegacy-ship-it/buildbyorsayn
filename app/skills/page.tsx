@@ -30,10 +30,22 @@ const SKILL_USAGE_STEPS = [
 ];
 
 const SKILL_PROMPTS = [
-  'Charge ce skill et adapte-le à mon projet : [contexte, cible, offre, stack].',
-  'Remplace les références visuelles par celles-ci et garde uniquement les standards qualité.',
-  'Audite mon site/app avec ce skill, puis propose les corrections prioritaires.',
-  'Crée une version Ultra Lean pour valider cette landing page en une session.',
+  {
+    skill: "Tous les skills",
+    prompt: "Charge ce skill et adapte-le à mon projet : [contexte, cible, offre, stack].",
+  },
+  {
+    skill: "UX/UI Design",
+    prompt: "Remplace les références visuelles par celles-ci et garde uniquement les standards qualité.",
+  },
+  {
+    skill: "UX/UI Design",
+    prompt: "Audite mon site/app avec ce skill, puis propose les corrections prioritaires.",
+  },
+  {
+    skill: "ORACLE Site Web",
+    prompt: "Crée une version Ultra Lean pour valider cette landing page en une session.",
+  },
 ];
 
 export default function SkillsPage() {
@@ -136,10 +148,15 @@ export default function SkillsPage() {
                   Prompts utiles pour interagir avec l'IA
                 </p>
                 <div className="grid gap-2">
-                  {SKILL_PROMPTS.map((prompt) => (
-                    <p key={prompt} className="rounded-lg bg-black/20 px-3 py-2 text-xs leading-relaxed text-white/55">
-                      {prompt}
-                    </p>
+                  {SKILL_PROMPTS.map((item) => (
+                    <div key={`${item.skill}-${item.prompt}`} className="rounded-lg bg-black/20 px-3 py-2">
+                      <p className="text-[10px] uppercase tracking-[0.16em] text-[#e8d5b0]/75">
+                        {item.skill}
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-white/55">
+                        {item.prompt}
+                      </p>
+                    </div>
                   ))}
                 </div>
               </div>
