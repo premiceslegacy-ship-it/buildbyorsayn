@@ -10,6 +10,32 @@ import { SKILLS_CATALOG } from "@/lib/skillsCatalog";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 
+const SKILL_USAGE_STEPS = [
+  {
+    title: "1. Charge le skill",
+    body: "Dépose le fichier .md dans /docs ou garde le dossier complet si c'est un zip. Demande ensuite à ton IA de le lire avant de travailler.",
+  },
+  {
+    title: "2. Donne ton contexte",
+    body: "Explique ton marché, ton client, ton offre, ta stack, ton niveau et ton objectif. Un skill devient puissant quand il comprend ton terrain.",
+  },
+  {
+    title: "3. Remplace les références",
+    body: "Les références Orsayn sont une base. Tu peux demander à l'IA de les remplacer par tes marques, screenshots, assets, couleurs et contraintes.",
+  },
+  {
+    title: "4. Fais-le évoluer",
+    body: "Après chaque projet, ajoute tes règles, erreurs fréquentes, prompts utiles et standards. Ton skill devient ton système de travail.",
+  },
+];
+
+const SKILL_PROMPTS = [
+  'Charge ce skill et adapte-le à mon projet : [contexte, cible, offre, stack].',
+  'Remplace les références visuelles par celles-ci et garde uniquement les standards qualité.',
+  'Audite mon site/app avec ce skill, puis propose les corrections prioritaires.',
+  'Crée une version Ultra Lean pour valider cette landing page en une session.',
+];
+
 export default function SkillsPage() {
   const [tier, setTier] = useState<string | null | "loading">("loading");
   const [checkoutHref, setCheckoutHref] = useState("/checkout");
@@ -76,6 +102,50 @@ export default function SkillsPage() {
             Ce sont les skills que j'ai configurés pour moi et pour mon écosystème. Je les utilise au quotidien pour cadrer, construire et auditer mes projets. Tu peux bien évidemment les adapter à ta manière de travailler, à ton marché et à tes propres projets.
           </p>
         </header>
+
+        <section className="mb-10">
+          <LiquidCard className="p-5 sm:p-6">
+            <div className="relative z-10">
+              <div className="max-w-3xl">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#e8d5b0] font-semibold mb-2">
+                  Mode d'emploi
+                </p>
+                <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8]">
+                  Approprie-toi ces skills, ne les copie pas juste.
+                </h2>
+                <p className="mt-3 text-sm sm:text-base text-white/50 leading-relaxed">
+                  Un skill est une base de travail vivante. Tu peux l'utiliser tel quel pour apprendre, puis le faire évoluer avec l'IA pour ton marché, tes clients, tes références, tes assets et tes propres standards.
+                </p>
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {SKILL_USAGE_STEPS.map((step) => (
+                  <div key={step.title} className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-4">
+                    <h3 className="text-sm font-semibold text-[#f0ede8]">
+                      {step.title}
+                    </h3>
+                    <p className="mt-2 text-xs leading-relaxed text-white/45">
+                      {step.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 rounded-xl border border-[#e8d5b0]/15 bg-[#e8d5b0]/[0.045] p-4">
+                <p className="text-sm font-semibold text-[#e8d5b0] mb-3">
+                  Prompts utiles pour interagir avec l'IA
+                </p>
+                <div className="grid gap-2">
+                  {SKILL_PROMPTS.map((prompt) => (
+                    <p key={prompt} className="rounded-lg bg-black/20 px-3 py-2 text-xs leading-relaxed text-white/55">
+                      {prompt}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </LiquidCard>
+        </section>
 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

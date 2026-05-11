@@ -13,7 +13,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "oracle-site-web",
     title: "ORACLE Site Web",
     description:
-      "Le skill site web que j'ai configuré pour mon écosystème : cadrage, conversion, SEO/GEO, design system et livraison propre. Tu peux l'adapter à tes propres clients et projets.",
+      "Le skill site web V3 : cadrage, Ultra Lean en 1 session, LP Orsayn, conversion, SEO/GEO, performance Lighthouse 100, délégation UX/UI et livraison propre. Tu peux l'adapter à tes propres clients et projets.",
     access: "beginner",
     fileName: "oracle-site-web.md",
   },
@@ -21,7 +21,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "ux-ui-design",
     title: "UX/UI Design Premium",
     description:
-      "Le sous-skill visuel que j'utilise pour mon écosystème : direction artistique, brand system, design system, copy UI, assets, motion, audits et quality gates. À adapter selon ton identité.",
+      "Le sous-skill UX/UI complet : direction artistique, brand/design system, audit ou refonte d'un site/app/SaaS existant, assets, motion, copy UI et quality gates. Les références Orsayn sont une base modifiable avec tes propres assets.",
     access: "full",
     fileName: "ux-ui-design.zip",
   },
