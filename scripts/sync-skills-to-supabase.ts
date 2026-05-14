@@ -1,19 +1,25 @@
-import { NextResponse } from "next/server";
-import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
+import { config as loadEnv } from "dotenv";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
-import { createClient } from "@/lib/supabase/server";
-import { getSkillBySlug, type SkillCatalogItem } from "@/lib/skillsCatalog";
+import { SKILLS_CATALOG } from "../lib/skillsCatalog";
 
-export const dynamic = "force-dynamic";
+loadEnv({ path: ".env.local", quiet: true });
+loadEnv({ quiet: true });
 
-const SKILLS_BUCKET = process.env.SUPABASE_SKILLS_BUCKET ?? "skills";
+const bucketName = process.env.SUPABASE_SKILLS_BUCKET ?? "skills";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const FILE_SKILLS: Record<string, string> = {
-  "oracle-site-web": "oracle-site-web.md",
-  "oracle-by-orsayn": "oracle-by-orsayn.md",
-  "expert-backend-v2": "expert-backend-v2.md",
-};
+if (!supabaseUrl || !serviceRoleKey) {
+  throw new Error(
+    "NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required."
+  );
+}
+
+const supabase = createClient(supabaseUrl, serviceRoleKey, {
+  auth: { persistSession: false },
+});
 
 function normalizeNotionMarkdown(raw: string) {
   return raw
@@ -36,55 +42,6 @@ function normalizeNotionMarkdown(raw: string) {
       return trimmedRight;
     })
     .join("\n");
-}
-
-async function getSkillContent(slug: string) {
-  const fileName = FILE_SKILLS[slug];
-
-  if (fileName) {
-    const raw = await readFile(
-      path.join(process.cwd(), "docs", fileName),
-      "utf8"
-    );
-    return normalizeNotionMarkdown(raw);
-  }
-
-  return null;
-}
-
-async function getStoredSkillContent(skill: SkillCatalogItem) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    return null;
-  }
-
-  const supabaseAdmin = createSupabaseAdmin(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false },
-  });
-
-  const { data, error } = await supabaseAdmin.storage
-    .from(SKILLS_BUCKET)
-    .download(skill.fileName);
-
-  if (error || !data) {
-    return null;
-  }
-
-  const buffer = Buffer.from(await data.arrayBuffer());
-
-  if (skill.fileName.endsWith(".md")) {
-    return {
-      body: normalizeNotionMarkdown(buffer.toString("utf8")),
-      contentType: "text/markdown; charset=utf-8",
-    };
-  }
-
-  return {
-    body: new Uint8Array(buffer),
-    contentType: "application/zip",
-  };
 }
 
 async function listFiles(rootDir: string, currentDir = "") {
@@ -208,95 +165,57 @@ async function createZipFromDirectory(rootDir: string, packageName: string) {
   return Buffer.concat([...localParts, centralDirectory, endOfCentralDirectory]);
 }
 
-export async function GET(
-  _request: Request,
-  { params }: { params: { slug: string } }
-) {
-  const skill = getSkillBySlug(params.slug);
+async function ensurePrivateBucket() {
+  const { data: buckets, error: listError } = await supabase.storage.listBuckets();
 
-  if (!skill) {
-    return NextResponse.json({ error: "Skill introuvable." }, { status: 404 });
-  }
+  if (listError) throw listError;
 
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const exists = buckets.some((bucket) => bucket.name === bucketName);
 
-  if (!user) {
-    return NextResponse.json({ error: "Connexion requise." }, { status: 401 });
-  }
-
-  if (skill.access !== "free") {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("tier")
-      .eq("id", user.id)
-      .single();
-
-    const hasAccess =
-      skill.access === "full"
-        ? profile?.tier === "full"
-        : profile?.tier === "beginner" || profile?.tier === "full";
-
-    if (!hasAccess) {
-      return NextResponse.json(
-        {
-          error:
-            skill.access === "full"
-              ? "Accès système complet requis."
-              : "Accès fondations requis.",
-        },
-        { status: 403 }
-      );
-    }
-  }
-
-  const storedSkill = await getStoredSkillContent(skill);
-
-  if (storedSkill) {
-    return new NextResponse(storedSkill.body, {
-      headers: {
-        "Content-Type": storedSkill.contentType,
-        "Content-Disposition": `attachment; filename="${skill.fileName}"`,
-        "Cache-Control": "private, no-store",
-      },
+  if (!exists) {
+    const { error } = await supabase.storage.createBucket(bucketName, {
+      public: false,
     });
+
+    if (error) throw error;
   }
-
-  if (process.env.NODE_ENV === "production") {
-    return NextResponse.json(
-      { error: "Fichier indisponible dans le stockage privé." },
-      { status: 404 }
-    );
-  }
-
-  if (skill.slug === "ux-ui-design") {
-    const content = await createZipFromDirectory(
-      path.join(process.cwd(), "docs", "ux-ui-design"),
-      "ux-ui-design"
-    );
-
-    return new NextResponse(new Uint8Array(content), {
-      headers: {
-        "Content-Type": "application/zip",
-        "Content-Disposition": `attachment; filename="${skill.fileName}"`,
-        "Cache-Control": "private, no-store",
-      },
-    });
-  }
-
-  const content = await getSkillContent(skill.slug);
-
-  if (!content) {
-    return NextResponse.json({ error: "Fichier indisponible." }, { status: 404 });
-  }
-
-  return new NextResponse(content, {
-    headers: {
-      "Content-Type": "text/markdown; charset=utf-8",
-      "Content-Disposition": `attachment; filename="${skill.fileName}"`,
-      "Cache-Control": "private, no-store",
-    },
-  });
 }
+
+async function uploadSkill(fileName: string, body: Buffer | string) {
+  const contentType = fileName.endsWith(".zip")
+    ? "application/zip"
+    : "text/markdown; charset=utf-8";
+
+  const { error } = await supabase.storage.from(bucketName).upload(fileName, body, {
+    contentType,
+    upsert: true,
+  });
+
+  if (error) throw error;
+
+  console.log(`Uploaded ${fileName} to ${bucketName}`);
+}
+
+async function main() {
+  await ensurePrivateBucket();
+
+  for (const skill of SKILLS_CATALOG) {
+    if (skill.fileName.endsWith(".zip")) {
+      const packageName = skill.fileName.replace(/\.zip$/i, "");
+      const zip = await createZipFromDirectory(
+        path.join(process.cwd(), "docs", packageName),
+        packageName
+      );
+      await uploadSkill(skill.fileName, zip);
+      continue;
+    }
+
+    const raw = await readFile(path.join(process.cwd(), "docs", skill.fileName), "utf8");
+    await uploadSkill(skill.fileName, normalizeNotionMarkdown(raw));
+  }
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

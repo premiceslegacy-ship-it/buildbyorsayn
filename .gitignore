@@ -7,11 +7,4 @@ coverage/
 .env*
 !.env.example
 .env.local
-/docs/*
-
-# Downloadable BUILD skills must be shipped with the app
-!/docs/oracle-site-web.md
-!/docs/oracle-by-orsayn.md
-!/docs/expert-backend-v2.md
-!/docs/ux-ui-design/
-!/docs/ux-ui-design/**
+docs/
