@@ -180,23 +180,32 @@ export default function VideosPage() {
               <div className="h-12 w-64 bg-white/5 rounded-xl animate-pulse" />
             ) : isFull ? (
               blocsWithVideos.length > 0 ? (
-                <div className="space-y-16">
+                <div className="space-y-10">
                   {blocsWithVideos.map((bloc) => {
                     const videos = (bloc as any).videos as { title: string; youtubeId: string; description?: string }[];
                     return (
                       <div key={bloc.id} id={`bloc-${bloc.id}`} className="scroll-mt-8">
-                        <div className="mb-6">
-                          <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-semibold mb-1">
+                        {/* Bloc header */}
+                        <div className="flex items-center gap-3 mb-5">
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-[#e8d5b0]/60 font-semibold">
                             Bloc {bloc.id}
-                          </p>
-                          <h3 className="text-xl font-semibold text-[#f0ede8] tracking-tight">
+                          </span>
+                          <span className="text-white/20">›</span>
+                          <span className="text-[13px] text-white/50 font-medium">
                             {bloc.titre.replace(/^Bloc \d+ : /, "")}
-                          </h3>
+                          </span>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          {videos.map((video) => (
-                            <VideoCard key={video.youtubeId} {...video} />
-                          ))}
+
+                        {/* Videos indented under the bloc */}
+                        <div className="pl-4 border-l border-white/[0.07]">
+                          <div className={videos.length === 1
+                            ? "max-w-lg"
+                            : "grid grid-cols-1 md:grid-cols-2 gap-6"
+                          }>
+                            {videos.map((video) => (
+                              <VideoCard key={video.youtubeId} {...video} />
+                            ))}
+                          </div>
                         </div>
                       </div>
                     );

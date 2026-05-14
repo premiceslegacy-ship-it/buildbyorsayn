@@ -10,6 +10,8 @@ const nextConfig = {
   poweredByHeader: false,
 
   async headers() {
+    const isDev = process.env.NODE_ENV === "development";
+    if (isDev) return [];
     return [
       {
         // Apply security headers to all routes

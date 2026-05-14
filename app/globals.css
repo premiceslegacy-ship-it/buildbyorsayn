@@ -1,9 +1,40 @@
 @import "tailwindcss";
 
 @theme {
+  /* Colors */
+  --color-background: #0e0e0f;
+  --color-background-secondary: #161618;
+  --color-background-tertiary: #1c1c1f;
+
+  --color-accent: #e8d5b0;
+  --color-accent-dark: #c9b48a;
+
+  --color-text: #f0ede8;
+  --color-text-secondary: rgba(240, 237, 232, 0.50);
+  --color-text-tertiary: rgba(240, 237, 232, 0.25);
+
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-active: rgba(232, 213, 176, 0.20);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+
+  --color-success: rgba(74, 222, 128, 0.80);
+  --color-error: rgba(248, 113, 113, 0.80);
+  --color-warning: rgba(251, 191, 36, 0.80);
+
+  /* Font */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+
+  /* Letter spacing */
+  --tracking-tightest: -0.03em;
+
+  /* Box shadow */
+  --shadow-glow: 0 0 60px -15px rgba(232, 213, 176, 0.15);
+
+  /* Animations */
+  --animate-apple-splash: appleSplash 3s ease-in-out forwards;
+  --animate-fade-in: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   --animate-fade-up: fade-up 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   --animate-fade-out: fade-out 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  --animate-fade-in: fade-in 0.2s ease-out forwards;
   --animate-reveal: reveal 600ms ease-out forwards;
 }
 
@@ -46,5 +77,27 @@
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes appleSplash {
+  0% { opacity: 0; transform: scale(0.9); }
+  20% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
   }
 }
