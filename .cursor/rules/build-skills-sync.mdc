@@ -1,0 +1,27 @@
+---
+description: Synchronize private BUILD skills after local updates
+alwaysApply: true
+---
+
+# BUILD Skills Sync
+
+If the user says they updated a BUILD skill file in `docs/`, run this from the repo root:
+
+```bash
+npm run skills:sync
+```
+
+The app serves downloads from private Supabase Storage, so existing skill content updates do not need GitHub push or Vercel deploy.
+
+Confirm success when the terminal shows:
+
+```text
+Uploaded <skill-file> to skills
+```
+
+Rules:
+
+- Never commit `docs/`.
+- Never reveal `.env.local` or Supabase service role keys.
+- Never commit `.next/` or `tsconfig.tsbuildinfo`.
+- For brand-new skills, update `lib/skillsCatalog.ts`, ensure the API route serves the file, run `npm run lint`, then sync.
