@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Download, FileText, Lock, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, FileText, FolderSearch, Lock, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
@@ -45,6 +45,14 @@ const SKILL_PROMPTS = [
   {
     skill: "ORACLE Site Web",
     prompt: "Crée une version Ultra Lean pour valider cette landing page en une session.",
+  },
+  {
+    skill: "Deep Research Verticale",
+    prompt: "Charge le fichier 10_PROMPT_UTILISATION_SIMPLE.md, remplis NICHE = \"[ta niche]\" et lance l'analyse complète.",
+  },
+  {
+    skill: "Deep Research Verticale",
+    prompt: "J'ai les fichiers 02 à 08 complétés. Charge-les tous et exécute le prompt 09 pour produire le dossier final de décision.",
   },
 ];
 
@@ -207,7 +215,7 @@ export default function SkillsPage() {
                     <div className="relative z-10 flex h-full flex-col">
                       <div className="flex items-start justify-between gap-4">
                         <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#e8d5b0] shadow-[0_4px_16px_rgba(0,0,0,0.2)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_16px_rgba(232,213,176,0.15)] transition-all duration-500">
-                          <AnimatedIcon icon={isFree ? Sparkles : FileText} className="w-6 h-6 drop-shadow-[0_0_8px_rgba(232,213,176,0.5)]" strokeWidth={1.5} />
+                          <AnimatedIcon icon={isFree ? Sparkles : skill.slug === "deep-research-vertical" ? FolderSearch : FileText} className="w-6 h-6 drop-shadow-[0_0_8px_rgba(232,213,176,0.5)]" strokeWidth={1.5} />
                         </div>
                         <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 border ${badgeClasses}`}>
                           {!isFree && <Lock className="w-3 h-3" />}

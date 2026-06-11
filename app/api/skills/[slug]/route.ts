@@ -271,10 +271,16 @@ export async function GET(
     );
   }
 
-  if (skill.slug === "ux-ui-design") {
+  const ZIP_DIR_SKILLS: Record<string, string> = {
+    "ux-ui-design": "ux-ui-design",
+    "deep-research-vertical": "deep-research-vertical",
+  };
+
+  if (skill.slug in ZIP_DIR_SKILLS) {
+    const dirName = ZIP_DIR_SKILLS[skill.slug];
     const content = await createZipFromDirectory(
-      path.join(process.cwd(), "docs", "ux-ui-design"),
-      "ux-ui-design"
+      path.join(process.cwd(), "docs", dirName),
+      dirName
     );
 
     return new NextResponse(new Uint8Array(content), {

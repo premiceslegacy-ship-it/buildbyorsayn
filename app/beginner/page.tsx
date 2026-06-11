@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowRight, ArrowLeft, GraduationCap, ShieldCheck } from "lucide-react";
-import { Logo } from "@/components/Logo";
+import { ArrowRight, ArrowLeft } from "lucide-react";
+import { NavBar } from "@/components/NavBar";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 
@@ -28,7 +27,6 @@ export default function BeginnerPage() {
   const [tier, setTier] = useState<string | null>(null);
   const [upgradeUrl, setUpgradeUrl] = useState<string>("#");
   const [displayEmail, setDisplayEmail] = useState<string>("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -54,43 +52,12 @@ export default function BeginnerPage() {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-5 blur-[120px] w-[600px] h-[300px] rounded-full pointer-events-none z-0" />
 
       {/* Nav */}
-      <nav className="w-full max-w-7xl mx-auto flex flex-wrap gap-y-4 items-center justify-between py-4 md:py-6 px-4 md:px-12 relative z-20">
-        <Logo layout="horizontal" className="h-6" hideText={false} />
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] sm:text-sm">
-          <Link href="/dashboard" className="text-white/40 hover:text-white/80 transition-colors">Tableau de bord</Link>
-          <Link href="/beginner" className="text-[#f0ede8] font-medium flex items-center gap-1.5">
-            <GraduationCap className="w-3.5 h-3.5" /> Fondations
-          </Link>
-          {tier === "full" && (
-            <Link href="/sources" className="text-white/40 hover:text-white/80 transition-colors">La stack</Link>
-          )}
-          <Link href="/skills" className="text-white/40 hover:text-white/80 transition-colors">Skills</Link>
-          {displayEmail === "mbebourasam@gmail.com" && (
-            <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors">
-              <ShieldCheck className="w-4 h-4" />
-            </Link>
-          )}
-          <div className="relative">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
-            >
-              {displayEmail ? displayEmail.substring(0, 2).toUpperCase() : "?"}
-            </button>
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
-                <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
-                <button
-                  className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors"
-                  onClick={async () => { const s = createClient(); await s.auth.signOut(); router.push("/login"); }}
-                >
-                  Se déconnecter
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
+      <NavBar
+        activeLink="beginner"
+        tier={tier}
+        displayEmail={displayEmail}
+        initials={displayEmail ? displayEmail.substring(0, 2).toUpperCase() : "?"}
+      />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 pb-32 relative z-10">
         {/* Progress */}

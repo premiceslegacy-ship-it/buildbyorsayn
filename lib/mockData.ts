@@ -129,6 +129,11 @@ export const BLOCS_DATA = [
         youtubeId: "6kTB2MAQthk",
         description: "Présentation des outils, pourquoi cette stack fixe, et comment les utiliser ensemble pour construire vite et bien.",
       },
+      {
+        title: "Tu ne verras plus jamais les skills de la même manière.",
+        youtubeId: "KCpUmE2Xi9U",
+        description: "Comment les skills changent fondamentalement ta façon de travailler avec l'IA.",
+      },
     ],
   },
   {

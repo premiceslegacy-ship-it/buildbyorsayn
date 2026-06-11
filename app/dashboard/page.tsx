@@ -2,11 +2,11 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock, ShieldCheck, GraduationCap, X } from "lucide-react";
-import { Logo } from "@/components/Logo";
+import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock, X } from "lucide-react";
 import Link from "next/link";
+import { NavBar } from "@/components/NavBar";
 import { BLOCS_DATA } from "@/lib/mockData";
 import { useProgress } from "@/hooks/useProgress";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
@@ -30,9 +30,6 @@ const ICONS: Record<string, any> = {
 export default function DashboardHub() {
   const router = useRouter();
   const { getBlocProgress, globalProgress, isLoaded, lastVisitedBloc } = useProgress();
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [displayName, setDisplayName] = useState("...");
   const [displayEmail, setDisplayEmail] = useState("");
@@ -85,16 +82,6 @@ export default function DashboardHub() {
     fetchUser();
   }, [router]);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   // Avoid hydration mismatch by not rendering progress until loaded
   const displayProgress = isLoaded ? globalProgress : 0;
 
@@ -110,82 +97,15 @@ export default function DashboardHub() {
       <div className="absolute bottom-0 right-0 bg-blue-500 opacity-5 blur-[120px] w-[400px] h-[400px] rounded-full pointer-events-none" />
 
       {/* Top Navigation */}
-      <nav className="w-full max-w-7xl mx-auto flex flex-wrap gap-y-4 items-center justify-between py-4 md:py-6 px-4 md:px-12 relative z-20">
-        <Logo layout="horizontal" className="h-6" hideText={false} />
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] sm:text-sm">
-          <Link href="/dashboard" className="text-[#f0ede8] font-medium">
-            Tableau de bord
-          </Link>
-          {/* Fondations — toujours visible, comportement selon tier */}
-          {(tier === "beginner" || tier === "full") ? (
-            <Link href="/beginner" className="text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5">
-              <GraduationCap className="w-3.5 h-3.5" /> Fondations
-            </Link>
-          ) : (
-            <button onClick={() => setModal("foundations")} className="text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5 cursor-pointer bg-transparent border-none font-[inherit] text-sm">
-              <GraduationCap className="w-3.5 h-3.5" /> Fondations
-            </button>
-          )}
-          {/* Stack — toujours visible */}
-          {tier === "full" ? (
-            <Link href="/sources" className="text-white/40 hover:text-white/80 transition-colors">
-              La stack
-            </Link>
-          ) : (
-            <button onClick={() => setModal("both")} className="text-white/40 hover:text-white/80 transition-colors cursor-pointer bg-transparent border-none font-[inherit] text-sm">
-              La stack
-            </button>
-          )}
-          <Link href="/skills" className="text-white/40 hover:text-white/80 transition-colors">
-            Skills
-          </Link>
-          {/* Vidéos — toujours visible */}
-          <Link href="/videos" className="text-white/40 hover:text-white/80 transition-colors">
-            Vidéos
-          </Link>
-
-          {displayEmail === "mbebourasam@gmail.com" && (
-            <Link
-              href="/admin"
-              title="Administration"
-              className="text-white/30 hover:text-[#e8d5b0] transition-colors"
-            >
-              <ShieldCheck className="w-4 h-4" />
-            </Link>
-          )}
-
-          {/* Dropdown Profil */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
-            >
-              {initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
-            </button>
-
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50 animate-fade-in">
-                <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">
-                  {displayName}
-                </div>
-                <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">
-                  {displayEmail}
-                </div>
-                <button
-                  className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors"
-                  onClick={async () => {
-                    const supabase = createClient();
-                    await supabase.auth.signOut();
-                    router.push("/login");
-                  }}
-                >
-                  Se déconnecter
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
+      <NavBar
+        activeLink="dashboard"
+        tier={tier}
+        displayName={displayName}
+        displayEmail={displayEmail}
+        initials={initials}
+        onFondationsClick={() => setModal("foundations")}
+        onStackClick={() => setModal("both")}
+      />
 
       <div className="max-w-7xl mx-auto px-4 md:px-12 pb-24 relative z-10">
 
