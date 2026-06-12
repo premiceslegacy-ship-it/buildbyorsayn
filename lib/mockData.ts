@@ -228,12 +228,12 @@ export const BLOCS_DATA = [
         title: "Un skill, c'est quoi exactement",
         content:
           "Un skill, c'est un framework que tu as construit ou capturé, formalisé dans un fichier, et que tu peux charger dans n'importe quel LLM pour obtenir un résultat précis et reproductible.\n\n" +
-          "Pas un prompt générique. Pas un \"tu es un expert en...\". Un cadre de pensée extrait d'une vraie expertise — la tienne ou celle d'un entrepreneur qui produit des résultats.\n\n" +
+          "Pas un prompt générique. Pas un \"tu es un expert en...\". Un cadre de pensée extrait d'une vraie expertise - la tienne ou celle d'un entrepreneur qui produit des résultats.\n\n" +
           "La différence concrète : un prompt générique donne à l'IA l'instruction de jouer un rôle. Un skill lui donne les variables, les contraintes, les critères de décision et les interdits d'un praticien réel. L'IA n'improvise plus. Elle opère dans un cadre que tu as défini.\n\n" +
           "---\n\n" +
           "Il existe deux chemins pour construire un skill.\n\n" +
-          "Chemin 1 — Tu es l'expert. Tu pratiques quelque chose depuis des années : la vente, les ads Facebook, la conception UX, le management d'équipe, la comptabilité freelance. Tu externalises ce savoir dans un fichier. Ton skill de vente contient tes questions de qualification, tes phrases de closing, tes critères pour dire non à un client. Tu l'utilises toi-même, tu le fais évoluer, tu le transmets à l'IA et à d'autres.\n\n" +
-          "Chemin 2 — La technique du ninja copieur. Tu n'es pas encore l'expert, mais tu as accès à quelqu'un qui l'est. Un entrepreneur qui print dans ta niche. Un créateur de contenu qui explique sa méthode. Un livre qui décrit un système. La démarche : tu agrèges ses sources dans NotebookLM — ses podcasts, ses vidéos, ses posts, ses interviews. Tu interroges ces sources de façon précise. Tu extrais les points clés, les décisions non-dites, les patterns récurrents. Tu les structures en skill. Tu n'as pas inventé la méthode. Tu l'as capturée, formalisée, et elle est maintenant réutilisable.\n\n" +
+          "Chemin 1 - Tu es l'expert. Tu pratiques quelque chose depuis des années : la vente, les ads Facebook, la conception UX, le management d'équipe, la comptabilité freelance. Tu externalises ce savoir dans un fichier. Ton skill de vente contient tes questions de qualification, tes phrases de closing, tes critères pour dire non à un client. Tu l'utilises toi-même, tu le fais évoluer, tu le transmets à l'IA et à d'autres.\n\n" +
+          "Chemin 2 - La technique du ninja copieur. Tu n'es pas encore l'expert, mais tu as accès à quelqu'un qui l'est. Un entrepreneur qui print dans ta niche. Un créateur de contenu qui explique sa méthode. Un livre qui décrit un système. La démarche : tu agrèges ses sources dans NotebookLM - ses podcasts, ses vidéos, ses posts, ses interviews. Tu interroges ces sources de façon précise. Tu extrais les points clés, les décisions non-dites, les patterns récurrents. Tu les structures en skill. Tu n'as pas inventé la méthode. Tu l'as capturée, formalisée, et elle est maintenant réutilisable.\n\n" +
           "---\n\n" +
           "Les deux chemins mènent au même endroit : un actif que tu possèdes, que tu peux charger en contexte dans un LLM, et qui produit un output de qualité professionnelle sans repartir de zéro à chaque fois.",
       },
@@ -242,9 +242,9 @@ export const BLOCS_DATA = [
         title: "Grouper les skills, construire la chaîne de valeur",
         content:
           "Un skill n'existe pas seul. Il s'inscrit dans une logique de système.\n\n" +
-          "Première règle : les skills qui couvrent le même domaine se regroupent. Si tu as un template de brand identity, un template de design system, et un template d'expérience utilisateur — ce sont trois éléments du même domaine. Tu peux les rassembler dans un seul skill de design. Ce skill devient plus dense, plus puissant, et plus facile à activer : une seule commande charge l'ensemble du cadre.\n\n" +
-          "Deuxième règle : les skills s'inscrivent dans une chaîne de valeur. Ton skill de design ne vit pas seul — il est dans la chaîne de valeur de la création d'un SaaS ou d'une landing page. Le skill de copywriting est dans la chaîne de valeur de ta campagne ads. Le skill de qualification client est dans la chaîne de valeur de ta vente.\n\n" +
-          "Chaque skill que tu construis est un composant qui s'articule avec les autres. Pas une collection d'outils disparates — une infrastructure cohérente où chaque pièce a une place et un rôle dans la séquence.\n\n" +
+          "Première règle : les skills qui couvrent le même domaine se regroupent. Si tu as un template de brand identity, un template de design system, et un template d'expérience utilisateur - ce sont trois éléments du même domaine. Tu peux les rassembler dans un seul skill de design. Ce skill devient plus dense, plus puissant, et plus facile à activer : une seule commande charge l'ensemble du cadre.\n\n" +
+          "Deuxième règle : les skills s'inscrivent dans une chaîne de valeur. Ton skill de design ne vit pas seul - il est dans la chaîne de valeur de la création d'un SaaS ou d'une landing page. Le skill de copywriting est dans la chaîne de valeur de ta campagne ads. Le skill de qualification client est dans la chaîne de valeur de ta vente.\n\n" +
+          "Chaque skill que tu construis est un composant qui s'articule avec les autres. Pas une collection d'outils disparates - une infrastructure cohérente où chaque pièce a une place et un rôle dans la séquence.\n\n" +
           "---\n\n" +
           "Exemple concret : tu construis un SaaS pour des comptables. Ta chaîne de valeur ressemble à ça.\n\n" +
           "Skill de recherche marché → définit le problème, le persona, le message\n" +
@@ -261,15 +261,15 @@ export const BLOCS_DATA = [
         title: "Le second cerveau et la règle du cashflow d'abord",
         content:
           "L'objectif final de tous ces skills n'est pas d'avoir une belle bibliothèque. C'est de ne plus jamais repartir de zéro.\n\n" +
-          "À chaque projet, tu charges les skills pertinents. La connaissance que tu as construite — ou capturée — devient immédiatement disponible. L'IA n'improvise plus. Elle opère dans ton système. Tu travailles plus vite, avec moins d'erreurs, et avec une qualité qui s'améliore à chaque itération parce que tes skills s'affinent au fil des projets.\n\n" +
-          "C'est ce qu'on appelle le second cerveau : toute ta connaissance — ou celle que tu es allé copier légitimement — formalisée, stockée, réutilisable sur tous tes projets, pour tous tes clients, à l'infini. C'est la définition de scaler son backend : pas recruter plus de gens, pas tourner plus d'heures — exécuter avec des systèmes qui capitalisent.\n\n" +
+          "À chaque projet, tu charges les skills pertinents. La connaissance que tu as construite - ou capturée - devient immédiatement disponible. L'IA n'improvise plus. Elle opère dans ton système. Tu travailles plus vite, avec moins d'erreurs, et avec une qualité qui s'améliore à chaque itération parce que tes skills s'affinent au fil des projets.\n\n" +
+          "C'est ce qu'on appelle le second cerveau : toute ta connaissance - ou celle que tu es allé copier légitimement - formalisée, stockée, réutilisable sur tous tes projets, pour tous tes clients, à l'infini. C'est la définition de scaler son backend : pas recruter plus de gens, pas tourner plus d'heures - exécuter avec des systèmes qui capitalisent.\n\n" +
           "---\n\n" +
           "Mais voilà la règle que la plupart des gens ratent : le second cerveau se construit après le cashflow, pas à la place.\n\n" +
-          "Il y a deux types de builders. Ceux qui passent leurs journées à construire des systèmes, des bibliothèques de skills, des automatisations — et qui n'ont pas encore un euro en banque. Et ceux qui vendent d'abord, livrent d'abord, encaissent d'abord, et qui construisent les systèmes progressivement à partir de leur pratique réelle.\n\n" +
+          "Il y a deux types de builders. Ceux qui passent leurs journées à construire des systèmes, des bibliothèques de skills, des automatisations - et qui n'ont pas encore un euro en banque. Et ceux qui vendent d'abord, livrent d'abord, encaissent d'abord, et qui construisent les systèmes progressivement à partir de leur pratique réelle.\n\n" +
           "La deuxième approche gagne. Toujours.\n\n" +
           "Les skills construits à partir de vrais projets sont meilleurs que ceux construits en chambre. Le framework que tu as testé sur un client réel, avec de vraies contraintes et de vrais résultats, vaut dix fois celui que tu as théorisé sans jamais l'exécuter.\n\n" +
           "---\n\n" +
-          "Ce bloc ne te propose pas de passer ta journée à construire des systèmes avant de gagner de l'argent. Il te propose une vraie stratégie : vends, livre, capitalise. À chaque projet, extrait ce qui fonctionne. Formalise-le. Ajoute-le à ton système. Ton second cerveau se construit en même temps que ton business — pas en dehors de lui.\n\n" +
+          "Ce bloc ne te propose pas de passer ta journée à construire des systèmes avant de gagner de l'argent. Il te propose une vraie stratégie : vends, livre, capitalise. À chaque projet, extrait ce qui fonctionne. Formalise-le. Ajoute-le à ton système. Ton second cerveau se construit en même temps que ton business - pas en dehors de lui.\n\n" +
           "Ceux qui te vendent des packs de 3000 produits gagnants à scraper ou des bibliothèques de prompts génériques n'ont pas compris ça. Un skill sans application terrain, c'est du bruit. Un skill extrait d'un vrai projet, c'est un actif.",
       },
     ],
