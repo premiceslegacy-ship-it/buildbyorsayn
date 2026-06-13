@@ -1,4 +1,5 @@
 node_modules/
+.next/
 build/
 dist/
 coverage/
@@ -8,3 +9,4 @@ coverage/
 !.env.example
 .env.local
 docs/
+tsconfig.tsbuildinfo
