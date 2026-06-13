@@ -300,10 +300,10 @@ export default function DashboardHub() {
                 <div className="flex flex-1 min-w-0 items-start justify-between">
                   <div>
                     <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0] font-medium mb-2">
-                      Verticale en production
+                      Verticale terminée
                     </p>
                     <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-1">
-                      Atelier BTP — voir une ligne verticale réelle
+                      Atelier BTP - voir une ligne verticale réelle
                     </h2>
                     <p className="text-sm text-white/50 mt-2">
                       Un exemple concret de ce que le système produit. Construit avec les mêmes frameworks que tu utilises ici.
