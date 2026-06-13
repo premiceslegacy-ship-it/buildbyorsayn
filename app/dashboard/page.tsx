@@ -281,7 +281,42 @@ export default function DashboardHub() {
           );
         })()}
 
-        {/* 4. Bloc Communauté — affiché uniquement pour tier = 'full' */}
+        {/* 4. Verticale en prod — preuve concrète visible par tous */}
+        <div className="mt-6">
+          <a
+            href="https://www.atelier-btp.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block"
+          >
+            <LiquidCard className="p-8 md:p-10 transition-all duration-300 cursor-pointer">
+              <div className="relative flex flex-col sm:flex-row items-start gap-10">
+                {/* Icône */}
+                <div className="flex-shrink-0 w-14 h-14 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.2)] transition-all duration-500">
+                  <Eye className="w-7 h-7 text-[#e8d5b0] drop-shadow-[0_0_10px_rgba(232,213,176,0.8)]" strokeWidth={1.5} />
+                </div>
+
+                {/* Texte + Flèche */}
+                <div className="flex flex-1 min-w-0 items-start justify-between">
+                  <div>
+                    <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0] font-medium mb-2">
+                      Verticale en production
+                    </p>
+                    <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-1">
+                      Atelier BTP — voir une ligne verticale réelle
+                    </h2>
+                    <p className="text-sm text-white/50 mt-2">
+                      Un exemple concret de ce que le système produit. Construit avec les mêmes frameworks que tu utilises ici.
+                    </p>
+                  </div>
+                  <ArrowRight className="flex-shrink-0 w-5 h-5 text-[#e8d5b0] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 hidden sm:block ml-4 mt-1" />
+                </div>
+              </div>
+            </LiquidCard>
+          </a>
+        </div>
+
+        {/* 5. Bloc Communauté — affiché uniquement pour tier = 'full' */}
         {tier === "full" && (
           <div className="mt-6">
             <a
