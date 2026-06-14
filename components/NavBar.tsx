@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { GraduationCap, ShieldCheck, Menu, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { createClient } from "@/lib/supabase/client";
 
 interface NavBarProps {
   activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole";
@@ -46,15 +45,8 @@ export function NavBar({
   }, []);
 
   const handleSignOut = async () => {
-    try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signOut();
-      if (error) console.error("signOut error:", error);
-      window.location.href = "/login";
-    } catch (e) {
-      console.error("signOut exception:", e);
-      window.location.href = "/login";
-    }
+    await fetch("/api/signout", { method: "POST" });
+    window.location.href = "/login";
   };
 
   const linkClass = (link: string) =>
