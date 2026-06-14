@@ -63,7 +63,7 @@ export default async function ProtocolePage() {
 
   const userTier = profile?.tier ?? null;
 
-  if (userTier !== "full" && userTier !== "admin") {
+  if (userTier !== "full" && userTier !== "beginner" && userTier !== "admin") {
     redirect("/checkout");
   }
 
