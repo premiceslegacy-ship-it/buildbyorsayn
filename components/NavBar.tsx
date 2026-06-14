@@ -63,8 +63,7 @@ export function NavBar({
       }).catch(() => null);
       await supabase.auth.signOut({ scope: "local" }).catch(() => null);
     } finally {
-      router.replace("/login");
-      router.refresh();
+      window.location.href = "/login";
     }
   };
 
@@ -95,7 +94,7 @@ export function NavBar({
         </button>
       )}
 
-      {hasFullAccess ? (
+      {hasFoundationAccess ? (
         <Link href="/sources" className={linkClass("sources")} onClick={() => setIsMobileMenuOpen(false)}>
           La stack
         </Link>
@@ -108,7 +107,7 @@ export function NavBar({
         </button>
       )}
 
-      {hasFullAccess && (
+      {hasFoundationAccess && (
         <Link href="/protocole" className={linkClass("protocole")} onClick={() => setIsMobileMenuOpen(false)}>
           Protocole Zéro
         </Link>

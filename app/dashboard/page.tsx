@@ -38,8 +38,9 @@ export default function DashboardHub() {
   const [userId, setUserId] = useState<string | null>(null);
   const [animatedProgress, setAnimatedProgress] = useState(0);
   const [sessionAdvances, setSessionAdvances] = useState(0);
-  const [checkoutUrls, setCheckoutUrls] = useState<{ beginner: string | null; full: string }>({
+  const [checkoutUrls, setCheckoutUrls] = useState<{ beginner: string | null; upgrade: string | null; full: string }>({
     beginner: null,
+    upgrade: null,
     full: "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a",
   });
 
@@ -178,9 +179,9 @@ export default function DashboardHub() {
                 <p className="text-sm font-semibold text-[#e8d5b0]">Tu n&apos;as encore rien à toi.</p>
                 <p className="text-xs text-white/40 mt-0.5">Le Bloc 1 est gratuit. Le reste du système te donne les fichiers, skills et méthodes pour construire des lignes verticales IA qui rapportent.</p>
               </div>
-              <Link href="/checkout" className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap">
-                Voir les accès <ArrowRight className="w-3 h-3" />
-              </Link>
+              <a href={`${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`} className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap">
+                Prendre le système complet <ArrowRight className="w-3 h-3" />
+              </a>
             </div>
           ) : null}
 
@@ -191,9 +192,9 @@ export default function DashboardHub() {
                 <p className="text-sm font-semibold text-[#e8d5b0]">Les fondations, c&apos;est le départ. Le système complet, c&apos;est ce qui construit.</p>
                 <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs, les sources et les méthodes complètes. 400€ de complément - une seule fois.</p>
               </div>
-              <Link href="/checkout" className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap">
+              <a href={`${checkoutUrls.upgrade ?? checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`} className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap">
                 Passer au complet <ArrowRight className="w-3 h-3" />
-              </Link>
+              </a>
             </div>
           )}
         </header>
@@ -413,39 +414,41 @@ export default function DashboardHub() {
               <X className="w-5 h-5" />
             </button>
 
-            <div className={modal === "both" ? "grid grid-cols-1 md:grid-cols-2 gap-5" : "max-w-sm mx-auto"}>
-              {/* Fondations card - toujours affichée */}
-              <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 flex flex-col backdrop-blur-xl">
-                <div className="mb-5">
-                  <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Fondations</span>
-                  <div className="flex items-baseline gap-1 mt-2 mb-1">
-                    <span className="text-3xl font-bold text-[#f0ede8]">97€</span>
-                    <span className="text-white/40 text-sm">TTC</span>
+            <div className={tier !== "beginner" && modal === "both" ? "grid grid-cols-1 md:grid-cols-2 gap-5" : "max-w-sm mx-auto"}>
+              {/* Fondations card - uniquement si pas encore beginner */}
+              {tier !== "beginner" && (
+                <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 flex flex-col backdrop-blur-xl">
+                  <div className="mb-5">
+                    <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Fondations</span>
+                    <div className="flex items-baseline gap-1 mt-2 mb-1">
+                      <span className="text-3xl font-bold text-[#f0ede8]">97€</span>
+                      <span className="text-white/40 text-sm">TTC</span>
+                    </div>
+                    <p className="text-white/40 text-xs">Accès à vie aux fondations</p>
                   </div>
-                  <p className="text-white/40 text-xs">Accès à vie aux fondations</p>
+                  <ul className="space-y-2 mb-6 flex-1">
+                    {["5 modules pour construire", "De zéro à un site en ligne", "Skills Deep Research + UX/UI", "Stack complète + Protocole Zéro"].map((f) => (
+                      <li key={f} className="text-xs text-white/55 flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-[#e8d5b0]/50 flex-shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href={checkoutUrls.beginner
+                      ? `${checkoutUrls.beginner}${userId ? `?client_reference_id=${userId}` : ""}`
+                      : "/checkout"
+                    }
+                    className="flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm"
+                  >
+                    Démarrer pour 97€
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
                 </div>
-                <ul className="space-y-2 mb-6 flex-1">
-                  {["5 modules pour construire", "De zéro à un site en ligne", "Skills Deep Research + UX/UI", "Stack complète + Protocole Zéro"].map((f) => (
-                    <li key={f} className="text-xs text-white/55 flex items-center gap-2">
-                      <span className="w-1 h-1 rounded-full bg-[#e8d5b0]/50 flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={checkoutUrls.beginner
-                    ? `${checkoutUrls.beginner}${userId ? `?client_reference_id=${userId}` : ""}`
-                    : "/checkout"
-                  }
-                  className="flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm"
-                >
-                  Démarrer pour 97€
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </a>
-              </div>
+              )}
 
-              {/* Accès complet - uniquement modal "both" */}
-              {modal === "both" && (
+              {/* Accès complet - toujours affiché dans modal "both", ou si beginner */}
+              {(modal === "both" || tier === "beginner") && (
                 <div className="bg-white/[0.04] border border-[#e8d5b0]/25 rounded-2xl p-6 flex flex-col relative backdrop-blur-xl">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] rounded-full px-3 py-1">Le vrai choix</span>
@@ -453,10 +456,10 @@ export default function DashboardHub() {
                   <div className="mb-5">
                     <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Système Complet</span>
                     <div className="flex items-baseline gap-1 mt-2 mb-1">
-                      <span className="text-3xl font-bold text-[#f0ede8]">497€</span>
+                      <span className="text-3xl font-bold text-[#f0ede8]">{tier === "beginner" ? "400€" : "497€"}</span>
                       <span className="text-white/40 text-sm">TTC</span>
                     </div>
-                    <p className="text-white/40 text-xs">Accès à vie - tout le système, une seule fois</p>
+                    <p className="text-white/40 text-xs">{tier === "beginner" ? "Complément - accès à vie au système complet" : "Accès à vie - tout le système, une seule fois"}</p>
                   </div>
                   <ul className="space-y-2 mb-6 flex-1">
                     {["7 blocs de système complets", "Méthodes actionnables", "Sources et ressources", "Fondations incluses", "Skills Deep Research + UX/UI", "Stack + Protocole Zéro"].map((f) => (
@@ -467,10 +470,13 @@ export default function DashboardHub() {
                     ))}
                   </ul>
                   <a
-                    href={`${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`}
+                    href={tier === "beginner"
+                      ? `${checkoutUrls.upgrade ?? checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
+                      : `${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
+                    }
                     className="flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] text-sm"
                   >
-                    Prendre le système complet - 497€
+                    {tier === "beginner" ? "Passer au complet - 400€" : "Prendre le système complet - 497€"}
                     <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
