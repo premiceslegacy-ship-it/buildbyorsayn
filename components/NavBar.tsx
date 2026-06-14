@@ -53,18 +53,15 @@ export function NavBar({
     setIsDropdownOpen(false);
     setIsMobileMenuOpen(false);
 
-    const supabase = createClient();
-
     try {
-      await fetch("/api/signout", {
-        method: "POST",
-        credentials: "include",
-        cache: "no-store",
-      }).catch(() => null);
+      await fetch("/api/signout", { method: "POST", credentials: "include" }).catch(() => null);
+      const supabase = createClient();
       await supabase.auth.signOut({ scope: "local" }).catch(() => null);
-    } finally {
-      window.location.href = "/login";
+    } catch {
+      // ignore
     }
+
+    window.location.href = "/login";
   };
 
   const linkClass = (link: string) =>
