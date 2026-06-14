@@ -46,9 +46,15 @@ export function NavBar({
   }, []);
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    window.location.href = "/login";
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signOut();
+      if (error) console.error("signOut error:", error);
+      window.location.href = "/login";
+    } catch (e) {
+      console.error("signOut exception:", e);
+      window.location.href = "/login";
+    }
   };
 
   const linkClass = (link: string) =>
