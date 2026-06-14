@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { GraduationCap, ShieldCheck, Menu, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { createClient } from "@/lib/supabase/client";
 
 interface NavBarProps {
   activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole";
@@ -28,6 +29,7 @@ export function NavBar({
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -45,8 +47,25 @@ export function NavBar({
   }, []);
 
   const handleSignOut = async () => {
-    await fetch("/api/signout", { method: "POST" });
-    window.location.href = "/login";
+    if (isSigningOut) return;
+
+    setIsSigningOut(true);
+    setIsDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+
+    const supabase = createClient();
+
+    try {
+      await fetch("/api/signout", {
+        method: "POST",
+        credentials: "include",
+        cache: "no-store",
+      }).catch(() => null);
+      await supabase.auth.signOut({ scope: "local" }).catch(() => null);
+    } finally {
+      router.replace("/login");
+      router.refresh();
+    }
   };
 
   const linkClass = (link: string) =>
@@ -134,10 +153,11 @@ export function NavBar({
               )}
               <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
               <button
+                disabled={isSigningOut}
                 className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
                 onClick={handleSignOut}
               >
-                Se déconnecter
+                {isSigningOut ? "Déconnexion..." : "Se déconnecter"}
               </button>
             </div>
           )}
@@ -160,10 +180,11 @@ export function NavBar({
               )}
               <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
               <button
+                disabled={isSigningOut}
                 className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
                 onClick={handleSignOut}
               >
-                Se déconnecter
+                {isSigningOut ? "Déconnexion..." : "Se déconnecter"}
               </button>
             </div>
           )}
