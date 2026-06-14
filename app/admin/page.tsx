@@ -92,7 +92,7 @@ export default async function AdminPage() {
   ]);
 
   const emailMap = new Map<string, string>(
-    (authData?.users ?? []).map((u) => [u.id, u.email ?? "—"])
+    (authData?.users ?? []).map((u) => [u.id, u.email ?? "-"])
   );
   const lastSignInMap = new Map<string, string | null>(
     (authData?.users ?? []).map((u) => [u.id, u.last_sign_in_at ?? null])
@@ -270,7 +270,7 @@ export default async function AdminPage() {
                             En ligne
                           </span>
                         ) : seen.style === "never" ? (
-                          <span className="text-white/25 text-[13px]">—</span>
+                          <span className="text-white/25 text-[13px]">-</span>
                         ) : (
                           <span className="text-white/40 text-[13px]">{seen.label}</span>
                         )}
@@ -280,7 +280,7 @@ export default async function AdminPage() {
                       <td className="px-5 py-4">
                         <div className="flex flex-wrap gap-1.5">
                           {blocks.length === 0 ? (
-                            <span className="text-white/25 text-[13px]">—</span>
+                            <span className="text-white/25 text-[13px]">-</span>
                           ) : (
                             blocks
                               .slice()

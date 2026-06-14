@@ -18,7 +18,7 @@ export function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // Appelé depuis un Server Component — le middleware gère le refresh
+            // Appelé depuis un Server Component. Le middleware gère le refresh.
           }
         },
       },

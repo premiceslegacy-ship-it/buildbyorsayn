@@ -4,6 +4,16 @@ export const BLOCS_DATA = [
     titre: "Bloc 1 : La logique du système",
     sections: [
       {
+        id: "b1-s0",
+        title: "Le marché IA fabrique des locataires numériques",
+        content:
+          "Soyons directs. La plupart des gens utilisent l'IA depuis des mois sans avoir construit quoi que ce soit qui leur appartient. Ils optimisent des interfaces qu'ils ne possèdent pas, avec des modèles qu'ils ne contrôlent pas, pour produire des livrables qui dépendent de plateformes qui peuvent changer demain.\n\n" +
+          "Marx avait théorisé ça au 19e siècle pour les usines : celui qui ne possède pas les moyens de production est contraint de vendre sa force de travail à celui qui les possède. L'IA est le nouveau moyen de production intellectuel. Claude, GPT, Gemini sont les machines du 21e siècle. Le locataire numérique les utilise sans les comprendre ni les posséder. Quand ils changent, régulation, arrêt de modèle, décision de plateforme, il recommence à zéro.\n\n" +
+          "La fenêtre actuelle est asymétrique. L'accès à des modèles exceptionnels est disponible, bon marché, et sans précédent historique. Cette fenêtre va se fermer progressivement : régulation européenne avec l'AI Act, commoditisation, protectionnisme digital. Ceux qui utilisent cette fenêtre pour construire du capital organique sortiront indépendants. Ceux qui l'utilisent pour louer de l'intelligence sortiront dépendants.\n\n" +
+          "La distillation, c'est l'acte de reprendre possession des moyens de production. Encoder ce qu'on sait faire : expertise, processus, systèmes, vision. Le placer dans des structures qu'on possède. Pas utiliser l'IA. Se distiller dedans. Ce qui est distillé ne peut pas être retiré.\n\n" +
+          "Ce bloc pose la logique du système. Pas la liste des outils. Pas les prompts à copier-coller. La structure de pensée qui fait que tout le reste tient.",
+      },
+      {
         id: "b1-s1",
         title: "Ce que l'IA a vraiment changé",
         content:

@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Users, Flag, Lock, X } from "lucide-react";
+import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Flag, Lock, X } from "lucide-react";
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -14,7 +14,6 @@ import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
-import { getCommunityLink } from "@/app/actions/getCommunityLink";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 
 const ICONS: Record<string, any> = {
@@ -35,9 +34,10 @@ export default function DashboardHub() {
   const [displayEmail, setDisplayEmail] = useState("");
   const [initials, setInitials] = useState("?");
   const [tier, setTier] = useState<string | null>(null);
-  const [communityLink, setCommunityLink] = useState<string | null>(null);
   const [modal, setModal] = useState<null | "foundations" | "both">(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [animatedProgress, setAnimatedProgress] = useState(0);
+  const [sessionAdvances, setSessionAdvances] = useState(0);
   const [checkoutUrls, setCheckoutUrls] = useState<{ beginner: string | null; full: string }>({
     beginner: null,
     full: "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02",
@@ -74,19 +74,51 @@ export default function DashboardHub() {
         .single();
       const userTier = profile?.tier ?? null;
       setTier(userTier);
-      if (userTier === "full") {
-        const link = await getCommunityLink();
-        setCommunityLink(link);
-      }
     };
     fetchUser();
   }, [router]);
 
-  // Avoid hydration mismatch by not rendering progress until loaded
+  // Animate progress on load
+  useEffect(() => {
+    if (!isLoaded) return;
+    const start = Date.now();
+    const duration = 900;
+    const end = globalProgress;
+    const tick = () => {
+      const elapsed = Date.now() - start;
+      const t = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setAnimatedProgress(Math.round(end * eased));
+      if (t < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [isLoaded, globalProgress]);
+
+  // Dynamic page title
+  useEffect(() => {
+    if (isLoaded) {
+      document.title = `${globalProgress}% : BUILD by Orsayn`;
+      return () => { document.title = "BUILD by Orsayn"; };
+    }
+  }, [isLoaded, globalProgress]);
+
+  useEffect(() => {
+    const raw = sessionStorage.getItem("build_session_advances");
+    setSessionAdvances(raw ? Number(raw) : 0);
+  }, []);
+
   const displayProgress = isLoaded ? globalProgress : 0;
 
+  const getGreeting = (progress: number) => {
+    if (progress === 0) return "Tu viens de démarrer. La plupart s'arrêtent ici.";
+    if (progress < 20) return "Les premiers pas. Ne t'arrête pas maintenant.";
+    if (progress < 60) return "Tu avances. Les gens qui finissent ça changent de trajectoire.";
+    if (progress < 100) return "Presque. Le seul bloqueur restant, c'est toi.";
+    return "Capital organique constitué. La suite, c'est le terrain.";
+  };
+
   // Find the bloc to resume: either the last visited, or the first incomplete, or default to bloc 1
-  const firstIncompleteBlocId = BLOCS_DATA.find(b => getBlocProgress(b.id) < 100)?.id || "1";
+  const firstIncompleteBlocId = BLOCS_DATA.find(b => getBlocProgress(b.id) < 100)?.id || null;
   const resumeBlocId = lastVisitedBloc || firstIncompleteBlocId;
   const resumeBloc = BLOCS_DATA.find(b => b.id === resumeBlocId) || BLOCS_DATA[0];
 
@@ -112,18 +144,31 @@ export default function DashboardHub() {
         {/* 1. En-tête de page (Welcome & Global Progress) */}
         <header className="flex flex-col gap-4 pt-8 mb-12">
           <h1 className="text-3xl text-[#f0ede8] font-semibold tracking-tight">
-            Ravi de te revoir, Builder.
+            {displayName !== "..." ? `Bienvenue, ${displayName}.` : "Bienvenue."}
           </h1>
           <p className="text-[rgba(240,237,232,0.60)] text-[16px]">
-            Tu en es à {displayProgress}% du système. {displayProgress === 100 ? "Système intégralement implémenté." : displayProgress === 0 ? "Commence le système pour atteindre ta situation désirée." : "Continue sur ta lancée."}
+            {isLoaded ? getGreeting(globalProgress) : "Chargement de ta progression..."}
           </p>
 
+          {sessionAdvances >= 2 && (
+            <LiquidCard className="w-full max-w-2xl p-4">
+              <p className="text-sm font-medium text-[#e8d5b0]">Tu es en zone. Continue.</p>
+              <p className="text-xs text-white/45 mt-1">Plusieurs blocs avancés dans cette session. Garde le rythme tant que l'énergie est là.</p>
+            </LiquidCard>
+          )}
+
           {/* Barre de progression globale large */}
-          <div className="w-full max-w-2xl mt-4 h-2 bg-white/5 rounded-full overflow-hidden">
-            <div
-              className="bg-gradient-to-r from-[#e8d5b0]/60 to-[#e8d5b0] h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_12px_rgba(232,213,176,0.3)]"
-              style={{ width: `${displayProgress}%` }}
-            />
+          <div className="w-full max-w-2xl mt-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs text-white/30 uppercase tracking-wider font-medium">Progression globale</span>
+              <span className="text-sm text-[#e8d5b0] font-semibold tabular-nums">{animatedProgress}%</span>
+            </div>
+            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-[#e8d5b0]/60 to-[#e8d5b0] h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_12px_rgba(232,213,176,0.3)]"
+                style={{ width: `${displayProgress}%` }}
+              />
+            </div>
           </div>
 
           {/* CTA upgrade pour les beginners */}
@@ -131,9 +176,9 @@ export default function DashboardHub() {
             <div className="mt-2 flex items-center justify-between bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-xl px-5 py-4">
               <div>
                 <p className="text-sm font-medium text-[#e8d5b0]">Passe au système complet</p>
-                <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs, les sources et la communauté pour 70€.</p>
+                <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs et les sources pour 70€.</p>
               </div>
-              <Link href="/checkout" className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all px-4 py-2 rounded-lg ml-4">
+              <Link href="/checkout" className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2 rounded-lg ml-4 shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)]">
                 Upgrader <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
@@ -164,12 +209,14 @@ export default function DashboardHub() {
           </div>
         </LiquidCard>
 
-        {/* 3. La Grille des Blocs (Le Menu) — blocs 1 à 6 */}
+        {/* 3. La Grille des Blocs (Le Menu), blocs 1 à 6 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {BLOCS_DATA.filter((b) => b.id !== "7").map((bloc) => {
             const Icon = ICONS[bloc.id] || Workflow;
             const progress = isLoaded ? getBlocProgress(bloc.id) : 0;
             const isLocked = tier !== "full" && bloc.id !== "1";
+            const isCompleted = progress === 100;
+            const isNextUp = isLoaded && bloc.id === firstIncompleteBlocId && !isLocked;
 
             return (
               <div
@@ -178,25 +225,44 @@ export default function DashboardHub() {
                 onClick={() => isLocked ? setModal("both") : router.push(`/blocs/${bloc.id}`)}
               >
                 <motion.div whileHover="hover" className="h-full">
-                  <LiquidCard className="p-6 text-left transition-all duration-500 flex flex-col h-full min-h-[220px]">
+                  <LiquidCard className={`p-6 text-left transition-all duration-500 flex flex-col h-full min-h-[220px] ${isNextUp ? "animate-pulse shadow-[0_0_0_1px_rgba(232,213,176,0.18),0_0_30px_rgba(232,213,176,0.12)]" : ""}`}>
                     {/* Glow background on hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
 
+                    {/* Glow pulsant pour le prochain bloc */}
+                    {isNextUp && (
+                      <div className="absolute inset-0 rounded-lg opacity-100 bg-[#e8d5b0]/[0.035] pointer-events-none" />
+                    )}
+
                     {/* Badge accès */}
-                    {tier !== "full" && bloc.id !== "1" && (
+                    {!isCompleted && tier !== "full" && bloc.id !== "1" && (
                       <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-2.5 py-1">
                         <Lock className="w-3 h-3 text-white/30" />
                         <span className="text-[11px] text-white/30 font-medium">Premium</span>
                       </div>
                     )}
-                    {tier !== "full" && bloc.id === "1" && (
+                    {!isCompleted && tier !== "full" && bloc.id === "1" && (
                       <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1">
                         <span className="text-[11px] text-emerald-400 font-medium">Gratuit</span>
                       </div>
                     )}
+                    {/* Badge XP si complété */}
+                    {isCompleted && (
+                      <div className="absolute top-4 right-4 z-20 flex items-center gap-1 bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-full px-2.5 py-1">
+                        <span className="text-[11px] text-[#e8d5b0] font-semibold">+250 XP</span>
+                      </div>
+                    )}
+                    {isCompleted && (
+                      <motion.div
+                        initial={{ opacity: 0.45, scale: 0.98 }}
+                        animate={{ opacity: 0, scale: 1.04 }}
+                        transition={{ duration: 0.75, ease: "easeOut" }}
+                        className="absolute inset-0 rounded-lg bg-[#e8d5b0]/15 pointer-events-none"
+                      />
+                    )}
 
                     {/* Icône Fintech illuminée */}
-                    <div className="relative w-12 h-12 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.2)] transition-all duration-500 mb-6">
+                    <div className={`relative w-12 h-12 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.2)] transition-all duration-500 mb-6 ${isNextUp ? "border-[#e8d5b0]/20 shadow-[0_0_16px_rgba(232,213,176,0.15)]" : ""}`}>
                       <AnimatedIcon icon={Icon} className="w-6 h-6 text-[#e8d5b0] drop-shadow-[0_0_10px_rgba(232,213,176,0.8)]" strokeWidth={1.5} />
                     </div>
 
@@ -209,7 +275,7 @@ export default function DashboardHub() {
                         <span className="text-xs text-white/40 uppercase tracking-wider font-medium">
                           Progression
                         </span>
-                        <span className="text-xs text-[#e8d5b0] font-medium">
+                        <span className={`text-xs font-medium ${isCompleted ? "text-[#e8d5b0]" : "text-[#e8d5b0]"}`}>
                           {progress}%
                         </span>
                       </div>
@@ -227,7 +293,7 @@ export default function DashboardHub() {
           })}
         </div>
 
-        {/* 3b. Bloc 7 Récapitulatif — pleine largeur, layout horizontal */}
+        {/* 3b. Bloc 7 Récapitulatif, pleine largeur, layout horizontal */}
         {(() => {
           const recap = BLOCS_DATA.find((b) => b.id === "7");
           if (!recap) return null;
@@ -281,7 +347,7 @@ export default function DashboardHub() {
           );
         })()}
 
-        {/* 4. Verticale en prod — preuve concrète visible par tous */}
+        {/* 4. Verticale en prod, preuve concrète visible par tous */}
         <div className="mt-6">
           <a
             href="https://www.atelier-btp.fr"
@@ -316,42 +382,6 @@ export default function DashboardHub() {
           </a>
         </div>
 
-        {/* 5. Bloc Communauté — affiché uniquement pour tier = 'full' */}
-        {tier === "full" && (
-          <div className="mt-6">
-            <a
-              href={communityLink ?? "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block"
-            >
-              <LiquidCard className="p-8 md:p-10 transition-all duration-300 cursor-pointer">
-                <div className="relative flex flex-col sm:flex-row items-start gap-10">
-                  {/* Icône */}
-                  <div className="flex-shrink-0 w-14 h-14 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.2)] transition-all duration-500">
-                    <Users className="w-7 h-7 text-[#e8d5b0] drop-shadow-[0_0_10px_rgba(232,213,176,0.8)]" strokeWidth={1.5} />
-                  </div>
-
-                  {/* Texte + Flèche */}
-                  <div className="flex flex-1 min-w-0 items-start justify-between">
-                    <div>
-                      <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0] font-medium mb-2">
-                        Espace membres
-                      </p>
-                      <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-1">
-                        Rejoindre la communauté privée
-                      </h2>
-                      <p className="text-sm text-white/50 mt-2">
-                        Accède au groupe réservé aux builders qui ont le système.
-                      </p>
-                    </div>
-                    <ArrowRight className="flex-shrink-0 w-5 h-5 text-[#e8d5b0] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 hidden sm:block ml-4 mt-1" />
-                  </div>
-                </div>
-              </LiquidCard>
-            </a>
-          </div>
-        )}
 
       </div>
 
@@ -416,7 +446,7 @@ export default function DashboardHub() {
                     <p className="text-white/40 text-xs">Accès à vie à tout le système</p>
                   </div>
                   <ul className="space-y-2 mb-6 flex-1">
-                    {["7 blocs de système complets", "Méthodes actionnables", "Communauté privée", "Fondations incluses"].map((f) => (
+                    {["7 blocs de système complets", "Méthodes actionnables", "Sources et ressources", "Fondations incluses"].map((f) => (
                       <li key={f} className="text-xs text-white/55 flex items-center gap-2">
                         <span className="w-1 h-1 rounded-full bg-[#e8d5b0]/50 flex-shrink-0" />
                         {f}

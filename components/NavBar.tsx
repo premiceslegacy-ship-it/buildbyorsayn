@@ -8,7 +8,7 @@ import { Logo } from "@/components/Logo";
 import { createClient } from "@/lib/supabase/client";
 
 interface NavBarProps {
-  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos";
+  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole";
   tier?: string | null;
   displayName?: string;
   displayEmail?: string;
@@ -56,13 +56,16 @@ export function NavBar({
       ? "text-[#f0ede8] font-medium"
       : "text-white/40 hover:text-white/80 transition-colors";
 
+  const hasFoundationAccess = tier === "beginner" || tier === "full" || tier === "admin";
+  const hasFullAccess = tier === "full" || tier === "admin";
+
   const navLinks = (
     <>
       <Link href="/dashboard" className={linkClass("dashboard")} onClick={() => setIsMobileMenuOpen(false)}>
         Tableau de bord
       </Link>
 
-      {tier === "beginner" || tier === "full" ? (
+      {hasFoundationAccess ? (
         <Link href="/beginner" className={`${linkClass("beginner")} flex items-center gap-1.5`} onClick={() => setIsMobileMenuOpen(false)}>
           <GraduationCap className="w-3.5 h-3.5" /> Fondations
         </Link>
@@ -75,7 +78,7 @@ export function NavBar({
         </button>
       )}
 
-      {tier === "full" ? (
+      {hasFullAccess ? (
         <Link href="/sources" className={linkClass("sources")} onClick={() => setIsMobileMenuOpen(false)}>
           La stack
         </Link>
@@ -86,6 +89,12 @@ export function NavBar({
         >
           La stack
         </button>
+      )}
+
+      {hasFullAccess && (
+        <Link href="/protocole" className={linkClass("protocole")} onClick={() => setIsMobileMenuOpen(false)}>
+          Protocole Zéro
+        </Link>
       )}
 
       <Link href="/skills" className={linkClass("skills")} onClick={() => setIsMobileMenuOpen(false)}>

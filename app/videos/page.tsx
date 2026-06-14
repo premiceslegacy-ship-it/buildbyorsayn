@@ -109,7 +109,7 @@ export default function VideosPage() {
           <section id="fondations" className="scroll-mt-8">
             <div className="mb-8">
               <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
-                Fondations — 30€
+                Fondations : 30€
               </p>
               <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
                 Le flow : de l'idée à l'URL en ligne
@@ -145,12 +145,12 @@ export default function VideosPage() {
             <div className="mt-16 border-t border-white/5" />
           </section>
 
-          {/* Bloc 1 — gratuit, visible par tous */}
+          {/* Bloc 1 : gratuit, visible par tous */}
           {bloc1Videos.length > 0 && (
             <section id="bloc-1" className="scroll-mt-8">
               <div className="mb-8">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
-                  Gratuit — Bloc 1
+                  Gratuit : Bloc 1
                 </p>
                 <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
                   La logique du système
@@ -169,7 +169,7 @@ export default function VideosPage() {
           <section id="systeme" className="scroll-mt-8">
             <div className="mb-8">
               <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
-                Système complet — 100€
+                Système complet : 100€
               </p>
               <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
                 Les blocs

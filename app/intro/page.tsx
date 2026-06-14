@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Zap, Shield, Layers, Terminal, Code2, Target, Brain, TrendingUp } from "lucide-react";
+import { ArrowRight, Zap, Shield, Target, Brain, TrendingUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
@@ -63,10 +63,65 @@ export default function IntroPage() {
       </div>
 
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-12 py-16 md:py-24 relative z-10">
-        
+
+        {/* Protocole Zéro, carte d'orientation */}
+        <section className="mb-24 pt-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col gap-6"
+          >
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-2">Le Protocole Zéro</p>
+              <h2 className="text-2xl font-medium tracking-tight text-[#f0ede8]">Tu es sur quelle phase ?</h2>
+              <p className="text-white/40 text-sm mt-1">Les blocs Build correspondent à chaque étape du chemin.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                {
+                  num: "01",
+                  titre: "L'Absorption",
+                  label: "Méthode Sharingan",
+                  blocs: "Blocs 2 et 4",
+                  desc: "Greffe les compétences. Encode les skills.",
+                },
+                {
+                  num: "02",
+                  titre: "Le Sprint Cash",
+                  label: "Premiers 10k€",
+                  blocs: "Blocs 1, 3 et 5",
+                  desc: "Positionne-toi. Utilise les frameworks. Vends.",
+                },
+                {
+                  num: "03",
+                  titre: "La Distillation",
+                  label: "Capital organique",
+                  blocs: "Blocs 6 et 7",
+                  desc: "Construis pour de vrai. Encode les SOPs.",
+                },
+              ].map((phase) => (
+                <LiquidCard key={phase.num} className="p-5">
+                  <div className="flex items-start gap-3 mb-3">
+                    <span className="text-[#e8d5b0]/30 font-mono font-bold text-base flex-shrink-0">{phase.num}</span>
+                    <div>
+                      <p className="text-[#f0ede8] font-semibold text-sm">{phase.titre}</p>
+                      <p className="text-[#e8d5b0] text-xs opacity-60">{phase.label}</p>
+                    </div>
+                  </div>
+                  <p className="text-white/40 text-xs leading-relaxed mb-3">{phase.desc}</p>
+                  <div className="inline-flex items-center gap-1.5 bg-[#e8d5b0]/8 border border-[#e8d5b0]/15 rounded-full px-2.5 py-1">
+                    <span className="text-[10px] text-[#e8d5b0] font-medium">{phase.blocs}</span>
+                  </div>
+                </LiquidCard>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+
         {/* Hero Section */}
-        <section className="min-h-[80vh] flex flex-col justify-center mb-24">
-          <motion.div 
+        <section className="min-h-[60vh] flex flex-col justify-center mb-24">
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
@@ -74,9 +129,9 @@ export default function IntroPage() {
             <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-[#f0ede8] to-white/40 leading-[1.05]">
               Avant de commencer.
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-white/50 max-w-3xl leading-relaxed font-light">
-              Ce système a été construit à partir d'une pratique réelle, des projets livrés, des erreurs corrigées. Tout ce qui est ici est actionnable.
+              Ce système a été construit à partir d&apos;une pratique réelle, des projets livrés, des erreurs corrigées. Tout ce qui est ici est actionnable.
             </p>
           </motion.div>
         </section>
@@ -198,4 +253,3 @@ export default function IntroPage() {
     </main>
   );
 }
-

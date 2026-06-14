@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { Compass, Layers, Sparkles, Workflow, LayoutTemplate, FileCode, Briefcase, LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AnimatedIconProps {
   icon: LucideIcon;
@@ -116,7 +117,10 @@ export function AnimatedIcon({ icon: Icon, className, strokeWidth = 1.5 }: Anima
   return (
     <motion.div
       variants={variants}
-      className="flex items-center justify-center"
+      className={cn(
+        "flex items-center justify-center rounded-md transform-gpu transition-all duration-[80ms]",
+        "drop-shadow-[0_1px_0_rgba(255,255,255,0.18)] active:translate-y-[1px]"
+      )}
     >
       <Icon className={className} strokeWidth={strokeWidth} />
     </motion.div>

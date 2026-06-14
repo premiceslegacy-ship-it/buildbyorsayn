@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
-import { ArrowRight, Zap, Layers, Users, GraduationCap, Lock } from "lucide-react";
+import { ArrowRight, Zap, Layers, GraduationCap, Lock } from "lucide-react";
 import { BetaCodeForm } from "./BetaCodeForm";
 
 const STRIPE_FULL_URL = "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02";
@@ -17,7 +17,7 @@ const BEGINNER_FEATURES = [
 const FULL_FEATURES = [
     { icon: Layers, label: "7 blocs de système complets" },
     { icon: Zap, label: "Méthodes actionnables et directes" },
-    { icon: Users, label: "Accès à la communauté privée" },
+    { icon: GraduationCap, label: "Sources et ressources" },
     { icon: GraduationCap, label: "Fondations incluses" },
 ];
 
@@ -71,21 +71,21 @@ export default async function CheckoutPage() {
                         {alreadyFull
                             ? "Tu as accès à l'ensemble du système Build, y compris les fondations."
                             : isUpgrading
-                            ? "Tu as les fondations. Débloque les 7 blocs, les sources et la communauté pour 70€."
+                            ? "Tu as les fondations. Débloque les 7 blocs et les sources pour 70€."
                             : "Choisis le niveau d'accès qui te correspond."}
                     </p>
                 </div>
 
                 {alreadyFull ? (
-                    /* Already full — show dashboard link */
+                    /* Already full: show dashboard link */
                     <div className="bg-white/[0.04] border border-[#e8d5b0]/20 rounded-2xl p-6 sm:p-8 backdrop-blur-xl text-center">
-                        <p className="text-white/50 text-sm mb-6">Retourne au tableau de bord pour accéder à tes blocs, tes sources et la communauté.</p>
+                        <p className="text-white/50 text-sm mb-6">Retourne au tableau de bord pour accéder à tes blocs et tes sources.</p>
                         <a href="/dashboard" className="group inline-flex items-center justify-center gap-2 py-4 px-8 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)]">
                             Tableau de bord
                         </a>
                     </div>
                 ) : isUpgrading ? (
-                    /* Upgrade flow — beginner → full */
+                    /* Upgrade flow: beginner → full */
                     <div className="bg-white/[0.04] border border-[#e8d5b0]/20 rounded-2xl p-6 backdrop-blur-xl">
                         <ul className="space-y-3 mb-8">
                             {FULL_FEATURES.map(({ icon: Icon, label }) => (
@@ -110,7 +110,7 @@ export default async function CheckoutPage() {
                         </a>
                     </div>
                 ) : (
-                    /* Standard flow — 2 options */
+                    /* Standard flow: 2 options */
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {/* Beginner */}
                         <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 backdrop-blur-xl flex flex-col">
@@ -135,11 +135,7 @@ export default async function CheckoutPage() {
                                     <Lock className="w-3.5 h-3.5 text-white/40 flex-shrink-0" strokeWidth={1.5} />
                                     <span className="text-xs text-white/40">Blocs & sources (non inclus)</span>
                                 </li>
-                                <li className="flex items-center gap-2.5 opacity-40">
-                                    <Lock className="w-3.5 h-3.5 text-white/40 flex-shrink-0" strokeWidth={1.5} />
-                                    <span className="text-xs text-white/40">Communauté Telegram (non inclus)</span>
-                                </li>
-                            </ul>
+                                    </ul>
                             <a href={beginnerUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm">
                                 Commencer pour 30€
                                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />

@@ -147,6 +147,10 @@ export default function BlocPage() {
   const blocIdNum = Number(blocId);
   const showPaywall = tier !== "full" && tier !== null && blocIdNum > 1;
   const showContent = tier === "full" || blocIdNum === 1;
+  const markSessionAdvance = () => {
+    const current = Number(sessionStorage.getItem("build_session_advances") ?? "0");
+    sessionStorage.setItem("build_session_advances", String(current + 1));
+  };
 
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] font-sans relative selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
@@ -171,7 +175,7 @@ export default function BlocPage() {
               {bloc.titre}
             </h1>
 
-            {/* Skeleton — chargement en cours pour blocs > 1 */}
+            {/* Skeleton : chargement en cours pour blocs > 1 */}
             {tier === null && blocIdNum > 1 && (
               <div className="mt-16 space-y-8 animate-pulse">
                 {[1, 2, 3].map((i) => (
@@ -185,7 +189,7 @@ export default function BlocPage() {
               </div>
             )}
 
-            {/* Paywall — blocs 2-7 pour non-payants */}
+            {/* Paywall : blocs 2-7 pour non-payants */}
             {showPaywall && (
               <div className="mt-8">
                 {/* Aperçu flouté */}
@@ -374,6 +378,7 @@ export default function BlocPage() {
                     className="w-full sm:w-auto"
                     size="xl"
                     onClick={async () => {
+                      markSessionAdvance();
                       await toggleBlocCompletion(Number(blocId));
                       router.refresh();
                       router.push(`/blocs/${nextBlocId}`);
@@ -388,6 +393,7 @@ export default function BlocPage() {
                     size="xl"
                     onClick={async () => {
                       if (globalProgress !== 100) {
+                        markSessionAdvance();
                         await toggleBlocCompletion(Number(blocId));
                         router.refresh();
                       }
