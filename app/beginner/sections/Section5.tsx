@@ -50,7 +50,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
             </div>
             <h3 className="text-xl font-semibold text-[#f0ede8] mb-4">La suite logique</h3>
             <p className="text-sm text-white/60 leading-relaxed mb-8">
-              Tu as les fondations. Le système complet pour construire des produits complexes, automatiser ton exécution et scaler tes revenus t'attend dans l'accès total.
+              Tu as les fondations. Le système complet - les 7 blocs, les sources et les méthodes pour construire des lignes verticales IA qui rapportent - t'attend.
             </p>
 
             <Link
@@ -58,15 +58,15 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
               className="inline-flex items-center justify-between w-full p-1 rounded-full bg-white/[0.03] border border-white/10 hover:border-[#e8d5b0]/40 transition-colors group/btn"
             >
               <div className="flex items-center gap-3 pl-4 pr-2">
-                <span className="text-sm font-medium text-[#f0ede8]">Accès au système complet</span>
-                <span className="text-xs text-white/40 line-through">100€</span>
+                <span className="text-sm font-medium text-[#f0ede8]">Système complet</span>
+                <span className="text-xs text-white/40 line-through">497€</span>
               </div>
               <div className="flex items-center gap-3 bg-[#e8d5b0] text-[#0e0e0f] px-5 py-2.5 rounded-full text-sm font-semibold">
-                Passer à 70€
+                Passer au complet - 400€
                 <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
               </div>
             </Link>
-            <p className="text-xs text-white/30 mt-4 text-center">Déjà pris en compte tes 30€ payés.</p>
+            <p className="text-xs text-white/30 mt-4 text-center">Complément pour passer au système complet.</p>
           </div>
         </div>
       ) : (

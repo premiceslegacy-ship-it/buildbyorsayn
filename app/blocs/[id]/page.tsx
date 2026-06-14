@@ -220,7 +220,7 @@ export default function BlocPage() {
                       6 méthodes complètes pour créer, vendre et scaler. Communauté privée de builders actifs + toutes les mises à jour à vie incluses.
                     </p>
                     <div className="flex items-baseline justify-center gap-2 mb-8">
-                      <span className="text-3xl font-bold text-[#e8d5b0]">100€</span>
+                      <span className="text-3xl font-bold text-[#e8d5b0]">497€</span>
                       <span className="text-white/40 text-sm">· accès à vie</span>
                     </div>
                     <a

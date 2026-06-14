@@ -109,7 +109,7 @@ export default function VideosPage() {
           <section id="fondations" className="scroll-mt-8">
             <div className="mb-8">
               <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
-                Fondations : 30€
+                Fondations : 97€
               </p>
               <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
                 Le flow : de l'idée à l'URL en ligne
@@ -136,7 +136,7 @@ export default function VideosPage() {
             ) : (
               <PaywallBanner
                 label="Accès Fondations requis"
-                description="Ces vidéos font partie des Fondations (30€)."
+                description="Ces vidéos font partie des Fondations (97€)."
                 ctaLabel="Accéder aux Fondations"
                 ctaHref={beginnerUrl}
               />
@@ -169,7 +169,7 @@ export default function VideosPage() {
           <section id="systeme" className="scroll-mt-8">
             <div className="mb-8">
               <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
-                Système complet : 100€
+                Système complet : 497€
               </p>
               <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
                 Les blocs
@@ -222,16 +222,16 @@ export default function VideosPage() {
             ) : isBeginner ? (
               <PaywallBanner
                 label="Accès système complet requis"
-                description="Ces vidéos font partie du système complet (70€ de plus)."
+                description="Ces vidéos font partie du système complet (400€ de complément)."
                 ctaLabel="Passer au système complet"
                 ctaHref={upgradeUrl}
               />
             ) : (
               <PaywallBanner
                 label="Accès système complet requis"
-                description="Ces vidéos font partie du système complet (100€)."
+                description="Ces vidéos font partie du système complet (497€)."
                 ctaLabel="Accéder au système complet"
-                ctaHref={`https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02${userId ? `?client_reference_id=${userId}` : ""}`}
+                ctaHref={`https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a${userId ? `?client_reference_id=${userId}` : ""}`}
               />
             )}
           </section>
