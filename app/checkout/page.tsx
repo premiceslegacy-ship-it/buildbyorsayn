@@ -3,7 +3,7 @@ import { Logo } from "@/components/Logo";
 import { ArrowRight, Zap, Layers, GraduationCap, Lock } from "lucide-react";
 import { BetaCodeForm } from "./BetaCodeForm";
 
-const STRIPE_FULL_URL = "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02";
+const STRIPE_FULL_URL = "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a";
 // These will be set once you create the products in Stripe:
 const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? "#";
 const STRIPE_UPGRADE_URL = process.env.STRIPE_UPGRADE_CHECKOUT_LINK ?? "#";
@@ -12,6 +12,8 @@ const BEGINNER_FEATURES = [
     { icon: GraduationCap, label: "5 modules fondations complets" },
     { icon: Zap, label: "De zéro à un site en ligne" },
     { icon: Layers, label: "IA, GitHub, IDE, Vercel" },
+    { icon: GraduationCap, label: "Skills Deep Research + UX/UI Premium" },
+    { icon: Layers, label: "Stack complète + Protocole Zéro" },
 ];
 
 const FULL_FEATURES = [
@@ -19,6 +21,8 @@ const FULL_FEATURES = [
     { icon: Zap, label: "Méthodes actionnables et directes" },
     { icon: GraduationCap, label: "Sources et ressources" },
     { icon: GraduationCap, label: "Fondations incluses" },
+    { icon: Zap, label: "Skills Deep Research + UX/UI Premium" },
+    { icon: Layers, label: "Stack complète + Protocole Zéro" },
 ];
 
 export default async function CheckoutPage() {
@@ -71,8 +75,8 @@ export default async function CheckoutPage() {
                         {alreadyFull
                             ? "Tu as accès à l'ensemble du système Build, y compris les fondations."
                             : isUpgrading
-                            ? "Tu as les fondations. Débloque les 7 blocs et les sources pour 70€."
-                            : "Choisis le niveau d'accès qui te correspond."}
+                            ? "Tu as les fondations. Débloque les 7 blocs et les sources pour 400€."
+                            : "La plupart des membres qui ont essayé les fondations finissent par prendre le système complet. Autant commencer là."}
                     </p>
                 </div>
 
@@ -100,7 +104,7 @@ export default async function CheckoutPage() {
                         <div className="flex items-baseline justify-between mb-6">
                             <span className="text-white/40 text-sm">Complément accès complet</span>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-bold text-[#f0ede8]">70€</span>
+                                <span className="text-3xl font-bold text-[#f0ede8]">400€</span>
                                 <span className="text-white/40 text-sm">TTC</span>
                             </div>
                         </div>
@@ -119,7 +123,7 @@ export default async function CheckoutPage() {
                                     <GraduationCap className="w-3 h-3" /> Fondations
                                 </span>
                                 <div className="flex items-baseline gap-1 mb-1">
-                                    <span className="text-3xl font-bold text-[#f0ede8]">30€</span>
+                                    <span className="text-3xl font-bold text-[#f0ede8]">97€</span>
                                     <span className="text-white/40 text-sm">TTC</span>
                                 </div>
                                 <span className="text-white/40 text-xs">Accès à vie aux fondations</span>
@@ -133,11 +137,11 @@ export default async function CheckoutPage() {
                                 ))}
                                 <li className="flex items-center gap-2.5 opacity-40">
                                     <Lock className="w-3.5 h-3.5 text-white/40 flex-shrink-0" strokeWidth={1.5} />
-                                    <span className="text-xs text-white/40">Blocs & sources (non inclus)</span>
+                                    <span className="text-xs text-white/40">7 blocs & sources (non inclus)</span>
                                 </li>
                                     </ul>
                             <a href={beginnerUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm">
-                                Commencer pour 30€
+                                Commencer pour 97€
                                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
                             </a>
                         </div>
@@ -152,7 +156,7 @@ export default async function CheckoutPage() {
                                     <Zap className="w-3 h-3" /> Complet
                                 </span>
                                 <div className="flex items-baseline gap-1 mb-1">
-                                    <span className="text-3xl font-bold text-[#f0ede8]">100€</span>
+                                    <span className="text-3xl font-bold text-[#f0ede8]">497€</span>
                                     <span className="text-white/40 text-sm">TTC</span>
                                 </div>
                                 <span className="text-white/40 text-xs">Accès à vie à tout le système</span>
@@ -166,7 +170,7 @@ export default async function CheckoutPage() {
                                 ))}
                             </ul>
                             <a href={fullUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)] text-sm">
-                                Débloquer l&apos;accès complet
+                                Prendre le système complet - 497€
                                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
                             </a>
                         </div>

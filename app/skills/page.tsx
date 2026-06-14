@@ -199,8 +199,8 @@ export default function SkillsPage() {
                   : "Complet";
               const lockedHref = isBeginner ? beginnerHref : checkoutHref;
               const lockedLabel = isBeginner
-                ? "Débloquer les fondations"
-                : "Débloquer le système";
+                ? "Débloquer les fondations - 97€"
+                : "Prendre le système complet - 497€";
 
               return (
                 <motion.div

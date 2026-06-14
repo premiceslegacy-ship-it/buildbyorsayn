@@ -72,15 +72,17 @@ export async function middleware(request: NextRequest) {
 
     const pathname = request.nextUrl.pathname;
 
-    // Routes réservées aux membres full (100€)
+    // Routes réservées aux membres full (497€)
     const requiresFull =
-        pathname === "/sources" ||
         pathname === "/fin" ||
         pathname === "/intro" ||
         pathname.startsWith("/admin");
 
-    // Route réservée aux membres beginner ET full (30€+)
-    const requiresBeginner = pathname === "/beginner";
+    // Routes réservées aux membres beginner ET full (97€+)
+    const requiresBeginner =
+        pathname === "/beginner" ||
+        pathname === "/sources" ||
+        pathname === "/protocole";
 
     if (requiresFull || requiresBeginner) {
         const { data: profile } = await supabase
@@ -112,5 +114,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/admin/:path*", "/beginner"],
+    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/admin/:path*", "/beginner", "/protocole"],
 };

@@ -40,7 +40,7 @@ export default function DashboardHub() {
   const [sessionAdvances, setSessionAdvances] = useState(0);
   const [checkoutUrls, setCheckoutUrls] = useState<{ beginner: string | null; full: string }>({
     beginner: null,
-    full: "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02",
+    full: "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a",
   });
 
   useEffect(() => {
@@ -171,15 +171,28 @@ export default function DashboardHub() {
             </div>
           </div>
 
+          {/* CTA upgrade pour les gratuits */}
+          {tier === "free" || tier === null ? (
+            <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-xl px-5 py-4">
+              <div>
+                <p className="text-sm font-semibold text-[#e8d5b0]">Tu n&apos;as encore rien à toi.</p>
+                <p className="text-xs text-white/40 mt-0.5">Le Bloc 1 est gratuit. Le reste du système te donne les fichiers, skills et méthodes pour construire des lignes verticales IA qui rapportent.</p>
+              </div>
+              <Link href="/checkout" className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap">
+                Voir les accès <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          ) : null}
+
           {/* CTA upgrade pour les beginners */}
           {tier === "beginner" && (
-            <div className="mt-2 flex items-center justify-between bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-xl px-5 py-4">
+            <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-xl px-5 py-4">
               <div>
-                <p className="text-sm font-medium text-[#e8d5b0]">Passe au système complet</p>
-                <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs et les sources pour 70€.</p>
+                <p className="text-sm font-semibold text-[#e8d5b0]">Les fondations, c&apos;est le départ. Le système complet, c&apos;est ce qui construit.</p>
+                <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs, les sources et les méthodes complètes. 400€ de complément - une seule fois.</p>
               </div>
-              <Link href="/checkout" className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2 rounded-lg ml-4 shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)]">
-                Upgrader <ArrowRight className="w-3 h-3" />
+              <Link href="/checkout" className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap">
+                Passer au complet <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
           )}
@@ -406,13 +419,13 @@ export default function DashboardHub() {
                 <div className="mb-5">
                   <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Fondations</span>
                   <div className="flex items-baseline gap-1 mt-2 mb-1">
-                    <span className="text-3xl font-bold text-[#f0ede8]">30€</span>
+                    <span className="text-3xl font-bold text-[#f0ede8]">97€</span>
                     <span className="text-white/40 text-sm">TTC</span>
                   </div>
                   <p className="text-white/40 text-xs">Accès à vie aux fondations</p>
                 </div>
                 <ul className="space-y-2 mb-6 flex-1">
-                  {["5 modules pour construire", "De zéro à un site en ligne", "IA, GitHub, IDE, Vercel"].map((f) => (
+                  {["5 modules pour construire", "De zéro à un site en ligne", "Skills Deep Research + UX/UI", "Stack complète + Protocole Zéro"].map((f) => (
                     <li key={f} className="text-xs text-white/55 flex items-center gap-2">
                       <span className="w-1 h-1 rounded-full bg-[#e8d5b0]/50 flex-shrink-0" />
                       {f}
@@ -426,7 +439,7 @@ export default function DashboardHub() {
                   }
                   className="flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm"
                 >
-                  Démarrer pour 30€
+                  Démarrer pour 97€
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>
               </div>
@@ -435,18 +448,18 @@ export default function DashboardHub() {
               {modal === "both" && (
                 <div className="bg-white/[0.04] border border-[#e8d5b0]/25 rounded-2xl p-6 flex flex-col relative backdrop-blur-xl">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] rounded-full px-3 py-1">Recommandé</span>
+                    <span className="text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] rounded-full px-3 py-1">Le vrai choix</span>
                   </div>
                   <div className="mb-5">
-                    <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Complet</span>
+                    <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Système Complet</span>
                     <div className="flex items-baseline gap-1 mt-2 mb-1">
-                      <span className="text-3xl font-bold text-[#f0ede8]">100€</span>
+                      <span className="text-3xl font-bold text-[#f0ede8]">497€</span>
                       <span className="text-white/40 text-sm">TTC</span>
                     </div>
-                    <p className="text-white/40 text-xs">Accès à vie à tout le système</p>
+                    <p className="text-white/40 text-xs">Accès à vie - tout le système, une seule fois</p>
                   </div>
                   <ul className="space-y-2 mb-6 flex-1">
-                    {["7 blocs de système complets", "Méthodes actionnables", "Sources et ressources", "Fondations incluses"].map((f) => (
+                    {["7 blocs de système complets", "Méthodes actionnables", "Sources et ressources", "Fondations incluses", "Skills Deep Research + UX/UI", "Stack + Protocole Zéro"].map((f) => (
                       <li key={f} className="text-xs text-white/55 flex items-center gap-2">
                         <span className="w-1 h-1 rounded-full bg-[#e8d5b0]/50 flex-shrink-0" />
                         {f}
@@ -457,7 +470,7 @@ export default function DashboardHub() {
                     href={`${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`}
                     className="flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] text-sm"
                   >
-                    Débloquer l&apos;accès complet
+                    Prendre le système complet - 497€
                     <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 </div>

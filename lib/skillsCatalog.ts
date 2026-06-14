@@ -22,7 +22,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     title: "UX/UI Design Premium",
     description:
       "Le sous-skill UX/UI complet : direction artistique, brand/design system, audit ou refonte d'un site/app/SaaS existant, assets, motion, copy UI et quality gates. Les références Orsayn sont une base modifiable avec tes propres assets.",
-    access: "full",
+    access: "beginner",
     fileName: "ux-ui-design.zip",
   },
   {
@@ -46,7 +46,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     title: "Deep Research Verticale",
     description:
       "Pack de 10 prompts pour analyser une niche avant de créer une ligne Orsayn. Marché, ICP, personas, douleurs profondes, psychologie d'achat, canaux, wedges, offre V1 et plan de validation 14 jours. La bonne data, c'est la recette : une fois que tu l'as, l'IA peut répliquer la sauce à l'infini.",
-    access: "full",
+    access: "beginner",
     fileName: "deep-research-vertical.zip",
   },
 ];
