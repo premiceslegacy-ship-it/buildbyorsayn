@@ -19,21 +19,25 @@ export async function POST(request: NextRequest) {
     }
   );
 
-  const { error } = await supabase.auth.signOut();
+  await supabase.auth.signOut();
 
-  const response = NextResponse.json(
-    error ? { ok: false, error: error.message } : { ok: true },
-    {
-      status: error ? 500 : 200,
-      headers: {
-        "Cache-Control": "no-store",
-      },
+  const response = NextResponse.redirect(new URL("/login", request.url), {
+    status: 302,
+  });
+
+  // Vider tous les cookies Supabase
+  request.cookies.getAll().forEach(({ name }) => {
+    if (name.startsWith("sb-")) {
+      response.cookies.set(name, "", { maxAge: 0, path: "/" });
     }
-  );
+  });
 
+  // Appliquer les cookies que Supabase veut écrire (tokens vidés)
   cookiesToSet.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, options);
   });
+
+  response.headers.set("Cache-Control", "no-store");
 
   return response;
 }

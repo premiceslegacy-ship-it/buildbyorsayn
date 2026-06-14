@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { GraduationCap, ShieldCheck, Menu, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { createClient } from "@/lib/supabase/client";
 
 interface NavBarProps {
   activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole";
@@ -26,10 +24,8 @@ export function NavBar({
   onFondationsClick,
   onStackClick,
 }: NavBarProps) {
-  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -46,22 +42,12 @@ export function NavBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSignOut = async () => {
-    if (isSigningOut) return;
-
-    setIsSigningOut(true);
-    setIsDropdownOpen(false);
-    setIsMobileMenuOpen(false);
-
-    try {
-      await fetch("/api/signout", { method: "POST", credentials: "include" }).catch(() => null);
-      const supabase = createClient();
-      await supabase.auth.signOut({ scope: "local" }).catch(() => null);
-    } catch {
-      // ignore
-    }
-
-    window.location.href = "/login";
+  const handleSignOut = () => {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/api/signout";
+    document.body.appendChild(form);
+    form.submit();
   };
 
   const linkClass = (link: string) =>
@@ -149,11 +135,10 @@ export function NavBar({
               )}
               <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
               <button
-                disabled={isSigningOut}
                 className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
                 onClick={handleSignOut}
               >
-                {isSigningOut ? "Déconnexion..." : "Se déconnecter"}
+                Se déconnecter
               </button>
             </div>
           )}
@@ -176,11 +161,10 @@ export function NavBar({
               )}
               <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
               <button
-                disabled={isSigningOut}
                 className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
                 onClick={handleSignOut}
               >
-                {isSigningOut ? "Déconnexion..." : "Se déconnecter"}
+                Se déconnecter
               </button>
             </div>
           )}
