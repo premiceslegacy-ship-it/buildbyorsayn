@@ -4,7 +4,7 @@ export function Section2() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3 mb-8">
-        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">02</span>
+        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">07</span>
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Comprendre l'environnement</h2>
       </div>
       <p className="text-white/60 text-base leading-relaxed mb-10">
@@ -74,22 +74,26 @@ export function Section2() {
             </p>
           </div>
         </div>
-        <div className="bg-black/20 border border-white/5 rounded-xl p-4">
-          <p className="text-xs font-semibold text-[#e8d5b0] mb-3">Les composantes d'un bon prompt</p>
+        <div className="bg-black/20 border border-white/5 rounded-xl p-4 mb-4">
+          <p className="text-xs font-semibold text-[#e8d5b0] mb-3">Ce qu'un bon prompt contient</p>
           <ul className="space-y-3">
             {[
-              ["Le rôle", "\"Tu es un développeur senior\", \"Tu es un copywriter\"."],
-              ["Le contexte", "Qui est le client, le problème, l'utilisateur final."],
-              ["La tâche précise", "\"Génère le texte du hero\", pas \"génère le site\"."],
-              ["Les contraintes", "\"Pas de jargon technique\", \"respecte ces couleurs\"."],
-              ["Le format de sortie", "Markdown, JSON, code React."],
+              ["Le rôle", "Qui l'IA doit incarner. \"Tu es un designer senior\", \"Tu es un développeur expérimenté\". Ça calibre le niveau de la réponse."],
+              ["Le contexte", "Qui est le client, quelle est sa vraie douleur, qui est l'utilisateur final. C'est ce qui fait la différence entre du générique et du sur-mesure."],
+              ["La tâche précise", "Une seule chose claire. \"Écris le texte de la section d'accueil\", pas \"fais le site\"."],
+              ["Les contraintes", "Ce qu'il ne faut pas faire. Pas de jargon, garder ces couleurs, ce ton, cette longueur."],
             ].map(([label, desc]) => (
               <li key={label as string} className="flex gap-2 text-xs md:text-sm text-white/50 leading-relaxed">
-                <span className="text-[#e8d5b0] flex-shrink-0 font-medium whitespace-nowrap min-w-[100px]">{label} :</span>
+                <span className="text-[#e8d5b0] flex-shrink-0 font-medium whitespace-nowrap min-w-[110px]">{label} :</span>
                 <span>{desc}</span>
               </li>
             ))}
           </ul>
+        </div>
+        <div className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-xl p-4">
+          <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
+            Mais le vrai secret n'est pas le prompt parfait à chaque fois. C'est le contexte chargé une fois pour toutes : tes fichiers de projet, tes règles, tes standards réunis dans un système réutilisable. C'est ça qu'on appelle un skill, et c'est ce qui transforme l'IA en collaborateur qui te connaît déjà.
+          </p>
         </div>
       </div>
     </div>

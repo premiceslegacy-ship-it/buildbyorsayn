@@ -86,16 +86,16 @@ const STEPS = [
   },
   {
     num: 4,
-    title: "La mise en ligne avec Vercel",
+    title: "La mise en ligne (Vercel ou Cloudflare)",
     body: (
       <>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
-          <strong className="text-white">Vercel</strong>, c'est l'hébergeur magique. Il transforme ton code en un vrai site accessible partout dans le monde.
+          Un hébergeur transforme ton code en un vrai site accessible partout dans le monde. <strong className="text-white">Vercel</strong> est le plus simple pour démarrer. <strong className="text-white">Cloudflare</strong> (avec Pages et Workers) est l'autre grande option, plus robuste, celle qu'on utilise pour les projets sérieux.
         </p>
         <ul className="space-y-3 text-sm text-white/55 leading-relaxed">
-          <li className="flex gap-2"><span className="text-[#e8d5b0] flex-shrink-0">•</span><span><strong className="text-white/80">Connexion :</strong> Crée un compte Vercel, clique sur "Importer", lie-le à ton GitHub.</span></li>
-          <li className="flex gap-2"><span className="text-[#e8d5b0] flex-shrink-0">•</span><span><strong className="text-white/80">Déploiement auto :</strong> À chaque <code>git push</code>, Vercel met ton site à jour en 60 secondes.</span></li>
-          <li className="flex gap-2"><span className="text-[#e8d5b0] flex-shrink-0">•</span><span><strong className="text-white/80">Variables :</strong> Configure tes secrets dans les paramètres Vercel → "Environment Variables".</span></li>
+          <li className="flex gap-2"><span className="text-[#e8d5b0] flex-shrink-0">•</span><span><strong className="text-white/80">Connexion :</strong> Crée un compte, clique sur "Importer" et lie-le à ton GitHub. Les deux fonctionnent pareil.</span></li>
+          <li className="flex gap-2"><span className="text-[#e8d5b0] flex-shrink-0">•</span><span><strong className="text-white/80">Déploiement auto :</strong> À chaque <code>git push</code>, ton site se met à jour tout seul en moins d'une minute.</span></li>
+          <li className="flex gap-2"><span className="text-[#e8d5b0] flex-shrink-0">•</span><span><strong className="text-white/80">Variables :</strong> Tes clés secrètes se rangent dans l'écran "Variables d'environnement", présent chez Vercel comme chez Cloudflare.</span></li>
         </ul>
         <p className="text-sm text-white/70 font-medium mt-4">
           Code, push, en ligne.
@@ -109,7 +109,7 @@ export function Section4() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3 mb-8">
-        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">04</span>
+        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">09</span>
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Le flow : de l'idée à l'URL en ligne</h2>
       </div>
 

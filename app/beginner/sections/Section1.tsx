@@ -2,7 +2,7 @@ export function Section1() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3 mb-8">
-        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">01</span>
+        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">06</span>
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Penser avant de construire</h2>
       </div>
       <p className="text-white/60 text-base leading-relaxed mb-10">

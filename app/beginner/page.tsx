@@ -7,6 +7,11 @@ import { NavBar } from "@/components/NavBar";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 
+import { SectionMindset } from "./sections/SectionMindset";
+import { SectionPsychologie } from "./sections/SectionPsychologie";
+import { SectionCopywriting } from "./sections/SectionCopywriting";
+import { SectionVente } from "./sections/SectionVente";
+import { SectionMarketing } from "./sections/SectionMarketing";
 import { Section1 } from "./sections/Section1";
 import { Section2 } from "./sections/Section2";
 import { Section3 } from "./sections/Section3";
@@ -14,11 +19,16 @@ import { Section4 } from "./sections/Section4";
 import { Section5 } from "./sections/Section5";
 
 const STEPS = [
-  { num: 1, label: "Penser avant de construire" },
-  { num: 2, label: "Comprendre l'environnement" },
-  { num: 3, label: "Générer des visuels pro" },
-  { num: 4, label: "De l'idée à l'URL en ligne" },
-  { num: 5, label: "L'angle mort" },
+  { num: 1, label: "L'état d'esprit qui fait l'argent" },
+  { num: 2, label: "Comprendre les gens" },
+  { num: 3, label: "Écrire pour vendre" },
+  { num: 4, label: "Vendre" },
+  { num: 5, label: "Capter l'attention" },
+  { num: 6, label: "Penser avant de construire" },
+  { num: 7, label: "Comprendre l'environnement" },
+  { num: 8, label: "Générer des visuels pro" },
+  { num: 9, label: "De l'idée à l'URL en ligne" },
+  { num: 10, label: "L'angle mort" },
 ];
 
 export default function BeginnerPage() {
@@ -44,7 +54,7 @@ export default function BeginnerPage() {
     fetchUser();
   }, [router]);
 
-  const goNext = () => { setStep(s => Math.min(s + 1, 5)); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const goNext = () => { setStep(s => Math.min(s + 1, 10)); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const goPrev = () => { setStep(s => Math.max(s - 1, 1)); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   return (
@@ -80,11 +90,16 @@ export default function BeginnerPage() {
         </div>
 
         {/* Section content */}
-        {step === 1 && <Section1 />}
-        {step === 2 && <Section2 />}
-        {step === 3 && <Section3 />}
-        {step === 4 && <Section4 />}
-        {step === 5 && <Section5 upgradeUrl={upgradeUrl} isFullUser={tier === "full"} />}
+        {step === 1 && <SectionMindset />}
+        {step === 2 && <SectionPsychologie />}
+        {step === 3 && <SectionCopywriting />}
+        {step === 4 && <SectionVente />}
+        {step === 5 && <SectionMarketing />}
+        {step === 6 && <Section1 />}
+        {step === 7 && <Section2 />}
+        {step === 8 && <Section3 />}
+        {step === 9 && <Section4 />}
+        {step === 10 && <Section5 upgradeUrl={upgradeUrl} isFullUser={tier === "full"} />}
 
         {/* Navigation */}
         <div className="flex items-center justify-between mt-16 pt-8 border-t border-white/8">
@@ -94,7 +109,7 @@ export default function BeginnerPage() {
             </button>
           ) : <div />}
 
-          {step < 5 ? (
+          {step < 10 ? (
             <button
               onClick={goNext}
               className="group flex items-center gap-2 px-6 py-3 bg-[#e8d5b0] text-[#0e0e0f] font-semibold text-sm rounded-xl hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.2)] hover:shadow-[0_0_36px_rgba(232,213,176,0.35)]"

@@ -5,32 +5,35 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3 mb-8">
-        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">05</span>
+        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">10</span>
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">L'angle mort</h2>
       </div>
+      <p className="text-white/60 text-base leading-relaxed mb-6">
+        Tu sais maintenant mettre un site en ligne. C'est déjà plus que la majorité des gens. Mais regarde la vérité en face : tu ne sais pas encore s'il convertit, s'il tiendra la charge le jour où le trafic arrive, ni s'il répond à un vrai marché qui peut payer.
+      </p>
       <p className="text-white/60 text-base leading-relaxed mb-10">
-        Jusqu'ici, on a vu 20% du travail. Ça suffit pour faire un "beau site". Ça ne suffit pas pour créer de vrais systèmes.
+        Tant que tu construis au feeling, tu restes locataire de tes propres compétences. L'IA, c'est l'avenir, et la vraie opportunité n'est pas de faire un joli site jetable. C'est d'en faire un actif qui rapporte, mois après mois. Voilà ce qui transforme l'un en l'autre.
       </p>
 
       {/* Les 4 piliers */}
-      <h3 className="text-base font-semibold text-[#f0ede8] mb-6">Ce qu'il manque pour un vrai produit :</h3>
+      <h3 className="text-base font-semibold text-[#f0ede8] mb-6">Ce qui sépare une vitrine d'un vrai système :</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
         {[
           {
             title: "Le framework ORACLE",
-            desc: "Ma méthode pour construire un projet de A à Z avec l'IA. Il remplace le prompt hasardeux par une structure de documents (BRIEF, BRAND-SYSTEM, DESIGN-SYSTEM, PRD, PARCOURS-UTILISATEURS, PROMPT-SYSTEM) qui permettent à l'IA d'avoir un contexte extrêmement précis. Chaque document nourrit le suivant. Le résultat final n'a rien à voir avec ce que tu obtiens en tapant « crée-moi un site » dans Lovable.",
+            desc: "La méthode pour construire un projet de A à Z avec l'IA, celle qu'on utilise pour bâtir nos propres lignes comme Atelier. Une structure de documents (brief, identité, design, fonctionnalités, parcours) où chacun nourrit le suivant. Le résultat n'a rien à voir avec un « crée-moi un site » lancé au hasard.",
           },
           {
             title: "La logique business",
-            desc: "Comment choisir une niche, se positionner, vendre avant de construire, itérer sur le feedback terrain. La technique c’est que 10% de l’équation, le plus dur c’est de vendre et faire de l’argent.",
+            desc: "Choisir une niche, te positionner, vendre avant de construire, t'ajuster avec le terrain. La technique, c'est 10% de l'équation. Le vrai défi, celui qui te fait gagner ta vie, c'est de vendre et de faire de l'argent.",
           },
           {
             title: "L'identité visuelle forte",
-            desc: "La différence entre un site qu'on oublie 10 secondes après l'avoir vu et un site qui installe une perception de marque. Ce n'est pas une question de budget, c'est une question de système.",
+            desc: "La différence entre un site qu'on oublie en dix secondes et un site qui installe une vraie marque dans la tête du client. Ce n'est pas une question de budget. C'est une question de système.",
           },
           {
             title: "L'ingénierie des Skills",
-            desc: "Au-delà d'un prompt basique, comment on construit un système complet de skills qu'on charge en un clic ?",
+            desc: "Comment encoder ton savoir-faire dans des systèmes réutilisables que tu charges en un clic. C'est ça, ton capital : ce que tu construis une fois et qui travaille pour toi sur tous tes projets suivants.",
           },
         ].map(({ title, desc }) => (
           <div key={title} className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5">
@@ -50,7 +53,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
             </div>
             <h3 className="text-xl font-semibold text-[#f0ede8] mb-4">La suite logique</h3>
             <p className="text-sm text-white/60 leading-relaxed mb-8">
-              Tu as les fondations. Le système complet - les 7 blocs, les sources et les méthodes pour construire des lignes verticales IA qui rapportent - t'attend.
+              Tu as les fondations. Maintenant l'écart à combler, c'est tout ce qui transforme un site en système qui rapporte. Le système complet - les 7 blocs, les sources et les méthodes exactes pour construire des lignes verticales IA qui génèrent du revenu chaque mois - t'attend.
             </p>
 
             <Link
