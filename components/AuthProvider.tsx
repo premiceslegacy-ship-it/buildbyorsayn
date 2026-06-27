@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { ActivityTracker } from "@/components/ActivityTracker";
 
 interface AuthContextValue {
   user: User | null;
@@ -22,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const handleSignOut = useCallback(() => {
     setUser(null);
-    router.push("/login");
+    router.push("/");
   }, [router]);
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ user, isLoading }}>
+      <ActivityTracker userEmail={user?.email} />
       {children}
     </AuthContext.Provider>
   );

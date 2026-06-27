@@ -2,11 +2,13 @@ export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { Activity, ArrowLeft, Eye, MousePointerClick, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { BLOCS_DATA } from "@/lib/mockData";
 import { setUserTier } from "@/app/actions/setUserTier";
+import { AdminAutoRefresh } from "@/components/AdminAutoRefresh";
+import { AdminMailComposer } from "@/components/AdminMailComposer";
 
 const ADMIN_EMAIL = "mbebourasam@gmail.com";
 const TOTAL_BLOCS = BLOCS_DATA.length;
@@ -20,6 +22,27 @@ type Profile = {
 type EnrichedUser = Profile & {
   email: string;
   lastSignIn: string | null;
+  currentPath: string | null;
+  lastActivity: string | null;
+  lastEvent: string | null;
+  events24h: number;
+  pageViews24h: number;
+};
+
+type Presence = {
+  user_id: string;
+  email: string | null;
+  current_path: string | null;
+  last_event: string | null;
+  last_seen_at: string;
+};
+
+type ActivityEvent = {
+  user_id: string;
+  email: string | null;
+  event_type: string;
+  path: string | null;
+  created_at: string;
 };
 
 function formatLastSeen(dateStr: string | null): { label: string; style: "online" | "never" | "default" } {
@@ -33,7 +56,7 @@ function formatLastSeen(dateStr: string | null): { label: string; style: "online
   const w = Math.floor(d / 7);
   const mo = Math.floor(d / 30);
 
-  if (s < 60)  return { label: "En ligne",           style: "online" };
+  if (s < 120) return { label: "En ligne",           style: "online" };
   if (m < 60)  return { label: `Il y a ${m} min`,    style: "default" };
   if (h < 24)  return { label: `Il y a ${h}h`,       style: "default" };
   if (d === 1) return { label: "Hier",                style: "default" };
@@ -86,9 +109,24 @@ export default async function AdminPage() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const [{ data: profiles }, { data: authData }] = await Promise.all([
+  const [
+    { data: profiles },
+    { data: authData },
+    { data: presenceData, error: presenceError },
+    { data: eventData, error: eventError },
+  ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id, tier, completed_blocks").order("id"),
     supabaseAdmin.auth.admin.listUsers({ perPage: 1000 }),
+    supabaseAdmin
+      .from("member_presence")
+      .select("user_id, email, current_path, last_event, last_seen_at")
+      .order("last_seen_at", { ascending: false })
+      .limit(1000),
+    supabaseAdmin
+      .from("member_activity_events")
+      .select("user_id, email, event_type, path, created_at")
+      .order("created_at", { ascending: false })
+      .limit(1000),
   ]);
 
   const emailMap = new Map<string, string>(
@@ -97,16 +135,46 @@ export default async function AdminPage() {
   const lastSignInMap = new Map<string, string | null>(
     (authData?.users ?? []).map((u) => [u.id, u.last_sign_in_at ?? null])
   );
+  const presenceMap = new Map<string, Presence>(
+    ((presenceData as Presence[] | null) ?? []).map((p) => [p.user_id, p])
+  );
+
+  const now = Date.now();
+  const last24h = now - 24 * 60 * 60 * 1000;
+  const recentEvents = ((eventData as ActivityEvent[] | null) ?? []).filter(
+    (event) => new Date(event.created_at).getTime() >= last24h
+  );
+  const eventCountByUser = new Map<string, number>();
+  const pageViewCountByUser = new Map<string, number>();
+
+  for (const event of recentEvents) {
+    eventCountByUser.set(event.user_id, (eventCountByUser.get(event.user_id) ?? 0) + 1);
+    if (event.event_type === "page_view") {
+      pageViewCountByUser.set(event.user_id, (pageViewCountByUser.get(event.user_id) ?? 0) + 1);
+    }
+  }
 
   const users: EnrichedUser[] = (profiles ?? []).map((p: Profile) => ({
     ...p,
     email: emailMap.get(p.id) ?? p.id,
     lastSignIn: lastSignInMap.get(p.id) ?? null,
+    currentPath: presenceMap.get(p.id)?.current_path ?? null,
+    lastActivity: presenceMap.get(p.id)?.last_seen_at ?? null,
+    lastEvent: presenceMap.get(p.id)?.last_event ?? null,
+    events24h: eventCountByUser.get(p.id) ?? 0,
+    pageViews24h: pageViewCountByUser.get(p.id) ?? 0,
   }));
 
   const fullCount = users.filter((u) => u.tier === "full").length;
   const beginnerCount = users.filter((u) => u.tier === "beginner").length;
   const paidCount = fullCount + beginnerCount;
+  const onlineCount = users.filter((u) => {
+    if (!u.lastActivity) return false;
+    return now - new Date(u.lastActivity).getTime() < 2 * 60 * 1000;
+  }).length;
+  const active24hCount = users.filter((u) => u.events24h > 0).length;
+  const pageViews24h = recentEvents.filter((event) => event.event_type === "page_view").length;
+  const trackingSetupMissing = Boolean(presenceError || eventError);
 
   const avgBlocs =
     users.length === 0
@@ -137,30 +205,60 @@ export default async function AdminPage() {
           <p className="text-xs uppercase tracking-[0.15em] text-white/30 font-semibold">
             Admin · Accès restreint
           </p>
-          <h1 className="text-3xl font-bold tracking-tight text-[#f0ede8]">
-            Tableau de bord utilisateurs
-          </h1>
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-[#f0ede8]">
+                Tableau de bord utilisateurs
+              </h1>
+              <p className="mt-2 text-sm text-white/35">
+                Présence réelle, progression, activité et pilotage des accès.
+              </p>
+            </div>
+            <AdminAutoRefresh />
+          </div>
         </div>
 
         {/* KPI cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6">
           {[
-            { label: "Utilisateurs", value: users.length },
-            { label: "Gratuits", value: users.length - paidCount },
-            { label: "Fondations", value: beginnerCount },
-            { label: "Complet", value: fullCount },
-            { label: "Blocs moy.", value: `${avgBlocs} / ${TOTAL_BLOCS}` },
+            { label: "Utilisateurs", value: users.length, icon: Users },
+            { label: "En ligne", value: onlineCount, icon: Activity },
+            { label: "Actifs 24h", value: active24hCount, icon: MousePointerClick },
+            { label: "Pages vues 24h", value: pageViews24h, icon: Eye },
+            { label: "Gratuits", value: users.length - paidCount, icon: Users },
+            { label: "Fondations", value: beginnerCount, icon: Users },
+            { label: "Complet", value: fullCount, icon: Users },
+            { label: "Blocs moy.", value: `${avgBlocs} / ${TOTAL_BLOCS}`, icon: Activity },
           ].map((kpi) => (
             <div
               key={kpi.label}
-              className="bg-white/[0.03] border border-white/8 rounded-2xl p-5"
+              className="bg-white/[0.03] border border-white/8 rounded-2xl p-4"
             >
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-1">
-                {kpi.label}
-              </p>
+              <kpi.icon className="mb-3 h-4 w-4 text-[#e8d5b0]/60" />
+              <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">{kpi.label}</p>
               <p className="text-2xl font-bold text-[#e8d5b0]">{kpi.value}</p>
             </div>
           ))}
+        </div>
+
+        {trackingSetupMissing && (
+          <div className="mb-6 rounded-xl border border-amber-400/20 bg-amber-400/8 px-4 py-3 text-sm text-amber-100/70">
+            Tracking prêt côté app, mais les tables Supabase ne répondent pas encore. Applique la migration
+            {" "}
+            <span className="font-mono text-amber-100">supabase/migrations/20260627190000_member_activity_tracking.sql</span>
+            {" "}
+            pour activer présence et événements.
+          </div>
+        )}
+
+        <div className="mb-10">
+          <AdminMailComposer
+            users={users.map((u) => ({
+              id: u.id,
+              email: u.email,
+              tier: u.tier,
+            }))}
+          />
         </div>
 
         {/* Table */}
@@ -182,6 +280,12 @@ export default async function AdminPage() {
                     Dernière connexion
                   </th>
                   <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
+                    Page actuelle
+                  </th>
+                  <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold text-right">
+                    Events 24h
+                  </th>
+                  <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
                     Blocs terminés
                   </th>
                   <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold text-right">
@@ -192,8 +296,8 @@ export default async function AdminPage() {
               <tbody>
                 {users.map((u, i) => {
                   const blocks = u.completed_blocks ?? [];
-                  const pct = Math.round((blocks.length / 7) * 100);
-                  const seen = formatLastSeen(u.lastSignIn);
+                  const pct = Math.round((blocks.length / TOTAL_BLOCS) * 100);
+                  const seen = formatLastSeen(u.lastActivity ?? u.lastSignIn);
                   return (
                     <tr
                       key={u.id}
@@ -276,6 +380,26 @@ export default async function AdminPage() {
                         )}
                       </td>
 
+                      <td className="px-5 py-4">
+                        {u.currentPath ? (
+                          <div className="flex flex-col gap-1">
+                            <span className="max-w-[220px] truncate rounded-md border border-white/8 bg-white/[0.03] px-2 py-1 font-mono text-xs text-white/55">
+                              {u.currentPath}
+                            </span>
+                            <span className="text-[11px] text-white/25">{u.lastEvent ?? "activity"}</span>
+                          </div>
+                        ) : (
+                          <span className="text-white/25 text-[13px]">-</span>
+                        )}
+                      </td>
+
+                      <td className="px-5 py-4 text-right">
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="text-sm font-semibold tabular-nums text-white/60">{u.events24h}</span>
+                          <span className="text-[11px] text-white/25">{u.pageViews24h} vues</span>
+                        </div>
+                      </td>
+
                       {/* Blocs chips */}
                       <td className="px-5 py-4">
                         <div className="flex flex-wrap gap-1.5">
@@ -318,7 +442,7 @@ export default async function AdminPage() {
                 {users.length === 0 && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={8}
                       className="px-5 py-10 text-center text-white/30 text-sm"
                     >
                       Aucun utilisateur trouvé.

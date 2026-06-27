@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import { ExternalLink, Play } from "lucide-react";
 import { NavBar } from "@/components/NavBar";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 
@@ -52,7 +53,7 @@ export default async function ProtocolePage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/");
   }
 
   const { data: profile } = await supabase
@@ -209,6 +210,43 @@ export default async function ProtocolePage() {
               ))}
             </div>
           </div>
+
+          <div className="h-px bg-[#2a2520]" />
+
+          {/* Vidéo liée */}
+          <LiquidCard className="p-5">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-[#e8d5b0]/20 bg-[#e8d5b0]/10">
+                  <Play className="h-4 w-4 text-[#e8d5b0]" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#f0ede8]">Voir la vidéo du Protocole Zéro</p>
+                  <p className="mt-1 text-sm leading-relaxed text-[#8a8070]">
+                    La version vidéo complète est disponible dans la bibliothèque.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Link
+                  href="/videos#fondations"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#c9b48a] px-4 py-2.5 text-sm font-semibold text-[#0e0e0f] transition-colors hover:bg-[#e8d5b0]"
+                >
+                  Ouvrir dans BUILD
+                  <Play className="h-3.5 w-3.5" />
+                </Link>
+                <a
+                  href="https://www.youtube.com/watch?v=tcFGu_zNsPE"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/75"
+                >
+                  YouTube
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+          </LiquidCard>
 
           <div className="h-px bg-[#2a2520]" />
 

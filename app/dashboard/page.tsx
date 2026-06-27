@@ -52,7 +52,7 @@ export default function DashboardHub() {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error || !user) {
         console.error("Session invalide:", error?.message);
-        router.push("/login");
+        router.push("/");
         return;
       }
       const email = user.email ?? "";
