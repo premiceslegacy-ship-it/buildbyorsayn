@@ -15,6 +15,8 @@ import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
+import { Suspense } from "react";
+import { UpgradedBanner } from "@/components/UpgradedBanner";
 
 const ICONS: Record<string, any> = {
   "1": Workflow,
@@ -125,6 +127,10 @@ export default function DashboardHub() {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans relative overflow-hidden">
+      <Suspense>
+        <UpgradedBanner />
+      </Suspense>
+
       {/* Halos */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-5 blur-[120px] w-[600px] h-[300px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-0 bg-blue-500 opacity-5 blur-[120px] w-[400px] h-[400px] rounded-full pointer-events-none" />

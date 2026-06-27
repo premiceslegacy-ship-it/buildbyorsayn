@@ -60,8 +60,20 @@ export async function POST(req: NextRequest) {
             if (profile) {
                 userId = profile.id;
             } else {
-                console.error(`Paiement reçu pour ${customerEmail} mais aucun compte trouvé dans la BDD.`);
-                // On pourrait créer un compte ici, ou envoyer un mail d'erreur à l'admin
+                // Aucun compte existant - on invite l'utilisateur via Supabase Auth
+                // Supabase crée le compte et envoie un email "Crée ton mot de passe"
+                const { data: invited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
+                    customerEmail,
+                    {
+                        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/update-password`,
+                        data: { invited_from: "stripe_checkout" },
+                    }
+                );
+                if (inviteError) {
+                    console.error(`Erreur invitation Supabase pour ${customerEmail}:`, inviteError.message);
+                } else if (invited?.user?.id) {
+                    userId = invited.user.id;
+                }
             }
         }
 

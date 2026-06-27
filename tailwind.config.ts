@@ -58,10 +58,20 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        scrollLeft: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        scrollRight: {
+          "0%": { transform: "translateX(-50%)" },
+          "100%": { transform: "translateX(0)" },
+        },
       },
       animation: {
         "apple-splash": "appleSplash 3s ease-in-out forwards",
         "fade-in": "fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "scroll-left": "scrollLeft 30s linear infinite",
+        "scroll-right": "scrollRight 30s linear infinite",
       },
     },
   },

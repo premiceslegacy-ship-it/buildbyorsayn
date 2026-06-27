@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
 @theme {
   /* Colors */
   --color-background: #0e0e0f;
