@@ -9,7 +9,11 @@ import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 
 const FONDATIONS_VIDEOS: { title: string; youtubeId: string; description?: string }[] = [
-  // { title: "...", youtubeId: "...", description: "..." },
+  {
+    title: "Le Protocole Zéro",
+    youtubeId: "tcFGu_zNsPE",
+    description: "De zéro compétence à antifragile numérique. La méthode en trois phases pour construire du capital organique avec l'IA.",
+  },
 ];
 
 function PaywallBanner({
