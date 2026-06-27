@@ -25,16 +25,21 @@ export async function POST(request: NextRequest) {
     status: 302,
   });
 
-  // Vider tous les cookies Supabase
-  request.cookies.getAll().forEach(({ name }) => {
-    if (name.startsWith("sb-")) {
-      response.cookies.set(name, "", { maxAge: 0, path: "/" });
-    }
-  });
-
   // Appliquer les cookies que Supabase veut écrire (tokens vidés)
   cookiesToSet.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, options);
+  });
+
+  // Vider tous les cookies Supabase en dernier pour éviter qu'un Set-Cookie
+  // renvoyé par auth.signOut() ne recrée une session côté navigateur.
+  request.cookies.getAll().forEach(({ name }) => {
+    if (name.startsWith("sb-")) {
+      response.cookies.set(name, "", {
+        maxAge: 0,
+        expires: new Date(0),
+        path: "/",
+      });
+    }
   });
 
   response.headers.set("Cache-Control", "no-store");

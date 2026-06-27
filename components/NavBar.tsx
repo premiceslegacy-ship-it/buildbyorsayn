@@ -42,13 +42,6 @@ export function NavBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSignOut = async () => {
-    const { createClient } = await import("@/lib/supabase/client");
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    window.location.href = "/login";
-  };
-
   const linkClass = (link: string) =>
     activeLink === link
       ? "text-[#f0ede8] font-medium"
@@ -133,12 +126,14 @@ export function NavBar({
                 <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
               )}
               <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
-              <button
-                className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
-                onClick={handleSignOut}
-              >
-                Se déconnecter
-              </button>
+              <form action="/api/signout" method="post">
+                <button
+                  type="submit"
+                  className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
+                >
+                  Se déconnecter
+                </button>
+              </form>
             </div>
           )}
         </div>
@@ -159,12 +154,14 @@ export function NavBar({
                 <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
               )}
               <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
-              <button
-                className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
-                onClick={handleSignOut}
-              >
-                Se déconnecter
-              </button>
+              <form action="/api/signout" method="post">
+                <button
+                  type="submit"
+                  className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
+                >
+                  Se déconnecter
+                </button>
+              </form>
             </div>
           )}
         </div>
