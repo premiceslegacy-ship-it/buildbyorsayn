@@ -42,12 +42,11 @@ export function NavBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSignOut = () => {
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = "/api/signout";
-    document.body.appendChild(form);
-    form.submit();
+  const handleSignOut = async () => {
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = "/login";
   };
 
   const linkClass = (link: string) =>
