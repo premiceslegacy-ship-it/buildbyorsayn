@@ -26,15 +26,21 @@ export function NavBar({
 }: NavBarProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const desktopDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const isInsideDropdown =
+        desktopDropdownRef.current?.contains(target) ||
+        mobileDropdownRef.current?.contains(target);
+
+      if (!isInsideDropdown) {
         setIsDropdownOpen(false);
       }
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
         setIsMobileMenuOpen(false);
       }
     };
@@ -112,7 +118,7 @@ export function NavBar({
       <div className="hidden md:flex items-center gap-6 text-sm">
         {navLinks}
 
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative" ref={desktopDropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
@@ -141,7 +147,7 @@ export function NavBar({
 
       {/* Mobile: hamburger + avatar */}
       <div className="flex md:hidden items-center gap-3">
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative" ref={mobileDropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
