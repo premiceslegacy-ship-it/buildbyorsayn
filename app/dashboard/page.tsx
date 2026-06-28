@@ -367,66 +367,111 @@ export default function DashboardHub() {
           );
         })()}
 
-        {/* 4. Écosystème Orsayn — lignes verticales */}
+        {/* 4. Écosystème Orsayn — schéma organigramme */}
         <div className="mt-6">
-          <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0]/60 font-medium mb-3">
+          <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0]/60 font-medium mb-2">
             L'écosystème Orsayn
           </p>
-          <p className="text-sm text-white/40 leading-relaxed mb-5">
+          <p className="text-sm text-white/40 leading-relaxed mb-8">
             Le marché est saturé de contenu sur l'IA. Peu de gens buildent vraiment. Voici ce qui est construit, en production, avec les mêmes méthodes que tu apprends ici.
           </p>
 
-          {/* Atelier — ligne live, cliquable */}
-          <a
-            href="https://www.atelier-btp.fr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group block mb-3"
-          >
-            <LiquidCard className="p-6 transition-all duration-300 cursor-pointer group-hover:border-[#c9b48a]/30">
-              <div className="flex items-center gap-5">
-                {/* Logo Atelier */}
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center p-2.5">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/logo-atelier-blanc.svg" alt="Atelier" className="w-full h-full object-contain" />
+          {/* Noeud racine — Orsayn */}
+          <div className="flex justify-center mb-0">
+            <div className="relative inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/[0.06] border border-[#e8d5b0]/20 shadow-[0_0_24px_rgba(232,213,176,0.08),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
+              <div className="w-2 h-2 rounded-full bg-[#e8d5b0] shadow-[0_0_8px_rgba(232,213,176,0.8)]" />
+              <span className="text-[#e8d5b0] text-sm font-semibold tracking-wide">Orsayn</span>
+              <span className="text-[10px] text-[#8a8070] font-medium">Maison-mère</span>
+            </div>
+          </div>
+
+          {/* Connecteur vertical central */}
+          <div className="flex justify-center">
+            <div className="w-px h-8 bg-gradient-to-b from-[#e8d5b0]/30 to-[#e8d5b0]/10" />
+          </div>
+
+          {/* Ligne horizontale + connecteurs vers les 3 verticales */}
+          <div className="relative flex justify-center mb-0">
+            {/* Ligne horizontale */}
+            <div className="absolute top-0 left-[16.67%] right-[16.67%] h-px bg-gradient-to-r from-transparent via-[#e8d5b0]/20 to-transparent" />
+            {/* 3 connecteurs verticaux */}
+            <div className="w-full grid grid-cols-3 gap-3">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="flex justify-center">
+                  <div className="w-px h-8 bg-gradient-to-b from-[#e8d5b0]/20 to-[#e8d5b0]/8" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[#f0ede8] text-sm font-semibold">Atelier</span>
-                    <span className="text-[10px] font-semibold text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2 py-0.5 leading-none">LIVE</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Les 3 cartes verticales */}
+          <div className="grid grid-cols-3 gap-3">
+
+            {/* Atelier — LIVE */}
+            <a
+              href="https://www.atelier-btp.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group col-span-1 block"
+            >
+              <div className="relative rounded-2xl bg-white/[0.04] border border-[#c9b48a]/20 shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-xl overflow-hidden transition-all duration-300 group-hover:border-[#c9b48a]/40 group-hover:shadow-[0_8px_40px_rgba(201,180,138,0.12),inset_0_1px_0_rgba(255,255,255,0.10)] group-hover:-translate-y-0.5 h-full">
+                {/* Halo or subtil en haut */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-12 bg-[#e8d5b0]/6 blur-2xl rounded-full pointer-events-none" />
+                <div className="relative z-10 p-5 flex flex-col h-full">
+                  {/* Badge LIVE */}
+                  <div className="flex justify-end mb-4">
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2.5 py-1 leading-none">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#0e0e0f]/50 animate-pulse" />
+                      LIVE
+                    </span>
                   </div>
-                  <p className="text-xs text-white/45 leading-relaxed">ERP BTP — devis, facturation, chantiers, équipe, rentabilité, relances IA. Ce que le système produit, en vrai.</p>
+                  {/* Monogramme centré */}
+                  <div className="flex justify-center mb-4">
+                    <div className="w-14 h-14 rounded-2xl bg-white/[0.06] border border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.08)] flex items-center justify-center p-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/monogramme-atelier.svg" alt="Atelier" className="w-full h-full object-contain" />
+                    </div>
+                  </div>
+                  {/* Wordmark */}
+                  <div className="flex justify-center mb-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/logo-atelier-blanc.svg" alt="Atelier" className="h-4 object-contain opacity-90" />
+                  </div>
+                  {/* Description */}
+                  <p className="text-[11px] text-white/40 text-center leading-relaxed mt-auto">ERP BTP - devis, facturation, chantiers, rentabilité, relances IA</p>
+                  {/* Lien discret */}
+                  <div className="flex items-center justify-center gap-1 mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="text-[10px] text-[#e8d5b0]/70">atelier-btp.fr</span>
+                    <ArrowRight className="w-3 h-3 text-[#e8d5b0]/70" />
+                  </div>
                 </div>
-                <ArrowRight className="flex-shrink-0 w-4 h-4 text-[#e8d5b0] opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" />
               </div>
-            </LiquidCard>
-          </a>
+            </a>
 
-          {/* Lignes à venir — grille mystère */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <LiquidCard className="p-5 opacity-35 select-none">
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/[0.03] border border-white/8 flex items-center justify-center">
-                  <span className="text-white/25 text-lg font-light">?</span>
-                </div>
-                <div>
-                  <span className="text-[#f0ede8]/40 text-sm font-semibold">Ligne verticale</span>
-                  <p className="text-xs text-white/20 mt-0.5">Bientôt.</p>
+            {/* Mystère 1 */}
+            <div className="col-span-1 select-none">
+              <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl overflow-hidden opacity-30 h-full min-h-[200px]">
+                <div className="relative z-10 p-5 flex flex-col items-center justify-center h-full gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center">
+                    <span className="text-white/20 text-xl font-extralight">?</span>
+                  </div>
+                  <span className="text-[11px] text-white/25 font-medium">Bientôt</span>
                 </div>
               </div>
-            </LiquidCard>
+            </div>
 
-            <LiquidCard className="p-5 opacity-20 select-none">
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/[0.02] border border-white/6 flex items-center justify-center">
-                  <span className="text-white/15 text-lg font-light">?</span>
-                </div>
-                <div>
-                  <span className="text-[#f0ede8]/30 text-sm font-semibold">Ligne verticale</span>
-                  <p className="text-xs text-white/15 mt-0.5">Bientôt.</p>
+            {/* Mystère 2 */}
+            <div className="col-span-1 select-none">
+              <div className="relative rounded-2xl bg-white/[0.01] border border-white/[0.04] backdrop-blur-xl overflow-hidden opacity-15 h-full min-h-[200px]">
+                <div className="relative z-10 p-5 flex flex-col items-center justify-center h-full gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+                    <span className="text-white/15 text-xl font-extralight">?</span>
+                  </div>
+                  <span className="text-[11px] text-white/15 font-medium">Bientôt</span>
                 </div>
               </div>
-            </LiquidCard>
+            </div>
+
           </div>
         </div>
 
