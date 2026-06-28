@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { LiquidCard } from "@/components/ui/liquid-glass-card";
 
 export function Section2() {
   return (
@@ -12,7 +13,7 @@ export function Section2() {
       </p>
 
       {/* LLM */}
-      <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 md:p-8 mb-6">
+      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Démystifier le LLM</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-6">
           Un LLM c'est le moteur derrière Claude, ChatGPT, Gemini. Il prédit le prochain mot le plus probable. Ce n'est pas une base de données. Il génère une réponse probable en fonction du contexte.
@@ -31,10 +32,10 @@ export function Section2() {
             </p>
           </div>
         </div>
-      </div>
+      </LiquidCard>
 
       {/* API */}
-      <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 md:p-8 mb-6">
+      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">L'analogie de l'API</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
           Une API, c'est comme un serveur dans un restaurant. Je passe ma commande au serveur, qui transmet à la cuisine, qui prépare et renvoie.
@@ -55,10 +56,10 @@ export function Section2() {
         <p className="text-sm text-white/55 leading-relaxed">
           Je comprends qu'il faut une clé API secrète, et gérer les erreurs. Sans cette compréhension, l'IA produirait du code que je ne saurais pas évaluer.
         </p>
-      </div>
+      </LiquidCard>
 
       {/* Prompt structuré */}
-      <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 md:p-8">
+      <LiquidCard className="rounded-2xl p-6 md:p-8">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Le prompt structuré</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-6">Même outil, même modèle, deux résultats radicalement différents.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -95,7 +96,7 @@ export function Section2() {
             Mais le vrai secret n'est pas le prompt parfait à chaque fois. C'est le contexte chargé une fois pour toutes : tes fichiers de projet, tes règles, tes standards réunis dans un système réutilisable. C'est ça qu'on appelle un skill, et c'est ce qui transforme l'IA en collaborateur qui te connaît déjà.
           </p>
         </div>
-      </div>
+      </LiquidCard>
     </div>
   );
 }

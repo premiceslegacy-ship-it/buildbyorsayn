@@ -1,3 +1,5 @@
+import { LiquidCard } from "@/components/ui/liquid-glass-card";
+
 export function Section1() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -50,15 +52,15 @@ export function Section1() {
               a: "Pas « avoir un beau site ». Un chiffre, une action, une métrique. 10 demandes de contact par mois. 500 visiteurs uniques. 3 clients signés. Cet objectif conditionne les décisions techniques : si l'objectif est de générer des leads, le SEO et le CTA sont prioritaires.",
             },
           ].map(({ q, a }) => (
-            <div key={q} className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5">
+            <LiquidCard key={q} className="rounded-2xl p-5">
               <p className="text-sm font-semibold text-[#e8d5b0] mb-3">{q}</p>
               <p className="text-xs text-white/55 leading-relaxed">{a}</p>
-            </div>
+            </LiquidCard>
           ))}
         </div>
       </div>
 
-      <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 md:p-8 mb-6">
+      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Pourquoi une IA seule ne suffit pas</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
           Beaucoup de gens pensent qu'il suffit de demander à l'IA "crée-moi un site pour un plombier" pour avoir un résultat professionnel. En théorie c'est possible. En pratique, le résultat sera générique, sans personnalité, sans compréhension du vrai problème du client.
@@ -66,9 +68,9 @@ export function Section1() {
         <p className="text-sm text-white/55 leading-relaxed mb-4">
           L'IA est un outil d'exécution extraordinaire. Mais elle a besoin d'un chef de projet qui sait ce qu'il veut. Mon rôle, ce n'est pas d'écrire du code. Mon rôle est de comprendre le problème, prendre les bonnes décisions de structure, et donner à l'IA un contexte suffisamment précis pour qu'elle produise quelque chose qui tient. <strong className="text-[#f0ede8]">L'IA fait l'exécution. Moi je fais le jugement.</strong>
         </p>
-      </div>
+      </LiquidCard>
 
-      <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 md:p-8 mb-6">
+      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Les automatisations, c'est du code</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
           Quand un formulaire de contact envoie automatiquement un mail et crée une ligne dans un CRM, c'est de la logique de code. Il y a une condition, une action, un résultat. Mais aujourd'hui, cette logique peut se décrire en langage naturel à une IA.
@@ -81,9 +83,9 @@ export function Section1() {
         <p className="text-sm text-white/55 leading-relaxed">
           C'est une instruction que je peux donner à Claude ou Cursor, et obtenir le code fonctionnel en retour. La condition : je comprenne ce que je veux.
         </p>
-      </div>
+      </LiquidCard>
 
-      <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 md:p-8">
+      <LiquidCard className="rounded-2xl p-6 md:p-8">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Les fichiers .md de contexte</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
           Avant de lancer quoi que ce soit dans un IDE ou un outil IA, je crée un dossier <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 rounded text-xs">/docs</code> dans mon projet avec des fichiers Markdown :
@@ -103,7 +105,7 @@ export function Section1() {
         <p className="text-sm text-white/55 leading-relaxed mt-4">
           Sans ces fichiers, l'IA avance en aveugle et génère du code générique. Avec eux, elle charge le contexte à chaque session.
         </p>
-      </div>
+      </LiquidCard>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Lock } from "lucide-react";
+import { LiquidCard } from "@/components/ui/liquid-glass-card";
 
 export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFullUser: boolean }) {
   return (
@@ -9,14 +10,14 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">L'angle mort</h2>
       </div>
       <p className="text-white/60 text-base leading-relaxed mb-6">
-        Tu sais maintenant mettre un site en ligne. C'est déjà plus que la majorité des gens. Mais regarde la vérité en face : tu ne sais pas encore s'il convertit, s'il tiendra la charge le jour où le trafic arrive, ni s'il répond à un vrai marché qui peut payer.
+        Tu as les Fondations entre les mains. C'est déjà plus que la majorité des gens. Avec ce que tu viens d'apprendre, le volume marketing, l'acquisition client, le grind brut, tu as tout pour décrocher tes premiers clients et tes premiers cashflows. Applique-le à la lettre et le cash rentre.
       </p>
       <p className="text-white/60 text-base leading-relaxed mb-10">
-        Tant que tu construis au feeling, tu restes locataire de tes propres compétences. L'IA, c'est l'avenir, et la vraie opportunité n'est pas de faire un joli site jetable. C'est d'en faire un actif qui rapporte, mois après mois. Voilà ce qui transforme l'un en l'autre.
+        Mais regarde la vérité en face. Tant que tu construis au feeling, tu restes locataire de tes propres outils. Une mise à jour de l'IA, un modèle qui change, une plateforme qui ferme, et tu repars de zéro. Les Fondations te font entrer dans le game. Le système complet, c'est ce qui te fait sortir de la dépendance pour de bon.
       </p>
 
       {/* Les 4 piliers */}
-      <h3 className="text-base font-semibold text-[#f0ede8] mb-6">Ce qui sépare une vitrine d'un vrai système :</h3>
+      <h3 className="text-base font-semibold text-[#f0ede8] mb-6">Ce qui te fait passer de premier cash à capital qui tient :</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
         {[
           {
@@ -25,7 +26,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
           },
           {
             title: "La logique business",
-            desc: "Choisir une niche, te positionner, vendre avant de construire, t'ajuster avec le terrain. La technique, c'est 10% de l'équation. Le vrai défi, celui qui te fait gagner ta vie, c'est de vendre et de faire de l'argent.",
+            desc: "Trouver la bonne idée, dans la bonne niche, celle que tu peux atteindre et qui a l'argent. Choisir entre le projet qui lock et le one-shot à gros ticket. Vendre avant de construire. La technique, c'est 10% de l'équation. Le reste, c'est ce qui te fait vraiment gagner ta vie.",
           },
           {
             title: "L'identité visuelle forte",
@@ -36,10 +37,10 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
             desc: "Comment encoder ton savoir-faire dans des systèmes réutilisables que tu charges en un clic. C'est ça, ton capital : ce que tu construis une fois et qui travaille pour toi sur tous tes projets suivants.",
           },
         ].map(({ title, desc }) => (
-          <div key={title} className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5">
+          <LiquidCard key={title} className="rounded-2xl p-5">
             <p className="text-sm font-semibold text-[#e8d5b0] mb-3">{title}</p>
             <p className="text-xs text-white/55 leading-relaxed">{desc}</p>
-          </div>
+          </LiquidCard>
         ))}
       </div>
 
@@ -53,7 +54,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
             </div>
             <h3 className="text-xl font-semibold text-[#f0ede8] mb-4">La suite logique</h3>
             <p className="text-sm text-white/60 leading-relaxed mb-8">
-              Tu as les fondations. Maintenant l'écart à combler, c'est tout ce qui transforme un site en système qui rapporte. Le système complet - les 7 blocs, les sources et les méthodes exactes pour construire des lignes verticales IA qui génèrent du revenu chaque mois - t'attend.
+              Les Fondations t'amènent tes premiers clients. Le système complet t'amène ailleurs : des projets long terme, des lignes verticales qui génèrent du revenu chaque mois, et ta propre expertise distillée dans des systèmes qui t'appartiennent. Tu ne crains plus une mise à jour de l'IA. Tu deviens antifragile. Les 7 blocs, les sources et les méthodes exactes t'attendent.
             </p>
 
             <Link

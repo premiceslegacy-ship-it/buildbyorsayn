@@ -1,5 +1,6 @@
 import { Play } from "lucide-react";
 import Link from "next/link";
+import { LiquidCard } from "@/components/ui/liquid-glass-card";
 
 const STEPS = [
   {
@@ -122,18 +123,17 @@ export function Section4() {
       {/* Grille 2x2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {STEPS.map((step) => (
-          <div
-            key={step.num}
-            className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 flex flex-col"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <span className="w-7 h-7 rounded-full bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 flex items-center justify-center text-xs font-bold text-[#e8d5b0] flex-shrink-0">
-                {step.num}
-              </span>
-              <h3 className="text-base font-semibold text-[#f0ede8]">{step.title}</h3>
+          <LiquidCard key={step.num} className="rounded-2xl p-6">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-7 h-7 rounded-full bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 flex items-center justify-center text-xs font-bold text-[#e8d5b0] flex-shrink-0">
+                  {step.num}
+                </span>
+                <h3 className="text-base font-semibold text-[#f0ede8]">{step.title}</h3>
+              </div>
+              {step.body}
             </div>
-            {step.body}
-          </div>
+          </LiquidCard>
         ))}
       </div>
 

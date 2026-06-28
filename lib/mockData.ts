@@ -26,27 +26,37 @@ export const BLOCS_DATA = [
       },
       {
         id: "b1-s2",
-        title: "Les modèles de business viables",
+        title: "Le vrai game : l'idée, pas la structure",
         content:
-          "Il en existe cinq. Un seul est adapté à ton stade actuel.\n\n" +
-          "Modèle 1, l'agence IA : tu livres des sites, des apps, des SaaS à des clients. Tu utilises l'IA pour produire dix fois plus vite qu'une agence classique. Tu gardes la marge. C'est le modèle pour commencer. Revenus immédiats, pas besoin d'audience.\n\n" +
-          "Modèle 2, le SaaS builder : tu construis tes propres produits et tu les vends en abonnement. Scalable, mais cycle long avant revenus significatifs. À envisager après avoir validé avec le modèle 1.\n\n" +
-          "Modèle 3, l'éducation et les systèmes : tu vends ce que tu sais faire, formations, templates, systèmes. Demande une pratique réelle à transmettre et une audience déjà constituée.\n\n" +
-          "Modèle 4, l'automatisation et les agents : tu construis des workflows IA pour des entreprises. Tickets élevés, peu de concurrence compétente. n8n c'est pas de la réelle compétence à mes yeux, sachant que tu peux construire des workflows sur un seul prompt. Mais comprendre la logique derrière, c'est plus intéressant.\n\n" +
-          "Modèle 5, le modèle hybride, c'est mon modèle : prestation plus produit plus éducation. C'est là où les profils solides arrivent après 12 à 24 mois de pratique.\n\n" +
-          "La règle absolue pour commencer : vends avant de construire. Pas de SaaS six mois dans ton coin avant d'avoir un client. La vente valide que tu résous un vrai problème.",
+          "Avant, le business en ligne c'était une question d'exécution. Aujourd'hui, avec l'IA qui code, qui rédige, qui design, et les agents qui exécutent à ta place, l'exécution devient une commodité. Ce qui reste rare, ce qui fait toute la différence, c'est l'idée. La bonne idée, dans la bonne niche, au bon moment.\n\n" +
+          "Et la bonne niche, ce n'est pas une affaire de passion. C'est une affaire de froideur. Une bonne niche réunit deux choses : tu peux communiquer avec elle (tu as un canal pour l'atteindre, tu peux lui parler dans sa langue), et elle a l'argent pour payer. Si l'une des deux manque, ce n'est pas une niche, c'est un loisir.\n\n" +
+          "À partir de là, il existe cinq modèles. Mais deux logiques dominent quand tu raisonnes comme un investisseur, pas comme un artisan.\n\n" +
+          "La première logique, le projet qui lock. Tu construis un système, souvent un SaaS, dans lequel tu fais entrer leurs données et leurs process. Une fois que toute leur opération vit dans ton système, ils ne peuvent plus partir sans tout perdre. C'est du revenu récurrent, prévisible, défendable. C'est ce que je construis avec mes lignes verticales : une niche, un système, un canal, du MRR.\n\n" +
+          "La seconde logique, le one-shot à gros ticket. Tu vends des projets uniques à des prix élevés. Pas de récurrence, mais du cashflow immédiat que tu réinjectes. Tu prends ce cash, tu le distilles en systèmes, tu le réinvestis dans la prochaine ligne, et tu recommences. C'est une mentalité de capital : des lignes verticales qui printent, et toi qui alloues.\n\n" +
+          "Les trois autres modèles existent et sont viables. L'agence IA : tu livres sites, apps et SaaS dix fois plus vite qu'une agence classique, tu gardes la marge. L'automatisation et les agents : tu construis des workflows IA pour des entreprises, gros tickets, peu de concurrence compétente. L'éducation : tu vends ce que tu sais faire, mais ça demande une pratique réelle à transmettre et une audience déjà là. Le modèle hybride, prestation plus produit plus éducation, c'est le mien, mais c'est là où les profils solides arrivent après 12 à 24 mois de terrain. Pas au départ.\n\n" +
+          "Une vérité froide à intégrer tout de suite : sur du SaaS et du B2B, le client achète rarement une personne. Il achète un système qui résout sa douleur. Tu peux print du cash sans qu'il sache qui tu es, sans attache, sans émotion. Pure froideur d'investisseur. L'infoproduit, lui, repose sur une personal brand et une relation. Ce sont deux jeux différents. Sache lequel tu joues.",
       },
       {
         id: "b1-s3",
-        title: "Le framework de positionnement",
+        title: "Le conseil pour démarrer : du grind, pas de la bureaucratie",
         content:
-          "Le positionnement, c'est une décision stratégique. Réponds à ces quatre questions avec précision, pas avec des généralités.\n\n" +
-          "Question 1, pour qui précisément : \"Pour les PME\" n'est pas une réponse. \"Pour les cabinets de gestion de patrimoine indépendants de 5 à 20 personnes\" est une réponse. Plus c'est précis, plus c'est vendable.\n\n" +
+          "Si tu débutes, oublie l'idée de monter une agence avec des process, une équipe, une structure et toute la bureaucratie qui va avec. Ce n'est pas ton problème à ce stade. Ton seul problème, c'est de trouver les idées qui font du cash et de les exécuter vite.\n\n" +
+          "Mets-toi en solo, ou en duo si tu as un vrai partenaire business. Pas plus. Tu cherches à printer du premier cashflow, loin des organigrammes et des outils de gestion de projet. À ce stade, c'est du grind pur et dur. Du sauvage. Tu testes des idées, tu vends, tu livres, tu encaisses, tu recommences.\n\n" +
+          "C'est exactement ce que décrit le Protocole Zéro : absorber les compétences, sprinter pour le cash, puis distiller. Si tu pars de zéro, c'est ta feuille de route. Ouvre l'onglet Protocole Zéro et suis-le à la lettre.\n\n" +
+          "Une fois que le cash rentre, alors seulement tu structures. Pas avant.",
+      },
+      {
+        id: "b1-s4b",
+        title: "Le positionnement : froid et chirurgical",
+        content:
+          "Le positionnement reste une décision stratégique. Mais ne réduis pas tout au \"problème à résoudre\". Le problème n'est qu'un levier parmi d'autres. Les gens, et même les entreprises, agissent par statut, par peur de perdre, par envie d'appartenir, par besoin de sécurité. Plus tu comprends ce qui les fait vraiment agir, plus tu vends. (On creuse ça dans les Fondations, section \"Comprendre ce qui fait agir les gens\".)\n\n" +
+          "Cela dit, le framework qui suit reste un excellent point de départ pour clarifier ta cible. Quatre questions, à répondre avec précision, pas avec des généralités.\n\n" +
+          "Question 1, pour qui précisément : \"Pour les PME\" n'est pas une réponse. \"Pour les cabinets de gestion de patrimoine indépendants de 5 à 20 personnes\" est une réponse. Plus c'est précis, plus c'est accessible et vendable.\n\n" +
           "Question 2, quel problème précis tu résous : pas \"je crée des sites web\". Le problème formulé comme ton client le formule dans sa tête à 3h du matin quand ça l'empêche de dormir. Je suis passé de \"je crée des sites performants\" à \"je corrige la dissonance de prestige : l'écart entre excellence réelle et présence digitale\". L'humain déteste l'incohérence, et c'est sur ce genre de biais que je joue.\n\n" +
-          "Les biais de Cialdini à retenir pour convaincre, persuader, convertir : la réciprocité, l'engagement et la cohérence, la preuve sociale, l'autorité, la rareté, et la sympathie. Ce sont les leviers psychologiques universels. Ils viennent du livre Influence et Manipulation de Robert Cialdini, à lire absolument.\n\n" +
-          "Question 3, pourquoi toi : réponse honnête au début, parce que tu comprends leur secteur mieux qu'un généraliste. Si tu te positionnes comme expert du BTP et que tu parles de leurs douleurs dans tes contenus, les entreprises te feront plus confiance qu'à une agence généraliste. Tu préfères manger des pâtes chez l'italien ou chez le mec qui vend des grecs, des burgers, des tacos, du poulet ? À long terme : parce que tu as des résultats documentés dans ce secteur.\n\n" +
-          "Question 4, comment tu le prouves : études de cas, résultats chiffrés si possible, témoignages. Si tu n'en as pas, montre ce que tu fais vraiment. Les démos peuvent être un vrai levier de preuve sociale.\n\n" +
-          "Formule de positionnement : J'aide [QUI PRÉCISÉMENT] à [RÉSOUDRE QUEL PROBLÈME] grâce à [TON APPROCHE] pour qu'ils puissent [RÉSULTAT MESURABLE]. C'est la phrase que tu dois pouvoir dire à n'importe qui en moins de 15 secondes.",
+          "Les biais de Cialdini à connaître pour convaincre, persuader, convertir : la réciprocité, l'engagement et la cohérence, la preuve sociale, l'autorité, la rareté, et la sympathie. Ce sont les leviers psychologiques universels. Ils viennent du livre Influence et Manipulation de Robert Cialdini, à lire absolument.\n\n" +
+          "Question 3, pourquoi toi : au début, parce que tu comprends leur secteur mieux qu'un généraliste. Tu préfères manger des pâtes chez l'italien ou chez le mec qui vend des grecs, des burgers, des tacos et du poulet ? À long terme : parce que tu as des résultats documentés dans ce secteur.\n\n" +
+          "Question 4, comment tu le prouves : études de cas, résultats chiffrés, témoignages. Si tu n'as rien, montre ce que tu fais vraiment. Une démo solide est un vrai levier de preuve sociale.\n\n" +
+          "Formule de positionnement : J'aide [QUI PRÉCISÉMENT] à [RÉSOUDRE QUEL PROBLÈME] grâce à [TON APPROCHE] pour qu'ils puissent [RÉSULTAT MESURABLE]. La phrase que tu dois pouvoir dire à n'importe qui en moins de 15 secondes.",
       },
       {
         id: "b1-s4",

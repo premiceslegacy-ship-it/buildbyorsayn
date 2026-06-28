@@ -1,3 +1,5 @@
+import { LiquidCard } from "@/components/ui/liquid-glass-card";
+
 export function SectionCopywriting() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -10,7 +12,7 @@ export function SectionCopywriting() {
       </p>
 
       {/* On ne lit pas */}
-      <div className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] border border-white/[0.07] border-t-white/10 rounded-2xl p-6 md:p-8 mb-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Les gens ne lisent pas, ils scannent</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
           Personne ne lit un texte mot à mot sur un écran. Les yeux glissent, attrapent les titres, les mots en gras, les phrases courtes. Si ton message est un gros bloc compact, il est mort avant d'être lu.
@@ -18,10 +20,10 @@ export function SectionCopywriting() {
         <p className="text-sm text-white/55 leading-relaxed">
           Écris pour la partie rapide et instinctive du cerveau, celle qui décide en une seconde si ça vaut la peine de continuer. <strong className="text-[#f0ede8]">Des titres clairs, des phrases courtes, des images mentales simples, de l'air entre les lignes.</strong>
         </p>
-      </div>
+      </LiquidCard>
 
       {/* Douleur puis bénéfice */}
-      <div className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] border border-white/[0.07] border-t-white/10 rounded-2xl p-6 md:p-8 mb-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Parle à la douleur, puis au bénéfice</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-5">
           On commence par nommer le problème mieux que le client ne saurait le dire lui-même. Il se reconnaît, il se sent compris. Ensuite seulement on montre le résultat qu'il peut atteindre. Même sur un bouton : il dit le bénéfice, pas l'action mécanique.
@@ -36,10 +38,10 @@ export function SectionCopywriting() {
             <p className="text-xs text-white/50">"Recevoir mon devis gratuit"</p>
           </div>
         </div>
-      </div>
+      </LiquidCard>
 
       {/* Cialdini */}
-      <div className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] border border-white/[0.07] border-t-white/10 rounded-2xl p-6 md:p-8 mb-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-5">Les grands leviers de persuasion</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-5">
           Le chercheur Robert Cialdini a identifié les ressorts qui poussent un humain à dire oui. Tu les retrouveras partout, dans tes textes comme dans tes ventes.
@@ -59,7 +61,7 @@ export function SectionCopywriting() {
             </li>
           ))}
         </ul>
-      </div>
+      </LiquidCard>
 
       <div className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-2xl px-6 py-5">
         <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">

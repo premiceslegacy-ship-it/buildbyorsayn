@@ -1,3 +1,5 @@
+import { LiquidCard } from "@/components/ui/liquid-glass-card";
+
 export function SectionPsychologie() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -9,12 +11,12 @@ export function SectionPsychologie() {
         On répète qu'il faut "résoudre un problème". C'est vrai, mais c'est incomplet. Les gens n'achètent pas que des solutions. Ils achètent des émotions, une image d'eux-mêmes, une place dans un groupe. Plus tu comprends la nature humaine en profondeur, plus tu vends.
       </p>
 
-      <div className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] border border-white/[0.07] border-t-white/10 rounded-2xl p-6 md:p-8 mb-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Le problème n'est qu'un levier parmi d'autres</h3>
         <p className="text-sm text-white/55 leading-relaxed">
           Un site web premium ne se vend pas parce qu'il règle un souci technique. Il se vend parce qu'il dit quelque chose sur celui qui le possède : "je suis un professionnel sérieux". L'achat est rarement rationnel. Il est émotionnel, puis justifié par la raison après coup. Ton travail, c'est de parler à l'émotion d'abord.
         </p>
-      </div>
+      </LiquidCard>
 
       {/* Les ressorts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -44,10 +46,10 @@ export function SectionPsychologie() {
             d: "Beaucoup d'achats servent juste à dormir tranquille : ne plus rater une facture, ne plus perdre un client, ne plus paniquer. Vendre la tranquillité d'esprit est souvent plus fort que vendre une fonctionnalité.",
           },
         ].map(({ t, d }) => (
-          <div key={t} className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] border border-white/[0.07] border-t-white/10 rounded-2xl p-5 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+          <LiquidCard key={t} className="rounded-2xl p-5">
             <p className="text-sm font-semibold text-[#e8d5b0] mb-3">{t}</p>
             <p className="text-xs text-white/55 leading-relaxed">{d}</p>
-          </div>
+          </LiquidCard>
         ))}
       </div>
 

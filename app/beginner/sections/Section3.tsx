@@ -1,3 +1,5 @@
+import { LiquidCard } from "@/components/ui/liquid-glass-card";
+
 export function Section3() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -46,16 +48,16 @@ export function Section3() {
               desc: "Un 'wrapper d'IA' regroupant tout un tas d'outils au même endroit. Confort absolu pour centraliser ta création visuelle. (faut du budget)",
             },
           ].map(({ name, desc }) => (
-            <div key={name} className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5">
+            <LiquidCard key={name} className="rounded-2xl p-5">
               <span className="text-sm font-semibold text-[#f0ede8] block mb-2">{name}</span>
               <p className="text-xs text-white/50 leading-relaxed">{desc}</p>
-            </div>
+            </LiquidCard>
           ))}
         </div>
       </div>
 
       {/* Penser comme un photographe */}
-      <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 md:p-8 mb-6">
+      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Penser comme un photographe</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-6">
           Un prompt image se construit comme un brief photo. Ne décris pas ce que tu veux voir, décris <em>comment</em> tu veux le capturer.
@@ -78,10 +80,10 @@ export function Section3() {
             "Commercial product photography of a minimalist ceramic mug, matte black. Shot with 50mm, f/2.8, soft side lighting..."
           </p>
         </div>
-      </div>
+      </LiquidCard>
 
       {/* Cohérence visuelle */}
-      <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 md:p-8">
+      <LiquidCard className="rounded-2xl p-6 md:p-8">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-4">La règle de la cohérence visuelle</h3>
         <p className="text-sm text-white/55 leading-relaxed mb-4">
           Avant de générer la moindre image, définis le style de ton site dans un fichier <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 rounded text-[11px] font-mono">DESIGN-SYSTEM.md</code>.
@@ -98,17 +100,7 @@ export function Section3() {
             </li>
           ))}
         </ul>
-      </div>
-
-      <div className="mt-6 bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-2xl p-6 md:p-8">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Le niveau au-dessus : ux-ui-design</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
-          Dans le système complet, j'utilise un skill dédié à l'UX/UI. Il ne se contente pas de dire "fais un beau site" : il force une direction artistique, un BRAND-SYSTEM, un DESIGN-SYSTEM, des règles de copywriting, des quality gates et des prompts visuels précis.
-        </p>
-        <p className="text-sm text-white/55 leading-relaxed">
-          C'est ce qui crée l'écart entre une page correcte générée par IA et un site qui ressemble à un vrai produit : cohérent, premium, lisible, mobile first et pensé pour convertir.
-        </p>
-      </div>
+      </LiquidCard>
     </div>
   );
 }

@@ -90,7 +90,7 @@ export default async function ProtocolePage() {
       />
 
       <div className="flex-1 px-6 sm:px-12 pb-24 relative z-10">
-        <div className="max-w-2xl mx-auto flex flex-col gap-20 pt-8">
+        <div className="max-w-3xl mx-auto flex flex-col gap-24 pt-12">
 
           {/* Hero */}
           <div className="flex flex-col gap-5">
@@ -115,20 +115,20 @@ export default async function ProtocolePage() {
               La thèse
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
-              <LiquidCard className="p-6">
+              <LiquidCard className="rounded-2xl p-6 sm:p-7">
                 <p className="text-xs text-[#c9b48a] uppercase tracking-[2px] font-medium mb-3">Le locataire numérique</p>
                 <p className="text-sm text-[#8a8070] leading-relaxed">
                   Utilise des outils IA puissants qu&apos;il ne comprend pas, ne possède pas et ne maîtrise pas. Quand les outils changent, il recommence à zéro. Illich avait nommé ça la contre-productivité : l&apos;outil crée la dépendance au lieu de l&apos;autonomie.
                 </p>
               </LiquidCard>
-              <LiquidCard className="p-6">
+              <LiquidCard className="rounded-2xl p-6 sm:p-7">
                 <p className="text-xs text-[#c9b48a] uppercase tracking-[2px] font-medium mb-3">Le capital organique</p>
                 <p className="text-sm text-[#c4b89a] leading-relaxed">
                   Ce qu&apos;on construit par la distillation. L&apos;expertise encodée, les systèmes documentés, la data propriétaire. S&apos;accumule dans le temps. Résiste aux changements d&apos;outils. Appartient entièrement à son propriétaire.
                 </p>
               </LiquidCard>
             </div>
-            <LiquidCard className="p-5">
+            <LiquidCard className="rounded-2xl p-6">
               <p className="text-sm text-[#8a8070] leading-relaxed italic">
                 &ldquo;Nous façonnons nos outils, puis nos outils nous façonnent.&rdquo; Formule attribuée à John Culkin, dans la lignée de McLuhan. La distillation est l&apos;acte de garder la main sur cette co-évolution. Tu formes le modèle avant qu&apos;il te forme.
               </p>
@@ -138,72 +138,80 @@ export default async function ProtocolePage() {
           <div className="h-px bg-[#2a2520]" />
 
           {/* Les 3 phases */}
-          <div className="flex flex-col gap-14">
+          <div className="flex flex-col gap-16">
             <h2 className="text-xs font-semibold uppercase tracking-[3px] text-[#c9b48a]">
               Les trois phases
             </h2>
 
-            {PHASES.map((phase, idx) => (
-              <div key={phase.num} className="flex flex-col gap-5">
-                <div className="flex items-baseline gap-3">
-                  <span className="text-[#c9b48a]/40 font-mono font-bold text-2xl">{phase.num}</span>
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#f0ede8]">{phase.titre}</h3>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-[#c9b48a] opacity-70">{phase.label}</span>
-                      <span className="text-xs text-[#555]">·</span>
-                      <span className="text-xs text-[#555]">{phase.duree}</span>
+            {PHASES.map((phase) => (
+              <LiquidCard key={phase.num} className="rounded-2xl p-7 sm:p-10">
+                <div className="flex flex-col gap-8">
+                  {/* En-tête : grand chiffre + titre */}
+                  <div className="flex items-center gap-5 sm:gap-7">
+                    <span className="text-5xl sm:text-6xl font-light tabular-nums leading-none tracking-tighter bg-gradient-to-b from-[#e8d5b0] to-[#c9b48a]/40 bg-clip-text text-transparent select-none">
+                      {phase.num}
+                    </span>
+                    <div className="flex flex-col gap-1.5 pt-1">
+                      <h3 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">{phase.titre}</h3>
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <span className="text-xs font-medium text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2.5 py-0.5">{phase.label}</span>
+                        <span className="text-xs text-[#8a8070]">{phase.duree}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <LiquidCard className="p-5">
-                  <p className="text-xs text-[#c9b48a]/60 uppercase tracking-[2px] font-medium mb-2">La douleur</p>
-                  <p className="text-sm text-[#8a8070] leading-relaxed">{phase.douleur}</p>
-                </LiquidCard>
+                  <div className="h-px bg-gradient-to-r from-[#c9b48a]/20 via-[#c9b48a]/10 to-transparent" />
 
-                <div className="flex flex-col gap-2">
-                  <p className="text-xs text-[#c9b48a] uppercase tracking-[2px] font-medium">La réponse</p>
-                  <p className="text-sm text-[#c4b89a] leading-relaxed">{phase.solution}</p>
-                </div>
-
-                <LiquidCard className="p-4">
-                  <div className="flex items-start gap-3">
-                    <span className="text-[#c9b48a] text-xs font-semibold uppercase tracking-[2px] flex-shrink-0 mt-0.5">Output</span>
-                    <p className="text-sm text-[#8a8070]">{phase.output}</p>
+                  {/* La douleur */}
+                  <div className="flex flex-col gap-2.5">
+                    <p className="text-[11px] text-[#c9b48a]/70 uppercase tracking-[2.5px] font-semibold">La douleur</p>
+                    <p className="text-[15px] text-[#8a8070] leading-[1.7]">{phase.douleur}</p>
                   </div>
-                </LiquidCard>
 
-                <p className="text-xs text-[#8a8070] italic border-l-2 border-[#c9b48a]/30 pl-3 leading-relaxed">
-                  {phase.citation}
-                </p>
+                  {/* La réponse */}
+                  <div className="flex flex-col gap-2.5">
+                    <p className="text-[11px] text-[#c9b48a] uppercase tracking-[2.5px] font-semibold">La réponse</p>
+                    <p className="text-[15px] text-[#c4b89a] leading-[1.75]">{phase.solution}</p>
+                  </div>
 
-                {idx < PHASES.length - 1 && <div className="h-px bg-[#2a2520] mt-4" />}
-              </div>
+                  {/* Output */}
+                  <div className="rounded-xl bg-[#c9b48a]/[0.06] border border-[#c9b48a]/15 px-5 py-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
+                      <span className="text-[#c9b48a] text-[11px] font-semibold uppercase tracking-[2.5px] flex-shrink-0 sm:mt-0.5">Output</span>
+                      <p className="text-[15px] text-[#c4b89a] leading-relaxed">{phase.output}</p>
+                    </div>
+                  </div>
+
+                  {/* Citation */}
+                  <p className="text-sm text-[#8a8070] italic border-l-2 border-[#c9b48a]/40 pl-4 leading-[1.7]">
+                    {phase.citation}
+                  </p>
+                </div>
+              </LiquidCard>
             ))}
           </div>
 
           {/* État final */}
-          <div className="flex flex-col gap-6">
-            <div className="flex items-baseline gap-3">
-              <span className="text-[#c9b48a]/40 font-mono font-bold text-2xl">∞</span>
-              <div>
-                <h3 className="text-xl font-semibold text-[#f0ede8]">L&apos;état final</h3>
-                <span className="text-xs text-[#c9b48a] opacity-70">Antifragile numérique</span>
+          <div className="flex flex-col gap-8">
+            <div className="flex items-center gap-5 sm:gap-7">
+              <span className="text-5xl sm:text-6xl font-light leading-none bg-gradient-to-b from-[#e8d5b0] to-[#c9b48a]/40 bg-clip-text text-transparent select-none">∞</span>
+              <div className="flex flex-col gap-1.5 pt-1">
+                <h3 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">L&apos;état final</h3>
+                <span className="text-xs font-medium text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2.5 py-0.5 w-fit">Antifragile numérique</span>
               </div>
             </div>
 
-            <p className="text-sm text-[#c4b89a] leading-relaxed">
+            <p className="text-[15px] text-[#c4b89a] leading-[1.75]">
               Taleb distingue trois types de systèmes : le fragile qui se brise sous le stress, le robuste qui résiste sans en bénéficier, et l&apos;antifragile qui gagne en force sous la volatilité. Le capital organique est antifragile par construction. Chaque changement de modèle IA, chaque régulation, chaque disruption de plateforme renforce tes systèmes au lieu de les détruire.
             </p>
 
-            <div className="grid sm:grid-cols-3 gap-3">
+            <div className="grid sm:grid-cols-3 gap-4">
               {[
                 { titre: "Lignes verticales IA", desc: "Tu lances des verticales dans des niches précises avec tes systèmes." },
                 { titre: "Investissement réel", desc: "Pierre, équity, actifs physiques. Tu joues sur plusieurs terrains." },
                 { titre: "Liberté totale", desc: "Tu ne subis plus rien. Tu choisis." },
               ].map((item) => (
-                <LiquidCard key={item.titre} className="p-5">
+                <LiquidCard key={item.titre} className="rounded-2xl p-6">
                   <p className="text-sm font-semibold text-[#f0ede8] mb-2">{item.titre}</p>
                   <p className="text-xs text-[#8a8070] leading-relaxed">{item.desc}</p>
                 </LiquidCard>
@@ -214,7 +222,7 @@ export default async function ProtocolePage() {
           <div className="h-px bg-[#2a2520]" />
 
           {/* Vidéo liée */}
-          <LiquidCard className="p-5">
+          <LiquidCard className="rounded-2xl p-6">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-4">
                 <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-[#e8d5b0]/20 bg-[#e8d5b0]/10">
