@@ -369,8 +369,11 @@ export default function DashboardHub() {
 
         {/* 4. Écosystème Orsayn — lignes verticales */}
         <div className="mt-6">
-          <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0]/60 font-medium mb-4">
+          <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0]/60 font-medium mb-3">
             L'écosystème Orsayn
+          </p>
+          <p className="text-sm text-white/40 leading-relaxed mb-5">
+            Le marché est saturé de contenu sur l'IA. Peu de gens buildent vraiment. Voici ce qui est construit, en production, avec les mêmes méthodes que tu apprends ici.
           </p>
 
           {/* Atelier — ligne live, cliquable */}
