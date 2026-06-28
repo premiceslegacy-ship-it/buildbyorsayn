@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, Check, Lock, Zap, GraduationCap, Layers, Play } from "lucide-react";
 import { LoveWall } from "@/components/LoveWall";
+import { EcosystemMap } from "@/components/EcosystemMap";
 
 const STRIPE_FULL_URL = "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a";
 const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? "#";
@@ -540,6 +541,15 @@ export default async function HomePage() {
               <p className="text-xs text-[#8a8070] mt-3">Accès à vie - paiement unique</p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ================================================================
+          ÉCOSYSTÈME ORSAYN
+      ================================================================ */}
+      <section className="relative z-10 px-6 py-20 sm:py-24 border-t border-white/[0.05]">
+        <div className="max-w-2xl mx-auto">
+          <EcosystemMap variant="homepage" tier={currentTier} />
         </div>
       </section>
 
