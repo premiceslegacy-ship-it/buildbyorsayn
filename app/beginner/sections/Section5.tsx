@@ -29,8 +29,8 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
             desc: "Trouver la bonne idée, dans la bonne niche, celle que tu peux atteindre et qui a l'argent. Choisir entre le projet qui lock et le one-shot à gros ticket. Vendre avant de construire. La technique, c'est 10% de l'équation. Le reste, c'est ce qui te fait vraiment gagner ta vie.",
           },
           {
-            title: "La recherche verticale",
-            desc: "Avant de builder, analyser. Taille de marché, ICP exact, douleurs profondes, psychologie d'achat, angles pub des concurrents, wedge d'entrée scoré. La data, c'est la recette - une fois que tu l'as, l'IA réplique la sauce sur tous tes projets suivants.",
+            title: "L'architecture produit",
+            desc: "ORACLE by Orsayn + Expert Backend : la méthode pour construire des apps, SaaS et outils métier qui tiennent. Pas juste un site. Un produit en couches, avec une logique de délégation, une base backend durcie et une livraison client-ready.",
           },
           {
             title: "L'ingénierie des Skills",
