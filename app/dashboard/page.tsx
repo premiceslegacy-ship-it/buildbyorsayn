@@ -385,16 +385,17 @@ export default function DashboardHub() {
           >
             <LiquidCard className="p-6 transition-all duration-300 cursor-pointer group-hover:border-[#c9b48a]/30">
               <div className="flex items-center gap-5">
-                {/* Logo placeholder stylé */}
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#e8d5b0]/8 border border-[#e8d5b0]/15 flex items-center justify-center">
-                  <span className="text-[#e8d5b0] text-xs font-bold tracking-wider">BTP</span>
+                {/* Logo Atelier */}
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center p-2.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/logo-atelier-blanc.svg" alt="Atelier" className="w-full h-full object-contain" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[#f0ede8] text-sm font-semibold">Atelier</span>
                     <span className="text-[10px] font-semibold text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2 py-0.5 leading-none">LIVE</span>
                   </div>
-                  <p className="text-xs text-white/45 leading-relaxed">Gestion BTP — devis, chantiers, équipe, rentabilité, agent WhatsApp. Ce que le système produit, en vrai.</p>
+                  <p className="text-xs text-white/45 leading-relaxed">ERP BTP — devis, facturation, chantiers, équipe, rentabilité, relances IA. Ce que le système produit, en vrai.</p>
                 </div>
                 <ArrowRight className="flex-shrink-0 w-4 h-4 text-[#e8d5b0] opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" />
               </div>
