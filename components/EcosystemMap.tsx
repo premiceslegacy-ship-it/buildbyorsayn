@@ -110,11 +110,9 @@ export function EcosystemMap({ variant, tier }: { variant: EcosystemVariant; tie
                   </span>
                 )}
               </div>
-              {/* Logo BUILD — icône cubes 3D identique au header */}
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-[#e8d5b0]/10 to-[#e8d5b0]/3 border border-[#e8d5b0]/15 shadow-[0_4px_16px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(232,213,176,0.12)] flex items-center justify-center mb-3 p-2">
-                <Logo hideText layout="vertical" className="!gap-0 w-8 h-8" />
-              </div>
-              <p className={`text-xs font-semibold mb-2 ${isDashboard && isMember ? "text-[#e8d5b0]/80" : "text-[#e8d5b0]/40"}`}>BUILD</p>
+              {/* Logo BUILD — cubes sans carré + texte identique au header */}
+              <Logo hideText layout="vertical" className="!gap-0 w-10 h-10 mb-2" />
+              <p className={`font-extrabold uppercase leading-none mb-2 ${isDashboard && isMember ? "text-[#f0ede8]" : "text-[#f0ede8]/45"}`} style={{ fontSize: "13px", letterSpacing: "2px" }}>BUILD</p>
               <p className="text-[10px] sm:text-[11px] text-white/35 text-center leading-relaxed mt-auto px-1">
                 {isDashboard && isMember
                   ? "La méthode, les skills, les frameworks. Tu en fais partie."
