@@ -206,7 +206,7 @@ export default async function HomePage() {
           ÉCOSYSTÈME ORSAYN — juste après la social proof
       ================================================================ */}
       <section className="relative z-10 px-6 py-16 sm:py-20 border-t border-white/[0.05]">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <EcosystemMap variant="homepage" tier={currentTier} />
         </div>
       </section>

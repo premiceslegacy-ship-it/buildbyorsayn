@@ -52,29 +52,29 @@ export function EcosystemMap({ variant, tier }: { variant: EcosystemVariant; tie
       </div>
 
       {/* 4 cartes */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
 
         {/* ATELIER */}
         <a href="https://www.atelier-btp.fr" target="_blank" rel="noopener noreferrer" className="group col-span-1 block">
           <div className="relative rounded-2xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-[#c9b48a]/20 shadow-[0_8px_32px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.09),inset_0_-1px_0_rgba(0,0,0,0.12)] backdrop-blur-xl overflow-hidden transition-all duration-300 group-hover:border-[#c9b48a]/40 group-hover:shadow-[0_12px_40px_rgba(201,180,138,0.12),inset_0_1px_0_rgba(255,255,255,0.12)] group-hover:-translate-y-1 h-full min-h-[210px]">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-10 bg-[#c9b48a]/6 blur-2xl rounded-full pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9b48a]/18 to-transparent" />
-            <div className="relative z-10 p-4 flex flex-col items-center h-full">
+            <div className="relative z-10 p-4 sm:p-6 flex flex-col items-center h-full">
               <div className="self-end mb-3">
                 <span className="inline-flex items-center gap-1 text-[9px] font-bold text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2 py-0.5 leading-none tracking-wide">
                   <span className="w-1 h-1 rounded-full bg-[#0e0e0f]/60 animate-pulse" />
                   LIVE
                 </span>
               </div>
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-white/[0.08] to-white/[0.03] border border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center p-2.5 mb-3">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-b from-white/[0.08] to-white/[0.03] border border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center p-2.5 mb-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/monogramme-atelier.svg" alt="Atelier" className="w-full h-full object-contain" />
               </div>
               <div className="mb-2 w-full flex justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-atelier-blanc.svg" alt="Atelier" className="h-3 object-contain opacity-80 max-w-[72px]" />
+                <img src="/logo-atelier-blanc.svg" alt="Atelier" className="h-3 sm:h-3.5 object-contain opacity-80 max-w-[80px]" />
               </div>
-              <p className="text-[10px] text-white/38 text-center leading-relaxed mt-auto px-1">
+              <p className="text-[10px] sm:text-[11px] text-white/38 text-center leading-relaxed mt-auto px-1">
                 ERP BTP nouvelle génération - devis intelligents, chantiers, rentabilité
               </p>
               <div className="flex items-center gap-1 mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -96,7 +96,7 @@ export function EcosystemMap({ variant, tier }: { variant: EcosystemVariant; tie
             {isDashboard && isMember && (
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-10 bg-[#e8d5b0]/5 blur-2xl rounded-full pointer-events-none" />
             )}
-            <div className="relative z-10 p-4 flex flex-col items-center h-full">
+            <div className="relative z-10 p-4 sm:p-6 flex flex-col items-center h-full">
               {/* Badge */}
               <div className="self-end mb-3">
                 {isDashboard && isMember ? (
@@ -110,12 +110,12 @@ export function EcosystemMap({ variant, tier }: { variant: EcosystemVariant; tie
                   </span>
                 )}
               </div>
-              {/* Logo BUILD — cubes 3D */}
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-[#e8d5b0]/10 to-[#e8d5b0]/3 border border-[#e8d5b0]/15 shadow-[0_4px_16px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(232,213,176,0.12)] flex items-center justify-center mb-3 overflow-hidden p-1.5">
-                <Logo hideText layout="vertical" className="w-full h-full scale-[1.1]" />
+              {/* Logo BUILD — icône cubes 3D identique au header */}
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-[#e8d5b0]/10 to-[#e8d5b0]/3 border border-[#e8d5b0]/15 shadow-[0_4px_16px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(232,213,176,0.12)] flex items-center justify-center mb-3 p-2">
+                <Logo hideText layout="vertical" className="!gap-0 w-8 h-8" />
               </div>
               <p className={`text-xs font-semibold mb-2 ${isDashboard && isMember ? "text-[#e8d5b0]/80" : "text-[#e8d5b0]/40"}`}>BUILD</p>
-              <p className="text-[10px] text-white/35 text-center leading-relaxed mt-auto px-1">
+              <p className="text-[10px] sm:text-[11px] text-white/35 text-center leading-relaxed mt-auto px-1">
                 {isDashboard && isMember
                   ? "La méthode, les skills, les frameworks. Tu en fais partie."
                   : "Méthode, skills, frameworks. La bibliothèque pour construire des lignes IA."}
