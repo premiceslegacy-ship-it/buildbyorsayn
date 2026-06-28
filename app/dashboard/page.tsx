@@ -367,39 +367,63 @@ export default function DashboardHub() {
           );
         })()}
 
-        {/* 4. Verticale en prod, preuve concrète visible par tous */}
+        {/* 4. Écosystème Orsayn — lignes verticales */}
         <div className="mt-6">
+          <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0]/60 font-medium mb-4">
+            L'écosystème Orsayn
+          </p>
+
+          {/* Atelier — ligne live, cliquable */}
           <a
             href="https://www.atelier-btp.fr"
             target="_blank"
             rel="noopener noreferrer"
-            className="group block"
+            className="group block mb-3"
           >
-            <LiquidCard className="p-8 md:p-10 transition-all duration-300 cursor-pointer">
-              <div className="relative flex flex-col sm:flex-row items-start gap-10">
-                {/* Icône */}
-                <div className="flex-shrink-0 w-14 h-14 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.2)] transition-all duration-500">
-                  <Eye className="w-7 h-7 text-[#e8d5b0] drop-shadow-[0_0_10px_rgba(232,213,176,0.8)]" strokeWidth={1.5} />
+            <LiquidCard className="p-6 transition-all duration-300 cursor-pointer group-hover:border-[#c9b48a]/30">
+              <div className="flex items-center gap-5">
+                {/* Logo placeholder stylé */}
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#e8d5b0]/8 border border-[#e8d5b0]/15 flex items-center justify-center">
+                  <span className="text-[#e8d5b0] text-xs font-bold tracking-wider">BTP</span>
                 </div>
-
-                {/* Texte + Flèche */}
-                <div className="flex flex-1 min-w-0 items-start justify-between">
-                  <div>
-                    <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0] font-medium mb-2">
-                      Verticale terminée
-                    </p>
-                    <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-1">
-                      Atelier BTP - voir une ligne verticale réelle
-                    </h2>
-                    <p className="text-sm text-white/50 mt-2">
-                      Un exemple concret de ce que le système produit. Construit avec les mêmes frameworks que tu utilises ici.
-                    </p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[#f0ede8] text-sm font-semibold">Atelier</span>
+                    <span className="text-[10px] font-semibold text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2 py-0.5 leading-none">LIVE</span>
                   </div>
-                  <ArrowRight className="flex-shrink-0 w-5 h-5 text-[#e8d5b0] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 hidden sm:block ml-4 mt-1" />
+                  <p className="text-xs text-white/45 leading-relaxed">Gestion BTP — devis, chantiers, équipe, rentabilité, agent WhatsApp. Ce que le système produit, en vrai.</p>
                 </div>
+                <ArrowRight className="flex-shrink-0 w-4 h-4 text-[#e8d5b0] opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" />
               </div>
             </LiquidCard>
           </a>
+
+          {/* Lignes à venir — grille mystère */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <LiquidCard className="p-5 opacity-35 select-none">
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/[0.03] border border-white/8 flex items-center justify-center">
+                  <span className="text-white/25 text-lg font-light">?</span>
+                </div>
+                <div>
+                  <span className="text-[#f0ede8]/40 text-sm font-semibold">Ligne verticale</span>
+                  <p className="text-xs text-white/20 mt-0.5">Bientôt.</p>
+                </div>
+              </div>
+            </LiquidCard>
+
+            <LiquidCard className="p-5 opacity-20 select-none">
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/[0.02] border border-white/6 flex items-center justify-center">
+                  <span className="text-white/15 text-lg font-light">?</span>
+                </div>
+                <div>
+                  <span className="text-[#f0ede8]/30 text-sm font-semibold">Ligne verticale</span>
+                  <p className="text-xs text-white/15 mt-0.5">Bientôt.</p>
+                </div>
+              </div>
+            </LiquidCard>
+          </div>
         </div>
 
 

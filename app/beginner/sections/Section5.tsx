@@ -7,7 +7,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3 mb-8">
         <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">10</span>
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">L'angle mort</h2>
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Le seuil</h2>
       </div>
       <p className="text-white/60 text-base leading-relaxed mb-6">
         Tu as les Fondations entre les mains. C'est déjà plus que la majorité des gens. Avec ce que tu viens d'apprendre, le volume marketing, l'acquisition client, le grind brut, tu as tout pour décrocher tes premiers clients et tes premiers cashflows. Applique-le à la lettre et le cash rentre.
