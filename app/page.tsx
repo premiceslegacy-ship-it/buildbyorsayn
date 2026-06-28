@@ -203,6 +203,15 @@ export default async function HomePage() {
       </section>
 
       {/* ================================================================
+          ÉCOSYSTÈME ORSAYN — juste après la social proof
+      ================================================================ */}
+      <section className="relative z-10 px-6 py-16 sm:py-20 border-t border-white/[0.05]">
+        <div className="max-w-2xl mx-auto">
+          <EcosystemMap variant="homepage" tier={currentTier} />
+        </div>
+      </section>
+
+      {/* ================================================================
           MANIFESTE - Storytelling + mécanisme unique
       ================================================================ */}
       <section className="relative z-10 px-6 py-28 sm:py-36">
@@ -541,15 +550,6 @@ export default async function HomePage() {
               <p className="text-xs text-[#8a8070] mt-3">Accès à vie - paiement unique</p>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* ================================================================
-          ÉCOSYSTÈME ORSAYN
-      ================================================================ */}
-      <section className="relative z-10 px-6 py-20 sm:py-24 border-t border-white/[0.05]">
-        <div className="max-w-2xl mx-auto">
-          <EcosystemMap variant="homepage" tier={currentTier} />
         </div>
       </section>
 
