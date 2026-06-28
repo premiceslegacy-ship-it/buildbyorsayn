@@ -48,11 +48,15 @@ const SKILL_PROMPTS = [
   },
   {
     skill: "Deep Research Verticale",
-    prompt: "Charge le fichier 10_PROMPT_UTILISATION_SIMPLE.md, remplis NICHE = \"[ta niche]\" et lance l'analyse complète.",
+    prompt: "Charge le fichier 10_PROMPT_UTILISATION_SIMPLE.md, remplis NICHE = \"[ta niche]\" et lance l'analyse complète. Produis le .md canonique et la page .html DA BUILD.",
   },
   {
     skill: "Deep Research Verticale",
-    prompt: "J'ai les fichiers 02 à 08 complétés. Charge-les tous et exécute le prompt 09 pour produire le dossier final de décision.",
+    prompt: "J'ai les fichiers 02 à 08 complétés. Charge-les tous et exécute le prompt 09 pour produire le dossier final, puis applique 11_OUTPUT_FORMAT_ET_LIVRABLE.md pour livrer le .md + le .html premium.",
+  },
+  {
+    skill: "Deep Research Verticale",
+    prompt: "Va dans la Meta Ad Library, cherche les pubs actives pour [niche] en [pays]. Extrais hook, angle, promesse, durée de diffusion et variantes. Croise avec les douleurs identifiées et propose l'angle unique encore inoccupé.",
   },
 ];
 
