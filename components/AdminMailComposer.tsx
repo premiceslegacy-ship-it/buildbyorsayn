@@ -53,7 +53,7 @@ const TEMPLATES: Record<TemplateKey, { label: string; icon: React.ReactNode; fil
       preheader: "Le contenu vient d'être mis à jour.",
       body: `BUILD vient d'être mis à jour.\n\n${updateTitle}\n\n${updateDesc}\n\nConnecte-toi pour voir les changements.`,
       ctaLabel: "Voir la mise à jour →",
-      ctaUrl: "https://buildbyorsayn.com/dashboard",
+      ctaUrl: "https://build-system-three.vercel.app/dashboard",
     }),
   },
 };
