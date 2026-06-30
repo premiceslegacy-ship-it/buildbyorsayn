@@ -14,6 +14,11 @@ const FONDATIONS_VIDEOS: { title: string; youtubeId: string; description?: strin
     youtubeId: "tcFGu_zNsPE",
     description: "De zéro compétence à antifragile numérique. La méthode en trois phases pour construire du capital organique avec l'IA.",
   },
+  {
+    title: "Le marché web en 2026 : positionnement, design systems et premiers clients",
+    youtubeId: "RCGFyJbGfM4",
+    description: "L'état du marché en clair : pourquoi le WordPress/Webflow est mort et comment prendre position aux deux extrêmes. Webcoding (Next.js + Vercel), design systems pour forcer l'IA à sortir du générique, et la stratégie pour décrocher les premiers clients.",
+  },
 ];
 
 function PaywallBanner({
