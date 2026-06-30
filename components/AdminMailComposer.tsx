@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Mail, Send, Users } from "lucide-react";
+import { Mail, Send, Users, Video, RefreshCw, FileText } from "lucide-react";
 
 type MailUser = {
   id: string;
@@ -18,12 +18,44 @@ type SendResult = {
   error?: string;
 };
 
+type TemplateKey = "blank" | "video" | "update";
+
 const AUDIENCE_LABELS: Record<Audience, string> = {
   selected: "Sélection",
   all: "Tous",
   free: "Gratuits",
   beginner: "Fondations",
   full: "Complet",
+};
+
+const TEMPLATES: Record<TemplateKey, { label: string; icon: React.ReactNode; fill: (vals: { videoTitle?: string; videoUrl?: string; updateTitle?: string; updateDesc?: string }) => { subject: string; preheader: string; body: string; ctaLabel: string; ctaUrl: string } }> = {
+  blank: {
+    label: "Vide",
+    icon: <FileText className="h-3.5 w-3.5" />,
+    fill: () => ({ subject: "", preheader: "", body: "", ctaLabel: "", ctaUrl: "" }),
+  },
+  video: {
+    label: "Nouvelle vidéo",
+    icon: <Video className="h-3.5 w-3.5" />,
+    fill: ({ videoTitle = "[Titre de la vidéo]", videoUrl = "" }) => ({
+      subject: `Nouvelle vidéo : ${videoTitle}`,
+      preheader: "Disponible maintenant dans ta bibliothèque BUILD.",
+      body: `Une nouvelle vidéo vient d'être ajoutée à BUILD.\n\n${videoTitle}\n\nElle illustre concrètement ce que tu apprends dans les modules - pas de théorie, que de l'actionnable.\n\nClique ci-dessous pour la regarder directement.`,
+      ctaLabel: "Regarder la vidéo →",
+      ctaUrl: videoUrl,
+    }),
+  },
+  update: {
+    label: "Mise à jour BUILD",
+    icon: <RefreshCw className="h-3.5 w-3.5" />,
+    fill: ({ updateTitle = "[Titre de la mise à jour]", updateDesc = "[Décris ce qui a changé]" }) => ({
+      subject: `Mise à jour BUILD : ${updateTitle}`,
+      preheader: "Le contenu vient d'être mis à jour.",
+      body: `BUILD vient d'être mis à jour.\n\n${updateTitle}\n\n${updateDesc}\n\nConnecte-toi pour voir les changements.`,
+      ctaLabel: "Voir la mise à jour →",
+      ctaUrl: "https://buildbyorsayn.com/dashboard",
+    }),
+  },
 };
 
 export function AdminMailComposer({ users }: { users: MailUser[] }) {
@@ -33,10 +65,17 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
   const [subject, setSubject] = useState("");
   const [preheader, setPreheader] = useState("");
   const [body, setBody] = useState("");
-  const [ctaLabel, setCtaLabel] = useState("Voir la mise à jour");
+  const [ctaLabel, setCtaLabel] = useState("");
   const [ctaUrl, setCtaUrl] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [result, setResult] = useState<SendResult | null>(null);
+
+  // Template state
+  const [activeTemplate, setActiveTemplate] = useState<TemplateKey>("blank");
+  const [videoTitle, setVideoTitle] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [updateTitle, setUpdateTitle] = useState("");
+  const [updateDesc, setUpdateDesc] = useState("");
 
   const selectedUsers = useMemo(
     () => users.filter((user) => selectedIds.includes(user.id)),
@@ -53,6 +92,27 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
     setSelectedIds((current) =>
       current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
     );
+  };
+
+  const applyTemplate = (key: TemplateKey) => {
+    setActiveTemplate(key);
+    setResult(null);
+    const filled = TEMPLATES[key].fill({ videoTitle, videoUrl, updateTitle, updateDesc });
+    setSubject(filled.subject);
+    setPreheader(filled.preheader);
+    setBody(filled.body);
+    setCtaLabel(filled.ctaLabel);
+    setCtaUrl(filled.ctaUrl);
+  };
+
+  const refreshTemplate = () => {
+    if (activeTemplate === "blank") return;
+    const filled = TEMPLATES[activeTemplate].fill({ videoTitle, videoUrl, updateTitle, updateDesc });
+    setSubject(filled.subject);
+    setPreheader(filled.preheader);
+    setBody(filled.body);
+    setCtaLabel(filled.ctaLabel);
+    setCtaUrl(filled.ctaUrl);
   };
 
   const sendEmail = async () => {
@@ -98,6 +158,86 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
         </div>
       </div>
 
+      {/* Template selector */}
+      <div className="mb-4">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-white/30">Template</p>
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(TEMPLATES) as TemplateKey[]).map((key) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => applyTemplate(key)}
+              className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                activeTemplate === key
+                  ? "border-[#e8d5b0]/40 bg-[#e8d5b0]/12 text-[#e8d5b0]"
+                  : "border-white/10 bg-white/[0.03] text-white/35 hover:bg-white/[0.06]"
+              }`}
+            >
+              {TEMPLATES[key].icon}
+              {TEMPLATES[key].label}
+            </button>
+          ))}
+        </div>
+
+        {/* Template fields */}
+        {activeTemplate === "video" && (
+          <div className="mt-3 flex flex-col gap-2 rounded-xl border border-[#e8d5b0]/15 bg-[#e8d5b0]/5 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#e8d5b0]/60">Infos vidéo</p>
+            <input
+              value={videoTitle}
+              onChange={(e) => setVideoTitle(e.target.value)}
+              onBlur={refreshTemplate}
+              placeholder="Titre de la vidéo"
+              className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80 outline-none placeholder:text-white/20 focus:border-[#e8d5b0]/40"
+            />
+            <input
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              onBlur={refreshTemplate}
+              placeholder="URL YouTube (https://youtu.be/...)"
+              className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80 outline-none placeholder:text-white/20 focus:border-[#e8d5b0]/40"
+            />
+            <button
+              type="button"
+              onClick={refreshTemplate}
+              className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-[#e8d5b0]/20 bg-[#e8d5b0]/10 px-3 py-1.5 text-xs text-[#e8d5b0]/80 transition-colors hover:bg-[#e8d5b0]/20"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Appliquer
+            </button>
+          </div>
+        )}
+
+        {activeTemplate === "update" && (
+          <div className="mt-3 flex flex-col gap-2 rounded-xl border border-[#e8d5b0]/15 bg-[#e8d5b0]/5 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#e8d5b0]/60">Infos mise à jour</p>
+            <input
+              value={updateTitle}
+              onChange={(e) => setUpdateTitle(e.target.value)}
+              onBlur={refreshTemplate}
+              placeholder="Titre de la mise à jour"
+              className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80 outline-none placeholder:text-white/20 focus:border-[#e8d5b0]/40"
+            />
+            <textarea
+              value={updateDesc}
+              onChange={(e) => setUpdateDesc(e.target.value)}
+              onBlur={refreshTemplate}
+              placeholder="Ce qui a changé, ce qui a été ajouté..."
+              rows={3}
+              className="resize-none rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80 outline-none placeholder:text-white/20 focus:border-[#e8d5b0]/40"
+            />
+            <button
+              type="button"
+              onClick={refreshTemplate}
+              className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-[#e8d5b0]/20 bg-[#e8d5b0]/10 px-3 py-1.5 text-xs text-[#e8d5b0]/80 transition-colors hover:bg-[#e8d5b0]/20"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Appliquer
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="flex flex-col gap-3">
           <input
@@ -123,7 +263,7 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
             <input
               value={ctaUrl}
               onChange={(event) => setCtaUrl(event.target.value)}
-              placeholder="URL du bouton, ex: https://youtube.com/..."
+              placeholder="URL du bouton"
               className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none transition-colors placeholder:text-white/20 focus:border-[#e8d5b0]/40"
             />
             <input
