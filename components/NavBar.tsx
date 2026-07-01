@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { GraduationCap, ShieldCheck, Menu, X } from "lucide-react";
+import { GraduationCap, ShieldCheck, Menu, X, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 interface NavBarProps {
@@ -26,9 +26,11 @@ export function NavBar({
 }: NavBarProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isFondationsOpen, setIsFondationsOpen] = useState(false);
   const desktopDropdownRef = useRef<HTMLDivElement>(null);
   const mobileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const fondationsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -42,6 +44,9 @@ export function NavBar({
       }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
         setIsMobileMenuOpen(false);
+      }
+      if (fondationsRef.current && !fondationsRef.current.contains(target)) {
+        setIsFondationsOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -75,6 +80,12 @@ export function NavBar({
         </button>
       )}
 
+      {hasFoundationAccess && (
+        <Link href="/protocole" className={`${linkClass("protocole")} pl-4`} onClick={() => setIsMobileMenuOpen(false)}>
+          Protocole Zéro
+        </Link>
+      )}
+
       {hasFoundationAccess ? (
         <Link href="/sources" className={linkClass("sources")} onClick={() => setIsMobileMenuOpen(false)}>
           La stack
@@ -86,12 +97,6 @@ export function NavBar({
         >
           La stack
         </button>
-      )}
-
-      {hasFoundationAccess && (
-        <Link href="/protocole" className={linkClass("protocole")} onClick={() => setIsMobileMenuOpen(false)}>
-          Protocole Zéro
-        </Link>
       )}
 
       <Link href="/skills" className={linkClass("skills")} onClick={() => setIsMobileMenuOpen(false)}>
@@ -110,13 +115,90 @@ export function NavBar({
     </>
   );
 
+  const desktopNavLinks = (
+    <>
+      <Link href="/dashboard" className={linkClass("dashboard")}>
+        Tableau de bord
+      </Link>
+
+      {hasFoundationAccess ? (
+        <div className="relative" ref={fondationsRef}>
+          <button
+            onClick={() => setIsFondationsOpen(!isFondationsOpen)}
+            className={`${linkClass("beginner")} flex items-center gap-1.5 bg-transparent border-none font-[inherit] text-sm cursor-pointer`}
+          >
+            <GraduationCap className="w-3.5 h-3.5" /> Fondations
+            <ChevronDown className={`w-3 h-3 transition-transform ${isFondationsOpen ? "rotate-180" : ""}`} />
+          </button>
+
+          {isFondationsOpen && (
+            <div className="absolute left-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-44 z-50 flex flex-col gap-0.5">
+              <Link
+                href="/beginner"
+                onClick={() => setIsFondationsOpen(false)}
+                className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
+                  activeLink === "beginner" ? "text-[#f0ede8] bg-white/5" : "text-white/50 hover:bg-white/5 hover:text-white/80"
+                }`}
+              >
+                Fondations
+              </Link>
+              <Link
+                href="/protocole"
+                onClick={() => setIsFondationsOpen(false)}
+                className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
+                  activeLink === "protocole" ? "text-[#f0ede8] bg-white/5" : "text-white/50 hover:bg-white/5 hover:text-white/80"
+                }`}
+              >
+                Protocole Zéro
+              </Link>
+            </div>
+          )}
+        </div>
+      ) : (
+        <button
+          onClick={() => onFondationsClick?.()}
+          className="text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5 bg-transparent border-none font-[inherit] text-sm cursor-pointer"
+        >
+          <GraduationCap className="w-3.5 h-3.5" /> Fondations
+        </button>
+      )}
+
+      {hasFoundationAccess ? (
+        <Link href="/sources" className={linkClass("sources")}>
+          La stack
+        </Link>
+      ) : (
+        <button
+          onClick={() => onStackClick?.()}
+          className="text-white/40 hover:text-white/80 transition-colors bg-transparent border-none font-[inherit] text-sm cursor-pointer"
+        >
+          La stack
+        </button>
+      )}
+
+      <Link href="/skills" className={linkClass("skills")}>
+        Skills
+      </Link>
+
+      <Link href="/videos" className={linkClass("videos")}>
+        Vidéos
+      </Link>
+
+      {displayEmail === "mbebourasam@gmail.com" && (
+        <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors">
+          <ShieldCheck className="w-4 h-4" />
+        </Link>
+      )}
+    </>
+  );
+
   return (
     <nav className="w-full max-w-7xl mx-auto flex items-center justify-between py-4 md:py-6 px-4 md:px-12 relative z-20">
       <Logo layout="horizontal" className="h-6" hideText={false} />
 
       {/* Desktop links */}
       <div className="hidden md:flex items-center gap-6 text-sm">
-        {navLinks}
+        {desktopNavLinks}
 
         <div className="relative" ref={desktopDropdownRef}>
           <button

@@ -27,6 +27,8 @@ type EnrichedUser = Profile & {
   lastEvent: string | null;
   events24h: number;
   pageViews24h: number;
+  pageViews7d: number;
+  pageViews30d: number;
 };
 
 type Presence = {
@@ -141,16 +143,32 @@ export default async function AdminPage() {
 
   const now = Date.now();
   const last24h = now - 24 * 60 * 60 * 1000;
-  const recentEvents = ((eventData as ActivityEvent[] | null) ?? []).filter(
+  const last7d = now - 7 * 24 * 60 * 60 * 1000;
+  const last30d = now - 30 * 24 * 60 * 60 * 1000;
+  const allEvents = (eventData as ActivityEvent[] | null) ?? [];
+  const recentEvents = allEvents.filter(
     (event) => new Date(event.created_at).getTime() >= last24h
   );
   const eventCountByUser = new Map<string, number>();
   const pageViewCountByUser = new Map<string, number>();
+  const pageViews7dByUser = new Map<string, number>();
+  const pageViews30dByUser = new Map<string, number>();
 
   for (const event of recentEvents) {
     eventCountByUser.set(event.user_id, (eventCountByUser.get(event.user_id) ?? 0) + 1);
     if (event.event_type === "page_view") {
       pageViewCountByUser.set(event.user_id, (pageViewCountByUser.get(event.user_id) ?? 0) + 1);
+    }
+  }
+
+  for (const event of allEvents) {
+    if (event.event_type !== "page_view") continue;
+    const t = new Date(event.created_at).getTime();
+    if (t >= last7d) {
+      pageViews7dByUser.set(event.user_id, (pageViews7dByUser.get(event.user_id) ?? 0) + 1);
+    }
+    if (t >= last30d) {
+      pageViews30dByUser.set(event.user_id, (pageViews30dByUser.get(event.user_id) ?? 0) + 1);
     }
   }
 
@@ -163,7 +181,16 @@ export default async function AdminPage() {
     lastEvent: presenceMap.get(p.id)?.last_event ?? null,
     events24h: eventCountByUser.get(p.id) ?? 0,
     pageViews24h: pageViewCountByUser.get(p.id) ?? 0,
-  }));
+    pageViews7d: pageViews7dByUser.get(p.id) ?? 0,
+    pageViews30d: pageViews30dByUser.get(p.id) ?? 0,
+  })).sort((a, b) => {
+    const aTime = a.lastActivity ?? a.lastSignIn;
+    const bTime = b.lastActivity ?? b.lastSignIn;
+    if (!aTime && !bTime) return 0;
+    if (!aTime) return 1;
+    if (!bTime) return -1;
+    return new Date(bTime).getTime() - new Date(aTime).getTime();
+  });
 
   const fullCount = users.filter((u) => u.tier === "full").length;
   const beginnerCount = users.filter((u) => u.tier === "beginner").length;
@@ -173,6 +200,12 @@ export default async function AdminPage() {
     return now - new Date(u.lastActivity).getTime() < 2 * 60 * 1000;
   }).length;
   const active24hCount = users.filter((u) => u.events24h > 0).length;
+  const active7dCount = users.filter((u) => u.pageViews7d > 0).length;
+  const inactive30dCount = users.filter((u) => {
+    const t = u.lastActivity ?? u.lastSignIn;
+    if (!t) return true;
+    return new Date(t).getTime() < last30d;
+  }).length;
   const pageViews24h = recentEvents.filter((event) => event.event_type === "page_view").length;
   const trackingSetupMissing = Boolean(presenceError || eventError);
 
@@ -219,11 +252,13 @@ export default async function AdminPage() {
         </div>
 
         {/* KPI cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-6">
           {[
             { label: "Utilisateurs", value: users.length, icon: Users },
             { label: "En ligne", value: onlineCount, icon: Activity },
             { label: "Actifs 24h", value: active24hCount, icon: MousePointerClick },
+            { label: "Actifs 7j", value: active7dCount, icon: MousePointerClick },
+            { label: "Inactifs 30j+", value: inactive30dCount, icon: Eye },
             { label: "Pages vues 24h", value: pageViews24h, icon: Eye },
             { label: "Gratuits", value: users.length - paidCount, icon: Users },
             { label: "Fondations", value: beginnerCount, icon: Users },
@@ -283,7 +318,7 @@ export default async function AdminPage() {
                     Page actuelle
                   </th>
                   <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold text-right">
-                    Events 24h
+                    Vues 24h / 7j / 30j
                   </th>
                   <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
                     Blocs terminés
@@ -394,9 +429,18 @@ export default async function AdminPage() {
                       </td>
 
                       <td className="px-5 py-4 text-right">
-                        <div className="flex flex-col items-end gap-1">
-                          <span className="text-sm font-semibold tabular-nums text-white/60">{u.events24h}</span>
-                          <span className="text-[11px] text-white/25">{u.pageViews24h} vues</span>
+                        <div className="flex items-center justify-end gap-1.5 tabular-nums">
+                          <span className={`text-sm font-semibold ${u.pageViews24h > 0 ? "text-[#e8d5b0]" : "text-white/25"}`}>
+                            {u.pageViews24h}
+                          </span>
+                          <span className="text-white/15 text-xs">/</span>
+                          <span className={`text-sm ${u.pageViews7d > 0 ? "text-white/60" : "text-white/25"}`}>
+                            {u.pageViews7d}
+                          </span>
+                          <span className="text-white/15 text-xs">/</span>
+                          <span className={`text-sm ${u.pageViews30d > 0 ? "text-white/40" : "text-white/25"}`}>
+                            {u.pageViews30d}
+                          </span>
                         </div>
                       </td>
 
@@ -455,7 +499,7 @@ export default async function AdminPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-white/20">
-          {users.length} utilisateur{users.length !== 1 ? "s" : ""} · données en temps réel
+          {users.length} utilisateur{users.length !== 1 ? "s" : ""} · triés par dernière activité · données en temps réel
         </p>
       </div>
     </main>
