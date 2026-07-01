@@ -78,6 +78,7 @@ const FONDATIONS_ITEMS = [
   { label: "GitHub + Vercel : déployer en 60 secondes", icon: GraduationCap },
   { label: "Skills Deep Research + UX/UI Premium inclus", icon: Zap },
   { label: "Le Protocole Zéro : de locataire à antifragile", icon: Check },
+  { label: "Vidéos tutos techniques (outils, configs, méthodes)", icon: Play },
 ];
 
 const SYSTEME_ITEMS = [
@@ -87,7 +88,27 @@ const SYSTEME_ITEMS = [
   { label: "Logique business : choisir une niche, vendre d'abord", icon: Zap },
   { label: "Identité visuelle forte : le système que j'utilise", icon: Layers },
   { label: "Sources et ressources exclusives", icon: GraduationCap },
+  { label: "Vidéos tutos techniques (outils, configs, méthodes)", icon: Play },
   { label: "Fondations incluses", icon: Check },
+];
+
+const FAQ_ITEMS = [
+  {
+    question: "C'est un paiement unique ou un abonnement ?",
+    answer: "Paiement unique. Aucun abonnement, aucun frais récurrent. Tu payes une fois, l'accès est à vie.",
+  },
+  {
+    question: "Quelle est la différence entre Fondations et Système Complet ?",
+    answer: "Fondations (97€) t'emmène de zéro à ton premier site en ligne : environnement IA, visuels, déploiement, Protocole Zéro. Système Complet (497€) inclut Fondations et ajoute les 7 blocs du framework ORACLE, les skills encodés, et la logique business complète.",
+  },
+  {
+    question: "Je n'ai aucune compétence technique, c'est fait pour moi ?",
+    answer: "Oui. Fondations part de zéro et couvre chaque étape concrètement - aucun prérequis technique.",
+  },
+  {
+    question: "Je peux commencer par Fondations puis passer au Système Complet ?",
+    answer: "Oui, à tout moment tu peux upgrader vers le Système Complet en ne payant que le complément.",
+  },
 ];
 
 export default async function HomePage() {
@@ -554,6 +575,29 @@ export default async function HomePage() {
       </section>
 
       {/* ================================================================
+          FAQ - Lever les objections avant le pricing
+      ================================================================ */}
+      <section className="relative z-10 px-6 py-20 sm:py-24 border-t border-white/[0.05]">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-7 text-center">
+            Questions fréquentes
+          </p>
+          <div className="flex flex-col gap-3">
+            {FAQ_ITEMS.map(({ question, answer }) => (
+              <div
+                key={question}
+                className="relative overflow-hidden bg-white/[0.025] border border-white/[0.06] rounded-xl px-5 py-4 shadow-[0_4px_16px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.04)]"
+              >
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent" />
+                <p className="text-sm font-semibold text-[#f0ede8] mb-1.5">{question}</p>
+                <p className="text-sm text-[#8a8070] leading-[1.7]">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================
           PRICING - Payer directement ici
       ================================================================ */}
       <section id="pricing" className="relative z-10 px-6 py-28 sm:py-36 border-t border-white/[0.05]">
@@ -704,6 +748,19 @@ export default async function HomePage() {
             Pas parce qu&apos;ils auront été plus rapides. Parce qu&apos;ils auront possédé
             quelque chose que les autres n&apos;auront jamais.
           </p>
+
+          {!(user && currentTier) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 text-left">
+              <div className="relative overflow-hidden bg-white/[0.03] border border-white/[0.07] rounded-xl p-5">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#e8d5b0] mb-1">Fondations - 97€</p>
+                <p className="text-xs text-white/40">De zéro à ton premier client, accès à vie, paiement unique.</p>
+              </div>
+              <div className="relative overflow-hidden bg-white/[0.03] border border-[#e8d5b0]/20 rounded-xl p-5">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#e8d5b0] mb-1">Système Complet - 497€</p>
+                <p className="text-xs text-white/40">Framework ORACLE, 7 blocs, skills encodés, Fondations incluses.</p>
+              </div>
+            </div>
+          )}
 
           {user && currentTier ? (
             <Link

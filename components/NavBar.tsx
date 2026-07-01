@@ -6,7 +6,7 @@ import { GraduationCap, ShieldCheck, Menu, X, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 interface NavBarProps {
-  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole";
+  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole" | "videos-tutos";
   tier?: string | null;
   displayName?: string;
   displayEmail?: string;
@@ -27,10 +27,12 @@ export function NavBar({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFondationsOpen, setIsFondationsOpen] = useState(false);
+  const [isVideosOpen, setIsVideosOpen] = useState(false);
   const desktopDropdownRef = useRef<HTMLDivElement>(null);
   const mobileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const fondationsRef = useRef<HTMLDivElement>(null);
+  const videosRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -47,6 +49,9 @@ export function NavBar({
       }
       if (fondationsRef.current && !fondationsRef.current.contains(target)) {
         setIsFondationsOpen(false);
+      }
+      if (videosRef.current && !videosRef.current.contains(target)) {
+        setIsVideosOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -105,6 +110,10 @@ export function NavBar({
 
       <Link href="/videos" className={linkClass("videos")} onClick={() => setIsMobileMenuOpen(false)}>
         Vidéos
+      </Link>
+
+      <Link href="/videos/tutos" className={`${linkClass("videos-tutos")} pl-4`} onClick={() => setIsMobileMenuOpen(false)}>
+        Vidéos tutos
       </Link>
 
       {displayEmail === "mbebourasam@gmail.com" && (
@@ -180,9 +189,38 @@ export function NavBar({
         Skills
       </Link>
 
-      <Link href="/videos" className={linkClass("videos")}>
-        Vidéos
-      </Link>
+      <div className="relative" ref={videosRef}>
+        <button
+          onClick={() => setIsVideosOpen(!isVideosOpen)}
+          className={`${linkClass("videos")} flex items-center gap-1.5 bg-transparent border-none font-[inherit] text-sm cursor-pointer`}
+        >
+          Vidéos
+          <ChevronDown className={`w-3 h-3 transition-transform ${isVideosOpen ? "rotate-180" : ""}`} />
+        </button>
+
+        {isVideosOpen && (
+          <div className="absolute left-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-44 z-50 flex flex-col gap-0.5">
+            <Link
+              href="/videos"
+              onClick={() => setIsVideosOpen(false)}
+              className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
+                activeLink === "videos" ? "text-[#f0ede8] bg-white/5" : "text-white/50 hover:bg-white/5 hover:text-white/80"
+              }`}
+            >
+              Vidéos
+            </Link>
+            <Link
+              href="/videos/tutos"
+              onClick={() => setIsVideosOpen(false)}
+              className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
+                activeLink === "videos-tutos" ? "text-[#f0ede8] bg-white/5" : "text-white/50 hover:bg-white/5 hover:text-white/80"
+              }`}
+            >
+              Vidéos tutos
+            </Link>
+          </div>
+        )}
+      </div>
 
       {displayEmail === "mbebourasam@gmail.com" && (
         <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors">

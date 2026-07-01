@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
-import { ArrowRight, Zap, Layers, GraduationCap, Lock } from "lucide-react";
+import { ArrowRight, Zap, Layers, GraduationCap, Lock, Play } from "lucide-react";
 import { BetaCodeForm } from "./BetaCodeForm";
 
 const STRIPE_FULL_URL = "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a";
@@ -14,6 +14,7 @@ const BEGINNER_FEATURES = [
     { icon: Layers, label: "IA, GitHub, IDE, Vercel" },
     { icon: GraduationCap, label: "Skills Deep Research + UX/UI Premium" },
     { icon: Layers, label: "Stack complète + Protocole Zéro" },
+    { icon: Play, label: "Vidéos tutos techniques" },
 ];
 
 const FULL_FEATURES = [
@@ -23,6 +24,7 @@ const FULL_FEATURES = [
     { icon: GraduationCap, label: "Fondations incluses" },
     { icon: Zap, label: "Skills Deep Research + UX/UI Premium" },
     { icon: Layers, label: "Stack complète + Protocole Zéro" },
+    { icon: Play, label: "Vidéos tutos techniques" },
 ];
 
 export default async function CheckoutPage() {
