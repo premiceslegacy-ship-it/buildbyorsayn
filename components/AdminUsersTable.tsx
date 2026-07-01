@@ -189,10 +189,7 @@ export function AdminUsersTable({ users, totalBlocs }: { users: EnrichedUser[]; 
                     {/* Tier selector */}
                     <td className="px-5 py-4">
                       <div className="flex gap-1.5">
-                        <form action={async () => {
-                          "use server";
-                          await setUserTier(u.id, null);
-                        }}>
+                        <form action={setUserTier.bind(null, u.id, null)}>
                           <button
                             type="submit"
                             className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
@@ -204,10 +201,7 @@ export function AdminUsersTable({ users, totalBlocs }: { users: EnrichedUser[]; 
                             Gratuit
                           </button>
                         </form>
-                        <form action={async () => {
-                          "use server";
-                          await setUserTier(u.id, "beginner");
-                        }}>
+                        <form action={setUserTier.bind(null, u.id, "beginner")}>
                           <button
                             type="submit"
                             className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
@@ -219,10 +213,7 @@ export function AdminUsersTable({ users, totalBlocs }: { users: EnrichedUser[]; 
                             Fondations
                           </button>
                         </form>
-                        <form action={async () => {
-                          "use server";
-                          await setUserTier(u.id, "full");
-                        }}>
+                        <form action={setUserTier.bind(null, u.id, "full")}>
                           <button
                             type="submit"
                             className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
