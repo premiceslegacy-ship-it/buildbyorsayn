@@ -12,7 +12,6 @@ const SKILLS_BUCKET = process.env.SUPABASE_SKILLS_BUCKET ?? "skills";
 const FILE_SKILLS: Record<string, string> = {
   "oracle-site-web": "oracle-site-web.md",
   "oracle-by-orsayn": "oracle-by-orsayn.md",
-  "expert-backend-v2": "expert-backend-v2.md",
 };
 
 function normalizeNotionMarkdown(raw: string) {
