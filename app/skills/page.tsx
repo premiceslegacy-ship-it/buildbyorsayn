@@ -29,34 +29,78 @@ const SKILL_USAGE_STEPS = [
   },
 ];
 
+const SKILL_WORKFLOW = [
+  {
+    step: "01",
+    title: "Deep Research Verticale",
+    body: "Tu choisis une niche. Le skill sort la vraie data du marché : douleurs à 3 niveaux, personas, concurrents, et les angles publicitaires que le marché paie déjà pour diffuser (Meta, TikTok, Google, LinkedIn). Tu sais si la niche mérite d'être attaquée avant d'écrire une ligne de code.",
+  },
+  {
+    step: "02",
+    title: "ORACLE by Orsayn",
+    body: "Il prend ta recherche marché comme entrée, cadre le produit avec toi en langage simple, puis délègue automatiquement l'UX/UI et le backend aux bons skills. Tu ressors avec les documents qui bloquent tout code prématuré.",
+  },
+  {
+    step: "03",
+    title: "UX/UI Design",
+    body: "Choisis un design system prêt à l'emploi dans le catalogue, ou envoie une image et le skill en extrait le pattern exact (couleurs, typo, structure) pour que ton produit transpire vraiment cette direction, pas un à-peu-près.",
+  },
+  {
+    step: "04",
+    title: "Backend Orsayn",
+    body: "Le skill qui empêche ton produit d'exposer les données de tes clients. RLS, validation, sécurité des agents IA, webhooks, performance : il audite l'existant ou construit le neuf, un plan validé avant chaque bloc de code.",
+  },
+  {
+    step: "05",
+    title: "ORACLE Site Web",
+    body: "Une fois le produit prêt, ce skill écrit la landing page à partir de la recherche marché et du design system du produit : même famille visuelle, copy qui vient des vraies objections du marché, pas de l'imagination.",
+  },
+];
+
 const SKILL_PROMPTS = [
   {
     skill: "Tous les skills",
     prompt: "Charge ce skill et adapte-le à mon projet : [contexte, cible, offre, stack].",
   },
   {
-    skill: "UX/UI Design",
-    prompt: "Remplace les références visuelles par celles-ci et garde uniquement les standards qualité.",
+    skill: "Deep Research Verticale",
+    prompt: "Charge le fichier 10_PROMPT_UTILISATION_SIMPLE.md, remplis NICHE = \"[ta niche]\" et lance l'analyse complète : marché, personas, psychologie d'achat, concurrents et angles publicitaires réels.",
+  },
+  {
+    skill: "Deep Research Verticale",
+    prompt: "Va dans la Meta Ad Library et le Google Ads Transparency Center, cherche les pubs actives pour [niche] en [pays]. Extrais hook, angle, promesse, durée de diffusion et variantes, puis dis-moi ce qui tourne depuis 6 mois (ce qui convertit) et ce qui a été coupé (ce qui ne marche pas).",
+  },
+  {
+    skill: "Deep Research Verticale",
+    prompt: "Produis les 8 CSV et le Research Hub (page HTML DA BUILD avec les CSV téléchargeables) à partir de cette recherche, pour que je puisse tout réexploiter avec n'importe quel LLM.",
+  },
+  {
+    skill: "ORACLE by Orsayn",
+    prompt: "Voici ma recherche deep-research-vertical sur [niche]. Cadre mon projet [type de produit] à partir de cette recherche, sans me refaire l'interview marché.",
   },
   {
     skill: "UX/UI Design",
-    prompt: "Audite mon site/app avec ce skill, puis propose les corrections prioritaires.",
+    prompt: "Montre-moi le catalogue de design systems et recommande-moi le plus adapté à [type de produit, registre attendu].",
+  },
+  {
+    skill: "UX/UI Design",
+    prompt: "Voici une image [screenshot/site/app]. Extrais le pattern exact et applique-le à mon projet : [contexte].",
+  },
+  {
+    skill: "UX/UI Design",
+    prompt: "Audite mon site/app avec ce skill, puis propose les corrections prioritaires classées critique/important/mineur.",
+  },
+  {
+    skill: "Backend Orsayn",
+    prompt: "Audite la sécurité de mon backend [Supabase/Next.js] : RLS, validation des inputs, webhooks, permissions. Classe chaque écart critique/important/mineur.",
+  },
+  {
+    skill: "ORACLE Site Web",
+    prompt: "Mon produit est cadré avec ORACLE by Orsayn. Construis la landing page à partir du BRIEF, du DESIGN-SYSTEM et de la recherche marché associée.",
   },
   {
     skill: "ORACLE Site Web",
     prompt: "Crée une version Ultra Lean pour valider cette landing page en une session.",
-  },
-  {
-    skill: "Deep Research Verticale",
-    prompt: "Charge le fichier 10_PROMPT_UTILISATION_SIMPLE.md, remplis NICHE = \"[ta niche]\" et lance l'analyse complète. Produis le .md canonique et la page .html DA BUILD.",
-  },
-  {
-    skill: "Deep Research Verticale",
-    prompt: "J'ai les fichiers 02 à 08 complétés. Charge-les tous et exécute le prompt 09 pour produire le dossier final, puis applique 11_OUTPUT_FORMAT_ET_LIVRABLE.md pour livrer le .md + le .html premium.",
-  },
-  {
-    skill: "Deep Research Verticale",
-    prompt: "Va dans la Meta Ad Library, cherche les pubs actives pour [niche] en [pays]. Extrais hook, angle, promesse, durée de diffusion et variantes. Croise avec les douleurs identifiées et propose l'angle unique encore inoccupé.",
   },
 ];
 
@@ -126,6 +170,40 @@ export default function SkillsPage() {
             Ce sont les skills que j'ai configurés pour moi et pour mon écosystème. Je les utilise au quotidien pour cadrer, construire et auditer mes projets. Tu peux bien évidemment les adapter à ta manière de travailler, à ton marché et à tes propres projets.
           </p>
         </header>
+
+        <section className="mb-10">
+          <LiquidCard className="p-5 sm:p-6">
+            <div className="relative z-10">
+              <div className="max-w-3xl">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#e8d5b0] font-semibold mb-2">
+                  Le workflow
+                </p>
+                <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8]">
+                  Ces skills ne sont pas des fichiers isolés. C'est une chaîne.
+                </h2>
+                <p className="mt-3 text-sm sm:text-base text-white/50 leading-relaxed">
+                  Chacun consomme ce que le précédent a produit. Tu peux en utiliser un seul, mais l'enchaînement complet est ce qui te fait gagner le plus de temps : la data marché devient le cadrage produit, le cadrage devient le design, le design devient la landing page.
+                </p>
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {SKILL_WORKFLOW.map((item) => (
+                  <div key={item.step} className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-4">
+                    <p className="text-[11px] font-mono text-[#e8d5b0]/70 mb-1">
+                      {item.step}
+                    </p>
+                    <h3 className="text-sm font-semibold text-[#f0ede8]">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-xs leading-relaxed text-white/45">
+                      {item.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </LiquidCard>
+        </section>
 
         <section className="mb-10">
           <LiquidCard className="p-5 sm:p-6">
