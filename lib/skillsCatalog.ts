@@ -45,7 +45,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "deep-research-vertical",
     title: "Deep Research Verticale",
     description:
-      "Le système complet de recherche marché : 13 prompts pour analyser une niche avec de la data réelle. Marché, ICP, personas, douleurs profondes, psychologie d'achat, canaux, wedges, offre V1, ads intelligence complète (Meta, TikTok, Google, LinkedIn : angles prouvés et cimetière des angles morts), 8 CSV exploitables par LLM et Research Hub final en page web DA BUILD. La bonne data, c'est la recette - une fois que tu l'as, l'IA peut répliquer la sauce à l'infini.",
+      "Le système complet de recherche marché : 14 prompts pour analyser une niche avec de la data réelle - et savoir si elle vaut le coup. Marché, ICP, personas, douleurs profondes, psychologie d'achat, canaux, wedges, offre V1, ads intelligence complète (Meta, TikTok, Google, LinkedIn : angles prouvés et cimetière des angles morts), verdict stratégique avec feu vert/orange/rouge (anomalie de marché à exploiter vite ou ligne durable, risque des mises à jour de modèles IA), 8 CSV exploitables par LLM et Research Hub final en page web DA BUILD. Si tu n'as pas d'idée, le skill t'en propose 3 sur la base de ton profil.",
     access: "beginner",
     fileName: "deep-research-vertical.zip",
   },
