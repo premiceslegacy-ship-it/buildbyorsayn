@@ -237,7 +237,13 @@ export const BLOCS_DATA = [
           "La règle à retenir : modèle puissant pour penser, modèle adapté pour exécuter, session fraîche pour construire. Le plan coûte un peu plus cher au départ, mais il évite les semaines de correction après.",
       },
     ],
-    videos: [],
+    videos: [
+      {
+        title: "L'ordre mental avant de construire",
+        youtubeId: "UbCE1m0DYe8",
+        description: "Comment structurer un projet web : du brief au développement, sans sauter les étapes.",
+      },
+    ],
   },
   {
     id: "4",
