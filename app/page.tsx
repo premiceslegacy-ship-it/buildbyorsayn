@@ -168,9 +168,9 @@ export default async function HomePage() {
         </p>
 
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.12] text-[#f0ede8] max-w-4xl mx-auto mb-6">
-          Passe de locataire numérique
+          Arrête d&apos;utiliser l&apos;IA.
           <br />
-          <span className="text-[#c9b48a]">à propriétaire de ton infrastructure IA.</span>
+          <span className="text-[#c9b48a]">Construis avec, et fais-en de l&apos;argent.</span>
         </h1>
 
         <p className="text-[#8a8070] text-lg leading-[1.75] max-w-xl mx-auto mb-12">
