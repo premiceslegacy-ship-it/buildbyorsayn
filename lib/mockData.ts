@@ -264,6 +264,24 @@ export const BLOCS_DATA = [
           "Les deux chemins mènent au même endroit : un actif que tu possèdes, que tu peux charger en contexte dans un LLM, et qui produit un output de qualité professionnelle sans repartir de zéro à chaque fois.",
       },
       {
+        id: "b4-s1b",
+        title: "Le framework de décomposition : le 80/20 de l'IA",
+        content:
+          "Voilà la stratégie derrière tous les skills de ce système. Ce n'est pas un secret de prompt. C'est une méthode de pensée, et c'est elle que tu dois voler.\n\n" +
+          "Prends n'importe quel métier, produit ou résultat business : un site qui vend, un SaaS, une campagne d'ads, une stratégie SEO, un closing. En surface, ça a l'air d'être UNE compétence. En réalité, c'est toujours un empilement de sous-métiers.\n\n" +
+          "Un site qui vend, ce n'est pas \"faire un site\". C'est un copywriter (titres, CTA, objections), un designer UI (direction artistique, tokens), un spécialiste UX (parcours, friction, mobile), un expert CRO (preuve sociale, psychologie de conversion, formulaires), un SEO (arborescence, intentions de recherche, données structurées), un développeur performance (Core Web Vitals), un profil sécurité (validation, rate limiting). Sept métiers. Une agence facture ça très cher précisément parce qu'il faut sept personnes compétentes.\n\n" +
+          "Un SaaS pareil : recherche marché, positionnement, pricing, onboarding/activation, design system, architecture backend, sécurité, emails transactionnels, analytics. Chaque sous-domaine a ses experts de référence, ses règles, ses benchmarks, ses erreurs classiques.\n\n" +
+          "---\n\n" +
+          "La méthode, en quatre étapes :\n\n" +
+          "1. DÉCOMPOSE. Prends le résultat visé et liste tous les sous-métiers et sous-compétences qui y contribuent. Pose la question à l'IA : \"si une entreprise de classe mondiale devait produire ce résultat, quels métiers seraient autour de la table ?\" Continue jusqu'à ce que chaque sous-domaine soit assez précis pour avoir SES références.\n\n" +
+          "2. CHASSE L'EXPERTISE, sous-domaine par sous-domaine. Deux sources. Ta propre pratique et ta data (tes projets, tes erreurs, tes clients, ce qui a marché). Et celle des meilleurs : les praticiens aux résultats mesurés, les études chiffrées, les benchmarks publics, les frameworks qui ont fait leurs preuves. C'est le Protocole Zéro appliqué aux skills : tu n'es pas encore l'expert, mais l'expertise existe quelque part - va la capturer, source par source.\n\n" +
+          "3. FORMALISE en skill. Chaque sous-domaine devient une section ou un skill : les règles, les chiffres qui tranchent, les critères de décision, les interdits, les templates. Pas \"sois un bon copywriter\" - mais \"CTA 4 mots max orientés bénéfice, première personne, jamais de verbe d'obligation\". La différence entre les deux, c'est la différence entre un prompt Instagram à 9€ et un actif.\n\n" +
+          "4. CHAÎNE. Les sous-skills s'articulent dans l'ordre de production réel : la recherche nourrit le cadrage, le cadrage nourrit le design, le design nourrit le build. C'est la section suivante.\n\n" +
+          "---\n\n" +
+          "C'est exactement comme ça que les skills de ce système ont été construits. Deep Research Verticale, c'est la décomposition du métier d'analyste marché : Schwartz pour la conscience, Hormozi pour l'offre, les ad libraries pour les angles prouvés. ORACLE, c'est la décomposition du métier de product manager : positionnement, PRD, onboarding, monétisation, chacun nourri des meilleures pratiques mesurées du domaine. UX/UI, c'est la décomposition du métier de directeur artistique : taxonomie des styles, extraction de pattern, anti-slop, système d'icônes. Backend Orsayn, c'est sept sous-métiers de la sécurité et de l'infra, un sous-skill chacun.\n\n" +
+          "Et c'est comme ça que tu construiras les tiens. Ton métier, ta niche, ton produit : décompose, chasse, formalise, chaîne. Pourquoi c'est le 80/20 de l'IA ? Parce que le modèle, tout le monde a le même. Le contexte, non. 20% de travail de structuration - la décomposition et la capture d'expertise - produit 80% de l'écart entre tes outputs et ceux du marché. Ceux qui achètent des packs de prompts génériques louent le même contexte que tout le monde. Toi, tu possèdes le tien.",
+      },
+      {
         id: "b4-s2",
         title: "Grouper les skills, construire la chaîne de valeur",
         content:

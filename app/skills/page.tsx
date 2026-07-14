@@ -29,6 +29,52 @@ const SKILL_USAGE_STEPS = [
   },
 ];
 
+const SKILL_METHOD_STEPS = [
+  {
+    step: "01",
+    title: "Décompose",
+    body: "Prends le résultat visé (site qui vend, SaaS, campagne ads) et liste les sous-métiers qui y contribuent. Un site qui vend = copywriter + UI + UX + CRO + SEO + performance + sécurité. Sept métiers, pas un.",
+  },
+  {
+    step: "02",
+    title: "Chasse l'expertise",
+    body: "Sous-domaine par sous-domaine : ta propre pratique et ta data, ou celle des meilleurs praticiens mesurés (Protocole Zéro appliqué aux skills). Benchmarks chiffrés, frameworks prouvés, jamais de généralités.",
+  },
+  {
+    step: "03",
+    title: "Formalise",
+    body: "Chaque sous-domaine devient des règles, des chiffres qui tranchent, des critères de décision et des interdits. Pas \"sois un bon copywriter\" - mais \"CTA 4 mots max, orienté bénéfice, première personne\".",
+  },
+  {
+    step: "04",
+    title: "Chaîne",
+    body: "Les skills s'articulent dans l'ordre de production réel : la recherche nourrit le cadrage, le cadrage nourrit le design, le design nourrit la landing page. Un système, pas une collection.",
+  },
+];
+
+const SKILL_METHOD_EXAMPLES = [
+  {
+    skill: "Deep Research Verticale",
+    body: "Décomposition du métier d'analyste marché : Schwartz (conscience), Hormozi (offre), Wiebe (langage client), ad libraries publiques (angles prouvés par l'argent dépensé).",
+  },
+  {
+    skill: "ORACLE by Orsayn",
+    body: "Décomposition du métier de product manager : positionnement (Dunford), JTBD, PRD des meilleures équipes produit, benchmarks d'activation et de monétisation.",
+  },
+  {
+    skill: "UX/UI Design",
+    body: "Décomposition du métier de directeur artistique : taxonomie des styles, extraction de pattern mesurée, protocole anti AI-slop, systèmes d'icônes et tokens.",
+  },
+  {
+    skill: "Backend Orsayn",
+    body: "Décomposition de la sécurité et de l'infra en 7 sous-métiers (RLS, API, agents IA, webhooks, perf, conformité, migration) : un sous-skill chacun, mapping OWASP.",
+  },
+  {
+    skill: "ORACLE Site Web",
+    body: "Décomposition du site qui vend en 10 sous-domaines : copy et CTA, arborescence, preuve sociale, psychologie de conversion, formulaires, SEO/GEO, performance, mesure.",
+  },
+];
+
 const SKILL_WORKFLOW = [
   {
     step: "01",
@@ -170,6 +216,58 @@ export default function SkillsPage() {
             Ce sont les skills que j'ai configurés pour moi et pour mon écosystème. Je les utilise au quotidien pour cadrer, construire et auditer mes projets. Tu peux bien évidemment les adapter à ta manière de travailler, à ton marché et à tes propres projets.
           </p>
         </header>
+
+        <section className="mb-10">
+          <LiquidCard className="p-5 sm:p-6">
+            <div className="relative z-10">
+              <div className="max-w-3xl">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#e8d5b0] font-semibold mb-2">
+                  La méthode
+                </p>
+                <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8]">
+                  Comment ces skills ont été pensés - et comment penser les tiens.
+                </h2>
+                <p className="mt-3 text-sm sm:text-base text-white/50 leading-relaxed">
+                  Chaque skill vient du même framework : prendre un métier ou un résultat business, le décomposer en sous-métiers et sous-compétences, puis mettre dans chaque sous-domaine la meilleure expertise disponible - la nôtre quand on a la data, celle des meilleurs praticiens mesurés sinon. C'est le 80/20 de l'IA : le modèle, tout le monde a le même ; le contexte, non. C'est ce qui sépare un actif d'un pack de prompts génériques vendu sur Insta. Le détail complet est dans le Bloc 4.
+                </p>
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {SKILL_METHOD_STEPS.map((item) => (
+                  <div key={item.step} className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-4">
+                    <p className="text-[11px] font-mono text-[#e8d5b0]/70 mb-1">
+                      {item.step}
+                    </p>
+                    <h3 className="text-sm font-semibold text-[#f0ede8]">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-xs leading-relaxed text-white/45">
+                      {item.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 rounded-xl border border-[#e8d5b0]/15 bg-[#e8d5b0]/[0.045] p-4">
+                <p className="text-sm font-semibold text-[#e8d5b0] mb-3">
+                  La méthode appliquée : comment chaque skill a été construit
+                </p>
+                <div className="grid gap-2">
+                  {SKILL_METHOD_EXAMPLES.map((item) => (
+                    <div key={item.skill} className="rounded-lg bg-black/20 px-3 py-2">
+                      <p className="text-[10px] uppercase tracking-[0.16em] text-[#e8d5b0]/75">
+                        {item.skill}
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-white/55">
+                        {item.body}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </LiquidCard>
+        </section>
 
         <section className="mb-10">
           <LiquidCard className="p-5 sm:p-6">
