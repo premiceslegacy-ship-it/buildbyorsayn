@@ -105,48 +105,29 @@ const SKILL_WORKFLOW = [
 
 const SKILL_PROMPTS = [
   {
-    skill: "Tous les skills",
-    prompt: "Charge ce skill et adapte-le à mon projet : [contexte, cible, offre, stack].",
-  },
-  {
     skill: "Deep Research Verticale",
+    role: "Analyse une niche avec de la vraie data marché - douleurs, personas, concurrents, angles publicitaires prouvés - avant de construire quoi que ce soit.",
     prompt: "Charge le fichier 10_PROMPT_UTILISATION_SIMPLE.md, remplis NICHE = \"[ta niche]\" et lance l'analyse complète : marché, personas, psychologie d'achat, concurrents et angles publicitaires réels.",
   },
   {
-    skill: "Deep Research Verticale",
-    prompt: "Va dans la Meta Ad Library et le Google Ads Transparency Center, cherche les pubs actives pour [niche] en [pays]. Extrais hook, angle, promesse, durée de diffusion et variantes, puis dis-moi ce qui tourne depuis 6 mois (ce qui convertit) et ce qui a été coupé (ce qui ne marche pas).",
-  },
-  {
-    skill: "Deep Research Verticale",
-    prompt: "Produis les 8 CSV et le Research Hub (page HTML DA BUILD avec les CSV téléchargeables) à partir de cette recherche, pour que je puisse tout réexploiter avec n'importe quel LLM.",
-  },
-  {
     skill: "ORACLE by Orsayn",
-    prompt: "Voici ma recherche deep-research-vertical sur [niche]. Cadre mon projet [type de produit] à partir de cette recherche, sans me refaire l'interview marché.",
+    role: "Cadre un produit (app, SaaS, outil interne) en langage simple : interview, documents fondateurs, décisions structurantes avant le code.",
+    prompt: "Voici ma recherche deep-research-vertical sur [niche] (ou dis-le si tu n'en as pas encore). Cadre mon projet [type de produit] avec ORACLE by Orsayn.",
   },
   {
     skill: "UX/UI Design",
-    prompt: "Montre-moi le catalogue de design systems et recommande-moi le plus adapté à [type de produit, registre attendu].",
-  },
-  {
-    skill: "UX/UI Design",
-    prompt: "Voici une image [screenshot/site/app]. Extrais le pattern exact et applique-le à mon projet : [contexte].",
-  },
-  {
-    skill: "UX/UI Design",
-    prompt: "Audite mon site/app avec ce skill, puis propose les corrections prioritaires classées critique/important/mineur.",
+    role: "Construit la direction artistique et le design system de n'importe quel projet, à partir de tes références ou d'un style que tu choisis - zéro rendu générique.",
+    prompt: "Voici mes références [captures/sites], ou dis-moi si je n'ai pas de préférence : recommande-moi un style. Construis la DA et le design system de [mon projet].",
   },
   {
     skill: "Backend Orsayn",
+    role: "Audite ou construit un backend complet - auth, RLS, API, sécurité, performance - avec un plan validé avant chaque bloc de code.",
     prompt: "Audite la sécurité de mon backend [Supabase/Next.js] : RLS, validation des inputs, webhooks, permissions. Classe chaque écart critique/important/mineur.",
   },
   {
     skill: "ORACLE Site Web",
+    role: "Construit une landing page ou un site qui convertit : copy orienté bénéfice, structure, SEO/GEO, performance Lighthouse 100.",
     prompt: "Mon produit est cadré avec ORACLE by Orsayn. Construis la landing page à partir du BRIEF, du DESIGN-SYSTEM et de la recherche marché associée.",
-  },
-  {
-    skill: "ORACLE Site Web",
-    prompt: "Crée une version Ultra Lean pour valider cette landing page en une session.",
   },
 ];
 
@@ -333,15 +314,18 @@ export default function SkillsPage() {
 
               <div className="mt-5 rounded-xl border border-[#e8d5b0]/15 bg-[#e8d5b0]/[0.045] p-4">
                 <p className="text-sm font-semibold text-[#e8d5b0] mb-3">
-                  Prompts utiles pour interagir avec l'IA
+                  Un skill, un rôle, un prompt pour démarrer
                 </p>
                 <div className="grid gap-2">
                   {SKILL_PROMPTS.map((item) => (
-                    <div key={`${item.skill}-${item.prompt}`} className="rounded-lg bg-black/20 px-3 py-2">
+                    <div key={item.skill} className="rounded-lg bg-black/20 px-3 py-2.5">
                       <p className="text-[10px] uppercase tracking-[0.16em] text-[#e8d5b0]/75">
                         {item.skill}
                       </p>
-                      <p className="mt-1 text-xs leading-relaxed text-white/55">
+                      <p className="mt-1 text-xs leading-relaxed text-white/70">
+                        {item.role}
+                      </p>
+                      <p className="mt-1.5 text-xs leading-relaxed text-white/50 italic">
                         {item.prompt}
                       </p>
                     </div>
