@@ -7,7 +7,12 @@ export const metadata: Metadata = {
   title: "Connexion | BUILD",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mode?: string }>;
+}) {
+  const { mode } = await searchParams;
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-[#0e0e0f]">
       {/* Logo en haut à gauche */}
@@ -21,7 +26,7 @@ export default function LoginPage() {
       <div className="flex flex-col items-center space-y-8 sm:space-y-12 relative z-10 w-full max-w-[400px]">
         <LiquidCard className="w-full p-6 sm:p-8">
           <div className="flex flex-col space-y-8 relative z-10">
-            <LoginForm />
+            <LoginForm initialMode={mode === "signup" ? "signup" : "login"} />
           </div>
         </LiquidCard>
       </div>

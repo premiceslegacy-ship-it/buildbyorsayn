@@ -9,9 +9,9 @@ import { createClient } from "@/lib/supabase/client";
 
 type Mode = "login" | "signup";
 
-export function LoginForm() {
+export function LoginForm({ initialMode = "login" }: { initialMode?: Mode }) {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("login");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [errors, setErrors] = useState({ email: "", password: "", auth: "" });
   const [info, setInfo] = useState("");
   const [isLoading, setIsLoading] = useState(false);

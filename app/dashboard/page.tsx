@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Flag, Lock, X } from "lucide-react";
+import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Flag, Lock, X, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { BLOCS_DATA } from "@/lib/mockData";
@@ -18,6 +18,7 @@ import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 import { Suspense } from "react";
 import { UpgradedBanner } from "@/components/UpgradedBanner";
 import { EcosystemMap } from "@/components/EcosystemMap";
+import { UpgradeCarousel } from "@/components/UpgradeCarousel";
 
 const ICONS: Record<string, any> = {
   "1": Workflow,
@@ -186,9 +187,12 @@ export default function DashboardHub() {
                 <p className="text-sm font-semibold text-[#e8d5b0]">Tu n&apos;as encore rien à toi.</p>
                 <p className="text-xs text-white/40 mt-0.5">Le Bloc 1 est gratuit. Le reste du système te donne les fichiers, skills et méthodes pour construire des lignes verticales IA qui rapportent.</p>
               </div>
-              <a href={`${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`} className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap">
-                Prendre le système complet <ArrowRight className="w-3 h-3" />
-              </a>
+              <button
+                onClick={() => setModal("both")}
+                className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap cursor-pointer"
+              >
+                Voir les offres <ArrowRight className="w-3 h-3" />
+              </button>
             </div>
           ) : null}
 
@@ -199,9 +203,33 @@ export default function DashboardHub() {
                 <p className="text-sm font-semibold text-[#e8d5b0]">Les fondations, c&apos;est le départ. Le système complet, c&apos;est ce qui construit.</p>
                 <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs, les sources et les méthodes complètes. 400€ de complément - une seule fois.</p>
               </div>
-              <a href={`${checkoutUrls.upgrade ?? checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`} className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap">
+              <button
+                onClick={() => setModal("both")}
+                className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap cursor-pointer"
+              >
                 Passer au complet <ArrowRight className="w-3 h-3" />
-              </a>
+              </button>
+            </div>
+          )}
+
+          {/* Relance contextuelle accompagnement - dès qu'il y a un signal d'engagement réel */}
+          {isLoaded && (getBlocProgress("1") >= 100 || tier === "beginner" || tier === "full") && (
+            <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/[0.02] border border-white/[0.07] rounded-xl px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 flex items-center justify-center">
+                  <PhoneCall className="w-3.5 h-3.5 text-[#e8d5b0]" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#f0ede8]">Tu avances. Tu veux aller plus vite ?</p>
+                  <p className="text-xs text-white/40 mt-0.5">3 semaines en 1:1 avec moi jusqu&apos;à ton lancement. Un call gratuit pour voir si ça a du sens.</p>
+                </div>
+              </div>
+              <Link
+                href="/accompagnement"
+                className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#e8d5b0] border border-[#e8d5b0]/30 hover:border-[#e8d5b0]/50 hover:bg-[#e8d5b0]/5 transition-all duration-150 px-4 py-2.5 rounded-lg whitespace-nowrap"
+              >
+                Découvrir l&apos;accompagnement <ArrowRight className="w-3 h-3" />
+              </Link>
             </div>
           )}
         </header>
@@ -382,7 +410,7 @@ export default function DashboardHub() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 sm:p-6"
           onClick={() => setModal(null)}
         >
-          <div className="relative w-full max-w-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             {/* Close button */}
             <button
               onClick={() => setModal(null)}
@@ -391,73 +419,30 @@ export default function DashboardHub() {
               <X className="w-5 h-5" />
             </button>
 
-            <div className={tier !== "beginner" && modal === "both" ? "grid grid-cols-1 md:grid-cols-2 gap-5" : "max-w-sm mx-auto"}>
-              {/* Fondations card - uniquement si pas encore beginner */}
-              {tier !== "beginner" && (
-                <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 flex flex-col backdrop-blur-xl">
-                  <div className="mb-5">
-                    <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Fondations</span>
-                    <div className="flex items-baseline gap-1 mt-2 mb-1">
-                      <span className="text-3xl font-bold text-[#f0ede8]">97€</span>
-                      <span className="text-white/40 text-sm">TTC</span>
-                    </div>
-                    <p className="text-white/40 text-xs">Accès à vie aux fondations</p>
-                  </div>
-                  <ul className="space-y-2 mb-6 flex-1">
-                    {["5 modules pour construire", "De zéro à un site en ligne", "Skills Deep Research + UX/UI", "Stack complète + Protocole Zéro"].map((f) => (
-                      <li key={f} className="text-xs text-white/55 flex items-center gap-2">
-                        <span className="w-1 h-1 rounded-full bg-[#e8d5b0]/50 flex-shrink-0" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <a
-                    href={checkoutUrls.beginner
-                      ? `${checkoutUrls.beginner}${userId ? `?client_reference_id=${userId}` : ""}`
-                      : "/checkout"
-                    }
-                    className="flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm"
-                  >
-                    Démarrer pour 97€
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              )}
+            <UpgradeCarousel
+              showFondations={tier !== "beginner" && modal === "both"}
+              fondationsUrl={checkoutUrls.beginner
+                ? `${checkoutUrls.beginner}${userId ? `?client_reference_id=${userId}` : ""}`
+                : "/checkout"
+              }
+              systemeUrl={tier === "beginner"
+                ? `${checkoutUrls.upgrade ?? checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
+                : `${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
+              }
+              systemePrice={tier === "beginner" ? "400" : "497"}
+            />
 
-              {/* Accès complet - toujours affiché dans modal "both", ou si beginner */}
-              {(modal === "both" || tier === "beginner") && (
-                <div className="bg-white/[0.04] border border-[#e8d5b0]/25 rounded-2xl p-6 flex flex-col relative backdrop-blur-xl">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] rounded-full px-3 py-1">Le vrai choix</span>
-                  </div>
-                  <div className="mb-5">
-                    <span className="text-xs font-medium text-[#e8d5b0] uppercase tracking-wider">Système Complet</span>
-                    <div className="flex items-baseline gap-1 mt-2 mb-1">
-                      <span className="text-3xl font-bold text-[#f0ede8]">{tier === "beginner" ? "400€" : "497€"}</span>
-                      <span className="text-white/40 text-sm">TTC</span>
-                    </div>
-                    <p className="text-white/40 text-xs">{tier === "beginner" ? "Complément - accès à vie au système complet" : "Accès à vie - tout le système, une seule fois"}</p>
-                  </div>
-                  <ul className="space-y-2 mb-6 flex-1">
-                    {["7 blocs de système complets", "Méthodes actionnables", "Sources et ressources", "Fondations incluses", "Skills Deep Research + UX/UI", "Stack + Protocole Zéro"].map((f) => (
-                      <li key={f} className="text-xs text-white/55 flex items-center gap-2">
-                        <span className="w-1 h-1 rounded-full bg-[#e8d5b0]/50 flex-shrink-0" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <a
-                    href={tier === "beginner"
-                      ? `${checkoutUrls.upgrade ?? checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
-                      : `${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
-                    }
-                    className="flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] text-sm"
-                  >
-                    {tier === "beginner" ? "Passer au complet - 400€" : "Prendre le système complet - 497€"}
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              )}
+            <div className="mt-6 text-center">
+              <p className="text-xs text-white/35 mb-2">
+                Tu préfères qu&apos;on construise ça ensemble, en direct ?
+              </p>
+              <Link
+                href="/accompagnement"
+                onClick={() => setModal(null)}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8d5b0]/80 hover:text-[#e8d5b0] underline underline-offset-4 transition-colors"
+              >
+                Découvrir l&apos;accompagnement 1:1
+              </Link>
             </div>
           </div>
         </div>

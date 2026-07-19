@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { GraduationCap, ShieldCheck, Menu, X, ChevronDown } from "lucide-react";
+import { GraduationCap, ShieldCheck, Menu, X, ChevronDown, PhoneCall } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 interface NavBarProps {
-  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole" | "videos-tutos";
+  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole" | "videos-tutos" | "accompagnement";
   tier?: string | null;
   displayName?: string;
   displayEmail?: string;
@@ -116,6 +116,14 @@ export function NavBar({
         Vidéos tutos
       </Link>
 
+      <Link
+        href="/accompagnement"
+        className={`${activeLink === "accompagnement" ? "text-[#e8d5b0] font-medium" : "text-[#e8d5b0]/80 hover:text-[#e8d5b0]"} flex items-center gap-1.5`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <PhoneCall className="w-3.5 h-3.5" /> Accompagnement
+      </Link>
+
       {displayEmail === "mbebourasam@gmail.com" && (
         <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
           <ShieldCheck className="w-4 h-4" />
@@ -221,6 +229,13 @@ export function NavBar({
           </div>
         )}
       </div>
+
+      <Link
+        href="/accompagnement"
+        className={`${activeLink === "accompagnement" ? "text-[#e8d5b0] font-medium" : "text-[#e8d5b0]/80 hover:text-[#e8d5b0]"} flex items-center gap-1.5`}
+      >
+        <PhoneCall className="w-3.5 h-3.5" /> Accompagnement
+      </Link>
 
       {displayEmail === "mbebourasam@gmail.com" && (
         <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors">
