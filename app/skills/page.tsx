@@ -175,7 +175,7 @@ export default function SkillsPage() {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-5 blur-[120px] w-[600px] h-[300px] rounded-full pointer-events-none" />
       <div className="fixed bottom-0 right-0 bg-blue-500 opacity-5 blur-[120px] w-[400px] h-[400px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-6 sm:py-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 relative z-10">
         <div className="mb-12">
           <Link
             href="/dashboard"
@@ -265,7 +265,7 @@ export default function SkillsPage() {
                 </p>
               </div>
 
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 {SKILL_WORKFLOW.map((item) => (
                   <div key={item.step} className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-4">
                     <p className="text-[11px] font-mono text-[#e8d5b0]/70 mb-1">
@@ -337,13 +337,13 @@ export default function SkillsPage() {
         </section>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((item) => (
               <div key={item} className="h-[240px] rounded-2xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {SKILLS_CATALOG.map((skill, index) => {
               const isFree = skill.access === "free";
               const isBeginner = skill.access === "beginner";

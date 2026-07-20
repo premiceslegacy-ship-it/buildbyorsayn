@@ -13,7 +13,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "oracle-site-web",
     title: "ORACLE Site Web",
     description:
-      "Le skill site web V3 : cadrage, Ultra Lean en 1 session, LP Orsayn, conversion, SEO/GEO, performance Lighthouse 100, délégation UX/UI et livraison propre. Tu peux l'adapter à tes propres clients et projets.",
+      "Construis un site ou une landing page qui vend : cadrage en une session (Ultra Lean) ou site complet, copy qui vient de ta vraie recherche marché, SEO/GEO et score Lighthouse 100 visés dès le départ. Livrable pour tes clients comme pour tes propres projets.",
     access: "beginner",
     fileName: "oracle-site-web.md",
   },
@@ -21,7 +21,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "ux-ui-design",
     title: "UX/UI Design Premium",
     description:
-      "Le sous-skill UX/UI complet : direction artistique, brand/design system, audit ou refonte d'un site/app/SaaS existant, assets, motion, copy UI et quality gates. Les références Orsayn sont une base modifiable avec tes propres assets.",
+      "Ton directeur artistique et designer système à la demande : donne tes références (ou choisis un style dans la taxonomie) et récupère une direction artistique complète, verrouillée, jamais générique. Fonctionne sur un projet neuf comme sur l'audit ou la refonte d'un existant.",
     access: "beginner",
     fileName: "ux-ui-design.zip",
   },
@@ -29,7 +29,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "oracle-by-orsayn",
     title: "ORACLE by Orsayn",
     description:
-      "Le système complet que j'utilise pour cadrer et construire apps, SaaS, outils métier, cockpits et produits IA avec une logique de couches, délégation et audit.",
+      "Le cadrage produit avant le code : une interview en langage naturel te transforme en chef de projet, sort les documents fondateurs (data model, sécurité, PRD) et délègue automatiquement le design et le backend aux bons skills. Pour apps, SaaS, outils métier, cockpits et produits IA.",
     access: "full",
     fileName: "oracle-by-orsayn.md",
   },
@@ -37,7 +37,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "backend-orsayn",
     title: "Backend Orsayn",
     description:
-      "Le cerveau backend complet qui remplace et étend Expert Backend v2 : un skill maître qui audite et construit (PLAN puis EXÉCUTION), et 7 sous-skills spécialisés - auth/RLS, routes API et validation, sécurité des agents IA, cron/webhooks, performance et observabilité, conformité RGPD/légale, sortie de Supabase. Mapping OWASP inclus.",
+      "Le skill qui t'évite de faire fuiter les données de tes clients : audite un backend existant ou en construit un neuf, toujours avec un plan validé avant le premier code. Auth, RLS, sécurité des agents IA, webhooks, performance - mapping OWASP inclus, un critique bloque toujours la livraison.",
     access: "full",
     fileName: "backend-orsayn.zip",
   },
@@ -45,7 +45,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "deep-research-vertical",
     title: "Deep Research Verticale",
     description:
-      "Le système complet de recherche marché : 14 prompts pour analyser une niche avec de la data réelle - et savoir si elle vaut le coup. Marché, ICP, personas, douleurs profondes, psychologie d'achat, canaux, wedges, offre V1, ads intelligence complète (Meta, TikTok, Google, LinkedIn : angles prouvés et cimetière des angles morts), verdict stratégique avec feu vert/orange/rouge (anomalie de marché à exploiter vite ou ligne durable, risque des mises à jour de modèles IA), 8 CSV exploitables par LLM et Research Hub final en page web DA BUILD. Si tu n'as pas d'idée, le skill t'en propose 3 sur la base de ton profil.",
+      "Sais si ta niche vaut le coup avant d'y toucher : marché, personas, douleurs réelles et angles publicitaires déjà prouvés par tes concurrents (Meta, TikTok, Google, LinkedIn), condensés en un verdict feu vert/orange/rouge. Pas d'idée ? Le skill t'en propose 3 selon ton profil.",
     access: "beginner",
     fileName: "deep-research-vertical.zip",
   },
