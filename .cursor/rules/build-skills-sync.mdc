@@ -1,27 +1,40 @@
 ---
-description: Synchronize private BUILD skills after local updates
+description: Synchronize private BUILD skills from the canonical Orsayn AI source
 alwaysApply: true
 ---
 
 # BUILD Skills Sync
 
-If the user says they updated a BUILD skill file in `docs/`, run this from the repo root:
+Use `$ORSAYN_AI_ROOT/skills/` as the private skill source of truth. The ignored repository `docs/` tree is only the BUILD publishing mirror.
+
+Published mappings:
+
+- `oracle-by-orsayn.md` to `docs/oracle-by-orsayn.md`;
+- `oracle-site-web.md` to `docs/oracle-site-web.md`;
+- `ux-ui-design-2/` to `docs/ux-ui-design/`;
+- `backend-orsayn/` to `docs/backend-orsayn/`;
+- `deep-research-vertical/` to `docs/deep-research-vertical/`.
+
+The legacy top-level `expert-backend-v2.md` is retired. Never mirror or publish it. Use `backend-orsayn/references/17-domains.md` as the maintained authority.
+
+When a canonical skill changes:
+
+1. Validate the entire source bundle.
+2. Mirror it into `docs/` and the native Hermes skill path, preserving structure and excluding `.DS_Store`.
+3. Compare hashes across all three layers.
+4. Run repository quality checks.
+5. Run:
 
 ```bash
 npm run skills:sync
 ```
 
-The app serves downloads from private Supabase Storage, so existing skill content updates do not need GitHub push or Vercel deploy.
-
-Confirm success when the terminal shows:
-
-```text
-Uploaded <skill-file> to skills
-```
+6. Read the remote artifact back from private Supabase Storage and compare it with the mirror.
 
 Rules:
 
-- Never commit `docs/`.
-- Never reveal `.env.local` or Supabase service role keys.
-- Never commit `.next/` or `tsconfig.tsbuildinfo`.
-- For brand-new skills, update `lib/skillsCatalog.ts`, ensure the API route serves the file, run `npm run lint`, then sync.
+- Never author a skill in `docs/` first.
+- Never commit `docs/`, `.env.local`, `.next/` or `tsconfig.tsbuildinfo`.
+- Never reveal Supabase service-role keys or other credentials.
+- Do not report success until source, Hermes mirror, BUILD mirror and remote artifact agree.
+- For a brand-new skill, update the app catalog/API, run validation, then sync and push the code changes.

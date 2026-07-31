@@ -2,24 +2,37 @@
 
 ## BUILD Skills Sync
 
-When the user says a BUILD skill in `docs/` was updated, run:
+The private skill source of truth is `$ORSAYN_AI_ROOT/skills/`. The repository `docs/` tree is an ignored publishing mirror, never the authoring source.
+
+The published set is:
+
+- `oracle-by-orsayn.md` to `docs/oracle-by-orsayn.md`;
+- `oracle-site-web.md` to `docs/oracle-site-web.md`;
+- `ux-ui-design-2/` to `docs/ux-ui-design/`;
+- `backend-orsayn/` to `docs/backend-orsayn/`;
+- `deep-research-vertical/` to `docs/deep-research-vertical/`.
+
+The legacy top-level `expert-backend-v2.md` is retired and must never be mirrored or published. Its maintained authority is `backend-orsayn/references/17-domains.md`.
+
+When the user updates a canonical skill:
+
+1. Validate the complete source bundle.
+2. Mirror it to `docs/` and to the native Hermes skill path while preserving structure and excluding `.DS_Store`.
+3. Compare source and mirror hashes.
+4. Run the repository quality checks.
+5. Run:
 
 ```bash
 npm run skills:sync
 ```
 
-This uploads the latest private skill files to Supabase Storage so users download the newest version from the app.
+6. Verify the uploaded artifact by reading it back from private Supabase Storage.
 
-For existing skill content updates:
-
-- No Vercel redeploy is required.
-- No GitHub push is required.
-- Confirm upload success with `Uploaded <skill-file> to skills`.
+Existing skill content updates do not require a Vercel redeploy. A brand-new catalog entry requires an explicit app catalog/API change, validation and code push.
 
 Safety:
 
 - Do not commit `docs/`.
-- Do not reveal `.env.local` or service role keys.
+- Do not reveal `.env.local`, credentials or service-role keys.
 - Do not commit `.next/` or `tsconfig.tsbuildinfo`.
-
-If a brand-new skill is added, update the app catalog/code first, run `npm run lint`, sync skills, then push code changes if needed.
+- Do not report success until source, Hermes mirror, BUILD mirror and remote artifact agree.
