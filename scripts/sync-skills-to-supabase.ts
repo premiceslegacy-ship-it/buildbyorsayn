@@ -1,13 +1,19 @@
 import { createClient } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
+import { createHash, randomBytes } from "node:crypto";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { SKILLS_CATALOG } from "../lib/skillsCatalog";
+import {
+  createSkillsPublicationManifest,
+  type SkillsPublicationArtifact,
+} from "../lib/skillsMetadata";
 
 loadEnv({ path: ".env.local", quiet: true });
 loadEnv({ quiet: true });
 
 const bucketName = process.env.SUPABASE_SKILLS_BUCKET ?? "skills";
+const publicationLockKey = "skills";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -170,9 +176,13 @@ async function ensurePrivateBucket() {
 
   if (listError) throw listError;
 
-  const exists = buckets.some((bucket) => bucket.name === bucketName);
+  const existing = buckets.find((bucket) => bucket.name === bucketName);
 
-  if (!exists) {
+  if (existing?.public) {
+    throw new Error(`Storage bucket ${bucketName} must be private.`);
+  }
+
+  if (!existing) {
     const { error } = await supabase.storage.createBucket(bucketName, {
       public: false,
     });
@@ -181,37 +191,130 @@ async function ensurePrivateBucket() {
   }
 }
 
-async function uploadSkill(fileName: string, body: Buffer | string) {
-  const contentType = fileName.endsWith(".zip")
-    ? "application/zip"
-    : "text/markdown; charset=utf-8";
+async function acquirePublicationLock() {
+  const token = randomBytes(16).toString("hex");
+  const { data, error } = await supabase.rpc(
+    "acquire_skill_publication_lock",
+    {
+      requested_lock_key: publicationLockKey,
+      requested_lock_token: token,
+    }
+  );
 
-  const { error } = await supabase.storage.from(bucketName).upload(fileName, body, {
-    contentType,
-    upsert: true,
-  });
+  if (error) throw error;
+  if (data !== true) {
+    throw new Error(
+      "Skills publication is already locked by another active sync."
+    );
+  }
+
+  return async () => {
+    const { data: released, error: releaseError } = await supabase.rpc(
+      "release_skill_publication_lock",
+      {
+        requested_lock_key: publicationLockKey,
+        requested_lock_token: token,
+      }
+    );
+
+    if (releaseError) throw releaseError;
+    if (released !== true) {
+      throw new Error("Publication lock ownership could not be released.");
+    }
+  };
+}
+
+async function uploadAndVerify(
+  storagePath: string,
+  body: Buffer | string,
+  upsert = false
+) {
+  const contentType = storagePath.endsWith(".zip")
+    ? "application/zip"
+    : storagePath.endsWith(".json")
+      ? "application/json; charset=utf-8"
+      : "text/markdown; charset=utf-8";
+  const expected = Buffer.isBuffer(body) ? body : Buffer.from(body, "utf8");
+
+  const { error } = await supabase.storage
+    .from(bucketName)
+    .upload(storagePath, expected, { contentType, upsert });
 
   if (error) throw error;
 
-  console.log(`Uploaded ${fileName} to ${bucketName}`);
+  const { data, error: readbackError } = await supabase.storage
+    .from(bucketName)
+    .download(storagePath);
+
+  if (readbackError || !data) {
+    throw (
+      readbackError ??
+      new Error(`Remote readback failed for ${storagePath}.`)
+    );
+  }
+
+  const remote = Buffer.from(await data.arrayBuffer());
+  if (!remote.equals(expected)) {
+    throw new Error(`Remote readback mismatch for ${storagePath}.`);
+  }
+
+  console.log(`Uploaded ${storagePath} to ${bucketName} (readback verified)`);
+}
+
+function createReleaseId(date: Date) {
+  const timestamp = date.toISOString().replace(/[-:.]/g, "");
+  return `${timestamp}-${randomBytes(4).toString("hex")}`;
+}
+
+function sha256(body: Buffer) {
+  return createHash("sha256").update(body).digest("hex");
+}
+
+async function buildSkillArtifact(fileName: string) {
+  if (fileName.endsWith(".zip")) {
+    const packageName = fileName.replace(/\.zip$/i, "");
+    return createZipFromDirectory(
+      path.join(process.cwd(), "docs", packageName),
+      packageName
+    );
+  }
+
+  const raw = await readFile(path.join(process.cwd(), "docs", fileName), "utf8");
+  return Buffer.from(normalizeNotionMarkdown(raw), "utf8");
 }
 
 async function main() {
   await ensurePrivateBucket();
+  const releaseLock = await acquirePublicationLock();
 
-  for (const skill of SKILLS_CATALOG) {
-    if (skill.fileName.endsWith(".zip")) {
-      const packageName = skill.fileName.replace(/\.zip$/i, "");
-      const zip = await createZipFromDirectory(
-        path.join(process.cwd(), "docs", packageName),
-        packageName
-      );
-      await uploadSkill(skill.fileName, zip);
-      continue;
+  try {
+    const releaseStartedAt = new Date();
+    const releaseId = createReleaseId(releaseStartedAt);
+    const releaseArtifacts: SkillsPublicationArtifact[] = [];
+
+    for (const skill of SKILLS_CATALOG) {
+      const body = await buildSkillArtifact(skill.fileName);
+      const storagePath = `releases/${releaseId}/${skill.fileName}`;
+
+      await uploadAndVerify(storagePath, body);
+      releaseArtifacts.push({
+        fileName: skill.fileName,
+        storagePath,
+        sha256: sha256(body),
+      });
     }
 
-    const raw = await readFile(path.join(process.cwd(), "docs", skill.fileName), "utf8");
-    await uploadSkill(skill.fileName, normalizeNotionMarkdown(raw));
+    const manifest = createSkillsPublicationManifest(
+      releaseId,
+      releaseArtifacts,
+      new Date()
+    );
+    const manifestBody = `${JSON.stringify(manifest, null, 2)}\n`;
+
+    await uploadAndVerify("manifest.json", manifestBody, true);
+    console.log(`Published immutable skills release ${releaseId}`);
+  } finally {
+    await releaseLock();
   }
 }
 

@@ -26,7 +26,7 @@ When the user updates a canonical skill:
 npm run skills:sync
 ```
 
-6. Verify the uploaded artifact by reading it back from private Supabase Storage.
+6. The sync command verifies every uploaded artifact by reading it back, then publishes and verifies `manifest.json`. That manifest timestamp powers the BUILD Skills page and must never advance after a partial or unverified publication.
 
 Existing skill content updates do not require a Vercel redeploy. A brand-new catalog entry requires an explicit app catalog/API change, validation and code push.
 

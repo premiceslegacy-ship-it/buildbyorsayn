@@ -7,6 +7,7 @@
     "dev": "next dev -p 3000 -H 127.0.0.1",
     "build": "next build",
     "start": "next start -p 3000 -H 0.0.0.0",
+    "test": "node --import tsx --test tests/**/*.test.ts",
     "lint": "tsc --noEmit",
     "skills:sync": "tsx scripts/sync-skills-to-supabase.ts"
   },

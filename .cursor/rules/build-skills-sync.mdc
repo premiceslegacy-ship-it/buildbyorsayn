@@ -29,7 +29,7 @@ When a canonical skill changes:
 npm run skills:sync
 ```
 
-6. Read the remote artifact back from private Supabase Storage and compare it with the mirror.
+6. Let the sync command read every remote artifact back and compare it with the mirror. It then publishes and verifies `manifest.json`; this timestamp is displayed on the BUILD Skills page and must not advance after partial failure.
 
 Rules:
 

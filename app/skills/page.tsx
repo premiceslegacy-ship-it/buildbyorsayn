@@ -9,6 +9,7 @@ import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 import { SKILLS_CATALOG } from "@/lib/skillsCatalog";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { SkillsFreshness } from "@/components/SkillsFreshness";
 
 const SKILL_USAGE_STEPS = [
   {
@@ -196,6 +197,7 @@ export default function SkillsPage() {
           <p className="text-white/50 text-[17px] mt-4 max-w-2xl leading-relaxed">
             Ce sont les skills que j'ai configurés pour moi et pour mon écosystème. Je les utilise au quotidien pour cadrer, construire et auditer mes projets. Tu peux bien évidemment les adapter à ta manière de travailler, à ton marché et à tes propres projets.
           </p>
+          <SkillsFreshness />
         </header>
 
         <section className="mb-10">

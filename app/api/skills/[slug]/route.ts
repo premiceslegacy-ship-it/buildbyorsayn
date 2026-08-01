@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
+import { createHash } from "node:crypto";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { createClient } from "@/lib/supabase/server";
-import { getSkillBySlug, type SkillCatalogItem } from "@/lib/skillsCatalog";
+import {
+  getSkillBySlug,
+  SKILLS_CATALOG,
+  type SkillCatalogItem,
+} from "@/lib/skillsCatalog";
+import { parseSkillsPublicationManifest } from "@/lib/skillsMetadata";
 
 export const dynamic = "force-dynamic";
 
@@ -61,21 +67,42 @@ async function getStoredSkillContent(skill: SkillCatalogItem) {
 
   const supabaseAdmin = createSupabaseAdmin(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false },
+    global: {
+      fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
+    },
   });
+  const storage = supabaseAdmin.storage.from(SKILLS_BUCKET);
 
-  const { data, error } = await supabaseAdmin.storage
-    .from(SKILLS_BUCKET)
-    .download(skill.fileName);
+  const { data: manifestData, error: manifestError } = await storage.download(
+    "manifest.json"
+  );
+  if (manifestError || !manifestData) return null;
 
-  if (error || !data) {
-    return null;
+  let manifest: ReturnType<typeof parseSkillsPublicationManifest> = null;
+  try {
+    manifest = parseSkillsPublicationManifest(
+      JSON.parse(Buffer.from(await manifestData.arrayBuffer()).toString("utf8")),
+      SKILLS_CATALOG.map((item) => item.fileName)
+    );
+  } catch {
+    manifest = null;
   }
 
+  const artifact = manifest?.artifacts.find(
+    (item) => item.fileName === skill.fileName
+  );
+  if (!artifact) return null;
+
+  const { data, error } = await storage.download(artifact.storagePath);
+  if (error || !data) return null;
+
   const buffer = Buffer.from(await data.arrayBuffer());
+  const digest = createHash("sha256").update(buffer).digest("hex");
+  if (digest !== artifact.sha256) return null;
 
   if (skill.fileName.endsWith(".md")) {
     return {
-      body: normalizeNotionMarkdown(buffer.toString("utf8")),
+      body: buffer.toString("utf8"),
       contentType: "text/markdown; charset=utf-8",
     };
   }
@@ -259,6 +286,7 @@ export async function GET(
         "Content-Type": storedSkill.contentType,
         "Content-Disposition": `attachment; filename="${skill.fileName}"`,
         "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   }
@@ -272,6 +300,7 @@ export async function GET(
 
   const ZIP_DIR_SKILLS: Record<string, string> = {
     "ux-ui-design": "ux-ui-design",
+    "backend-orsayn": "backend-orsayn",
     "deep-research-vertical": "deep-research-vertical",
   };
 
@@ -287,6 +316,7 @@ export async function GET(
         "Content-Type": "application/zip",
         "Content-Disposition": `attachment; filename="${skill.fileName}"`,
         "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   }
@@ -302,6 +332,7 @@ export async function GET(
       "Content-Type": "text/markdown; charset=utf-8",
       "Content-Disposition": `attachment; filename="${skill.fileName}"`,
       "Cache-Control": "private, no-store",
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }

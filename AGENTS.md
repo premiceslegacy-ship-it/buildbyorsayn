@@ -29,7 +29,7 @@ When the user says they updated, modified, replaced, added, or published a skill
 npm run skills:sync
 ```
 
-6. Read every published artifact back from Supabase Storage, normalize it with the same rules as the local mirror, and compare path sets plus content hashes. Upload output alone is not proof of success.
+6. `npm run skills:sync` reads every uploaded artifact back, compares exact bytes, then publishes and verifies `manifest.json`. The manifest timestamp is the date shown on the BUILD Skills page and must only advance after every catalog artifact passes readback.
 
 Typical trigger phrases:
 
@@ -43,8 +43,8 @@ If the command is blocked by sandbox/network permissions, request approval and r
 
 Success criteria:
 
-- The output includes `Uploaded <skill-file> to skills`.
-- Remote readback returns the complete expected path set and content hashes identical to the normalized BUILD mirrors.
+- The output includes `Uploaded <skill-file> to skills (readback verified)` for every catalog artifact and `manifest.json`.
+- The verified manifest contains the complete expected artifact set and advances its timestamp only after all artifact readbacks pass.
 - Tell the user the latest version is now available from the app only after both checks pass.
 - For existing skill content updates, no GitHub push or Vercel redeploy is required.
 
