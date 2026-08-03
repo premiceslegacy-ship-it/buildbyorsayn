@@ -110,7 +110,7 @@ export function EcosystemMap({ variant, tier }: { variant: EcosystemVariant; tie
                   </span>
                 )}
               </div>
-              {/* Logo BUILD — cubes sans carré + texte identique au header */}
+              {/* Logo BUILD : cubes sans carré + texte identique au header */}
               <Logo hideText layout="vertical" className="!gap-0 w-10 h-10 mb-2" />
               <p className={`font-extrabold uppercase leading-none mb-2 ${isDashboard && isMember ? "text-[#f0ede8]" : "text-[#f0ede8]/45"}`} style={{ fontSize: "13px", letterSpacing: "2px" }}>BUILD</p>
               <p className="text-[10px] sm:text-[11px] text-white/35 text-center leading-relaxed mt-auto px-1">

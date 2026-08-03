@@ -17,7 +17,6 @@ const SKILLS_BUCKET = process.env.SUPABASE_SKILLS_BUCKET ?? "skills";
 
 const FILE_SKILLS: Record<string, string> = {
   "oracle-site-web": "oracle-site-web.md",
-  "oracle-by-orsayn": "oracle-by-orsayn.md",
 };
 
 function normalizeNotionMarkdown(raw: string) {
@@ -299,6 +298,7 @@ export async function GET(
   }
 
   const ZIP_DIR_SKILLS: Record<string, string> = {
+    "oracle-by-orsayn": "oracle-by-orsayn",
     "ux-ui-design": "ux-ui-design",
     "backend-orsayn": "backend-orsayn",
     "deep-research-vertical": "deep-research-vertical",

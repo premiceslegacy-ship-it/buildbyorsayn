@@ -6,7 +6,7 @@ The private skill source of truth is `$ORSAYN_AI_ROOT/skills/`. The repository `
 
 The published set is:
 
-- `oracle-by-orsayn.md` to `docs/oracle-by-orsayn.md`;
+- `oracle-by-orsayn.md` plus `oracle-by-orsayn/references/` to `docs/oracle-by-orsayn/SKILL.md` plus `docs/oracle-by-orsayn/references/`;
 - `oracle-site-web.md` to `docs/oracle-site-web.md`;
 - `ux-ui-design-2/` to `docs/ux-ui-design/`;
 - `backend-orsayn/` to `docs/backend-orsayn/`;

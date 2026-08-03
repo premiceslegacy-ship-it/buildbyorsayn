@@ -16,7 +16,7 @@ When the user says they updated, modified, replaced, added, or published a skill
 
 1. Read and validate the changed source bundle completely.
 2. Mirror it into `docs/` while preserving directory structure and excluding `.DS_Store`:
-   - `oracle-by-orsayn.md` → `docs/oracle-by-orsayn.md`
+   - `oracle-by-orsayn.md` + `oracle-by-orsayn/references/` → `docs/oracle-by-orsayn/SKILL.md` + `docs/oracle-by-orsayn/references/`
    - `oracle-site-web.md` → `docs/oracle-site-web.md`
    - `ux-ui-design-2/` → `docs/ux-ui-design/`
    - `backend-orsayn/` → `docs/backend-orsayn/`
@@ -53,4 +53,4 @@ Important rules:
 - Never commit `docs/`; it contains private BUILD content and is ignored by Git.
 - Never expose `.env.local` or `SUPABASE_SERVICE_ROLE_KEY`.
 - Never commit `.next/` or `tsconfig.tsbuildinfo`.
-- If a brand-new skill is added, update `lib/skillsCatalog.ts`, ensure the API route can serve it, run `npm run lint`, then push app-code changes if needed.
+- If a brand-new skill is added or an artifact changes between `.md` and `.zip`, update `lib/skillsCatalog.ts`, ensure the API route can serve it, run `npm test`, `npm run lint` et `npm run build`, then push app-code changes if needed.

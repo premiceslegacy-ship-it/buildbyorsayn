@@ -29,9 +29,9 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "oracle-by-orsayn",
     title: "ORACLE by Orsayn",
     description:
-      "Le cadrage produit avant le code : une interview en langage naturel te transforme en chef de projet, sort les documents fondateurs (data model, sécurité, PRD) et délègue automatiquement le design et le backend aux bons skills. Pour apps, SaaS, outils métier, cockpits et produits IA.",
+      "Le chef d'orchestre avant le code : interview fondatrice, documents et capacités bien rangés, data, sécurité, UX, copy, stratégie GTM et acquisition. Il choisit les réseaux pertinents, le tunnel, le contenu et les ads selon le projet, puis délègue aux bons skills.",
     access: "full",
-    fileName: "oracle-by-orsayn.md",
+    fileName: "oracle-by-orsayn.zip",
   },
   {
     slug: "backend-orsayn",

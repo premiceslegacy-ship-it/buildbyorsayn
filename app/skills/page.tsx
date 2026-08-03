@@ -112,7 +112,7 @@ const SKILL_PROMPTS = [
   },
   {
     skill: "ORACLE by Orsayn",
-    role: "Cadre un produit (app, SaaS, outil interne) en langage simple : interview, documents fondateurs, décisions structurantes avant le code.",
+    role: "Cadre un produit en langage simple : interview, documents fondateurs, décisions avant le code, puis stratégie GTM et acquisition adaptée au projet.",
     prompt: "Voici ma recherche deep-research-vertical sur [niche] (ou dis-le si tu n'en as pas encore). Cadre mon projet [type de produit] avec ORACLE by Orsayn.",
   },
   {
