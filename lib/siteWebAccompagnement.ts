@@ -3,22 +3,23 @@ export type AccompanimentTrack = "debutant" | "experimente" | "agence";
 export type AccompanimentTask = {
   id: string;
   title: string;
-  proof: string;
+  outcome: string;
   tracks?: AccompanimentTrack[];
 };
 
-export type AccompanimentPhase = {
+export type AccompanimentTheme = {
   id: string;
   marker: string;
-  duration: string;
   title: string;
   promise: string;
   why: string;
   deliverables: string[];
   tasks: AccompanimentTask[];
-  validation: string;
-  trackValidation?: Partial<Record<AccompanimentTrack, string>>;
+  finishLine: string;
+  trackFinishLine?: Partial<Record<AccompanimentTrack, string>>;
 };
+
+export type AccompanimentPhase = AccompanimentTheme;
 
 export const TRACKS: Array<{
   id: AccompanimentTrack;
@@ -29,327 +30,520 @@ export const TRACKS: Array<{
 }> = [
   {
     id: "debutant",
-    label: "Je pars de zéro",
-    shortLabel: "Débutant",
+    label: "Je démarre",
+    shortLabel: "Je démarre",
     description:
-      "Tu apprends le vocabulaire, la logique du web et les gestes de base avant de construire.",
+      "Tu veux comprendre les bases et construire sans dépendre d'une suite de commandes que tu ne comprends pas.",
     adjustment:
-      "Les fondations sont obligatoires et validées par une petite page construite sans magie.",
+      "On prend le temps de rendre chaque décision claire avant de passer à la suivante.",
   },
   {
     id: "experimente",
-    label: "Je livre déjà des sites",
-    shortLabel: "Expérimenté",
+    label: "J'ai déjà livré",
+    shortLabel: "J'ai déjà livré",
     description:
-      "Tu compresses les bases et travailles surtout le jugement, le système et la reproductibilité.",
+      "Tu as déjà produit des sites et tu veux surtout gagner en clarté, en qualité et en régularité.",
     adjustment:
-      "Les acquis sont testés. Ce qui est maîtrisé est sauté, pas rejoué pour remplir le calendrier.",
+      "On va directement sur les sujets qui te font encore perdre du temps ou de la qualité.",
   },
   {
     id: "agence",
-    label: "Je veux faire scaler une agence",
-    shortLabel: "Agence",
+    label: "Je travaille en équipe",
+    shortLabel: "En équipe",
     description:
-      "Tu transformes plusieurs années de pratique en chaîne de production transmissible et contrôlée.",
+      "Tu veux qu'une équipe puisse produire avec le même niveau d'exigence, sans tout garder dans ta tête.",
     adjustment:
-      "Chaque étape identifie ce qui relève de l'expert, du process, du skill, du contrôle humain et du client.",
+      "On précise qui décide, qui produit et qui relit, pour que le travail reste fiable quand il circule.",
   },
 ];
 
-export const PHASES: AccompanimentPhase[] = [
+export const THEMES: AccompanimentTheme[] = [
   {
     id: "diagnostic",
-    marker: "Avant le départ",
-    duration: "1 diagnostic de 90 min",
-    title: "Partir de ton vrai niveau et de ton vrai business",
+    marker: "01",
+    title: "Un projet clair avant de commencer",
     promise:
-      "On ne te fait pas suivre un programme générique. On mesure ce que tu sais déjà faire, ce qui manque et le résultat à obtenir.",
+      "Tu sais ce que ton site doit changer, pour qui et quelle action il doit provoquer.",
     why:
-      "Un débutant, un freelance expérimenté et une agence n'ont ni les mêmes angles morts, ni les mêmes preuves à produire.",
+      "Sans objectif précis, on fabrique une page agréable à regarder mais inutile pour l'activité.",
     deliverables: [
-      "Baseline de compétences",
-      "Objectif commercial du site",
-      "Projet fil rouge",
-      "Parcours personnalisé",
+      "Objectif du site",
+      "Personne à aider",
+      "Projet de travail",
+      "Ordre des sujets",
     ],
     tasks: [
-      { id: "web-diagnostic-01", title: "Décrire le projet, l'offre et le résultat attendu", proof: "Brief oral et fiche projet complétée" },
-      { id: "web-diagnostic-02", title: "Auditer le niveau web, design, copy, code et acquisition", proof: "Matrice de compétences notée avec exemples" },
-      { id: "web-diagnostic-03", title: "Choisir une preuve finale mesurable", proof: "Critères d'acceptation écrits avant le build" },
-      { id: "web-diagnostic-04", title: "Tracer la voie débutant, expérimenté ou agence", proof: "Étapes obligatoires, compressées et optionnelles identifiées" },
-      { id: "web-diagnostic-agency-01", title: "Cartographier les rôles, handoffs et goulots de l'équipe", proof: "Carte owner, exécutant, reviewer et validation client", tracks: ["agence"] },
+      {
+        id: "web-diagnostic-01",
+        title: "Décrire ce que le site doit changer",
+        outcome: "Un objectif formulé avec des mots simples.",
+      },
+      {
+        id: "web-diagnostic-02",
+        title: "Faire le point sur ce que tu sais déjà faire",
+        outcome: "Les sujets à travailler sont identifiés sans refaire ce qui est déjà acquis.",
+      },
+      {
+        id: "web-diagnostic-03",
+        title: "Choisir le résultat à obtenir",
+        outcome: "On sait à quoi ressemble une bonne sortie avant de commencer.",
+      },
+      {
+        id: "web-diagnostic-04",
+        title: "Fixer l'ordre de travail",
+        outcome: "Le prochain sujet est évident et le calendrier reste adaptable.",
+      },
+      {
+        id: "web-diagnostic-agency-01",
+        title: "Décider qui fait quoi dans l'équipe",
+        outcome: "Les décisions, la production et la relecture ont un responsable clair.",
+        tracks: ["agence"],
+      },
     ],
-    validation:
-      "Le projet, la cible, l'action principale et la preuve finale tiennent sur une page compréhensible par une personne extérieure.",
-    trackValidation: {
-      agence: "L'agence a aussi identifié qui décide, qui produit, qui revoit, qui parle au client et où une perte de qualité peut apparaître.",
+    finishLine:
+      "On peut avancer quand le projet tient en une minute d'explication et que la prochaine action est claire.",
+    trackFinishLine: {
+      agence:
+        "L'équipe sait aussi qui décide, qui produit, qui relit et qui échange avec le client.",
     },
   },
   {
-    id: "fondations",
-    marker: "Semaine 1",
-    duration: "1 à 2 sessions",
-    title: "Comprendre ce qu'est réellement un site",
-    promise:
-      "Tu comprends comment une page tient debout avant de demander à l'IA de la construire.",
-    why:
-      "Sans vocabulaire ni modèle mental, l'IA masque les erreurs. Tu peux obtenir une belle capture sans savoir corriger un layout, une marge ou un composant.",
-    deliverables: [
-      "Page de fondations",
-      "Lexique personnel",
-      "Premier composant responsive",
-      "Carte frontend, backend et hébergement",
-    ],
-    tasks: [
-      { id: "web-foundations-01", title: "Comprendre page, section, conteneur, grille et colonne", proof: "Schéma annoté d'une page existante", tracks: ["debutant"] },
-      { id: "web-foundations-02", title: "Distinguer padding, margin, gap, width et max-width", proof: "Exercice responsive corrigé", tracks: ["debutant"] },
-      { id: "web-foundations-03", title: "Comprendre composants, variantes, états et contenu", proof: "Un composant avec au moins quatre états" },
-      { id: "web-foundations-04", title: "Relier navigateur, frontend, backend, API, base et domaine", proof: "Carte simple expliquée sans jargon" },
-      { id: "web-foundations-05", title: "Lire et modifier une page dans les DevTools", proof: "Capture avant et après avec explication", tracks: ["debutant"] },
-      { id: "web-foundations-06", title: "Passer le test de compression des acquis", proof: "Démonstration sans aide", tracks: ["experimente", "agence"] },
-    ],
-    validation:
-      "Tu peux expliquer la structure d'une page, corriger un problème d'espacement et anticiper son comportement mobile sans demander une régénération complète.",
-  },
-  {
     id: "business-copy",
-    marker: "Semaine 2",
-    duration: "2 sessions",
-    title: "Faire du site un maillon du système commercial",
+    marker: "02",
+    title: "Un message qui donne envie d'avancer",
     promise:
-      "Le site ne promet pas de créer des clients tout seul. Il clarifie, rassure, prouve et transforme l'attention venant des bons canaux.",
+      "Ton site explique rapidement ce que tu proposes, à qui tu t'adresses et pourquoi agir maintenant.",
     why:
-      "Une belle boutique au milieu du désert reste vide. Le message, l'offre, l'ICP et le canal précèdent la structure de page.",
+      "Un site ne rattrape pas une offre floue. Les bons mots viennent du problème réel, pas d'un vocabulaire de brochure.",
     deliverables: [
-      "ICP et contexte d'achat",
-      "Message central",
-      "Carte des objections",
-      "COPY-DECK versionné",
+      "Offre lisible",
+      "Message principal",
+      "Réponses aux hésitations",
+      "Action suivante",
     ],
     tasks: [
-      { id: "web-copy-01", title: "Relier offre, ICP, niveau de conscience et source de trafic", proof: "Matrice trafic, message, action" },
-      { id: "web-copy-02", title: "Extraire les mots du marché au lieu de les inventer", proof: "Corpus VOC sourcé et daté" },
-      { id: "web-copy-03", title: "Écrire la promesse, les preuves, les objections et le CTA", proof: "Copy deck complet sans texte interchangeable" },
-      { id: "web-copy-04", title: "Croiser Schwartz, Ogilvy, Cialdini et les autres fondamentaux avec le réel", proof: "Choix de framework justifié, pas de citations décoratives" },
-      { id: "web-copy-05", title: "Préparer une variante de message réellement testable", proof: "Hypothèse, baseline, métrique et garde-fous" },
-      { id: "web-copy-agency-01", title: "Définir le contrat d'entrée et de validation du copy client", proof: "Sources requises, owner, délais, révisions et acceptation", tracks: ["agence"] },
+      {
+        id: "web-copy-01",
+        title: "Relier l'offre à la personne qui la cherche",
+        outcome: "Le message correspond à une situation réelle et à un besoin précis.",
+      },
+      {
+        id: "web-copy-02",
+        title: "Reprendre les mots utilisés sur le terrain",
+        outcome: "Les textes parlent comme les clients parlent.",
+      },
+      {
+        id: "web-copy-03",
+        title: "Écrire la promesse et l'action suivante",
+        outcome: "La page dit ce que l'on gagne et quoi faire ensuite.",
+      },
+      {
+        id: "web-copy-04",
+        title: "Choisir les bons principes d'écriture",
+        outcome: "Chaque choix sert la compréhension au lieu de remplir la page.",
+      },
+      {
+        id: "web-copy-05",
+        title: "Préparer une deuxième façon de présenter l'offre",
+        outcome: "On peut comparer deux messages sans tout changer à la fois.",
+      },
+      {
+        id: "web-copy-agency-01",
+        title: "Fixer comment le texte client est préparé et relu",
+        outcome: "Les sources, les retours et l'accord final ne dépendent pas d'un échange perdu.",
+        tracks: ["agence"],
+      },
     ],
-    validation:
-      "Le premier écran dit pour qui, quel écart est traité et quelle action vient ensuite. Aucun titre ne pourrait être copié chez dix concurrents.",
+    finishLine:
+      "On peut avancer quand une personne extérieure comprend l'offre et l'action à faire sans explication orale.",
   },
   {
     id: "references-da",
-    marker: "Semaine 3",
-    duration: "2 sessions",
-    title: "Construire une direction, pas collectionner des screenshots",
+    marker: "03",
+    title: "Une direction qui donne confiance",
     promise:
-      "Tu apprends à partir d'un univers, d'une émotion ou d'un mécanisme visuel, même lorsque la référence n'est pas un site web.",
+      "Tu choisis l'allure du site pour servir le message, pas pour collectionner de belles images.",
     why:
-      "Pinterest peut donner une lumière, une matière ou une tension. Refero montre des écrans. Mintlify montre la précision d'un système. Rare UI ouvre des pistes de composants. Chaque source a un rôle différent.",
+      "Une référence peut aider pour une ambiance, une page, une animation ou un détail. Elle ne donne pas automatiquement la bonne réponse à ton projet.",
     deliverables: [
-      "Matrice de références",
-      "Anti-références",
-      "PATTERN-DNA",
-      "DA-SYNTHESIS validée",
+      "Références utiles",
+      "Ce que l'on écarte",
+      "Direction choisie",
+      "Premier écran comparé",
     ],
     tasks: [
-      { id: "web-da-01", title: "Sourcer références et anti-références par rôle", proof: "Board avec Pinterest, produit, motion et composants séparés" },
-      { id: "web-da-02", title: "Extraire structure, lumière, typographie, matière et tension", proof: "PATTERN-DNA avec valeurs inférées clairement étiquetées" },
-      { id: "web-da-03", title: "Proposer deux directions sur le même écran réel", proof: "Comparatif équivalent, pas deux moodboards" },
-      { id: "web-da-04", title: "Choisir ce qui est repris, traduit ou rejeté", proof: "Matrice observation, mécanisme, traduction, décision" },
+      {
+        id: "web-da-01",
+        title: "Choisir des références pour le bon usage",
+        outcome: "Chaque référence a une raison d'être et un rôle précis.",
+      },
+      {
+        id: "web-da-02",
+        title: "Repérer ce qui crée l'impression recherchée",
+        outcome: "On sait ce qui vient des mots, des images, des formes ou du rythme.",
+      },
+      {
+        id: "web-da-03",
+        title: "Comparer deux directions sur le vrai écran",
+        outcome: "Le choix se fait sur le projet réel, pas sur deux tableaux d'inspiration.",
+      },
+      {
+        id: "web-da-04",
+        title: "Décider ce qui est gardé, adapté ou écarté",
+        outcome: "Le site a sa propre personnalité sans copier une référence.",
+      },
     ],
-    validation:
-      "La direction retenue reste reconnaissable sans le logo, mais ne reproduit ni la composition ni les assets propriétaires d'une référence.",
+    finishLine:
+      "On peut avancer quand le site inspire la bonne impression avant même que l'on regarde le logo.",
   },
   {
     id: "design-system-assets",
-    marker: "Semaine 4",
-    duration: "2 sessions",
-    title: "Passer de la direction au design system agent-ready",
+    marker: "04",
+    title: "Des pages cohérentes partout",
     promise:
-      "Un humain ou un agent peut créer une nouvelle page et ses états sans inventer les règles manquantes.",
+      "Tu poses des règles simples pour que chaque nouvelle page ressemble au même site, sur mobile comme sur ordinateur.",
     why:
-      "Un design system n'est pas une palette. Il relie tokens, composants, contenu, images, logos, motion, responsive, accessibilité et handoff.",
+      "Sans règles partagées, chaque nouvelle page repart de zéro et le site finit par se contredire.",
     deliverables: [
-      "Design system web navigable",
-      "Tokens sémantiques",
-      "Contrats de composants",
-      "Famille d'assets",
-      "Motion spec",
+      "Règles visuelles du site",
+      "Pages et cas importants",
+      "Visuels cohérents",
+      "Version mobile",
     ],
     tasks: [
-      { id: "web-ds-01", title: "Définir primitives, rôles sémantiques et tokens composants", proof: "Source de tokens versionnée avec provenance" },
-      { id: "web-ds-02", title: "Documenter anatomie, variantes, états et responsive", proof: "Composants rendus avec contenus réalistes" },
-      { id: "web-ds-03", title: "Choisir Figma, SVG, HTML ou image IA selon le rôle", proof: "Registre d'assets et décision de médium" },
-      { id: "web-ds-04", title: "Créer un asset statique canonique et ses dérivés", proof: "Source, prompt, modèle, dimensions, fallback et validation" },
-      { id: "web-ds-05", title: "Ajouter du motion léger seulement s'il sert un état ou une idée", proof: "Déclencheur, durée, fin, interruption et reduced motion" },
-      { id: "web-ds-06", title: "Passer le gate anti AI-slop", proof: "Audit argumenté, captures et corrections" },
-      { id: "web-ds-agency-01", title: "Séparer les décisions senior des opérations déléguables", proof: "Matrice jugement, process, skill, contrôle et escalade", tracks: ["agence"] },
-      { id: "web-ds-agency-02", title: "Créer une fixture de revue utilisable par un second designer", proof: "États, contenus adverses, viewports et verdict documentés", tracks: ["agence"] },
+      {
+        id: "web-ds-01",
+        title: "Fixer les règles visuelles du site",
+        outcome: "Les couleurs, caractères, espacements et formes suivent une même logique.",
+      },
+      {
+        id: "web-ds-02",
+        title: "Prévoir les différents cas d'une page",
+        outcome: "Les états normal, vide, en attente et en erreur restent compréhensibles.",
+      },
+      {
+        id: "web-ds-03",
+        title: "Choisir le bon format pour chaque visuel",
+        outcome: "Chaque image, illustration ou schéma a un rôle et un format adapté.",
+      },
+      {
+        id: "web-ds-04",
+        title: "Créer une base visuelle réutilisable",
+        outcome: "Une nouvelle page peut être produite sans inventer une nouvelle identité.",
+      },
+      {
+        id: "web-ds-05",
+        title: "Ajouter du mouvement seulement s'il aide à comprendre",
+        outcome: "Les animations confirment une action ou une transition et restent discrètes.",
+      },
+      {
+        id: "web-ds-06",
+        title: "Relire le site comme un client",
+        outcome: "Les décorations inutiles disparaissent et la page garde une hiérarchie nette.",
+      },
+      {
+        id: "web-ds-agency-01",
+        title: "Décider ce qui doit être relu par un senior",
+        outcome: "L'équipe sait quelles décisions ne doivent pas être prises automatiquement.",
+        tracks: ["agence"],
+      },
+      {
+        id: "web-ds-agency-02",
+        title: "Donner à une autre personne de quoi produire sans toi",
+        outcome: "Une autre personne peut reprendre le travail avec les mêmes règles.",
+        tracks: ["agence"],
+      },
     ],
-    validation:
-      "Une seconde personne peut produire une section, une card, un état d'erreur et une déclinaison mobile cohérente sans improviser la marque.",
-    trackValidation: {
-      agence: "Un collaborateur peut produire, un senior peut contrôler avec une fixture commune et les désaccords disposent d'une règle d'escalade.",
+    finishLine:
+      "On peut avancer quand une autre personne comprend les règles et que le site reste clair sur petit écran.",
+    trackFinishLine: {
+      agence:
+        "L'équipe dispose d'un exemple commun à produire et à relire, avec une règle simple en cas de désaccord.",
     },
   },
   {
     id: "build-stack",
-    marker: "Semaine 5",
-    duration: "2 sessions",
-    title: "Construire, versionner et garder le contrôle",
+    marker: "05",
+    title: "Construire et mettre en ligne",
     promise:
-      "Tu passes du brief au code sans transformer le vibecoding en boîte noire.",
+      "Tu passes de l'idée à une version utilisable, que l'on peut relire, corriger et remettre en ligne sans repartir de zéro.",
     why:
-      "GitHub, previews, variables d'environnement et rollback rendent le travail réversible. L'outil précis change, la discipline reste.",
+      "Le bon outil compte moins que la capacité à comprendre ce qui a changé et à revenir en arrière quand il le faut.",
     deliverables: [
-      "Repository propre",
-      "Preview partageable",
-      "Composants construits",
-      "Journal de décisions",
+      "Espace de travail propre",
+      "Versions conservées",
+      "Version de test",
+      "Site en ligne",
     ],
     tasks: [
-      { id: "web-build-01", title: "Initialiser le repo, les branches et le contrat agent", proof: "Historique Git lisible et secrets exclus" },
-      { id: "web-build-02", title: "Choisir la stack proportionnée au projet", proof: "Décision Next.js, statique, CMS ou autre justifiée" },
-      { id: "web-build-03", title: "Construire par slices vérifiables", proof: "Chaque slice possède résultat, tests et capture" },
-      { id: "web-build-04", title: "Déployer une Preview sur Vercel ou Cloudflare", proof: "URL testée après lecture des logs" },
-      { id: "web-build-05", title: "Documenter le rollback et la reprise", proof: "Retour à une version connue démontré" },
-      { id: "web-build-agency-01", title: "Formaliser la chaîne branche, review, preview et acceptation", proof: "Template de PR, reviewer obligatoire et gate client", tracks: ["agence"] },
-      { id: "web-build-agency-02", title: "Mesurer le temps et les reprises par étape", proof: "Baseline delivery et principales causes de rework", tracks: ["agence"] },
+      {
+        id: "web-build-01",
+        title: "Préparer l'espace de travail et les versions",
+        outcome: "Le projet reste lisible et chaque modification peut être retrouvée.",
+      },
+      {
+        id: "web-build-02",
+        title: "Choisir l'outil adapté au projet",
+        outcome: "On évite de prendre un outil plus compliqué que le besoin.",
+      },
+      {
+        id: "web-build-03",
+        title: "Construire les pages dans le bon ordre",
+        outcome: "Chaque partie est vérifiée avant d'ajouter la suivante.",
+      },
+      {
+        id: "web-build-04",
+        title: "Partager une version de test",
+        outcome: "Le site peut être relu sur un vrai appareil avant sa mise en ligne.",
+      },
+      {
+        id: "web-build-05",
+        title: "Savoir revenir à une version qui fonctionne",
+        outcome: "Une erreur ne force pas à reconstruire tout le projet.",
+      },
+      {
+        id: "web-build-agency-01",
+        title: "Écrire le chemin d'une livraison d'équipe",
+        outcome: "Une version ne part pas chez le client sans relecture prévue.",
+        tracks: ["agence"],
+      },
+      {
+        id: "web-build-agency-02",
+        title: "Repérer ce qui ralentit les livraisons",
+        outcome: "Les reprises sont reliées à une cause que l'équipe peut corriger.",
+        tracks: ["agence"],
+      },
     ],
-    validation:
-      "Le site peut être repris depuis le repo, lancé localement, prévisualisé et restauré sans dépendre de la conversation qui l'a généré.",
-    trackValidation: {
-      agence: "La chaîne peut être exécutée par l'équipe sans accès implicite au contexte du fondateur et sans fusionner une livraison non revue.",
+    finishLine:
+      "On peut avancer quand le site est en ligne, compréhensible par une autre personne et récupérable après une erreur.",
+    trackFinishLine: {
+      agence:
+        "La livraison peut être reprise par l'équipe sans dépendre de la mémoire du fondateur.",
     },
   },
   {
     id: "connected",
-    marker: "Semaine 6A",
-    duration: "Branche selon le projet",
-    title: "Ajouter uniquement le backend que le résultat exige",
+    marker: "06",
+    title: "Ajouter seulement ce qui est nécessaire",
     promise:
-      "Espace client, formulaire, CRM, automatisation, API ou paiement sont ajoutés avec des frontières claires.",
+      "Les formulaires, comptes, paiements ou automatisations ne sont ajoutés que s'ils servent vraiment le résultat.",
     why:
-      "Un site connecté change de classe de risque. Auth, permissions, validation, données et opérations ne sont pas du polish frontend.",
+      "Dès qu'un site garde des informations ou déclenche une action, il faut protéger les personnes et prévoir les erreurs.",
     deliverables: [
-      "Carte des données",
-      "Contrats API",
-      "Matrice de permissions",
-      "Plan de sauvegarde",
+      "Besoins utiles",
+      "Informations protégées",
+      "Actions autorisées",
+      "Plan en cas d'erreur",
     ],
     tasks: [
-      { id: "web-connected-01", title: "Décider si une base de données est réellement nécessaire", proof: "Alternative sans BDD comparée au besoin" },
-      { id: "web-connected-02", title: "Choisir Supabase, Neon ou VPS selon le rôle", proof: "Décision coût, auth, portabilité et opérations" },
-      { id: "web-connected-03", title: "Centraliser accès data, API et secrets côté serveur", proof: "Audit de frontières et variables" },
-      { id: "web-connected-04", title: "Tester auth, permissions, validation et échecs", proof: "Cas autorisé, refusé, invalide et doublon" },
-      { id: "web-connected-05", title: "Relier CRM ou automatisation avec idempotence", proof: "Replay sans double effet" },
+      {
+        id: "web-connected-01",
+        title: "Décider ce que le site doit vraiment garder",
+        outcome: "Les informations demandées ont une utilité claire.",
+      },
+      {
+        id: "web-connected-02",
+        title: "Choisir où les informations seront conservées",
+        outcome: "Le choix reste proportionné au besoin et au budget.",
+      },
+      {
+        id: "web-connected-03",
+        title: "Protéger les accès et les informations",
+        outcome: "Une personne ne peut pas voir ou modifier ce qui ne la concerne pas.",
+      },
+      {
+        id: "web-connected-04",
+        title: "Tester les cas autorisés et les erreurs",
+        outcome: "Le site explique quoi faire quand une information manque ou qu'une action échoue.",
+      },
+      {
+        id: "web-connected-05",
+        title: "Éviter les doublons quand une action est répétée",
+        outcome: "Un clic répété ne crée pas deux paiements, deux demandes ou deux dossiers.",
+      },
     ],
-    validation:
-      "Aucune donnée sensible ni action critique n'est accessible par simple manipulation du navigateur. Les échecs restent récupérables.",
+    finishLine:
+      "On peut avancer quand chaque information a une raison, un accès prévu et une solution si quelque chose se passe mal.",
   },
   {
     id: "seo-geo",
-    marker: "Semaine 6B",
-    duration: "1 à 2 sessions",
-    title: "Installer un système SEO, GEO et mesure plutôt qu'une checklist",
+    marker: "07",
+    title: "Être trouvé par les bonnes personnes",
     promise:
-      "Le site devient lisible pour les moteurs, les assistants et les humains, puis son apprentissage est relié aux vraies requêtes.",
+      "Tes pages répondent aux bonnes recherches et tu peux voir ce qui attire vraiment des visiteurs.",
     why:
-      "Le SEO et le GEO peuvent produire durablement, rarement instantanément. La Search Console permet de mesurer impressions, requêtes, pages et écarts au lieu de deviner.",
+      "Être visible prend du temps. Il faut relier chaque page à une question réelle puis regarder ce qui se passe.",
     deliverables: [
-      "Carte intentions et pages",
-      "Schema.org",
-      "Search Console configurée",
-      "Brief d'agent SEO borné",
+      "Pages liées aux recherches",
+      "Site lisible par les moteurs",
+      "Suivi des recherches",
+      "Plan d'amélioration",
     ],
     tasks: [
-      { id: "web-seo-01", title: "Cartographier intentions, pages, preuves et maillage", proof: "SEO-GEO-MAP reliée aux offres" },
-      { id: "web-seo-02", title: "Implémenter métadonnées, sitemap, robots et données structurées", proof: "Inspection technique et résultats enrichis testés" },
-      { id: "web-seo-03", title: "Configurer Google Search Console et son API", proof: "Propriété vérifiée et première requête API documentée" },
-      { id: "web-seo-04", title: "Définir l'agent SEO, ses sources et ses permissions", proof: "Process lire, recommander, approuver, publier, mesurer" },
-      { id: "web-seo-05", title: "Préparer les surfaces GEO sans fabriquer d'autorité", proof: "Entités, réponses, sources et preuves cohérentes" },
+      {
+        id: "web-seo-01",
+        title: "Relier chaque page à une recherche réelle",
+        outcome: "Chaque page répond à une intention précise.",
+      },
+      {
+        id: "web-seo-02",
+        title: "Aider les moteurs à comprendre le site",
+        outcome: "Les titres, adresses et informations importantes sont propres.",
+      },
+      {
+        id: "web-seo-03",
+        title: "Voir les recherches qui amènent des visiteurs",
+        outcome: "Les décisions viennent de recherches observées, pas d'une intuition seule.",
+      },
+      {
+        id: "web-seo-04",
+        title: "Décider ce qui peut être proposé ou publié",
+        outcome: "Aucun texte automatique ne part sans relecture prévue.",
+      },
+      {
+        id: "web-seo-05",
+        title: "Répondre sans inventer d'autorité",
+        outcome: "Les pages restent justes, utiles et reliées à des sources vérifiables.",
+      },
     ],
-    validation:
-      "Les moteurs peuvent découvrir et interpréter les pages, les mesures sont accessibles et aucune publication agentique ne contourne la validation prévue.",
+    finishLine:
+      "On peut avancer quand les pages sont compréhensibles par les moteurs et que les premières recherches peuvent être suivies.",
   },
   {
     id: "launch-acquisition",
-    marker: "Semaines 7 et 8",
-    duration: "2 à 3 sessions",
-    title: "Lancer avec des canaux, des preuves et une boucle de vente honnête",
+    marker: "08",
+    title: "Obtenir des demandes",
     promise:
-      "Tu ne restes pas à attendre le trafic. Tu montres, contactes, observes les réponses et améliores le système.",
+      "Tu relies le site à quelques actions concrètes pour que les bonnes personnes puissent le découvrir et te contacter.",
     why:
-      "Le site rassure quand l'attention existe. Les premiers clients viennent souvent de la prospection, du contenu, du réseau et de démonstrations personnalisées.",
+      "Un site ne crée pas de demande dans le vide. Il devient utile quand il reçoit une attention qualifiée et apprend des réponses obtenues.",
     deliverables: [
-      "Liste de prospects propre",
-      "Séquence de contact",
-      "Démonstration Loom",
-      "Plan de contenu",
-      "Tableau d'expériences",
+      "Deux canaux de départ",
+      "Liste de contacts propre",
+      "Message de prise de contact",
+      "Premières mesures",
     ],
     tasks: [
-      { id: "web-acq-01", title: "Choisir deux canaux maximum pour le premier cycle", proof: "Canaux reliés à l'ICP et à la capacité réelle" },
-      { id: "web-acq-02", title: "Construire un petit outil de collecte autorisée", proof: "Source, consentement, conformité et qualité documentés" },
-      { id: "web-acq-03", title: "Créer une approche appel, LinkedIn ou email non trompeuse", proof: "Message court ancré dans un problème observé" },
-      { id: "web-acq-04", title: "Enregistrer une vidéo Loom personnalisée qui montre le gap", proof: "Avant, conséquence, possibilité, prochaine étape" },
-      { id: "web-acq-05", title: "Publier du contenu qui montre le travail réel", proof: "Trois pièces liées à des décisions ou preuves" },
-      { id: "web-acq-06", title: "Lancer un test borné", proof: "Contrôle, variante, métrique métier et règle d'arrêt" },
-      { id: "web-acq-agency-01", title: "Transformer une preuve de delivery en actif commercial réutilisable", proof: "Cas, limites, consentement client et variantes par ICP", tracks: ["agence"] },
+      {
+        id: "web-acq-01",
+        title: "Choisir deux façons de toucher les bonnes personnes",
+        outcome: "Les canaux correspondent à l'audience et au temps disponible.",
+      },
+      {
+        id: "web-acq-02",
+        title: "Préparer une liste de contacts propre et autorisée",
+        outcome: "Les contacts sont utiles, compréhensibles et traités correctement.",
+      },
+      {
+        id: "web-acq-03",
+        title: "Écrire un premier message humain",
+        outcome: "Le message parle d'une situation concrète et ne force pas la vente.",
+      },
+      {
+        id: "web-acq-04",
+        title: "Montrer le site à une personne précise",
+        outcome: "La démonstration fait voir ce que le site peut changer pour elle.",
+      },
+      {
+        id: "web-acq-05",
+        title: "Publier ce que le travail apprend",
+        outcome: "Le contenu montre des décisions réelles plutôt que des promesses vagues.",
+      },
+      {
+        id: "web-acq-06",
+        title: "Mesurer les réponses et les demandes",
+        outcome: "On regarde les échanges utiles, pas seulement le nombre de clics.",
+      },
+      {
+        id: "web-acq-agency-01",
+        title: "Transformer une livraison en exemple réutilisable",
+        outcome: "L'exemple respecte le client et peut être adapté à une nouvelle cible.",
+        tracks: ["agence"],
+      },
     ],
-    validation:
-      "Le site est relié à des canaux actifs, chaque message reste honnête sur ce qu'un site peut produire et la métrique va au-delà du clic.",
+    finishLine:
+      "On peut avancer quand le site reçoit une attention réelle et qu'une réponse permet de choisir la prochaine amélioration.",
   },
   {
     id: "qa-capitalisation",
-    marker: "Clôture",
-    duration: "1 revue complète",
-    title: "Livrer, apprendre et transformer le travail en capital",
+    marker: "09",
+    title: "Améliorer avec le réel",
     promise:
-      "Le projet ne finit pas à la mise en ligne. Il produit une preuve, une méthode, des erreurs comprises et des actifs réutilisables.",
+      "Tu vérifies ce qui fonctionne, tu corriges ce qui bloque et tu gardes une méthode réutilisable pour la suite.",
     why:
-      "Une exécution unique est un résultat. Une exécution tracée, comparée, testée et promue avec prudence devient une capacité.",
+      "La mise en ligne n'est pas la fin. C'est le moment où l'on peut enfin apprendre des usages, des demandes et des erreurs réelles.",
     deliverables: [
-      "Rapport de QA",
-      "Dossier de passation",
-      "SOPs candidates",
-      "Skills candidats",
-      "Plan 30, 60 et 90 jours",
+      "Relecture complète",
+      "Site vérifié en ligne",
+      "Méthodes réutilisables",
+      "Suivi 30, 60 et 90 jours",
     ],
     tasks: [
-      { id: "web-qa-01", title: "Tester responsive, clavier, accessibilité, performance et erreurs", proof: "Rapport avec commandes, captures et verdicts" },
-      { id: "web-qa-02", title: "Vérifier production, domaine, formulaires et analytics", proof: "Smoke tests post-déploiement" },
-      { id: "web-qa-03", title: "Séparer observation, pattern candidat, SOP et skill", proof: "Registre de capitalisation avec niveau de preuve" },
-      { id: "web-qa-04", title: "Créer les tests de non-régression utiles", proof: "Incident reproductible couvert" },
-      { id: "web-qa-05", title: "Écrire le plan de suivi 30, 60 et 90 jours", proof: "Prochaines décisions, métriques et dates" },
-      { id: "web-qa-agency-01", title: "Promouvoir un seul process à travers le gate de capitalisation", proof: "Trigger, owner, preuve, version, rollback et date de revue", tracks: ["agence"] },
-      { id: "web-qa-agency-02", title: "Préparer l'onboarding d'un collaborateur sur le système", proof: "Exécution témoin sans aide du fondateur et écarts observés", tracks: ["agence"] },
+      {
+        id: "web-qa-01",
+        title: "Tester le site sur mobile et ordinateur",
+        outcome: "Les pages, boutons et textes restent utilisables partout.",
+      },
+      {
+        id: "web-qa-02",
+        title: "Vérifier les demandes et les mesures",
+        outcome: "Une demande envoyée arrive au bon endroit et peut être suivie.",
+      },
+      {
+        id: "web-qa-03",
+        title: "Noter ce qui s'est répété ou bloqué",
+        outcome: "Les apprentissages sont séparés des impressions rapides.",
+      },
+      {
+        id: "web-qa-04",
+        title: "Éviter qu'une erreur revienne",
+        outcome: "Les problèmes importants sont couverts par une vérification simple.",
+      },
+      {
+        id: "web-qa-05",
+        title: "Préparer le suivi à 30, 60 et 90 jours",
+        outcome: "Les prochaines décisions ont une date et une mesure associée.",
+      },
+      {
+        id: "web-qa-agency-01",
+        title: "Faire relire une méthode avant de la généraliser",
+        outcome: "Une réussite isolée ne devient pas automatiquement la règle de toute l'équipe.",
+        tracks: ["agence"],
+      },
+      {
+        id: "web-qa-agency-02",
+        title: "Faire reprendre le système par un collaborateur",
+        outcome: "Les écarts restants sont visibles avant de transmettre la méthode.",
+        tracks: ["agence"],
+      },
     ],
-    validation:
-      "Le live est vérifié, la reprise est documentée et aucune leçon n'est promue en règle globale sans preuve suffisante.",
-    trackValidation: {
-      agence: "Au moins un process a été transmis, exécuté, revu et rendu réversible sans transformer une réussite isolée en standard global.",
+    finishLine:
+      "On peut avancer quand le site est vérifié, que les prochaines mesures sont posées et que les apprentissages peuvent servir ailleurs.",
+    trackFinishLine: {
+      agence:
+        "Au moins une méthode a été transmise, exécutée, relue et rendue réversible avant d'être généralisée.",
     },
   },
 ];
 
+export const PHASES = THEMES;
+
 export const OUTCOMES = [
-  "Un site utile dans un système d'acquisition réel",
-  "Une méthode de design par références qui ne produit pas d'AI slop",
-  "Un design system précis, rendu et réutilisable",
-  "Une stack comprise, versionnée et déployable",
-  "Un socle SEO, GEO et Search Console mesurable",
-  "Des process, SOPs et skills candidats issus du terrain",
+  "Un site qui sert une offre et une action précises",
+  "Un message que les bons clients comprennent",
+  "Une direction visuelle cohérente et personnelle",
+  "Un site en ligne que tu peux reprendre",
+  "Des demandes reliées à des actions concrètes",
+  "Une méthode que tu peux réutiliser",
 ];
 
 export const TOOL_LAYERS = [
-  { label: "Sourcer", tools: "Pinterest, Refero, Mintlify, Rare UI, sites métier" },
-  { label: "Concevoir", tools: "Figma, HTML, SVG, design system versionné" },
-  { label: "Produire", tools: "IDE agentique, GitHub, modèles image et vidéo adaptés" },
-  { label: "Opérer", tools: "Vercel ou Cloudflare, Supabase ou Neon, API, VPS si justifié" },
-  { label: "Mesurer", tools: "Search Console, analytics, CRM, retours commerciaux" },
-  { label: "Capitaliser", tools: "SOPs, skills, tests, assets, décisions versionnées" },
+  { label: "Trouver des idées", tools: "Références visuelles, sites métier, exemples de pages" },
+  { label: "Préparer", tools: "Plan des pages, textes, règles visuelles et visuels" },
+  { label: "Construire", tools: "Outil de travail, versions, relecture et mise en ligne" },
+  { label: "Relier", tools: "Demandes, informations, accès et automatisations si nécessaires" },
+  { label: "Regarder", tools: "Recherches, visites, réponses et demandes reçues" },
+  { label: "Garder", tools: "Décisions, vérifications, méthodes et exemples réutilisables" },
 ];
 
 export type SiteWebFollowUpProfile = {
@@ -407,49 +601,49 @@ export function buildSiteWebFollowUpMarkdown({
   completed: string[];
   exportedAt?: Date;
 }) {
-  const visibleTasks = PHASES.flatMap((phase) =>
-    phase.tasks.filter((task) => !task.tracks || task.tracks.includes(profile.track))
+  const completedSet = new Set(completed);
+  const visibleTasks = THEMES.flatMap((theme) =>
+    theme.tasks.filter((task) => !task.tracks || task.tracks.includes(profile.track))
   );
-  const completedVisible = visibleTasks.filter((task) => completed.includes(task.id)).length;
+  const completedVisible = visibleTasks.filter((task) => completedSet.has(task.id)).length;
   const progress = visibleTasks.length
     ? Math.round((completedVisible / visibleTasks.length) * 100)
     : 0;
   const track = TRACKS.find((item) => item.id === profile.track)?.shortLabel ?? profile.track;
   const date = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(exportedAt);
-  const phaseSections = PHASES.map((phase) => {
-    const tasks = phase.tasks.filter(
+  const themeSections = THEMES.map((theme) => {
+    const tasks = theme.tasks.filter(
       (task) => !task.tracks || task.tracks.includes(profile.track)
     );
     const taskLines = tasks
       .map(
         (task) =>
-          `${completed.includes(task.id) ? "- [x]" : "- [ ]"} ${task.title}\n  Preuve attendue : ${task.proof}`
+          `${completedSet.has(task.id) ? "- [x]" : "- [ ]"} ${task.title}\n  Résultat visé : ${task.outcome}`
       )
       .join("\n");
-    const trackGate = phase.trackValidation?.[profile.track];
-    const validation = trackGate
-      ? `${phase.validation} ${trackGate}`
-      : phase.validation;
-    return `## ${phase.marker} : ${phase.title}\n\nValidation du palier : ${validation}\n\n${taskLines}`;
+    const trackLine = theme.trackFinishLine?.[profile.track];
+    const finishLine = trackLine ? `${theme.finishLine} ${trackLine}` : theme.finishLine;
+    return `## ${theme.marker} : ${theme.title}\n\nÀ la fin de ce thème : ${theme.promise}\n\nQuand on peut avancer : ${finishLine}\n\n${taskLines}`;
   }).join("\n\n");
 
   return (
-    `# Suivi post-accompagnement : Site Web by AI\n\n` +
+    `# Suivi de l'accompagnement : Site Web\n\n` +
     `Client : ${escapeInlineMarkdown(profile.name)}\n\n` +
     `Entreprise : ${escapeInlineMarkdown(profile.company)}\n\n` +
     `Projet : ${escapeInlineMarkdown(profile.project)}\n\n` +
     `URL : ${escapeInlineMarkdown(profile.siteUrl) || "Non renseignée"}\n\n` +
-    `Parcours : ${track}\n\n` +
+    `Point de départ : ${track}\n\n` +
     `Exporté le : ${date}\n\n` +
-    `Progression : ${completedVisible}/${visibleTasks.length} preuves, soit ${progress} %\n\n` +
-    `## Baseline et état de sortie\n\n${safeTextBlock(followUp.baseline, "À compléter pendant la revue de clôture.")}\n\n` +
-    `## Mesures à suivre\n\n${safeTextBlock(followUp.metrics, "Aucune métrique renseignée.")}\n\n` +
+    `Progression : ${completedVisible}/${visibleTasks.length} tâches, soit ${progress} %\n\n` +
+    `## Départ et état de sortie\n\n${safeTextBlock(followUp.baseline, "À compléter pendant la revue de clôture.")}\n\n` +
+    `## Mesures à suivre\n\n${safeTextBlock(followUp.metrics, "Aucune mesure renseignée.")}\n\n` +
     `## À 30 jours\n\n${safeTextBlock(followUp.day30, "À compléter.")}\n\n` +
     `## À 60 jours\n\n${safeTextBlock(followUp.day60, "À compléter.")}\n\n` +
     `## À 90 jours\n\n${safeTextBlock(followUp.day90, "À compléter.")}\n\n` +
-    `## Observations, erreurs et patterns candidats\n\n${safeTextBlock(followUp.observations, "Aucune observation renseignée.")}\n\n` +
-    `## Règle de capitalisation\n\nUne répétition déclenche la capture. Elle ne déclenche pas automatiquement une promotion. Une observation devient SOP, skill, test ou asset seulement après diagnostic, preuve adaptée au risque, versionnement et revue.\n\n` +
-    phaseSections +
+    `## Notes de suivi\n\n${safeTextBlock(followUp.observations, "Aucune note renseignée.")}\n\n` +
+    `## Règle de suite\n\nOn ne transforme pas une réussite isolée en règle générale. On garde ce qui est compris, mesuré, réutilisable et relu.\n\n` +
+    `## Thèmes de travail\n\n` +
+    themeSections +
     "\n"
   );
 }

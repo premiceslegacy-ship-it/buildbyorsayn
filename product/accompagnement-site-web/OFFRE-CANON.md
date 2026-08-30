@@ -1,82 +1,103 @@
-# Site Web by AI : offre canonique
+# Site Web : offre canonique
 
 ## Rôle
 
-Cette offre accompagne une personne ou une équipe pour concevoir, construire, lancer et rendre reproductible un système de production web avec l'IA.
+Cet accompagnement apprend à créer des sites web avec l'IA pour en tirer des revenus. Le site peut devenir une prestation vendue à des clients, le support d'une nouvelle activité ou la capacité de production d'une agence.
 
-Elle ne vend pas un site magique. Elle transmet une capacité de décision et d'exécution qui reste utile lorsque le modèle, l'IDE ou l'hébergeur change.
+Le point de départ change selon la personne, mais le résultat recherché reste le même : savoir transformer un besoin réel en site clair, livrable, présentable et améliorable. On ne vend ni une page décorative, ni un raccourci magique vers des revenus.
+
+## Promesse
+
+Créer avec l'IA ne consiste pas à demander une page puis à accepter sa première version. Il faut savoir cadrer le projet, donner le bon contexte, faire produire, relire, corriger, mettre en ligne et présenter le résultat comme une prestation ou comme un actif pour sa propre activité.
 
 ## Résultat attendu
 
-À la fin, l'accompagné possède :
+À la fin, l'accompagné repart avec :
 
-- un site relié à une offre, une cible, une action et des canaux réels ;
-- une méthode de recherche visuelle qui transforme des références en règles sans les copier ;
-- un design system agent-ready, rendu et suffisamment précis pour être prolongé ;
-- un repository versionné, une preview, une production et une procédure de reprise ;
-- un socle SEO, GEO et Search Console mesurable ;
-- un plan d'acquisition honnête qui ne fait pas croire qu'un site crée seul la demande ;
-- un registre de patterns, SOPs, skills, tests et assets candidats issus du travail réel ;
-- un document de suivi à 30, 60 et 90 jours.
+- un site web construit avec l'IA et relié à une offre, une personne et une action précise ;
+- une façon de travailler qui permet de produire sans copier-coller aveugle ;
+- une prestation de site que l'on peut expliquer, présenter et vendre ;
+- une direction visuelle cohérente et personnelle ;
+- des pages utilisables sur mobile et ordinateur ;
+- un site en ligne que l'on peut relire, corriger et reprendre ;
+- les fonctions nécessaires, sans ajouter de complexité pour impressionner ;
+- des pages que les moteurs peuvent comprendre ;
+- un premier plan concret pour obtenir des demandes ;
+- une base réutilisable pour développer une activité, une agence ou une reconversion.
+
+Le résultat commercial dépend ensuite du marché, de l'offre, de la prospection, de la qualité d'exécution et de la régularité. L'accompagnement donne une capacité de production et une méthode, pas une garantie de chiffre d'affaires.
 
 ## Publics
 
-### Débutant
+### Je démarre
 
-Les bases du web, du layout et de la mise en ligne sont obligatoires. Le passage au palier suivant exige une preuve construite et expliquée.
+On part des bases utiles pour passer de zéro à un premier site livrable, puis comprendre comment le proposer comme prestation.
 
-### Expérimenté
+### J'ai déjà de l'expérience
 
-Les acquis sont testés. Une compétence démontrée est compressée. Le temps libéré est déplacé vers le jugement, le système, les branches connectées, l'acquisition et la capitalisation.
+On ne refait pas ce qui est acquis. On travaille les décisions qui font encore perdre du temps, de la qualité ou des ventes, afin de produire plus régulièrement.
 
-### Agence
+### Je lance mon activité
 
-Chaque étape sépare ce qui relève du jugement d'un senior, d'un process stable, d'un skill, d'un contrôle humain et d'une validation client. L'objectif supplémentaire est la transmissibilité sans baisse silencieuse de qualité.
+On construit un site qui porte une offre claire et aide à présenter le savoir-faire aux premières personnes à contacter.
+
+### Je développe une agence
+
+On transforme une façon de faire personnelle en règles, rôles et méthodes partageables, pour produire avec une équipe sans tout garder dans sa tête.
+
+### Je me reconvertis
+
+On apprend par un projet réel et on repart avec une première offre, un site montrable et une compréhension concrète du métier.
 
 ## Format
 
-- Diagnostic initial de 90 minutes.
-- Huit semaines de construction, adaptées au niveau.
-- Une ou deux sessions par semaine selon le palier.
-- Travail sur un projet fil rouge réel.
-- Validation par preuves, pas par temps passé ni vidéos regardées.
-- Revue de clôture.
-- Plan de suivi 30, 60 et 90 jours.
+- Un échange initial de 15 minutes pour comprendre le projet.
+- Un diagnostic de 90 minutes si l'accompagnement est pertinent.
+- Des sessions adaptées au projet et au point de départ.
+- Un seul projet réel comme fil conducteur.
+- Des thèmes travaillés dans l'ordre où ils servent le résultat.
+- Une relecture avant chaque passage important.
+- Un suivi à 30, 60 et 90 jours après la mise en ligne.
 
-Le prix et la capacité ne sont pas inventés dans ce document. Ils sont décidés par Samuel selon le périmètre, le niveau, le nombre de sessions et le risque du projet.
+La durée exacte et le nombre de sessions dépendent du périmètre, du niveau et des besoins réels. Rien n'est présenté comme un calendrier identique pour tout le monde.
 
-## Progression
+## Thèmes de travail
 
-1. Diagnostic et preuve finale.
-2. Fondations web.
-3. Business, message et copy.
-4. Références et direction artistique.
-5. Design system et assets.
-6. Build, Git et déploiement.
-7. Branche connectée lorsque nécessaire.
-8. SEO, GEO, Search Console et agent SEO borné.
-9. Lancement et acquisition.
-10. QA, passation et capitalisation.
+1. Un projet clair avant de commencer.
+2. Un message qui donne envie d'avancer.
+3. Une direction qui donne confiance.
+4. Des pages cohérentes partout.
+5. Construire et mettre en ligne.
+6. Ajouter seulement ce qui est nécessaire.
+7. Être trouvé par les bonnes personnes.
+8. Obtenir des demandes.
+9. Améliorer avec le réel.
 
-La définition détaillée de chaque palier vit dans `lib/siteWebAccompagnement.ts` et alimente l'espace membre.
+La liste détaillée est dans `lib/siteWebAccompagnement.ts`. Elle alimente la page de l'offre, l'espace membre et l'export de suivi.
 
-## Garde-fous commerciaux
+## Principes de travail
 
-- Le site n'est jamais présenté comme un canal d'acquisition autonome.
-- Le SEO et le GEO sont décrits comme des actifs qui mûrissent, pas comme une promesse de court terme.
-- Aucun témoignage, chiffre, délai de résultat ou rareté n'est inventé.
-- Le call initial diagnostique avant de prescrire.
-- Le parcours saute ce qui est démontré, jamais ce qui est seulement déclaré.
-- Une réussite isolée reste un pattern candidat.
+- Le résultat économique passe avant l'outil.
+- Un site doit pouvoir être vendu, utilisé ou développé, pas seulement montré.
+- Le visiteur comprend avant que la technique soit expliquée.
+- Une fonction n'entre que si elle sert le projet.
+- Une tâche n'est cochée que lorsqu'elle est faite.
+- Une personne peut demander une explication à tout moment.
+- Une erreur importante est corrigée avant de passer à la suite.
+- Une réussite isolée ne devient pas automatiquement une méthode générale.
 
-## Architecture produit retenue
+## Architecture produit
 
-L'offre et l'espace de progression sont intégrés à BUILD :
+L'accompagnement reste dans BUILD :
 
-- `/accompagnement` : page publique de l'offre ;
-- `/accompagnement/espace` : progression, personnalisation et export du suivi ;
-- Supabase `progress` : synchronisation des preuves lorsque l'utilisateur est connecté ;
-- localStorage : copie locale et personnalisation sans donnée sensible ;
-- export Markdown : document portable et possédé par l'accompagné.
+- `/accompagnement` : sas pour choisir un accompagnement ;
+- `/accompagnement/site-web` : page de l'offre Site Web ;
+- `/accompagnement/espace` : thèmes, progression, informations et export ;
+- `/accompagnement/formateur` : vue de pilotage réservée au formateur ;
+- Supabase `progress` : progression des personnes connectées ;
+- `localStorage` : informations de personnalisation et reprise locale ;
+- export Markdown : document portable que l'accompagné peut conserver.
 
-Neon n'est pas ajouté. BUILD possède déjà l'auth et la table de progression dans Supabase. Une seconde base créerait une frontière de données et des opérations supplémentaires sans bénéfice pour cette V1.
+Les visuels de proposition sont des compositions BUILD en HTML/CSS. Ils montrent le brief, la construction, la relecture et la sortie commerciale. Une réglette affiche des logos familiers de ChatGPT, Codex, Claude Code, Stripe, Vercel et Supabase pour situer l'écosystème utilisé. Ces outils ne sont pas présentés comme la valeur de l'accompagnement et aucun résultat financier ne leur est attribué.
+
+Aucune donnée de connexion ou clé de service ne doit être affichée dans l'interface ou dans un document exporté.

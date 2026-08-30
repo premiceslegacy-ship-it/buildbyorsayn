@@ -3,14 +3,15 @@ import test from "node:test";
 import {
   buildSiteWebFollowUpFilename,
   buildSiteWebFollowUpMarkdown,
+  THEMES,
 } from "../lib/siteWebAccompagnement";
 
 const followUp = {
   baseline: "Un premier site existe.",
   day30: "Mesurer les premiers signaux.",
   day60: "Comparer les angles.",
-  day90: "Promouvoir uniquement les patterns prouvés.",
-  metrics: "Leads qualifiés et temps de livraison.",
+  day90: "Garder ce qui fonctionne.",
+  metrics: "Demandes qualifiées et temps de livraison.",
   observations: "Une friction a été observée.",
 };
 
@@ -31,8 +32,9 @@ test("buildSiteWebFollowUpMarkdown exports a personalized portable report", () =
 
   assert.match(markdown, /Client : Camille Martin/);
   assert.match(markdown, /Entreprise : Atelier Horizon/);
-  assert.match(markdown, /- \[x\] Décrire le projet, l'offre et le résultat attendu/);
-  assert.match(markdown, /- \[ \] Auditer le niveau web, design, copy, code et acquisition/);
+  assert.match(markdown, /- \[x\] Décrire ce que le site doit changer/);
+  assert.match(markdown, /- \[ \] Faire le point sur ce que tu sais déjà faire/);
+  assert.match(markdown, /Progression : 1\/45 tâches, soit 2 %/);
   assert.match(markdown, /À 90 jours/);
   assert.equal(markdown.includes(String.fromCodePoint(0x2014)), false);
   assert.equal(buildSiteWebFollowUpFilename(profile), "suivi-site-web-atelier-horizon.md");
@@ -53,18 +55,18 @@ test("buildSiteWebFollowUpMarkdown adapts tasks to the selected track", () => {
     exportedAt: new Date("2026-08-30T10:00:00Z"),
   });
 
-  assert.doesNotMatch(markdown, /Comprendre page, section, conteneur, grille et colonne/);
-  assert.match(markdown, /Passer le test de compression des acquis/);
+  assert.match(markdown, /Faire le point sur ce que tu sais déjà faire/);
+  assert.doesNotMatch(markdown, /Décider qui fait quoi dans l'équipe/);
   assert.match(markdown, /URL : Non renseignée/);
   assert.equal(buildSiteWebFollowUpFilename(profile), "suivi-site-web-studio-deja.md");
 });
 
-test("buildSiteWebFollowUpMarkdown gives agencies distinct operational gates", () => {
+test("buildSiteWebFollowUpMarkdown gives teams distinct responsibilities", () => {
   const markdown = buildSiteWebFollowUpMarkdown({
     profile: {
-      name: "Agence",
+      name: "Équipe",
       company: "Studio",
-      project: "Scale",
+      project: "Organisation",
       siteUrl: "",
       track: "agence",
     },
@@ -73,9 +75,18 @@ test("buildSiteWebFollowUpMarkdown gives agencies distinct operational gates", (
     exportedAt: new Date("2026-08-30T10:00:00Z"),
   });
 
-  assert.match(markdown, /Cartographier les rôles, handoffs et goulots de l'équipe/);
-  assert.match(markdown, /Séparer les décisions senior des opérations déléguables/);
-  assert.match(markdown, /Un collaborateur peut produire, un senior peut contrôler/);
+  assert.match(markdown, /Décider qui fait quoi dans l'équipe/);
+  assert.match(markdown, /Décider ce qui doit être relu par un senior/);
+  assert.match(markdown, /Faire relire une méthode avant de la généraliser/);
+});
+
+test("the accompaniment is organized as themes, not weeks or gates", () => {
+  assert.deepEqual(
+    THEMES.map((theme) => theme.marker),
+    ["01", "02", "03", "04", "05", "06", "07", "08", "09"]
+  );
+  const source = JSON.stringify(THEMES);
+  assert.doesNotMatch(source, /Semaine|Gate|DevTools|padding|margin|gap/);
 });
 
 test("buildSiteWebFollowUpMarkdown contains untrusted text without changing its structure", () => {

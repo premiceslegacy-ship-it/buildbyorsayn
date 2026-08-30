@@ -138,8 +138,10 @@ export default function BlocPage() {
   const isBlocCompleted =
     completedSectionsInBloc.length === bloc.sections.length;
 
-  const nextBlocId = String(Number(blocId) + 1);
-  const hasNextBloc = BLOCS_DATA.some((b) => b.id === nextBlocId);
+  const currentBlocIndex = BLOCS_DATA.findIndex((item) => item.id === blocId);
+  const nextBloc = currentBlocIndex >= 0 ? BLOCS_DATA[currentBlocIndex + 1] : undefined;
+  const nextBlocId = nextBloc?.id;
+  const hasNextBloc = Boolean(nextBlocId);
 
   const checkoutUrl = checkoutUserId
     ? `https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02?client_reference_id=${checkoutUserId}`

@@ -1,4 +1,4 @@
-# Suivi post-accompagnement : Site Web by AI
+# Suivi après l'accompagnement : Site Web
 
 Client : [Prénom Nom]
 
@@ -8,73 +8,73 @@ Projet : [Nom du projet]
 
 URL : [URL]
 
-Parcours : [Débutant / Expérimenté / Agence]
+Point de départ : [Je démarre / J'ai déjà livré / En équipe]
 
 Date de clôture : [Date]
 
-## Baseline et état de sortie
+## Le départ et l'état actuel
 
-Décrire ce qui existait au départ, ce qui fonctionne maintenant, ce qui reste fragile et la preuve disponible.
+Décrire ce qui existait au début, ce qui fonctionne maintenant et ce qui reste fragile.
 
-## Mesures à suivre
+## Ce qu'on regarde
 
-- leads qualifiés ;
-- rendez-vous qualifiés ;
-- conversion en opportunité ou revenu ;
-- requêtes et pages utiles dans Search Console ;
-- temps de livraison ;
-- corrections client ;
-- erreurs récurrentes ;
-- coût par résultat accepté.
+Garder uniquement les mesures qui peuvent changer une décision :
 
-Conserver uniquement les mesures qui peuvent changer une décision.
+- demandes qualifiées ;
+- rendez-vous utiles ;
+- passage d'une visite à une demande ;
+- recherches et pages qui attirent des visiteurs ;
+- temps nécessaire pour livrer ;
+- corrections demandées ;
+- erreurs qui reviennent ;
+- coût pour obtenir un résultat accepté.
 
 ## À 30 jours
 
-Mesurer les premiers signaux. Corriger les frictions critiques. Vérifier le fonctionnement des formulaires, des canaux, des pages principales et des événements. Parler aux premiers prospects ou utilisateurs. Ne pas ajouter de nouvelles pages pour éviter de traiter un problème de message ou de ciblage.
+Regarder les premiers signaux. Vérifier les pages principales, les demandes, les canaux et les mesures. Parler aux premières personnes qui ont vu le site. Corriger les blocages les plus importants avant d'ajouter de nouvelles pages.
 
-Décision attendue : [continuer / corriger / arrêter / tester une variante]
+Décision attendue : [continuer / corriger / arrêter / essayer une autre version]
 
 ## À 60 jours
 
-Comparer les angles d'acquisition. Approfondir les requêtes utiles. Revoir les pages et contenus qui créent réellement des conversations. Documenter les process répétés sans les promouvoir automatiquement.
+Comparer les façons d'obtenir de l'attention. Revoir les recherches utiles et les pages qui créent de vraies conversations. Noter les actions qui reviennent souvent, sans les imposer tout de suite à d'autres projets.
 
-Décision attendue : [angle à renforcer / page à revoir / canal à couper / process à formaliser]
+Décision attendue : [renforcer un angle / revoir une page / arrêter un canal / écrire une méthode]
 
 ## À 90 jours
 
-Décider ce qui devient SOP, skill, asset, test de non-régression ou simple note projet. Vérifier que la preuve est suffisante, que le contexte de validité est clair et que la promotion reste réversible.
+Décider ce qui peut être réutilisé, ce qui doit rester propre à ce projet et ce qui mérite encore d'être vérifié. Garder la possibilité de revenir en arrière.
 
-Décision attendue : [promouvoir / retester / garder local / déprécier]
+Décision attendue : [réutiliser / retester / garder pour ce projet / abandonner]
 
-## Registre d'apprentissage
+## Notes d'apprentissage
 
-### Observation
+### Ce qui s'est passé
 
-[Ce qui s'est produit]
+[Observation concrète]
 
-### Hypothèse de cause
+### Pourquoi cela a pu arriver
 
-[Pourquoi cela a pu se produire]
+[Hypothèse de cause]
 
-### Preuve disponible
+### Ce qui permet de le vérifier
 
-[Mesure, entretien, log, capture ou test]
+[Mesure, échange, journal, capture ou test]
 
-### Risque d'une mauvaise généralisation
+### Ce qui pourrait changer la conclusion
 
-[Ce qui pourrait rendre la leçon fausse ailleurs]
+[Contexte différent, public différent, volume insuffisant ou autre limite]
 
-### Destination proposée
+### Où ranger la suite
 
-[Projet / incident / expérience / SOP / skill / asset / test / décision]
+[Projet / incident / expérience / méthode / test / décision]
 
-### Revue requise
+### Qui relit
 
-[Qui valide et selon quel gate]
+[Personne responsable de la décision]
 
-## Règle de capitalisation
+## Règle de suite
 
-Une répétition déclenche la capture. Elle ne déclenche pas automatiquement une promotion. Une observation devient SOP, skill, test ou asset seulement après diagnostic, preuve adaptée au risque, versionnement et revue.
+Une action répétée mérite d'être notée. Elle ne devient pas automatiquement une règle. On généralise seulement ce qui est compris, mesuré, réutilisable et relu.
 
-L'espace `/accompagnement/espace` génère une version personnalisée de ce document avec la progression réelle et les preuves du parcours.
+L'espace `/accompagnement/espace` génère une version personnalisée de ce document avec la progression réelle et les notes du projet.

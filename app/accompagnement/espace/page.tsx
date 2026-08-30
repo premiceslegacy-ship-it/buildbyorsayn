@@ -1,9 +1,9 @@
 import { SiteWebWorkspace } from "@/components/accompagnement/SiteWebWorkspace";
 
 export const metadata = {
-  title: "Espace Site Web by AI : BUILD by Orsayn",
+  title: "Espace Site Web | BUILD",
   description:
-    "Parcours, preuves, livrables et suivi 30, 60, 90 jours de l'accompagnement Site Web by AI.",
+    "Thèmes de travail, progression et suivi de l'accompagnement Site Web.",
 };
 
 export default function SiteWebAccompanimentWorkspacePage() {

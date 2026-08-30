@@ -81,24 +81,24 @@ export default function IntroPage() {
               {[
                 {
                   num: "01",
-                  titre: "L'Absorption",
-                  label: "Méthode Sharingan",
-                  blocs: "Blocs 2 et 4",
-                  desc: "Greffe les compétences. Encode les skills.",
+                  titre: "Les fondations",
+                  label: "Comprendre et vendre",
+                  blocs: "Blocs 1 et 5",
+                  desc: "Comprends le système. Clarifie l'offre. Trouve le besoin.",
                 },
                 {
                   num: "02",
-                  titre: "Le Sprint Cash",
-                  label: "Premiers 10k€",
-                  blocs: "Blocs 1, 3 et 5",
-                  desc: "Positionne-toi. Utilise les frameworks. Vends.",
+                  titre: "La construction",
+                  label: "Passer à l'action",
+                  blocs: "Blocs 3 et 6",
+                  desc: "Prépare. Construis. Mets en ligne.",
                 },
                 {
                   num: "03",
-                  titre: "La Distillation",
-                  label: "Capital organique",
-                  blocs: "Blocs 6 et 7",
-                  desc: "Construis pour de vrai. Encode les SOPs.",
+                  titre: "L'amélioration",
+                  label: "Garder ce qui marche",
+                  blocs: "Blocs 2, 4 et 7",
+                  desc: "Choisis mieux. Réutilise. Itère.",
                 },
               ].map((phase) => (
                 <LiquidCard key={phase.num} className="p-5">

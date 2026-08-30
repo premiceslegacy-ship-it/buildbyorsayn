@@ -1,220 +1,173 @@
-# Design system : Site Web by AI
+# Design system : Accompagnement Site Web
 
-## Statut et provenance
+## Statut
 
-Version : 1.0
+Version : 2.0
 
-Surface : page d'offre et espace de progression BUILD.
+Surface : sas des accompagnements, page de l'offre Site Web et espace membre.
 
-Référence visuelle fournie : `Identité Visuelle/DA/f53bd06f88ecd3ef7d0d8c24f558af42.jpg`.
+Source de vérité :
 
-Toutes les valeurs dérivées de la photographie sont `inférées`. Les valeurs présentes dans le code sont des décisions `proposées`, puis calibrées sur les routes réelles. Elles ne sont pas présentées comme les tokens exacts de la référence.
+- `build-brand-system.md`
+- `build-design-system.md`
+- `app/globals.css`
+- `components/Logo.tsx`
 
-## Thèse visuelle
+La direction n'est pas une identité séparée. Elle reprend la direction BUILD pour que l'accompagnement reste une partie du même produit.
 
-Un système calme apparaît dans la brume. L'accompagné passe d'un territoire intuitif et diffus à une chaîne d'exécution lisible, sans perdre la créativité ni l'émotion.
+## Direction visuelle
 
-## Ce qui est repris comme mécanisme
+Registre : sombre, direct, précis, calme.
 
-- Une lumière laiteuse et froide traverse un fond profond.
-- Le display serif apporte l'imagination et l'éditorial.
-- Le sans serif apporte la méthode et l'interface.
-- Un objet humain ou central est remplacé par un objet de progression, afin de lier l'émotion à la fonction du produit.
-- Le bouton clair, presque nacré, concentre l'action.
-- Le grain empêche l'univers de devenir un gradient SaaS parfaitement lisse.
+La page doit donner l'impression d'un atelier de travail sérieux, pas d'un outil IA générique. La hiérarchie vient de la taille des titres, des espacements, des filets fins et de la lumière or patiné. Aucun effet ne doit prendre la place du résultat annoncé.
 
-## Ce qui n'est pas copié
+## Marque
 
-- Aucun nuage, personnage, slogan, composition ou badge Colab n'est repris.
-- L'image source n'est pas utilisée dans le produit.
-- Le hero n'imite pas son placement exact.
-- La palette est refroidie et assombrie pour rester dans l'univers Orsayn.
+- Utiliser le composant `Logo` existant et le mot BUILD.
+- Ne pas afficher de logo Orsayn dans ces surfaces.
+- Ne pas recréer un logo avec une autre image ou une autre typographie.
+- Le sas porte BUILD. La page Site Web porte BUILD. L'espace membre porte BUILD.
 
-## Tokens de couleur
+## Assets de proposition
 
-| Token | Valeur proposée | Rôle |
-|---|---:|---|
-| `canvas.base` | `#0b1117` | Fond principal, silence et contraste |
-| `canvas.elevated` | `#101920` | Section ou couche fonctionnelle |
-| `surface.glass` | `rgba(229, 237, 238, 0.07)` | Surface élevée rare |
-| `surface.input` | `rgba(0, 0, 0, 0.20)` | Saisie et zones éditables |
-| `text.primary` | `#f1ece4` | Titres et informations principales |
-| `text.body` | `#b8c2c9` | Corps long |
-| `text.muted` | `#8d9aa3` | Détails et métadonnées |
-| `line.subtle` | `rgba(255, 255, 255, 0.08)` | Séparation structurelle |
-| `accent.ice` | `#d5e1e6` | Focus, lumière et statut actif |
-| `action.background` | `#e5eceb` | Action principale |
-| `action.text` | `#172027` | Texte sur action principale |
-| `editorial.paper` | `#edf0eb` | Section claire de la timeline |
+Les assets visuels de la page ne représentent pas des logiciels. Ils représentent le travail qui crée la valeur : un brief, le contexte donné à l'IA, une page construite, une relecture et une sortie commerciale.
 
-Le bleu froid est une lumière et un état, jamais un second CTA dominant.
+Les compositions sont codées dans `components/AccompanimentAssets.tsx` et restent dans la palette BUILD. Une réglette présente des logos familiers de ChatGPT, Codex, Claude Code, Stripe, Vercel et Supabase. Ils servent à situer l'écosystème de production, pas à faire croire qu'un logiciel constitue la valeur de l'accompagnement.
+
+Le centre des compositions reste le travail réel : brief, contexte donné à l'IA, page construite, relecture, mise en ligne et sortie commerciale. Les éventuels boutons dans les fausses pages sont des éléments de décor explicatifs, pas des contrôles fonctionnels.
+
+La page Site Web utilise trois compositions principales :
+
+- `AudienceRoutesAsset` : les cinq points de départ et leur sortie possible ;
+- `SiteWebOutcomeAsset` : le passage d'une idée à un site vendable ;
+- `WorkCycleAsset` et `ThemeAtlas` : la construction, la relecture et les thèmes du projet.
+
+Les ombres et reliefs sont limités aux boutons ou aux feuilles visuelles afin d'évoquer un objet manipulable. Ils ne deviennent pas un système de cartes ou une décoration généralisée.
+
+## Couleurs
+
+| Rôle | Valeur | Usage |
+|---|---|---|
+| Fond principal | `#0e0e0f` | Toutes les surfaces de travail |
+| Fond secondaire | `#161618` | Alternance et zone de regroupement |
+| Or patiné | `#e8d5b0` | Action principale, sélection, index et progression |
+| Or sombre | `#c9b48a` | Variation discrète de l'accent |
+| Texte principal | `#f0ede8` | Titres et informations importantes |
+| Texte secondaire | `rgba(240, 237, 232, 0.50)` | Explications et détails |
+| Texte discret | `rgba(240, 237, 232, 0.25)` | Métadonnées non essentielles |
+| Filet | `rgba(255, 255, 255, 0.07)` | Séparation des zones et des lignes |
+| Succès | `rgba(74, 222, 128, 0.80)` | Confirmation explicite |
+| Erreur | `rgba(248, 113, 113, 0.80)` | Échec et récupération |
+
+Pas de gradient de fond, pas de halo décoratif, pas de bleu concurrent de l'or BUILD.
 
 ## Typographie
 
-### Display
+L'accompagnement utilise la même pile que BUILD : `-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif` via `font-sans`.
 
-Pile actuelle : `Iowan Old Style`, `Baskerville`, `Times New Roman`, serif.
+- Les titres restent en sans serif, avec un poids moyen et un interlettrage serré.
+- Les textes d'interface restent lisibles à partir de 14 px.
+- Les libellés courts peuvent utiliser la casse haute avec parcimonie.
+- Aucun serif éditorial n'est ajouté à l'accompagnement.
+- Aucun texte important ne dépend d'une police externe non chargée.
 
-Rôle : titres éditoriaux, grandes transitions et expression de l'idée.
+## Composition
 
-Règles :
+### Sas
 
-- tracking de `-0.04em` à `-0.055em` sur les grands titres ;
-- line-height de `0.88` à `1.02` selon la longueur ;
-- aucune capitale intégrale en display ;
-- largeur de ligne bornée pour éviter un mur typographique ;
-- sur mobile, taille fluide et saut de ligne naturel, jamais une copie compressée du desktop.
+Le sas explique qu'il existe plusieurs accompagnements et donne une seule destination active. Les offres futures restent visibles comme une information de contexte, pas comme de faux boutons.
 
-### Interface et corps
+### Page de l'offre
 
-Inter, via `next/font`, avec fallbacks système.
+Ordre de lecture :
 
-Rôle : navigation, actions, corps, preuves et saisie.
+1. résultat économique et promesse de création de sites avec l'IA ;
+2. points de départ selon le niveau et le projet ;
+3. ce que le site permet de vendre ou de développer ;
+4. façon de travailler ;
+5. thèmes abordés ;
+6. limites de l'accompagnement ;
+7. prise de contact.
 
-Règles :
-
-- corps de 14 à 18 px selon la surface ;
-- ligne de 1.5 à 1.75 ;
-- labels de 10 à 11 px seulement pour des métadonnées non essentielles ;
-- tracking des labels de `0.16em` à `0.26em` ;
-- aucune information décisive à moins de 12 px.
-
-## Grille et espaces
-
-### Page d'offre
-
-- largeur maximale : 1280 px ;
-- marges : 20 px compact, 32 px régulier, 48 px large ;
-- hero large : grille `1.12fr / 0.88fr` ;
-- sections : 96 à 128 px vertical sur large, 80 à 96 px compact ;
-- texte de lecture : 640 à 760 px maximum.
+Le H1 est centré. Les boutons nomment une action courte : `Parler du projet`, `Ouvrir l'espace`, `Voir l'offre` et `Ouvrir le thème`. Le relief skeuomorphique reste léger : bord inférieur, reflet intérieur, état pressé et focus visible, sans dégrader le contraste ni la lisibilité.
 
 ### Espace membre
 
-- large : `292px / minmax(0, 1fr) / 320px` ;
-- régulier et compact : colonne unique ;
-- la navigation de paliers devient une bande horizontale scrollable ;
-- la personnalisation descend après le travail principal sur mobile ;
-- aucune largeur minimale enfant ne peut agrandir le viewport.
+Ordre de lecture :
 
-Échelle d'espacement utilisée : 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128.
+1. progression globale ;
+2. liste des thèmes ;
+3. sujet actif ;
+4. tâches du sujet ;
+5. condition simple pour passer à la suite ;
+6. éléments produits ;
+7. notes de suivi ;
+8. informations personnelles.
 
-## Géométrie
+La navigation est une liste de lignes. Les tâches sont des lignes sélectionnables. Les cartes empilées ne servent pas de structure par défaut.
 
-- bouton principal : pill, hauteur minimale 48 px ;
-- bouton secondaire : pill ou cercle seulement pour une vraie action ;
-- surface narrative : rayon 30 à 34 px ;
-- inputs : rayon 12 à 16 px ;
-- séparations : filets, alignements et espace avant de créer une card ;
-- aucune plaque décorative derrière chaque icône.
+## Thèmes
 
-## Matière
+L'espace ne parle pas en semaines. Il suit les thèmes du travail :
 
-Le verre est réservé à l'objet principal, à la progression et à quelques surfaces d'état. Il n'est pas appliqué à chaque section.
+1. Un projet clair avant de commencer.
+2. Un message qui donne envie d'avancer.
+3. Une direction qui donne confiance.
+4. Des pages cohérentes partout.
+5. Construire et mettre en ligne.
+6. Ajouter seulement ce qui est nécessaire.
+7. Être trouvé par les bonnes personnes.
+8. Obtenir des demandes.
+9. Améliorer avec le réel.
 
-Contrat :
+Chaque thème contient un résultat attendu, des tâches courtes et une phrase simple qui indique quand le sujet est suffisamment avancé. Aucun thème n'est présenté comme une gate ou comme une collection de preuves.
 
-- contenu lisible sans `backdrop-filter` ;
-- bordure claire entre 8 et 15 % d'opacité ;
-- une lumière interne supérieure ;
-- ombre diffuse et profonde ;
-- grain global très léger ;
-- pas de glow autour de chaque composant.
+## Actions et états
 
-## Composants
+Les boutons principaux utilisent le fond `#e8d5b0` et le texte `#0e0e0f`. Les boutons secondaires restent transparents avec un filet clair.
 
-### Action principale
+Chaque action doit avoir les états suivants quand ils s'appliquent : repos, survol, focus visible, pression, désactivé, sauvegarde, succès et erreur avec récupération.
 
-But : diagnostic ou export.
+La progression affiche toujours un nombre en plus de la couleur. Une tâche cochée indique qu'elle a été faite. La synchronisation distante conserve une file locale en cas de panne.
 
-États : rest, hover, focus-visible, pressed, disabled si nécessaire.
+Les champs ont un label visible. Les textes de secours expliquent ce qui s'est passé et quoi faire ensuite.
 
-Focus : anneau clair de 2 px avec offset visible.
+## Icônes et motion
 
-Compact : largeur complète lorsque le libellé reste court.
+Les icônes Lucide restent réservées aux actions ou aux statuts utiles : retour, export, sauvegarde, remise à zéro, recherche et activité. Aucune icône décorative n'est ajoutée à chaque section.
 
-### Palier de navigation
+La motion sert uniquement à confirmer une sauvegarde, un changement de thème ou une progression. Elle n'est pas nécessaire pour comprendre la page. Le mode `prefers-reduced-motion` ramène les transitions à 1 ms et désactive le défilement doux.
 
-But : changer de phase et montrer l'avancement.
+## Responsive
 
-Anatomie : index, marker temporel, compteur de preuves, chevron large uniquement.
+Viewports à vérifier : 320, 375, 768, 1024, 1025 et 1440 px.
 
-États : rest, hover, active, completed.
-
-Mobile : élément de 230 px dans une bande scrollable, pas une liste verticale avant le contenu.
-
-### Tâche-preuve
-
-But : enregistrer une preuve existante, pas simuler une progression.
-
-Anatomie : contrôle circulaire, action, preuve attendue.
-
-États : rest, hover, focus-visible, completed, saving, rollback en cas d'échec distant.
-
-### Champ de suivi
-
-But : produire le document après accompagnement.
-
-Les labels restent visibles. Le placeholder n'est jamais le label. La donnée reste locale dans cette V1.
-
-## Motion
-
-### Micro-interaction
-
-- durée proposée : 150 ms ;
-- easing : `cubic-bezier(0.16, 1, 0.3, 1)` ;
-- propriétés : couleur, bordure, translateY inférieur à 2 px ;
-- interruption : immédiate ;
-- état final : stable et lisible.
-
-### Progression
-
-- durée proposée : 500 ms ;
-- propriété : largeur de barre ;
-- aucune boucle ;
-- le pourcentage textuel reste la source d'information.
-
-### Reduced motion
-
-Toutes les animations et transitions passent à 1 ms. Le scroll smooth est désactivé. Aucune information ne dépend du mouvement.
-
-## Logo et asset
-
-Le fichier utilisé est `public/orsayn-secondary-anthracite.png`.
-
-Il est placé sur une surface claire afin de conserver le contraste du logo anthracite. Son rôle est la signature de marque. Il n'est pas répété dans les cartes.
+- Le sas et la page d'offre restent centrés sans couper le H1.
+- La table des thèmes devient une liste lisible sur petit écran.
+- L'espace membre passe de trois zones à une colonne dans l'ordre de lecture.
+- La liste des thèmes devient défilable horizontalement uniquement lorsqu'elle ne tient plus.
+- Aucune action ne descend sous 44 px.
+- Aucun texte ou bouton important ne dépend du survol.
 
 ## Anti AI-slop
 
-Le système refuse :
+Interdits dans ces surfaces :
 
-- gradient violet SaaS ;
-- grille de cards répétée pour remplir ;
-- hero générique avec mockup de dashboard sans rapport ;
-- icône encadrée systématiquement ;
-- glass sur toutes les surfaces ;
-- métrique inventée ;
-- témoignage inventé ;
-- motion de scroll décoratif ;
-- copie littérale de la référence ;
-- phrase qui pourrait vendre n'importe quelle agence web.
+- police serif ajoutée pour faire premium ;
+- logo Orsayn ou variante de marque ;
+- sparkles, halos, blobs ou grille décorative ;
+- glassmorphism sans rôle ;
+- rangées de cartes interchangeables ;
+- logos d'outils utilisés comme preuve de valeur ;
+- répétition de listes numérotées `01`, `02`, `03` pour remplacer une vraie composition ;
+- traits décoratifs devant chaque ligne ;
+- jargon non expliqué ;
+- faux chiffres ou faux témoignages ;
+- bouton dont le résultat n'est pas compréhensible ;
+- thème présenté comme une semaine ou une preuve.
 
-## Calibration et preuves
+## QA
 
-Routes et viewports testés :
+Le rapport historique dans `visual-qa/browser-report.json` correspond à l'ancienne interface et n'est pas une preuve pour cette version. Il doit être régénéré après la prochaine capture navigateur.
 
-- `/accompagnement` à 320, 375, 768 et 1440 px ;
-- `/accompagnement/espace` en session authentifiée à 320, 375, 768, 1023, 1025 et 1440 px ;
-- zoom 200 % simulé par un viewport CSS de 640 px avec `devicePixelRatio: 2` ;
-- reduced motion, navigation clavier, focus visible et arbre d'accessibilité.
-
-Preuves versionnées :
-
-- `product/accompagnement-site-web/visual-qa/browser-report.json` ;
-- `product/accompagnement-site-web/visual-qa/rls-runtime-verification.json`.
-
-Captures locales inspectées : `/tmp/build-offer-qa-final/`.
-
-Résultats : aucun overflow horizontal, aucune cible interactive visible sous 44 px, aucun champ sans label, checkboxes et radios nommées dans l'arbre d'accessibilité, focus visible, reduced motion à 1 ms, double clic sérialisé en une mutation, panne réseau conservée dans l'outbox, reprise synchronisée au reload, export Markdown téléchargé et vérifié. L'unique erreur console enregistrée correspond à l'échec réseau volontaire de la fixture. Le typecheck, les 12 tests et le build de production réussissent. La RLS `progress` a été appliquée puis vérifiée avec deux utilisateurs isolés : lecture et écriture propres autorisées, lecture, insertion et suppression croisées refusées.
-
-Une validation humaine de direction artistique reste souhaitable avant de considérer cette identité comme verrouillée pour toutes les futures offres.
+La direction BUILD est validée par la demande du propriétaire du produit. Le rendu final doit encore faire l'objet d'une revue visuelle indépendante avant publication.

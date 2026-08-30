@@ -5,12 +5,7 @@ import { ArrowRight, UserPlus } from "lucide-react";
 import { LoveWall } from "@/components/LoveWall";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { PricingCarousel } from "@/components/PricingCarousel";
-import {
-  ChatConsumerMock,
-  ClaudeCodeMock,
-  CodexMock,
-  StripeNotifMock,
-} from "@/components/HomeAssets";
+import { BuildCreationAsset } from "@/components/AccompanimentAssets";
 
 const STRIPE_FULL_URL = "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a";
 const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? "#";
@@ -78,13 +73,6 @@ const TWEETS = [
   },
 ];
 
-const TAKES = [
-  "Ton prompt n'est pas un actif. Ton système l'est.",
-  "90% du contenu IA t'apprend à optimiser une pioche en leasing.",
-  "Le locataire numérique croit qu'il construit. Il consomme.",
-  "La question n'est pas quel outil utiliser. C'est quoi tu construis avec pendant qu'ils sont là.",
-];
-
 const FAQ_ITEMS = [
   {
     question: "C'est un paiement unique ou un abonnement ?",
@@ -116,12 +104,12 @@ function CtaButton({
 }) {
   const sizeClasses =
     size === "lg"
-      ? "text-base px-10 py-4 rounded-2xl"
-      : "text-sm px-7 py-3.5 rounded-xl";
+      ? "rounded-[4px] px-10 py-4 text-base"
+      : "rounded-[4px] px-7 py-3.5 text-sm";
   return (
     <a
       href={href}
-      className={`relative overflow-hidden inline-flex items-center justify-center gap-2 bg-[#c9b48a] hover:bg-[#e8d5b0] text-[#0a0908] font-bold ${sizeClasses} transition-all duration-[80ms] shadow-[0_4px_0_rgba(100,76,36,0.9),0_10px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.45)] hover:shadow-[0_5px_0_rgba(100,76,36,0.9),0_14px_30px_rgba(0,0,0,0.45)] active:translate-y-[3px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)] before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/30 before:to-transparent before:pointer-events-none`}
+      className={`inline-flex items-center justify-center gap-2 border border-[#9a7d49] bg-[#c9b48a] font-bold text-[#0a0908] shadow-[0_3px_0_rgba(100,76,36,0.95),0_10px_24px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.5)] transition-[transform,background-color,box-shadow] duration-100 hover:bg-[#e8d5b0] hover:shadow-[0_4px_0_rgba(100,76,36,0.95),0_13px_28px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.55)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(100,76,36,0.95),0_5px_12px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e0f] ${sizeClasses}`}
     >
       <span className="relative z-10 flex items-center gap-2">
         {children}
@@ -224,69 +212,39 @@ export default async function HomePage() {
       {/* ================================================================
           LE PROBLÈME / LA SITUATION DÉSIRÉE - en visuel
       ================================================================ */}
-      <section className="relative z-10 px-6 py-16 sm:py-20 border-t border-white/[0.05]">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#f0ede8] mb-3 leading-tight">
-            La même IA. Deux résultats opposés.
-          </h2>
-          <p className="text-[#8a8070] text-base text-center max-w-md mx-auto mb-12">
-            La différence ne vient pas de l&apos;outil. Elle vient de ce que tu en fais.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6 mb-12">
-            {/* Aujourd'hui */}
-            <div className="flex flex-col gap-4">
-              <p className="text-[11px] font-bold uppercase tracking-[3px] text-white/35">
-                Aujourd&apos;hui
-              </p>
-              <ChatConsumerMock />
-              <p className="text-sm text-[#8a8070] leading-relaxed">
-                Tu poses des questions. Tu copies des réponses.
-                Dans six mois, rien ne t&apos;appartient.
-              </p>
-            </div>
-
-            {/* Avec BUILD */}
-            <div className="flex flex-col gap-4">
-              <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#e8d5b0]">
-                Avec BUILD
-              </p>
-              <ClaudeCodeMock />
-              <StripeNotifMock amount="+ 900,00 €" label="Paiement reçu - Site vitrine client" />
-              <p className="text-sm text-[#c4b89a] leading-relaxed">
-                Tu diriges des systèmes qui livrent. Et qui encaissent.
-              </p>
-            </div>
-          </div>
-
-          {/* Indépendance des modèles */}
-          <div className="max-w-2xl mx-auto mb-12">
-            <CodexMock />
-            <p className="text-sm text-[#8a8070] leading-relaxed text-center mt-4">
-              Un skill que tu crées une fois tourne sur n&apos;importe quel modèle.
-              Claude, Codex, ce qui existera dans trois ans.
-              <span className="text-[#f0ede8] font-semibold"> C&apos;est ça, posséder.</span>
+      <section className="relative z-10 border-t border-white/[0.05] px-6 py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="mb-3 text-2xl font-bold leading-tight text-[#f0ede8] sm:text-3xl">
+              La même IA. Deux résultats opposés.
+            </h2>
+            <p className="mx-auto mb-12 max-w-xl text-base text-[#8a8070]">
+              La différence ne vient pas de l&apos;outil. Elle vient de ce que tu en fais.
             </p>
           </div>
 
-          {/* Prises de position - scannables */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-12 max-w-2xl mx-auto">
-            {TAKES.map((take) => (
-              <div
-                key={take}
-                className="relative overflow-hidden bg-white/[0.025] border border-white/[0.06] rounded-xl px-4 py-4 shadow-[0_4px_16px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.04)]"
-              >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent" />
-                <p className="text-sm text-[#c4b89a] leading-snug">&ldquo;{take}&rdquo;</p>
-              </div>
-            ))}
+          <BuildCreationAsset />
+
+          <div className="mx-auto mt-10 grid max-w-4xl gap-8 border-t border-white/[0.08] pt-8 md:grid-cols-2 md:gap-12">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[3px] text-white/35">Sans méthode</p>
+              <p className="mt-3 max-w-md text-base leading-7 text-[#8a8070]">
+                Tu poses des questions, tu copies des réponses et tu recommences à chaque projet. Rien ne devient vraiment à toi.
+              </p>
+            </div>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#e8d5b0]">Avec BUILD</p>
+              <p className="mt-3 max-w-md text-base leading-7 text-[#c4b89a]">
+                Tu apprends à donner un cap à l&apos;IA, à construire une vraie page et à la reprendre jusqu&apos;à ce qu&apos;elle serve ton activité.
+              </p>
+            </div>
           </div>
 
-          <div className="text-center">
-            <h3 className="text-xl sm:text-2xl font-bold text-[#f0ede8] mb-6 leading-snug">
+          <div className="mt-12 text-center">
+            <h3 className="mb-6 text-xl font-bold leading-snug text-[#f0ede8] sm:text-2xl">
               L&apos;écart entre les deux, ce n&apos;est pas le talent.
               <br />
-              <span className="text-[#c9b48a]">C&apos;est le système.</span>
+              <span className="text-[#c9b48a]">C&apos;est la façon de construire.</span>
             </h3>
             {!isMember && <CtaButton href="#pricing">Combler l&apos;écart</CtaButton>}
           </div>

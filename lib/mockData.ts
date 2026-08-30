@@ -1,4 +1,4 @@
-export const BLOCS_DATA = [
+const BLOCS_DATA_SOURCE = [
   {
     id: "1",
     titre: "Bloc 1 : La logique du système",
@@ -464,10 +464,9 @@ export const BLOCS_DATA = [
           "Ce qui sépare les deux : la cadence d'itération. Pas la qualité initiale du document. Un document parfait au premier jet mais jamais mis à jour est mort au bout de trois mois. Un document imparfait mais revu chaque semaine devient précieux.\n\n" +
           "---\n\n" +
           "RÉCAP : Ce que tu sais maintenant faire\n\n" +
-          "Blocs 1 à 4 t'ont donné la stack et l'environnement de travail. Les outils, les librairies, la logique de construction. Ce sont les fondations techniques.\n\n" +
-          "Bloc 5 t'a montré que le business commence par la vente, que le client prime sur l'ego technique, que le feedback terrain est non-négociable, et qu'il existe une ligne rouge entre les erreurs acceptables et celles qui bloquent la livraison.\n\n" +
-          "Bloc 6 t'a présenté ORACLE by Orsayn et ORACLE Site Web : le framework de construction de A à Z, puis le maillon qui vend ce qui a été construit. L'interview interne, ORSAYN-PROJECT.md, les documents fondateurs, les sous-skills qui exécutent dans leur domaine, le score Lighthouse 100 non négociable pour tout ce qui se publie, et la logique de téléchargement du skill comme fichier vivant.\n\n" +
-          "Bloc 7 t'a donné les outils pour tenir dans la durée. Processiser ce qu'on fait plus de deux fois. Auditer avant d'automatiser. Encoder les process répétitifs dans des skills. Distinguer l'apprentissage d'une erreur de l'apprentissage d'une réussite. Itérer chaque semaine plutôt que construire une documentation parfaite une seule fois.\n\n" +
+          "Bloc 1 pose la logique du système et la façon de choisir un projet qui mérite d'être construit. Bloc 5 remet le client, la vente et le retour du terrain au centre. Bloc 3 donne l'ordre des décisions avant de produire.\n\n" +
+          "Bloc 6 montre comment construire pour de vrai, mettre en ligne et garder le contrôle du projet. Bloc 2 aide ensuite à choisir les outils selon le besoin, au lieu d'empiler une liste de services.\n\n" +
+          "Bloc 4 explique comment transformer une pratique répétée en méthode transmissible. Bloc 7 rassemble les vérifications, les apprentissages et l'itération qui permettent de tenir dans la durée.\n\n" +
           "Ce que tout ça forme ensemble : un système de travail complet. De la vente au delivery, de l'idée au produit en production, de la première version à l'itération continue. Tu n'as pas besoin de tout maîtriser avant de commencer. Tu as besoin de commencer pour commencer à maîtriser.\n\n" +
           "La question maintenant : quel est ton prochain projet ? Lance ORACLE. Décris-le. Commence.",
       },
@@ -475,3 +474,9 @@ export const BLOCS_DATA = [
     videos: [],
   },
 ];
+
+const CHRONOLOGICAL_BLOCK_ORDER = ["1", "5", "3", "6", "2", "4", "7"];
+
+export const BLOCS_DATA = CHRONOLOGICAL_BLOCK_ORDER
+  .map((id) => BLOCS_DATA_SOURCE.find((bloc) => bloc.id === id))
+  .filter((bloc): bloc is (typeof BLOCS_DATA_SOURCE)[number] => Boolean(bloc));
