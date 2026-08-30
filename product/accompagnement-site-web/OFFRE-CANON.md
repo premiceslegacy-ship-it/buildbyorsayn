@@ -98,6 +98,6 @@ L'accompagnement reste dans BUILD :
 - `localStorage` : informations de personnalisation et reprise locale ;
 - export Markdown : document portable que l'accompagné peut conserver.
 
-Les visuels de proposition sont des compositions BUILD en HTML/CSS. Ils montrent le brief, la construction, la relecture et la sortie commerciale. Une réglette affiche des logos familiers de ChatGPT, Codex, Claude Code, Stripe, Vercel et Supabase pour situer l'écosystème utilisé. Ces outils ne sont pas présentés comme la valeur de l'accompagnement et aucun résultat financier ne leur est attribué.
+Les visuels de proposition sont des compositions BUILD en HTML/CSS. Ils montrent le brief, la construction, la relecture, la mise en ligne et la sortie commerciale. Les vrais logomarks dédiés de ChatGPT, Codex et Claude Code, ainsi que les marques Vercel, Supabase et Stripe, apparaissent dans des étapes auxquelles ils donnent un rôle lisible. Ils ne sont jamais affichés comme une rangée décorative : les outils restent des moyens, la méthode et le résultat économique constituent la valeur de l'accompagnement.
 
 Aucune donnée de connexion ou clé de service ne doit être affichée dans l'interface ou dans un document exporté.

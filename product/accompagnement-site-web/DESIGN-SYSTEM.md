@@ -30,17 +30,17 @@ La page doit donner l'impression d'un atelier de travail sérieux, pas d'un outi
 
 ## Assets de proposition
 
-Les assets visuels de la page ne représentent pas des logiciels. Ils représentent le travail qui crée la valeur : un brief, le contexte donné à l'IA, une page construite, une relecture et une sortie commerciale.
+Les assets visuels de la page ne représentent pas des logiciels isolés. Ils représentent le travail qui crée la valeur : un brief réel, le contexte donné à l'IA, une page construite, une relecture, une mise en ligne et une sortie commerciale compréhensible.
 
-Les compositions sont codées dans `components/AccompanimentAssets.tsx` et restent dans la palette BUILD. Une réglette présente des logos familiers de ChatGPT, Codex, Claude Code, Stripe, Vercel et Supabase. Ils servent à situer l'écosystème de production, pas à faire croire qu'un logiciel constitue la valeur de l'accompagnement.
+Les compositions sont codées dans `components/AccompanimentAssets.tsx` et restent dans la palette BUILD. Les marques produit sont des opérateurs placés dans le flux, avec un verbe et une responsabilité : ChatGPT clarifie le message, Codex construit la page, Claude Code aide à la reprise, Vercel publie, Supabase connecte lorsque le projet le demande et Stripe intervient seulement lorsqu'il y a un paiement à relier.
 
-Le centre des compositions reste le travail réel : brief, contexte donné à l'IA, page construite, relecture, mise en ligne et sortie commerciale. Les éventuels boutons dans les fausses pages sont des éléments de décor explicatifs, pas des contrôles fonctionnels.
+Il est interdit de poser ces logos en rangée décorative. Une marque doit toujours être attachée à une étape, une entrée ou une sortie. Le centre des compositions reste le travail réel et le résultat économique. Les éventuels boutons dans les fausses pages sont des éléments de décor explicatifs, pas des contrôles fonctionnels.
 
 La page Site Web utilise trois compositions principales :
 
-- `AudienceRoutesAsset` : les cinq points de départ et leur sortie possible ;
-- `SiteWebOutcomeAsset` : le passage d'une idée à un site vendable ;
-- `WorkCycleAsset` et `ThemeAtlas` : la construction, la relecture et les thèmes du projet.
+- `AudienceRoutesAsset` : cinq scènes d'entrée avec une transformation et une sortie concrète ;
+- `SiteWebOutcomeAsset` : le passage d'une offre à rendre claire vers un site relu, présentable et mesurable ;
+- `WorkCycleAsset` et `ThemeAtlas` : la chaîne de production, la relecture et les thèmes du projet.
 
 Les ombres et reliefs sont limités aux boutons ou aux feuilles visuelles afin d'évoquer un objet manipulable. Ils ne deviennent pas un système de cartes ou une décoration généralisée.
 
