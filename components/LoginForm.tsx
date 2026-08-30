@@ -3,14 +3,19 @@
 import { useState } from "react";
 import { AlertCircle, MailCheck } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeInternalRedirect } from "@/lib/safeRedirect";
 
 type Mode = "login" | "signup";
 
-export function LoginForm({ initialMode = "login" }: { initialMode?: Mode }) {
-  const router = useRouter();
+export function LoginForm({
+  initialMode = "login",
+  redirectTo = "/dashboard",
+}: {
+  initialMode?: Mode;
+  redirectTo?: string;
+}) {
   const [mode, setMode] = useState<Mode>(initialMode);
   const [errors, setErrors] = useState({ email: "", password: "", auth: "" });
   const [info, setInfo] = useState("");
@@ -104,7 +109,7 @@ export function LoginForm({ initialMode = "login" }: { initialMode?: Mode }) {
       }
 
       // Navigation complète pour garantir que les cookies sont envoyés au serveur
-      window.location.href = "/dashboard";
+      window.location.href = sanitizeInternalRedirect(redirectTo);
       return;
     } catch {
       setErrors((prev) => ({

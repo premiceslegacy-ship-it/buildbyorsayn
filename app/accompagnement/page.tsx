@@ -1,51 +1,114 @@
-import { createClient } from "@/lib/supabase/server";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  PhoneCall,
-  Video,
-  Target,
-  Rocket,
   Check,
-  Star,
-  Calendar,
+  CircleDot,
+  Code2,
+  Compass,
+  ExternalLink,
+  Gauge,
+  Layers3,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Workflow,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
-import { NavBar } from "@/components/NavBar";
+import {
+  OUTCOMES,
+  PHASES,
+  TOOL_LAYERS,
+  TRACKS,
+} from "@/lib/siteWebAccompagnement";
 
 export const metadata = {
-  title: "Accompagnement 1:1 - Lancement en 3 semaines : BUILD by Orsayn",
+  title: "Site Web by AI : accompagnement 1:1 par Orsayn",
   description:
-    "3 semaines, en direct avec Samuel, jusqu'à ton lancement. Réservé à ceux qui veulent aller plus vite que seuls.",
+    "Un accompagnement adaptatif pour concevoir, construire, lancer et capitaliser un site web avec l'IA sans produire un template générique.",
 };
 
 const CAL_URL = "https://cal.com/samuel-mbeboura/15min";
 
-const STEPS = [
+const PRINCIPLES = [
   {
-    icon: Target,
-    title: "Semaine 1 - Le cadrage",
-    text: "On pose ta niche, ton offre, ta cible. Fini les hésitations : à la fin de la semaine, tu sais exactement quoi construire et pour qui.",
+    icon: Compass,
+    title: "Le jugement avant la génération",
+    text: "Tu apprends à décider ce qui doit exister, pour qui et pourquoi avant de demander à un modèle de produire.",
   },
   {
-    icon: Rocket,
-    title: "Semaine 2 - La construction",
-    text: "On construit en direct, ensemble. Ton système, ton site, tes premiers actifs. Tu ne regardes pas un tuto : tu livres, avec moi à côté.",
+    icon: Layers3,
+    title: "Le système avant la page",
+    text: "Copy, design, composants, assets, SEO, acquisition et mesure sont reliés. Le site n'est jamais traité comme une image isolée.",
   },
   {
-    icon: Check,
-    title: "Semaine 3 - Le lancement",
-    text: "On sort en ligne, on ajuste, on cherche le premier client. L'objectif n'est pas d'apprendre : c'est d'avoir lancé.",
+    icon: Workflow,
+    title: "La preuve avant la recette",
+    text: "Une réussite devient d'abord un pattern candidat. Elle est comparée, testée et bornée avant de devenir une SOP ou un skill.",
   },
 ];
 
-const INCLUS = [
-  "Des calls quasi tous les jours, 1h à 2h, en 1:1 avec Samuel",
-  "Accès complet au Système BUILD pendant l'accompagnement",
-  "On construit sur ton projet réel, pas sur un exercice",
-  "Un plan clair jour par jour, zéro flou sur la prochaine étape",
-  "Support direct entre les calls pour débloquer les urgences",
+const DELIVERABLE_GROUPS = [
+  {
+    label: "Stratégie",
+    items: ["Brief et ICP", "Carte des objections", "Copy deck", "Plan d'acquisition"],
+  },
+  {
+    label: "Design",
+    items: ["Matrice de références", "DA-SYNTHESIS", "Design system", "Famille d'assets"],
+  },
+  {
+    label: "Produit",
+    items: ["Repo GitHub", "Preview", "Site en production", "Rapport de QA"],
+  },
+  {
+    label: "Capital",
+    items: ["SOPs candidates", "Skills candidats", "Tests de non-régression", "Suivi 30, 60, 90 jours"],
+  },
 ];
+
+function EditorialMark() {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[#d8d1c4]/20 bg-[#f0eadf] shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+        <Image
+          src="/orsayn-secondary-anthracite.png"
+          alt="Orsayn"
+          width={1720}
+          height={1480}
+          className="h-8 w-9 object-contain"
+          priority
+        />
+      </div>
+      <div>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#aab9c7]">Orsayn</p>
+        <p className="text-sm font-medium text-[#f4efe7]">Site Web by AI</p>
+      </div>
+    </div>
+  );
+}
+
+function PrimaryLink({ href, children, external = false }: { href: string; children: React.ReactNode; external?: boolean }) {
+  const className =
+    "group inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(222,231,235,0.88))] px-6 py-3 text-sm font-semibold text-[#17202a] shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_10px_28px_rgba(5,12,18,0.34)] transition duration-150 hover:-translate-y-0.5 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#dcebf2] focus-visible:ring-offset-4 focus-visible:ring-offset-[#101820] active:translate-y-0";
+
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        {children}
+        <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={className}>
+      {children}
+      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+    </Link>
+  );
+}
 
 export default async function AccompagnementPage() {
   const supabase = await createClient();
@@ -53,240 +116,285 @@ export default async function AccompagnementPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let tier: string | null = null;
-  if (user?.id) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("tier")
-      .eq("id", user.id)
-      .single();
-    tier = profile?.tier ?? null;
-  }
-
   return (
-    <main className="min-h-screen bg-[#0a0908] text-[#f0ede8] relative overflow-hidden font-sans">
-      {/* Halos ambiants */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[700px] bg-[radial-gradient(ellipse_at_center,rgba(232,213,176,0.08),transparent_65%)] blur-[100px] pointer-events-none" />
-      <div className="absolute top-[60vh] right-0 w-[600px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(232,213,176,0.03),transparent_70%)] blur-[130px] pointer-events-none" />
+    <main className="min-h-screen overflow-hidden bg-[#0b1117] text-[#f4efe7] selection:bg-[#d4e3ec]/25">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[920px] overflow-hidden">
+        <div className="absolute left-1/2 top-[-440px] h-[920px] w-[1200px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(circle_at_42%_72%,rgba(234,228,205,0.72),rgba(133,175,198,0.44)_26%,rgba(63,100,131,0.22)_46%,transparent_70%)] blur-[30px]" />
+        <div className="absolute left-[5%] top-[190px] h-[380px] w-[540px] rounded-[45%] bg-[radial-gradient(circle,rgba(197,210,211,0.28),rgba(105,132,153,0.11)_46%,transparent_68%)] blur-[38px]" />
+        <div className="absolute right-[-8%] top-[260px] h-[480px] w-[620px] rounded-[50%] bg-[radial-gradient(circle,rgba(178,194,203,0.25),rgba(79,111,138,0.08)_50%,transparent_70%)] blur-[46px]" />
+        <div className="absolute inset-0 opacity-[0.11] [background-image:url('data:image/svg+xml,%3Csvg_viewBox=%220_0_180_180%22_xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter_id=%22n%22%3E%3CfeTurbulence_type=%22fractalNoise%22_baseFrequency=%220.9%22_numOctaves=%224%22_stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect_width=%22100%25%22_height=%22100%25%22_filter=%22url(%23n)%22_opacity=%220.42%22/%3E%3C/svg%3E')]" />
+      </div>
 
-      {user ? (
-        <NavBar tier={tier} />
-      ) : (
-        <header className="flex items-center justify-between px-6 py-6 sm:px-12 sm:py-8 relative z-10 max-w-7xl mx-auto">
-          <Logo layout="horizontal" />
-          <Link href="/login" className="text-sm text-[#c9b48a] hover:text-[#f0ede8] transition-colors">
-            J&apos;ai déjà un compte
+      <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 lg:px-12">
+        <EditorialMark />
+        <div className="flex items-center gap-3">
+          {user ? (
+            <Link href="/dashboard" className="hidden text-sm text-[#c6d1d8] transition hover:text-white sm:inline-flex">
+              Retour à BUILD
+            </Link>
+          ) : (
+            <Link href="/login" className="hidden min-h-11 items-center px-2 text-sm text-[#c6d1d8] transition hover:text-white sm:inline-flex">
+              Se connecter
+            </Link>
+          )}
+          <Link
+            href={user ? "/accompagnement/espace" : "/login"}
+            className="inline-flex min-h-11 items-center rounded-full border border-white/15 bg-white/[0.07] px-4 text-sm font-medium text-[#eef3f4] backdrop-blur-xl transition hover:bg-white/[0.11] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+          >
+            {user ? "Voir l'espace" : "Se connecter à l'espace"}
           </Link>
-        </header>
-      )}
-
-      {/* ================================================================
-          HERO - Système 1 : cadrage émotionnel immédiat
-      ================================================================ */}
-      <section className="relative z-10 flex flex-col items-center px-6 pt-12 pb-16 sm:pt-16 sm:pb-20 text-center">
-        <div className="inline-flex items-center gap-2 bg-[#e8d5b0]/10 border border-[#e8d5b0]/25 rounded-full px-4 py-1.5 mb-8 backdrop-blur-xl shadow-[0_2px_8px_rgba(232,213,176,0.08),inset_0_1px_0_rgba(255,255,255,0.08)]">
-          <Star className="w-3.5 h-3.5 text-[#e8d5b0] fill-[#e8d5b0]" strokeWidth={0} />
-          <span className="text-xs font-bold text-[#e8d5b0] uppercase tracking-wider">
-            Réservé - places limitées
-          </span>
         </div>
+      </header>
 
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.12] text-[#f0ede8] max-w-3xl mx-auto mb-6">
-          Tu pourrais tout faire seul.
-          <br />
-          <span className="text-[#c9b48a]">Ou lancer dans 3 semaines, avec moi à côté.</span>
-        </h1>
-
-        <p className="text-[#8a8070] text-lg leading-[1.7] max-w-xl mx-auto mb-10">
-          Le Système t&apos;apprend à construire. L&apos;accompagnement, c&apos;est moi qui construis
-          avec toi, en direct, jusqu&apos;à ce que tu aies lancé. Pas de replay. Pas de module de plus.
-          Un binôme, un calendrier, un résultat.
-        </p>
-
-        <div className="flex flex-col items-center gap-3">
-          <a
-            href={CAL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative overflow-hidden inline-flex items-center justify-center gap-2 bg-[#c9b48a] hover:bg-[#e8d5b0] text-[#0a0908] font-bold text-base px-10 py-4 rounded-2xl transition-all duration-[80ms] shadow-[0_5px_0_rgba(100,76,36,0.9),0_12px_28px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.45)] hover:shadow-[0_6px_0_rgba(100,76,36,0.9),0_16px_34px_rgba(0,0,0,0.45)] active:translate-y-[4px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)] before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/30 before:to-transparent before:pointer-events-none"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              <PhoneCall className="w-4.5 h-4.5" />
-              Réserver mon call gratuit
-            </span>
-          </a>
-          <p className="text-xs text-[#8a8070]">15 minutes, sans engagement - on regarde si ça a du sens</p>
-        </div>
-      </section>
-
-      {/* ================================================================
-          LE FUNNEL EXPLICITE - Système 2 : structure claire
-      ================================================================ */}
-      <section className="relative z-10 px-6 py-14 border-t border-white/[0.05]">
-        <div className="max-w-3xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[
-              { icon: Calendar, label: "1. Tu réserves", text: "Un call de 15 minutes, gratuit, sur Cal.com." },
-              { icon: Video, label: "2. On discute", text: "Ta situation, ton objectif, si l'accompagnement est pertinent pour toi." },
-              { icon: Rocket, label: "3. On démarre", text: "Si c'est un match, on cale le programme de 3 semaines ensemble." },
-            ].map(({ icon: Icon, label, text }) => (
-              <div
-                key={label}
-                className="relative overflow-hidden bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]"
-              >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                <Icon className="w-5 h-5 text-[#e8d5b0] mb-3" strokeWidth={1.5} />
-                <p className="text-sm font-bold text-[#f0ede8] mb-1">{label}</p>
-                <p className="text-xs text-white/45 leading-relaxed">{text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================
-          LE PROGRAMME - 3 semaines
-      ================================================================ */}
-      <section className="relative z-10 px-6 py-16 sm:py-20 border-t border-white/[0.05]">
-        <div className="max-w-2xl mx-auto">
-          <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-4 text-center">
-            Le programme
+      <section className="relative z-10 mx-auto grid min-h-[760px] max-w-7xl items-center gap-14 px-5 pb-24 pt-16 sm:px-8 lg:grid-cols-[1.12fr_0.88fr] lg:px-12 lg:pb-32 lg:pt-20">
+        <div className="max-w-3xl">
+          <p className="mb-8 text-[11px] font-semibold uppercase tracking-[0.26em] text-[#c3d1d9]">
+            Accompagnement 1:1 adaptatif
           </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#f0ede8] mb-12 leading-tight">
-            3 semaines. Un objectif : ton lancement.
-          </h2>
+          <h1 className="max-w-[920px] text-balance text-[clamp(3.15rem,8vw,7.2rem)] leading-[0.88] tracking-[-0.055em] text-[#f1ede6] [font-family:'Iowan_Old_Style','Baskerville','Times_New_Roman',serif]">
+            Construire un site que l&apos;IA n&apos;aurait pas pu inventer seule.
+          </h1>
+          <p className="mt-9 max-w-2xl text-pretty text-base leading-8 text-[#b8c2c9] sm:text-lg">
+            Tu pars de ton expertise, de ton marché et d&apos;une direction réelle. L&apos;IA accélère l&apos;exécution. Elle ne choisit ni la vérité business, ni le goût, ni la preuve à ta place.
+          </p>
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <PrimaryLink href={CAL_URL} external>Réserver l&apos;appel de cadrage de 15 min</PrimaryLink>
+            <p className="max-w-xs text-sm leading-6 text-[#8797a3]">
+              Cet appel vérifie le fit. Le diagnostic de 90 minutes vient ensuite si l&apos;accompagnement est pertinent.
+            </p>
+          </div>
+        </div>
 
-          <div className="flex flex-col gap-5">
-            {STEPS.map(({ icon: Icon, title, text }) => (
-              <div
-                key={title}
-                className="relative overflow-hidden flex gap-5 bg-gradient-to-b from-white/[0.045] to-white/[0.015] border border-white/[0.08] rounded-2xl p-6 backdrop-blur-xl shadow-[0_12px_36px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.06)]"
-              >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-b from-[#e8d5b0]/15 to-[#e8d5b0]/8 border border-[#e8d5b0]/20 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]">
-                  <Icon className="w-5 h-5 text-[#e8d5b0]" strokeWidth={1.5} />
+        <div className="relative mx-auto w-full max-w-xl lg:translate-y-12">
+          <div className="absolute -inset-10 rounded-full bg-[#c7dbe6]/10 blur-3xl" />
+          <div className="relative overflow-hidden rounded-[34px] border border-white/15 bg-[linear-gradient(145deg,rgba(235,241,242,0.12),rgba(43,62,76,0.28))] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-2xl sm:p-7">
+            <div className="mb-8 flex items-center justify-between border-b border-white/10 pb-5">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#91a4b1]">La chaîne réelle</p>
+                <p className="mt-1 text-sm font-medium text-[#edf1f1]">De l&apos;expertise au capital</p>
+              </div>
+              <Gauge className="h-5 w-5 text-[#d5e1e6]" strokeWidth={1.5} />
+            </div>
+
+            <div className="space-y-3">
+              {[
+                ["01", "Observer", "Le métier, le marché, les références"],
+                ["02", "Décider", "La promesse, le système, les règles"],
+                ["03", "Construire", "Le site, les assets, les connexions"],
+                ["04", "Mesurer", "Le trafic, les réponses, les erreurs"],
+                ["05", "Distiller", "Les SOPs, skills, tests et patterns"],
+              ].map(([num, label, detail], index) => (
+                <div key={num} className="group grid grid-cols-[36px_1fr] gap-4">
+                  <div className="flex flex-col items-center">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-[#dfe8e9]/10 text-[10px] font-semibold text-[#dbe6e9]">
+                      {num}
+                    </span>
+                    {index < 4 && <div className="h-7 w-px bg-gradient-to-b from-white/20 to-white/5" />}
+                  </div>
+                  <div className="pb-5 pt-1">
+                    <p className="text-sm font-semibold text-[#f2eee7]">{label}</p>
+                    <p className="mt-1 text-sm leading-6 text-[#8fa0ab]">{detail}</p>
+                  </div>
                 </div>
+              ))}
+            </div>
+
+            <div className="mt-3 rounded-2xl border border-[#dbe5e8]/15 bg-[#eef3f2]/[0.07] p-4">
+              <p className="text-xs leading-5 text-[#c8d3d7]">
+                Le site est le terrain d&apos;apprentissage. La vraie valeur est la capacité à reproduire le niveau de décision sur le projet suivant.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative z-10 border-y border-white/[0.07] bg-[#0d141b]/78 px-5 py-8 backdrop-blur-xl sm:px-8 lg:px-12">
+        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {PRINCIPLES.map(({ icon: Icon, title, text }) => (
+            <div key={title} className="border-b border-white/[0.07] py-5 sm:border-b-0 sm:border-r sm:px-6 last:border-0 first:pl-0">
+              <Icon className="mb-4 h-5 w-5 text-[#cbd9df]" strokeWidth={1.5} />
+              <h2 className="text-base font-semibold text-[#f0ede6]">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-[#8e9da7]">{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="relative z-10 mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <div className="grid gap-14 lg:grid-cols-[0.75fr_1.25fr]">
+          <div className="lg:sticky lg:top-12 lg:self-start">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#8fa8b7]">Adaptatif par preuve</p>
+            <h2 className="mt-5 text-4xl leading-[0.98] tracking-[-0.04em] text-[#f1ece4] sm:text-5xl [font-family:'Iowan_Old_Style','Baskerville','Times_New_Roman',serif]">
+              Même exigence. Pas le même chemin.
+            </h2>
+            <p className="mt-6 max-w-md text-base leading-7 text-[#8d9aa3]">
+              On ne confond pas personnalisation et improvisation. Les gates restent stables. Le temps passé sur chaque palier dépend de ce que tu peux déjà démontrer.
+            </p>
+          </div>
+
+          <div className="divide-y divide-white/[0.08] border-y border-white/[0.08]">
+            {TRACKS.map((track, index) => (
+              <article key={track.id} className="grid gap-5 py-8 sm:grid-cols-[62px_1fr] sm:py-10">
+                <span className="text-sm tabular-nums text-[#708491]">0{index + 1}</span>
                 <div>
-                  <p className="text-base font-bold text-[#f0ede8] mb-1.5">{title}</p>
-                  <p className="text-sm text-white/50 leading-relaxed">{text}</p>
+                  <h3 className="text-2xl text-[#ece8e1] [font-family:'Iowan_Old_Style','Baskerville',serif]">{track.label}</h3>
+                  <p className="mt-3 max-w-2xl text-sm leading-7 text-[#9aa8b0]">{track.description}</p>
+                  <p className="mt-4 flex gap-3 text-sm leading-6 text-[#c5d0d4]">
+                    <CircleDot className="mt-0.5 h-4 w-4 flex-none text-[#c8d9e1]" strokeWidth={1.5} />
+                    {track.adjustment}
+                  </p>
                 </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative z-10 border-y border-white/[0.07] bg-[#edf0eb] text-[#171c20]">
+        <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+          <div className="max-w-3xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#5b6c73]">La progression</p>
+            <h2 className="mt-5 text-4xl leading-[0.98] tracking-[-0.045em] sm:text-6xl [font-family:'Iowan_Old_Style','Baskerville','Times_New_Roman',serif]">
+              Huit semaines de construction. Quatre-vingt-dix jours pour transformer le résultat en système.
+            </h2>
+          </div>
+
+          <div className="mt-16 border-t border-black/15">
+            {PHASES.map((phase, index) => (
+              <article key={phase.id} className="grid gap-6 border-b border-black/15 py-8 lg:grid-cols-[72px_210px_1fr_auto] lg:items-start lg:py-9">
+                <span className="text-xs tabular-nums text-[#4e5d63]">{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#53636b]">{phase.marker}</p>
+                  <p className="mt-2 text-xs text-[#56656b]">{phase.duration}</p>
+                </div>
+                <div className="max-w-2xl">
+                  <h3 className="text-xl font-semibold tracking-[-0.02em] text-[#182026]">{phase.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-[#58676e]">{phase.promise}</p>
+                </div>
+                <Link
+                  href={user
+                    ? `/accompagnement/espace#${phase.id}`
+                    : `/login?next=${encodeURIComponent("/accompagnement/espace")}&phase=${encodeURIComponent(phase.id)}`}
+                  className="inline-flex min-h-11 items-center gap-2 px-1 text-sm font-semibold text-[#26343b] underline decoration-black/20 underline-offset-4 transition hover:decoration-black/70"
+                >
+                  Ouvrir le palier <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative z-10 mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <div className="grid gap-14 lg:grid-cols-2">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#8fa8b7]">Écosystème compris, pas récité</p>
+            <h2 className="mt-5 max-w-xl text-4xl leading-[1.02] tracking-[-0.04em] text-[#f1ece4] sm:text-5xl [font-family:'Iowan_Old_Style','Baskerville',serif]">
+              Tu apprends à choisir la couche qui sert le résultat.
+            </h2>
+            <p className="mt-6 max-w-xl text-base leading-7 text-[#8d9aa3]">
+              GitHub, Vercel, Cloudflare, Supabase, Neon ou un VPS ne sont pas des badges de sérieux. Chaque outil entre parce qu'il remplit un rôle, avec un coût et une frontière compris.
+            </p>
+          </div>
+          <div className="divide-y divide-white/[0.08] border-y border-white/[0.08]">
+            {TOOL_LAYERS.map((layer, index) => (
+              <div key={layer.label} className="grid grid-cols-[44px_110px_1fr] gap-4 py-5 text-sm">
+                <span className="text-[#8fa2ac]">0{index + 1}</span>
+                <span className="font-semibold text-[#dce5e8]">{layer.label}</span>
+                <span className="leading-6 text-[#8798a3]">{layer.tools}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ================================================================
-          CE QUI EST INCLUS
-      ================================================================ */}
-      <section className="relative z-10 px-6 py-16 sm:py-20 border-t border-white/[0.05]">
-        <div className="max-w-2xl mx-auto">
-          <div className="relative overflow-hidden bg-gradient-to-b from-white/[0.05] to-white/[0.02] border border-[#e8d5b0]/20 rounded-2xl p-7 sm:p-9 backdrop-blur-xl shadow-[0_16px_48px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)]">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e8d5b0]/25 to-transparent" />
-            <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-6">
-              Ce qui est inclus
-            </p>
-            <ul className="flex flex-col gap-3.5 mb-8">
-              {INCLUS.map((label) => (
-                <li key={label} className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#e8d5b0]/12 border border-[#e8d5b0]/20 flex items-center justify-center mt-0.5">
-                    <Check className="w-3 h-3 text-[#e8d5b0]" strokeWidth={2.5} />
-                  </div>
-                  <span className="text-sm text-[rgba(240,237,232,0.8)] leading-relaxed">{label}</span>
-                </li>
+      <section className="relative z-10 border-y border-white/[0.07] bg-[#101920]">
+        <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+          <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#8fa8b7]">Ce que tu gardes</p>
+              <h2 className="mt-5 text-4xl leading-[1] tracking-[-0.04em] text-[#f1ece4] sm:text-5xl [font-family:'Iowan_Old_Style','Baskerville',serif]">
+                Des livrables, puis les rails pour recommencer.
+              </h2>
+            </div>
+            <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2">
+              {DELIVERABLE_GROUPS.map((group) => (
+                <div key={group.label}>
+                  <p className="border-b border-white/10 pb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#9db0ba]">{group.label}</p>
+                  <ul className="mt-4 space-y-3">
+                    {group.items.map((item) => (
+                      <li key={item} className="flex items-start gap-3 text-sm leading-6 text-[#c2cdd2]">
+                        <Check className="mt-1 h-3.5 w-3.5 flex-none text-[#d8e5e9]" strokeWidth={1.7} />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
-            <p className="text-xs text-white/35 mb-6 leading-relaxed">
-              L&apos;accompagnement n&apos;est pas vendu en ligne. Le call de 15 minutes sert à vérifier
-              qu&apos;on peut vraiment t&apos;amener au lancement en 3 semaines - et à caler ensemble
-              les modalités si c&apos;est le cas.
+            </div>
+          </div>
+
+          <div className="mt-20 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {OUTCOMES.map((outcome, index) => (
+              <div key={outcome} className="min-h-36 border-l border-white/12 px-5 py-2">
+                <span className="text-xs text-[#91a5af]">0{index + 1}</span>
+                <p className="mt-5 text-base leading-7 text-[#e3e7e6]">{outcome}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative z-10 mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#8fa8b7]">La vérité commerciale</p>
+            <h2 className="mt-5 text-4xl leading-[1.02] tracking-[-0.04em] text-[#f1ece4] [font-family:'Iowan_Old_Style','Baskerville',serif]">
+              Le site ne remplace pas l'acquisition.
+            </h2>
+          </div>
+          <div className="grid gap-5 lg:col-span-2 sm:grid-cols-3">
+            {[
+              { icon: Search, title: "SEO et GEO", text: "Un actif qui mûrit. Pas une promesse de trafic immédiat." },
+              { icon: Sparkles, title: "Contenu et preuve", text: "Montrer le travail réel crée la confiance avant le rendez-vous." },
+              { icon: Code2, title: "Prospection et Loom", text: "L'abondance vient d'un système de contact ciblé, humain et mesuré." },
+            ].map(({ icon: Icon, title, text }) => (
+              <div key={title} className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+                <Icon className="h-5 w-5 text-[#cbdde3]" strokeWidth={1.5} />
+                <h3 className="mt-8 text-base font-semibold text-[#f0ede6]">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-[#8e9da7]">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative z-10 border-t border-white/[0.07] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <div className="mx-auto grid max-w-7xl items-end gap-12 lg:grid-cols-[1fr_auto]">
+          <div className="max-w-4xl">
+            <Logo layout="horizontal" className="mb-12" />
+            <h2 className="text-balance text-5xl leading-[0.94] tracking-[-0.05em] text-[#f1ece4] sm:text-7xl [font-family:'Iowan_Old_Style','Baskerville','Times_New_Roman',serif]">
+              On ne vend pas un site. On construit ta capacité à en livrer d'autres, mieux.
+            </h2>
+            <p className="mt-8 max-w-2xl text-base leading-8 text-[#8f9da6]">
+              Le premier échange sert à diagnostiquer le niveau, choisir le projet fil rouge et vérifier si le périmètre est réaliste. Si ce n'est pas le bon accompagnement, on le dira.
             </p>
-            <a
-              href={CAL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative overflow-hidden inline-flex items-center justify-center gap-2 w-full bg-[#e8d5b0] hover:bg-[#f0dfc0] text-[#0a0908] font-bold text-sm px-7 py-4 rounded-xl transition-all duration-[80ms] shadow-[0_3px_0_rgba(100,76,36,0.9),0_6px_20px_rgba(0,0,0,0.35),0_0_28px_rgba(232,213,176,0.15),inset_0_1px_0_rgba(255,255,255,0.5)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)] before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/30 before:to-transparent before:pointer-events-none"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                <PhoneCall className="w-4 h-4" />
-                Réserver mon call gratuit
-              </span>
-            </a>
+          </div>
+          <div className="flex flex-col gap-4 lg:items-end">
+            <PrimaryLink href={CAL_URL} external>Réserver l&apos;appel de cadrage</PrimaryLink>
+            <Link href={user ? "/accompagnement/espace" : "/login"} className="inline-flex min-h-11 items-center justify-center gap-2 text-sm font-semibold text-[#c8d4d9] underline decoration-white/20 underline-offset-4 hover:decoration-white/60">
+              {user ? "Explorer le document de suivi" : "Se connecter pour ouvrir le suivi"} <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ================================================================
-          POUR QUI - qualifier, pas vendre à tout le monde
-      ================================================================ */}
-      <section className="relative z-10 px-6 py-16 sm:py-20 border-t border-white/[0.05]">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-xl sm:text-2xl font-bold text-center text-[#f0ede8] mb-10 leading-snug">
-            Ce n&apos;est pas pour tout le monde.
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="relative overflow-hidden bg-white/[0.03] border border-[#e8d5b0]/20 rounded-2xl p-6 backdrop-blur-xl">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#e8d5b0] mb-3">
-                C&apos;est pour toi si
-              </p>
-              <ul className="flex flex-col gap-2.5">
-                {[
-                  "Tu as déjà le Système ou tu veux le prendre maintenant",
-                  "Tu veux lancer vite, pas apprendre indéfiniment",
-                  "Tu peux dégager 1 à 2h par jour pendant 3 semaines",
-                ].map((t) => (
-                  <li key={t} className="text-sm text-white/65 flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#e8d5b0] flex-shrink-0 mt-0.5" strokeWidth={2} />
-                    {t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="relative overflow-hidden bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6 backdrop-blur-xl opacity-70">
-              <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-3">
-                Ce n&apos;est pas pour toi si
-              </p>
-              <ul className="flex flex-col gap-2.5">
-                {[
-                  "Tu cherches encore à te convaincre que l'IA peut marcher",
-                  "Tu veux un résultat sans y consacrer de temps",
-                  "Tu n'as pas encore regardé le Système",
-                ].map((t) => (
-                  <li key={t} className="text-sm text-white/40 flex items-start gap-2">
-                    <span className="w-1 h-1 rounded-full bg-white/30 flex-shrink-0 mt-2" />
-                    {t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+      <footer className="relative z-10 border-t border-white/[0.07] px-5 py-8 sm:px-8 lg:px-12">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 text-xs text-[#8fa0a8] sm:flex-row sm:items-center sm:justify-between">
+          <span>BUILD by Orsayn. Accompagnement Site Web by AI.</span>
+          <span className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5" /> Décisions traçables, progression par preuves.</span>
         </div>
-      </section>
-
-      {/* ================================================================
-          CTA FINAL
-      ================================================================ */}
-      <section className="relative z-10 px-6 py-24 sm:py-28 border-t border-white/[0.05] text-center">
-        <div className="max-w-xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#f0ede8] mb-5 leading-[1.2]">
-            3 semaines pour lancer.
-            <br />
-            <span className="text-[#c9b48a]">15 minutes pour savoir si c&apos;est pour toi.</span>
-          </h2>
-          <a
-            href={CAL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative overflow-hidden inline-flex items-center justify-center gap-2 bg-[#c9b48a] hover:bg-[#e8d5b0] text-[#0a0908] font-bold text-base px-10 py-4 rounded-2xl transition-all duration-[80ms] shadow-[0_5px_0_rgba(100,76,36,0.9),0_12px_28px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.45)] active:translate-y-[4px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)] before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/30 before:to-transparent before:pointer-events-none"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              <PhoneCall className="w-4.5 h-4.5" />
-              Réserver mon call gratuit
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </a>
-        </div>
-      </section>
+      </footer>
     </main>
   );
 }

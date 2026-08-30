@@ -18,7 +18,7 @@ export function Section3() {
           Le "AI slop", c'est ce rendu générique, lisse, sur-saturé et artificiel que produisent les IA par défaut. Un utilisateur le repère en une fraction de seconde, et ça détruit instantanément la crédibilité de ton site.
         </p>
         <p className="text-sm text-white/60 leading-relaxed">
-          La solution ? <strong className="text-white">Le contexte visuel.</strong> Ne demande jamais à une IA de "faire un beau design". Va d'abord sur Pinterest, Dribbble ou Awwwards. Prends des captures d'écran des sites, des couleurs, des typos, des ambiances photographiques qui te plaisent. C'est exactement la logique d'ORACLE Site Web : définir le brief, le message, la direction artistique et le design system avant de générer.
+          La solution ? <strong className="text-white">Le contexte visuel et la décomposition.</strong> Ne demande jamais à une IA de "faire un beau design". Pinterest peut fournir un univers, une lumière ou une émotion. Refero montre des écrans réels. Mintlify montre le degré de précision d'un design system. Rare UI ouvre des pistes de composants inhabituels. Chaque référence reçoit un rôle. Tu extrais ensuite la structure, la typographie, la matière, les comportements et les interdits avant de construire ta propre direction.
         </p>
       </div>
 
@@ -46,6 +46,10 @@ export function Section3() {
             {
               name: "Higgsfield",
               desc: "Un 'wrapper d'IA' regroupant tout un tas d'outils au même endroit. Confort absolu pour centraliser ta création visuelle. (faut du budget)",
+            },
+            {
+              name: "Figma, SVG et HTML",
+              desc: "Figma sert à composer et valider. Un SVG ou un asset HTML est souvent plus juste qu'une image lorsqu'il faut du responsive, des états, du texte accessible ou une animation légère.",
             },
           ].map(({ name, desc }) => (
             <LiquidCard key={name} className="rounded-2xl p-5">
@@ -92,7 +96,8 @@ export function Section3() {
           {[
             "Décide d'un style et tiens-t'y (ex: \"Photographie commerciale, tons chauds\" ou \"Illustration flat\").",
             "Conserve les paramètres (objectif, colorimétrie) d'un prompt réussi pour les suivants.",
-            "N'utilise qu'un seul modèle IA pour le même projet (Midjourney a son grain, Kling a le sien).",
+            "Garde un brief, une géométrie, une palette et un registre d'assets communs, même si plusieurs modèles sont nécessaires.",
+            "Conserve le statique comme source canonique avant de produire un dérivé image-to-video ou une animation légère.",
           ].map((text, i) => (
             <li key={i} className="flex gap-3">
               <span className="w-1.5 h-1.5 rounded-full bg-[#e8d5b0]/50 flex-shrink-0 mt-2" />

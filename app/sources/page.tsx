@@ -263,6 +263,38 @@ const SOURCES = [
     type: "Outils & Infra",
     url: "https://rapidapi.com",
   },
+  {
+    id: 31,
+    name: "Pinterest",
+    description: "Pour capter un univers, une émotion, une matière ou une lumière, même lorsque la référence n'est pas un site web.",
+    icon: Palette,
+    type: "Design & UI",
+    url: "https://www.pinterest.com",
+  },
+  {
+    id: 32,
+    name: "Refero",
+    description: "Bibliothèque d'écrans et de parcours réels pour analyser structure, hiérarchie, composants et détails d'interface.",
+    icon: LayoutList,
+    type: "Design & UI",
+    url: "https://refero.design",
+  },
+  {
+    id: 33,
+    name: "Mintlify",
+    description: "Référence de précision documentaire pour étudier la profondeur d'un design system, pas une identité à recopier.",
+    icon: BookOpen,
+    type: "Design & UI",
+    url: "https://mintlify.com",
+  },
+  {
+    id: 34,
+    name: "Rare UI",
+    description: "Collection émergente de composants peu vus. À surveiller comme source de mécanismes, jamais comme bibliothèque à cloner.",
+    icon: Box,
+    type: "Design & UI",
+    url: "https://rareui.com",
+  },
 ];
 
 export default function SourcesPage() {
@@ -364,7 +396,7 @@ export default function SourcesPage() {
                         <h3 className="text-lg font-semibold text-[#f0ede8] mb-2 tracking-tight">
                           {source.name}
                         </h3>
-                        <p className="text-sm text-[rgba(240,237,232,0.45)] leading-relaxed line-clamp-2">
+                        <p className="text-sm text-[rgba(240,237,232,0.65)] leading-relaxed line-clamp-2">
                           {source.description}
                         </p>
                       </div>

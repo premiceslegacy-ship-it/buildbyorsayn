@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { BLOCS_DATA } from "@/lib/mockData";
 import { createClient } from "@/lib/supabase/client";
@@ -11,6 +11,7 @@ export function useProgress() {
   const [lastVisitedBloc, setLastVisitedBlocState] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const pendingItems = useRef(new Set<string>());
 
   // ─── Load : user + progress from Supabase ──────────────────────────────────
   useEffect(() => {
@@ -36,7 +37,14 @@ export function useProgress() {
       if (error) {
         console.error("Erreur lors du chargement de la progression:", error.message);
       } else if (data) {
-        setCheckedItems(data.map((row: { item_id: string }) => row.item_id));
+        const validItems = new Set(
+          BLOCS_DATA.flatMap((bloc) => bloc.sections.map((section) => section.id))
+        );
+        setCheckedItems(
+          data
+            .map((row: { item_id: string }) => row.item_id)
+            .filter((itemId: string) => validItems.has(itemId))
+        );
       }
 
       // lastVisitedBloc reste dans localStorage (préférence d'UI, non critique)
@@ -58,7 +66,8 @@ export function useProgress() {
   // ─── toggleItem : UI Optimiste + Supabase en arrière-plan ──────────────────
   const toggleItem = useCallback(
     async (itemId: string) => {
-      if (!userId) return;
+      if (!userId || pendingItems.current.has(itemId)) return;
+      pendingItems.current.add(itemId);
 
       const isChecked = checkedItems.includes(itemId);
 
@@ -72,32 +81,39 @@ export function useProgress() {
       const moduleParts = itemId.split("-");
       const moduleId = moduleParts[0]; // "b1", "b2", etc.
 
-      if (isChecked) {
-        // 2a. Décochage → DELETE
-        const { error } = await supabase
-          .from("progress")
-          .delete()
-          .eq("user_id", userId)
-          .eq("item_id", itemId);
+      try {
+        if (isChecked) {
+          // 2a. Décochage → DELETE
+          const { error } = await supabase
+            .from("progress")
+            .delete()
+            .eq("user_id", userId)
+            .eq("item_id", itemId);
 
-        if (error) {
-          console.error("Erreur lors de la suppression de la progression:", error.message);
-          // Rollback optimiste
-          setCheckedItems((prev) => [...prev, itemId]);
-        }
-      } else {
-        // 2b. Cochage → INSERT
-        const { error } = await supabase.from("progress").insert({
-          user_id: userId,
-          module_id: moduleId,
-          item_id: itemId,
-        });
+          if (error) {
+            console.error("Erreur lors de la suppression de la progression:", error.message);
+            // Rollback optimiste
+            setCheckedItems((prev) => [...prev, itemId]);
+          }
+        } else {
+          // 2b. Cochage idempotent : deux onglets peuvent viser le même item.
+          const { error } = await supabase.from("progress").upsert(
+            {
+              user_id: userId,
+              module_id: moduleId,
+              item_id: itemId,
+            },
+            { onConflict: "user_id,item_id", ignoreDuplicates: true }
+          );
 
-        if (error) {
-          console.error("Erreur lors de l'enregistrement de la progression:", error.message);
-          // Rollback optimiste
-          setCheckedItems((prev) => prev.filter((id) => id !== itemId));
+          if (error) {
+            console.error("Erreur lors de l'enregistrement de la progression:", error.message);
+            // Rollback optimiste
+            setCheckedItems((prev) => prev.filter((id) => id !== itemId));
+          }
         }
+      } finally {
+        pendingItems.current.delete(itemId);
       }
     },
     [checkedItems, userId]

@@ -1,0 +1,18 @@
+{
+  "verdict": "PASS",
+  "verifiedAt": "2026-08-30T06:06:27.079Z",
+  "migration": "20260830052000_progress_rls.sql",
+  "checks": {
+    "ownInsert": true,
+    "ownSelectCount": 1,
+    "crossSelectCount": 0,
+    "crossInsertDenied": true,
+    "crossDeleteCount": 0,
+    "rowStillExistsAfterCrossDelete": true,
+    "ownDeleteCount": 1
+  },
+  "failure": null,
+  "fixtureCleanup": {
+    "temporaryUsersRemaining": 0
+  }
+}

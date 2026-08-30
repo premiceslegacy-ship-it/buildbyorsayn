@@ -65,12 +65,15 @@ export async function middleware(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) {
-        const homeUrl = new URL("/", request.url);
-        return createRedirectWithCookies(homeUrl, supabaseResponse, SECURITY_HEADERS);
-    }
-
     const pathname = request.nextUrl.pathname;
+
+    if (!user) {
+        const destination = pathname.startsWith("/accompagnement/espace")
+            ? `/login?next=${encodeURIComponent(pathname)}`
+            : "/";
+        const redirectUrl = new URL(destination, request.url);
+        return createRedirectWithCookies(redirectUrl, supabaseResponse, SECURITY_HEADERS);
+    }
 
     // Routes réservées aux membres full (497€)
     const requiresFull =
@@ -114,5 +117,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/admin/:path*", "/beginner", "/protocole"],
+    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/admin/:path*", "/beginner", "/protocole", "/accompagnement/espace/:path*"],
 };

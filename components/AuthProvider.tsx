@@ -23,7 +23,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const handleSignOut = useCallback(() => {
     setUser(null);
-    router.push("/");
+    if (typeof window === "undefined" || window.location.pathname !== "/login") {
+      router.push("/");
+    }
   }, [router]);
 
   useEffect(() => {
@@ -38,11 +40,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Écoute en temps réel les changements de session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === "SIGNED_OUT" || !session) {
+        if (event === "SIGNED_OUT") {
           handleSignOut();
-        } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-          // Token rafraîchi silencieusement → on met à jour l'utilisateur
-          setUser(session.user);
+        } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+          setUser(session?.user ?? null);
+          setIsLoading(false);
+        } else if (event === "INITIAL_SESSION") {
+          // Une page publique reste accessible lorsqu'aucune session n'existe.
+          // Les routes privées sont protégées par le middleware.
+          setUser(session?.user ?? null);
           setIsLoading(false);
         }
       }

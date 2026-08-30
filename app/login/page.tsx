@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import { Logo } from "@/components/Logo";
 import { LoginForm } from "@/components/LoginForm";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
+import { PHASES } from "@/lib/siteWebAccompagnement";
+import { sanitizeInternalRedirect } from "@/lib/safeRedirect";
 
 export const metadata: Metadata = {
   title: "Connexion | BUILD",
@@ -10,9 +12,19 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ mode?: string }>;
+  searchParams: Promise<{
+    mode?: string | string[];
+    next?: string | string[];
+    phase?: string | string[];
+  }>;
 }) {
-  const { mode } = await searchParams;
+  const { mode, next, phase } = await searchParams;
+  const safeBase = sanitizeInternalRedirect(next);
+  const phaseValue = typeof phase === "string" ? phase : null;
+  const safePhase = PHASES.some((item) => item.id === phaseValue) ? phaseValue : null;
+  const redirectTo = safePhase && safeBase.startsWith("/accompagnement/espace")
+    ? `${safeBase.split("#")[0]}#${safePhase}`
+    : safeBase;
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-[#0e0e0f]">
       {/* Logo en haut à gauche */}
@@ -26,7 +38,7 @@ export default async function LoginPage({
       <div className="flex flex-col items-center space-y-8 sm:space-y-12 relative z-10 w-full max-w-[400px]">
         <LiquidCard className="w-full p-6 sm:p-8">
           <div className="flex flex-col space-y-8 relative z-10">
-            <LoginForm initialMode={mode === "signup" ? "signup" : "login"} />
+            <LoginForm initialMode={mode === "signup" ? "signup" : "login"} redirectTo={redirectTo} />
           </div>
         </LiquidCard>
       </div>

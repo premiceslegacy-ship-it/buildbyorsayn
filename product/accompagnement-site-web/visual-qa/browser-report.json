@@ -1,0 +1,394 @@
+{
+  "viewports": [
+    {
+      "name": "workspace-320",
+      "width": 320,
+      "height": 760,
+      "metrics": {
+        "innerWidth": 320,
+        "scrollWidth": 320,
+        "bodyScrollWidth": 320,
+        "tooSmall": [],
+        "checkboxCount": 4,
+        "radioCount": 0,
+        "currentStepCount": 1,
+        "trackBeforeH1": true,
+        "unlabeledInputs": 0
+      },
+      "screenshot": "/tmp/build-offer-qa-final/workspace-320.png"
+    },
+    {
+      "name": "workspace-375",
+      "width": 375,
+      "height": 812,
+      "metrics": {
+        "innerWidth": 375,
+        "scrollWidth": 375,
+        "bodyScrollWidth": 375,
+        "tooSmall": [],
+        "checkboxCount": 4,
+        "radioCount": 0,
+        "currentStepCount": 1,
+        "trackBeforeH1": true,
+        "unlabeledInputs": 0
+      },
+      "screenshot": "/tmp/build-offer-qa-final/workspace-375.png"
+    },
+    {
+      "name": "workspace-768",
+      "width": 768,
+      "height": 900,
+      "metrics": {
+        "innerWidth": 768,
+        "scrollWidth": 768,
+        "bodyScrollWidth": 768,
+        "tooSmall": [],
+        "checkboxCount": 4,
+        "radioCount": 0,
+        "currentStepCount": 1,
+        "trackBeforeH1": true,
+        "unlabeledInputs": 0
+      },
+      "screenshot": "/tmp/build-offer-qa-final/workspace-768.png"
+    },
+    {
+      "name": "workspace-1023",
+      "width": 1023,
+      "height": 900,
+      "metrics": {
+        "innerWidth": 1023,
+        "scrollWidth": 1023,
+        "bodyScrollWidth": 1023,
+        "tooSmall": [],
+        "checkboxCount": 4,
+        "radioCount": 0,
+        "currentStepCount": 1,
+        "trackBeforeH1": true,
+        "unlabeledInputs": 0
+      },
+      "screenshot": "/tmp/build-offer-qa-final/workspace-1023.png"
+    },
+    {
+      "name": "workspace-1025",
+      "width": 1025,
+      "height": 900,
+      "metrics": {
+        "innerWidth": 1025,
+        "scrollWidth": 1025,
+        "bodyScrollWidth": 1025,
+        "tooSmall": [],
+        "checkboxCount": 4,
+        "radioCount": 0,
+        "currentStepCount": 1,
+        "trackBeforeH1": false,
+        "unlabeledInputs": 0
+      },
+      "screenshot": "/tmp/build-offer-qa-final/workspace-1025.png"
+    },
+    {
+      "name": "workspace-1440",
+      "width": 1440,
+      "height": 1000,
+      "metrics": {
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "tooSmall": [],
+        "checkboxCount": 4,
+        "radioCount": 0,
+        "currentStepCount": 1,
+        "trackBeforeH1": false,
+        "unlabeledInputs": 0
+      },
+      "screenshot": "/tmp/build-offer-qa-final/workspace-1440.png"
+    },
+    {
+      "name": "offer-320",
+      "width": 320,
+      "height": 760,
+      "status": 200,
+      "metrics": {
+        "innerWidth": 320,
+        "scrollWidth": 320,
+        "bodyScrollWidth": 320,
+        "h1": "Construire un site que l'IA n'aurait pas pu inventer seule.",
+        "unlabeledButtons": 0,
+        "tooSmall": [],
+        "numberContrast": 5.949660622885333,
+        "durationContrast": 5.264375169968407,
+        "toolIndexContrast": 7.166520770757972,
+        "outcomeIndexContrast": 6.9419969755868,
+        "deepLinkHref": "/login?next=%2Faccompagnement%2Fespace&phase=diagnostic"
+      },
+      "screenshot": "/tmp/build-offer-qa-final/offer-320.png"
+    },
+    {
+      "name": "offer-375",
+      "width": 375,
+      "height": 812,
+      "status": 200,
+      "metrics": {
+        "innerWidth": 375,
+        "scrollWidth": 375,
+        "bodyScrollWidth": 375,
+        "h1": "Construire un site que l'IA n'aurait pas pu inventer seule.",
+        "unlabeledButtons": 0,
+        "tooSmall": [],
+        "numberContrast": 5.949660622885333,
+        "durationContrast": 5.264375169968407,
+        "toolIndexContrast": 7.166520770757972,
+        "outcomeIndexContrast": 6.9419969755868,
+        "deepLinkHref": "/login?next=%2Faccompagnement%2Fespace&phase=diagnostic"
+      },
+      "screenshot": "/tmp/build-offer-qa-final/offer-375.png"
+    },
+    {
+      "name": "offer-768",
+      "width": 768,
+      "height": 900,
+      "status": 200,
+      "metrics": {
+        "innerWidth": 768,
+        "scrollWidth": 768,
+        "bodyScrollWidth": 768,
+        "h1": "Construire un site que l'IA n'aurait pas pu inventer seule.",
+        "unlabeledButtons": 0,
+        "tooSmall": [],
+        "numberContrast": 5.949660622885333,
+        "durationContrast": 5.264375169968407,
+        "toolIndexContrast": 7.166520770757972,
+        "outcomeIndexContrast": 6.9419969755868,
+        "deepLinkHref": "/login?next=%2Faccompagnement%2Fespace&phase=diagnostic"
+      },
+      "screenshot": "/tmp/build-offer-qa-final/offer-768.png"
+    },
+    {
+      "name": "offer-1440",
+      "width": 1440,
+      "height": 1000,
+      "status": 200,
+      "metrics": {
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "h1": "Construire un site que l'IA n'aurait pas pu inventer seule.",
+        "unlabeledButtons": 0,
+        "tooSmall": [],
+        "numberContrast": 5.949660622885333,
+        "durationContrast": 5.264375169968407,
+        "toolIndexContrast": 7.166520770757972,
+        "outcomeIndexContrast": 6.9419969755868,
+        "deepLinkHref": "/login?next=%2Faccompagnement%2Fespace&phase=diagnostic"
+      },
+      "screenshot": "/tmp/build-offer-qa-final/offer-1440.png"
+    }
+  ],
+  "interactions": {
+    "deepLinkAfterLogin": "http://127.0.0.1:3000/accompagnement/espace#design-system-assets",
+    "doubleClick": {
+      "doubleClicked": true,
+      "mutationRequests": 1,
+      "resetDuringPending": {
+        "message": "Attends la fin de la synchronisation en cours avant de réinitialiser la progression.",
+        "resetDisabled": true
+      },
+      "afterDouble": {
+        "completed": [
+          "web-diagnostic-01"
+        ],
+        "outbox": [],
+        "message": ""
+      }
+    },
+    "networkFailure": {
+      "failureClicked": true,
+      "mutationRequests": 1,
+      "afterFailure": {
+        "completed": [
+          "web-diagnostic-01",
+          "web-diagnostic-02"
+        ],
+        "outbox": [
+          {
+            "itemId": "web-diagnostic-02",
+            "completed": true
+          }
+        ],
+        "message": "Modification conservée localement et placée en attente de synchronisation."
+      }
+    },
+    "recovery": {
+      "afterRecovery": {
+        "completed": [
+          "web-diagnostic-01",
+          "web-diagnostic-02"
+        ],
+        "outbox": [],
+        "syncText": true
+      },
+      "remoteItems": [
+        "web-diagnostic-01",
+        "web-diagnostic-02"
+      ],
+      "remoteError": null
+    },
+    "secondDeviceBeforeReset": [
+      "web-diagnostic-01",
+      "web-diagnostic-02"
+    ],
+    "export": {
+      "exportClicked": true,
+      "files": [
+        "suivi-site-web-atelier-horizon.md"
+      ],
+      "containsName": true,
+      "containsCompany": true,
+      "containsForbiddenDash": false,
+      "bytes": 11326
+    },
+    "resetEverywhere": {
+      "resetClicked": true,
+      "resetLocal": {
+        "completed": [],
+        "outbox": []
+      },
+      "remoteItemsAfterReload": [],
+      "secondDeviceAfterReset": [],
+      "remoteItemsAfterSecondDevice": [],
+      "remoteError": null
+    },
+    "duplicateNextStatus": 200
+  },
+  "accessibility": {
+    "roles": {
+      "RootWebArea": 1,
+      "none": 136,
+      "main": 1,
+      "generic": 13,
+      "sectionheader": 1,
+      "complementary": 2,
+      "alert": 1,
+      "link": 1,
+      "paragraph": 15,
+      "button": 13,
+      "navigation": 1,
+      "StaticText": 135,
+      "heading": 5,
+      "checkbox": 4,
+      "LabelText": 13,
+      "group": 1,
+      "InlineTextBox": 162,
+      "textbox": 10,
+      "Legend": 1,
+      "radio": 3
+    },
+    "workspacePhaseIndexContrast": 7.702313121113498,
+    "namedCheckboxes": [
+      "Décrire le projet, l'offre et le résultat attendu Preuve : Brief oral et fiche projet complétée",
+      "Auditer le niveau web, design, copy, code et acquisition Preuve : Matrice de compétences notée avec exemples",
+      "Choisir une preuve finale mesurable Preuve : Critères d'acceptation écrits avant le build",
+      "Tracer la voie débutant, expérimenté ou agence Preuve : Étapes obligatoires, compressées et optionnelles identifiées"
+    ],
+    "namedRadios": [
+      "Débutant Les fondations sont obligatoires et validées par une petite page construite sans magie.",
+      "Expérimenté Les acquis sont testés. Ce qui est maîtrisé est sauté, pas rejoué pour remplir le calendrier.",
+      "Agence Chaque étape identifie ce qui relève de l'expert, du process, du skill, du contrôle humain et du client."
+    ],
+    "focusTrail": [
+      {
+        "tag": "A",
+        "text": "Retour à l'offre",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.999994 0.0000455677 0.0000200868 / 0.6) 0px 0px 0px 2px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Exporter le suiviExporter",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "01Avant le départ2/4 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "02Semaine 10/5 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "03Semaine 20/5 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "04Semaine 30/4 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "05Semaine 40/6 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "06Semaine 50/5 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "07Semaine 6A0/5 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "08Semaine 6B0/5 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "09Semaines 7 et 80/6 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "10Clôture0/5 preuves",
+        "outline": "solid",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+      }
+    ],
+    "radioKeyboard": {
+      "found": true,
+      "initial": "debutant",
+      "afterFirstArrow": "experimente",
+      "afterSecondArrow": "agence"
+    },
+    "reducedMotion": {
+      "transitionDuration": "0.001s",
+      "animationDuration": "0.001s"
+    },
+    "zoom200": {
+      "innerWidth": 640,
+      "scrollWidth": 640,
+      "bodyScrollWidth": 640,
+      "devicePixelRatio": 2
+    }
+  },
+  "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+  ],
+  "expectedConsoleErrors": 1,
+  "unexpectedConsoleErrors": [],
+  "verdict": "PASS"
+}
