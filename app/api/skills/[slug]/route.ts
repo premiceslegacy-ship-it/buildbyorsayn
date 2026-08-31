@@ -235,15 +235,16 @@ async function createZipFromDirectory(rootDir: string, packageName: string) {
 
 export async function GET(
   _request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
-  const skill = getSkillBySlug(params.slug);
+  const { slug } = await params;
+  const skill = getSkillBySlug(slug);
 
   if (!skill) {
     return NextResponse.json({ error: "Skill introuvable." }, { status: 404 });
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

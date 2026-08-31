@@ -23,12 +23,12 @@ const PLANS: Plan[] = [
     icon: GraduationCap,
     price: "97",
     tagline: "Pour partir de zéro",
-    outcome: "À la fin : tu sais mettre un site en ligne, seul, et le facturer.",
+    outcome: "À la fin : tu sais transformer une intention en premier asset vendable et le proposer.",
     items: [
-      { label: "Ton premier site en ligne, étape par étape" },
+      { label: "Ton premier asset utile, de l'idée à la livraison" },
       { label: "Comprendre l'IA assez pour ne plus jamais être perdu" },
       { label: "Des visuels pro sans designer ni budget" },
-      { label: "Mettre en ligne en 60 secondes, comme les pros" },
+      { label: "Présenter et livrer un résultat propre" },
       { label: "2 skills prêts à l'emploi inclus" },
       { label: "Vidéos tutos techniques pas à pas" },
       { label: "Framework ORACLE + 7 blocs système", locked: true },
@@ -231,7 +231,7 @@ export function PricingCarousel({
           Fondations te rend capable. Le Système Complet te rend rentable.
         </p>
         <p className="text-[13px] text-white/45 text-center leading-relaxed">
-          Avec Fondations, tu sais livrer un site. Avec le Système Complet, tu as la machine
+          Avec Fondations, tu sais livrer un premier asset. Avec le Système Complet, tu as la machine
           entière : quoi vendre, à qui, comment livrer vite, et comment recommencer.
           Tu peux aussi commencer à 97€ et passer au complet plus tard en ne payant que la différence.
         </p>

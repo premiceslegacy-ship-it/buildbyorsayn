@@ -49,7 +49,7 @@ type ActivityEvent = {
 
 export default async function AdminPage() {
   // ── 1. Vérification identité ──────────────────────────────────────────────
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -200,7 +200,15 @@ export default async function AdminPage() {
                 Présence réelle, progression, activité et pilotage des accès.
               </p>
             </div>
-            <AdminAutoRefresh />
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/accompagnement/formateur"
+                className="border border-[#c9b48a]/50 px-4 py-2.5 text-sm text-[#e8d5b0] transition-colors hover:border-[#c9b48a] hover:bg-[#e8d5b0]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
+              >
+                Gérer les accompagnements
+              </Link>
+              <AdminAutoRefresh />
+            </div>
           </div>
         </div>
 

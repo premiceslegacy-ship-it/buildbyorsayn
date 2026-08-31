@@ -1,0 +1,35 @@
+{
+  "verdict": "PASS",
+  "verifiedAt": "2026-08-31T21:31:54.518Z",
+  "migrations": [
+    "20260830110000_accompaniment_assignments.sql",
+    "20260831193000_accompaniment_workspace_context.sql",
+    "20260831204500_accompaniment_workspace_postgrest_grants.sql"
+  ],
+  "checks": {
+    "activeMemberSeesOwnAssignment": true,
+    "plannedMemberSeesNoAssignment": true,
+    "crossMemberSeesNoAssignment": true,
+    "activeMemberCanSaveOwnTheme": true,
+    "plannedMemberCannotSaveOwnTheme": true,
+    "crossMemberCannotSaveOwnTheme": true,
+    "crossMemberSeesNoProgress": true,
+    "activeMemberCanSaveSharedContext": true,
+    "memberCannotChangeImmutableContextColumns": true,
+    "activeMemberCannotDeleteSharedContext": true,
+    "plannedMemberCannotSaveSharedContext": true,
+    "crossMemberSeesNoSharedContext": true,
+    "crossMemberCannotWriteSharedContext": true,
+    "activeMemberSeesTrainerContextUpdate": true,
+    "revokedMemberSeesNoAssignment": true,
+    "revokedMemberCannotSaveTheme": true,
+    "revokedMemberSeesNoSharedContext": true,
+    "revokedMemberCannotWriteSharedContext": true
+  },
+  "diagnostics": {},
+  "failure": null,
+  "cleanupFailure": null,
+  "fixtureCleanup": {
+    "temporaryUsersRemaining": 0
+  }
+}

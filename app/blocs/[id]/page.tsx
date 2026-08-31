@@ -146,9 +146,8 @@ export default function BlocPage() {
   const checkoutUrl = checkoutUserId
     ? `https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02?client_reference_id=${checkoutUserId}`
     : "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02";
-  const blocIdNum = Number(blocId);
-  const showPaywall = tier !== "full" && tier !== null && blocIdNum > 1;
-  const showContent = tier === "full" || blocIdNum === 1;
+  const showPaywall = tier !== "full" && tier !== null && currentBlocIndex > 0;
+  const showContent = tier === "full" || currentBlocIndex === 0;
   const markSessionAdvance = () => {
     const current = Number(sessionStorage.getItem("build_session_advances") ?? "0");
     sessionStorage.setItem("build_session_advances", String(current + 1));
@@ -178,7 +177,7 @@ export default function BlocPage() {
             </h1>
 
             {/* Skeleton : chargement en cours pour blocs > 1 */}
-            {tier === null && blocIdNum > 1 && (
+            {tier === null && currentBlocIndex > 0 && (
               <div className="mt-16 space-y-8 animate-pulse">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="space-y-3">

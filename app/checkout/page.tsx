@@ -10,7 +10,7 @@ const STRIPE_UPGRADE_URL = process.env.STRIPE_UPGRADE_CHECKOUT_LINK ?? "#";
 
 const BEGINNER_FEATURES = [
     { icon: GraduationCap, label: "5 modules fondations complets" },
-    { icon: Zap, label: "De zéro à un site en ligne" },
+    { icon: Zap, label: "De zéro à un premier asset vendable" },
     { icon: Layers, label: "IA, GitHub, IDE, Vercel" },
     { icon: GraduationCap, label: "Skills Deep Research + UX/UI Premium" },
     { icon: Layers, label: "Stack complète + Protocole Zéro" },
@@ -28,7 +28,7 @@ const FULL_FEATURES = [
 ];
 
 export default async function CheckoutPage() {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     // Check current tier for upgrade flow

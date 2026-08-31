@@ -1,4 +1,4 @@
-# Suivi après l'accompagnement : Site Web
+# Suivi après l'accompagnement : activité et vente
 
 Client : [Prénom Nom]
 
@@ -6,9 +6,9 @@ Entreprise : [Entreprise]
 
 Projet : [Nom du projet]
 
-URL : [URL]
+Lien principal : [URL ou référence]
 
-Point de départ : [Je démarre / J'ai déjà livré / En équipe]
+Point de départ : [Je démarre / Je vends déjà / Je veux scaler]
 
 Date de clôture : [Date]
 
@@ -22,8 +22,8 @@ Garder uniquement les mesures qui peuvent changer une décision :
 
 - demandes qualifiées ;
 - rendez-vous utiles ;
-- passage d'une visite à une demande ;
-- recherches et pages qui attirent des visiteurs ;
+- passage d'une attention à une conversation ;
+- recherches et assets qui attirent les bonnes personnes ;
 - temps nécessaire pour livrer ;
 - corrections demandées ;
 - erreurs qui reviennent ;
@@ -31,15 +31,15 @@ Garder uniquement les mesures qui peuvent changer une décision :
 
 ## À 30 jours
 
-Regarder les premiers signaux. Vérifier les pages principales, les demandes, les canaux et les mesures. Parler aux premières personnes qui ont vu le site. Corriger les blocages les plus importants avant d'ajouter de nouvelles pages.
+Regarder les premiers signaux. Vérifier l'offre, les demandes, les canaux, les livraisons et les mesures. Parler aux premières personnes qui ont vu ou utilisé les assets. Corriger les blocages les plus importants avant d'ajouter de nouvelles productions.
 
 Décision attendue : [continuer / corriger / arrêter / essayer une autre version]
 
 ## À 60 jours
 
-Comparer les façons d'obtenir de l'attention. Revoir les recherches utiles et les pages qui créent de vraies conversations. Noter les actions qui reviennent souvent, sans les imposer tout de suite à d'autres projets.
+Comparer les façons d'obtenir de l'attention. Revoir les recherches utiles et les assets qui créent de vraies conversations. Noter les actions qui reviennent souvent, sans les imposer tout de suite à d'autres projets.
 
-Décision attendue : [renforcer un angle / revoir une page / arrêter un canal / écrire une méthode]
+Décision attendue : [renforcer un angle / revoir un asset / arrêter un canal / écrire une méthode]
 
 ## À 90 jours
 

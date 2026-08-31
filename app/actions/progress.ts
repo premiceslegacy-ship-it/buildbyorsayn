@@ -17,7 +17,7 @@ export async function toggleBlocCompletion(
     return { success: false, completedBlocks: [] };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

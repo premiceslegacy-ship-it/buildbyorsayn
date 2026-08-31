@@ -476,7 +476,30 @@ const BLOCS_DATA_SOURCE = [
 ];
 
 const CHRONOLOGICAL_BLOCK_ORDER = ["1", "5", "3", "6", "2", "4", "7"];
+const DISPLAY_NUMBER_BY_SOURCE_NUMBER: Record<string, number> = Object.fromEntries(
+  CHRONOLOGICAL_BLOCK_ORDER.map((sourceId, index) => [sourceId, index + 1])
+);
+
+function renumberBlockReferences(value: string) {
+  return value.replace(/\bBlocs?\s+([1-7])\b/g, (match, sourceNumber: string) => {
+    const displayNumber = DISPLAY_NUMBER_BY_SOURCE_NUMBER[sourceNumber];
+    return displayNumber ? match.replace(sourceNumber, String(displayNumber)) : match;
+  });
+}
 
 export const BLOCS_DATA = CHRONOLOGICAL_BLOCK_ORDER
   .map((id) => BLOCS_DATA_SOURCE.find((bloc) => bloc.id === id))
-  .filter((bloc): bloc is (typeof BLOCS_DATA_SOURCE)[number] => Boolean(bloc));
+  .filter((bloc): bloc is (typeof BLOCS_DATA_SOURCE)[number] => Boolean(bloc))
+  .map((bloc, index) => ({
+    ...bloc,
+    displayNumber: index + 1,
+    titre: bloc.titre.replace(/^Bloc \d+\s*:\s*/, `Bloc ${index + 1} : `),
+    sections: bloc.sections.map((section) => ({
+      ...section,
+      content: renumberBlockReferences(section.content),
+    })),
+  }));
+
+export const BLOCK_DISPLAY_NUMBER_BY_ID = Object.fromEntries(
+  BLOCS_DATA.map((bloc) => [bloc.id, bloc.displayNumber])
+);

@@ -6,7 +6,7 @@ const TRACKED_EVENTS = new Set(["page_view", "heartbeat", "tab_visible", "tab_hi
 const LOGGED_EVENTS = new Set(["page_view", "tab_visible", "tab_hidden"]);
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

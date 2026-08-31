@@ -47,7 +47,7 @@ const PHASES = [
 ];
 
 export default async function ProtocolePage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -33,27 +33,27 @@ export const TRACKS: Array<{
     label: "Je démarre",
     shortLabel: "Je démarre",
     description:
-      "Tu veux comprendre les bases et construire sans dépendre d'une suite de commandes que tu ne comprends pas.",
+      "Tu veux partir d'un savoir-faire ou d'une idée et comprendre comment vendre tes premiers sites web créés avec l'IA.",
     adjustment:
-      "On prend le temps de rendre chaque décision claire avant de passer à la suivante.",
+      "On prend le temps de rendre chaque décision commerciale et chaque étape de production claire avant de passer à la suivante.",
   },
   {
     id: "experimente",
-    label: "J'ai déjà livré",
-    shortLabel: "J'ai déjà livré",
+    label: "Je vends déjà",
+    shortLabel: "Je vends déjà",
     description:
-      "Tu as déjà produit des sites et tu veux surtout gagner en clarté, en qualité et en régularité.",
+      "Tu as déjà produit ou vendu des sites web et tu veux structurer l'offre, la vente et la livraison pour gagner en régularité.",
     adjustment:
-      "On va directement sur les sujets qui te font encore perdre du temps ou de la qualité.",
+      "On va directement sur les sujets qui te font encore perdre du temps, de la marge ou des ventes.",
   },
   {
     id: "agence",
-    label: "Je travaille en équipe",
-    shortLabel: "En équipe",
+    label: "Expert : je veux scaler",
+    shortLabel: "Je veux scaler",
     description:
-      "Tu veux qu'une équipe puisse produire avec le même niveau d'exigence, sans tout garder dans ta tête.",
+      "Tu vends déjà des sites web et tu veux utiliser l'IA pour augmenter le volume sans sacrifier la qualité, la marge ou la maîtrise de l'activité.",
     adjustment:
-      "On précise qui décide, qui produit et qui relit, pour que le travail reste fiable quand il circule.",
+      "On repère ce qui peut être standardisé, accéléré ou transmis pour vendre et livrer davantage sans tout garder dans ta tête.",
   },
 ];
 
@@ -61,70 +61,70 @@ export const THEMES: AccompanimentTheme[] = [
   {
     id: "diagnostic",
     marker: "01",
-    title: "Un projet clair avant de commencer",
+    title: "Une activité de sites web claire avant de commencer",
     promise:
-      "Tu sais ce que ton site doit changer, pour qui et quelle action il doit provoquer.",
+      "Tu sais quel type de site web tu peux vendre, à qui, pour quel résultat et avec quel premier périmètre.",
     why:
-      "Sans objectif précis, on fabrique une page agréable à regarder mais inutile pour l'activité.",
+      "Sans client précis et offre de site claire, on produit des pages sans savoir pourquoi elles devraient être achetées.",
     deliverables: [
-      "Objectif du site",
-      "Personne à aider",
-      "Projet de travail",
-      "Ordre des sujets",
+      "Positionnement simple",
+      "Offre de site web",
+      "Client prioritaire",
+      "Premier site à vendre",
     ],
     tasks: [
       {
         id: "web-diagnostic-01",
-        title: "Décrire ce que le site doit changer",
-        outcome: "Un objectif formulé avec des mots simples.",
+        title: "Décrire le résultat que ton site doit apporter",
+        outcome: "Une situation de départ et une valeur recherchée sont formulées pour le client.",
       },
       {
         id: "web-diagnostic-02",
-        title: "Faire le point sur ce que tu sais déjà faire",
-        outcome: "Les sujets à travailler sont identifiés sans refaire ce qui est déjà acquis.",
+        title: "Lister ce que tu peux déjà produire avec l'IA",
+        outcome: "Les acquis utiles à la vente de sites sont séparés des sujets à travailler.",
       },
       {
         id: "web-diagnostic-03",
-        title: "Choisir le résultat à obtenir",
-        outcome: "On sait à quoi ressemble une bonne sortie avant de commencer.",
+        title: "Choisir le type de site que tu peux vendre en premier",
+        outcome: "Une offre de site de départ est assez concrète pour être présentée.",
       },
       {
         id: "web-diagnostic-04",
-        title: "Fixer l'ordre de travail",
-        outcome: "Le prochain sujet est évident et le calendrier reste adaptable.",
+        title: "Fixer le premier signal de progrès",
+        outcome: "On sait si l'on cherche une réponse, un rendez-vous, une commande ou une livraison.",
       },
       {
         id: "web-diagnostic-agency-01",
-        title: "Décider qui fait quoi dans l'équipe",
-        outcome: "Les décisions, la production et la relecture ont un responsable clair.",
+        title: "Décider qui porte la vente, la production et la relecture",
+        outcome: "La valeur, les décisions et les contrôles ont un responsable clair.",
         tracks: ["agence"],
       },
     ],
     finishLine:
-      "On peut avancer quand le projet tient en une minute d'explication et que la prochaine action est claire.",
+      "On peut avancer quand une entreprise précise, une offre de site et une prochaine action commerciale tiennent en une minute.",
     trackFinishLine: {
       agence:
-        "L'équipe sait aussi qui décide, qui produit, qui relit et qui échange avec le client.",
+        "L'équipe sait aussi qui décide, qui vend, qui produit, qui relit et qui échange avec le client.",
     },
   },
   {
     id: "business-copy",
     marker: "02",
-    title: "Un message qui donne envie d'avancer",
+    title: "Une offre de sites web que les bons clients comprennent",
     promise:
-      "Ton site explique rapidement ce que tu proposes, à qui tu t'adresses et pourquoi agir maintenant.",
+      "Ton offre explique le problème que le site règle, ce que le client reçoit et pourquoi il est logique d'avancer.",
     why:
-      "Un site ne rattrape pas une offre floue. Les bons mots viennent du problème réel, pas d'un vocabulaire de brochure.",
+      "Un site ne se vend pas à lui seul. La vente commence quand le résultat, les limites et la prochaine étape sont clairs.",
     deliverables: [
-      "Offre lisible",
+      "Offre de site lisible",
       "Message principal",
       "Réponses aux hésitations",
-      "Action suivante",
+      "Parcours de vente",
     ],
     tasks: [
       {
         id: "web-copy-01",
-        title: "Relier l'offre à la personne qui la cherche",
+        title: "Relier l'offre de site à l'entreprise qui la cherche",
         outcome: "Le message correspond à une situation réelle et à un besoin précis.",
       },
       {
@@ -134,18 +134,18 @@ export const THEMES: AccompanimentTheme[] = [
       },
       {
         id: "web-copy-03",
-        title: "Écrire la promesse et l'action suivante",
-        outcome: "La page dit ce que l'on gagne et quoi faire ensuite.",
+        title: "Écrire la promesse du site et l'action suivante",
+        outcome: "L'offre dit ce que l'entreprise gagne et comment commencer.",
       },
       {
         id: "web-copy-04",
-        title: "Choisir les bons principes d'écriture",
-        outcome: "Chaque choix sert la compréhension au lieu de remplir la page.",
+        title: "Choisir les preuves qui rendent l'offre crédible",
+        outcome: "Chaque preuve aide à comprendre la valeur au lieu de remplir un support.",
       },
       {
         id: "web-copy-05",
         title: "Préparer une deuxième façon de présenter l'offre",
-        outcome: "On peut comparer deux messages sans tout changer à la fois.",
+        outcome: "On peut comparer deux angles sans tout changer à la fois.",
       },
       {
         id: "web-copy-agency-01",
@@ -155,21 +155,21 @@ export const THEMES: AccompanimentTheme[] = [
       },
     ],
     finishLine:
-      "On peut avancer quand une personne extérieure comprend l'offre et l'action à faire sans explication orale.",
+      "Une entreprise extérieure comprend quel site tu proposes, pour quel résultat et comment commencer sans explication orale.",
   },
   {
     id: "references-da",
     marker: "03",
-    title: "Une direction qui donne confiance",
+    title: "Des références pour créer des sites qui donnent confiance",
     promise:
-      "Tu choisis l'allure du site pour servir le message, pas pour collectionner de belles images.",
+      "Tu choisis une direction et des références qui renforcent la valeur perçue de tes sites, de tes preuves et de ton offre.",
     why:
-      "Une référence peut aider pour une ambiance, une page, une animation ou un détail. Elle ne donne pas automatiquement la bonne réponse à ton projet.",
+      "Un site esthétique ne remplace pas un résultat. Chaque référence doit aider le client à comprendre, croire ou décider.",
     deliverables: [
-      "Références utiles",
+      "Références de sites utiles",
       "Ce que l'on écarte",
       "Direction choisie",
-      "Premier écran comparé",
+      "Premier site comparé",
     ],
     tasks: [
       {
@@ -179,57 +179,57 @@ export const THEMES: AccompanimentTheme[] = [
       },
       {
         id: "web-da-02",
-        title: "Repérer ce qui crée l'impression recherchée",
-        outcome: "On sait ce qui vient des mots, des images, des formes ou du rythme.",
+        title: "Repérer ce qui crée la confiance recherchée",
+        outcome: "On sait ce qui vient des mots, des preuves, des images, des formes ou du rythme.",
       },
       {
         id: "web-da-03",
-        title: "Comparer deux directions sur le vrai écran",
-        outcome: "Le choix se fait sur le projet réel, pas sur deux tableaux d'inspiration.",
+        title: "Comparer deux directions sur un vrai site",
+        outcome: "Le choix se fait sur le travail réel, pas sur deux tableaux d'inspiration.",
       },
       {
         id: "web-da-04",
         title: "Décider ce qui est gardé, adapté ou écarté",
-        outcome: "Le site a sa propre personnalité sans copier une référence.",
+        outcome: "L'activité a sa propre personnalité sans copier une référence.",
       },
     ],
     finishLine:
-      "On peut avancer quand le site inspire la bonne impression avant même que l'on regarde le logo.",
+      "On peut avancer quand tes références donnent une direction crédible au site et renforcent l'offre sans la remplacer.",
   },
   {
     id: "design-system-assets",
     marker: "04",
-    title: "Des pages cohérentes partout",
+    title: "Une base de production web que tu peux réutiliser",
     promise:
-      "Tu poses des règles simples pour que chaque nouvelle page ressemble au même site, sur mobile comme sur ordinateur.",
+      "Tu poses des règles simples pour produire des sites web et supports cohérents sans repartir de zéro à chaque client.",
     why:
-      "Sans règles partagées, chaque nouvelle page repart de zéro et le site finit par se contredire.",
+      "Sans base de production commune, chaque site repart de zéro et l'activité dépend de ton énergie du jour.",
     deliverables: [
-      "Règles visuelles du site",
-      "Pages et cas importants",
-      "Visuels cohérents",
-      "Version mobile",
+      "Règles de marque",
+      "Bibliothèque web",
+      "Cas clients importants",
+      "Base de production",
     ],
     tasks: [
       {
         id: "web-ds-01",
-        title: "Fixer les règles visuelles du site",
-        outcome: "Les couleurs, caractères, espacements et formes suivent une même logique.",
+        title: "Fixer les règles visuelles des sites",
+        outcome: "Les couleurs, caractères, espacements et formes suivent une même logique sur chaque site livré.",
       },
       {
         id: "web-ds-02",
-        title: "Prévoir les différents cas d'une page",
-        outcome: "Les états normal, vide, en attente et en erreur restent compréhensibles.",
+        title: "Prévoir les situations importantes du parcours",
+        outcome: "Les états normal, vide, en attente et en erreur restent compréhensibles pour la personne en face.",
       },
       {
         id: "web-ds-03",
-        title: "Choisir le bon format pour chaque visuel",
-        outcome: "Chaque image, illustration ou schéma a un rôle et un format adapté.",
+        title: "Choisir le bon format pour chaque élément du site",
+        outcome: "Chaque page, image, proposition, illustration ou schéma a un rôle et un format adapté.",
       },
       {
         id: "web-ds-04",
-        title: "Créer une base visuelle réutilisable",
-        outcome: "Une nouvelle page peut être produite sans inventer une nouvelle identité.",
+        title: "Créer une base de site réutilisable",
+        outcome: "Un nouveau site peut être produit sans inventer une nouvelle identité ni refaire chaque élément.",
       },
       {
         id: "web-ds-05",
@@ -238,13 +238,13 @@ export const THEMES: AccompanimentTheme[] = [
       },
       {
         id: "web-ds-06",
-        title: "Relire le site comme un client",
-        outcome: "Les décorations inutiles disparaissent et la page garde une hiérarchie nette.",
+        title: "Relire chaque asset comme un client",
+        outcome: "Les décorations inutiles disparaissent et la valeur reste immédiatement lisible.",
       },
       {
         id: "web-ds-agency-01",
         title: "Décider ce qui doit être relu par un senior",
-        outcome: "L'équipe sait quelles décisions ne doivent pas être prises automatiquement.",
+        outcome: "L'équipe sait quelles décisions de valeur ou de marque ne doivent pas être prises automatiquement.",
         tracks: ["agence"],
       },
       {
@@ -255,25 +255,25 @@ export const THEMES: AccompanimentTheme[] = [
       },
     ],
     finishLine:
-      "On peut avancer quand une autre personne comprend les règles et que le site reste clair sur petit écran.",
+      "On peut avancer quand tu peux produire un nouveau site avec les mêmes règles et sans refaire chaque décision.",
     trackFinishLine: {
       agence:
-        "L'équipe dispose d'un exemple commun à produire et à relire, avec une règle simple en cas de désaccord.",
+        "L'équipe dispose d'un exemple commun à produire, vendre et relire, avec une règle simple en cas de désaccord.",
     },
   },
   {
     id: "build-stack",
     marker: "05",
-    title: "Construire et mettre en ligne",
+    title: "Construire et livrer les sites que tu peux vendre",
     promise:
-      "Tu passes de l'idée à une version utilisable, que l'on peut relire, corriger et remettre en ligne sans repartir de zéro.",
+      "Tu passes de l'offre à un site web réel, propre et livrable, sans perdre le fil entre production, validation et vente.",
     why:
-      "Le bon outil compte moins que la capacité à comprendre ce qui a changé et à revenir en arrière quand il le faut.",
+      "Une activité web avance quand elle transforme une promesse en site remis au client, pas quand un outil produit une première version.",
     deliverables: [
       "Espace de travail propre",
-      "Versions conservées",
-      "Version de test",
-      "Site en ligne",
+      "Site web versionné",
+      "Site testable",
+      "Process de livraison",
     ],
     tasks: [
       {
@@ -283,18 +283,18 @@ export const THEMES: AccompanimentTheme[] = [
       },
       {
         id: "web-build-02",
-        title: "Choisir l'outil adapté au projet",
+        title: "Choisir l'outil adapté au site",
         outcome: "On évite de prendre un outil plus compliqué que le besoin.",
       },
       {
         id: "web-build-03",
-        title: "Construire les pages dans le bon ordre",
+        title: "Construire les pages et éléments du site dans le bon ordre",
         outcome: "Chaque partie est vérifiée avant d'ajouter la suivante.",
       },
       {
         id: "web-build-04",
-        title: "Partager une version de test",
-        outcome: "Le site peut être relu sur un vrai appareil avant sa mise en ligne.",
+        title: "Partager une version de test du site",
+        outcome: "Le site peut être relu par la bonne personne avant d'être remis ou vendu.",
       },
       {
         id: "web-build-05",
@@ -315,7 +315,7 @@ export const THEMES: AccompanimentTheme[] = [
       },
     ],
     finishLine:
-      "On peut avancer quand le site est en ligne, compréhensible par une autre personne et récupérable après une erreur.",
+      "On peut avancer quand le site est utilisable, présentable à un client et récupérable après une erreur.",
     trackFinishLine: {
       agence:
         "La livraison peut être reprise par l'équipe sans dépendre de la mémoire du fondateur.",
@@ -324,13 +324,13 @@ export const THEMES: AccompanimentTheme[] = [
   {
     id: "connected",
     marker: "06",
-    title: "Ajouter seulement ce qui est nécessaire",
+    title: "Relier tes sites à la vente et à la livraison",
     promise:
-      "Les formulaires, comptes, paiements ou automatisations ne sont ajoutés que s'ils servent vraiment le résultat.",
+      "Tu ajoutes les formulaires, paiements, automatisations ou espaces seulement quand ils aident à vendre ou sécurisent la livraison du site.",
     why:
-      "Dès qu'un site garde des informations ou déclenche une action, il faut protéger les personnes et prévoir les erreurs.",
+      "Chaque connexion doit servir une décision du business, protéger les données et éviter les erreurs coûteuses.",
     deliverables: [
-      "Besoins utiles",
+      "Parcours client utile",
       "Informations protégées",
       "Actions autorisées",
       "Plan en cas d'erreur",
@@ -339,7 +339,7 @@ export const THEMES: AccompanimentTheme[] = [
       {
         id: "web-connected-01",
         title: "Décider ce que le site doit vraiment garder",
-        outcome: "Les informations demandées ont une utilité claire.",
+        outcome: "Les informations demandées ont une utilité commerciale ou opérationnelle claire.",
       },
       {
         id: "web-connected-02",
@@ -354,7 +354,7 @@ export const THEMES: AccompanimentTheme[] = [
       {
         id: "web-connected-04",
         title: "Tester les cas autorisés et les erreurs",
-        outcome: "Le site explique quoi faire quand une information manque ou qu'une action échoue.",
+        outcome: "Le parcours explique quoi faire quand une information manque ou qu'une action échoue.",
       },
       {
         id: "web-connected-05",
@@ -363,37 +363,37 @@ export const THEMES: AccompanimentTheme[] = [
       },
     ],
     finishLine:
-      "On peut avancer quand chaque information a une raison, un accès prévu et une solution si quelque chose se passe mal.",
+      "On peut avancer quand chaque connexion a une raison, un accès prévu et une solution si quelque chose se passe mal.",
   },
   {
     id: "seo-geo",
     marker: "07",
-    title: "Être trouvé par les bonnes personnes",
+    title: "Être trouvé par les entreprises qui ont besoin d'un site",
     promise:
-      "Tes pages répondent aux bonnes recherches et tu peux voir ce qui attire vraiment des visiteurs.",
+      "Tu relies ton offre de site et tes contenus aux recherches, conversations et canaux qui peuvent amener une vraie opportunité.",
     why:
-      "Être visible prend du temps. Il faut relier chaque page à une question réelle puis regarder ce qui se passe.",
+      "La visibilité ne vaut que si elle touche la bonne personne et ouvre une conversation utile.",
     deliverables: [
-      "Pages liées aux recherches",
-      "Site lisible par les moteurs",
-      "Suivi des recherches",
+      "Angle de visibilité",
+      "Offre de site trouvable",
+      "Suivi des signaux",
       "Plan d'amélioration",
     ],
     tasks: [
       {
         id: "web-seo-01",
-        title: "Relier chaque page à une recherche réelle",
-        outcome: "Chaque page répond à une intention précise.",
+        title: "Relier chaque contenu à une intention réelle",
+        outcome: "Chaque contenu répond à une question ou une étape précise du parcours vers une demande de site.",
       },
       {
         id: "web-seo-02",
-        title: "Aider les moteurs à comprendre le site",
-        outcome: "Les titres, adresses et informations importantes sont propres.",
+        title: "Aider les canaux à comprendre ton activité",
+        outcome: "Les titres, informations et preuves importantes sont propres et cohérents.",
       },
       {
         id: "web-seo-03",
-        title: "Voir les recherches qui amènent des visiteurs",
-        outcome: "Les décisions viennent de recherches observées, pas d'une intuition seule.",
+        title: "Voir les signaux qui amènent des opportunités",
+        outcome: "Les décisions viennent de recherches et de réponses observées, pas d'une intuition seule.",
       },
       {
         id: "web-seo-04",
@@ -403,25 +403,25 @@ export const THEMES: AccompanimentTheme[] = [
       {
         id: "web-seo-05",
         title: "Répondre sans inventer d'autorité",
-        outcome: "Les pages restent justes, utiles et reliées à des sources vérifiables.",
+        outcome: "Les assets restent justes, utiles et reliés à des sources vérifiables.",
       },
     ],
     finishLine:
-      "On peut avancer quand les pages sont compréhensibles par les moteurs et que les premières recherches peuvent être suivies.",
+      "On peut avancer quand tes assets sont compréhensibles par les bons canaux et que les premiers signaux peuvent être suivis.",
   },
   {
     id: "launch-acquisition",
     marker: "08",
-    title: "Obtenir des demandes",
+    title: "Obtenir des demandes et vendre des sites",
     promise:
-      "Tu relies le site à quelques actions concrètes pour que les bonnes personnes puissent le découvrir et te contacter.",
+      "Tu transformes ton offre de site et tes preuves en actions concrètes pour obtenir des demandes, vendre et suivre ce qui fonctionne.",
     why:
-      "Un site ne crée pas de demande dans le vide. Il devient utile quand il reçoit une attention qualifiée et apprend des réponses obtenues.",
+      "Un asset ne travaille pas seul. Il devient utile quand une personne précise le découvre, comprend la valeur et sait quoi faire ensuite.",
     deliverables: [
       "Deux canaux de départ",
       "Liste de contacts propre",
-      "Message de prise de contact",
-      "Premières mesures",
+      "Message pour vendre un site",
+      "Suivi des demandes et ventes",
     ],
     tasks: [
       {
@@ -441,7 +441,7 @@ export const THEMES: AccompanimentTheme[] = [
       },
       {
         id: "web-acq-04",
-        title: "Montrer le site à une personne précise",
+        title: "Présenter l'offre de site à une entreprise précise",
         outcome: "La démonstration fait voir ce que le site peut changer pour elle.",
       },
       {
@@ -451,8 +451,8 @@ export const THEMES: AccompanimentTheme[] = [
       },
       {
         id: "web-acq-06",
-        title: "Mesurer les réponses et les demandes",
-        outcome: "On regarde les échanges utiles, pas seulement le nombre de clics.",
+        title: "Mesurer les réponses, rendez-vous et ventes",
+        outcome: "On regarde les étapes utiles, pas seulement le nombre de clics.",
       },
       {
         id: "web-acq-agency-01",
@@ -462,32 +462,32 @@ export const THEMES: AccompanimentTheme[] = [
       },
     ],
     finishLine:
-      "On peut avancer quand le site reçoit une attention réelle et qu'une réponse permet de choisir la prochaine amélioration.",
+      "On peut avancer quand une entreprise précise répond, qu'une prochaine étape est posée et que la vente d'un site peut être répétée.",
   },
   {
     id: "qa-capitalisation",
     marker: "09",
-    title: "Améliorer avec le réel",
+    title: "Améliorer les ventes de sites et protéger la marge",
     promise:
-      "Tu vérifies ce qui fonctionne, tu corriges ce qui bloque et tu gardes une méthode réutilisable pour la suite.",
+      "Tu observes ce qui aide à vendre, produire et livrer des sites, puis tu corriges avant de transformer l'apprentissage en méthode.",
     why:
-      "La mise en ligne n'est pas la fin. C'est le moment où l'on peut enfin apprendre des usages, des demandes et des erreurs réelles.",
+      "Le premier résultat ne prouve pas encore un business. Il faut regarder les ventes, les délais, la marge, les objections et la qualité de livraison.",
     deliverables: [
-      "Relecture complète",
-      "Site vérifié en ligne",
+      "Relecture d'un site vendu",
+      "Marge par projet",
       "Méthodes réutilisables",
       "Suivi 30, 60 et 90 jours",
     ],
     tasks: [
       {
         id: "web-qa-01",
-        title: "Tester le site sur mobile et ordinateur",
-        outcome: "Les pages, boutons et textes restent utilisables partout.",
+        title: "Tester le site et l'offre dans leur vrai contexte",
+        outcome: "Le site, les supports, les messages et les actions restent utilisables par les bonnes personnes.",
       },
       {
         id: "web-qa-02",
-        title: "Vérifier les demandes et les mesures",
-        outcome: "Une demande envoyée arrive au bon endroit et peut être suivie.",
+        title: "Vérifier les demandes, ventes et mesures",
+        outcome: "Une réponse, une commande ou une livraison arrive au bon endroit et peut être suivie.",
       },
       {
         id: "web-qa-03",
@@ -502,7 +502,7 @@ export const THEMES: AccompanimentTheme[] = [
       {
         id: "web-qa-05",
         title: "Préparer le suivi à 30, 60 et 90 jours",
-        outcome: "Les prochaines décisions ont une date et une mesure associée.",
+        outcome: "Les prochaines décisions ont une date, une mesure et un effet attendu sur l'activité.",
       },
       {
         id: "web-qa-agency-01",
@@ -518,7 +518,7 @@ export const THEMES: AccompanimentTheme[] = [
       },
     ],
     finishLine:
-      "On peut avancer quand le site est vérifié, que les prochaines mesures sont posées et que les apprentissages peuvent servir ailleurs.",
+      "On peut avancer quand les ventes, délais, coûts et reprises sont visibles et que ce qui fonctionne peut servir à un autre site.",
     trackFinishLine: {
       agence:
         "Au moins une méthode a été transmise, exécutée, relue et rendue réversible avant d'être généralisée.",
@@ -526,24 +526,107 @@ export const THEMES: AccompanimentTheme[] = [
   },
 ];
 
+export type ThemeGuidance = {
+  competency: string;
+  milestone: string;
+  autonomyTip: string;
+};
+
+export const THEME_GUIDANCE: Record<string, ThemeGuidance> = {
+  diagnostic: {
+    competency: "Cadrer une offre de site web et une première vente avant de toucher à l'outil.",
+    milestone: "Une entreprise précise, une offre de site et la prochaine décision tiennent en une minute.",
+    autonomyTip: "Demande à l'agent de reformuler la valeur du site, la cible et la prochaine action commerciale avant de produire.",
+  },
+  "business-copy": {
+    competency: "Transformer une offre de site floue en proposition que les bonnes entreprises comprennent.",
+    milestone: "Une entreprise comprend le problème traité par le site, ce qu'elle reçoit et comment commencer.",
+    autonomyTip: "Fais proposer trois angles, puis garde celui qui parle le plus précisément au problème réel et à la valeur créée.",
+  },
+  "references-da": {
+    competency: "Choisir une direction visuelle au service de la valeur du site et des preuves.",
+    milestone: "Tu peux expliquer pourquoi ton site doit avoir cette allure et ce qu'elle doit faire comprendre.",
+    autonomyTip: "Donne à l'agent des références, leur usage et tes interdits, jamais seulement le mot moderne.",
+  },
+  "design-system-assets": {
+    competency: "Poser des règles pour produire des sites cohérents et réutilisables.",
+    milestone: "Un nouveau site peut être créé sans réinventer l'identité ou le message.",
+    autonomyTip: "Demande une vérification des règles et de l'usage réel avant d'ajouter une nouveauté.",
+  },
+  "build-stack": {
+    competency: "Construire, versionner, relire et livrer un site web vendable.",
+    milestone: "Le site fonctionne, se présente à un client et peut être repris après une erreur.",
+    autonomyTip: "Demande un plan avant la production et une preuve après chaque livraison.",
+  },
+  connected: {
+    competency: "Ajouter une connexion seulement quand elle raccourcit la vente ou sécurise la livraison.",
+    milestone: "Chaque donnée, accès et action a une raison business et un cas d'erreur prévu.",
+    autonomyTip: "Fais expliciter ce qui est stocké, qui y accède et comment l'échec est géré.",
+  },
+  "seo-geo": {
+    competency: "Relier l'offre de site à une recherche, une conversation et une intention réelle.",
+    milestone: "Chaque contenu répond à une question précise et peut ouvrir une demande de site.",
+    autonomyTip: "Demande des sources et sépare toujours ce qui est vérifié de ce qui est supposé.",
+  },
+  "launch-acquisition": {
+    competency: "Transformer une offre de site et ses preuves en demandes commerciales.",
+    milestone: "Tu as une audience, un canal, un message et un signal de vente de site à observer.",
+    autonomyTip: "Commence par une audience précise et mesure les réponses, rendez-vous et ventes, pas seulement les visites.",
+  },
+  "qa-capitalisation": {
+    competency: "Apprendre du réel, protéger ta marge et scaler une activité de sites web.",
+    milestone: "Tu sais quoi garder, corriger et transmettre pour vendre et livrer plus de sites proprement.",
+    autonomyTip: "Après chaque vente ou livraison, note un fait observé, une décision et un test pour la suite.",
+  },
+};
+
+export const SITE_WEB_THEME_IDS = THEMES.map((theme) => theme.id);
+
+export function themeCheckId(themeId: string) {
+  return `web-theme-${themeId}`;
+}
+
+export function getThemeGuidance(themeId: string): ThemeGuidance {
+  const theme = THEMES.find((item) => item.id === themeId);
+  return (
+    THEME_GUIDANCE[themeId] ?? {
+      competency: theme?.promise ?? "Comprendre ce que ce thème rend possible.",
+      milestone: theme?.finishLine ?? "Une étape concrète peut être montrée.",
+      autonomyTip: "Demande à l'agent de reformuler le contexte avant d'agir.",
+    }
+  );
+}
+
+export function isThemeUnderstood(
+  themeId: string,
+  track: AccompanimentTrack,
+  completedItemIds: Set<string>
+) {
+  if (completedItemIds.has(themeCheckId(themeId))) return true;
+  const theme = THEMES.find((item) => item.id === themeId);
+  if (!theme) return false;
+  const tasks = theme.tasks.filter((task) => !task.tracks || task.tracks.includes(track));
+  return tasks.length > 0 && tasks.every((task) => completedItemIds.has(task.id));
+}
+
 export const PHASES = THEMES;
 
 export const OUTCOMES = [
-  "Un site qui sert une offre et une action précises",
-  "Un message que les bons clients comprennent",
-  "Une direction visuelle cohérente et personnelle",
-  "Un site en ligne que tu peux reprendre",
-  "Des demandes reliées à des actions concrètes",
-  "Une méthode que tu peux réutiliser",
+  "Une offre de sites web que les bons clients comprennent",
+  "Des sites et preuves qui renforcent la confiance",
+  "Un site réel que tu peux vendre et livrer",
+  "Un parcours simple entre demande, vente et livraison",
+  "Des signaux pour augmenter le volume sans perdre la marge",
+  "Une méthode réutilisable pour scaler ton activité web",
 ];
 
 export const TOOL_LAYERS = [
-  { label: "Trouver des idées", tools: "Références visuelles, sites métier, exemples de pages" },
-  { label: "Préparer", tools: "Plan des pages, textes, règles visuelles et visuels" },
-  { label: "Construire", tools: "Outil de travail, versions, relecture et mise en ligne" },
-  { label: "Relier", tools: "Demandes, informations, accès et automatisations si nécessaires" },
-  { label: "Regarder", tools: "Recherches, visites, réponses et demandes reçues" },
-  { label: "Garder", tools: "Décisions, vérifications, méthodes et exemples réutilisables" },
+  { label: "Comprendre", tools: "Marché, entreprise cliente, problème et offre de site" },
+  { label: "Préparer", tools: "Brief, copy, références, preuves et direction du site" },
+  { label: "Produire", tools: "Outils de création web, versions, relecture et livraison" },
+  { label: "Relier", tools: "Formulaires, CRM, paiements et automatisations utiles au site" },
+  { label: "Vendre", tools: "Canaux, conversations, propositions de sites et suivi" },
+  { label: "Apprendre", tools: "Ventes, délais, marge, retours et méthodes réutilisables" },
 ];
 
 export type SiteWebFollowUpProfile = {
@@ -594,56 +677,73 @@ export function buildSiteWebFollowUpMarkdown({
   profile,
   followUp,
   completed,
+  themeIds,
   exportedAt = new Date(),
 }: {
   profile: SiteWebFollowUpProfile;
   followUp: SiteWebFollowUpValues;
   completed: string[];
+  themeIds?: string[];
   exportedAt?: Date;
 }) {
   const completedSet = new Set(completed);
-  const visibleTasks = THEMES.flatMap((theme) =>
-    theme.tasks.filter((task) => !task.tracks || task.tracks.includes(profile.track))
-  );
-  const completedVisible = visibleTasks.filter((task) => completedSet.has(task.id)).length;
-  const progress = visibleTasks.length
-    ? Math.round((completedVisible / visibleTasks.length) * 100)
+  const visibleThemes = THEMES.filter((theme) => !themeIds || themeIds.includes(theme.id));
+  const completedVisible = visibleThemes.filter((theme) =>
+    isThemeUnderstood(theme.id, profile.track, completedSet)
+  ).length;
+  const progress = visibleThemes.length
+    ? Math.round((completedVisible / visibleThemes.length) * 100)
     : 0;
   const track = TRACKS.find((item) => item.id === profile.track)?.shortLabel ?? profile.track;
   const date = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(exportedAt);
-  const themeSections = THEMES.map((theme) => {
-    const tasks = theme.tasks.filter(
-      (task) => !task.tracks || task.tracks.includes(profile.track)
-    );
-    const taskLines = tasks
-      .map(
-        (task) =>
-          `${completedSet.has(task.id) ? "- [x]" : "- [ ]"} ${task.title}\n  Résultat visé : ${task.outcome}`
-      )
-      .join("\n");
-    const trackLine = theme.trackFinishLine?.[profile.track];
-    const finishLine = trackLine ? `${theme.finishLine} ${trackLine}` : theme.finishLine;
-    return `## ${theme.marker} : ${theme.title}\n\nÀ la fin de ce thème : ${theme.promise}\n\nQuand on peut avancer : ${finishLine}\n\n${taskLines}`;
-  }).join("\n\n");
+  const themeSections = visibleThemes
+    .map((theme) => {
+      const guidance = getThemeGuidance(theme.id);
+      const status = isThemeUnderstood(theme.id, profile.track, completedSet)
+        ? "Compris"
+        : "À travailler";
+      return [
+        `### ${theme.marker} · ${theme.title}`,
+        `Statut : ${status}`,
+        `Compétence gagnée : ${guidance.competency}`,
+        `Étape franchie : ${guidance.milestone}`,
+        `Repère avec ton agent : ${guidance.autonomyTip}`,
+      ].join("\n\n");
+    })
+    .join("\n\n");
 
   return (
-    `# Suivi de l'accompagnement : Site Web\n\n` +
+    `# Guide d'autonomie · Vente de sites web avec l'IA\n\n` +
+    `Ce guide t'aide à continuer seul après les séances. Tu peux le donner à un agent IA comme contexte de travail, ou le garder comme repère.\n\n` +
     `Client : ${escapeInlineMarkdown(profile.name)}\n\n` +
     `Entreprise : ${escapeInlineMarkdown(profile.company)}\n\n` +
     `Projet : ${escapeInlineMarkdown(profile.project)}\n\n` +
-    `URL : ${escapeInlineMarkdown(profile.siteUrl) || "Non renseignée"}\n\n` +
+    `Lien principal : ${escapeInlineMarkdown(profile.siteUrl) || "Non renseigné"}\n\n` +
     `Point de départ : ${track}\n\n` +
     `Exporté le : ${date}\n\n` +
-    `Progression : ${completedVisible}/${visibleTasks.length} tâches, soit ${progress} %\n\n` +
-    `## Départ et état de sortie\n\n${safeTextBlock(followUp.baseline, "À compléter pendant la revue de clôture.")}\n\n` +
-    `## Mesures à suivre\n\n${safeTextBlock(followUp.metrics, "Aucune mesure renseignée.")}\n\n` +
-    `## À 30 jours\n\n${safeTextBlock(followUp.day30, "À compléter.")}\n\n` +
-    `## À 60 jours\n\n${safeTextBlock(followUp.day60, "À compléter.")}\n\n` +
-    `## À 90 jours\n\n${safeTextBlock(followUp.day90, "À compléter.")}\n\n` +
-    `## Notes de suivi\n\n${safeTextBlock(followUp.observations, "Aucune note renseignée.")}\n\n` +
-    `## Règle de suite\n\nOn ne transforme pas une réussite isolée en règle générale. On garde ce qui est compris, mesuré, réutilisable et relu.\n\n` +
-    `## Thèmes de travail\n\n` +
+    `Progression : ${completedVisible}/${visibleThemes.length} thèmes compris, soit ${progress} %\n\n` +
+    `## Travailler avec un agent IA\n\n` +
+    `1. Donne le contexte avant la demande : projet, personne visée, offre, contraintes et résultat attendu.\n` +
+    `2. Demande une reformulation avant l'exécution. Si le problème est mal compris, arrête-toi là.\n` +
+    `3. Sépare le plan et l'exécution : fais d'abord nommer les étapes, les risques et les vérifications.\n` +
+    `4. Demande une preuve après l'action : test, aperçu, comparaison ou mesure réelle.\n` +
+    `5. Garde les décisions importantes dans ce guide au lieu de les laisser disparaître dans une conversation.\n\n` +
+    `### Prompt de départ\n\n` +
+    safeTextBlock(
+      "Voici le contexte de mon projet. Commence par reformuler le résultat attendu, les personnes concernées et la prochaine décision. Ne produis pas encore de code. Signale ce qui manque ou ce qui est incertain. Après validation, propose un plan court, puis exécute une étape à la fois avec une vérification.",
+      "Commence par reformuler le contexte avant d'agir."
+    ) +
+    `\n\n## Tes thèmes\n\n` +
     themeSections +
-    "\n"
+    `\n\n## Quand tu bloques\n\n` +
+    `Reviens au dernier résultat vérifiable. Décris ce qui devait se passer, ce qui s'est réellement passé et la dernière modification. Demande à l'agent de chercher la cause avant de proposer une correction. Ne change pas plusieurs variables à la fois.\n\n` +
+    `## Après les premières ventes ou livraisons\n\n` +
+    `À 30 jours : ${escapeInlineMarkdown(followUp.day30)}\n\n` +
+    `À 60 jours : ${escapeInlineMarkdown(followUp.day60)}\n\n` +
+    `À 90 jours : ${escapeInlineMarkdown(followUp.day90)}\n\n` +
+    `Ce que tu regardes : ${escapeInlineMarkdown(followUp.metrics)}\n\n` +
+    `## Notes personnelles\n\n${safeTextBlock(followUp.observations, "Ajoute ici les décisions ou apprentissages que tu veux retrouver.")}\n\n` +
+    `## Règle de suite\n\n` +
+    `Garde ce qui est compris, vérifié, réutilisable et relié à un résultat. Une réussite isolée devient une piste, pas une règle générale.\n`
   );
 }

@@ -36,7 +36,7 @@ Ces manques ont été corrigés partiellement dans `app/beginner/sections/Sectio
 
 ## Problème d'ordre actuel
 
-Le parcours Fondations est globalement compréhensible : psychologie, copy, vente, marketing, cadrage, environnement, visuels, mise en ligne, seuil.
+Le parcours Fondations est globalement compréhensible : psychologie, copy, vente, marketing, cadrage, environnement, assets, livraison et seuil.
 
 Les sept blocs sont moins cohérents pédagogiquement :
 
@@ -54,7 +54,7 @@ La logique business arrive trop tard. La stack arrive trop tôt et risque de dev
 
 ### Fondation mentale et commerciale
 
-1. Pourquoi construire et ce qu'un site peut réellement produire.
+1. Pourquoi vendre des sites web avec l'IA et ce qu'un site peut réellement produire.
 2. Psychologie, offre, ICP, copy, vente et canaux.
 3. Penser avant de construire.
 4. Bases web et vocabulaire de production.

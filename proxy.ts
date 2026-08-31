@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import {
+    ACCOMPANIMENT_ACCESS_STATUSES,
+    SITE_WEB_ACCOMPANIMENT_SLUG,
+} from "@/lib/accompanimentAccess";
 
 // Security headers applied to every middleware response
 const SECURITY_HEADERS: Record<string, string> = {
@@ -36,7 +40,7 @@ function createRedirectWithCookies(
     return response;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     let supabaseResponse = NextResponse.next({ request });
 
     const supabase = createServerClient(
@@ -73,6 +77,34 @@ export async function middleware(request: NextRequest) {
             : "/";
         const redirectUrl = new URL(destination, request.url);
         return createRedirectWithCookies(redirectUrl, supabaseResponse, SECURITY_HEADERS);
+    }
+
+    const requiresAccompaniment = pathname.startsWith("/accompagnement/espace");
+    if (requiresAccompaniment) {
+        const today = new Date().toISOString().slice(0, 10);
+        const { data: assignment, error: assignmentError } = await supabase
+            .from("accompaniment_assignments")
+            .select("status, starts_on, ends_on")
+            .eq("user_id", user.id)
+            .eq("accompaniment_slug", SITE_WEB_ACCOMPANIMENT_SLUG)
+            .in("status", ACCOMPANIMENT_ACCESS_STATUSES)
+            .lte("starts_on", today)
+            .or(`ends_on.is.null,ends_on.gte.${today}`)
+            .limit(1)
+            .maybeSingle();
+
+        const hasAccess = Boolean(
+            !assignmentError &&
+                assignment &&
+                ACCOMPANIMENT_ACCESS_STATUSES.includes(assignment.status) &&
+                assignment.starts_on <= today &&
+                (!assignment.ends_on || assignment.ends_on >= today)
+        );
+
+        if (!hasAccess) {
+            const accessUrl = new URL("/accompagnement?access=restricted", request.url);
+            return createRedirectWithCookies(accessUrl, supabaseResponse, SECURITY_HEADERS);
+        }
     }
 
     // Routes réservées aux membres full (497€)

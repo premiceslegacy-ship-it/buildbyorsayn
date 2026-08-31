@@ -28,7 +28,7 @@ export async function redeemBetaCode(
         return { error: "Code invalide. Vérifie et réessaie." };
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {

@@ -5,7 +5,7 @@ import { ArrowRight, UserPlus } from "lucide-react";
 import { LoveWall } from "@/components/LoveWall";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { PricingCarousel } from "@/components/PricingCarousel";
-import { BuildCreationAsset } from "@/components/AccompanimentAssets";
+import { BuildMethodHeroAsset } from "@/components/AccompanimentAssets";
 
 const STRIPE_FULL_URL = "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a";
 const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? "#";
@@ -21,7 +21,7 @@ const TWEETS = [
     handle: "@julienrouze",
     name: "Julien",
     avatar: "J",
-    text: "Le framework ORACLE seul vaut 10x le prix. J'ai livré 3 sites en un mois. Mes clients n'ont aucune idée de la vitesse à laquelle je travaille maintenant.",
+    text: "Le framework ORACLE seul vaut 10x le prix. J'ai livré 3 missions en un mois. Mes clients n'ont aucune idée de la vitesse à laquelle je travaille maintenant.",
   },
   {
     handle: "@ines_digital",
@@ -51,7 +51,7 @@ const TWEETS = [
     handle: "@mariecld",
     name: "Marie",
     avatar: "M",
-    text: "J'avais peur de ne pas être assez technique. Fondations m'a prouvé le contraire. De zéro à un site en ligne en 4 jours. Payé 900 euros. Premier client signé.",
+    text: "J'avais peur de ne pas être assez technique. Fondations m'a prouvé le contraire. De zéro à une première offre présentable en 4 jours. Payé 900 euros. Premier client signé.",
   },
   {
     handle: "@alex_verticals",
@@ -80,7 +80,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Quelle est la différence entre Fondations et Système Complet ?",
-    answer: "Fondations (97€) t'emmène de zéro à ton premier site en ligne et facturé. Système Complet (497€) inclut Fondations et ajoute la machine business entière : le framework ORACLE, les 7 blocs, les skills encodés, la logique de vente.",
+    answer: "Fondations (97€) t'emmène de zéro à un premier asset utile et à une façon de le proposer. Système Complet (497€) inclut Fondations et ajoute la machine business entière : le framework ORACLE, les 7 blocs, les skills encodés, la logique de vente.",
   },
   {
     question: "Je n'ai aucune compétence technique, c'est fait pour moi ?",
@@ -146,7 +146,7 @@ export default async function HomePage() {
     : STRIPE_FULL_URL;
 
   return (
-    <main className="min-h-screen bg-[#0a0908] text-[#f0ede8] flex flex-col relative overflow-hidden font-sans">
+    <main className="min-h-screen bg-[#0a0908] text-[#f0ede8] flex flex-col relative overflow-hidden">
 
       {/* Halos ambiants */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[700px] bg-[radial-gradient(ellipse_at_center,rgba(232,213,176,0.07),transparent_65%)] blur-[100px] pointer-events-none" />
@@ -177,15 +177,15 @@ export default async function HomePage() {
           BUILD BY ORSAYN
         </p>
 
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.12] text-[#f0ede8] max-w-4xl mx-auto mb-6">
+        <h1 className="mx-auto mb-6 max-w-5xl text-4xl font-medium leading-[1.02] tracking-[-0.04em] text-[#f0ede8] sm:text-6xl lg:text-7xl">
           Arrête d&apos;utiliser l&apos;IA.
           <br />
-          <span className="text-[#c9b48a]">Construis avec, et fais-en de l&apos;argent.</span>
+          <span className="build-hero-gradient">Construis avec, et fais-en de l&apos;argent.</span>
         </h1>
 
         <p className="text-[#8a8070] text-lg leading-[1.7] max-w-lg mx-auto mb-10">
-          La méthode et les skills que j&apos;utilise pour construire mes propres
-          systèmes IA. Zéro compétence technique requise.
+          La méthode et les skills que j&apos;utilise pour transformer une intention
+          en assets utiles, systèmes réutilisables et valeur vendable.
         </p>
 
         {isMember ? (
@@ -210,20 +210,20 @@ export default async function HomePage() {
       </section>
 
       {/* ================================================================
-          LE PROBLÈME / LA SITUATION DÉSIRÉE - en visuel
+          LA MÉTHODE BUILD - en visuel
       ================================================================ */}
       <section className="relative z-10 border-t border-white/[0.05] px-6 py-16 sm:py-20">
         <div className="mx-auto max-w-5xl">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="mb-3 text-2xl font-bold leading-tight text-[#f0ede8] sm:text-3xl">
-              La même IA. Deux résultats opposés.
+              Les outils changent. La méthode reste.
             </h2>
             <p className="mx-auto mb-12 max-w-xl text-base text-[#8a8070]">
-              La différence ne vient pas de l&apos;outil. Elle vient de ce que tu en fais.
+              BUILD t&apos;apprend à passer de l&apos;intention au résultat : cadrer, produire, vendre et réutiliser ce qui fonctionne.
             </p>
           </div>
 
-          <BuildCreationAsset />
+          <BuildMethodHeroAsset />
 
           <div className="mx-auto mt-10 grid max-w-4xl gap-8 border-t border-white/[0.08] pt-8 md:grid-cols-2 md:gap-12">
             <div>
@@ -235,16 +235,16 @@ export default async function HomePage() {
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#e8d5b0]">Avec BUILD</p>
               <p className="mt-3 max-w-md text-base leading-7 text-[#c4b89a]">
-                Tu apprends à donner un cap à l&apos;IA, à construire une vraie page et à la reprendre jusqu&apos;à ce qu&apos;elle serve ton activité.
+                Tu apprends à donner un cap à l&apos;IA, à orchestrer les bons outils et à transformer ton travail en offres, assets et systèmes qui se vendent et se réutilisent.
               </p>
             </div>
           </div>
 
           <div className="mt-12 text-center">
             <h3 className="mb-6 text-xl font-bold leading-snug text-[#f0ede8] sm:text-2xl">
-              L&apos;écart entre les deux, ce n&apos;est pas le talent.
+              La valeur n&apos;est pas dans l&apos;outil.
               <br />
-              <span className="text-[#c9b48a]">C&apos;est la façon de construire.</span>
+              <span className="text-[#c9b48a]">Elle est dans la façon de construire.</span>
             </h3>
             {!isMember && <CtaButton href="#pricing">Combler l&apos;écart</CtaButton>}
           </div>

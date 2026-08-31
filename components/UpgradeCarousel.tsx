@@ -24,9 +24,9 @@ const PLANS: Plan[] = [
     price: "97",
     eyebrow: "Pour commencer léger",
     headline: "Tu débutes. Tu veux juste ton premier résultat concret.",
-    outcome: "À la fin : un site en ligne, livré, facturé. Rien de plus, rien de moins.",
+    outcome: "À la fin : une première offre présentable, livrée et proposée à la bonne personne.",
     items: [
-      { label: "Ton premier site en ligne, étape par étape" },
+      { label: "Ton premier asset utile, de l'idée à la livraison" },
       { label: "Comprendre l'IA assez pour ne plus jamais être perdu" },
       { label: "Des visuels pro sans designer ni budget" },
       { label: "2 skills prêts à l'emploi inclus" },
