@@ -30,10 +30,30 @@ function safeMessage(error: unknown) {
     .replaceAll(supabaseUrl, "[REDACTED]");
 }
 
-async function listFixtures() {
+function isRlsPolicyDenied(error: { code?: string; message?: string } | null) {
+  return Boolean(
+    error?.code === "42501" &&
+    error.message &&
+    /row-level security/i.test(error.message)
+  );
+}
+
+function isPermissionDenied(error: { code?: string; message?: string } | null) {
+  return Boolean(
+    error?.code === "42501" &&
+    error.message &&
+    /(row-level security|permission denied)/i.test(error.message)
+  );
+}
+
+async function listFixtures(runId: string) {
   const { data, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
   if (error) throw error;
-  return (data.users as User[]).filter((user) => user.email?.startsWith("hermes-accomp-"));
+  return (data.users as User[]).filter((user) =>
+    user.email?.endsWith("@example.invalid") &&
+    user.user_metadata?.hermes_fixture === "accompaniment-access" &&
+    user.user_metadata?.run_id === runId
+  );
 }
 
 async function cleanupUsers(users: User[]) {
@@ -55,13 +75,13 @@ async function cleanupUsers(users: User[]) {
 }
 
 async function main() {
-  await cleanupUsers(await listFixtures());
-
   const stamp = Date.now();
+  const runId = String(stamp);
   const password = `Hermes-${stamp}-Aa9!`;
   const today = new Date().toISOString().slice(0, 10);
   const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const users: User[] = [];
   const checks: Record<string, boolean | number> = {};
   const diagnostics: Record<string, string> = {};
@@ -70,11 +90,15 @@ async function main() {
   let cleanupFailure: string | null = null;
 
   try {
-    for (const suffix of ["a", "b"]) {
+    for (const suffix of ["a", "b", "c", "d"]) {
       const { data, error } = await admin.auth.admin.createUser({
         email: `hermes-accomp-${stamp}-${suffix}@example.invalid`,
         password,
         email_confirm: true,
+        user_metadata: {
+          hermes_fixture: "accompaniment-access",
+          run_id: runId,
+        },
       });
       if (error || !data.user) throw error ?? new Error("Fixture creation failed.");
       users.push(data.user);
@@ -101,6 +125,26 @@ async function main() {
         ends_on: tomorrow,
         notes: "Runtime planned fixture",
       },
+      {
+        user_id: users[2].id,
+        accompaniment_slug: "site-web",
+        track: "debutant",
+        theme_ids: ["diagnostic"],
+        status: "active",
+        starts_on: tomorrow,
+        ends_on: null,
+        notes: "Runtime future fixture",
+      },
+      {
+        user_id: users[3].id,
+        accompaniment_slug: "site-web",
+        track: "agence",
+        theme_ids: ["diagnostic"],
+        status: "active",
+        starts_on: twoDaysAgo,
+        ends_on: yesterday,
+        notes: "Runtime expired fixture",
+      },
     ], { onConflict: "user_id,accompaniment_slug" });
     if (assignmentInsert.error) throw assignmentInsert.error;
 
@@ -115,13 +159,23 @@ async function main() {
     );
     const activeAssignmentId = assignmentIdByUser.get(users[0].id);
     const plannedAssignmentId = assignmentIdByUser.get(users[1].id);
-    if (!activeAssignmentId || !plannedAssignmentId) throw new Error("Assignment fixture lookup failed.");
+    const futureAssignmentId = assignmentIdByUser.get(users[2].id);
+    const expiredAssignmentId = assignmentIdByUser.get(users[3].id);
+    if (!activeAssignmentId || !plannedAssignmentId || !futureAssignmentId || !expiredAssignmentId) {
+      throw new Error("Assignment fixture lookup failed.");
+    }
 
     const clientA = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
     const clientB = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
+    const clientC = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
+    const clientD = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
     const loginA = await clientA.auth.signInWithPassword({ email: users[0].email!, password });
     const loginB = await clientB.auth.signInWithPassword({ email: users[1].email!, password });
-    if (loginA.error || loginB.error) throw loginA.error ?? loginB.error;
+    const loginC = await clientC.auth.signInWithPassword({ email: users[2].email!, password });
+    const loginD = await clientD.auth.signInWithPassword({ email: users[3].email!, password });
+    if (loginA.error || loginB.error || loginC.error || loginD.error) {
+      throw loginA.error ?? loginB.error ?? loginC.error ?? loginD.error;
+    }
 
     const ownAssignmentA = await clientA
       .from("accompaniment_assignments")
@@ -138,10 +192,22 @@ async function main() {
       .select("id")
       .eq("user_id", users[0].id)
       .eq("accompaniment_slug", "site-web");
+    const futureAssignmentC = await clientC
+      .from("accompaniment_assignments")
+      .select("id")
+      .eq("user_id", users[2].id)
+      .eq("accompaniment_slug", "site-web");
+    const expiredAssignmentD = await clientD
+      .from("accompaniment_assignments")
+      .select("id")
+      .eq("user_id", users[3].id)
+      .eq("accompaniment_slug", "site-web");
 
-    checks.activeMemberSeesOwnAssignment = (ownAssignmentA.data?.length ?? 0) === 1;
-    checks.plannedMemberSeesNoAssignment = (plannedAssignmentB.data?.length ?? 0) === 0;
-    checks.crossMemberSeesNoAssignment = (crossAssignmentB.data?.length ?? 0) === 0;
+    checks.activeMemberSeesOwnAssignment = !ownAssignmentA.error && (ownAssignmentA.data?.length ?? 0) === 1;
+    checks.plannedMemberSeesNoAssignment = !plannedAssignmentB.error && (plannedAssignmentB.data?.length ?? 0) === 0;
+    checks.crossMemberSeesNoAssignment = !crossAssignmentB.error && (crossAssignmentB.data?.length ?? 0) === 0;
+    checks.futureMemberSeesNoAssignment = !futureAssignmentC.error && (futureAssignmentC.data?.length ?? 0) === 0;
+    checks.expiredMemberSeesNoAssignment = !expiredAssignmentD.error && (expiredAssignmentD.data?.length ?? 0) === 0;
 
     const ownInsert = await clientA.from("progress").insert({
       user_id: users[0].id,
@@ -155,21 +221,35 @@ async function main() {
       module_id: "web-accompagnement",
       item_id: "web-theme-planned-own",
     });
-    checks.plannedMemberCannotSaveOwnTheme = Boolean(plannedOwnInsert.error);
+    checks.plannedMemberCannotSaveOwnTheme = isRlsPolicyDenied(plannedOwnInsert.error);
+
+    const futureOwnInsert = await clientC.from("progress").insert({
+      user_id: users[2].id,
+      module_id: "web-accompagnement",
+      item_id: "web-theme-future-own",
+    });
+    checks.futureMemberCannotSaveOwnTheme = isRlsPolicyDenied(futureOwnInsert.error);
+
+    const expiredOwnInsert = await clientD.from("progress").insert({
+      user_id: users[3].id,
+      module_id: "web-accompagnement",
+      item_id: "web-theme-expired-own",
+    });
+    checks.expiredMemberCannotSaveOwnTheme = isRlsPolicyDenied(expiredOwnInsert.error);
 
     const crossInsert = await clientB.from("progress").insert({
       user_id: users[0].id,
       module_id: "web-accompagnement",
       item_id: "web-theme-cross-user",
     });
-    checks.crossMemberCannotSaveOwnTheme = Boolean(crossInsert.error);
+    checks.crossMemberCannotSaveOwnTheme = isRlsPolicyDenied(crossInsert.error);
 
     const crossSelect = await clientB
       .from("progress")
       .select("item_id")
       .eq("user_id", users[0].id)
       .eq("module_id", "web-accompagnement");
-    checks.crossMemberSeesNoProgress = (crossSelect.data?.length ?? 0) === 0;
+    checks.crossMemberSeesNoProgress = !crossSelect.error && (crossSelect.data?.length ?? 0) === 0;
 
     const ownContextUpsert = await clientA.from("accompaniment_workspace_context").upsert({
       assignment_id: activeAssignmentId,
@@ -223,7 +303,7 @@ async function main() {
       .eq("assignment_id", activeAssignmentId)
       .maybeSingle();
     checks.activeMemberCannotDeleteSharedContext =
-      (Boolean(activeDelete.error) || (activeDelete.data?.length ?? 0) === 0) &&
+      (isPermissionDenied(activeDelete.error) || (!activeDelete.error && (activeDelete.data?.length ?? 0) === 0)) &&
       contextAfterDeleteProbe.data?.assignment_id === activeAssignmentId;
 
     const plannedContextUpsert = await clientB.from("accompaniment_workspace_context").upsert({
@@ -234,13 +314,33 @@ async function main() {
       shared_notes: "Ne doit pas passer",
       updated_by: users[1].id,
     });
-    checks.plannedMemberCannotSaveSharedContext = Boolean(plannedContextUpsert.error);
+    checks.plannedMemberCannotSaveSharedContext = isRlsPolicyDenied(plannedContextUpsert.error);
+
+    const futureContextUpsert = await clientC.from("accompaniment_workspace_context").upsert({
+      assignment_id: futureAssignmentId,
+      company: "Fixture future",
+      project: "Projet non commencé",
+      site_url: "",
+      shared_notes: "Ne doit pas passer",
+      updated_by: users[2].id,
+    });
+    checks.futureMemberCannotSaveSharedContext = isRlsPolicyDenied(futureContextUpsert.error);
+
+    const expiredContextUpsert = await clientD.from("accompaniment_workspace_context").upsert({
+      assignment_id: expiredAssignmentId,
+      company: "Fixture expirée",
+      project: "Projet terminé",
+      site_url: "",
+      shared_notes: "Ne doit pas passer",
+      updated_by: users[3].id,
+    });
+    checks.expiredMemberCannotSaveSharedContext = isRlsPolicyDenied(expiredContextUpsert.error);
 
     const crossContextSelect = await clientB
       .from("accompaniment_workspace_context")
       .select("assignment_id")
       .eq("assignment_id", activeAssignmentId);
-    checks.crossMemberSeesNoSharedContext = (crossContextSelect.data?.length ?? 0) === 0;
+    checks.crossMemberSeesNoSharedContext = !crossContextSelect.error && (crossContextSelect.data?.length ?? 0) === 0;
 
     const crossContextUpsert = await clientB.from("accompaniment_workspace_context").upsert({
       assignment_id: activeAssignmentId,
@@ -250,7 +350,7 @@ async function main() {
       shared_notes: "Ne doit pas passer",
       updated_by: users[1].id,
     });
-    checks.crossMemberCannotWriteSharedContext = Boolean(crossContextUpsert.error);
+    checks.crossMemberCannotWriteSharedContext = isRlsPolicyDenied(crossContextUpsert.error);
 
     const trainerContextUpdate = await admin
       .from("accompaniment_workspace_context")
@@ -284,20 +384,20 @@ async function main() {
       .select("id")
       .eq("user_id", users[0].id)
       .eq("accompaniment_slug", "site-web");
-    checks.revokedMemberSeesNoAssignment = (revokedAssignmentA.data?.length ?? 0) === 0;
+    checks.revokedMemberSeesNoAssignment = !revokedAssignmentA.error && (revokedAssignmentA.data?.length ?? 0) === 0;
 
     const revokedInsert = await clientA.from("progress").insert({
       user_id: users[0].id,
       module_id: "web-accompagnement",
       item_id: "web-theme-after-revoke",
     });
-    checks.revokedMemberCannotSaveTheme = Boolean(revokedInsert.error);
+    checks.revokedMemberCannotSaveTheme = isRlsPolicyDenied(revokedInsert.error);
 
     const revokedContextSelect = await clientA
       .from("accompaniment_workspace_context")
       .select("assignment_id")
       .eq("assignment_id", activeAssignmentId);
-    checks.revokedMemberSeesNoSharedContext = (revokedContextSelect.data?.length ?? 0) === 0;
+    checks.revokedMemberSeesNoSharedContext = !revokedContextSelect.error && (revokedContextSelect.data?.length ?? 0) === 0;
 
     const revokedContextUpdate = await clientA
       .from("accompaniment_workspace_context")
@@ -305,7 +405,8 @@ async function main() {
       .eq("assignment_id", activeAssignmentId)
       .select("assignment_id");
     checks.revokedMemberCannotWriteSharedContext =
-      Boolean(revokedContextUpdate.error) || (revokedContextUpdate.data?.length ?? 0) === 0;
+      isRlsPolicyDenied(revokedContextUpdate.error) ||
+      (!revokedContextUpdate.error && (revokedContextUpdate.data?.length ?? 0) === 0);
 
     verdict = Object.values(checks).every((value) => value === true) ? "PASS" : "FAIL";
   } catch (error) {
@@ -319,7 +420,7 @@ async function main() {
     }
   }
 
-  const remainingFixtures = (await listFixtures()).length;
+  const remainingFixtures = (await listFixtures(runId)).length;
   if (remainingFixtures !== 0) verdict = "FAIL";
 
   const report = {

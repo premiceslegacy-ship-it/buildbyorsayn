@@ -6,11 +6,11 @@ Surface vérifiée : `/accompagnement/site-web`, avec contrôle complémentaire 
 
 Serveur de vérification : `http://127.0.0.1:3001`.
 
-Working-tree fingerprint : `e71d552b0ae91eea10e8d525eac7e22e44c7909bd9bd293a9a43b7ca06de497e`
+Working-tree fingerprint : `39a1b26017eae5448f0e45cf5beb37453109968197ca5a82efe1678f1fb9e05d`
 
 Empreinte calculée sur le diff Git courant et les hashes des fichiers non suivis hors fichiers ignorés, en excluant ce rapport afin d'éviter une empreinte autoréférentielle.
 
-Verified at : `2026-08-31T23:35:24+02:00`
+Verified at : `2026-09-01T00:16:22+02:00`
 
 Cette passe vérifie la proposition de valeur transversale du sas, la fiche explicitement dédiée au premier accompagnement site web, les CTA tactiles, les flux des assets, l'illustration ASCII/dithering du sas, la stabilité des logos, la recomposition responsive et le mode `prefers-reduced-motion`.
 
@@ -190,15 +190,15 @@ La route membre, le proxy Next et la RLS exigent une affectation `active` ou `co
 
 Le contexte partagé est stocké dans `accompaniment_workspace_context`, lié par clé primaire à l'affectation. Le membre actif et le formateur peuvent enregistrer activité, projet, URL et notes. Le membre passe par RLS ; le formateur passe par une action serveur vérifiée et un client admin filtré par affectation.
 
-Le test runtime distant couvre `18` scénarios : accès actif, refus planifié sur sa propre progression, refus croisé, progression, contexte partagé, colonnes immuables, interdiction de suppression, mise à jour formateur, révocation et nettoyage des fixtures. Verdict : `PASS`, zéro fixture restante.
+Le test runtime distant couvre `24` scénarios : accès actif, refus planifié, futur, expiré et croisé, progression, contexte partagé, colonnes immuables, interdiction de suppression, mise à jour formateur, révocation et nettoyage borné au `run_id`. Verdict : `PASS`, zéro fixture restante.
 
 ## Commandes et résultats
 
 - `npx tsc --noEmit` : exit 0 ;
-- `npm test` : exit 0, 25 tests réussis ;
+- `npm test` : exit 0, 28 tests réussis ;
 - `npm run lint` : exit 0 ;
 - `npm run test:rls` : exit 0, verdict runtime `PASS` ;
-- `npm run test:accompaniment-access` : exit 0, verdict runtime `PASS` sur 18 scénarios ;
+- `npm run test:accompaniment-access` : exit 0, verdict runtime `PASS` sur 24 scénarios ;
 - `npm run build` : exit 0 avec Next.js `16.3.4`, typecheck inclus et 26 routes générées ;
 - `npm audit --omit=dev` : zéro vulnérabilité connue ;
 - `supabase db lint --linked --level warning` : aucune erreur de schéma ;
@@ -221,14 +221,14 @@ Verdict des assets, de la proposition de valeur et des CTA vérifiés : `PASS`.
 
 Builder identity : `Hermes Agent`.
 
-Reviewer identity : `Hermes independent reviewer sa-0-001c4d8c` (`gpt-5.6-sol`).
+Reviewer identity : `Hermes independent reviewer sa-0-b8470eb7` (`gpt-5.6-sol`).
 
 Builder and reviewer are distinct : yes.
 
 Reviewer did not generate the approved baseline : yes.
 
-Independent review fingerprint : `c4177a6281a4f9108f908ea37439951ff62c3fd8c6105a55b411786dec93a79d`.
+Independent review fingerprint : `f19e5d755c9b66c1661e8811cddfa21d2467e98c1646a0f507f09f509c359029`.
 
-Independent review trace : `/Users/useersm/.hermes/cache/delegation/live/deleg_e6f171b9/task-0.log`.
+Independent review trace : `/Users/useersm/.hermes/cache/delegation/live/deleg_0b9f1591/task-0.log`.
 
 Verdict global du scope livré : `PASS`. La revue clavier complète, le lecteur d'écran et les sessions réelles membre/formateur restent des limites explicitement non couvertes, pas une certification d'accessibilité complète.

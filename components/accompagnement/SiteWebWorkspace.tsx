@@ -173,7 +173,7 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
       const remoteThemeIds = validThemeIds.filter((themeId) =>
         isThemeUnderstood(themeId, assignment.track, remoteItems)
       );
-      setUnderstoodThemeIds((current) => [...new Set([...current, ...remoteThemeIds])]);
+      setUnderstoodThemeIds(remoteThemeIds);
     }
 
     void loadRemoteProgress();
@@ -220,7 +220,12 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
           .eq("item_id", itemId);
 
     if (result.error) {
-      setSyncMessage("La coche reste visible ici, mais la synchronisation a échoué. Réessaie dans un instant.");
+      setUnderstoodThemeIds((current) =>
+        completed
+          ? current.filter((id) => id !== themeId)
+          : [...new Set([...current, themeId])]
+      );
+      setSyncMessage("La modification n'a pas été enregistrée et a été annulée. Réessaie dans un instant.");
     }
     setPendingThemeIds((current) => current.filter((id) => id !== themeId));
   }
