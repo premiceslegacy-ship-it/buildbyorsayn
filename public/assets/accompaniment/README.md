@@ -57,13 +57,13 @@ Le workflow validé est formalisé dans le skill local `ascii-magic-design-asset
 - contrat d'animation et reduced motion ;
 - gabarit de provenance et de QA.
 
-## Asset : le coffre, le cadenas ("bientôt disponible") et la flèche
+## Asset : le coffre et le cadenas ("bientôt disponible"), silhouettes isolées
 
-Cartes du folder d'accompagnement affiché sur la home, sous les cards de pricing.
+Icônes utilisées dans les cartes du folder d'accompagnement (`AccompanimentFolderCard.tsx`).
 
 ### Source
 
-- Silhouettes originales dessinées en SVG pour ce projet (coffre, cadenas fermé, flèche) : `1200 × 750 px`, fond noir, forme blanche, aucun droit tiers.
+- Silhouettes originales dessinées en SVG pour ce projet (coffre, cadenas fermé) : `1200 × 750 px`, fond noir, forme blanche, aucun droit tiers.
 - Aucune photo, aucune source externe.
 
 ### Transformation
@@ -75,16 +75,32 @@ Même recette que les mains (section précédente), appliquée via `ascii-magic.
 3. Export PNG (le moteur ASCII Magic exporte le fond noir en alpha opaque, pas transparent) puis post-traitement local : luminance -> alpha, noir -> transparence réelle, RGB -> palette BUILD.
 4. Recoloration :
    - coffre : or `#e8d5b0` (dither) et crème `#f0ede8` (characters), pleine opacité - asset "disponible" ;
-   - cadenas et flèche : gris sourd `#8f8b84`, alpha réduit (`0.5-0.7`) - asset "bientôt disponible / à venir".
-5. Redimensionné à `960 × 600 px` (coffre) et compressé en palette réduite pour rester léger.
+   - cadenas : gris sourd `#8f8b84`, alpha réduit (`0.5-0.7`) - asset "bientôt disponible".
+5. Redimensionné à `960 × 600 px` et compressé en palette réduite pour rester léger.
 
 ### Fichiers livrés
 
 - `coffre-dither-atkinson-build.png`, `coffre-characters-build.png` : accompagnement disponible (site web).
 - `soon-dither-atkinson-build.png`, `soon-characters-build.png` : accompagnements à venir.
-- `arrow-dither-atkinson-build.png`, `arrow-characters-build.png` : flèche "d'autres accompagnements arrivent".
 - Tous en PNG RGBA transparent.
 
-### Composant
+## Asset : la scène du coffre (fond de la card d'accompagnement)
+
+Fond plein cadre de `AccompanimentFolderCard.tsx`, pas une icône isolée : un vrai décor (halo, rayons, pièces avec reflet, étincelles, ombre portée dégradée) autour du coffre, pour donner un univers plutôt qu'un objet posé sur du vide.
+
+### Source
+
+- Composition SVG originale `1400 × 900 px` avec de vrais dégradés (metal, halo radial), un filtre `feTurbulence` de grain sur toute la scène et un `feDisplacementMap` pour casser les contours nets des rayons/halos/étincelles avant conversion. Un aplat vectoriel simple ne donne rien une fois passé au dither : il faut de la matière (dégradés, grain, bords irréguliers) en amont.
+- Aucune photo, aucune source externe.
+
+### Transformation
+
+Même recette Atkinson / Characters que ci-dessus, appliquée sur cette composition texturée. Export, post-traitement alpha, recoloration or `#e8d5b0` (dither) et crème `#f0ede8` (characters), puis réduit à `1120 × 720 px`.
+
+### Fichiers livrés
+
+- `coffre-scene-dither-atkinson-build.png`, `coffre-scene-characters-build.png` : fond plein cadre, opacité réduite (`~0.9` dither, `~0.7` characters) pour rester lisible derrière le texte et le folder.
+
+## Composant
 
 `components/ui/ascii-dither-asset.tsx` généralise le rendu deux/trois couches utilisé par `hands-ascii-dither.tsx`, `AccompanimentFolderCard.tsx` et le CSS `.guidance-ascii-*` de `app/globals.css`.

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { CheckGlyph, CoffreGlyph, FondationsGlyph, LockGlyph, MarkGlyph } from "@/components/ui/pricing-glyphs";
-import { AccompanimentFolderCard } from "@/components/AccompanimentFolderCard";
 import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
 
 type Plan = {
@@ -34,6 +33,9 @@ const PLANS: Plan[] = [
       { label: "Présenter et livrer un résultat propre" },
       { label: "2 skills prêts à l'emploi inclus" },
       { label: "Framework ORACLE + 7 blocs système", locked: true },
+      { label: "Choisir une niche et vendre avant de construire", locked: true },
+      { label: "Skills encodés prêts à copier-coller", locked: true },
+      { label: "Sources et ressources complètes", locked: true },
     ],
     buyers: "121 personnes ont commencé ici",
     cta: `Commencer pour ${FONDATIONS_PRICE}€`,
@@ -224,8 +226,6 @@ export function PricingCarousel({
           ))}
         </div>
       </div>
-
-      <AccompanimentFolderCard />
     </div>
   );
 }

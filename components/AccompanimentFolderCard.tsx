@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import { FolderComponent } from "@/components/ui/folder-component";
 import { AsciiDitherAsset } from "@/components/ui/ascii-dither-asset";
 import { ACCOMPAGNEMENTS, ACCOMPANIMENT_CAL_URL } from "@/lib/accompagnements";
 
-const available = ACCOMPAGNEMENTS.find((item) => item.status === "available");
+const AVAILABLE = ACCOMPAGNEMENTS.filter((item) => item.status === "available");
+const SOON_COUNT = ACCOMPAGNEMENTS.filter((item) => item.status === "soon").length;
 
 function AvailableCardContent() {
   return (
@@ -42,60 +44,132 @@ function SoonCardContent() {
   );
 }
 
-export function AccompanimentFolderCard() {
+function AccompagnementCarousel() {
+  const [index, setIndex] = useState(0);
+  const item = AVAILABLE[index];
+  const multiple = AVAILABLE.length > 1;
+
+  const prev = () => setIndex((i) => (i === 0 ? AVAILABLE.length - 1 : i - 1));
+  const next = () => setIndex((i) => (i === AVAILABLE.length - 1 ? 0 : i + 1));
+
   return (
-    <div className="relative mt-10 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0908] p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <span aria-hidden="true" className="build-atmosphere-orb build-atmosphere-orb-one opacity-40" />
-      <span aria-hidden="true" className="build-atmosphere-orb build-atmosphere-orb-two opacity-40" />
+    <div className="w-full">
+      <div className="flex items-center gap-3">
+        {multiple && (
+          <button
+            onClick={prev}
+            aria-label="Accompagnement précédent"
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.05] text-[#e8d5b0] transition-colors hover:bg-white/[0.1]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+        )}
 
-      <div className="relative z-10 grid gap-8 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-10">
-        <div className="mx-auto sm:mx-0">
-          <FolderComponent
-            color="build"
-            size="sm"
-            cards={[<SoonCardContent key="soon-1" />, <SoonCardContent key="soon-2" />, <AvailableCardContent key="available" />]}
-          />
-        </div>
-
-        <div className="text-center sm:text-left">
-          <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-3">
-            Tu préfères qu&apos;on construise ça ensemble ?
-          </p>
-          <h3 className="text-xl sm:text-2xl font-bold text-[#f0ede8] mb-3 leading-tight">
-            Un accompagnement 1:1, pas une formation de plus.
-          </h3>
-          <p className="text-[#8a8070] text-sm leading-relaxed mb-6 max-w-md mx-auto sm:mx-0">
-            {available?.description}
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-start">
+        <div className="min-w-0 flex-1 text-center sm:text-left">
+          <p className="text-xs uppercase tracking-[0.16em] text-[#8f8b84]">Disponible</p>
+          <h4 className="mt-2 text-lg font-bold text-[#f0ede8]">{item.title}</h4>
+          <p className="mt-2 text-sm leading-relaxed text-[#8a8070]">{item.description}</p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
             <a
               href={ACCOMPANIMENT_CAL_URL}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#e8d5b0] px-5 py-3 text-sm font-bold text-[#0a0908] shadow-[0_3px_0_rgba(100,76,36,0.9)] transition-all duration-[80ms] hover:bg-[#f0dfc0] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)]"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#e8d5b0] px-4 py-2.5 text-sm font-bold text-[#0a0908] shadow-[0_3px_0_rgba(100,76,36,0.9)] transition-all duration-[80ms] hover:bg-[#f0dfc0] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)]"
             >
               Réserver le premier appel
               <ArrowRight className="h-3.5 w-3.5" />
             </a>
-            {available?.href && (
+            {item.href && (
               <Link
-                href={available.href}
+                href={item.href}
                 className="text-sm font-semibold text-[#e8d5b0]/80 underline underline-offset-4 hover:text-[#e8d5b0]"
               >
                 Voir l&apos;accompagnement
               </Link>
             )}
           </div>
+        </div>
 
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-white/30 sm:justify-start">
-            <AsciiDitherAsset
-              ditherSrc="/assets/accompaniment/arrow-dither-atkinson-build.png"
-              charactersSrc="/assets/accompaniment/arrow-characters-build.png"
-              className="guidance-ascii-scene h-4 w-10"
-              animated={false}
+        {multiple && (
+          <button
+            onClick={next}
+            aria-label="Accompagnement suivant"
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.05] text-[#e8d5b0] transition-colors hover:bg-white/[0.1]"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
+      {multiple && (
+        <div className="mt-4 flex justify-center gap-2 sm:justify-start">
+          {AVAILABLE.map((a, i) => (
+            <button
+              key={a.id}
+              onClick={() => setIndex(i)}
+              aria-label={`Voir ${a.title}`}
+              className={`h-1.5 rounded-full transition-all duration-200 ${
+                i === index ? "w-6 bg-[#e8d5b0]" : "w-1.5 bg-white/20 hover:bg-white/35"
+              }`}
             />
-            <span>D&apos;autres accompagnements arrivent</span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function AccompanimentFolderCard() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative mt-10 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0908] shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)]">
+      <AsciiDitherAsset
+        ditherSrc="/assets/accompaniment/coffre-scene-dither-atkinson-build.png"
+        charactersSrc="/assets/accompaniment/coffre-scene-characters-build.png"
+        className="guidance-ascii-scene absolute inset-0 h-full w-full opacity-90"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-[#0a0908]/60 to-[#0a0908]/10" />
+
+      <div className="relative z-10 flex flex-col items-center gap-14 px-6 py-12 sm:px-12 sm:py-16 lg:min-h-[440px] lg:flex-row lg:items-center lg:justify-between">
+        <div className="text-center lg:max-w-sm lg:text-left">
+          <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-3">
+            Tu préfères qu&apos;on construise ça ensemble ?
+          </p>
+          <h3 className="text-2xl sm:text-3xl font-bold text-[#f0ede8] mb-4 leading-tight">
+            Des accompagnements 1:1 pour avancer sur ce qui compte.
+          </h3>
+          <p className="text-sm leading-relaxed text-[#8a8070]">
+            Un dossier, plusieurs accompagnements. Clique pour l&apos;ouvrir et voir ce qui est disponible.
+          </p>
+        </div>
+
+        <div className="flex flex-shrink-0 flex-col items-center pt-8 pr-4 sm:pt-0 sm:pr-8">
+          <div className="scale-[0.8] sm:scale-100">
+            <FolderComponent
+              color="build"
+              size="md"
+              pinOpen={open}
+              onOpenChange={setOpen}
+              cards={[<SoonCardContent key="soon-1" />, <SoonCardContent key="soon-2" />, <AvailableCardContent key="available" />]}
+            />
+          </div>
+          <p className="mt-3 text-xs text-white/30">
+            {open
+              ? `${AVAILABLE.length} disponible${AVAILABLE.length > 1 ? "s" : ""}, ${SOON_COUNT} à venir`
+              : "Clique sur le dossier"}
+          </p>
+        </div>
+      </div>
+
+      <div
+        className={`relative z-10 overflow-hidden border-t border-white/[0.08] bg-[#0a0908]/80 backdrop-blur-sm transition-[grid-template-rows] duration-500 ease-out ${
+          open ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"
+        }`}
+      >
+        <div className="min-h-0">
+          <div className="px-6 py-8 sm:px-12">
+            <AccompagnementCarousel />
           </div>
         </div>
       </div>

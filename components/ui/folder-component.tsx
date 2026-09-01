@@ -69,6 +69,8 @@ type FolderComponentProps = Omit<React.ComponentProps<"div">, "color"> & {
   color?: "black" | "white" | "blue" | "build";
   size?: "sm" | "md" | "lg";
   cards?: [React.ReactNode, React.ReactNode, React.ReactNode];
+  pinOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const BASE_WIDTH = 321;
@@ -82,12 +84,15 @@ const FolderComponent = ({
   size = "md",
   className,
   cards,
+  pinOpen = false,
+  onOpenChange,
   ...props
 }: FolderComponentProps) => {
   const theme = themes[color] ?? themes.black;
   const scale = sizeScales[size];
   const [isHovered, setIsHovered] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [clicked, setClicked] = useState(false);
+  const isOpen = pinOpen || clicked;
 
   return (
     <div
@@ -107,11 +112,12 @@ const FolderComponent = ({
           WebkitTapHighlightColor: "transparent",
         }}
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          setIsHovered(false);
-          setIsOpen(false);
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => {
+          const next = !clicked;
+          setClicked(next);
+          onOpenChange?.(next);
         }}
-        onClick={() => setIsOpen((o) => !o)}
       >
         <div
           className="absolute top-1/2 left-1/2"

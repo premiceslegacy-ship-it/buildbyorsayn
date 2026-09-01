@@ -5,6 +5,7 @@ import { ArrowRight, UserPlus } from "lucide-react";
 import { LoveWall } from "@/components/LoveWall";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { PricingCarousel } from "@/components/PricingCarousel";
+import { AccompanimentFolderCard } from "@/components/AccompanimentFolderCard";
 import { BuildMethodHeroAsset } from "@/components/AccompanimentAssets";
 import { COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
 
@@ -294,21 +295,13 @@ export default async function HomePage() {
           ) : (
             <PricingCarousel beginnerUrl={beginnerUrl} fullUrl={fullUrl} />
           )}
-
-          {!isMember && (
-            <div className="text-center mt-10">
-              <p className="text-sm text-white/40 mb-2">
-                Tu veux qu&apos;on construise ça ensemble, en direct ?
-              </p>
-              <Link
-                href="/accompagnement"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#e8d5b0]/80 hover:text-[#e8d5b0] underline underline-offset-4 transition-colors"
-              >
-                Découvrir l&apos;accompagnement 1:1
-              </Link>
-            </div>
-          )}
         </div>
+
+        {!isMember && (
+          <div className="max-w-5xl mx-auto">
+            <AccompanimentFolderCard />
+          </div>
+        )}
       </section>
 
       {/* ================================================================

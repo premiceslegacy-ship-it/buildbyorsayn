@@ -12,3 +12,4 @@ docs/
 tsconfig.tsbuildinfo
 .watcher-backups/
 supabase/.temp/
+.vercel
