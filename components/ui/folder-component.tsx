@@ -75,6 +75,10 @@ type FolderComponentProps = Omit<React.ComponentProps<"div">, "color"> & {
 
 const BASE_WIDTH = 321;
 const BASE_HEIGHT = 270;
+// The topmost card rises y:-180 with a ~214px-tall card body when open, well
+// above the folder's own BASE_HEIGHT. Reserve that space in normal flow so
+// consumers don't need to guess a magic padding to avoid clipping it.
+const OPEN_TOP_RESERVE = 160;
 
 const FLAP_PATH =
   "M0 25C0 11.1929 11.1929 0 25 0H136.084C143.044 0 149.689 2.90139 154.42 8.00608L178.08 33.5343C182.811 38.639 189.456 41.5404 196.416 41.5404H296C309.807 41.5404 321 52.7333 321 66.5404V216C321 229.807 309.807 241 296 241H25C11.1929 241 0 229.807 0 216V25Z";
@@ -98,10 +102,11 @@ const FolderComponent = ({
     <div
       data-slot="folder"
       className={cn(
-        "relative w-full h-full flex items-center justify-center",
+        "relative w-full h-full flex items-end justify-center",
         className,
       )}
       {...props}
+      style={{ paddingTop: OPEN_TOP_RESERVE * scale, ...props.style }}
     >
       <div
         className="relative cursor-pointer select-none"

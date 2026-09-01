@@ -4,10 +4,12 @@ type AsciiDitherAssetProps = {
   className?: string;
   label?: string;
   animated?: boolean;
+  fit?: "contain" | "cover";
 };
 
-export function AsciiDitherAsset({ ditherSrc, charactersSrc, className, label, animated = true }: AsciiDitherAssetProps) {
+export function AsciiDitherAsset({ ditherSrc, charactersSrc, className, label, animated = true, fit = "contain" }: AsciiDitherAssetProps) {
   const decorative = !label;
+  const fitStyle = fit === "cover" ? { objectFit: "cover" as const } : undefined;
   return (
     <div
       className={className}
@@ -17,6 +19,7 @@ export function AsciiDitherAsset({ ditherSrc, charactersSrc, className, label, a
     >
       <img
         className="guidance-ascii-layer guidance-ascii-dither"
+        style={fitStyle}
         src={ditherSrc}
         alt=""
         aria-hidden="true"
@@ -25,6 +28,7 @@ export function AsciiDitherAsset({ ditherSrc, charactersSrc, className, label, a
       />
       <img
         className="guidance-ascii-layer guidance-ascii-characters"
+        style={fitStyle}
         src={charactersSrc}
         alt=""
         aria-hidden="true"
@@ -34,6 +38,7 @@ export function AsciiDitherAsset({ ditherSrc, charactersSrc, className, label, a
       {animated && (
         <img
           className="guidance-ascii-layer guidance-ascii-signal"
+          style={fitStyle}
           src={charactersSrc}
           alt=""
           aria-hidden="true"

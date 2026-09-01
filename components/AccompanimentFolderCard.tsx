@@ -18,6 +18,7 @@ function AvailableCardContent() {
         charactersSrc="/assets/accompaniment/accompaniment-card-characters-build.png"
         className="absolute inset-0 h-full w-full"
         animated={false}
+        fit="cover"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-transparent to-transparent" />
       <div className="relative z-10 mt-auto">
@@ -138,7 +139,7 @@ export function AccompanimentFolderCard() {
         </div>
 
         <div className="flex flex-shrink-0 flex-col items-center pr-4 sm:pr-8">
-          <div className="scale-[0.8] pt-16 sm:scale-100 sm:pt-20">
+          <div className="scale-[0.8] sm:scale-100">
             <FolderComponent
               color="build"
               size="md"
