@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { FolderComponent } from "@/components/ui/folder-component";
-import { AsciiDitherAsset } from "@/components/ui/ascii-dither-asset";
+import { CoffreGlyph, LockGlyph } from "@/components/ui/pricing-glyphs";
 import { ACCOMPAGNEMENTS, ACCOMPANIMENT_CAL_URL } from "@/lib/accompagnements";
 
 const AVAILABLE = ACCOMPAGNEMENTS.filter((item) => item.status === "available");
@@ -13,11 +13,7 @@ const SOON_COUNT = ACCOMPAGNEMENTS.filter((item) => item.status === "soon").leng
 function AvailableCardContent() {
   return (
     <div className="relative flex h-full w-full flex-col justify-between p-3.5">
-      <AsciiDitherAsset
-        ditherSrc="/assets/accompaniment/coffre-dither-atkinson-build.png"
-        charactersSrc="/assets/accompaniment/coffre-characters-build.png"
-        className="guidance-ascii-scene absolute inset-x-2 top-2 h-[62%]"
-      />
+      <CoffreGlyph className="h-8 w-8 text-[#e8d5b0]" />
       <div className="relative z-10 mt-auto">
         <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]">Disponible</p>
         <p className="mt-1 text-[11px] font-medium leading-snug text-[#f0ede8]">
@@ -31,12 +27,7 @@ function AvailableCardContent() {
 function SoonCardContent() {
   return (
     <div className="relative flex h-full w-full flex-col justify-between p-3.5">
-      <AsciiDitherAsset
-        ditherSrc="/assets/accompaniment/soon-dither-atkinson-build.png"
-        charactersSrc="/assets/accompaniment/soon-characters-build.png"
-        className="guidance-ascii-scene absolute inset-x-2 top-2 h-[62%] opacity-70"
-        animated={false}
-      />
+      <LockGlyph className="h-8 w-8 text-white/30" />
       <div className="relative z-10 mt-auto">
         <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8f8b84]">Bientôt disponible</p>
       </div>
@@ -124,12 +115,8 @@ export function AccompanimentFolderCard() {
 
   return (
     <div className="relative mt-10 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0908] shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <AsciiDitherAsset
-        ditherSrc="/assets/accompaniment/coffre-scene-dither-atkinson-build.png"
-        charactersSrc="/assets/accompaniment/coffre-scene-characters-build.png"
-        className="guidance-ascii-scene absolute inset-0 h-full w-full opacity-90"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-[#0a0908]/60 to-[#0a0908]/10" />
+      <span aria-hidden="true" className="build-atmosphere-orb build-atmosphere-orb-one opacity-30" />
+      <span aria-hidden="true" className="build-atmosphere-orb build-atmosphere-orb-two opacity-30" />
 
       <div className="relative z-10 flex flex-col items-center gap-14 px-6 py-12 sm:px-12 sm:py-16 lg:min-h-[440px] lg:flex-row lg:items-center lg:justify-between">
         <div className="text-center lg:max-w-sm lg:text-left">
