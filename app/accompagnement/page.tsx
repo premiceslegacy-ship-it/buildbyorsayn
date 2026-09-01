@@ -7,8 +7,9 @@ import {
   isAccompanimentAdminUser,
   SITE_WEB_ACCOMPANIMENT_SLUG,
 } from "@/lib/accompanimentAccess";
+import { ACCOMPAGNEMENTS, ACCOMPANIMENT_CAL_URL } from "@/lib/accompagnements";
 
-const CAL_URL = "https://cal.com/samuel-mbeboura/point-sur-ton-projet-de-site-web";
+const CAL_URL = ACCOMPANIMENT_CAL_URL;
 
 export const metadata = {
   title: "Accompagnements | BUILD",
@@ -91,17 +92,22 @@ export default async function AccompagnementPage({ searchParams }: Props) {
           </div>
 
           <div className="mt-12 divide-y divide-white/[0.1] border-y border-white/[0.1]">
-            <Link href="/accompagnement/site-web" className="group grid gap-5 py-7 transition hover:bg-white/[0.03] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-10 sm:px-4">
-              <div className="min-w-0">
-                <p className="text-xs uppercase tracking-[0.16em] text-[#8f8b84]">Disponible</p>
-                <h3 className="mt-3 text-2xl font-medium text-[#f0ede8]">Construire et vendre des sites web avec l&apos;IA</h3>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#bdb9b0]">Pour passer d'un premier site web réalisé avec l'IA à une offre vendable, un processus de livraison et une activité web qui peut grandir.</p>
-              </div>
-              <span className="text-sm text-[#e8d5b0] underline decoration-[#c9b48a] underline-offset-4">Voir cet accompagnement <span aria-hidden="true">→</span></span>
-            </Link>
-            <div className="py-7 text-[#8f8b84] sm:px-4">
-              <p className="text-sm text-[#d8d3c8]">D'autres accompagnements arrivent.</p>
-            </div>
+            {ACCOMPAGNEMENTS.map((item) =>
+              item.status === "available" && item.href ? (
+                <Link key={item.id} href={item.href} className="group grid gap-5 py-7 transition hover:bg-white/[0.03] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-10 sm:px-4">
+                  <div className="min-w-0">
+                    <p className="text-xs uppercase tracking-[0.16em] text-[#8f8b84]">Disponible</p>
+                    <h3 className="mt-3 text-2xl font-medium text-[#f0ede8]">{item.title}</h3>
+                    <p className="mt-3 max-w-2xl text-sm leading-6 text-[#bdb9b0]">{item.description}</p>
+                  </div>
+                  <span className="text-sm text-[#e8d5b0] underline decoration-[#c9b48a] underline-offset-4">Voir cet accompagnement <span aria-hidden="true">→</span></span>
+                </Link>
+              ) : (
+                <div key={item.id} className="py-7 text-[#8f8b84] sm:px-4">
+                  <p className="text-sm text-[#d8d3c8]">{item.description}</p>
+                </div>
+              )
+            )}
           </div>
 
           <div className="mt-10 flex flex-col items-start gap-5 border-t border-white/[0.08] pt-8 sm:flex-row sm:items-end sm:justify-between">

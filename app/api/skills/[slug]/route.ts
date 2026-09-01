@@ -3,6 +3,7 @@ import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { COFFRE_LABEL } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
 import {
   getSkillBySlug,
@@ -270,7 +271,7 @@ export async function GET(
         {
           error:
             skill.access === "full"
-              ? "Accès système complet requis."
+              ? `Accès ${COFFRE_LABEL} requis.`
               : "Accès fondations requis.",
         },
         { status: 403 }

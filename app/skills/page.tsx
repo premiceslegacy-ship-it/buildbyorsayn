@@ -10,6 +10,7 @@ import { SKILLS_CATALOG } from "@/lib/skillsCatalog";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { SkillsFreshness } from "@/components/SkillsFreshness";
+import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
 
 const SKILL_USAGE_STEPS = [
   {
@@ -362,11 +363,11 @@ export default function SkillsPage() {
                 ? "Gratuit"
                 : isBeginner
                   ? "Fondations"
-                  : "Complet";
+                  : COFFRE_LABEL;
               const lockedHref = isBeginner ? beginnerHref : checkoutHref;
               const lockedLabel = isBeginner
-                ? "Débloquer les fondations - 97€"
-                : "Prendre le système complet - 497€";
+                ? `Débloquer les fondations - ${FONDATIONS_PRICE}€`
+                : `Prendre ${COFFRE_LABEL} - ${COFFRE_PRICE}€`;
 
               return (
                 <motion.div

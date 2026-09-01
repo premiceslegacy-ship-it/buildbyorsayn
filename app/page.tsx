@@ -6,8 +6,9 @@ import { LoveWall } from "@/components/LoveWall";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { PricingCarousel } from "@/components/PricingCarousel";
 import { BuildMethodHeroAsset } from "@/components/AccompanimentAssets";
+import { COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
 
-const STRIPE_FULL_URL = "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a";
+const STRIPE_FULL_URL = STRIPE_FULL_CHECKOUT_LINK;
 const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? "#";
 
 const TWEETS = [
@@ -63,7 +64,7 @@ const TWEETS = [
     handle: "@sophie_bld",
     name: "Sophie",
     avatar: "S",
-    text: "Fondations d'abord. Système complet 3 semaines plus tard. La progression est logique. Le contenu est dense mais actionnable. Et ça marche.",
+    text: "Fondations d'abord. LE COFFRE 3 semaines plus tard. La progression est logique. Le contenu est dense mais actionnable. Et ça marche.",
   },
   {
     handle: "@pierrewx",
@@ -79,16 +80,16 @@ const FAQ_ITEMS = [
     answer: "Paiement unique. Aucun abonnement, aucun frais récurrent. Tu payes une fois, l'accès est à vie.",
   },
   {
-    question: "Quelle est la différence entre Fondations et Système Complet ?",
-    answer: "Fondations (97€) t'emmène de zéro à un premier asset utile et à une façon de le proposer. Système Complet (497€) inclut Fondations et ajoute la machine business entière : le framework ORACLE, les 7 blocs, les skills encodés, la logique de vente.",
+    question: "Quelle est la différence entre Fondations et LE COFFRE ?",
+    answer: `Fondations (${FONDATIONS_PRICE}€) t'emmène de zéro à un premier asset utile et à une façon de le proposer. LE COFFRE (${COFFRE_PRICE}€) inclut Fondations et ajoute la machine business entière : le framework ORACLE, les 7 blocs, les skills encodés, la logique de vente.`,
   },
   {
     question: "Je n'ai aucune compétence technique, c'est fait pour moi ?",
     answer: "Oui. Fondations part de zéro et couvre chaque étape concrètement - aucun prérequis technique.",
   },
   {
-    question: "Je peux commencer par Fondations puis passer au Système Complet ?",
-    answer: "Oui, à tout moment tu peux upgrader vers le Système Complet en ne payant que le complément.",
+    question: "Je peux commencer par Fondations puis passer au COFFRE ?",
+    answer: `Oui, à tout moment tu peux upgrader vers LE COFFRE en ne payant que le complément (${UPGRADE_PRICE}€).`,
   },
 ];
 

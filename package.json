@@ -11,7 +11,8 @@
     "test:rls": "tsx scripts/verify-progress-rls.ts",
     "test:accompaniment-access": "tsx scripts/verify-accompaniment-access.ts",
     "lint": "tsc --noEmit",
-    "skills:sync": "tsx scripts/sync-skills-to-supabase.ts"
+    "skills:sync": "tsx scripts/sync-skills-to-supabase.ts",
+    "stripe:pricing": "tsx --env-file=.env.local scripts/update-stripe-pricing.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

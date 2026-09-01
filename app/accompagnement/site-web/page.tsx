@@ -8,8 +8,9 @@ import {
   SITE_WEB_ACCOMPANIMENT_SLUG,
 } from "@/lib/accompanimentAccess";
 import { THEMES } from "@/lib/siteWebAccompagnement";
+import { ACCOMPANIMENT_CAL_URL } from "@/lib/accompagnements";
 
-const CAL_URL = "https://cal.com/samuel-mbeboura/point-sur-ton-projet-de-site-web";
+const CAL_URL = ACCOMPANIMENT_CAL_URL;
 
 export const metadata = {
   title: "Vendre des sites web avec l&apos;IA | BUILD",

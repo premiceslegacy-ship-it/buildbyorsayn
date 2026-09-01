@@ -7,6 +7,7 @@ import { BLOCS_DATA } from "@/lib/mockData";
 import { VideoCard } from "@/components/VideoCard";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
+import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
 
 const FONDATIONS_VIDEOS: { title: string; youtubeId: string; description?: string }[] = [
   {
@@ -118,7 +119,7 @@ export default function VideosPage() {
           <section id="fondations" className="scroll-mt-8">
             <div className="mb-8">
               <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
-                Fondations : 97€
+                Fondations : {FONDATIONS_PRICE}€
               </p>
               <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
                 Le flow : de l'idée à l'URL en ligne
@@ -145,7 +146,7 @@ export default function VideosPage() {
             ) : (
               <PaywallBanner
                 label="Accès Fondations requis"
-                description="Ces vidéos font partie des Fondations (97€)."
+                description={`Ces vidéos font partie des Fondations (${FONDATIONS_PRICE}€).`}
                 ctaLabel="Accéder aux Fondations"
                 ctaHref={beginnerUrl}
               />
@@ -174,11 +175,11 @@ export default function VideosPage() {
             </section>
           )}
 
-          {/* Section Système complet */}
+          {/* Section LE COFFRE */}
           <section id="systeme" className="scroll-mt-8">
             <div className="mb-8">
               <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-1">
-                Système complet : 497€
+                {COFFRE_LABEL} : {COFFRE_PRICE}€
               </p>
               <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
                 Les blocs
@@ -230,17 +231,17 @@ export default function VideosPage() {
               )
             ) : isBeginner ? (
               <PaywallBanner
-                label="Accès système complet requis"
-                description="Ces vidéos font partie du système complet (400€ de complément)."
-                ctaLabel="Passer au système complet"
+                label={`Accès ${COFFRE_LABEL} requis`}
+                description={`Ces vidéos font partie de ${COFFRE_LABEL} (${UPGRADE_PRICE}€ de complément).`}
+                ctaLabel={`Passer à ${COFFRE_LABEL}`}
                 ctaHref={upgradeUrl}
               />
             ) : (
               <PaywallBanner
-                label="Accès système complet requis"
-                description="Ces vidéos font partie du système complet (497€)."
-                ctaLabel="Accéder au système complet"
-                ctaHref={`https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a${userId ? `?client_reference_id=${userId}` : ""}`}
+                label={`Accès ${COFFRE_LABEL} requis`}
+                description={`Ces vidéos font partie de ${COFFRE_LABEL} (${COFFRE_PRICE}€).`}
+                ctaLabel={`Accéder à ${COFFRE_LABEL}`}
+                ctaHref={`${STRIPE_FULL_CHECKOUT_LINK}${userId ? `?client_reference_id=${userId}` : ""}`}
               />
             )}
           </section>

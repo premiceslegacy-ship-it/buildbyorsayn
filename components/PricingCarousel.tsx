@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, ArrowLeft, Check, Star, GraduationCap, Zap, Lock } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
+import { CheckGlyph, CoffreGlyph, FondationsGlyph, LockGlyph, MarkGlyph } from "@/components/ui/pricing-glyphs";
+import { AccompanimentFolderCard } from "@/components/AccompanimentFolderCard";
+import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
 
 type Plan = {
   id: string;
   badge: string;
-  icon: typeof Zap;
+  icon: typeof CoffreGlyph;
   price: string;
   tagline: string;
   outcome: string;
@@ -20,9 +23,9 @@ const PLANS: Plan[] = [
   {
     id: "fondations",
     badge: "Fondations",
-    icon: GraduationCap,
-    price: "97",
-    tagline: "Pour partir de zéro",
+    icon: FondationsGlyph,
+    price: String(FONDATIONS_PRICE),
+    tagline: "Le réflexe : ton premier résultat",
     outcome: "À la fin : tu sais transformer une intention en premier asset vendable et le proposer.",
     items: [
       { label: "Ton premier asset utile, de l'idée à la livraison" },
@@ -30,40 +33,38 @@ const PLANS: Plan[] = [
       { label: "Des visuels pro sans designer ni budget" },
       { label: "Présenter et livrer un résultat propre" },
       { label: "2 skills prêts à l'emploi inclus" },
-      { label: "Vidéos tutos techniques pas à pas" },
       { label: "Framework ORACLE + 7 blocs système", locked: true },
     ],
     buyers: "121 personnes ont commencé ici",
-    cta: "Commencer pour 97€",
+    cta: `Commencer pour ${FONDATIONS_PRICE}€`,
     highlighted: false,
   },
   {
     id: "systeme",
-    badge: "Système Complet",
-    icon: Zap,
-    price: "497",
-    tagline: "Pour en faire un business",
-    outcome: "À la fin : un système à toi qui trouve, livre et facture des clients.",
+    badge: COFFRE_LABEL,
+    icon: CoffreGlyph,
+    price: String(COFFRE_PRICE),
+    tagline: "La décision : quoi vendre, à qui",
+    outcome: "À la fin : tu sais ce que tu vends, à qui, et tu peux le refaire à volonté.",
     items: [
       { label: "Tout Fondations inclus" },
       { label: "Framework ORACLE : l'IA exécute comme un employé senior" },
       { label: "7 blocs : de l'idée au client qui paye" },
       { label: "Skills encodés prêts à copier-coller" },
       { label: "Choisir une niche, vendre d'abord, construire ensuite" },
-      { label: "L'identité visuelle que j'utilise pour Orsayn" },
-      { label: "Sources, ressources et vidéos tutos exclusives" },
+      { label: "Sources et ressources complètes" },
     ],
     buyers: "71 personnes construisent avec",
-    cta: "Prendre le système - 497€",
+    cta: `Prendre ${COFFRE_LABEL} - ${COFFRE_PRICE}€`,
     highlighted: true,
   },
 ];
 
-function Stars() {
+function Marks() {
   return (
     <span className="inline-flex items-center gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} className="w-3.5 h-3.5 text-[#e8d5b0] fill-[#e8d5b0]" strokeWidth={0} />
+        <MarkGlyph key={i} className="w-3.5 h-3.5 text-[#e8d5b0] fill-[#e8d5b0]" />
       ))}
     </span>
   );
@@ -145,7 +146,7 @@ export function PricingCarousel({
 
                     <div className="flex items-center justify-between mb-5">
                       <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8d5b0] bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-full px-3 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-                        <Icon className="w-3 h-3" /> {plan.badge}
+                        <Icon className="w-3.5 h-3.5" /> {plan.badge}
                       </div>
                       <span className="text-xs text-white/40">{plan.tagline}</span>
                     </div>
@@ -159,7 +160,7 @@ export function PricingCarousel({
 
                     {/* Note et répartition des membres */}
                     <div className="flex items-center gap-2.5 mb-6">
-                      <Stars />
+                      <Marks />
                       <span className="text-xs text-[#c4b89a]">{plan.buyers}</span>
                     </div>
 
@@ -174,9 +175,9 @@ export function PricingCarousel({
                           className={`flex items-center gap-2.5 ${item.locked ? "opacity-30" : ""}`}
                         >
                           {item.locked ? (
-                            <Lock className="w-3.5 h-3.5 text-white/30 flex-shrink-0" strokeWidth={1.5} />
+                            <LockGlyph className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
                           ) : (
-                            <Check className="w-3.5 h-3.5 text-[#e8d5b0] flex-shrink-0" strokeWidth={2} />
+                            <CheckGlyph className="w-3.5 h-3.5 text-[#e8d5b0] flex-shrink-0" />
                           )}
                           <span className={`text-[13px] ${item.locked ? "text-white/40" : "text-[rgba(240,237,232,0.75)]"}`}>
                             {item.label}
@@ -224,18 +225,7 @@ export function PricingCarousel({
         </div>
       </div>
 
-      {/* L'écart entre les deux offres */}
-      <div className="mt-10 relative overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)]">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-        <p className="text-sm text-[#f0ede8] font-semibold mb-2 text-center">
-          Fondations te rend capable. Le Système Complet te rend rentable.
-        </p>
-        <p className="text-[13px] text-white/45 text-center leading-relaxed">
-          Avec Fondations, tu sais livrer un premier asset. Avec le Système Complet, tu as la machine
-          entière : quoi vendre, à qui, comment livrer vite, et comment recommencer.
-          Tu peux aussi commencer à 97€ et passer au complet plus tard en ne payant que la différence.
-        </p>
-      </div>
+      <AccompanimentFolderCard />
     </div>
   );
 }

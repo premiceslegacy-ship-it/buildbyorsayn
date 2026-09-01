@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { setUserTier } from "@/app/actions/setUserTier";
+import { COFFRE_LABEL } from "@/lib/pricing";
 
 type EnrichedUser = {
   id: string;
@@ -26,8 +27,8 @@ const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "Tous les membres" },
   { key: "free", label: "Gratuit" },
   { key: "beginner", label: "Fondations" },
-  { key: "full", label: "Complet" },
-  { key: "paid", label: "Fondations + Complet" },
+  { key: "full", label: COFFRE_LABEL },
+  { key: "paid", label: `Fondations + ${COFFRE_LABEL}` },
 ];
 
 function matchesFilter(tier: string | null, filter: FilterKey): boolean {
@@ -72,7 +73,7 @@ function TierBadge({ tier }: { tier: string | null }) {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        Complet
+        {COFFRE_LABEL}
       </span>
     );
   }
@@ -222,7 +223,7 @@ export function AdminUsersTable({ users, totalBlocs }: { users: EnrichedUser[]; 
                                 : "bg-white/5 text-white/30 border border-white/10 hover:bg-white/10"
                             }`}
                           >
-                            Complet
+                            {COFFRE_LABEL}
                           </button>
                         </form>
                       </div>
