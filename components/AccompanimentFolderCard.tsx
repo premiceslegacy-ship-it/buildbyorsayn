@@ -4,16 +4,22 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { FolderComponent } from "@/components/ui/folder-component";
-import { CoffreGlyph, LockGlyph } from "@/components/ui/pricing-glyphs";
+import { LockGlyph } from "@/components/ui/pricing-glyphs";
+import { AsciiDitherAsset } from "@/components/ui/ascii-dither-asset";
 import { ACCOMPAGNEMENTS, ACCOMPANIMENT_CAL_URL } from "@/lib/accompagnements";
 
 const AVAILABLE = ACCOMPAGNEMENTS.filter((item) => item.status === "available");
-const SOON_COUNT = ACCOMPAGNEMENTS.filter((item) => item.status === "soon").length;
 
 function AvailableCardContent() {
   return (
-    <div className="relative flex h-full w-full flex-col justify-between p-3.5">
-      <CoffreGlyph className="h-8 w-8 text-[#e8d5b0]" />
+    <div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[20px] p-3.5">
+      <AsciiDitherAsset
+        ditherSrc="/assets/accompaniment/accompaniment-card-dither-atkinson-build.png"
+        charactersSrc="/assets/accompaniment/accompaniment-card-characters-build.png"
+        className="absolute inset-0 h-full w-full"
+        animated={false}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-transparent to-transparent" />
       <div className="relative z-10 mt-auto">
         <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]">Disponible</p>
         <p className="mt-1 text-[11px] font-medium leading-snug text-[#f0ede8]">
@@ -131,8 +137,8 @@ export function AccompanimentFolderCard() {
           </p>
         </div>
 
-        <div className="flex flex-shrink-0 flex-col items-center pt-8 pr-4 sm:pt-0 sm:pr-8">
-          <div className="scale-[0.8] sm:scale-100">
+        <div className="flex flex-shrink-0 flex-col items-center pr-4 sm:pr-8">
+          <div className="scale-[0.8] pt-16 sm:scale-100 sm:pt-20">
             <FolderComponent
               color="build"
               size="md"
@@ -141,11 +147,7 @@ export function AccompanimentFolderCard() {
               cards={[<SoonCardContent key="soon-1" />, <SoonCardContent key="soon-2" />, <AvailableCardContent key="available" />]}
             />
           </div>
-          <p className="mt-3 text-xs text-white/30">
-            {open
-              ? `${AVAILABLE.length} disponible${AVAILABLE.length > 1 ? "s" : ""}, ${SOON_COUNT} à venir`
-              : "Clique sur le dossier"}
-          </p>
+          <p className="mt-3 text-xs text-white/30">Clique sur le dossier</p>
         </div>
       </div>
 

@@ -46,7 +46,6 @@ const themes = {
   },
   build: {
     backFill: "#171719",
-    backImage: "/assets/accompaniment/folder-coffre-texture.jpg",
     backInsetColor: "0 0 0 0 0.91 0 0 0 0 0.84 0 0 0 0 0.69 0 0 0 0.3 0",
     backInsetShadow: "inset 0 0 6px 2px rgba(232,213,176,0.3)",
     flapFill: "#e8d5b0",
@@ -136,9 +135,6 @@ const FolderComponent = ({
                 height: BASE_HEIGHT,
                 borderRadius: 25,
                 backgroundColor: theme.backFill,
-                backgroundImage: "backImage" in theme ? `url(${theme.backImage})` : undefined,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
                 boxShadow: theme.backInsetShadow,
               }}
             />
