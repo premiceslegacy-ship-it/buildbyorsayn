@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CheckCircle, Loader2, X } from "lucide-react";
+import { COFFRE_LABEL } from "@/lib/pricing";
 
 type State = "polling" | "confirmed" | "timeout";
 
@@ -68,7 +69,7 @@ export function UpgradedBanner() {
             <Loader2 className="w-4 h-4 text-[#c9b48a] animate-spin flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[#f0ede8]">Activation en cours...</p>
-              <p className="text-xs text-[#8a8070]">Ton accès Système Complet est en train d&apos;être activé.</p>
+              <p className="text-xs text-[#8a8070]">Ton accès à {COFFRE_LABEL} est en train d&apos;être activé.</p>
             </div>
           </>
         )}
@@ -77,7 +78,7 @@ export function UpgradedBanner() {
           <>
             <CheckCircle className="w-4 h-4 text-[#c9b48a] flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#f0ede8]">Accès Système Complet activé.</p>
+              <p className="text-sm font-semibold text-[#f0ede8]">Accès à {COFFRE_LABEL} activé.</p>
               <p className="text-xs text-[#8a8070]">Tout le contenu est maintenant débloqué.</p>
             </div>
             <button onClick={() => setVisible(false)} className="text-[#8a8070] hover:text-[#f0ede8] transition-colors flex-shrink-0">

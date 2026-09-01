@@ -11,6 +11,7 @@ import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { LinkifiedText } from "@/components/ui/linkified-text";
 import { createClient } from "@/lib/supabase/client";
 import { toggleBlocCompletion } from "@/app/actions/progress";
+import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK } from "@/lib/pricing";
 
 function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
@@ -144,8 +145,8 @@ export default function BlocPage() {
   const hasNextBloc = Boolean(nextBlocId);
 
   const checkoutUrl = checkoutUserId
-    ? `https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02?client_reference_id=${checkoutUserId}`
-    : "https://buy.stripe.com/aFa28saRUgSdaFm69W5AQ02";
+    ? `${STRIPE_FULL_CHECKOUT_LINK}?client_reference_id=${checkoutUserId}`
+    : STRIPE_FULL_CHECKOUT_LINK;
   const showPaywall = tier !== "full" && tier !== null && currentBlocIndex > 0;
   const showContent = tier === "full" || currentBlocIndex === 0;
   const markSessionAdvance = () => {
@@ -221,14 +222,14 @@ export default function BlocPage() {
                       6 méthodes complètes pour créer, vendre et scaler. Communauté privée de builders actifs + toutes les mises à jour à vie incluses.
                     </p>
                     <div className="flex items-baseline justify-center gap-2 mb-8">
-                      <span className="text-3xl font-bold text-[#e8d5b0]">497€</span>
+                      <span className="text-3xl font-bold text-[#e8d5b0]">{COFFRE_PRICE}€</span>
                       <span className="text-white/40 text-sm">· accès à vie</span>
                     </div>
                     <a
                       href={checkoutUrl}
                       className="group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]"
                     >
-                      Je veux le système complet
+                      Je veux {COFFRE_LABEL}
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                     </a>
                     <p className="text-center text-xs text-white/25 mt-4">

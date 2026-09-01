@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, ArrowLeft, Check, Star, GraduationCap, Zap, Lock } from "lucide-react";
+import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
 
 type Plan = {
   id: string;
@@ -21,7 +22,7 @@ const PLANS: Plan[] = [
     id: "fondations",
     badge: "Fondations",
     icon: GraduationCap,
-    price: "97",
+    price: String(FONDATIONS_PRICE),
     eyebrow: "Pour commencer léger",
     headline: "Tu débutes. Tu veux juste ton premier résultat concret.",
     outcome: "À la fin : une première offre présentable, livrée et proposée à la bonne personne.",
@@ -34,26 +35,26 @@ const PLANS: Plan[] = [
       { label: "Skills encodés complets", locked: true },
     ],
     buyers: "121 personnes ont commencé ici",
-    ctaLabel: "Rester sur Fondations - 97€",
+    ctaLabel: `Rester sur Fondations - ${FONDATIONS_PRICE}€`,
   },
   {
     id: "systeme",
-    badge: "Système Complet",
+    badge: COFFRE_LABEL,
     icon: Zap,
-    price: "497",
+    price: String(COFFRE_PRICE),
     eyebrow: "Pour ceux qui visent le vrai résultat",
     headline: "Tu es aguerri. Tu veux la méthode entière, pas un aperçu.",
-    outcome: "À la fin : une machine à toi qui trouve, livre et facture des clients en continu.",
+    outcome: "À la fin : tu sais ce que tu vends, à qui, et tu peux le refaire.",
     items: [
       { label: "Tout Fondations inclus" },
       { label: "Framework ORACLE : l'IA exécute comme un employé senior" },
       { label: "7 blocs : de l'idée au client qui paye" },
       { label: "Skills encodés prêts à copier-coller" },
       { label: "Choisir une niche, vendre d'abord, construire ensuite" },
-      { label: "Sources, ressources et identité visuelle complètes" },
+      { label: "Sources et ressources complètes" },
     ],
     buyers: "71 personnes construisent avec",
-    ctaLabel: "Prendre le système complet",
+    ctaLabel: `Prendre ${COFFRE_LABEL}`,
   },
 ];
 
@@ -68,7 +69,7 @@ function Stars() {
 }
 
 /**
- * Carousel fondations / système complet, utilisé dans la modal upgrade du dashboard.
+ * Carousel fondations / LE COFFRE, utilisé dans la modal upgrade du dashboard.
  * Cadrage volontaire en "niveau" (léger vs aguerri) pour challenger l'égo business
  * plutôt que de juxtaposer les deux offres côte à côte.
  */

@@ -1,4 +1,6 @@
-# Asset ASCII / Dither des mains
+# Assets ASCII / Dither de l'accompagnement
+
+## Asset : les mains
 
 ## Source
 
@@ -54,3 +56,35 @@ Le workflow validé est formalisé dans le skill local `ascii-magic-design-asset
 - recettes pour images, logos, icônes, cards, heroes, schémas et vidéos ;
 - contrat d'animation et reduced motion ;
 - gabarit de provenance et de QA.
+
+## Asset : le coffre, le cadenas ("bientôt disponible") et la flèche
+
+Cartes du folder d'accompagnement affiché sur la home, sous les cards de pricing.
+
+### Source
+
+- Silhouettes originales dessinées en SVG pour ce projet (coffre, cadenas fermé, flèche) : `1200 × 750 px`, fond noir, forme blanche, aucun droit tiers.
+- Aucune photo, aucune source externe.
+
+### Transformation
+
+Même recette que les mains (section précédente), appliquée via `ascii-magic.com/app` :
+
+1. Couche `Dither` : `Atkinson`, palette `Mono 1-bit`, chroma `Luminance only`, pixel size `2`, strength `100`, contrast `122`, threshold `50`.
+2. Couche `Characters` : jeu `Standard` `@#S08Xx+=-;:.`, font size `7`, coverage `100`, edge emphasis `22`, dark threshold `24`, brightness `6`, contrast `100`.
+3. Export PNG (le moteur ASCII Magic exporte le fond noir en alpha opaque, pas transparent) puis post-traitement local : luminance -> alpha, noir -> transparence réelle, RGB -> palette BUILD.
+4. Recoloration :
+   - coffre : or `#e8d5b0` (dither) et crème `#f0ede8` (characters), pleine opacité - asset "disponible" ;
+   - cadenas et flèche : gris sourd `#8f8b84`, alpha réduit (`0.5-0.7`) - asset "bientôt disponible / à venir".
+5. Redimensionné à `960 × 600 px` (coffre) et compressé en palette réduite pour rester léger.
+
+### Fichiers livrés
+
+- `coffre-dither-atkinson-build.png`, `coffre-characters-build.png` : accompagnement disponible (site web).
+- `soon-dither-atkinson-build.png`, `soon-characters-build.png` : accompagnements à venir.
+- `arrow-dither-atkinson-build.png`, `arrow-characters-build.png` : flèche "d'autres accompagnements arrivent".
+- Tous en PNG RGBA transparent.
+
+### Composant
+
+`components/ui/ascii-dither-asset.tsx` généralise le rendu deux/trois couches utilisé par `hands-ascii-dither.tsx`, `AccompanimentFolderCard.tsx` et le CSS `.guidance-ascii-*` de `app/globals.css`.

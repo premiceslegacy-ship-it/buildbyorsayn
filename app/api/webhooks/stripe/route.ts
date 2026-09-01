@@ -17,7 +17,7 @@ function escapeHtml(value: string) {
 function determineTier(priceId: string | null | undefined): "beginner" | "full" {
     if (!priceId) return "beginner"; // Sécurité : si priceId inconnu, on ne promeut pas au-delà de beginner
     if (priceId === process.env.STRIPE_BEGINNER_PRICE_ID) return "beginner";
-    // FULL (100€) et UPGRADE (70€) donnent tous les deux l'accès complet
+    // FULL (267€) et UPGRADE (170€) donnent tous les deux l'accès complet
     if (
         priceId === process.env.STRIPE_FULL_PRICE_ID ||
         priceId === process.env.STRIPE_UPGRADE_PRICE_ID

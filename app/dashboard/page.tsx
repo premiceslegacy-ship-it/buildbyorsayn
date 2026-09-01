@@ -19,6 +19,7 @@ import { Suspense } from "react";
 import { UpgradedBanner } from "@/components/UpgradedBanner";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { UpgradeCarousel } from "@/components/UpgradeCarousel";
+import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
 
 const ICONS: Record<string, any> = {
   "1": Workflow,
@@ -45,7 +46,7 @@ export default function DashboardHub() {
   const [checkoutUrls, setCheckoutUrls] = useState<{ beginner: string | null; upgrade: string | null; full: string }>({
     beginner: null,
     upgrade: null,
-    full: "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a",
+    full: STRIPE_FULL_CHECKOUT_LINK,
   });
 
   useEffect(() => {
@@ -200,8 +201,8 @@ export default function DashboardHub() {
           {tier === "beginner" && (
             <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-xl px-5 py-4">
               <div>
-                <p className="text-sm font-semibold text-[#e8d5b0]">Les fondations, c&apos;est le départ. Le système complet, c&apos;est ce qui construit.</p>
-                <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs, les sources et les méthodes complètes. 400€ de complément - une seule fois.</p>
+                <p className="text-sm font-semibold text-[#e8d5b0]">Les fondations, c&apos;est le départ. {COFFRE_LABEL}, c&apos;est ce qui construit.</p>
+                <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs, les sources et les méthodes complètes. {UPGRADE_PRICE}€ de complément - une seule fois.</p>
               </div>
               <button
                 onClick={() => setModal("both")}
@@ -429,7 +430,7 @@ export default function DashboardHub() {
                 ? `${checkoutUrls.upgrade ?? checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
                 : `${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
               }
-              systemePrice={tier === "beginner" ? "400" : "497"}
+              systemePrice={tier === "beginner" ? String(UPGRADE_PRICE) : String(COFFRE_PRICE)}
             />
 
             <div className="mt-6 text-center">

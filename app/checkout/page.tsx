@@ -2,8 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, Zap, Layers, GraduationCap, Lock, Play } from "lucide-react";
 import { BetaCodeForm } from "./BetaCodeForm";
+import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
 
-const STRIPE_FULL_URL = "https://buy.stripe.com/dRm8wQ8JMgSd7taaqc5AQ0a";
+const STRIPE_FULL_URL = STRIPE_FULL_CHECKOUT_LINK;
 // These will be set once you create the products in Stripe:
 const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? "#";
 const STRIPE_UPGRADE_URL = process.env.STRIPE_UPGRADE_CHECKOUT_LINK ?? "#";
@@ -71,14 +72,14 @@ export default async function CheckoutPage() {
             <div className="relative z-10 w-full max-w-2xl mt-20 pb-16">
                 <div className="text-center mb-10">
                     <h1 className="text-3xl font-semibold tracking-tight text-[#f0ede8] mb-3">
-                        {alreadyFull ? "Tu as déjà l'accès complet" : isUpgrading ? "Passe au système complet" : "Accès réservé"}
+                        {alreadyFull ? "Tu as déjà l'accès complet" : isUpgrading ? `Passe à ${COFFRE_LABEL}` : "Accès réservé"}
                     </h1>
                     <p className="text-[rgba(240,237,232,0.55)] text-base leading-relaxed">
                         {alreadyFull
                             ? "Tu as accès à l'ensemble du système Build, y compris les fondations."
                             : isUpgrading
-                            ? "Tu as les fondations. Débloque les 7 blocs et les sources pour 400€."
-                            : "La plupart des membres qui ont essayé les fondations finissent par prendre le système complet. Autant commencer là."}
+                            ? `Tu as les fondations. Débloque les 7 blocs et les sources pour ${UPGRADE_PRICE}€.`
+                            : `La plupart des membres qui ont essayé les fondations finissent par prendre ${COFFRE_LABEL}. Autant commencer là.`}
                     </p>
                 </div>
 
@@ -106,7 +107,7 @@ export default async function CheckoutPage() {
                         <div className="flex items-baseline justify-between mb-6">
                             <span className="text-white/40 text-sm">Complément accès complet</span>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-bold text-[#f0ede8]">400€</span>
+                                <span className="text-3xl font-bold text-[#f0ede8]">{UPGRADE_PRICE}€</span>
                                 <span className="text-white/40 text-sm">TTC</span>
                             </div>
                         </div>
@@ -125,7 +126,7 @@ export default async function CheckoutPage() {
                                     <GraduationCap className="w-3 h-3" /> Fondations
                                 </span>
                                 <div className="flex items-baseline gap-1 mb-1">
-                                    <span className="text-3xl font-bold text-[#f0ede8]">97€</span>
+                                    <span className="text-3xl font-bold text-[#f0ede8]">{FONDATIONS_PRICE}€</span>
                                     <span className="text-white/40 text-sm">TTC</span>
                                 </div>
                                 <span className="text-white/40 text-xs">Accès à vie aux fondations</span>
@@ -143,7 +144,7 @@ export default async function CheckoutPage() {
                                 </li>
                                     </ul>
                             <a href={beginnerUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm">
-                                Commencer pour 97€
+                                Commencer pour {FONDATIONS_PRICE}€
                                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
                             </a>
                         </div>
@@ -155,10 +156,10 @@ export default async function CheckoutPage() {
                             </div>
                             <div className="mb-5">
                                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#e8d5b0] bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-full px-3 py-1 mb-4">
-                                    <Zap className="w-3 h-3" /> Complet
+                                    <Zap className="w-3 h-3" /> {COFFRE_LABEL}
                                 </span>
                                 <div className="flex items-baseline gap-1 mb-1">
-                                    <span className="text-3xl font-bold text-[#f0ede8]">497€</span>
+                                    <span className="text-3xl font-bold text-[#f0ede8]">{COFFRE_PRICE}€</span>
                                     <span className="text-white/40 text-sm">TTC</span>
                                 </div>
                                 <span className="text-white/40 text-xs">Accès à vie à tout le système</span>
@@ -172,7 +173,7 @@ export default async function CheckoutPage() {
                                 ))}
                             </ul>
                             <a href={fullUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)] text-sm">
-                                Prendre le système complet - 497€
+                                Prendre {COFFRE_LABEL} - {COFFRE_PRICE}€
                                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
                             </a>
                         </div>
