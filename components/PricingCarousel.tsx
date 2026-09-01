@@ -10,7 +10,6 @@ type Plan = {
   badge: string;
   icon: typeof CoffreGlyph;
   price: string;
-  tagline: string;
   outcome: string;
   items: { label: string; locked?: boolean }[];
   buyers: string;
@@ -24,18 +23,13 @@ const PLANS: Plan[] = [
     badge: "Fondations",
     icon: FondationsGlyph,
     price: String(FONDATIONS_PRICE),
-    tagline: "Le réflexe : ton premier résultat",
     outcome: "À la fin : tu sais transformer une intention en premier asset vendable et le proposer.",
     items: [
       { label: "Ton premier asset utile, de l'idée à la livraison" },
-      { label: "Comprendre l'IA assez pour ne plus jamais être perdu" },
-      { label: "Des visuels pro sans designer ni budget" },
+      { label: "3 skills prêts à l'emploi : site, design, étude de marché" },
       { label: "Présenter et livrer un résultat propre" },
-      { label: "2 skills prêts à l'emploi inclus" },
       { label: "Framework ORACLE + 7 blocs système", locked: true },
-      { label: "Choisir une niche et vendre avant de construire", locked: true },
-      { label: "Skills encodés prêts à copier-coller", locked: true },
-      { label: "Sources et ressources complètes", locked: true },
+      { label: "3 skills en plus : SaaS, backend, design Apple", locked: true },
     ],
     buyers: "121 personnes ont commencé ici",
     cta: `Commencer pour ${FONDATIONS_PRICE}€`,
@@ -46,15 +40,13 @@ const PLANS: Plan[] = [
     badge: COFFRE_LABEL,
     icon: CoffreGlyph,
     price: String(COFFRE_PRICE),
-    tagline: "La décision : quoi vendre, à qui",
     outcome: "À la fin : tu sais ce que tu vends, à qui, et tu peux le refaire à volonté.",
     items: [
       { label: "Tout Fondations inclus" },
       { label: "Framework ORACLE : l'IA exécute comme un employé senior" },
       { label: "7 blocs : de l'idée au client qui paye" },
-      { label: "Skills encodés prêts à copier-coller" },
+      { label: "6 skills complets : sites, SaaS, backend sécurisé, design Apple" },
       { label: "Choisir une niche, vendre d'abord, construire ensuite" },
-      { label: "Sources et ressources complètes" },
     ],
     buyers: "71 personnes construisent avec",
     cta: `Prendre ${COFFRE_LABEL} - ${COFFRE_PRICE}€`,
@@ -146,11 +138,10 @@ export function PricingCarousel({
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between mb-5">
+                    <div className="mb-5">
                       <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8d5b0] bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-full px-3 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
                         <Icon className="w-3.5 h-3.5" /> {plan.badge}
                       </div>
-                      <span className="text-xs text-white/40">{plan.tagline}</span>
                     </div>
 
                     <div className="flex items-baseline gap-1.5 mb-1">

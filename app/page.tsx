@@ -6,6 +6,7 @@ import { LoveWall } from "@/components/LoveWall";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { PricingCarousel } from "@/components/PricingCarousel";
 import { AccompanimentFolderCard } from "@/components/AccompanimentFolderCard";
+import { SkillsShowcase } from "@/components/SkillsShowcase";
 import { BuildMethodHeroAsset } from "@/components/AccompanimentAssets";
 import { COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
 
@@ -186,7 +187,7 @@ export default async function HomePage() {
         </h1>
 
         <p className="text-[#8a8070] text-lg leading-[1.7] max-w-lg mx-auto mb-10">
-          La méthode et les skills que j&apos;utilise pour transformer une intention
+          Tu repars avec une méthode et des skills qui transforment une intention
           en assets utiles, systèmes réutilisables et valeur vendable.
         </p>
 
@@ -205,7 +206,7 @@ export default async function HomePage() {
               </Link>
             </div>
             <p className="text-xs text-[#8a8070]">
-              192 membres construisent déjà - Paiement unique, accès à vie
+              194 membres construisent déjà - Paiement unique, accès à vie
             </p>
           </div>
         )}
@@ -282,7 +283,7 @@ export default async function HomePage() {
               Commence maintenant.
             </h2>
             <p className="text-[#8a8070] text-base max-w-md mx-auto leading-[1.7]">
-              192 membres construisent déjà. Accès à vie, aucun abonnement, aucune surprise.
+              194 membres construisent déjà. Accès à vie, aucun abonnement, aucune surprise.
             </p>
           </div>
 
@@ -298,9 +299,12 @@ export default async function HomePage() {
         </div>
 
         {!isMember && (
-          <div className="max-w-5xl mx-auto">
-            <AccompanimentFolderCard />
-          </div>
+          <>
+            <SkillsShowcase />
+            <div className="max-w-5xl mx-auto">
+              <AccompanimentFolderCard />
+            </div>
+          </>
         )}
       </section>
 

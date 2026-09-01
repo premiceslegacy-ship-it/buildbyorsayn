@@ -138,7 +138,7 @@ export function AccompanimentFolderCard() {
           </p>
         </div>
 
-        <div className="flex flex-shrink-0 flex-col items-center pr-4 sm:pr-8">
+        <div className="flex flex-shrink-0 flex-col items-center sm:pr-8">
           <div className="scale-[0.8] sm:scale-100">
             <FolderComponent
               color="build"
