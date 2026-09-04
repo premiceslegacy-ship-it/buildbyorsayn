@@ -1,0 +1,23 @@
+{
+  "verdict": "PASS",
+  "verifiedAt": "2026-09-04T21:27:05.237Z",
+  "migrations": [
+    "20260904151355_mcp_knowledge_base.sql",
+    "20260904151436_mcp_oauth.sql",
+    "20260904180000_mcp_security_hardening.sql",
+    "20260904190000_mcp_final_hardening.sql",
+    "20260904230000_mcp_bounded_cleanup.sql",
+    "20260904233000_mcp_dcr_capacity_recovery.sql"
+  ],
+  "checks": {
+    "previewSeesCount": 1,
+    "beginnerSeesCount": 2,
+    "fullSeesCount": 3,
+    "anonSelectDenied": true,
+    "anonRpcDenied": true
+  },
+  "failure": null,
+  "fixtureCleanup": {
+    "temporaryUsersRemaining": 0
+  }
+}

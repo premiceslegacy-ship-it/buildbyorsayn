@@ -8,8 +8,11 @@ const nextConfig = {
     if (isDev) return [];
     return [
       {
-        // Apply security headers to all routes
-        source: "/(.*)",
+        // Apply security headers to all routes except the MCP connector
+        // surface: Cross-Origin-Resource-Policy: same-origin below would
+        // otherwise block Claude/ChatGPT from fetching /api/mcp and the
+        // OAuth discovery documents cross-origin.
+        source: "/((?!api/mcp|\\.well-known).*)",
         headers: [
           // --- HIGH / CRITICAL ---
           {

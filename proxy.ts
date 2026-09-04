@@ -4,6 +4,7 @@ import {
     ACCOMPANIMENT_ACCESS_STATUSES,
     SITE_WEB_ACCOMPANIMENT_SLUG,
 } from "@/lib/accompanimentAccess";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 // Security headers applied to every middleware response
 const SECURITY_HEADERS: Record<string, string> = {
@@ -72,8 +73,10 @@ export async function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
 
     if (!user) {
-        const destination = pathname.startsWith("/accompagnement/espace")
-            ? `/login?next=${encodeURIComponent(pathname)}`
+        const requiresLoginRedirect =
+            pathname.startsWith("/accompagnement/espace") || pathname === "/mcp/consent";
+        const destination = requiresLoginRedirect
+            ? `/login?next=${encodeURIComponent(pathname + request.nextUrl.search)}`
             : "/";
         const redirectUrl = new URL(destination, request.url);
         return createRedirectWithCookies(redirectUrl, supabaseResponse, SECURITY_HEADERS);
@@ -120,13 +123,13 @@ export async function proxy(request: NextRequest) {
         pathname === "/protocole";
 
     if (requiresFull || requiresBeginner) {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
             .from("profiles")
             .select("tier")
             .eq("id", user.id)
-            .single();
+            .maybeSingle();
 
-        const tier = profile?.tier;
+        const tier = profileError || !profile ? null : normalizeProfileTier(profile.tier);
 
         if (requiresFull && tier !== "full") {
             const checkoutUrl = new URL("/checkout", request.url);
@@ -149,5 +152,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/admin/:path*", "/beginner", "/protocole", "/accompagnement/espace/:path*"],
+    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/admin/:path*", "/beginner", "/protocole", "/accompagnement/espace/:path*", "/mcp/consent"],
 };

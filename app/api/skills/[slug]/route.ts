@@ -1,20 +1,12 @@
 import { NextResponse } from "next/server";
-import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
-import { createHash } from "node:crypto";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { COFFRE_LABEL } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
-import {
-  getSkillBySlug,
-  SKILLS_CATALOG,
-  type SkillCatalogItem,
-} from "@/lib/skillsCatalog";
-import { parseSkillsPublicationManifest } from "@/lib/skillsMetadata";
+import { getSkillBySlug } from "@/lib/skillsCatalog";
+import { getStoredSkillContent } from "@/lib/skills/storage";
 
 export const dynamic = "force-dynamic";
-
-const SKILLS_BUCKET = process.env.SUPABASE_SKILLS_BUCKET ?? "skills";
 
 const FILE_SKILLS: Record<string, string> = {
   "oracle-site-web": "oracle-site-web.md",
@@ -55,62 +47,6 @@ async function getSkillContent(slug: string) {
   }
 
   return null;
-}
-
-async function getStoredSkillContent(skill: SkillCatalogItem) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    return null;
-  }
-
-  const supabaseAdmin = createSupabaseAdmin(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false },
-    global: {
-      fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
-    },
-  });
-  const storage = supabaseAdmin.storage.from(SKILLS_BUCKET);
-
-  const { data: manifestData, error: manifestError } = await storage.download(
-    "manifest.json"
-  );
-  if (manifestError || !manifestData) return null;
-
-  let manifest: ReturnType<typeof parseSkillsPublicationManifest> = null;
-  try {
-    manifest = parseSkillsPublicationManifest(
-      JSON.parse(Buffer.from(await manifestData.arrayBuffer()).toString("utf8")),
-      SKILLS_CATALOG.map((item) => item.fileName)
-    );
-  } catch {
-    manifest = null;
-  }
-
-  const artifact = manifest?.artifacts.find(
-    (item) => item.fileName === skill.fileName
-  );
-  if (!artifact) return null;
-
-  const { data, error } = await storage.download(artifact.storagePath);
-  if (error || !data) return null;
-
-  const buffer = Buffer.from(await data.arrayBuffer());
-  const digest = createHash("sha256").update(buffer).digest("hex");
-  if (digest !== artifact.sha256) return null;
-
-  if (skill.fileName.endsWith(".md")) {
-    return {
-      body: buffer.toString("utf8"),
-      contentType: "text/markdown; charset=utf-8",
-    };
-  }
-
-  return {
-    body: new Uint8Array(buffer),
-    contentType: "application/zip",
-  };
 }
 
 async function listFiles(rootDir: string, currentDir = "") {
