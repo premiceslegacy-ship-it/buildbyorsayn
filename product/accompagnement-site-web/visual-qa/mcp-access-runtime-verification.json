@@ -1,6 +1,6 @@
 {
   "verdict": "PASS",
-  "verifiedAt": "2026-09-04T21:27:05.237Z",
+  "verifiedAt": "2026-09-04T21:42:13.671Z",
   "migrations": [
     "20260904151355_mcp_knowledge_base.sql",
     "20260904151436_mcp_oauth.sql",
