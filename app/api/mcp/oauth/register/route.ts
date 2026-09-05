@@ -10,7 +10,7 @@ import {
   requestOriginAllowed,
 } from "@/lib/mcp/http";
 import { sanitizeClientName } from "@/lib/mcp/oauth";
-import { dcrMetadataSchema } from "@/lib/mcp/oauthSchemas";
+import { parseDcrClientMetadata } from "@/lib/mcp/oauthSchemas";
 import { observeMcpRoute } from "@/lib/mcp/observability";
 import { hashRateLimitSubject, trustedClientAddress } from "@/lib/mcp/security";
 
@@ -49,7 +49,7 @@ async function handlePost(request: Request) {
     return errorResponse("invalid_client_metadata", "Malformed JSON body.", 400);
   }
 
-  const parsed = dcrMetadataSchema.safeParse(body);
+  const parsed = parseDcrClientMetadata(body);
   if (!parsed.success) {
     return errorResponse("invalid_client_metadata", "Client metadata is invalid.", 400);
   }
@@ -92,6 +92,7 @@ async function handlePost(request: Request) {
       grant_types: ["authorization_code", "refresh_token"],
       response_types: ["code"],
       token_endpoint_auth_method: "none",
+      scope: parsed.data.scope,
     },
     { status: 201, headers: NO_STORE }
   );

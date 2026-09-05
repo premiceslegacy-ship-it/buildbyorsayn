@@ -12,6 +12,7 @@ import {
 import { GET as getAuthorizationMetadata } from "../app/.well-known/oauth-authorization-server/route";
 import { GET as getResourceMetadata } from "../app/.well-known/oauth-protected-resource/route";
 import { POST as registerClient } from "../app/api/mcp/oauth/register/route";
+import { parseDcrClientMetadata } from "../lib/mcp/oauthSchemas";
 import { POST as issueToken } from "../app/api/mcp/oauth/token/route";
 
 process.env.MCP_OAUTH_ISSUER ??= "https://buildbyorsayn.com";
@@ -98,6 +99,23 @@ test("MCP POST emits a safe correlated outcome without logging credentials", asy
     status: 403,
   });
   assert.doesNotMatch(lines[0], /private|authorization|bearer|token|query|prompt|code/i);
+});
+
+test("DCR accepts the MCP scope that Claude sends and rejects broader scopes", () => {
+  const baseMetadata = {
+    redirect_uris: ["https://claude.ai/api/mcp/auth_callback"],
+    token_endpoint_auth_method: "none",
+    grant_types: ["authorization_code", "refresh_token"],
+    response_types: ["code"],
+    client_name: "Claude",
+  };
+
+  const accepted = parseDcrClientMetadata({ ...baseMetadata, scope: "mcp" });
+  assert.equal(accepted.success, true);
+  if (accepted.success) assert.equal(accepted.data.scope, "mcp");
+
+  assert.equal(parseDcrClientMetadata({ ...baseMetadata, scope: "mcp admin" }).success, false);
+  assert.equal(parseDcrClientMetadata({ ...baseMetadata, scope: "" }).success, false);
 });
 
 test("DCR requires JSON and rejects a present disallowed Origin", async () => {

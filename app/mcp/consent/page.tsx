@@ -65,6 +65,10 @@ export default async function McpConsentPage({
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] flex items-center justify-center p-4 sm:p-6">
       <LiquidCard className="w-full max-w-md p-6 sm:p-8">
+        <div className="mb-6 flex justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/api/mcp/logo" alt="BUILD" className="h-16 w-16 rounded-xl object-contain" />
+        </div>
         <h1 className="text-xl font-semibold mb-2">Application non verifiee</h1>
         <p className="text-sm text-[#f0ede8]/70 mb-6">
           Le nom « {clientName} » est declare par l&apos;application et n&apos;a pas ete verifie par BUILD.

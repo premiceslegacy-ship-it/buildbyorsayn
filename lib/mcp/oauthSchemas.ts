@@ -12,7 +12,12 @@ export const dcrMetadataSchema = z.object({
   token_endpoint_auth_method: z.literal("none").default("none"),
   grant_types: z.array(z.enum(["authorization_code", "refresh_token"])).max(2).optional(),
   response_types: z.array(z.literal("code")).max(1).optional(),
+  scope: z.literal("mcp").default("mcp"),
 }).strict();
+
+export function parseDcrClientMetadata(body: unknown) {
+  return dcrMetadataSchema.safeParse(body);
+}
 
 export function createAuthorizationRequestSchema(resourceUrl: string) {
   return z.object({

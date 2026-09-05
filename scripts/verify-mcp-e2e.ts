@@ -291,6 +291,7 @@ async function main(): Promise<void> {
         client_name: "BUILD MCP automated E2E",
         redirect_uris: [redirectUri],
         token_endpoint_auth_method: "none",
+        scope: "mcp",
       }),
     });
     const registration = await json<Record<string, unknown>>(registrationResponse);
@@ -300,6 +301,7 @@ async function main(): Promise<void> {
     }
     assert.equal(registrationResponse.status, 201);
     assert.equal(typeof registration.client_id, "string");
+    assert.equal(registration.scope, "mcp");
     assert.ok(clientId);
     report.dynamicClientRegistration = "PASS";
 

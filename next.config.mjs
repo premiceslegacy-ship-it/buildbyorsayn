@@ -11,6 +11,7 @@ const nextConfig = {
 
   outputFileTracingIncludes: {
     "/api/mcp/showcase-asset": ["./private/brand-assets/build-mcp-connector-characters.webp"],
+    "/api/mcp/logo": ["./private/brand-assets/build-logo.png"],
   },
 
   async headers() {
