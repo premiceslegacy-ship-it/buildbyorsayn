@@ -256,12 +256,30 @@ test("the release E2E covers both discovery documents, PKCE denial, user revocat
 
 test("tier evidence bounds and reaps each E2E child process", async () => {
   const runner = await readFile("scripts/verify-mcp-tier-evidence.ts", "utf8");
+  const processTree = await readFile("scripts/mcp-process-tree.ts", "utf8");
 
   assert.match(runner, /TIER_CHILD_DEADLINE_MS/);
-  assert.match(runner, /setTimeout\(\(\) => \{[\s\S]*child\.kill\("SIGTERM"\)/);
-  assert.match(runner, /child\.kill\("SIGKILL"\)/);
+  assert.match(runner, /requestTermination\("deadline"\)/);
+  assert.match(runner, /signalProcessTree\(child, "SIGTERM"\)/);
+  assert.match(runner, /killTimer = setTimeout\(\(\) => \{[\s\S]*signalProcessTree\(child, "SIGKILL"\)/);
+  assert.match(runner, /signalProcessTree\(child, "SIGKILL"\)/);
+  assert.match(runner, /detached:\s*true/);
+  assert.match(runner, /terminationReason/);
+  assert.match(runner, /terminationFailure/);
+  assert.match(runner, /terminationWatchdogTimer/);
+  assert.match(runner, /failClosed/);
+  assert.match(runner, /process\.platform === "win32"/);
+  assert.match(runner, /requires POSIX process groups/);
+  assert.match(runner, /output-overflow/);
+  assert.match(runner, /orphaned-descendant/);
+  assert.match(runner, /child-error/);
+  assert.match(runner, /PROCESS_GROUP_DRAIN_TIMEOUT_MS/);
+  assert.match(runner, /isProcessGroupAlive\(child\.pid\)/);
+  assert.match(runner, /drainTimer/);
   assert.match(runner, /clearTimeout/);
   assert.match(runner, /child\.once\("close"/);
+  assert.match(processTree, /process\.kill\(-child\.pid, signal\)/);
+  assert.match(processTree, /process\.kill\(-pid, 0\)/);
 });
 
 test("forward DCR cleanup reclaims stale used clients without cascading active OAuth state", async () => {

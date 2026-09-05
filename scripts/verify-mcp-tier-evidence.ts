@@ -6,6 +6,8 @@ import {
   validateCleanupReadback,
   validateTierThresholds,
 } from "./mcp-tier-contract";
+import { isProcessGroupAlive, signalProcessTree } from "./mcp-process-tree";
+import { appendBoundedOutput } from "./mcp-output-buffer";
 
 const OUTPUT_PATH = resolve(
   "product/accompagnement-site-web/visual-qa/mcp-tier-runtime-verification.json"
@@ -13,6 +15,8 @@ const OUTPUT_PATH = resolve(
 const TIERS = ["beginner", "full"] as const;
 const TIER_CHILD_DEADLINE_MS = 180_000;
 const TIER_CHILD_KILL_GRACE_MS = 5_000;
+const PROCESS_GROUP_DRAIN_POLL_MS = 25;
+const PROCESS_GROUP_DRAIN_TIMEOUT_MS = TIER_CHILD_KILL_GRACE_MS + 5_000;
 const TIER_LABELS = {
   beginner: "Fondations",
   full: "LE COFFRE",
@@ -42,6 +46,9 @@ type TierRun = {
 };
 
 function runTier(tier: E2eTier): Promise<E2eReport> {
+  if (process.platform === "win32") {
+    return Promise.reject(new Error("MCP tier evidence requires POSIX process groups."));
+  }
   return new Promise((resolveReport, rejectReport) => {
     const child = spawn(
       process.execPath,
@@ -49,46 +56,61 @@ function runTier(tier: E2eTier): Promise<E2eReport> {
       {
         cwd: process.cwd(),
         env: { ...process.env, MCP_E2E_TIER: tier },
+        detached: true,
         stdio: ["ignore", "pipe", "ignore"],
       }
     );
     let stdout = "";
     let settled = false;
-    let timedOut = false;
+    let closeObserved = false;
+    let closeCode: number | null = null;
+    let terminationReason: "deadline" | "output-overflow" | "orphaned-descendant" | "child-error" | null = null;
+    let terminationFailure: Error | undefined;
     let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
     let killTimer: ReturnType<typeof setTimeout> | undefined;
+    let drainTimer: ReturnType<typeof setTimeout> | undefined;
+    let terminationWatchdogTimer: ReturnType<typeof setTimeout> | undefined;
+    let drainStartedAt: number | undefined;
+
     const clearTimers = () => {
       if (deadlineTimer) clearTimeout(deadlineTimer);
       if (killTimer) clearTimeout(killTimer);
+      if (drainTimer) clearTimeout(drainTimer);
+      if (terminationWatchdogTimer) clearTimeout(terminationWatchdogTimer);
     };
-    const terminateAfterDeadline = () => {
-      if (settled) return;
-      timedOut = true;
-      child.kill("SIGTERM");
-      killTimer = setTimeout(() => {
-        if (!settled) child.kill("SIGKILL");
-      }, TIER_CHILD_KILL_GRACE_MS);
-    };
-    deadlineTimer = setTimeout(terminateAfterDeadline, TIER_CHILD_DEADLINE_MS);
-    child.stdout.on("data", (chunk: Buffer) => {
-      stdout += chunk.toString("utf8");
-      if (stdout.length > 256_000) child.kill("SIGTERM");
-    });
-    child.once("error", () => {
+
+    const failClosed = (error: Error) => {
       if (settled) return;
       settled = true;
       clearTimers();
-      rejectReport(new Error(`Could not start ${tier} MCP E2E.`));
-    });
-    child.once("close", (code) => {
-      if (settled) return;
+      rejectReport(error);
+    };
+
+    const settle = () => {
+      if (settled || !closeObserved) return;
       settled = true;
       clearTimers();
-      if (timedOut) {
+      if (terminationFailure) {
+        rejectReport(terminationFailure);
+        return;
+      }
+      if (terminationReason === "deadline") {
         rejectReport(new Error(`${tier} MCP E2E exceeded its child deadline.`));
         return;
       }
-      if (code !== 0) {
+      if (terminationReason === "output-overflow") {
+        rejectReport(new Error(`${tier} MCP E2E exceeded its child output limit.`));
+        return;
+      }
+      if (terminationReason === "orphaned-descendant") {
+        rejectReport(new Error(`${tier} MCP E2E left a descendant process alive.`));
+        return;
+      }
+      if (terminationReason === "child-error") {
+        rejectReport(new Error(`Could not start ${tier} MCP E2E.`));
+        return;
+      }
+      if (closeCode !== 0) {
         rejectReport(new Error(`${tier} MCP E2E returned a failure.`));
         return;
       }
@@ -97,6 +119,80 @@ function runTier(tier: E2eTier): Promise<E2eReport> {
       } catch {
         rejectReport(new Error(`${tier} MCP E2E returned invalid evidence.`));
       }
+    };
+
+    const waitForGroupDrain = () => {
+      if (settled) return;
+      if (isProcessGroupAlive(child.pid)) {
+        drainStartedAt ??= Date.now();
+        if (Date.now() - drainStartedAt >= PROCESS_GROUP_DRAIN_TIMEOUT_MS) {
+          const failure = terminationFailure ?? new Error(`${tier} MCP E2E process group did not drain.`);
+          failClosed(failure);
+          return;
+        }
+        drainTimer = setTimeout(waitForGroupDrain, PROCESS_GROUP_DRAIN_POLL_MS);
+        return;
+      }
+      if (closeObserved) settle();
+    };
+
+    const requestTermination = (
+      reason: "deadline" | "output-overflow" | "orphaned-descendant" | "child-error"
+    ) => {
+      if (terminationReason || settled) return;
+      terminationReason = reason;
+      try {
+        signalProcessTree(child, "SIGTERM");
+      } catch (error) {
+        terminationFailure ??= error instanceof Error
+          ? error
+          : new Error("MCP process-group termination failed.");
+      }
+      terminationWatchdogTimer = setTimeout(() => {
+        if (settled) return;
+        const failure = terminationFailure ?? new Error(`${tier} MCP E2E process group did not drain.`);
+        failClosed(failure);
+      }, PROCESS_GROUP_DRAIN_TIMEOUT_MS);
+      killTimer = setTimeout(() => {
+        if (settled) return;
+        try {
+          signalProcessTree(child, "SIGKILL");
+        } catch (error) {
+          terminationFailure ??= error instanceof Error
+            ? error
+            : new Error("MCP process-group termination failed.");
+        }
+        waitForGroupDrain();
+      }, TIER_CHILD_KILL_GRACE_MS);
+      waitForGroupDrain();
+    };
+
+    const terminateAfterDeadline = () => {
+      requestTermination("deadline");
+    };
+
+    deadlineTimer = setTimeout(terminateAfterDeadline, TIER_CHILD_DEADLINE_MS);
+    child.stdout.on("data", (chunk: Buffer) => {
+      if (terminationReason) return;
+      const bounded = appendBoundedOutput(stdout, chunk.toString("utf8"));
+      stdout = bounded.output;
+      if (bounded.overflow) requestTermination("output-overflow");
+    });
+    child.once("error", (error) => {
+      if (settled) return;
+      terminationFailure = new Error(`Could not start ${tier} MCP E2E: ${error.message}`);
+      closeObserved = true;
+      requestTermination("child-error");
+    });
+    child.once("close", (code) => {
+      if (settled) return;
+      closeObserved = true;
+      closeCode = code;
+      if (!terminationReason && isProcessGroupAlive(child.pid)) {
+        requestTermination("orphaned-descendant");
+        return;
+      }
+      waitForGroupDrain();
     });
   });
 }
