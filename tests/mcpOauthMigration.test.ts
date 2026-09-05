@@ -250,6 +250,18 @@ test("the release E2E covers both discovery documents, PKCE denial, user revocat
   assert.match(script, /userRevocation/);
   const command = manifest.scripts["test:mcp-e2e"];
   assert.equal((command.match(/tsx scripts\/verify-mcp-e2e\.ts/g) ?? []).length, 3);
+  const tierCommand = manifest.scripts["test:mcp-tiers"];
+  assert.match(tierCommand, /verify-mcp-tier-evidence\.ts/);
+});
+
+test("tier evidence bounds and reaps each E2E child process", async () => {
+  const runner = await readFile("scripts/verify-mcp-tier-evidence.ts", "utf8");
+
+  assert.match(runner, /TIER_CHILD_DEADLINE_MS/);
+  assert.match(runner, /setTimeout\(\(\) => \{[\s\S]*child\.kill\("SIGTERM"\)/);
+  assert.match(runner, /child\.kill\("SIGKILL"\)/);
+  assert.match(runner, /clearTimeout/);
+  assert.match(runner, /child\.once\("close"/);
 });
 
 test("forward DCR cleanup reclaims stale used clients without cascading active OAuth state", async () => {

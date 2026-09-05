@@ -1,0 +1,67 @@
+{
+  "verdict": "PASS",
+  "generatedBy": "scripts/verify-mcp-tier-evidence.ts",
+  "verifiedAt": "2026-09-05T12:00:18.003Z",
+  "environment": "local production build with Next start on the isolated MCP E2E port",
+  "commercialGate": "closed",
+  "tierMapping": {
+    "preview": "preview",
+    "Fondations": "beginner",
+    "LE COFFRE": "full"
+  },
+  "commands": {
+    "tierHttp": "npm run test:mcp-tiers"
+  },
+  "tierHttpRuns": [
+    {
+      "label": "Fondations",
+      "tier": "beginner",
+      "tierBoundary": "PASS",
+      "toolsListP50Ms": 161,
+      "toolsListP95Ms": 185.5,
+      "concurrentRequests": 8,
+      "concurrentDurationMs": 277.9,
+      "knowledgeSearchDurationMs": 798.6,
+      "cleanupReadback": {
+        "temporaryOAuthClientsRemaining": 0,
+        "temporaryAuthorizationRequestsRemaining": 0,
+        "temporaryAuthorizationCodesRemaining": 0,
+        "temporaryAccessTokensRemaining": 0,
+        "temporaryRefreshTokensRemaining": 0,
+        "temporaryProfilesRemaining": 0,
+        "temporaryAuthUsersRemaining": 0,
+        "temporaryRateLimitRowsRemaining": 0
+      }
+    },
+    {
+      "label": "LE COFFRE",
+      "tier": "full",
+      "tierBoundary": "PASS",
+      "toolsListP50Ms": 151.9,
+      "toolsListP95Ms": 242.8,
+      "concurrentRequests": 8,
+      "concurrentDurationMs": 216.1,
+      "knowledgeSearchDurationMs": 617.7,
+      "cleanupReadback": {
+        "temporaryOAuthClientsRemaining": 0,
+        "temporaryAuthorizationRequestsRemaining": 0,
+        "temporaryAuthorizationCodesRemaining": 0,
+        "temporaryAccessTokensRemaining": 0,
+        "temporaryRefreshTokensRemaining": 0,
+        "temporaryProfilesRemaining": 0,
+        "temporaryAuthUsersRemaining": 0,
+        "temporaryRateLimitRowsRemaining": 0
+      }
+    }
+  ],
+  "thresholds": {
+    "toolsListP50MsLessThan": 750,
+    "toolsListP95MsLessThan": 1500,
+    "concurrentBatchMsLessThan": 2000,
+    "knowledgeSearchMsLessThan": 4000
+  },
+  "clientProofStatus": {
+    "claude": "pending real client connection and MCP tool call",
+    "chatgpt": "pending real client connection and MCP tool call"
+  }
+}

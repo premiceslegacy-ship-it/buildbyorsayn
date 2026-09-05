@@ -19,6 +19,7 @@ test("verify:release composes every mandatory release gate in fail-fast order", 
     "npm run test:mcp-postgres",
     "npm run test:mcp-access",
     "npm run test:mcp-e2e",
+    "npm run test:mcp-tiers",
     "git diff --check",
   ]);
   assert.equal(commands.filter((command) => command === "npm run test:mcp-postgres").length, 2);

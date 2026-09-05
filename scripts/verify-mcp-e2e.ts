@@ -9,6 +9,10 @@ import { createClient } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
 import { hashRateLimitSubject } from "../lib/mcp/security";
 import {
+  MCP_TIER_THRESHOLDS,
+  validateCleanupReadback,
+} from "./mcp-tier-contract";
+import {
   assertMcpSuccess,
   assertTextToolResult,
   assertToolsList,
@@ -17,15 +21,31 @@ import {
 
 loadEnv({ path: ".env.local", quiet: true });
 
+const requestedTier = process.env.MCP_E2E_TIER;
+if (requestedTier !== undefined && requestedTier !== "beginner" && requestedTier !== "full") {
+  throw new Error("MCP_E2E_TIER must be beginner or full.");
+}
+const E2E_TIER = (requestedTier ?? "beginner") as "beginner" | "full";
+
 const PORT = 3100;
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 const RESOURCE = `${BASE_URL}/api/mcp`;
 const TEST_ADDRESS = `203.0.113.${(Date.now() % 250) + 1}`;
 const TRUSTED_NETWORK_HEADER = { "x-vercel-forwarded-for": TEST_ADDRESS };
-const TOOLS_LIST_P50_LIMIT_MS = 750;
-const TOOLS_LIST_P95_LIMIT_MS = 1_500;
-const CONCURRENT_LIMIT_MS = 2_000;
-const KNOWLEDGE_SEARCH_LIMIT_MS = 4_000;
+const TOOLS_LIST_P50_LIMIT_MS = MCP_TIER_THRESHOLDS.toolsListP50MsLessThan;
+const TOOLS_LIST_P95_LIMIT_MS = MCP_TIER_THRESHOLDS.toolsListP95MsLessThan;
+const CONCURRENT_LIMIT_MS = MCP_TIER_THRESHOLDS.concurrentBatchMsLessThan;
+const KNOWLEDGE_SEARCH_LIMIT_MS = MCP_TIER_THRESHOLDS.knowledgeSearchMsLessThan;
+const LOCKED_SKILL_RESPONSE =
+  "Ce skill existe dans un palier superieur. Son contenu et ses metadonnees restent verrouilles.";
+const ARCHIVED_SKILL_RESPONSE =
+  "Ce skill est distribue en archive depuis le tableau de bord BUILD et n'est pas servi par le MCP.";
+const OAUTH_FIXTURE_TABLES = [
+  ["temporaryAuthorizationRequestsRemaining", "mcp_authorization_requests"],
+  ["temporaryAuthorizationCodesRemaining", "mcp_authorization_codes"],
+  ["temporaryAccessTokensRemaining", "mcp_access_tokens"],
+  ["temporaryRefreshTokensRemaining", "mcp_refresh_tokens"],
+] as const;
 const REQUIRED_ENV = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
@@ -186,22 +206,37 @@ function temporaryRateLimitSubjects(): string[] {
   ];
 }
 
-async function verifyCleanup(userId: string | null, clientId: string | null): Promise<void> {
+async function verifyCleanup(
+  userId: string | null,
+  clientId: string | null
+): Promise<Record<string, number>> {
   const failures: string[] = [];
+  const readback: Record<string, number> = {};
   if (clientId) {
     const { count, error } = await admin
       .from("mcp_oauth_clients")
       .select("client_id", { count: "exact", head: true })
       .eq("client_id", clientId);
+    readback.temporaryOAuthClientsRemaining = count ?? -1;
     if (error || count !== 0) failures.push("temporary OAuth client remains");
+    for (const [key, table] of OAUTH_FIXTURE_TABLES) {
+      const { count: childCount, error: childError } = await admin
+        .from(table)
+        .select("client_id", { count: "exact", head: true })
+        .eq("client_id", clientId);
+      readback[key] = childCount ?? -1;
+      if (childError || childCount !== 0) failures.push(`${table} rows remain`);
+    }
   }
   if (userId) {
     const { count, error } = await admin
       .from("profiles")
       .select("id", { count: "exact", head: true })
       .eq("id", userId);
+    readback.temporaryProfilesRemaining = count ?? -1;
     if (error || count !== 0) failures.push("temporary profile remains");
     const authReadback = await admin.auth.admin.getUserById(userId);
+    readback.temporaryAuthUsersRemaining = authReadback.data.user ? 1 : 0;
     if (authReadback.data.user) failures.push("temporary auth user remains");
     const authReadStatus = (authReadback.error as { status?: number } | null)?.status;
     if (authReadback.error && authReadStatus !== 404) failures.push("auth user readback failed");
@@ -210,11 +245,13 @@ async function verifyCleanup(userId: string | null, clientId: string | null): Pr
     .from("mcp_rate_limits")
     .select("subject", { count: "exact", head: true })
     .in("subject", temporaryRateLimitSubjects());
+  readback.temporaryRateLimitRowsRemaining = rateLimitCount ?? -1;
   if (rateLimitReadError || rateLimitCount !== 0) failures.push("temporary rate-limit rows remain");
   if (failures.length > 0) throw new Error(`E2E cleanup verification failed: ${failures.join(", ")}.`);
+  return validateCleanupReadback(readback);
 }
 
-async function cleanup(userId: string | null, clientId: string | null): Promise<void> {
+async function cleanup(userId: string | null, clientId: string | null): Promise<Record<string, number>> {
   const failures: string[] = [];
   if (clientId) {
     const { error } = await admin.from("mcp_oauth_clients").delete().eq("client_id", clientId);
@@ -232,16 +269,18 @@ async function cleanup(userId: string | null, clientId: string | null): Promise<
     .in("subject", temporaryRateLimitSubjects());
   if (rateLimitError) failures.push("rate-limit deletion failed");
 
+  let readback: Record<string, number> = {};
   try {
-    await verifyCleanup(userId, clientId);
+    readback = await verifyCleanup(userId, clientId);
   } catch {
     failures.push("readback verification failed");
   }
   if (failures.length > 0) throw new Error(`E2E cleanup failed: ${failures.join(", ")}.`);
+  return readback;
 }
 
 async function main(): Promise<void> {
-  const report: Record<string, unknown> = {};
+  const report: Record<string, unknown> = { tier: E2E_TIER };
   let userId: string | null = null;
   let clientId: string | null = null;
   let server: ReturnType<typeof startServer> | null = null;
@@ -279,7 +318,7 @@ async function main(): Promise<void> {
     const { error: profileError } = await admin.from("profiles").upsert({
       id: userId,
       email,
-      tier: "beginner",
+      tier: E2E_TIER,
     });
     if (profileError) throw new Error("Could not grant the temporary E2E tier.");
 
@@ -445,9 +484,12 @@ async function main(): Promise<void> {
       searchResult.structuredContent as { matches?: Array<Record<string, unknown>> } | undefined
     )?.matches;
     assert.ok(Array.isArray(searchMatches) && searchMatches.length > 0);
+    const accessibleKnowledgeTiers = E2E_TIER === "full"
+      ? ["free", "preview", "beginner", "full"]
+      : ["free", "preview", "beginner"];
     for (const match of searchMatches) {
       assert.equal(match.source, "skills-catalog");
-      assert.ok(["free", "preview", "beginner"].includes(String(match.tier_required)));
+      assert.ok(accessibleKnowledgeTiers.includes(String(match.tier_required)));
       assert.equal(typeof match.title, "string");
       assert.ok(String(match.title).trim().length > 0);
       assert.equal(typeof match.content, "string");
@@ -479,15 +521,35 @@ async function main(): Promise<void> {
     const availableContentText = assertTextToolResult(
       assertMcpSuccess(availableContent.payload, 5)
     );
-    assert.match(availableContentText, /Palier actuel : beginner/);
-    for (const slug of ["oracle-site-web", "ux-ui-design", "deep-research-vertical"]) {
+    assert.match(availableContentText, new RegExp(`Palier actuel : ${E2E_TIER}`));
+    const foundationSlugs = ["oracle-site-web", "ux-ui-design", "deep-research-vertical"];
+    const coffreSlugs = ["oracle-by-orsayn", "backend-orsayn", "apple-design-skills"];
+    const visibleSlugs = E2E_TIER === "full"
+      ? [...foundationSlugs, ...coffreSlugs]
+      : foundationSlugs;
+    for (const slug of visibleSlugs) {
       assert.match(availableContentText, new RegExp(`\\(${slug}\\)`));
     }
-    assert.match(availableContentText, /3 skill\(s\) supplementaire\(s\)/);
-    assert.doesNotMatch(
-      availableContentText,
-      /\((?:oracle-by-orsayn|backend-orsayn|apple-design-skills)\)/
-    );
+    if (E2E_TIER === "full") {
+      assert.doesNotMatch(availableContentText, /skill\(s\) supplementaire\(s\)/);
+    } else {
+      assert.match(availableContentText, /3 skill\(s\) supplementaire\(s\)/);
+      assert.doesNotMatch(availableContentText, /\((?:oracle-by-orsayn|backend-orsayn|apple-design-skills)\)/);
+    }
+    const tierBoundary = await mcpRequest(firstAccessToken, {
+      jsonrpc: "2.0",
+      id: 9,
+      method: "tools/call",
+      params: { name: "get_skill", arguments: { slug: "oracle-by-orsayn" } },
+    });
+    assert.equal(tierBoundary.status, 200);
+    const tierBoundaryText = assertTextToolResult(assertMcpSuccess(tierBoundary.payload, 9));
+    if (E2E_TIER === "full") {
+      assert.equal(tierBoundaryText, ARCHIVED_SKILL_RESPONSE);
+    } else {
+      assert.equal(tierBoundaryText, LOCKED_SKILL_RESPONSE);
+    }
+    report.tierBoundary = "PASS";
     report.authenticatedMcp = "PASS";
     report.runtimeTools = ["search_knowledge", "get_skill", "list_available_content"];
 
@@ -532,6 +594,7 @@ async function main(): Promise<void> {
       concurrentDurationMs: concurrentDuration,
       knowledgeSearchDurationMs,
     };
+    report.thresholds = MCP_TIER_THRESHOLDS;
 
     const refreshParams = new URLSearchParams({
       grant_type: "refresh_token",
@@ -645,8 +708,9 @@ async function main(): Promise<void> {
       failure ??= new Error("Could not close the E2E browser.");
     }
     try {
-      await cleanup(userId, clientId);
+      const cleanupReadback = await cleanup(userId, clientId);
       report.cleanup = "PASS";
+      report.cleanupReadback = cleanupReadback;
     } catch (cleanupError) {
       failure ??= cleanupError;
     }
