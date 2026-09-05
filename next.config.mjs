@@ -3,6 +3,16 @@ const nextConfig = {
   // Remove X-Powered-By header
   poweredByHeader: false,
 
+  // No optimized local images are used. Keep the revocable MCP asset out of
+  // /_next/image so its launch gate and no-store response cannot be bypassed.
+  images: {
+    localPatterns: [{ pathname: "/_next-image-not-used/**" }],
+  },
+
+  outputFileTracingIncludes: {
+    "/api/mcp/showcase-asset": ["./private/brand-assets/build-mcp-connector-characters.webp"],
+  },
+
   async headers() {
     const isDev = process.env.NODE_ENV === "development";
     if (isDev) return [];

@@ -66,6 +66,7 @@ function challenge(verifier) {
 
 const H = {
   request1: "1".repeat(64), request2: "2".repeat(64), request3: "3".repeat(64),
+  request4: sha256("request-four"), code4: sha256("code-four"),
   code1: "a".repeat(64), code2: "b".repeat(64), code3: "c".repeat(64),
   access1: "d".repeat(64), refresh1: "e".repeat(64),
   access2a: "4".repeat(64), access2b: "5".repeat(64),
@@ -78,6 +79,7 @@ const verifier = "A".repeat(43);
 const wrongVerifier = "B".repeat(43);
 const clientId = "mcp_test_client_00000000000000000001";
 const userId = "11111111-1111-4111-8111-111111111111";
+const otherUserId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const redirectUri = "http://127.0.0.1:4567/callback";
 const resource = "http://127.0.0.1:3100/api/mcp";
 
@@ -98,18 +100,25 @@ applyFile("supabase/migrations/20260904180000_mcp_security_hardening.sql");
 applyFile("supabase/migrations/20260904190000_mcp_final_hardening.sql");
 applyFile("supabase/migrations/20260904230000_mcp_bounded_cleanup.sql");
 applyFile("supabase/migrations/20260904233000_mcp_dcr_capacity_recovery.sql");
+applyFile("supabase/migrations/20260905000000_mcp_cleanup_deadline_reserve.sql");
+applyFile("supabase/migrations/20260905001000_mcp_knowledge_entitlement_boundary.sql");
+applyFile("supabase/migrations/20260905002000_mcp_consent_user_binding.sql");
 
 assert.equal(sql("select relrowsecurity::int || ':' || relforcerowsecurity::int from pg_class where oid='public.knowledge_chunks'::regclass"), "1:1");
 assert.equal(sql("select has_table_privilege('anon','public.knowledge_chunks','select')::int || ':' || has_table_privilege('authenticated','public.knowledge_chunks','select')::int"), "0:0");
 assert.equal(sql("select (to_regprocedure('public.consume_mcp_authorization_code(text,text,text)') is null)::int || ':' || (to_regprocedure('public.match_knowledge_chunks(extensions.vector,text,integer,text)') is null)::int"), "1:1");
 assert.equal(sql("select count(*) from pg_proc where pronamespace='public'::regnamespace and proname like '%mcp%' and prosecdef and not (coalesce(proconfig,'{}') @> array['search_path=\"\"'])"), "0");
+assert.equal(sql("select has_schema_privilege('anon','public','create')::int || ':' || has_schema_privilege('authenticated','public','create')::int || ':' || has_schema_privilege('service_role','public','create')::int"), "0:0:0");
 
 sql(`insert into auth.users(id,email) values ('${userId}','mcp-test@example.invalid');
+insert into auth.users(id,email) values ('${otherUserId}','mcp-other@example.invalid');
+insert into public.profiles(id,tier) values ('${userId}','preview');
+insert into public.profiles(id,tier) values ('${otherUserId}','preview');
 insert into public.mcp_oauth_clients(client_id,client_name,redirect_uris,grant_types,token_endpoint_auth_method)
 values ('${clientId}','MCP test client',array['${redirectUri}'],array['authorization_code','refresh_token'],'none');`);
 
 function createRequest(requestHash) {
-  const status = sql(`select public.create_mcp_authorization_request('${requestHash}','${clientId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','state')`);
+  const status = sql(`select public.create_mcp_authorization_request('${requestHash}','${clientId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','state','${userId}')`);
   assert.equal(status, "created");
 }
 
@@ -125,13 +134,19 @@ assert.equal(sql(`select count(*) from public.mcp_authorization_codes where code
 const issuedCode1 = sql(`select code_hash from public.mcp_authorization_codes where code_hash in ('${H.code1}','${H.code2}')`);
 
 createRequest(H.request2);
-assert.equal(sql(`select status from public.deny_mcp_authorization_request('${H.request2}')`), "denied");
-assert.equal(sql(`select status from public.deny_mcp_authorization_request('${H.request2}')`), "invalid_request");
+assert.equal(sql(`select status from public.deny_mcp_authorization_request('${H.request2}','${otherUserId}')`), "invalid_request");
+assert.equal(sql(`select status from public.deny_mcp_authorization_request('${H.request2}','${userId}')`), "denied");
+assert.equal(sql(`select status from public.deny_mcp_authorization_request('${H.request2}','${userId}')`), "invalid_request");
+
+createRequest(H.request4);
+assert.equal(sql(`select status from public.approve_mcp_authorization_request('${H.request4}','${otherUserId}','${H.code4}')`), "invalid_request");
+assert.equal(sql(`select status from public.approve_mcp_authorization_request('${H.request4}','${userId}','${H.code4}')`), "approved");
 
 assert.equal(sql(`select status from public.exchange_mcp_authorization_code('${issuedCode1}','${redirectUri}','${clientId}','${challenge(wrongVerifier)}','${resource}','${H.access1}','${H.refresh1}','22222222-2222-4222-8222-222222222222')`), "invalid_grant");
 assert.equal(sql(`select (consumed_at is null)::int from public.mcp_authorization_codes where code_hash='${issuedCode1}'`), "1");
 assert.equal(sql(`select status from public.exchange_mcp_authorization_code('${issuedCode1}','${redirectUri}','${clientId}','${challenge(verifier)}','${resource}','${H.access1}','${H.refresh1}','22222222-2222-4222-8222-222222222222')`), "issued");
-assert.equal(sql(`select round(extract(epoch from expires_at-now()))::int from public.mcp_access_tokens where token_hash='${H.access1}'`), "900");
+const accessTtlSeconds = Number(sql(`select round(extract(epoch from expires_at-now()))::int from public.mcp_access_tokens where token_hash='${H.access1}'`));
+assert(accessTtlSeconds >= 895 && accessTtlSeconds <= 900, `unexpected access token TTL: ${accessTtlSeconds}`);
 
 createRequest(H.request3);
 assert.equal(sql(`select status from public.approve_mcp_authorization_request('${H.request3}','${userId}','${H.code3}')`), "approved");
@@ -142,6 +157,7 @@ const exchangeResults = await Promise.all([
 assert.deepEqual(exchangeResults.sort(), ["invalid_grant", "issued"]);
 assert.equal(sql(`select count(*) from public.mcp_access_tokens where token_hash in ('${H.access2a}','${H.access2b}')`), "1");
 assert.equal(sql(`select count(*) from public.mcp_refresh_tokens where token_hash in ('${H.refresh2a}','${H.refresh2b}')`), "1");
+const issuedAccess2 = sql(`select token_hash from public.mcp_access_tokens where token_hash in ('${H.access2a}','${H.access2b}')`);
 
 sql(`create or replace function public.mcp_test_fail_access_insert() returns trigger language plpgsql as $$ begin if new.token_hash='${H.failedAccess}' then raise exception 'synthetic insert failure'; end if; return new; end $$;
 create trigger mcp_test_fail_access before insert on public.mcp_access_tokens for each row execute function public.mcp_test_fail_access_insert();
@@ -172,8 +188,8 @@ assert.equal(sql("select count(*) from public.mcp_refresh_tokens where family_ex
 const zeroVector = `[${Array(768).fill(0).join(",")}]`;
 const fpA = "a".repeat(64);
 const fpB = "b".repeat(64);
-function row(source, sourceId, index, hash = "c".repeat(64)) {
-  return { source, source_id: sourceId, chunk_index: index, title: `${source}-${sourceId}`, content: "synthetic content", content_hash: hash, tier_required: "preview", embedding: zeroVector, metadata: { embeddingFingerprint: fpA } };
+function row(source, sourceId, index, hash = "c".repeat(64), tier = "preview") {
+  return { source, source_id: sourceId, chunk_index: index, title: `${source}-${sourceId}`, content: "synthetic content", content_hash: hash, tier_required: tier, embedding: zeroVector, metadata: { embeddingFingerprint: fpA } };
 }
 function literal(value) {
   return `'${JSON.stringify(value).replaceAll("'", "''")}'::jsonb`;
@@ -195,9 +211,32 @@ for (const payload of ["null,'[]'::jsonb", "'[]'::jsonb,null"]) {
 }
 assert.equal(sql(`select upserted_count || ':' || deleted_count from public.apply_mcp_knowledge_snapshot('[]'::jsonb,'[]'::jsonb,array['obsidian'],true)`), "0:1");
 assert.equal(sql("select count(*) from public.knowledge_chunks where source='obsidian'"), "0");
+assert.equal(sql(`select upserted_count from public.apply_mcp_knowledge_snapshot(${literal([row("blocs","full-only",0,"e".repeat(64),"full")])},${literal([{source:"blocs",source_id:"full-only",chunk_index:0}])},array['blocs'],false)`), "1");
+assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,null,'${fpA}')`), "1");
+const unknownAccessHash = sha256("unknown-knowledge-access-token");
+const expiredAccessHash = sha256("expired-knowledge-access-token");
+const revokedAccessHash = sha256("revoked-knowledge-access-token");
+const wrongScopeAccessHash = sha256("wrong-scope-knowledge-access-token");
+sql(`insert into public.mcp_access_tokens(token_hash,client_id,user_id,scope,resource,expires_at,revoked_at)
+values ('${expiredAccessHash}','${clientId}','${userId}','mcp','${resource}',now()-interval '1 second',null),
+       ('${revokedAccessHash}','${clientId}','${userId}','mcp','${resource}',now()+interval '1 minute',now()),
+       ('${wrongScopeAccessHash}','${clientId}','${userId}','profile','${resource}',now()+interval '1 minute',null)`);
+assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${unknownAccessHash}','${resource}',20,null,'${fpA}')`, "unknown knowledge token must fail");
+assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${expiredAccessHash}','${resource}',20,null,'${fpA}')`, "expired knowledge token must fail");
+assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${revokedAccessHash}','${resource}',20,null,'${fpA}')`, "revoked knowledge token must fail");
+assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${wrongScopeAccessHash}','${resource}',20,null,'${fpA}')`, "wrong knowledge scope must fail");
+assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','https://wrong.example/api/mcp',20,null,'${fpA}')`, "wrong knowledge resource must fail");
+sql(`update public.profiles set tier='unknown' where id='${userId}'`);
+assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,null,'${fpA}')`, "unknown profile tier must fail");
+sql(`update public.profiles set tier=null where id='${userId}'`);
+assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,null,'${fpA}')`, "null profile tier must fail");
+sql(`delete from public.profiles where id='${userId}'`);
+assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,null,'${fpA}')`, "missing profile row must fail");
+sql(`insert into public.profiles(id,tier) values ('${userId}','full')`);
+assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,null,'${fpA}')`), "2");
 let mismatchFailed = false;
 try {
-  sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'full',8,null,'${fpB}')`);
+  sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',8,null,'${fpB}')`);
 } catch {
   mismatchFailed = true;
 }
@@ -225,11 +264,11 @@ const freshClientId = "mcp_cleanup_fresh_client";
 sql(`insert into public.mcp_oauth_clients(client_id,client_name,redirect_uris,grant_types,token_endpoint_auth_method,created_at)
 values ('${staleClientId}','stale cleanup client',array['${redirectUri}'],array['authorization_code','refresh_token'],'none',now()-interval '8 days'),
        ('${freshClientId}','fresh cleanup client',array['${redirectUri}'],array['authorization_code','refresh_token'],'none',now());
-insert into public.mcp_authorization_requests(request_hash,client_id,redirect_uri,code_challenge,code_challenge_method,scope,resource,state,expires_at)
-values ('${cleanupHashes.requestExpired1}','${clientId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()-interval '2 days'),
-       ('${cleanupHashes.requestExpired2}','${clientId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()-interval '2 days'),
-       ('${cleanupHashes.requestExpired3}','${clientId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()-interval '2 days'),
-       ('${cleanupHashes.requestFresh}','${clientId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()+interval '5 minutes');
+insert into public.mcp_authorization_requests(request_hash,client_id,user_id,redirect_uri,code_challenge,code_challenge_method,scope,resource,state,expires_at)
+values ('${cleanupHashes.requestExpired1}','${clientId}','${userId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()-interval '2 days'),
+       ('${cleanupHashes.requestExpired2}','${clientId}','${userId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()-interval '2 days'),
+       ('${cleanupHashes.requestExpired3}','${clientId}','${userId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()-interval '2 days'),
+       ('${cleanupHashes.requestFresh}','${clientId}','${userId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()+interval '5 minutes');
 insert into public.mcp_authorization_codes(code_hash,client_id,user_id,redirect_uri,code_challenge,code_challenge_method,scope,resource,expires_at)
 values ('${cleanupHashes.codeExpired}','${clientId}','${userId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}',now()-interval '2 days'),
        ('${cleanupHashes.codeFresh}','${clientId}','${userId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}',now()+interval '1 minute');
@@ -268,8 +307,8 @@ sql(`truncate public.mcp_oauth_clients cascade;
 insert into public.mcp_oauth_clients(client_id,client_name,redirect_uris,grant_types,token_endpoint_auth_method,created_at,last_used_at)
 select 'mcp_capacity_' || lpad(series::text, 4, '0'), 'capacity client', array['${redirectUri}'], array['authorization_code','refresh_token'], 'none', now()-interval '30 days', now()-interval '8 days'
 from generate_series(1,500) series;
-insert into public.mcp_authorization_requests(request_hash,client_id,redirect_uri,code_challenge,code_challenge_method,scope,resource,state,expires_at)
-values ('${sha256("capacity-pending-request")}','mcp_capacity_0001','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()+interval '5 minutes');
+insert into public.mcp_authorization_requests(request_hash,client_id,user_id,redirect_uri,code_challenge,code_challenge_method,scope,resource,state,expires_at)
+values ('${sha256("capacity-pending-request")}','mcp_capacity_0001','${userId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','',now()+interval '5 minutes');
 insert into public.mcp_authorization_codes(code_hash,client_id,user_id,redirect_uri,code_challenge,code_challenge_method,scope,resource,expires_at)
 values ('${sha256("capacity-active-code")}','mcp_capacity_0002','${userId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}',now()+interval '1 minute');
 insert into public.mcp_access_tokens(token_hash,client_id,user_id,scope,resource,expires_at)
@@ -287,6 +326,7 @@ console.log(JSON.stringify({
   migration_apply: "passed",
   rls: "passed",
   authorization_request_single_use: "passed",
+  authorization_request_user_binding: "passed",
   authorization_code_concurrency: "passed",
   pkce_non_consumption: "passed",
   token_rollback: "passed",
@@ -304,4 +344,14 @@ console.log(JSON.stringify({
   knowledge_partial_apply: "passed",
   knowledge_opt_out_deletion: "passed",
   embedding_fingerprint_rejection: "passed",
+  knowledge_entitlement_from_token: "passed",
+  unknown_token_rejection: "passed",
+  expired_token_rejection: "passed",
+  revoked_token_rejection: "passed",
+  wrong_scope_rejection: "passed",
+  knowledge_resource_binding: "passed",
+  unknown_tier_rejection: "passed",
+  null_tier_rejection: "passed",
+  missing_profile_rejection: "passed",
+  public_schema_create_revoked: "passed",
 }));

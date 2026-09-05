@@ -28,3 +28,8 @@ BEGIN
     )';
   END IF;
 END $$;
+
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  tier text
+);

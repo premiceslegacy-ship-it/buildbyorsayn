@@ -13,6 +13,11 @@ export type StoredSkillContent = {
   contentType: string;
 };
 
+export type StoredSkillRequestOptions = {
+  signal?: AbortSignal;
+  timeoutMs?: number;
+};
+
 /**
  * Downloads and verifies a published skill artifact from Supabase Storage
  * against the signed manifest (SHA-256), the same trust chain enforced by
@@ -20,7 +25,8 @@ export type StoredSkillContent = {
  * route and the MCP get_skill tool so the verification logic exists once.
  */
 export async function getStoredSkillContent(
-  skill: SkillCatalogItem
+  skill: SkillCatalogItem,
+  options: StoredSkillRequestOptions = {}
 ): Promise<StoredSkillContent | null> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -28,15 +34,18 @@ export async function getStoredSkillContent(
   if (!supabaseUrl || !serviceRoleKey) {
     return null;
   }
+  const timeoutMs = options.timeoutMs ?? 10_000;
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) return null;
 
   const supabaseAdmin = createSupabaseAdmin(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false },
     global: {
       fetch: (input, init) => {
-        const timeout = AbortSignal.timeout(10_000);
-        const signal = init?.signal
-          ? AbortSignal.any([init.signal, timeout])
-          : timeout;
+        const timeout = AbortSignal.timeout(timeoutMs);
+        const signals = [init?.signal, options.signal, timeout].filter(
+          (signal): signal is AbortSignal => signal instanceof AbortSignal
+        );
+        const signal = signals.length === 1 ? signals[0] : AbortSignal.any(signals);
         return fetch(input, { ...init, cache: "no-store", signal });
       },
     },

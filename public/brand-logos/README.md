@@ -4,7 +4,7 @@ These product marks are stored locally so BUILD assets do not depend on a remote
 
 Existing files:
 
-- `chatgpt.svg`: ChatGPT/OpenAI knot used as the ChatGPT product mark.
+- `chatgpt.svg`: repository copy used as the ChatGPT product mark. Repository revision SHA-256: `d4bb99346a264aca1072e6b6c2f2f5d0925a511c668a12a7b99451eaa7f8d4b8`. No official downloadable-source revision or commercial co-brand approval is evidenced here; do not treat this checksum as proof of permission.
 - `codex.svg`: dedicated Codex logomark, copied from the versioned `@lobehub/icons-static-svg@1.94.0` asset `codex-color.svg`.
 - `claude-code.svg`: dedicated Claude Code logomark, copied from the versioned `@lobehub/icons-static-svg@1.94.0` asset `claudecode-color.svg`.
 - `openai.svg`: OpenAI company mark retained only where the company identity is explicitly named.
@@ -21,6 +21,7 @@ Added for the method assets:
 
 Source URLs:
 
+- `https://openai.com/brand` for the current OpenAI and ChatGPT trademark usage guidelines.
 - `https://cdn.simpleicons.org/cloudflare`
 - `https://cdn.simpleicons.org/github`
 - `https://cdn.simpleicons.org/pinterest`

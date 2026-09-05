@@ -253,6 +253,15 @@ async function main(): Promise<void> {
     await assertPortAvailable();
     server = startServer();
     await waitForServer(server.child);
+    const authorizationMetadata = await json<Record<string, unknown>>(
+      await timedFetch(`${BASE_URL}/.well-known/oauth-authorization-server`)
+    );
+    const protectedResourceMetadata = await json<Record<string, unknown>>(
+      await timedFetch(`${BASE_URL}/.well-known/oauth-protected-resource`)
+    );
+    assert.equal(authorizationMetadata.issuer, BASE_URL);
+    assert.equal(protectedResourceMetadata.resource, RESOURCE);
+    assert.deepEqual(protectedResourceMetadata.authorization_servers, [BASE_URL]);
     report.discovery = "PASS";
 
     const stamp = Date.now();
@@ -344,6 +353,15 @@ async function main(): Promise<void> {
       code_verifier: verifier,
       resource: RESOURCE,
     });
+    const wrongVerifierParams = new URLSearchParams(codeParams);
+    const wrongVerifier = opaqueToken();
+    sensitiveValues.add(wrongVerifier);
+    wrongVerifierParams.set("code_verifier", wrongVerifier);
+    const wrongVerifierExchange = await tokenRequest(wrongVerifierParams);
+    assert.equal(wrongVerifierExchange.response.status, 400);
+    assert.equal(wrongVerifierExchange.body.error, "invalid_grant");
+    report.wrongPkceVerifierDeniedWithoutConsumption = "PASS";
+
     const issued = await tokenRequest(codeParams);
     assert.equal(issued.response.status, 200);
     assert.equal(issued.body.token_type, "Bearer");
@@ -553,6 +571,69 @@ async function main(): Promise<void> {
     assert.equal(revokedFamilyCall.status, 401);
     assert.equal(revokedFamilyCall.payload.error, "unauthorized");
     report.familyRevocation = "PASS";
+
+    const revocationVerifier = opaqueToken();
+    const revocationChallenge = sha256Base64Url(revocationVerifier);
+    const revocationState = opaqueToken();
+    sensitiveValues.add(revocationVerifier);
+    sensitiveValues.add(revocationChallenge);
+    sensitiveValues.add(revocationState);
+    const revocationAuthorizeUrl = new URL(authorizeUrl);
+    revocationAuthorizeUrl.searchParams.set("code_challenge", revocationChallenge);
+    revocationAuthorizeUrl.searchParams.set("state", revocationState);
+    await page.goto(revocationAuthorizeUrl.toString());
+    if (new URL(page.url()).pathname === "/login") {
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Mot de passe").fill(password);
+      await page.getByRole("button", { name: "Continuer" }).click();
+    }
+    await page.waitForURL(/\/mcp\/consent\?request=/, { timeout: 30_000 });
+    await page.getByRole("button", { name: "Autoriser" }).click();
+    await page.waitForURL(
+      (url) => url.pathname === "/mcp-callback" && url.searchParams.has("code"),
+      { timeout: 30_000 }
+    );
+    const revocationCallback = new URL(page.url());
+    const revocationCode = revocationCallback.searchParams.get("code");
+    assert.ok(revocationCode);
+    sensitiveValues.add(revocationCode);
+    assert.equal(revocationCallback.searchParams.get("state"), revocationState);
+    const revocationIssued = await tokenRequest(new URLSearchParams({
+      grant_type: "authorization_code",
+      code: revocationCode,
+      redirect_uri: redirectUri,
+      client_id: clientId,
+      code_verifier: revocationVerifier,
+      resource: RESOURCE,
+    }));
+    assert.equal(revocationIssued.response.status, 200);
+    assert.equal(typeof revocationIssued.body.access_token, "string");
+    assert.equal(typeof revocationIssued.body.refresh_token, "string");
+    const revocationAccessToken = revocationIssued.body.access_token as string;
+    const revocationRefreshToken = revocationIssued.body.refresh_token as string;
+    sensitiveValues.add(revocationAccessToken);
+    sensitiveValues.add(revocationRefreshToken);
+    const { error: userRevocationError } = await admin.rpc("revoke_mcp_user_connections", {
+      p_user_id: userId,
+    });
+    assert.equal(userRevocationError, null);
+    const revokedUserCall = await mcpRequest(revocationAccessToken, {
+      jsonrpc: "2.0",
+      id: 8,
+      method: "tools/list",
+      params: {},
+    });
+    assert.equal(revokedUserCall.status, 401);
+    assert.equal(revokedUserCall.payload.error, "unauthorized");
+    const revokedUserRefresh = await tokenRequest(new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: revocationRefreshToken,
+      client_id: clientId,
+      resource: RESOURCE,
+    }));
+    assert.equal(revokedUserRefresh.response.status, 400);
+    assert.equal(revokedUserRefresh.body.error, "invalid_grant");
+    report.userWideRevocation = "PASS";
   } catch (error) {
     failure = error;
   } finally {

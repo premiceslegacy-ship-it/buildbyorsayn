@@ -50,6 +50,8 @@ Les assets ne sont pas des bento grids. Ils utilisent un canvas de relations ave
 
 Les compositions relationnelles ne sont pas enfermées dans un grand cadre extérieur. Le canvas respire dans la section qui l'accueille ; seuls les nœuds, le centre et la sortie portent une surface lorsque cela aide à comprendre le flux.
 
+**Exception approuvée pour le connecteur MCP du pricing général** : `McpConnectorShowcase` utilise un raster naturel détaillé, puis un export réel ASCII Magic `Characters`. Cette exception ne modifie pas les compositions de la page d'accompagnement. Elle conserve les mêmes règles de sens : BUILD domine au centre, Claude et ChatGPT restent des entrées secondaires reliées, les noms d'outils ne sont pas répétés sous les logos et aucun grand cadre extérieur n'enferme la relation. L'asset reste masqué tant que les validations réelles dans les deux clients n'ont pas autorisé le lancement.
+
 Les assets d'outils ne possèdent aucun cercle d'orbite. Les cards individuelles, les logos et les flux restent visibles ; aucun anneau décoratif ne relie artificiellement les marques.
 
 Les ombres et reliefs sont limités aux boutons ou aux feuilles visuelles afin d'évoquer un objet manipulable. Ils ne deviennent pas un système de cartes ou une décoration généralisée.

@@ -55,3 +55,62 @@ test("bounded body rejects invalid or oversized declared lengths", async () => {
   );
   assert.deepEqual(oversized, { ok: false, reason: "too_large" });
 });
+
+test("bounded body returns on deadline even when stream cancellation never settles", async () => {
+  const body = new ReadableStream<Uint8Array>({
+    pull() {
+      return new Promise<void>(() => undefined);
+    },
+    cancel() {
+      return new Promise<void>(() => undefined);
+    },
+  });
+
+  const result = await Promise.race([
+    readBoundedBody(
+      new Request("https://example.test", {
+        method: "POST",
+        body,
+        duplex: "half",
+      } as RequestInit),
+      32,
+      { timeoutMs: 10 }
+    ),
+    new Promise<"hung">((resolve) => setTimeout(() => resolve("hung"), 100)),
+  ]);
+
+  assert.notEqual(result, "hung");
+  assert.deepEqual(result, { ok: false, reason: "timeout" });
+});
+
+test("bounded body cancels a stalled stream before its read deadline", async () => {
+  let cancelled = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const body = new ReadableStream<Uint8Array>({
+    start(controller) {
+      timer = setTimeout(() => {
+        controller.enqueue(new TextEncoder().encode("{}"));
+        controller.close();
+      }, 80);
+    },
+    cancel() {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    },
+  });
+  const startedAt = performance.now();
+
+  const result = await readBoundedBody(
+    new Request("https://example.test", {
+      method: "POST",
+      body,
+      duplex: "half",
+    } as RequestInit),
+    32,
+    { timeoutMs: 15 }
+  );
+
+  assert.deepEqual(result, { ok: false, reason: "timeout" });
+  assert.equal(cancelled, true);
+  assert.ok(performance.now() - startedAt < 70);
+});

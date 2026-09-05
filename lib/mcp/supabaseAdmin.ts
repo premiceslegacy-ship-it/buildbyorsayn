@@ -5,6 +5,7 @@ export const DEFAULT_MCP_SUPABASE_TIMEOUT_MS = 15_000;
 type McpSupabaseAdminOptions = {
   fetch?: typeof fetch;
   timeoutMs?: number;
+  signal?: AbortSignal;
 };
 
 /**
@@ -32,9 +33,10 @@ export function createMcpSupabaseAdmin(options: McpSupabaseAdminOptions = {}) {
       fetch: (input, init) => {
         const callerSignal = init?.signal ?? (input instanceof Request ? input.signal : undefined);
         const timeoutSignal = AbortSignal.timeout(timeoutMs);
-        const signal = callerSignal
-          ? AbortSignal.any([callerSignal, timeoutSignal])
-          : timeoutSignal;
+        const signals = [options.signal, callerSignal, timeoutSignal].filter(
+          (signal): signal is AbortSignal => Boolean(signal)
+        );
+        const signal = signals.length === 1 ? signals[0] : AbortSignal.any(signals);
         return fetchImpl(input, { ...init, cache: "no-store", signal });
       },
     },

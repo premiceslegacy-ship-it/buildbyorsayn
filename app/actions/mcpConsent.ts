@@ -92,10 +92,18 @@ export async function denyMcpConsent(formData: FormData) {
     redirect("/dashboard");
   }
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    finish("denied", 401);
+    redirect("/login");
+  }
+
   const admin = createMcpSupabaseAdmin();
   const { data, error } = (await admin
     .rpc("deny_mcp_authorization_request", {
       p_request_hash: hashToken(requestHandle),
+      p_user_id: user.id,
     })
     .maybeSingle()) as { data: DenialResult | null; error: unknown };
 

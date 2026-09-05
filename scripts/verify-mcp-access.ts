@@ -1,6 +1,7 @@
 import { createClient, type User } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
 import { mkdir, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { embeddingFingerprint, resolveEmbeddingConfig } from "../lib/knowledge/embeddings";
 
@@ -37,10 +38,25 @@ function fakeEmbedding(seed: number): number[] {
   return values.map((v) => v / norm);
 }
 
-async function listFixtures() {
-  const { data, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  if (error) throw error;
-  return (data.users as User[]).filter((user) => user.email?.startsWith(FIXTURE_PREFIX));
+async function listFixtures(): Promise<User[]> {
+  const fixtures: User[] = [];
+  let page = 1;
+  let totalPages = 1;
+  while (page <= totalPages) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) throw error;
+    const pagination = data as {
+      users: User[];
+      lastPage?: number;
+      nextPage?: number | null;
+    };
+    fixtures.push(
+      ...pagination.users.filter((user) => user.email?.startsWith(FIXTURE_PREFIX))
+    );
+    totalPages = pagination.lastPage ?? (pagination.nextPage ? page + 1 : page);
+    page += 1;
+  }
+  return fixtures;
 }
 
 async function cleanupUsers(users: User[]) {
@@ -50,27 +66,57 @@ async function cleanupUsers(users: User[]) {
   if (profileByUserId.error) {
     throw new Error(`profiles: ${profileByUserId.error.message}`);
   }
-  for (const user of users) {
-    const { error } = await admin.auth.admin.deleteUser(user.id);
-    if (error) throw new Error(`auth cleanup: ${error.message}`);
+  const deletions = await Promise.allSettled(
+    users.map(async (user) => {
+      const { error } = await admin.auth.admin.deleteUser(user.id);
+      if (error) throw new Error("auth cleanup failed");
+    })
+  );
+  if (deletions.some((result) => result.status === "rejected")) {
+    throw new Error("auth cleanup failed");
   }
 }
 
-async function cleanupChunks(stamp: number) {
+async function deleteFixtureRows(table: string, column: string, prefix: string) {
   const { error } = await admin
-    .from("knowledge_chunks")
+    .from(table)
     .delete()
-    .eq("source", `hermes-mcp-test-${stamp}`);
-  if (error) throw new Error(`knowledge_chunks cleanup: ${error.message}`);
+    .like(column, `${prefix}%`);
+  if (error) throw new Error(`${table} cleanup failed`);
+}
+
+async function cleanupAllFixtures(): Promise<boolean> {
+  const results = await Promise.allSettled([
+    (async () => cleanupUsers(await listFixtures()))(),
+    deleteFixtureRows("mcp_authorization_requests", "client_id", FIXTURE_PREFIX),
+    deleteFixtureRows("mcp_authorization_codes", "client_id", FIXTURE_PREFIX),
+    deleteFixtureRows("mcp_access_tokens", "client_id", FIXTURE_PREFIX),
+    deleteFixtureRows("mcp_refresh_tokens", "client_id", FIXTURE_PREFIX),
+    deleteFixtureRows("mcp_oauth_clients", "client_id", FIXTURE_PREFIX),
+    deleteFixtureRows("knowledge_chunks", "source", `${FIXTURE_PREFIX}test-`),
+  ]);
+  return results.every((result) => result.status === "fulfilled");
+}
+
+async function countFixtureRows(table: string, column: string, prefix: string): Promise<number> {
+  const { count, error } = await admin
+    .from(table)
+    .select("*", { count: "exact", head: true })
+    .like(column, `${prefix}%`);
+  if (error || count === null) throw new Error(`${table} verification failed`);
+  return count;
 }
 
 async function main() {
-  await cleanupUsers(await listFixtures());
+  if (!(await cleanupAllFixtures())) {
+    throw new Error("Preflight fixture cleanup failed.");
+  }
 
   const stamp = Date.now();
   const password = `Hermes-${stamp}-Aa9!`;
-  const users: User[] = [];
   const checks: Record<string, boolean | number> = {};
+  const clientId = `${FIXTURE_PREFIX}client-${stamp}`;
+  const resource = "https://mcp-verification.invalid/api/mcp";
   let verdict: "PASS" | "FAIL" = "FAIL";
   let failure: string | null = null;
 
@@ -85,19 +131,22 @@ async function main() {
         email_confirm: true,
       });
       if (error || !data.user) throw error ?? new Error("Fixture creation failed.");
-      users.push(data.user);
       userIdByTier[tier] = data.user.id;
 
-      // "preview" is intentionally left without a profiles row at all, to
-      // verify the fail-open-to-lowest-tier default for a bare authenticated
-      // account rather than relying on an explicit tier value.
-      if (tier !== "preview") {
-        const { error: profileError } = await admin
-          .from("profiles")
-          .upsert({ id: data.user.id, email: data.user.email, tier });
-        if (profileError) throw profileError;
-      }
+      const { error: profileError } = await admin
+        .from("profiles")
+        .upsert({ id: data.user.id, email: data.user.email, tier });
+      if (profileError) throw profileError;
     }
+
+    const { error: clientError } = await admin.from("mcp_oauth_clients").insert({
+      client_id: clientId,
+      client_name: "Hermes MCP entitlement verifier",
+      redirect_uris: ["http://127.0.0.1:47123/callback"],
+      grant_types: ["authorization_code", "refresh_token"],
+      token_endpoint_auth_method: "none",
+    });
+    if (clientError) throw clientError;
 
     const source = `hermes-mcp-test-${stamp}`;
     const testChunks = tiers.map((tier, index) => ({
@@ -118,9 +167,23 @@ async function main() {
     const queryEmbedding = fakeEmbedding(1);
 
     for (const tier of tiers) {
+      const tokenHash = createHash("sha256")
+        .update(`${stamp}:${tier}:mcp-access-verifier`)
+        .digest("hex");
+      const { error: tokenError } = await admin.from("mcp_access_tokens").insert({
+        token_hash: tokenHash,
+        client_id: clientId,
+        user_id: userIdByTier[tier],
+        scope: "mcp",
+        resource,
+        expires_at: new Date(Date.now() + 5 * 60_000).toISOString(),
+      });
+      if (tokenError) throw tokenError;
+
       const { data: matches, error } = await admin.rpc("match_mcp_knowledge_chunks", {
         query_embedding: queryEmbedding,
-        requested_tier: tier,
+        p_token_hash: tokenHash,
+        p_expected_resource: resource,
         match_count: 20,
         source_filter: source,
         embedding_fingerprint: EMBEDDING_FINGERPRINT,
@@ -135,7 +198,8 @@ async function main() {
 
     const anonRpc = await anonClient.rpc("match_mcp_knowledge_chunks", {
       query_embedding: queryEmbedding,
-      requested_tier: "full",
+      p_token_hash: "0".repeat(64),
+      p_expected_resource: resource,
       match_count: 5,
       source_filter: source,
       embedding_fingerprint: EMBEDDING_FINGERPRINT,
@@ -151,36 +215,40 @@ async function main() {
         ? "PASS"
         : "FAIL";
 
-    await cleanupChunks(stamp);
   } catch (error) {
     failure =
       error instanceof Error
         ? error.message
         : JSON.stringify(error, Object.getOwnPropertyNames(error as object));
   } finally {
-    await cleanupUsers(users);
-    await cleanupChunks(stamp);
+    if (!(await cleanupAllFixtures())) {
+      failure = failure ?? "Fixture cleanup failed.";
+      verdict = "FAIL";
+    }
   }
 
-  const remainingFixtures = (await listFixtures()).length;
-  if (remainingFixtures !== 0) verdict = "FAIL";
+  const fixtureCleanup = {
+    temporaryUsersRemaining: (await listFixtures()).length,
+    temporaryClientsRemaining: await countFixtureRows("mcp_oauth_clients", "client_id", FIXTURE_PREFIX),
+    temporaryAccessTokensRemaining: await countFixtureRows("mcp_access_tokens", "client_id", FIXTURE_PREFIX),
+    temporaryRefreshTokensRemaining: await countFixtureRows("mcp_refresh_tokens", "client_id", FIXTURE_PREFIX),
+    temporaryAuthorizationCodesRemaining: await countFixtureRows("mcp_authorization_codes", "client_id", FIXTURE_PREFIX),
+    temporaryAuthorizationRequestsRemaining: await countFixtureRows("mcp_authorization_requests", "client_id", FIXTURE_PREFIX),
+    temporaryChunksRemaining: await countFixtureRows("knowledge_chunks", "source", `${FIXTURE_PREFIX}test-`),
+  };
+  if (Object.values(fixtureCleanup).some((count) => count !== 0)) verdict = "FAIL";
 
   const report = {
     verdict,
     verifiedAt: new Date().toISOString(),
-    migrations: [
-      "20260904151355_mcp_knowledge_base.sql",
-      "20260904151436_mcp_oauth.sql",
-      "20260904180000_mcp_security_hardening.sql",
-      "20260904190000_mcp_final_hardening.sql",
-      "20260904230000_mcp_bounded_cleanup.sql",
-      "20260904233000_mcp_dcr_capacity_recovery.sql",
+    runtimeEvidenceScope: [
+      "tier-filtered knowledge RPC results for preview, beginner, and full profiles",
+      "anonymous table and RPC denial",
+      "fixture cleanup across all Supabase Auth pages and MCP fixture tables",
     ],
     checks,
     failure,
-    fixtureCleanup: {
-      temporaryUsersRemaining: remainingFixtures,
-    },
+    fixtureCleanup,
   };
 
   await mkdir(path.dirname(outputPath), { recursive: true });

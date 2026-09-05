@@ -1,13 +1,10 @@
 {
   "verdict": "PASS",
-  "verifiedAt": "2026-09-04T21:42:13.671Z",
-  "migrations": [
-    "20260904151355_mcp_knowledge_base.sql",
-    "20260904151436_mcp_oauth.sql",
-    "20260904180000_mcp_security_hardening.sql",
-    "20260904190000_mcp_final_hardening.sql",
-    "20260904230000_mcp_bounded_cleanup.sql",
-    "20260904233000_mcp_dcr_capacity_recovery.sql"
+  "verifiedAt": "2026-09-05T03:15:01.042Z",
+  "runtimeEvidenceScope": [
+    "tier-filtered knowledge RPC results for preview, beginner, and full profiles",
+    "anonymous table and RPC denial",
+    "fixture cleanup across all Supabase Auth pages and MCP fixture tables"
   ],
   "checks": {
     "previewSeesCount": 1,
@@ -18,6 +15,12 @@
   },
   "failure": null,
   "fixtureCleanup": {
-    "temporaryUsersRemaining": 0
+    "temporaryUsersRemaining": 0,
+    "temporaryClientsRemaining": 0,
+    "temporaryAccessTokensRemaining": 0,
+    "temporaryRefreshTokensRemaining": 0,
+    "temporaryAuthorizationCodesRemaining": 0,
+    "temporaryAuthorizationRequestsRemaining": 0,
+    "temporaryChunksRemaining": 0
   }
 }

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -8,7 +8,9 @@ import {
   evaluateObsidianNote,
   hasHardExcludedSegment,
   isPathConfinedToVault,
+  readConfinedUtf8Prefix,
   readConfinedUtf8File,
+  readConfinedUtf8FileBounded,
 } from "../lib/knowledge/obsidianGate";
 import { collectObsidianDocuments, resolveObsidianSourceMode } from "../lib/knowledge/obsidianSource";
 import { parseFrontmatter } from "../lib/knowledge/frontmatter";
@@ -112,6 +114,21 @@ test("content containing a live secret key is excluded entirely", async () => {
   });
 });
 
+test("a detected secret blocks the scan even when required metadata is missing", async () => {
+  await withVault(async (vaultRoot) => {
+    const secret = "sk_" + "live_" + "z".repeat(24);
+    await writeNote(
+      vaultRoot,
+      "30 Methodes/incomplete-secret.md",
+      `---\nbuild-tier: coffre\nstatus: living\n---\n${secret}\n`
+    );
+    const result = await collectObsidianDocuments(vaultRoot);
+    assert.equal(result.documents.length, 0);
+    assert.equal(result.scan.ok, false);
+    assert.equal(result.decisions[0]?.blocking, true);
+  });
+});
+
 test("a credential-bearing note path is blocked without entering reports", async () => {
   await withVault(async (vaultRoot) => {
     const hazardousValue = "MCP_REQUEST_RATE_LIMIT_PEPPER=" + "a".repeat(32);
@@ -148,6 +165,22 @@ test("a hard-excluded credential-bearing filename is redacted and blocks the sca
     assert.deepEqual(result.scan.hazards, [
       "possible secret detected in path: [REDACTED_PATH]",
     ]);
+  });
+});
+
+test("secret-bearing ordinary directory and non-Markdown names block the scan", async () => {
+  await withVault(async (vaultRoot) => {
+    const directorySecret = "CRON_SECRET=" + "d".repeat(32);
+    const fileSecret = "API_KEY=" + "f".repeat(24);
+    await mkdir(path.join(vaultRoot, directorySecret));
+    await writeFile(path.join(vaultRoot, `${fileSecret}.txt`), "not markdown", "utf8");
+
+    const result = await collectObsidianDocuments(vaultRoot);
+    const serialized = JSON.stringify(result);
+    assert.equal(result.scan.ok, false);
+    assert.equal(serialized.includes(directorySecret), false);
+    assert.equal(serialized.includes(fileSecret), false);
+    assert.ok(result.scan.hazards.filter((hazard) => hazard.includes("[REDACTED_PATH]")).length >= 2);
   });
 });
 
@@ -193,11 +226,50 @@ test("confined reads bind validation to the opened regular file", async () => {
   });
 });
 
+test("bounded confined reads reject bytes beyond the opened-file ceiling", async () => {
+  await withVault(async (vaultRoot) => {
+    const file = await writeNote(vaultRoot, "bounded.md", "ééé");
+    assert.deepEqual(await readConfinedUtf8FileBounded(file, vaultRoot, 6), {
+      text: "ééé",
+      bytesRead: 6,
+    });
+    assert.equal(await readConfinedUtf8FileBounded(file, vaultRoot, 5), null);
+  });
+});
+
+test("bounded confined reads never request a byte beyond the caller budget", async () => {
+  const source = await readFile("lib/knowledge/obsidianGate.ts", "utf8");
+  assert.match(source, /Buffer\.allocUnsafe\(maxBytes\)/);
+  assert.doesNotMatch(source, /maxBytes\s*\+\s*1/);
+  assert.match(source, /while \(bytesRead < maxBytes\)/);
+});
+
+test("the vault walker streams directory entries instead of materializing them", async () => {
+  const source = await readFile("lib/knowledge/obsidianSource.ts", "utf8");
+  assert.match(source, /\bopendir\b/);
+  assert.doesNotMatch(source, /\breaddir\b/);
+});
+
+test("eligibility inspection reads only a bounded frontmatter prefix", async () => {
+  await withVault(async (vaultRoot) => {
+    const bodyMarker = "PRIVATE-BODY-MUST-NOT-BE-READ";
+    const file = await writeNote(
+      vaultRoot,
+      "candidate.md",
+      `---\nbuild-tier: preview\nstatus: archived\n---\n${"x".repeat(100)}${bodyMarker.repeat(1000)}`
+    );
+    const prefix = await readConfinedUtf8Prefix(file, vaultRoot, 128);
+    assert.ok(prefix);
+    assert.equal(prefix.includes(bodyMarker), false);
+    assert.ok(Buffer.byteLength(prefix, "utf8") <= 128);
+  });
+});
+
 test("the nominal case: a correctly tagged, non-excluded note is allowed", async () => {
   await withVault(async (vaultRoot) => {
     const rel = "30 Methodes/Protocole Zero.md";
     const content =
-      "---\nbuild-tier: fondations\nstatus: living\nauthority: synthesis\ntitle: Protocole Zero\n---\nCeci est ma synthese personnelle.\n";
+      "---\nbuild-tier: fondations\nstatus: living\nauthority: synthesis\nsensitivity: training\ntitle: Protocole Zero\n---\nCeci est ma synthese personnelle.\n";
     const abs = await writeNote(vaultRoot, rel, content);
     const result = await evaluateObsidianNote(rel, abs, vaultRoot, content);
     assert.equal(result.allowed, true);
@@ -208,17 +280,50 @@ test("the nominal case: a correctly tagged, non-excluded note is allowed", async
   });
 });
 
+test("a private source without an explicit allowed sensitivity is excluded", async () => {
+  await withVault(async (vaultRoot) => {
+    const rel = "30 Methodes/missing-sensitivity.md";
+    const content =
+      "---\nbuild-tier: fondations\nstatus: living\nauthority: synthesis\n---\nContent.\n";
+    const abs = await writeNote(vaultRoot, rel, content);
+    const result = await evaluateObsidianNote(rel, abs, vaultRoot, content);
+    assert.equal(result.allowed, false);
+  });
+});
+
+test("a private source without an explicit allowed publication status is excluded", async () => {
+  await withVault(async (vaultRoot) => {
+    const rel = "30 Methodes/missing-status.md";
+    const content =
+      "---\nbuild-tier: fondations\nauthority: synthesis\nsensitivity: training\n---\nContent.\n";
+    const abs = await writeNote(vaultRoot, rel, content);
+    const result = await evaluateObsidianNote(rel, abs, vaultRoot, content);
+    assert.equal(result.allowed, false);
+  });
+});
+
+test("a private source without an explicit allowed authority is excluded", async () => {
+  await withVault(async (vaultRoot) => {
+    const rel = "30 Methodes/missing-authority.md";
+    const content =
+      "---\nbuild-tier: fondations\nstatus: living\nsensitivity: training\n---\nContent.\n";
+    const abs = await writeNote(vaultRoot, rel, content);
+    const result = await evaluateObsidianNote(rel, abs, vaultRoot, content);
+    assert.equal(result.allowed, false);
+  });
+});
+
 test("build-tier maps coffre to full and preview to preview", async () => {
   await withVault(async (vaultRoot) => {
     const relCoffre = "a.md";
-    const contentCoffre = "---\nbuild-tier: coffre\nauthority: synthesis\n---\nx\n";
+    const contentCoffre = "---\nbuild-tier: coffre\nstatus: living\nauthority: synthesis\nsensitivity: training\n---\nx\n";
     const absCoffre = await writeNote(vaultRoot, relCoffre, contentCoffre);
     const resultCoffre = await evaluateObsidianNote(relCoffre, absCoffre, vaultRoot, contentCoffre);
     assert.equal(resultCoffre.allowed, true);
     if (resultCoffre.allowed) assert.equal(resultCoffre.tier, "full");
 
     const relPreview = "b.md";
-    const contentPreview = "---\nbuild-tier: preview\nauthority: synthesis\n---\nx\n";
+    const contentPreview = "---\nbuild-tier: preview\nstatus: living\nauthority: synthesis\nsensitivity: training\n---\nx\n";
     const absPreview = await writeNote(vaultRoot, relPreview, contentPreview);
     const resultPreview = await evaluateObsidianNote(relPreview, absPreview, vaultRoot, contentPreview);
     assert.equal(resultPreview.allowed, true);
@@ -335,6 +440,33 @@ test("a symlinked parent directory is rejected before reading a note", async () 
       await isPathConfinedToVault(path.join(linkedDirectory, "note.md"), vaultRoot),
       false
     );
+  });
+});
+
+test("vault traversal fails closed beyond the configured depth", async () => {
+  await withVault(async (vaultRoot) => {
+    const deepPath = `${Array.from({ length: 34 }, (_, index) => `d${index}`).join("/")}/note.md`;
+    await writeNote(
+      vaultRoot,
+      deepPath,
+      "---\nbuild-tier: preview\nstatus: living\nauthority: synthesis\nsensitivity: training\n---\nBody\n"
+    );
+    const result = await collectObsidianDocuments(vaultRoot);
+    assert.equal(result.scan.ok, false);
+    assert.ok(result.scan.hazards.includes("vault traversal depth limit exceeded"));
+  });
+});
+
+test("eligible Obsidian files above the byte limit block publication", async () => {
+  await withVault(async (vaultRoot) => {
+    await writeNote(
+      vaultRoot,
+      "oversized.md",
+      `---\nbuild-tier: preview\nstatus: living\nauthority: synthesis\nsensitivity: training\n---\n${"a".repeat(1_048_577)}`
+    );
+    const result = await collectObsidianDocuments(vaultRoot);
+    assert.equal(result.scan.ok, false);
+    assert.equal(result.decisions[0]?.blocking, true);
   });
 });
 

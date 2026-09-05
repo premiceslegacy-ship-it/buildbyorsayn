@@ -57,9 +57,9 @@ test("normalizeProfileTier maps known tiers to themselves", () => {
   assert.equal(normalizeProfileTier("full"), "full");
 });
 
-test("normalizeProfileTier gives the intentional preview to missing profiles only", () => {
-  assert.equal(normalizeProfileTier(null), "preview");
-  assert.equal(normalizeProfileTier(undefined), "preview");
+test("normalizeProfileTier rejects missing and unknown tiers", () => {
+  assert.equal(normalizeProfileTier(null), null);
+  assert.equal(normalizeProfileTier(undefined), null);
   assert.equal(normalizeProfileTier(""), null);
   assert.equal(normalizeProfileTier("FULL"), null);
   assert.equal(normalizeProfileTier("unknown"), null);
@@ -70,8 +70,8 @@ test("resolveMcpProfileTier fails closed when the profile lookup fails", () => {
   assert.equal(resolveMcpProfileTier({ tier: "full" }, { code: "timeout" }), null);
 });
 
-test("resolveMcpProfileTier grants preview only after a successful empty lookup", () => {
-  assert.equal(resolveMcpProfileTier(null, null), "preview");
+test("resolveMcpProfileTier rejects a successful lookup without a known profile tier", () => {
+  assert.equal(resolveMcpProfileTier(null, null), null);
   assert.equal(resolveMcpProfileTier({ tier: null }, null), null);
   assert.equal(resolveMcpProfileTier({ tier: "FULL" }, null), null);
   assert.equal(resolveMcpProfileTier({ tier: "admin" }, null), "full");

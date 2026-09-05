@@ -66,6 +66,7 @@ async function handleGet(request: Request) {
     p_scope: input.scope,
     p_resource: input.resource,
     p_state: input.state,
+    p_user_id: user.id,
   });
   if (insertError || requestStatus !== "created") {
     return oauthError("Authorization is temporarily unavailable.", 503);

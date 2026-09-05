@@ -62,10 +62,68 @@ export async function isPathConfinedToVault(
   }
 }
 
+export type ConfinedUtf8File = {
+  text: string;
+  bytesRead: number;
+};
+
+export async function readConfinedUtf8FileBounded(
+  filePath: string,
+  vaultRoot: string,
+  maxBytes: number
+): Promise<ConfinedUtf8File | null> {
+  if (!Number.isInteger(maxBytes) || maxBytes < 1 || maxBytes > 64 * 1024 * 1024) return null;
+  const resolvedFile = path.resolve(filePath);
+  if (!(await isPathConfinedToVault(resolvedFile, vaultRoot))) return null;
+
+  let handle;
+  try {
+    handle = await open(resolvedFile, constants.O_RDONLY | constants.O_NOFOLLOW);
+    const openedStats = await handle.stat();
+    if (!openedStats.isFile() || openedStats.size > maxBytes) return null;
+
+    const canonicalRoot = await realpath(path.resolve(vaultRoot));
+    const canonicalFile = await realpath(resolvedFile);
+    const relative = path.relative(canonicalRoot, canonicalFile);
+    if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) return null;
+
+    const canonicalStats = await stat(canonicalFile);
+    if (canonicalStats.dev !== openedStats.dev || canonicalStats.ino !== openedStats.ino) return null;
+    if (!(await isPathConfinedToVault(resolvedFile, vaultRoot))) return null;
+
+    const buffer = Buffer.allocUnsafe(maxBytes);
+    let bytesRead = 0;
+    while (bytesRead < maxBytes) {
+      const next = await handle.read(buffer, bytesRead, maxBytes - bytesRead, bytesRead);
+      if (next.bytesRead === 0) break;
+      bytesRead += next.bytesRead;
+    }
+    const finalStats = await handle.stat();
+    if (!finalStats.isFile() || finalStats.size > maxBytes) return null;
+
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(buffer.subarray(0, bytesRead));
+    return { text, bytesRead };
+  } catch {
+    return null;
+  } finally {
+    await handle?.close().catch(() => undefined);
+  }
+}
+
 export async function readConfinedUtf8File(
   filePath: string,
   vaultRoot: string
 ): Promise<string | null> {
+  const result = await readConfinedUtf8FileBounded(filePath, vaultRoot, 64 * 1024 * 1024);
+  return result?.text ?? null;
+}
+
+export async function readConfinedUtf8Prefix(
+  filePath: string,
+  vaultRoot: string,
+  maxBytes: number
+): Promise<string | null> {
+  if (!Number.isInteger(maxBytes) || maxBytes < 1 || maxBytes > 64 * 1024) return null;
   const resolvedFile = path.resolve(filePath);
   if (!(await isPathConfinedToVault(resolvedFile, vaultRoot))) return null;
 
@@ -84,7 +142,9 @@ export async function readConfinedUtf8File(
     if (canonicalStats.dev !== openedStats.dev || canonicalStats.ino !== openedStats.ino) return null;
     if (!(await isPathConfinedToVault(resolvedFile, vaultRoot))) return null;
 
-    return await handle.readFile({ encoding: "utf8" });
+    const buffer = Buffer.alloc(maxBytes);
+    const { bytesRead } = await handle.read(buffer, 0, maxBytes, 0);
+    return buffer.subarray(0, bytesRead).toString("utf8");
   } catch {
     return null;
   } finally {
@@ -153,6 +213,14 @@ export async function evaluateObsidianNote(
     };
   }
 
+  if (containsSecret(rawContent)) {
+    return {
+      allowed: false,
+      reason: "possible secret detected in content",
+      blocking: true,
+    };
+  }
+
   const parsed = parseFrontmatter(rawContent);
   if (!parsed) {
     return { allowed: false, reason: "invalid or missing frontmatter block" };
@@ -166,27 +234,31 @@ export async function evaluateObsidianNote(
     return { allowed: false, reason: "missing or unrecognized build-tier" };
   }
 
-  const status = parsed.fields.status?.trim().toLowerCase();
-  if (status && !ALLOWED_STATUSES.has(status)) {
+  const statusRaw = parsed.fields.status;
+  if (statusRaw === undefined) {
+    return { allowed: false, reason: "missing required publication status" };
+  }
+  const status = statusRaw.trim().toLowerCase();
+  if (!ALLOWED_STATUSES.has(status)) {
     return { allowed: false, reason: `unrecognized or excluded status: ${status}` };
   }
 
-  const authority = parsed.fields.authority?.trim().toLowerCase();
-  if (authority && !ALLOWED_AUTHORITIES.has(authority)) {
+  const authorityRaw = parsed.fields.authority;
+  if (authorityRaw === undefined) {
+    return { allowed: false, reason: "missing required authority" };
+  }
+  const authority = authorityRaw.trim().toLowerCase();
+  if (!ALLOWED_AUTHORITIES.has(authority)) {
     return { allowed: false, reason: `unrecognized or excluded authority: ${authority}` };
   }
 
-  const sensitivity = parsed.fields.sensitivity?.trim().toLowerCase();
-  if (sensitivity && !ALLOWED_SENSITIVITIES.has(sensitivity)) {
-    return { allowed: false, reason: `unrecognized or excluded sensitivity: ${sensitivity}` };
+  const sensitivityRaw = parsed.fields.sensitivity;
+  if (sensitivityRaw === undefined) {
+    return { allowed: false, reason: "missing required sensitivity" };
   }
-
-  if (containsSecret(rawContent)) {
-    return {
-      allowed: false,
-      reason: "possible secret detected in content",
-      blocking: true,
-    };
+  const sensitivity = sensitivityRaw.trim().toLowerCase();
+  if (!ALLOWED_SENSITIVITIES.has(sensitivity)) {
+    return { allowed: false, reason: `unrecognized or excluded sensitivity: ${sensitivity}` };
   }
 
   const title = parsed.fields.title || path.basename(relativePath, ".md");

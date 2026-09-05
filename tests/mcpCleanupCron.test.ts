@@ -144,7 +144,10 @@ test("cleanup route accepts a valid secret and returns the validated structured 
   assert.equal(typeof logRecord.durationMs, "number");
   assert.equal(JSON.stringify(logRecord).includes(secret), false);
   assert.ok(MCP_CLEANUP_SUPABASE_TIMEOUT_MS < DEFAULT_MCP_SUPABASE_TIMEOUT_MS);
-  assert.ok(MCP_CLEANUP_SUPABASE_TIMEOUT_MS < 10_000);
+  assert.ok(
+    MCP_CLEANUP_SUPABASE_TIMEOUT_MS <= 6_000,
+    "a 10 second cron needs at least 4 seconds for parsing, logging, and a controlled response"
+  );
 });
 
 test("cleanup is scheduled daily and calls only the bounded cleanup RPC", async () => {
@@ -176,4 +179,15 @@ test("cleanup SQL is batch-bounded, time-bounded, and release-gated", async () =
     scripts?: Record<string, string>;
   };
   assert.equal(packageJson.scripts?.["test:mcp-postgres"], "node scripts/verify-mcp-postgres-gates.mjs");
+});
+
+test("cleanup SQL finishes before the HTTP deadline reserve", async () => {
+  const migration = await readFile(
+    "supabase/migrations/20260905000000_mcp_cleanup_deadline_reserve.sql",
+    "utf8"
+  );
+  assert.match(
+    migration,
+    /alter function public\.cleanup_mcp_oauth_state\(integer\)[\s\S]*set statement_timeout = '5s'/i
+  );
 });

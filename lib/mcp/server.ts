@@ -4,8 +4,11 @@ import { canAccess, type McpTier } from "@/lib/mcpAccess";
 import { getSkillBySlug, SKILLS_CATALOG } from "@/lib/skillsCatalog";
 import { getStoredSkillContent } from "@/lib/skills/storage";
 import { createMcpSupabaseAdmin } from "@/lib/mcp/supabaseAdmin";
+import { getMcpResourceUrl } from "@/lib/mcp/config";
 import {
   createEmbeddingProvider,
+  DEFAULT_EMBEDDING_ATTEMPT_TIMEOUT_MS,
+  DEFAULT_EMBEDDING_TOTAL_TIMEOUT_MS,
   embeddingFingerprint,
 } from "@/lib/knowledge/embeddings";
 import type { McpAuthContext } from "@/lib/mcp/auth";
@@ -66,14 +69,27 @@ export function formatUntrustedKnowledgeResults(matches: KnowledgeMatch[]): {
   };
 }
 
-async function embedQuery(query: string): Promise<{
+type McpServerRuntimeOptions = {
+  signal?: AbortSignal;
+  deadlineAt?: number;
+};
+
+async function embedQuery(query: string, runtime: McpServerRuntimeOptions): Promise<{
   embedding: number[];
   fingerprint: string;
 } | null> {
   const provider = createEmbeddingProvider();
   if (!provider) return null;
+  const remainingMs = runtime.deadlineAt
+    ? Math.max(0, runtime.deadlineAt - Date.now() - 250)
+    : DEFAULT_EMBEDDING_TOTAL_TIMEOUT_MS;
+  if (remainingMs <= 0) return null;
   try {
-    const [embedding] = await provider.embedBatch([query], "RETRIEVAL_QUERY");
+    const [embedding] = await provider.embedBatch([query], "RETRIEVAL_QUERY", {
+      totalTimeoutMs: Math.min(DEFAULT_EMBEDDING_TOTAL_TIMEOUT_MS, remainingMs),
+      attemptTimeoutMs: Math.min(DEFAULT_EMBEDDING_ATTEMPT_TIMEOUT_MS, remainingMs),
+      signal: runtime.signal,
+    });
     if (!embedding) return null;
     return { embedding, fingerprint: embeddingFingerprint(provider.config) };
   } catch {
@@ -96,7 +112,10 @@ function toolError(message: string) {
  * The tier is captured in this factory closure and every result is validated
  * again in TypeScript after the SQL tier filter.
  */
-export function createBuildMcpServer(auth: McpAuthContext): McpServer {
+export function createBuildMcpServer(
+  auth: McpAuthContext,
+  runtime: McpServerRuntimeOptions = {}
+): McpServer {
   const server = new McpServer({ name: "build-by-orsayn", version: "1.0.0" });
 
   server.registerTool(
@@ -108,13 +127,19 @@ export function createBuildMcpServer(auth: McpAuthContext): McpServer {
       inputSchema: SEARCH_KNOWLEDGE_INPUT_SHAPE,
     },
     async ({ query, source, limit }) => {
-      const queryEmbedding = await embedQuery(query);
+      const queryEmbedding = await embedQuery(query, runtime);
       if (!queryEmbedding) return toolError("La recherche est temporairement indisponible.");
 
-      const admin = createMcpSupabaseAdmin();
+      const admin = createMcpSupabaseAdmin({
+        signal: runtime.signal,
+        timeoutMs: runtime.deadlineAt
+          ? Math.max(1, Math.min(15_000, runtime.deadlineAt - Date.now()))
+          : 15_000,
+      });
       const { data: rawMatches, error } = await admin.rpc("match_mcp_knowledge_chunks", {
         query_embedding: queryEmbedding.embedding,
-        requested_tier: auth.tier,
+        p_token_hash: auth.tokenHash,
+        p_expected_resource: getMcpResourceUrl(),
         match_count: limit ?? 8,
         source_filter: source ?? null,
         embedding_fingerprint: queryEmbedding.fingerprint,
@@ -181,7 +206,16 @@ export function createBuildMcpServer(auth: McpAuthContext): McpServer {
         };
       }
 
-      const stored = await getStoredSkillContent(skill);
+      const remainingMs = runtime.deadlineAt
+        ? Math.max(0, runtime.deadlineAt - Date.now() - 250)
+        : 10_000;
+      if (remainingMs <= 0 || runtime.signal?.aborted) {
+        return toolError("Ce skill est momentanement indisponible.");
+      }
+      const stored = await getStoredSkillContent(skill, {
+        signal: runtime.signal,
+        timeoutMs: Math.min(10_000, remainingMs),
+      });
       if (!stored || typeof stored.body !== "string") {
         return toolError("Ce skill est momentanement indisponible.");
       }

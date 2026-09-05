@@ -7,8 +7,9 @@ import { resolveMcpProfileTier, type McpTier } from "@/lib/mcpAccess";
 export type McpAuthContext = {
   userId: string;
   clientId: string;
+  tokenHash: string;
   tier: McpTier;
-  scope: string | null;
+  scope: "mcp";
 };
 
 /**
@@ -23,18 +24,21 @@ export async function resolveMcpAuth(request: Request): Promise<McpAuthContext |
   if (!match) return null;
 
   const token = match[1].trim();
-  if (!token) return null;
+  if (!/^[A-Za-z0-9_-]{43}$/.test(token)) return null;
+  const tokenHash = hashToken(token);
 
-  const admin = createMcpSupabaseAdmin();
+  const admin = createMcpSupabaseAdmin({ signal: request.signal });
   const { data: tokenRow, error: tokenError } = await admin
     .from("mcp_access_tokens")
     .select("client_id, user_id, scope, resource, expires_at, revoked_at")
-    .eq("token_hash", hashToken(token))
+    .eq("token_hash", tokenHash)
     .maybeSingle();
 
   if (tokenError || !tokenRow) return null;
   if (tokenRow.revoked_at) return null;
-  if (new Date(tokenRow.expires_at).getTime() <= Date.now()) return null;
+  if (tokenRow.scope !== "mcp") return null;
+  const expiresAtMs = Date.parse(tokenRow.expires_at);
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) return null;
 
   // The token must be valid specifically for this resource server (RFC
   // 8707): a token minted for a different MCP server must never work here.
@@ -52,8 +56,9 @@ export async function resolveMcpAuth(request: Request): Promise<McpAuthContext |
   return {
     userId: tokenRow.user_id,
     clientId: tokenRow.client_id,
+    tokenHash,
     tier,
-    scope: tokenRow.scope,
+    scope: "mcp",
   };
 }
 

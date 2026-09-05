@@ -29,6 +29,7 @@ test("CORS reflects only configured origins and never wildcard", () => {
     ["https://claude.ai"]
   );
   assert.equal(denied["Access-Control-Allow-Origin"], undefined);
+  assert.equal(denied.Vary, "Origin");
   assert.throws(() => corsHeadersForRequest(new Request("https://buildbyorsayn.com"), ["*"]));
 });
 

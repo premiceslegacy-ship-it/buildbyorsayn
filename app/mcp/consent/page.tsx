@@ -37,6 +37,7 @@ export default async function McpConsentPage({
     .from("mcp_authorization_requests")
     .select("client_id, redirect_uri")
     .eq("request_hash", hashToken(requestHandle))
+    .eq("user_id", user.id)
     .is("consumed_at", null)
     .gt("expires_at", new Date().toISOString())
     .maybeSingle();

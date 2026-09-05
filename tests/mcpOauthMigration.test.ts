@@ -114,6 +114,23 @@ test("consent uses a server-side single-use authorization request", async () => 
   assert.match(sql, /interval '5 minutes'/);
 });
 
+test("consent requests are bound to the authenticated user that initiated them", async () => {
+  const sql = await readFile(
+    "supabase/migrations/20260905002000_mcp_consent_user_binding.sql",
+    "utf8"
+  );
+  const authorize = await readFile("app/api/mcp/oauth/authorize/route.ts", "utf8");
+  const actions = await readFile("app/actions/mcpConsent.ts", "utf8");
+  const page = await readFile("app/mcp/consent/page.tsx", "utf8");
+
+  assert.match(sql, /add column if not exists user_id uuid/);
+  assert.match(sql, /request\.user_id = p_user_id/);
+  assert.match(sql, /create function public\.deny_mcp_authorization_request\(\s*p_request_hash text,\s*p_user_id uuid/);
+  assert.match(authorize, /p_user_id: user\.id/);
+  assert.match(actions, /export async function denyMcpConsent[\s\S]*auth\.getUser\(\)[\s\S]*p_user_id: user\.id/);
+  assert.match(page, /\.eq\("user_id", user\.id\)/);
+});
+
 test("database time owns access and refresh token lifetimes", async () => {
   const sql = await readFile(
     "supabase/migrations/20260904180000_mcp_security_hardening.sql",
@@ -196,18 +213,43 @@ test("the dashboard revokes connections only for the authenticated server-derive
   assert.match(action, /p_user_id:\s*user\.id/);
   assert.doesNotMatch(action, /formData|searchParams|p_user_id:\s*[a-zA-Z]+Id/);
   assert.match(dashboard, /action=\{revokeMcpConnections\}/);
-  assert.match(dashboard, /Deconnecter tous les assistants/);
+  assert.match(dashboard, /Couper toutes les connexions/);
 });
 
-test("the remote MCP access report names every applied MCP migration", async () => {
+test("the remote MCP access report describes only runtime evidence it directly observes", async () => {
   const script = await readFile("scripts/verify-mcp-access.ts", "utf8");
+  assert.doesNotMatch(script, /migrations:\s*\[/);
+  assert.match(script, /runtimeEvidenceScope/);
+});
 
-  assert.match(script, /20260904151355_mcp_knowledge_base\.sql/);
-  assert.match(script, /20260904151436_mcp_oauth\.sql/);
-  assert.match(script, /20260904180000_mcp_security_hardening\.sql/);
-  assert.match(script, /20260904190000_mcp_final_hardening\.sql/);
-  assert.match(script, /20260904230000_mcp_bounded_cleanup\.sql/);
-  assert.match(script, /20260904233000_mcp_dcr_capacity_recovery\.sql/);
+test("the remote verifier attempts every cleanup and proves no fixture type remains", async () => {
+  const verifier = await readFile("scripts/verify-mcp-access.ts", "utf8");
+  assert.match(verifier, /Promise\.allSettled/);
+  assert.match(verifier, /while \(page <= totalPages\)/);
+  assert.match(verifier, /perPage:\s*1000/);
+  for (const field of [
+    "temporaryUsersRemaining",
+    "temporaryClientsRemaining",
+    "temporaryAccessTokensRemaining",
+    "temporaryRefreshTokensRemaining",
+    "temporaryAuthorizationCodesRemaining",
+    "temporaryAuthorizationRequestsRemaining",
+    "temporaryChunksRemaining",
+  ]) {
+    assert.match(verifier, new RegExp(field));
+  }
+});
+
+test("the release E2E covers both discovery documents, PKCE denial, user revocation, and three runs", async () => {
+  const script = await readFile("scripts/verify-mcp-e2e.ts", "utf8");
+  const manifest = JSON.parse(await readFile("package.json", "utf8")) as {
+    scripts: Record<string, string>;
+  };
+  assert.match(script, /oauth-protected-resource/);
+  assert.match(script, /wrongPkceVerifierDenied/);
+  assert.match(script, /userRevocation/);
+  const command = manifest.scripts["test:mcp-e2e"];
+  assert.equal((command.match(/tsx scripts\/verify-mcp-e2e\.ts/g) ?? []).length, 3);
 });
 
 test("forward DCR cleanup reclaims stale used clients without cascading active OAuth state", async () => {

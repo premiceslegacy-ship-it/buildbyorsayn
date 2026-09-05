@@ -3,7 +3,7 @@ import { createMcpSupabaseAdmin } from "@/lib/mcp/supabaseAdmin";
 import { verifyMcpCleanupAuthorization } from "@/lib/mcp/cronAuth";
 import { logMcpEvent, resolveMcpRequestId } from "@/lib/mcp/observability";
 
-export const MCP_CLEANUP_SUPABASE_TIMEOUT_MS = 9_000;
+export const MCP_CLEANUP_SUPABASE_TIMEOUT_MS = 6_000;
 
 const CLEANUP_RESULT_SCHEMA = z.array(z.object({
   authorization_requests_deleted: z.number().int().nonnegative(),

@@ -59,10 +59,10 @@ export function corsHeadersForRequest(
     "Access-Control-Allow-Headers":
       "Authorization, Content-Type, Mcp-Session-Id, Mcp-Protocol-Version",
     "Access-Control-Expose-Headers": "WWW-Authenticate, Mcp-Session-Id",
+    Vary: "Origin",
   };
   if (origin && allowedOrigins.includes(origin)) {
     headers["Access-Control-Allow-Origin"] = origin;
-    headers.Vary = "Origin";
   }
   return headers;
 }

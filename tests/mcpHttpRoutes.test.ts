@@ -5,7 +5,9 @@ import {
   DELETE as deleteMcp,
   OPTIONS as optionsMcp,
   POST as postMcp,
+  mcpBodyFailure,
   readBoundedMcpRequest,
+  runWithMcpRouteDeadline,
 } from "../app/api/mcp/route";
 import { GET as getAuthorizationMetadata } from "../app/.well-known/oauth-authorization-server/route";
 import { GET as getResourceMetadata } from "../app/.well-known/oauth-protected-resource/route";
@@ -54,6 +56,7 @@ test("MCP preflight never reflects a denied origin", async () => {
   }));
   assert.equal(response.status, 403);
   assert.equal(response.headers.get("access-control-allow-origin"), null);
+  assert.equal(response.headers.get("vary"), "Origin");
 });
 
 test("MCP POST rejects a present disallowed Origin before infrastructure work", async () => {
@@ -63,6 +66,7 @@ test("MCP POST rejects a present disallowed Origin before infrastructure work", 
     body: "{}",
   }));
   assert.equal(response.status, 403);
+  assert.equal(response.headers.get("vary"), "Origin");
 });
 
 test("MCP POST emits a safe correlated outcome without logging credentials", async () => {
@@ -110,6 +114,7 @@ test("DCR requires JSON and rejects a present disallowed Origin", async () => {
     body: "{}",
   }));
   assert.equal(hostileResponse.status, 403);
+  assert.equal(hostileResponse.headers.get("vary"), "Origin");
 });
 
 test("token endpoint rejects hostile origins and oversized chunked forms", async () => {
@@ -119,6 +124,7 @@ test("token endpoint rejects hostile origins and oversized chunked forms", async
     body: "grant_type=refresh_token",
   }));
   assert.equal(hostileResponse.status, 403);
+  assert.equal(hostileResponse.headers.get("vary"), "Origin");
 
   const oversizedResponse = await issueToken(new Request("https://buildbyorsayn.com/api/mcp/oauth/token", {
     method: "POST",
@@ -157,7 +163,38 @@ test("MCP bounds chunked bodies by bytes when content-length is absent", async (
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ payload: "é".repeat(40_000) }),
   });
-  assert.equal(await readBoundedMcpRequest(oversized), null);
+  assert.deepEqual(await readBoundedMcpRequest(oversized), {
+    ok: false,
+    reason: "too_large",
+  });
+});
+
+test("MCP body failures preserve their cause and map to distinct responses", async () => {
+  const invalidUtf8 = new Request("https://buildbyorsayn.com/api/mcp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: new Uint8Array([0xff]),
+  });
+  assert.deepEqual(await readBoundedMcpRequest(invalidUtf8), {
+    ok: false,
+    reason: "invalid_utf8",
+  });
+  assert.deepEqual(mcpBodyFailure("too_large"), { status: 413, error: "payload_too_large" });
+  assert.deepEqual(mcpBodyFailure("invalid_utf8"), { status: 400, error: "invalid_body" });
+  assert.deepEqual(mcpBodyFailure("invalid_length"), { status: 400, error: "invalid_content_length" });
+  assert.deepEqual(mcpBodyFailure("timeout"), { status: 408, error: "request_timeout" });
+});
+
+test("MCP route deadline returns before a stalled operation and aborts its signal", async () => {
+  const controller = new AbortController();
+  const result = await runWithMcpRouteDeadline(
+    new Promise<string>(() => undefined),
+    10,
+    controller,
+    () => "timed-out"
+  );
+  assert.equal(result, "timed-out");
+  assert.equal(controller.signal.aborted, true);
 });
 
 test("OAuth register and token endpoints answer browser preflights with the exact allowlisted origin", async () => {
@@ -180,6 +217,7 @@ test("OAuth register and token endpoints answer browser preflights with the exac
     }));
     assert.equal(denied.status, 403);
     assert.equal(denied.headers.get("access-control-allow-origin"), null);
+    assert.equal(denied.headers.get("vary"), "Origin");
   }
 });
 

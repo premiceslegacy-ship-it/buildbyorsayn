@@ -1,6 +1,12 @@
 export type BoundedBodyResult =
   | { ok: true; text: string }
-  | { ok: false; reason: "invalid_length" | "too_large" | "invalid_utf8" };
+  | { ok: false; reason: "invalid_length" | "too_large" | "invalid_utf8" | "timeout" };
+
+type BoundedBodyOptions = {
+  timeoutMs?: number;
+};
+
+const DEFAULT_BODY_READ_TIMEOUT_MS = 5_000;
 
 export function isJsonMediaType(contentType: string | null): boolean {
   return (contentType ?? "").split(";", 1)[0].trim().toLowerCase() === "application/json";
@@ -41,6 +47,8 @@ export function applyOAuthCors(
   origin: string | null,
   allowedOrigins: ReadonlySet<string>
 ): Response {
+  response.headers.set("Cache-Control", "no-store");
+  response.headers.set("Vary", "Origin");
   if (origin !== null && requestOriginAllowed(origin, allowedOrigins)) {
     for (const [name, value] of Object.entries(oauthCorsHeaders(origin))) {
       response.headers.set(name, value);
@@ -64,7 +72,8 @@ export function oauthPreflightResponse(
 
 export async function readBoundedBody(
   request: Request,
-  maxBytes: number
+  maxBytes: number,
+  options: BoundedBodyOptions = {}
 ): Promise<BoundedBodyResult> {
   const declaredRaw = request.headers.get("content-length");
   if (declaredRaw !== null) {
@@ -79,20 +88,43 @@ export async function readBoundedBody(
   const reader = request.body.getReader();
   const chunks: Uint8Array[] = [];
   let total = 0;
+  let abandoned = false;
+  const cancelWithoutWaiting = () => {
+    abandoned = true;
+    void reader.cancel().catch(() => undefined);
+  };
+  const timeoutMs = options.timeoutMs ?? DEFAULT_BODY_READ_TIMEOUT_MS;
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    cancelWithoutWaiting();
+    return { ok: false, reason: "timeout" };
+  }
+  const timedOut = Symbol("body-read-timeout");
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<typeof timedOut>((resolve) => {
+    timeoutHandle = setTimeout(() => resolve(timedOut), timeoutMs);
+  });
 
   try {
     while (true) {
-      const { done, value } = await reader.read();
+      const next = await Promise.race([reader.read(), timeout]);
+      if (next === timedOut) {
+        cancelWithoutWaiting();
+        return { ok: false, reason: "timeout" };
+      }
+      const { done, value } = next;
       if (done) break;
       total += value.byteLength;
       if (total > maxBytes) {
-        await reader.cancel();
+        cancelWithoutWaiting();
         return { ok: false, reason: "too_large" };
       }
       chunks.push(value);
     }
   } catch {
     return { ok: false, reason: "invalid_utf8" };
+  } finally {
+    if (timeoutHandle) clearTimeout(timeoutHandle);
+    if (!abandoned) reader.releaseLock();
   }
 
   const bytes = new Uint8Array(total);

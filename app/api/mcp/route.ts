@@ -3,7 +3,11 @@ import { resolveMcpAuth, wwwAuthenticateHeader } from "@/lib/mcp/auth";
 import { createBuildMcpServer } from "@/lib/mcp/server";
 import { createMcpSupabaseAdmin } from "@/lib/mcp/supabaseAdmin";
 import { getMcpAllowedOrigins } from "@/lib/mcp/config";
-import { readBoundedBody, requestOriginAllowed } from "@/lib/mcp/http";
+import {
+  readBoundedBody,
+  requestOriginAllowed,
+  type BoundedBodyResult,
+} from "@/lib/mcp/http";
 import {
   logMcpEvent,
   resolveMcpRequestId,
@@ -20,6 +24,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 const MAX_MCP_BODY_BYTES = 65_536;
+const MCP_ROUTE_DEADLINE_MS = 27_000;
 
 function responseHeaders(request: Request): Record<string, string> {
   return {
@@ -40,15 +45,58 @@ function jsonError(request: Request, error: string, status: number, retryAfter?:
   });
 }
 
-export async function readBoundedMcpRequest(request: Request): Promise<Request | null> {
-  const bounded = await readBoundedBody(request, MAX_MCP_BODY_BYTES);
-  if (bounded.ok === false) return null;
-  return new Request(request.url, {
-    method: request.method,
-    headers: request.headers,
-    body: bounded.text,
-    signal: request.signal,
+type McpBodyFailureReason = Extract<BoundedBodyResult, { ok: false }>["reason"];
+
+export function mcpBodyFailure(reason: McpBodyFailureReason): {
+  status: number;
+  error: string;
+} {
+  switch (reason) {
+    case "too_large":
+      return { status: 413, error: "payload_too_large" };
+    case "invalid_length":
+      return { status: 400, error: "invalid_content_length" };
+    case "invalid_utf8":
+      return { status: 400, error: "invalid_body" };
+    case "timeout":
+      return { status: 408, error: "request_timeout" };
+  }
+}
+
+export async function runWithMcpRouteDeadline<T>(
+  operation: Promise<T>,
+  timeoutMs: number,
+  controller: AbortController,
+  onTimeout: () => T
+): Promise<T> {
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((resolve) => {
+    timeoutHandle = setTimeout(() => {
+      controller.abort(new Error("MCP route deadline exceeded"));
+      resolve(onTimeout());
+    }, timeoutMs);
   });
+  try {
+    return await Promise.race([operation, timeout]);
+  } finally {
+    if (timeoutHandle) clearTimeout(timeoutHandle);
+  }
+}
+
+export async function readBoundedMcpRequest(
+  request: Request
+): Promise<{ ok: true; request: Request } | { ok: false; reason: McpBodyFailureReason }> {
+  const bounded = await readBoundedBody(request, MAX_MCP_BODY_BYTES);
+  if (bounded.ok === false) return bounded;
+  return {
+    ok: true,
+    request: new Request(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: bounded.text,
+      signal: request.signal,
+    }),
+  };
 }
 
 function originAllowed(request: Request): boolean {
@@ -74,7 +122,7 @@ export async function DELETE(request: Request) {
   });
 }
 
-export async function POST(request: Request) {
+async function handleMcpPost(request: Request, deadlineAt: number) {
   const startedAt = performance.now();
   const requestId = resolveMcpRequestId(request.headers.get("x-request-id"));
   const finish = (response: Response, outcome: McpOperationalOutcome): Response => {
@@ -116,7 +164,10 @@ export async function POST(request: Request) {
     return finish(jsonError(request, "temporarily_unavailable", 503, "5"), "failed");
   }
 
-  const admin = createMcpSupabaseAdmin();
+  const admin = createMcpSupabaseAdmin({
+    signal: request.signal,
+    timeoutMs: Math.max(1, Math.min(15_000, deadlineAt - Date.now())),
+  });
   const { data: allowed, error: rateLimitError } = await admin.rpc("check_mcp_rate_limit", {
     p_subject: hashRateLimitSubject("mcp-request", identity, pepper),
     p_max_per_window: 120,
@@ -144,18 +195,19 @@ export async function POST(request: Request) {
   }
 
   const boundedRequest = await readBoundedMcpRequest(request);
-  if (!boundedRequest) {
-    return finish(jsonError(request, "payload_too_large", 413), "invalid");
+  if (boundedRequest.ok === false) {
+    const failure = mcpBodyFailure(boundedRequest.reason);
+    return finish(jsonError(request, failure.error, failure.status), "invalid");
   }
 
-  const server = createBuildMcpServer(auth);
+  const server = createBuildMcpServer(auth, { signal: request.signal, deadlineAt });
   try {
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true,
     });
     await server.connect(transport);
-    const response = await transport.handleRequest(boundedRequest);
+    const response = await transport.handleRequest(boundedRequest.request);
     const headers = new Headers(response.headers);
     for (const [key, value] of Object.entries(responseHeaders(request))) headers.set(key, value);
     return finish(new Response(response.body, {
@@ -168,4 +220,31 @@ export async function POST(request: Request) {
   } finally {
     await server.close().catch(() => undefined);
   }
+}
+
+export async function POST(request: Request) {
+  const startedAt = performance.now();
+  const requestId = resolveMcpRequestId(request.headers.get("x-request-id"));
+  const controller = new AbortController();
+  const signal = AbortSignal.any([request.signal, controller.signal]);
+  const routeRequest = new Request(request, { signal });
+  const deadlineAt = Date.now() + MCP_ROUTE_DEADLINE_MS;
+
+  return runWithMcpRouteDeadline(
+    handleMcpPost(routeRequest, deadlineAt),
+    MCP_ROUTE_DEADLINE_MS,
+    controller,
+    () => {
+      const response = jsonError(request, "request_timeout", 504);
+      response.headers.set("X-Request-Id", requestId);
+      logMcpEvent({
+        event: "mcp.request",
+        requestId,
+        outcome: "failed",
+        status: 504,
+        durationMs: performance.now() - startedAt,
+      });
+      return response;
+    }
+  );
 }

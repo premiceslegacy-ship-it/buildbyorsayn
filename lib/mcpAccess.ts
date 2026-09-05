@@ -22,22 +22,19 @@ function isKnownTier(value: unknown): value is McpTier {
 export function normalizeProfileTier(rawTier: string | null | undefined): McpTier | null {
   if (rawTier === "admin") return "full";
   if (isKnownTier(rawTier)) return rawTier;
-  if (rawTier === null || rawTier === undefined) return "preview";
   return null;
 }
 
 /**
- * A successful lookup with no profile row is the intentional free demo.
- * A database error is an authentication failure, while a corrupt stored
- * value receives only the public tier.
+ * Fail-closed normalization used by server prechecks and UI gates. The MCP
+ * authorization boundary remains the PostgreSQL entitlement lookup derived
+ * from the active bearer token. Missing, null, or unknown tiers are denied.
  */
 export function resolveMcpProfileTier(
   profile: { tier: string | null } | null,
   lookupError: unknown
 ): McpTier | null {
-  if (lookupError) return null;
-  if (profile === null) return "preview";
-  if (profile.tier === null) return null;
+  if (lookupError || profile === null || profile.tier === null) return null;
   return normalizeProfileTier(profile.tier);
 }
 

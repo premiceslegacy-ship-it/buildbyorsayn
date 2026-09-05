@@ -80,6 +80,29 @@ test("OpenRouter aborts stalled attempts within the total embedding budget", asy
   assert.ok(Date.now() - startedAt < 500);
 });
 
+test("OpenRouter combines caller cancellation with its internal embedding deadlines", async () => {
+  const controller = new AbortController();
+  let observedSignal: AbortSignal | null = null;
+  const provider = new OpenRouterEmbeddingProvider("test-key", "test-model", {
+    fetch: async (_input, init) => {
+      observedSignal = init?.signal ?? null;
+      return new Promise<Response>((_resolve, reject) => {
+        observedSignal?.addEventListener("abort", () => reject(observedSignal?.reason), { once: true });
+      });
+    },
+  });
+  const pending = provider.embedBatch(["query"], "RETRIEVAL_QUERY", {
+    signal: controller.signal,
+    totalTimeoutMs: 2_000,
+    attemptTimeoutMs: 2_000,
+    maxAttempts: 1,
+  });
+
+  controller.abort(new Error("caller_cancelled"));
+  await assert.rejects(pending, /caller_cancelled/);
+  assert.equal(observedSignal?.aborted, true);
+});
+
 test("Gemini aborts stalled SDK calls and disables SDK retries per attempt", async () => {
   const configs: Array<Record<string, unknown>> = [];
   const fakeClient = {

@@ -13,6 +13,7 @@ export type EmbeddingRequestOptions = {
   attemptTimeoutMs?: number;
   maxAttempts?: number;
   backoffBaseMs?: number;
+  signal?: AbortSignal;
 };
 
 type ResolvedEmbeddingRequestOptions = {
@@ -20,6 +21,7 @@ type ResolvedEmbeddingRequestOptions = {
   attemptTimeoutMs: number;
   maxAttempts: number;
   backoffBaseMs: number;
+  signal?: AbortSignal;
 };
 
 export type EmbeddingTask = "RETRIEVAL_DOCUMENT" | "RETRIEVAL_QUERY";
@@ -145,6 +147,7 @@ function resolveRequestOptions(options: EmbeddingRequestOptions = {}): ResolvedE
     ),
     maxAttempts,
     backoffBaseMs,
+    signal: options.signal,
   };
 }
 
@@ -193,7 +196,8 @@ async function withRetries<T>(
 ): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt < options.maxAttempts; attempt += 1) {
-    if (totalSignal.aborted || Date.now() >= deadlineAt) throw new EmbeddingDeadlineError();
+    if (totalSignal.aborted) throw totalSignal.reason ?? new EmbeddingDeadlineError();
+    if (Date.now() >= deadlineAt) throw new EmbeddingDeadlineError();
     const remainingMs = Math.max(1, deadlineAt - Date.now());
     const attemptDeadline = deadlineSignal(Math.min(options.attemptTimeoutMs, remainingMs));
     const signal = AbortSignal.any([totalSignal, attemptDeadline.signal]);
@@ -201,7 +205,8 @@ async function withRetries<T>(
       return await operation(signal, Math.min(options.attemptTimeoutMs, remainingMs));
     } catch (error) {
       lastError = error;
-      if (totalSignal.aborted || Date.now() >= deadlineAt) throw new EmbeddingDeadlineError();
+      if (totalSignal.aborted) throw totalSignal.reason ?? new EmbeddingDeadlineError();
+      if (Date.now() >= deadlineAt) throw new EmbeddingDeadlineError();
       if (!isRetryableError(error) || attempt === options.maxAttempts - 1) throw error;
       await abortableSleep(options.backoffBaseMs * 2 ** attempt, totalSignal);
     } finally {
@@ -236,6 +241,9 @@ export class GeminiEmbeddingProvider implements EmbeddingProvider {
   ): Promise<number[][]> {
     const options = resolveRequestOptions(requestOptions);
     const totalDeadline = deadlineSignal(options.totalTimeoutMs);
+    const totalSignal = options.signal
+      ? AbortSignal.any([options.signal, totalDeadline.signal])
+      : totalDeadline.signal;
     const deadlineAt = Date.now() + options.totalTimeoutMs;
     const results: number[][] = [];
     try {
@@ -244,7 +252,7 @@ export class GeminiEmbeddingProvider implements EmbeddingProvider {
         results.push(...(await withRetries(
           (signal, attemptTimeoutMs) => this.embedOnce(batch, taskType, signal, attemptTimeoutMs),
           options,
-          totalDeadline.signal,
+          totalSignal,
           deadlineAt
         )));
       }
@@ -312,6 +320,9 @@ export class OpenRouterEmbeddingProvider implements EmbeddingProvider {
   ): Promise<number[][]> {
     const options = resolveRequestOptions(requestOptions);
     const totalDeadline = deadlineSignal(options.totalTimeoutMs);
+    const totalSignal = options.signal
+      ? AbortSignal.any([options.signal, totalDeadline.signal])
+      : totalDeadline.signal;
     const deadlineAt = Date.now() + options.totalTimeoutMs;
     const results: number[][] = [];
     try {
@@ -320,7 +331,7 @@ export class OpenRouterEmbeddingProvider implements EmbeddingProvider {
         results.push(...(await withRetries(
           (signal) => this.embedOnce(batch, taskType, signal),
           options,
-          totalDeadline.signal,
+          totalSignal,
           deadlineAt
         )));
       }

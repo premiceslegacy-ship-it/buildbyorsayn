@@ -16,7 +16,7 @@
     "knowledge:sync": "tsx scripts/ingest-knowledge.ts",
     "knowledge:sync:apply": "tsx scripts/ingest-knowledge.ts --apply",
     "test:mcp-access": "tsx scripts/verify-mcp-access.ts",
-    "test:mcp-e2e": "npm run build && tsx scripts/verify-mcp-e2e.ts",
+    "test:mcp-e2e": "npm run build && tsx scripts/verify-mcp-e2e.ts && tsx scripts/verify-mcp-e2e.ts && tsx scripts/verify-mcp-e2e.ts",
     "test:mcp-postgres": "node scripts/verify-mcp-postgres-gates.mjs",
     "verify:release": "npm test && npm run lint && npm audit --omit=dev --audit-level=high && npm run knowledge:sync && npm run test:mcp-postgres && npm run test:mcp-postgres && npm run test:mcp-access && npm run test:mcp-e2e && git diff --check"
   },
