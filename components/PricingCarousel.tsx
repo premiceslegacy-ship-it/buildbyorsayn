@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { CheckGlyph, CoffreGlyph, FondationsGlyph, LockGlyph, MarkGlyph } from "@/components/ui/pricing-glyphs";
-import { McpConnectorShowcase } from "@/components/McpConnectorShowcase";
+
 import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
 
 type Plan = {
@@ -224,7 +224,6 @@ export function PricingCarousel({
           ))}
         </div>
       </div>
-      {MCP_CONNECTOR_VISIBLE ? <McpConnectorShowcase beta={!MCP_CONNECTOR_LAUNCHED} /> : null}
     </div>
   );
 }

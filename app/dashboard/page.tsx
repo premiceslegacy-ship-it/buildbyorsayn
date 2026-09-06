@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 import { Suspense } from "react";
 import { UpgradedBanner } from "@/components/UpgradedBanner";
+import { McpDashboardEntry } from "@/components/McpDashboardEntry";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { UpgradeCarousel } from "@/components/UpgradeCarousel";
 import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
@@ -39,6 +40,7 @@ export default function DashboardHub() {
   const [displayEmail, setDisplayEmail] = useState("");
   const [initials, setInitials] = useState("?");
   const [tier, setTier] = useState<string | null>(null);
+  const [profileReady, setProfileReady] = useState(false);
   const [modal, setModal] = useState<null | "foundations" | "both">(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [animatedProgress, setAnimatedProgress] = useState(0);
@@ -80,6 +82,7 @@ export default function DashboardHub() {
         .single();
       const userTier = profile?.tier ?? null;
       setTier(userTier);
+      setProfileReady(true);
     };
     fetchUser();
   }, [router]);
@@ -258,6 +261,8 @@ export default function DashboardHub() {
             </LiquidButton>
           </div>
         </LiquidCard>
+
+        <McpDashboardEntry tier={tier} profileReady={profileReady} resumeTitle={resumeBloc.titre} />
 
         {/* 3. La Grille des Blocs (Le Menu), blocs 1 à 6 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -4,14 +4,14 @@ import test from "node:test";
 
 test("the public pricing presents one shared MCP connector below both offers", async () => {
   const pricing = await readFile("components/PricingCarousel.tsx", "utf8");
-  const matches = pricing.match(/<McpConnectorShowcase\s+beta=\{!MCP_CONNECTOR_LAUNCHED\}\s*\/>/g) ?? [];
+  const homepage = await readFile("app/page.tsx", "utf8");
 
-  assert.match(pricing, /import \{ McpConnectorShowcase \}/);
-  assert.equal(matches.length, 1);
-  assert.match(
-    pricing,
-    /\{MCP_CONNECTOR_VISIBLE \? <McpConnectorShowcase beta=\{!MCP_CONNECTOR_LAUNCHED\} \/> : null\}/,
-  );
+  assert.doesNotMatch(pricing, /import \{ McpConnectorShowcase \}|<McpConnectorShowcase/);
+  assert.match(homepage, /import \{ McpConnectorShowcase \}/);
+  assert.match(homepage, /MCP_CONNECTOR_VISIBLE/);
+  assert.match(homepage, /max-w-5xl mx-auto/);
+  assert.match(homepage, /<McpConnectorShowcase beta=\{!MCP_CONNECTOR_LAUNCHED\} \/>/);
+  assert.ok(homepage.indexOf("<PricingCarousel") < homepage.indexOf("<McpConnectorShowcase"));
   assert.match(pricing, /BUILD dans Claude et ChatGPT, avec les contenus Fondations/);
   assert.match(pricing, /BUILD dans Claude et ChatGPT, avec tout ton accès BUILD/);
   assert.match(pricing, /mcp:\s*true/g);
@@ -52,8 +52,9 @@ test("each accessible study block offers a direct assistant connection path only
 
   assert.match(blockPage, /import \{ McpStudyCallout \}/);
   assert.match(blockPage, /getMcpConnectionStatus/);
-  assert.match(blockPage, /mcpConnectionStatus === "disconnected"/);
-  assert.match(blockPage, /if \(!MCP_CONNECTOR_VISIBLE\) return/);
+  assert.match(blockPage, /const hasMcpAccess = tier === "beginner" \|\| tier === "full" \|\| tier === "admin"/);
+  assert.match(blockPage, /MCP_CONNECTOR_VISIBLE && hasMcpAccess && showContent && mcpConnectionStatus === "disconnected"/);
+  assert.match(blockPage, /if \(!MCP_CONNECTOR_VISIBLE \|\| !hasMcpAccess\) return/);
   assert.match(callout, /Continue ce bloc dans Claude ou ChatGPT/);
   assert.match(callout, /Ton assistant voit uniquement les contenus inclus dans ton accès/);
   assert.match(callout, /href="\/dashboard\/mcp"/);
@@ -70,17 +71,25 @@ test("each accessible study block offers a direct assistant connection path only
   assert.match(connectionAction, /return "unknown"/);
 });
 
-test("the shared MCP block explains both access depths without limiting native assistant knowledge", async () => {
+test("the shared MCP block demonstrates the training benefit with concise copy", async () => {
   const showcase = await readFile("components/McpConnectorShowcase.tsx", "utf8");
 
   assert.match(showcase, /Inclus dans les deux offres/);
-  assert.match(showcase, /Connexion bêta/);
+  assert.match(showcase, /Bêta/);
   assert.match(showcase, /Fondations/);
   assert.match(showcase, /LE COFFRE/);
-  assert.match(showcase, /Garde toute la puissance de ton assistant/);
-  assert.match(showcase, /forfait web payant compatible/);
-  assert.match(showcase, /administrateur de ton espace/);
-  assert.match(showcase, /\/dashboard\/mcp/);
+  assert.match(showcase, /Tu peux enfin poser la question qui te bloque\./);
+  assert.match(showcase, /Ton assistant retrouve le contenu BUILD utile/);
+  assert.match(showcase, /Comment j&apos;applique ce contenu à mon projet/);
+  assert.match(showcase, /Quel skill peut m&apos;aider ici/);
+  assert.match(showcase, /Fondations ou LE COFFRE : ton assistant voit uniquement les contenus inclus/);
+  assert.match(showcase, /href="\/mcp\/start"/);
+  assert.match(showcase, /Connecter mon assistant/);
+  assert.doesNotMatch(showcase, /brand-logos|rounded-full/);
+  assert.doesNotMatch(showcase, /Garde toute la puissance de ton assistant/);
+  assert.doesNotMatch(showcase, /forfait web payant compatible/);
+  assert.doesNotMatch(showcase, /administrateur de ton espace/);
+  assert.doesNotMatch(showcase, /ACCESS_LEVELS|<Check|space-y-3/);
   assert.match(showcase, /focus-visible:ring-2/);
 });
 
@@ -107,13 +116,13 @@ test("the MCP asset follows BUILD hierarchy and records mark provenance", async 
   assert.match(assetReadme, /brand approval/i);
 });
 
-test("the final Characters asset stays fully visible on compact screens", async () => {
+test("the public connector uses one useful reference image instead of decorative UI", async () => {
   const showcase = await readFile("components/McpConnectorShowcase.tsx", "utf8");
 
-  assert.match(showcase, /\/api\/mcp\/showcase-asset/);
-  assert.doesNotMatch(showcase, /\/brand-assets\/build-mcp-connector-characters\.webp/);
-  assert.match(showcase, /\bunoptimized\b/);
-  assert.match(showcase, /aspect-\[16\/9\]/);
-  assert.doesNotMatch(showcase, /min-h-\[250px\]/);
-  assert.match(showcase, /logos BUILD, Claude et ChatGPT/);
+  assert.match(showcase, /src="\/api\/mcp\/showcase-asset"/);
+  assert.match(showcase, /alt="Contexte BUILD transmis à ton assistant"/);
+  assert.match(showcase, /TON CONTEXTE BUILD/);
+  assert.match(showcase, /Exemples de questions/);
+  assert.doesNotMatch(showcase, /useState|aria-pressed|setLevel/);
+  assert.doesNotMatch(showcase, /rounded-2xl/g);
 });

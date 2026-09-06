@@ -5,6 +5,7 @@ import { ArrowRight, UserPlus } from "lucide-react";
 import { LoveWall } from "@/components/LoveWall";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { PricingCarousel } from "@/components/PricingCarousel";
+import { McpConnectorShowcase } from "@/components/McpConnectorShowcase";
 import { AccompanimentFolderCard } from "@/components/AccompanimentFolderCard";
 import { SkillsShowcase } from "@/components/SkillsShowcase";
 import { BuildMethodHeroAsset } from "@/components/AccompanimentAssets";
@@ -12,6 +13,9 @@ import { COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRIC
 
 const STRIPE_FULL_URL = STRIPE_FULL_CHECKOUT_LINK;
 const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? "#";
+const MCP_CONNECTOR_LAUNCHED = process.env.NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED === "true";
+const MCP_CONNECTOR_BETA_VISIBLE = process.env.NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE === "true";
+const MCP_CONNECTOR_VISIBLE = MCP_CONNECTOR_BETA_VISIBLE || MCP_CONNECTOR_LAUNCHED;
 
 const TWEETS = [
   {
@@ -297,6 +301,12 @@ export default async function HomePage() {
             <PricingCarousel beginnerUrl={beginnerUrl} fullUrl={fullUrl} />
           )}
         </div>
+
+        {!isMember && MCP_CONNECTOR_VISIBLE ? (
+          <div className="max-w-5xl mx-auto">
+            <McpConnectorShowcase beta={!MCP_CONNECTOR_LAUNCHED} />
+          </div>
+        ) : null}
 
         {!isMember && (
           <>

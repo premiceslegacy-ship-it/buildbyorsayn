@@ -55,6 +55,7 @@ export default function BlocPage() {
   const { checkedItems, toggleItem, globalProgress, isLoaded, setLastVisitedBloc } = useProgress();
   const [activeSection, setActiveSection] = useState<string>("");
   const [tier, setTier] = useState<string | null>(null);
+  const hasMcpAccess = tier === "beginner" || tier === "full" || tier === "admin";
   const [checkoutUserId, setCheckoutUserId] = useState<string | null>(null);
   const [mcpConnectionStatus, setMcpConnectionStatus] = useState<McpConnectionStatus>("unknown");
 
@@ -81,11 +82,11 @@ export default function BlocPage() {
   }, [blocId]);
 
   useEffect(() => {
-    if (!MCP_CONNECTOR_VISIBLE) return;
+    if (!MCP_CONNECTOR_VISIBLE || !hasMcpAccess) return;
     getMcpConnectionStatus()
       .then(setMcpConnectionStatus)
       .catch(() => setMcpConnectionStatus("unknown"));
-  }, []);
+  }, [hasMcpAccess]);
 
   useEffect(() => {
     if (bloc && bloc.sections.length > 0) {
@@ -192,7 +193,7 @@ export default function BlocPage() {
               {bloc.titre}
             </h1>
 
-            {MCP_CONNECTOR_VISIBLE && showContent && mcpConnectionStatus === "disconnected" ? (
+            {MCP_CONNECTOR_VISIBLE && hasMcpAccess && showContent && mcpConnectionStatus === "disconnected" ? (
               <McpStudyCallout />
             ) : null}
 
