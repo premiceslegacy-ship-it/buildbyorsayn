@@ -4,7 +4,7 @@ import { canAccess, type McpTier } from "@/lib/mcpAccess";
 import { getSkillBySlug, SKILLS_CATALOG } from "@/lib/skillsCatalog";
 import { getStoredSkillContent } from "@/lib/skills/storage";
 import { createMcpSupabaseAdmin } from "@/lib/mcp/supabaseAdmin";
-import { getMcpResourceUrl } from "@/lib/mcp/config";
+import { getMcpIssuer, getMcpResourceUrl } from "@/lib/mcp/config";
 import {
   createEmbeddingProvider,
   DEFAULT_EMBEDDING_ATTEMPT_TIMEOUT_MS,
@@ -116,7 +116,18 @@ export function createBuildMcpServer(
   auth: McpAuthContext,
   runtime: McpServerRuntimeOptions = {}
 ): McpServer {
-  const server = new McpServer({ name: "build-by-orsayn", version: "1.0.0" });
+  const issuer = getMcpIssuer();
+  const server = new McpServer({
+    name: "build-by-orsayn",
+    title: "BUILD by Orsayn",
+    version: "1.0.0",
+    websiteUrl: issuer,
+    icons: [{
+      src: `${issuer}/api/mcp/logo`,
+      mimeType: "image/png",
+      sizes: ["549x528"],
+    }],
+  });
 
   server.registerTool(
     "search_knowledge",

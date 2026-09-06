@@ -8,15 +8,20 @@ import {
 
 const CHALLENGE = "A".repeat(43);
 
-test("DCR accepts only strict public-client metadata", () => {
+test("DCR accepts public-client metadata and ignores unsupported display metadata", () => {
   const valid = {
     redirect_uris: ["https://client.example/callback"],
     client_name: "Claude",
     token_endpoint_auth_method: "none",
   };
   assert.equal(dcrMetadataSchema.safeParse(valid).success, true);
+  assert.equal(dcrMetadataSchema.safeParse({
+    ...valid,
+    client_uri: "https://claude.ai",
+    logo_uri: "https://claude.ai/favicon.ico",
+    software_id: "claude",
+  }).success, true);
   assert.equal(dcrMetadataSchema.safeParse({ ...valid, token_endpoint_auth_method: "client_secret_post" }).success, false);
-  assert.equal(dcrMetadataSchema.safeParse({ ...valid, unexpected: true }).success, false);
   assert.equal(dcrMetadataSchema.safeParse({ ...valid, redirect_uris: [valid.redirect_uris[0], valid.redirect_uris[0]] }).success, false);
 });
 
