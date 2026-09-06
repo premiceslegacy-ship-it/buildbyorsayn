@@ -9,14 +9,14 @@ import { createBuildMcpServer } from "../lib/mcp/server";
 
 process.env.MCP_OAUTH_ISSUER ??= "https://buildbyorsayn.com";
 
-test("OAuth discovery exposes the official BUILD logo URL", async () => {
+test("OAuth discovery does not expose the MCP icon as an OAuth endpoint", async () => {
   const response = await getAuthorizationMetadata(
     new Request("https://buildbyorsayn.com/.well-known/oauth-authorization-server"),
   );
   const metadata = await response.json() as { issuer: string; logo_uri?: string };
 
   assert.equal(response.status, 200);
-  assert.equal(metadata.logo_uri, `${metadata.issuer}/api/mcp/logo`);
+  assert.equal(metadata.logo_uri, undefined);
 });
 
 test("the MCP branding route serves the official BUILD PNG", async () => {
@@ -79,9 +79,16 @@ test("the MCP initialize response exposes the official BUILD icon", async () => 
   }
 });
 
-test("the consent page uses the controlled BUILD logo URL", async () => {
+test("the consent page uses clear French copy and trusted client branding", async () => {
   const page = await readFile("app/mcp/consent/page.tsx", "utf8");
 
   assert.match(page, /\/api\/mcp\/logo/);
   assert.match(page, /alt="BUILD"/);
+  assert.match(page, /Connecter \{presentation\.displayName\} à BUILD/);
+  assert.match(page, /Autoriser \{presentation\.displayName\}/);
+  assert.match(page, /Afficher les détails techniques/);
+  assert.match(page, /title: "Connecter un assistant à BUILD"/);
+  assert.doesNotMatch(page, /title: "Connecter Claude à BUILD"/);
+  assert.doesNotMatch(page, /Application non verifiee/);
+  assert.doesNotMatch(page, /Destination exacte/);
 });

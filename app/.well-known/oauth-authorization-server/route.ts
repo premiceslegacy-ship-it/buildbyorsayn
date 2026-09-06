@@ -9,7 +9,6 @@ export async function GET(request: Request) {
   return NextResponse.json(
     {
       issuer,
-      logo_uri: `${issuer}/api/mcp/logo`,
       authorization_endpoint: `${issuer}/api/mcp/oauth/authorize`,
       token_endpoint: `${issuer}/api/mcp/oauth/token`,
       registration_endpoint: `${issuer}/api/mcp/oauth/register`,

@@ -173,11 +173,14 @@ test("hardening removes the obsolete non-PKCE code-consumption RPC", async () =>
   );
 });
 
-test("dynamic OAuth clients are disclosed as unverified with their exact redirect destination", async () => {
+test("dynamic OAuth clients remain unverified and keep their exact redirect available", async () => {
   const consent = await readFile("app/mcp/consent/page.tsx", "utf8");
-  assert.match(consent, /Application non verifiee/);
-  assert.match(consent, /authorizationRequest\.redirect_uri/);
-  assert.match(consent, /Destination exacte/);
+  assert.match(consent, /!presentation\.verified/);
+  assert.match(consent, /L’identité de cette application n’a pas pu être confirmée/);
+  assert.match(consent, /const redirectUri = authorizationRequest\.redirect_uri/);
+  assert.match(consent, /Afficher les détails techniques/);
+  assert.match(consent, /Adresse de retour/);
+  assert.match(consent, />\{redirectUri\}<\/p>/);
   assert.doesNotMatch(consent, /<h1[^>]*>Connecter \{clientName\}<\/h1>/);
 });
 

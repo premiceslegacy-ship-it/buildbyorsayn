@@ -370,12 +370,13 @@ async function main(): Promise<void> {
     await page.getByLabel("Mot de passe").fill(password);
     await page.getByRole("button", { name: "Continuer" }).click();
     await page.waitForURL(/\/mcp\/consent\?request=/, { timeout: 30_000 });
-    await page.getByRole("heading", { name: "Application non verifiee" }).waitFor();
-    await page.getByText("BUILD MCP automated E2E", { exact: false }).waitFor();
+    await page.getByRole("heading", { name: "Connecter BUILD MCP automated E2E à BUILD" }).waitFor();
+    await page.getByText("L’identité de cette application n’a pas pu être confirmée", { exact: false }).waitFor();
+    await page.getByText("Afficher les détails techniques", { exact: true }).click();
     await page.getByText(redirectUri, { exact: true }).waitFor();
     report.loginAndConsentScreen = "PASS";
 
-    await page.getByRole("button", { name: "Autoriser" }).click();
+    await page.getByRole("button", { name: "Autoriser BUILD MCP automated E2E" }).click();
     await page.waitForURL((url) => url.pathname === "/mcp-callback" && url.searchParams.has("code"), {
       timeout: 30_000,
     });
