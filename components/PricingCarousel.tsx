@@ -12,7 +12,7 @@ type Plan = {
   icon: typeof CoffreGlyph;
   price: string;
   outcome: string;
-  items: { label: string; locked?: boolean }[];
+  items: { label: string; locked?: boolean; mcp?: boolean }[];
   buyers: string;
   cta: string;
   highlighted: boolean;
@@ -29,6 +29,7 @@ const PLANS: Plan[] = [
       { label: "Ton premier asset utile, de l'idée à la livraison" },
       { label: "3 skills prêts à l'emploi : site, design, étude de marché" },
       { label: "Présenter et livrer un résultat propre" },
+      { label: "BUILD dans Claude et ChatGPT, avec les contenus Fondations", mcp: true },
       { label: "Framework ORACLE + 7 blocs système", locked: true },
       { label: "3 skills en plus : SaaS, backend, design Apple", locked: true },
     ],
@@ -48,6 +49,7 @@ const PLANS: Plan[] = [
       { label: "7 blocs : de l'idée au client qui paye" },
       { label: "6 skills complets : sites, SaaS, backend sécurisé, design Apple" },
       { label: "Choisir une niche, vendre d'abord, construire ensuite" },
+      { label: "BUILD dans Claude et ChatGPT, avec tout ton accès BUILD", mcp: true },
     ],
     buyers: "71 personnes construisent avec",
     cta: `Prendre ${COFFRE_LABEL} - ${COFFRE_PRICE}€`,
@@ -56,6 +58,8 @@ const PLANS: Plan[] = [
 ];
 
 const MCP_CONNECTOR_LAUNCHED = process.env.NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED === "true";
+const MCP_CONNECTOR_BETA_VISIBLE = process.env.NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE === "true";
+const MCP_CONNECTOR_VISIBLE = MCP_CONNECTOR_BETA_VISIBLE || MCP_CONNECTOR_LAUNCHED;
 
 function Marks() {
   return (
@@ -165,7 +169,7 @@ export function PricingCarousel({
                     </p>
 
                     <ul className="flex flex-col gap-2.5 mb-7 flex-1">
-                      {plan.items.map((item) => (
+                      {plan.items.filter((item) => !item.mcp || MCP_CONNECTOR_VISIBLE).map((item) => (
                         <li
                           key={item.label}
                           className={`flex items-center gap-2.5 ${item.locked ? "opacity-30" : ""}`}
@@ -220,7 +224,7 @@ export function PricingCarousel({
           ))}
         </div>
       </div>
-      {MCP_CONNECTOR_LAUNCHED ? <McpConnectorShowcase /> : null}
+      {MCP_CONNECTOR_VISIBLE ? <McpConnectorShowcase beta={!MCP_CONNECTOR_LAUNCHED} /> : null}
     </div>
   );
 }

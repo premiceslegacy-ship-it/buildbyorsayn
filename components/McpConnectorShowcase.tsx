@@ -13,7 +13,7 @@ const ACCESS_LEVELS = [
   },
 ];
 
-export function McpConnectorShowcase() {
+export function McpConnectorShowcase({ beta = false }: { beta?: boolean } = {}) {
   return (
     <section aria-labelledby="mcp-connector-title" className="mt-12">
       <div className="relative aspect-[16/9] overflow-hidden rounded-[1.25rem]">
@@ -30,9 +30,16 @@ export function McpConnectorShowcase() {
 
       <div className="grid gap-8 pt-8 sm:px-2 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div>
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-[#e8d5b0]">
-            Inclus dans les deux offres
-          </p>
+          <div className="mb-3 flex flex-wrap items-center gap-3">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#e8d5b0]">
+              Inclus dans les deux offres
+            </p>
+            {beta ? (
+              <span className="rounded-full border border-[#e8d5b0]/25 bg-[#e8d5b0]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#e8d5b0]">
+                Connexion bêta
+              </span>
+            ) : null}
+          </div>
           <h3 id="mcp-connector-title" className="max-w-xl text-2xl font-semibold leading-tight text-[#f0ede8] sm:text-3xl">
             Retrouve BUILD directement dans Claude ou ChatGPT
           </h3>
@@ -47,7 +54,7 @@ export function McpConnectorShowcase() {
           </p>
           <Link
             href="/dashboard/mcp"
-            className="group mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8d5b0] px-5 py-3.5 text-sm font-bold text-[#0a0908] shadow-[0_3px_0_rgba(100,76,36,0.9),0_7px_20px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.5)] transition-[transform,box-shadow,background-color] duration-[80ms] hover:bg-[#f0dfc0] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)]"
+            className="group mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8d5b0] px-5 py-3.5 text-sm font-bold text-[#0a0908] shadow-[0_3px_0_rgba(100,76,36,0.9),0_7px_20px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.5)] transition-[transform,box-shadow,background-color] duration-[80ms] hover:bg-[#f0dfc0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0dfc0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e0f] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)]"
           >
             Connecter mon assistant
             <ArrowRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden="true" />

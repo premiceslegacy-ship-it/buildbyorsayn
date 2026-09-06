@@ -12,6 +12,13 @@ import { LinkifiedText } from "@/components/ui/linkified-text";
 import { createClient } from "@/lib/supabase/client";
 import { toggleBlocCompletion } from "@/app/actions/progress";
 import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK } from "@/lib/pricing";
+import { McpStudyCallout } from "@/components/McpStudyCallout";
+import { getMcpConnectionStatus } from "@/app/actions/mcpConnections";
+import type { McpConnectionStatus } from "@/lib/mcp/connectionStatus";
+
+const MCP_CONNECTOR_LAUNCHED = process.env.NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED === "true";
+const MCP_CONNECTOR_BETA_VISIBLE = process.env.NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE === "true";
+const MCP_CONNECTOR_VISIBLE = MCP_CONNECTOR_BETA_VISIBLE || MCP_CONNECTOR_LAUNCHED;
 
 function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
@@ -49,6 +56,7 @@ export default function BlocPage() {
   const [activeSection, setActiveSection] = useState<string>("");
   const [tier, setTier] = useState<string | null>(null);
   const [checkoutUserId, setCheckoutUserId] = useState<string | null>(null);
+  const [mcpConnectionStatus, setMcpConnectionStatus] = useState<McpConnectionStatus>("unknown");
 
   useEffect(() => {
     if (blocId) {
@@ -71,6 +79,13 @@ export default function BlocPage() {
     };
     fetchProfile();
   }, [blocId]);
+
+  useEffect(() => {
+    if (!MCP_CONNECTOR_VISIBLE) return;
+    getMcpConnectionStatus()
+      .then(setMcpConnectionStatus)
+      .catch(() => setMcpConnectionStatus("unknown"));
+  }, []);
 
   useEffect(() => {
     if (bloc && bloc.sections.length > 0) {
@@ -176,6 +191,10 @@ export default function BlocPage() {
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-10 md:mb-16 tracking-tight text-[#f0ede8]">
               {bloc.titre}
             </h1>
+
+            {MCP_CONNECTOR_VISIBLE && showContent && mcpConnectionStatus === "disconnected" ? (
+              <McpStudyCallout />
+            ) : null}
 
             {/* Skeleton : chargement en cours pour blocs > 1 */}
             {tier === null && currentBlocIndex > 0 && (
