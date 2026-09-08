@@ -13,4 +13,10 @@ test("the showcase uses the gated BUILD reference asset as useful context", asyn
   assert.match(source, /LE COFFRE/);
   assert.match(source, /Ton assistant retrouve/);
   assert.doesNotMatch(source, /useState|aria-pressed/);
+  assert.match(source, /width=\{1600\}/);
+  assert.match(source, /height=\{900\}/);
+  assert.match(source, /loading="eager"/);
+  assert.match(source, /fetchPriority="high"/);
+  assert.match(source, /decoding="async"/);
+  assert.match(source, /aspect-\[16\/9\]/);
 });

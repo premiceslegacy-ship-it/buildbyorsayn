@@ -10,7 +10,7 @@ test("the public MCP entry sends each visitor to the next useful step", () => {
   );
   assert.deepEqual(
     resolveMcpStartDecision({ connectorVisible: true, authenticated: false, tier: null, lookupFailed: false }),
-    { kind: "redirect", destination: "/login?next=%2Fmcp%2Fstart" },
+    { kind: "redirect", destination: "/login?mode=signup&next=%2Fmcp%2Fstart" },
   );
   assert.deepEqual(
     resolveMcpStartDecision({ connectorVisible: true, authenticated: true, tier: "free", lookupFailed: false }),

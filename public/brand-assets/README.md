@@ -9,7 +9,7 @@ The delivered visual follows a three-stage process:
 Files:
 
 - `private/brand-assets/build-mcp-connector-source.png`: source raster kept outside `public/` and never served.
-- `private/brand-assets/build-mcp-connector-characters.webp`: optimized 3200 × 1800 version served only by `/api/mcp/showcase-asset` after the launch gate is true.
+- `private/brand-assets/build-mcp-connector-characters.webp`: optimized 1600 × 900 web version served only by `/api/mcp/showcase-asset` while the beta gate or final launch gate is open.
 
 Landscape source: [Cloudy mountain scenery](https://commons.wikimedia.org/wiki/File:Cloudy_mountain_scenery_(Unsplash).jpg), Nathan Anderson, released under CC0 1.0.
 

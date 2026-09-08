@@ -5,6 +5,7 @@ import {
   getMcpConnectionStatus,
   revokeMcpConnections,
 } from "@/app/actions/mcpConnections";
+import { McpSetupGuide } from "@/components/McpSetupGuide";
 import { NavBar } from "@/components/NavBar";
 import { getMcpResourceUrl } from "@/lib/mcp/config";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
@@ -176,33 +177,10 @@ export default async function McpDashboardPage({
       {disconnected ? (
         <section className="py-10">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#c9b48a]">Une seule adresse</p>
-          <code className="mt-3 block select-all break-all bg-white/[0.04] px-4 py-3 text-sm text-[#e8d5b0]">
-            {mcpUrl}
-          </code>
-          <div className="mt-9 grid gap-8 sm:grid-cols-2 sm:divide-x sm:divide-white/[0.08]">
-            <div>
-              <div className="flex items-center gap-3">
-                <Image src="/brand-logos/claude.svg" alt="" width={24} height={24} className="h-6 w-6" />
-                <h2 className="text-xl font-medium">Claude</h2>
-              </div>
-              <p className="mt-4 text-sm leading-6 text-[#f0ede8]/60">
-                Paramètres, Connecteurs, puis Ajouter un connecteur personnalisé. Colle l&apos;adresse et autorise BUILD.
-              </p>
-            </div>
-            <div className="sm:pl-8">
-              <div className="flex items-center gap-3">
-                <Image src="/brand-logos/chatgpt.svg" alt="" width={24} height={24} className="h-6 w-6" />
-                <h2 className="text-xl font-medium">ChatGPT</h2>
-              </div>
-              <p className="mt-4 text-sm leading-6 text-[#f0ede8]/60">
-                Active le mode développeur, ajoute un connecteur personnalisé, puis colle la même adresse.
-              </p>
-              <p className="mt-2 text-xs text-[#f0ede8]/40">Parcours bêta encore à confirmer sur un compte réel.</p>
-            </div>
-          </div>
-          <p className="mt-8 text-xs leading-5 text-[#f0ede8]/40">
-            Claude ou ChatGPT peut demander un forfait web payant compatible ou l&apos;autorisation de l&apos;administrateur de ton espace.
+          <p className="mt-3 max-w-xl text-sm leading-6 text-[#f0ede8]/60">
+            Utilise cette même adresse dans Claude ou ChatGPT. Le guide ci-dessous te montre exactement où cliquer.
           </p>
+          <McpSetupGuide mcpUrl={mcpUrl} />
         </section>
       ) : null}
 

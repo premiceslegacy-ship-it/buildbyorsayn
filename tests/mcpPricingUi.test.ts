@@ -21,6 +21,7 @@ test("the public pricing presents one shared MCP connector below both offers", a
 test("beta visibility stays separate from the final launch gate", async () => {
   const pricing = await readFile("components/PricingCarousel.tsx", "utf8");
   const dashboard = await readFile("app/dashboard/mcp/page.tsx", "utf8");
+  const guide = await readFile("components/McpSetupGuide.tsx", "utf8");
   const assetRoute = await readFile("app/api/mcp/showcase-asset/route.ts", "utf8");
   const exampleEnv = await readFile(".env.example", "utf8");
 
@@ -38,8 +39,8 @@ test("beta visibility stays separate from the final launch gate", async () => {
   assert.match(dashboard, /\{disconnected \? \(/);
   assert.doesNotMatch(dashboard, /\{!connected \? \(/);
   assert.match(dashboard, /La connexion à Claude et ChatGPT n&apos;est pas encore ouverte/);
-  assert.match(dashboard, /forfait web payant compatible/);
-  assert.match(dashboard, /autorisation de l&apos;administrateur/);
+  assert.match(guide, /forfait web payant compatible/);
+  assert.match(guide, /autorisation de l&apos;administrateur/);
   assert.match(exampleEnv, /NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE="false"/);
   assert.match(exampleEnv, /NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED="false"/);
   assert.match(exampleEnv, /Claude ET ChatGPT sur l'URL publique/);

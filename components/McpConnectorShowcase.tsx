@@ -11,8 +11,12 @@ export function McpConnectorShowcase({ beta = false }: { beta?: boolean } = {}) 
           <img
             src="/api/mcp/showcase-asset"
             alt="Contexte BUILD transmis à ton assistant"
+            width={1600}
+            height={900}
             className="block aspect-[16/9] h-full w-full object-cover"
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
           <figcaption className="border-t border-white/[0.1] px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-white/60 sm:px-7">
             TON CONTEXTE BUILD RESTE AVEC TOI

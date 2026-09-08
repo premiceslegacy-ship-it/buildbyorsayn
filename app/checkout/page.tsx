@@ -28,7 +28,13 @@ const FULL_FEATURES = [
     { icon: Play, label: "Vidéos tutos techniques" },
 ];
 
-export default async function CheckoutPage() {
+export default async function CheckoutPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ from?: string | string[] }>;
+}) {
+    const { from } = await searchParams;
+    const fromMcp = from === "mcp";
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -72,15 +78,28 @@ export default async function CheckoutPage() {
             <div className="relative z-10 w-full max-w-2xl mt-20 pb-16">
                 <div className="text-center mb-10">
                     <h1 className="text-3xl font-semibold tracking-tight text-[#f0ede8] mb-3">
-                        {alreadyFull ? "Tu as déjà l'accès complet" : isUpgrading ? `Passe à ${COFFRE_LABEL}` : "Accès réservé"}
+                        {alreadyFull
+                            ? "Tu as déjà l'accès complet"
+                            : isUpgrading
+                            ? `Passe à ${COFFRE_LABEL}`
+                            : fromMcp
+                            ? "Connecte ton assistant à BUILD"
+                            : "Accès réservé"}
                     </h1>
                     <p className="text-[rgba(240,237,232,0.55)] text-base leading-relaxed">
                         {alreadyFull
                             ? "Tu as accès à l'ensemble du système Build, y compris les fondations."
                             : isUpgrading
                             ? `Tu as les fondations. Débloque les 7 blocs et les sources pour ${UPGRADE_PRICE}€.`
+                            : fromMcp
+                            ? "Ton compte est prêt. Choisis Fondations ou LE COFFRE pour activer l'accès et connecter ton assistant."
                             : `La plupart des membres qui ont essayé les fondations finissent par prendre ${COFFRE_LABEL}. Autant commencer là.`}
                     </p>
+                    {fromMcp && !alreadyFull ? (
+                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.14em] text-[#e8d5b0]">
+                            Le connecteur MCP est inclus dans les deux offres
+                        </p>
+                    ) : null}
                 </div>
 
                 {alreadyFull ? (

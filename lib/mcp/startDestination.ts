@@ -17,7 +17,7 @@ export function resolveMcpStartDecision({
 }): McpStartDecision {
   if (!connectorVisible) return { kind: "redirect", destination: "/" };
   if (!authenticated) {
-    return { kind: "redirect", destination: "/login?next=%2Fmcp%2Fstart" };
+    return { kind: "redirect", destination: "/login?mode=signup&next=%2Fmcp%2Fstart" };
   }
   if (lookupFailed || tier === null) return { kind: "unavailable" };
 

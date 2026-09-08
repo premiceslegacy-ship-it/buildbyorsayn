@@ -33,6 +33,9 @@ test("the member dashboard exposes one functional MCP rail with free-standing cl
   assert.match(entry, /href:\s*"\/mcp\/start"/);
   assert.match(entry, /href:\s*"\/dashboard\/mcp"/);
   assert.doesNotMatch(entry, /LiquidCard|rounded-2xl|backdrop-blur|from-.*to-/);
+  const chatgptLogo = await readFile("public/brand-logos/chatgpt.svg", "utf8");
+  assert.match(chatgptLogo, /fill="#fff(?:fff)?"/);
+  assert.match(chatgptLogo, /fill="#0e0e0f"/);
 });
 
 test("the MCP setup page gates instructions by paid access and uses a focused layout", async () => {

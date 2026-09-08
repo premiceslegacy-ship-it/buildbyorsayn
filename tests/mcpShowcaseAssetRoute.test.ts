@@ -19,7 +19,9 @@ test("the co-branded MCP asset is available only in beta or after final launch",
     const beta = await GET();
     assert.equal(beta.status, 200);
     assert.equal(beta.headers.get("content-type"), "image/webp");
-    assert.ok((await beta.arrayBuffer()).byteLength > 100_000);
+    const betaBytes = (await beta.arrayBuffer()).byteLength;
+    assert.ok(betaBytes > 100_000);
+    assert.ok(betaBytes < 1_000_000);
 
     process.env.NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE = "false";
     process.env.NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED = "true";
