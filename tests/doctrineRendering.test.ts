@@ -75,3 +75,26 @@ test("renders semantic chapter headings, paragraphs, lists and hides frontmatter
   assert.doesNotMatch(html, /private|hidden|---/);
   assert.equal(chapterTitle(files[0]), "Introduction");
 });
+
+const corpus18Directory = process.env.DOCTRINE_RENDER_CORPUS18;
+test("real eighteen-file corpus: all 41 links render to existing chapter anchors", { skip: !corpus18Directory && "Set DOCTRINE_RENDER_CORPUS18 to the private corpus directory" }, () => {
+  const corpus = readdirSync(corpus18Directory!).filter(name => name.endsWith(".md")).sort().map(path => ({ path, content: readFileSync(join(corpus18Directory!, path), "utf8") }));
+  assert.equal(corpus.length, 18);
+  let count = 0;
+  const ids = new Set(corpus.map((_, index) => `#chapitre-${index}`));
+  for (const file of corpus) {
+    const html = renderToStaticMarkup(createElement(DoctrineMarkdown, { file, files: corpus }));
+    const links = [...stripFrontmatter(file.content).matchAll(/\]\(([^)]+\.md(?:#[^)]*)?)\)/g)];
+    const rendered = [...html.matchAll(/href="(#chapitre-\d+)"/g)].map(match => match[1]);
+    assert.equal(rendered.length, links.length, file.path);
+    for (const [index, link] of links.entries()) {
+      const target = doctrineHref(link[1], file, corpus);
+      assert.ok(target && ids.has(target), file.path);
+      assert.equal(rendered[index], target);
+      count++;
+    }
+    assert.doesNotMatch(html, /build-tier:|<h1|dangerouslySetInnerHTML/);
+    assert.match(html, /<h2/);
+  }
+  assert.equal(count, 41);
+});

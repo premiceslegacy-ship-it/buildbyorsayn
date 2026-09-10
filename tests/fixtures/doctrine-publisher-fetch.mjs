@@ -11,7 +11,7 @@ globalThis.fetch = async (input, init = {}) => {
   const path = url.pathname;
   const method = init.method ?? 'GET';
   log.calls.push({ path, method, cache: init.cache, redirect: init.redirect });
-  if (path.includes('/rpc/')) return Response.json(true);
+  if (path.includes('/rpc/')) return Response.json(process.env.PUBLISH_TEST_MODE !== 'lock-busy');
   if (path === '/storage/v1/bucket/skills') return Response.json({ public: false });
   if (!path.startsWith('/storage/v1/object/skills/')) throw new Error('Unexpected request');
   if (method !== 'GET') {
@@ -22,6 +22,8 @@ globalThis.fetch = async (input, init = {}) => {
   const bytes = objects.get(path);
   if (!bytes) return new Response(null, { status: 404 });
   let chunks = [bytes.subarray(0, 2), bytes.subarray(2)];
+  if (process.env.PUBLISH_TEST_MODE === 'artifact-mismatch' && !path.endsWith('manifest.json')) chunks = [Buffer.alloc(bytes.length, 65)];
+  if (process.env.PUBLISH_TEST_MODE === 'manifest-mismatch' && path.endsWith('manifest.json')) chunks = [Buffer.alloc(bytes.length, 32)];
   let headers = {};
   if (process.env.PUBLISH_TEST_MODE === 'overflow') chunks = [Buffer.alloc(bytes.length + 1, 65), Buffer.from('unread-tail')];
   if (process.env.PUBLISH_TEST_MODE === 'manifest-overflow' && path.endsWith('manifest.json')) chunks = [Buffer.alloc(65537), Buffer.from('unread-tail')];

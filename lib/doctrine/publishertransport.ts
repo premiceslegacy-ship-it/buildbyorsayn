@@ -1,20 +1,28 @@
 import { DOCTRINE_BUCKET, DOCTRINE_MANIFEST_PATH, doctrineArtifactPath, parseDoctrineManifest, type DoctrineManifest } from "./publication";
-import { DOCTRINE_MANIFEST_MAX_BYTES, readBoundedResponse, withinDoctrineReadDeadline } from "./readbounded";
+import { DOCTRINE_MANIFEST_MAX_BYTES, DOCTRINE_TOTAL_MAX_BYTES, readBoundedResponse, withinDoctrineReadDeadline } from "./readbounded";
 
 export const DOCTRINE_PUBLICATION_TIMEOUT_MS = 120_000;
 const failed = () => new Error("Doctrine publication transport unavailable");
+
+// Conservative reservation for both bucket metadata and manifest in the app reader.
+export function preflightDoctrinePublication(manifest: DoctrineManifest): void {
+  const valid = parseDoctrineManifest(manifest);
+  const total = valid.artifacts.reduce((sum, artifact) => sum + artifact.bytes, 0);
+  if (total + 2 * DOCTRINE_MANIFEST_MAX_BYTES > DOCTRINE_TOTAL_MAX_BYTES ||
+      Buffer.byteLength(JSON.stringify(valid, null, 2) + "\n") > DOCTRINE_MANIFEST_MAX_BYTES) throw failed();
+}
 
 // One transport per publication, including bucket check, lock RPCs and write acknowledgements.
 export function createDoctrinePublisherTransport(url: string, key: string, manifest: DoctrineManifest,
   options: { fetch?: typeof fetch; timeoutMs?: number } = {}) {
   const valid = parseDoctrineManifest(manifest);
-  if (valid.artifacts.length !== 9) throw failed();
+  preflightDoctrinePublication(valid);
   const limits = new Map(valid.artifacts.map(artifact => [doctrineArtifactPath(valid, artifact.path), artifact.bytes]));
   limits.set(DOCTRINE_MANIFEST_PATH, DOCTRINE_MANIFEST_MAX_BYTES);
-  // Each of nine artifacts is read three times. Allow one manifest and 13 control
-  // responses (bucket, acquire/release, nine uploads, pointer upload), each <=64KiB.
-  const budget = { remainingBytes: 3 * valid.artifacts.reduce((sum, artifact) => sum + artifact.bytes, 0) + 14 * DOCTRINE_MANIFEST_MAX_BYTES,
-    deadline: performance.now() + (options.timeoutMs ?? DOCTRINE_PUBLICATION_TIMEOUT_MS) };
+  // Three artifact passes, one manifest and N+4 bounded control responses.
+  // The schema caps N at 100; app-compatible artifact bytes are capped above.
+  const budget = { remainingBytes: 3 * valid.artifacts.reduce((sum, artifact) => sum + artifact.bytes, 0) + (valid.artifacts.length + 5) * DOCTRINE_MANIFEST_MAX_BYTES,
+    deadline: performance.now() + Math.min(options.timeoutMs ?? DOCTRINE_PUBLICATION_TIMEOUT_MS, DOCTRINE_PUBLICATION_TIMEOUT_MS) };
   const controller = new AbortController();
   const transport = options.fetch ?? globalThis.fetch;
   const check = () => { if (controller.signal.aborted || performance.now() >= budget.deadline) throw failed(); };

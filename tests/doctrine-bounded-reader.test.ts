@@ -188,3 +188,16 @@ test("many small chunks share one bounded output allocation", async () => {
   const bytes = await readBoundedResponse(streamResponse(Array.from({ length: 1024 }, () => new Uint8Array([65]))).response, 1024);
   assert.equal(bytes.length, 1024); assert.ok(bytes.every(value => value === 65));
 });
+
+test("unchanged v1 reader accepts all 18 approved artifacts with exact hashes", async () => {
+  const { DOCTRINE_INVENTORIES } = await import("../lib/doctrine/inventory");
+  const { sha256 } = await import("../lib/doctrine/publication");
+  const names = DOCTRINE_INVENTORIES["agentique-v1"];
+  const bytes = names.map(name => encoder.encode(`# Synthetic ${name}\n`));
+  const manifest = { schemaVersion: 1, tier: "full", releaseId: "corpus18", artifacts: names.map((path, i) => ({ path, bytes: bytes[i].length, sha256: sha256(bytes[i]) })) };
+  await withStorage([bucket(), Response.json(manifest), ...bytes.map(b => streamResponse([b]).response)], async calls => {
+    const files = await readPublishedDoctrine();
+    assert.deepEqual(files.map(f => f.path), [...names]);
+    assert.equal(calls.length, 20);
+  });
+});

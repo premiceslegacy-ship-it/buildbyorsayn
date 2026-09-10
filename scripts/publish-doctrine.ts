@@ -1,35 +1,69 @@
 import { config as loadEnv } from "dotenv";
-import { readdir, readFile, lstat } from "node:fs/promises";
+import { readdir, lstat, open } from "node:fs/promises";
 import { resolve, join } from "node:path";
+import { constants } from "node:fs";
+import { DOCTRINE_TOTAL_MAX_BYTES, DOCTRINE_MANIFEST_MAX_BYTES } from "../lib/doctrine/readbounded";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { DOCTRINE_BUCKET, DOCTRINE_MANIFEST_PATH, doctrineArtifactPath, parseDoctrineManifest, sha256, verifyDoctrineFiles, withDoctrinePublicationLock } from "../lib/doctrine/publication";
-import { createDoctrinePublisherTransport } from "../lib/doctrine/publishertransport";
+import { createDoctrinePublisherTransport, preflightDoctrinePublication } from "../lib/doctrine/publishertransport";
+import { doctrineInventory } from "../lib/doctrine/inventory";
 import { doctrineDocuments } from "../lib/knowledge/doctrineSource";
 import { findKnowledgeSecretHazards } from "../lib/knowledge/safety";
 
-loadEnv({ path: ".env.local", quiet: true });
 const args = process.argv.slice(2);
 if (args.some(arg => arg !== "--apply" && !arg.startsWith("--source="))) throw new Error("Unknown publisher argument");
 const apply = args.includes("--apply");
+if (apply) loadEnv({ path: ".env.local", quiet: true });
 const source = args.find(arg => arg.startsWith("--source="))?.slice(9) || process.env.DOCTRINE_SOURCE_DIR;
 if (!source) throw new Error("Set DOCTRINE_SOURCE_DIR or --source=<private corpus directory>");
+
+// Reject replacement symlinks and open replacement FIFOs without waiting for a writer.
+// Validate the handle before allocating/reading; O_NONBLOCK does not deadline regular disk IO.
+async function readSource(path: string, limit: number): Promise<Buffer> {
+  const file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  try {
+    const stat = await file.stat();
+    if (!stat.isFile() || stat.size <= 0 || stat.size > limit) throw new Error("Source size invalid");
+    const bytes = Buffer.alloc(stat.size);
+    let offset = 0;
+    while (offset < bytes.length) {
+      const { bytesRead } = await file.read(bytes, offset, bytes.length - offset, offset);
+      if (!bytesRead) throw new Error("Source truncated");
+      offset += bytesRead;
+    }
+    const extra = await file.read(Buffer.alloc(1), 0, 1, offset);
+    if (extra.bytesRead) throw new Error("Source grew");
+    return bytes;
+  } finally { await file.close(); }
+}
 
 async function main() {
   const directory = resolve(source!);
   if ((await lstat(directory)).isSymbolicLink()) throw new Error("Symlink source refused");
   const names = (await readdir(directory)).filter(name => name !== ".DS_Store").sort();
-  if (names.length !== 9) throw new Error("Expected exactly nine doctrine Markdown files");
+  doctrineInventory(names);
   const bytesByName = new Map<string, Buffer>();
+  let remaining = DOCTRINE_TOTAL_MAX_BYTES - 2 * DOCTRINE_MANIFEST_MAX_BYTES;
+  // Stat the entire inventory before allocating any content or starting network.
+  for (const name of names) {
+    const stat = await lstat(join(directory, name));
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size <= 0 || stat.size > 2_000_000 || stat.size > remaining) throw new Error("Source budget invalid");
+    remaining -= stat.size;
+  }
+  remaining = DOCTRINE_TOTAL_MAX_BYTES - 2 * DOCTRINE_MANIFEST_MAX_BYTES;
   for (const name of names) {
     if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]*\.md$/.test(name)) throw new Error("Unexpected source entry");
     const stat = await lstat(join(directory, name));
     if (!stat.isFile() || stat.isSymbolicLink()) throw new Error("Regular files required");
-    bytesByName.set(name, await readFile(join(directory, name)));
+    const bytes = await readSource(join(directory, name), Math.min(2_000_000, remaining));
+    bytesByName.set(name, bytes);
+    remaining -= bytes.length;
   }
   const manifest = parseDoctrineManifest({ schemaVersion: 1, tier: "full", releaseId: randomUUID(),
     artifacts: names.map(path => { const bytes = bytesByName.get(path)!; return { path, bytes: bytes.length, sha256: sha256(bytes) }; }),
   });
+  preflightDoctrinePublication(manifest);
   const files = await verifyDoctrineFiles(manifest, async path => bytesByName.get(path.split("/").pop()!)!);
   if (findKnowledgeSecretHazards(doctrineDocuments(files)).length) throw new Error("Possible secret in doctrine; publication refused");
   console.log(`${apply ? "APPLY" : "DRY-RUN"}: ${files.length} verified full-only doctrine files`);
@@ -61,7 +95,7 @@ async function main() {
       if (JSON.stringify(currentNames) !== JSON.stringify(names)) throw new Error("Source inventory changed");
       for (const name of names) {
         if ((await lstat(join(directory, name))).isSymbolicLink() ||
-            !(await readFile(join(directory, name))).equals(bytesByName.get(name)!)) throw new Error("Source changed");
+            !(await readSource(join(directory, name), bytesByName.get(name)!.length)).equals(bytesByName.get(name)!)) throw new Error("Source changed");
       }
       const manifestBytes = Buffer.from(JSON.stringify(manifest, null, 2) + "\n");
       const { error } = await storage.upload(DOCTRINE_MANIFEST_PATH, manifestBytes, {

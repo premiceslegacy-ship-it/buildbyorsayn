@@ -3,7 +3,7 @@ import test from "node:test";
 import { createDoctrinePublisherTransport } from "../lib/doctrine/publishertransport";
 import { DOCTRINE_MANIFEST_MAX_BYTES } from "../lib/doctrine/readbounded";
 import { parseDoctrineManifest, doctrineArtifactPath, withDoctrinePublicationLock } from "../lib/doctrine/publication";
-const manifest = (size = 2_000_000) => parseDoctrineManifest({ schemaVersion: 1, tier: "full", releaseId: "fixture", artifacts: Array.from({ length: 9 }, (_, i) => ({ path: `file${i}.md`, bytes: size, sha256: "a".repeat(64) })) });
+const manifest = (size = 800_000, count = 9) => parseDoctrineManifest({ schemaVersion: 1, tier: "full", releaseId: "fixture", artifacts: Array.from({ length: count }, (_, i) => ({ path: `file${i}.md`, bytes: size, sha256: "a".repeat(64) })) });
 function body(size: number, headers: Record<string, string> = {}) {
   let pulls = 0; let cancelled = false;
   return { response: new Response(new ReadableStream<Uint8Array>({
@@ -19,17 +19,17 @@ test("publisher shared budget permits all 27 maximum artifacts and controls, rej
   await assert.rejects(client.run(async () => {
     for (let i = 0; i < 13; i++) await client.fetch("https://publisher.invalid/control");
     await client.download("doctrine/v1/manifest.json");
-    size = 2_000_000;
+    size = 800_000;
     for (let pass = 0; pass < 3; pass++) for (const artifact of m.artifacts) {
-      assert.equal((await client.download(doctrineArtifactPath(m, artifact.path))).length, 2_000_000); completed++;
+      assert.equal((await client.download(doctrineArtifactPath(m, artifact.path))).length, 800_000); completed++;
     }
     await client.download(doctrineArtifactPath(m, m.artifacts[0].path));
   }));
   assert.equal(completed, 27);
 });
 
-for (const length of [undefined, "1", "2000001", "bogus", "9007199254740992"]) test(`publisher bounds synthetic artifact stream with content-length ${length}`, async () => {
-  const m = manifest(); const b = body(2_000_001, length ? { "content-length": length } : {});
+for (const length of [undefined, "1", "800001", "bogus", "9007199254740992"]) test(`publisher bounds synthetic artifact stream with content-length ${length}`, async () => {
+  const m = manifest(); const b = body(800_001, length ? { "content-length": length } : {});
   const client = createDoctrinePublisherTransport("https://publisher.invalid", "fixture", m, { fetch: async () => b.response });
   await assert.rejects(client.run(() => client.download(doctrineArtifactPath(m, m.artifacts[0].path))));
   assert.equal(b.cancelled(), true);
@@ -80,4 +80,26 @@ test("late headers after timeout are cancelled and cannot resume publication", a
   assert.equal(signal?.aborted, true);
   const b = body(4); deliver(b.response); await new Promise(resolve => setImmediate(resolve));
   assert.equal(b.cancelled(), true); assert.equal(b.pulls(), 0);
+});
+
+test("publisher refuses an app-incompatible corpus before any network", () => {
+  let calls = 0;
+  assert.throws(() => createDoctrinePublisherTransport("https://publisher.invalid", "fixture", manifest(2_000_000), { fetch: async () => { calls++; return Response.json(true); } }));
+  assert.equal(calls, 0);
+});
+
+test("18-file shared budget permits exactly three passes and N+5 controls", async () => {
+  const m = manifest(400_000, 18);
+  let size = DOCTRINE_MANIFEST_MAX_BYTES; let completed = 0;
+  const client = createDoctrinePublisherTransport("https://publisher.invalid", "fixture", m, { fetch: async () => body(size).response });
+  await assert.rejects(client.run(async () => {
+    for (let i = 0; i < 22; i++) await client.fetch("https://publisher.invalid/control");
+    await client.download("doctrine/v1/manifest.json");
+    size = 400_000;
+    for (let pass = 0; pass < 3; pass++) for (const artifact of m.artifacts) {
+      assert.equal((await client.download(doctrineArtifactPath(m, artifact.path))).length, size); completed++;
+    }
+    await client.download(doctrineArtifactPath(m, m.artifacts[0].path));
+  }));
+  assert.equal(completed, 54);
 });
