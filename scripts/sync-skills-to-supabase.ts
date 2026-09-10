@@ -4,6 +4,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { SKILLS_CATALOG } from "../lib/skillsCatalog";
+import { SKILLS_MANIFEST_PATH, SKILLS_CATALOG_VERSION, parseCurrentSkillsPublicationManifest } from "../lib/skills/publication";
 import {
   createSkillsPublicationManifest,
   type SkillsPublicationArtifact,
@@ -254,6 +255,10 @@ async function uploadAndVerify(
   }
 
   const remote = Buffer.from(await data.arrayBuffer());
+  if (storagePath === SKILLS_MANIFEST_PATH &&
+      !parseCurrentSkillsPublicationManifest(JSON.parse(remote.toString("utf8")))) {
+    throw new Error("Remote catalogue manifest version or artifact set is invalid.");
+  }
   if (!remote.equals(expected)) {
     throw new Error(`Remote readback mismatch for ${storagePath}.`);
   }
@@ -304,14 +309,18 @@ async function main() {
       });
     }
 
-    const manifest = createSkillsPublicationManifest(
+    const manifest = { ...createSkillsPublicationManifest(
       releaseId,
       releaseArtifacts,
       new Date()
-    );
+    ), catalogVersion: SKILLS_CATALOG_VERSION };
+    if (!parseCurrentSkillsPublicationManifest(manifest)) {
+      throw new Error("Refusing invalid catalogue manifest before pointer publication.");
+    }
     const manifestBody = `${JSON.stringify(manifest, null, 2)}\n`;
 
-    await uploadAndVerify("manifest.json", manifestBody, true);
+    // Preserve legacy manifest.json and all releases it references for old apps.
+    await uploadAndVerify(SKILLS_MANIFEST_PATH, manifestBody, true);
     console.log(`Published immutable skills release ${releaseId}`);
   } finally {
     await releaseLock();

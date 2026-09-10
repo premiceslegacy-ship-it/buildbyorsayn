@@ -5,36 +5,22 @@ alwaysApply: true
 
 # BUILD Skills Sync
 
-Use `$ORSAYN_AI_ROOT/skills/` as the private skill source of truth. The ignored repository `docs/` tree is only the BUILD publishing mirror.
+Read and follow `AGENTS.md`, `CLAUDE.md` and `SKILLS-PUBLICATION.md`; all publication requires review and frozen canonical sources.
 
-Published mappings:
+Source of truth is `$ORSAYN_AI_ROOT/skills/`; ignored `docs/` is a publishing mirror, never an authoring source. Published catalogue v2 mappings:
 
-- `oracle-by-orsayn.md` to `docs/oracle-by-orsayn.md`;
-- `oracle-site-web.md` to `docs/oracle-site-web.md`;
-- `ux-ui-design-2/` to `docs/ux-ui-design/`;
-- `backend-orsayn/` to `docs/backend-orsayn/`;
-- `deep-research-vertical/` to `docs/deep-research-vertical/`.
+- `oracle-by-orsayn/SKILL.md` + `oracle-by-orsayn/references/` -> `docs/oracle-by-orsayn/SKILL.md` + `docs/oracle-by-orsayn/references/` (ZIP);
+- `oracle-site-web.md` -> `docs/oracle-site-web.md`;
+- `ux-ui-design-2/` -> `docs/ux-ui-design/`;
+- `backend-orsayn/` -> `docs/backend-orsayn/`;
+- `deep-research-vertical/` -> `docs/deep-research-vertical/`;
+- `apple-design-skills/` -> `docs/apple-design-skills/`;
+- `code-motion-production/` -> `docs/code-motion-production/` (BEGINNER explicitly authorized).
 
-The legacy top-level `expert-backend-v2.md` is retired. Never mirror or publish it. Use `backend-orsayn/references/17-domains.md` as the maintained authority.
+Never publish retired `expert-backend-v2.md`; authority is `backend-orsayn/references/17-domains.md`. Discover native Hermes paths and preserve their categories.
 
-When a canonical skill changes:
+Validate entire source bundles, back up mirrors, exclude `.DS_Store`, compare canonical/Hermes/BUILD hashes and rerun stability checks before/after remote publication. App changes require `npm test`, `npm run lint`, `npm run build`.
 
-1. Validate the entire source bundle.
-2. Mirror it into `docs/` and the native Hermes skill path, preserving structure and excluding `.DS_Store`.
-3. Compare hashes across all three layers.
-4. Run repository quality checks.
-5. Run:
+After explicit review only, `npm run skills:sync` uploads immutable releases and verifies bytes, then publishes and strictly reads back `catalogs/v2/manifest.json`: schema version 2, catalogVersion 2, exact seven artifacts. NEVER overwrite legacy `manifest.json` or delete its referenced releases. Publish/independently verify v2 before new app deployment; rollback old app continues using legacy. See phased runbook.
 
-```bash
-npm run skills:sync
-```
-
-6. Let the sync command read every remote artifact back and compare it with the mirror. It then publishes and verifies `manifest.json`; this timestamp is displayed on the BUILD Skills page and must not advance after partial failure.
-
-Rules:
-
-- Never author a skill in `docs/` first.
-- Never commit `docs/`, `.env.local`, `.next/` or `tsconfig.tsbuildinfo`.
-- Never reveal Supabase service-role keys or other credentials.
-- Do not report success until source, Hermes mirror, BUILD mirror and remote artifact agree.
-- For a brand-new skill, update the app catalog/API, run validation, then sync and push the code changes.
+Never commit `docs/`, `.env.local`, `.next/`, `tsconfig.tsbuildinfo`; never reveal credentials. No upload/deploy/watcher accept during preparation. Do not announce availability before independent ZIP member readback and deployed UI/API/MCP checks. Fixtures are not live evidence. Coordinate watcher acceptance across all workers.

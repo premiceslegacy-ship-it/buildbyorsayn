@@ -1,10 +1,9 @@
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import {
-  SKILLS_CATALOG,
   type SkillCatalogItem,
 } from "@/lib/skillsCatalog";
-import { parseSkillsPublicationManifest } from "@/lib/skillsMetadata";
+import { parseCurrentSkillsPublicationManifest, SKILLS_MANIFEST_PATH } from "@/lib/skills/publication";
 
 const SKILLS_BUCKET = process.env.SUPABASE_SKILLS_BUCKET ?? "skills";
 
@@ -53,15 +52,14 @@ export async function getStoredSkillContent(
   const storage = supabaseAdmin.storage.from(SKILLS_BUCKET);
 
   const { data: manifestData, error: manifestError } = await storage.download(
-    "manifest.json"
+    SKILLS_MANIFEST_PATH
   );
   if (manifestError || !manifestData) return null;
 
-  let manifest: ReturnType<typeof parseSkillsPublicationManifest> = null;
+  let manifest: ReturnType<typeof parseCurrentSkillsPublicationManifest> = null;
   try {
-    manifest = parseSkillsPublicationManifest(
-      JSON.parse(Buffer.from(await manifestData.arrayBuffer()).toString("utf8")),
-      SKILLS_CATALOG.map((item) => item.fileName)
+    manifest = parseCurrentSkillsPublicationManifest(
+      JSON.parse(Buffer.from(await manifestData.arrayBuffer()).toString("utf8"))
     );
   } catch {
     manifest = null;

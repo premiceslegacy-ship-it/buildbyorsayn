@@ -30,7 +30,7 @@ export async function collectBlocsDocuments(): Promise<KnowledgeDocument[]> {
         sourceId: section.id,
         title: `${bloc.titre} - ${section.title}`,
         content: section.content,
-        tier: isShowcaseSection ? "preview" : "beginner",
+        tier: bloc.displayNumber !== 1 ? "full" : isShowcaseSection ? "preview" : "beginner",
       });
     }
   }

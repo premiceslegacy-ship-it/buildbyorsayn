@@ -5,10 +5,12 @@ import {
   DELETE as deleteMcp,
   OPTIONS as optionsMcp,
   POST as postMcp,
+} from "../app/api/mcp/route";
+import {
   mcpBodyFailure,
   readBoundedMcpRequest,
   runWithMcpRouteDeadline,
-} from "../app/api/mcp/route";
+} from "../lib/mcp/routeRequest";
 import { GET as getAuthorizationMetadata } from "../app/.well-known/oauth-authorization-server/route";
 import { GET as getResourceMetadata } from "../app/.well-known/oauth-protected-resource/route";
 import { POST as registerClient } from "../app/api/mcp/oauth/register/route";

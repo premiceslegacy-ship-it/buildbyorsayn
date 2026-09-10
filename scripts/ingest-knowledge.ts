@@ -12,6 +12,7 @@ import {
   type PreparedKnowledgeChunk,
 } from "@/lib/knowledge/ingestionPlan";
 import { collectObsidianDocuments, resolveObsidianSourceMode } from "@/lib/knowledge/obsidianSource";
+import { collectDoctrineDocuments } from "@/lib/knowledge/doctrineSource";
 import { findKnowledgeSecretHazards } from "@/lib/knowledge/safety";
 import {
   collectAccompagnementDocuments,
@@ -46,6 +47,7 @@ const ALWAYS_SCANNED_SOURCES = [
   "accompagnement",
   "skills-catalog",
   "skills-content",
+  "doctrine",
 ] as const;
 
 async function collectAllDocuments(): Promise<{
@@ -67,6 +69,7 @@ async function collectAllDocuments(): Promise<{
   documents.push(...(await collectAccompagnementDocuments()));
   documents.push(...(await collectSkillsCatalogDocuments()));
   documents.push(...(await collectSkillsContentDocuments()));
+  documents.push(...(await collectDoctrineDocuments()));
 
   const scannedSources = new Set<string>(ALWAYS_SCANNED_SOURCES);
   let obsidianReport: {

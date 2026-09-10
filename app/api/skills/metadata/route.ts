@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
-import { parseSkillsPublicationManifest } from "@/lib/skillsMetadata";
-import { SKILLS_CATALOG } from "@/lib/skillsCatalog";
+import { parseCurrentSkillsPublicationManifest, SKILLS_MANIFEST_PATH } from "@/lib/skills/publication";
 
 export const dynamic = "force-dynamic";
 
 const SKILLS_BUCKET = process.env.SUPABASE_SKILLS_BUCKET ?? "skills";
-const MANIFEST_FILE = "manifest.json";
+const MANIFEST_FILE = SKILLS_MANIFEST_PATH;
 
 export async function GET() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -36,11 +35,10 @@ export async function GET() {
     );
   }
 
-  let manifest: ReturnType<typeof parseSkillsPublicationManifest> = null;
+  let manifest: ReturnType<typeof parseCurrentSkillsPublicationManifest> = null;
   try {
-    manifest = parseSkillsPublicationManifest(
-      JSON.parse(Buffer.from(await data.arrayBuffer()).toString("utf8")),
-      SKILLS_CATALOG.map((skill) => skill.fileName)
+    manifest = parseCurrentSkillsPublicationManifest(
+      JSON.parse(Buffer.from(await data.arrayBuffer()).toString("utf8"))
     );
   } catch {
     manifest = null;

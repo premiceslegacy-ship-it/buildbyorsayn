@@ -47,7 +47,7 @@ test("beta visibility stays separate from the final launch gate", async () => {
 });
 
 test("each accessible study block offers a direct assistant connection path only while disconnected", async () => {
-  const blockPage = await readFile("app/blocs/[id]/page.tsx", "utf8");
+  const blockPage = await readFile("app/blocs/[id]/BlocClient.tsx", "utf8");
   const callout = await readFile("components/McpStudyCallout.tsx", "utf8");
   const connectionAction = await readFile("app/actions/mcpConnections.ts", "utf8");
 

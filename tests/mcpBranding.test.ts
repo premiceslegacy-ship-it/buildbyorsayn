@@ -5,6 +5,7 @@ import test from "node:test";
 
 import { GET as getMcpLogo } from "../app/api/mcp/logo/route";
 import { GET as getAuthorizationMetadata } from "../app/.well-known/oauth-authorization-server/route";
+import { BUILD_ASSISTANT_INSTRUCTIONS } from "../lib/mcp/assistantInstructions";
 import { createBuildMcpServer } from "../lib/mcp/server";
 
 process.env.MCP_OAUTH_ISSUER ??= "https://buildbyorsayn.com";
@@ -63,9 +64,13 @@ test("the MCP initialize response exposes the official BUILD icon", async () => 
       }),
     }));
     const payload = await response.json() as {
-      result?: { serverInfo?: { title?: string; websiteUrl?: string; icons?: Array<{ src?: string; mimeType?: string }> } };
+      result?: { instructions?: string; serverInfo?: { title?: string; websiteUrl?: string; icons?: Array<{ src?: string; mimeType?: string }> } };
     };
     const serverInfo = payload.result?.serverInfo;
+    assert.equal(payload.result?.instructions, BUILD_ASSISTANT_INSTRUCTIONS);
+    assert.match(BUILD_ASSISTANT_INSTRUCTIONS, /contexte/);
+    assert.match(BUILD_ASSISTANT_INSTRUCTIONS, /connaissances générales/);
+    assert.match(BUILD_ASSISTANT_INSTRUCTIONS, /Ne tente jamais de contourner/);
     assert.equal(response.status, 200);
     assert.equal(serverInfo?.title, "BUILD by Orsayn");
     assert.equal(serverInfo?.websiteUrl, "https://buildbyorsayn.com");

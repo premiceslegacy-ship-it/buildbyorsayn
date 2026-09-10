@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Workflow, Layers, LayoutTemplate, FileCode, Briefcase, ArrowRight, Eye, Flag, Lock, X, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
-import { BLOCS_DATA } from "@/lib/mockData";
+import { BLOCS_DATA } from "@/lib/blocCatalog";
 import { useProgress } from "@/hooks/useProgress";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";

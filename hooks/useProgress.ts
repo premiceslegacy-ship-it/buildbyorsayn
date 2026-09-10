@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { BLOCS_DATA } from "@/lib/mockData";
+import { BLOCS_DATA } from "@/lib/blocCatalog";
 import { createClient } from "@/lib/supabase/client";
 
 export function useProgress() {

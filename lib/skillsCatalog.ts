@@ -10,6 +10,14 @@ export type SkillCatalogItem = {
 
 export const SKILLS_CATALOG: SkillCatalogItem[] = [
   {
+    slug: "code-motion-production",
+    title: "Production vidéo par le code",
+    description:
+      "Crée des vidéos animées par le code : cadrage, direction visuelle, animation et vérification des exports dans un processus de production reproductible.",
+    access: "beginner",
+    fileName: "code-motion-production.zip",
+  },
+  {
     slug: "oracle-site-web",
     title: "ORACLE Site Web",
     description:
@@ -21,7 +29,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "ux-ui-design",
     title: "UX/UI Design Premium",
     description:
-      "Ton directeur artistique et designer système à la demande : donne tes références (ou choisis un style dans la taxonomie) et récupère une direction artistique complète, verrouillée, jamais générique. Fonctionne sur un projet neuf comme sur l'audit ou la refonte d'un existant.",
+      "Pars de tes sites et images de référence pour construire une direction adaptée à ton projet : analyse mesurée, copywriting, tokens, icônes originales et audit des états réels. Un cadre compact pour concevoir, auditer ou refondre sans appliquer un style générique.",
     access: "beginner",
     fileName: "ux-ui-design.zip",
   },

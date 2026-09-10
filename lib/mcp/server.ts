@@ -1,3 +1,4 @@
+import { BUILD_ASSISTANT_INSTRUCTIONS } from "@/lib/mcp/assistantInstructions";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { canAccess, type McpTier } from "@/lib/mcpAccess";
@@ -20,6 +21,7 @@ export const KNOWLEDGE_SOURCES = [
   "skills-catalog",
   "skills-content",
   "obsidian",
+  "doctrine",
 ] as const;
 
 const MCP_TIERS = ["free", "preview", "beginner", "full"] as const;
@@ -51,6 +53,7 @@ export function validateKnowledgeMatches(
 ): KnowledgeMatch[] | null {
   const parsed = z.array(KNOWLEDGE_MATCH_SCHEMA).safeParse(value);
   if (!parsed.success) return null;
+  if (parsed.data.some((match) => match.source === "doctrine" && match.tier_required !== "full")) return null;
   if (parsed.data.some((match) => !canAccess(requesterTier, match.tier_required))) return null;
   return parsed.data;
 }
@@ -127,7 +130,7 @@ export function createBuildMcpServer(
       mimeType: "image/png",
       sizes: ["549x528"],
     }],
-  });
+  }, { instructions: BUILD_ASSISTANT_INSTRUCTIONS });
 
   server.registerTool(
     "search_knowledge",

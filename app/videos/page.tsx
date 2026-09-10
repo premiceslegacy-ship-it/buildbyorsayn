@@ -3,24 +3,14 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Lock, Play } from "lucide-react";
 import Link from "next/link";
-import { BLOCS_DATA } from "@/lib/mockData";
+import { BLOCS_DATA } from "@/lib/blocCatalog";
+import type { BlocVideo } from "@/lib/blocCatalog";
+import { getBlocVideoLibrary } from "@/lib/blocVideos";
 import { VideoCard } from "@/components/VideoCard";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
 
-const FONDATIONS_VIDEOS: { title: string; youtubeId: string; description?: string }[] = [
-  {
-    title: "Le Protocole Zéro",
-    youtubeId: "tcFGu_zNsPE",
-    description: "De zéro compétence à antifragile numérique. La méthode en trois phases pour construire du capital organique avec l'IA.",
-  },
-  {
-    title: "Le marché web en 2026 : positionnement, design systems et premiers clients",
-    youtubeId: "RCGFyJbGfM4",
-    description: "L'état du marché en clair : pourquoi le WordPress/Webflow est mort et comment prendre position aux deux extrêmes. Webcoding (Next.js + Vercel), design systems pour forcer l'IA à sortir du générique, et la stratégie pour décrocher les premiers clients.",
-  },
-];
 
 function PaywallBanner({
   label,
@@ -52,6 +42,8 @@ function PaywallBanner({
 }
 
 export default function VideosPage() {
+  const [FONDATIONS_VIDEOS, setFoundationVideos] = useState<BlocVideo[]>([]);
+  const [blocsWithVideos, setBlocsWithVideos] = useState<{ id: string; titre: string; videos: BlocVideo[] }[]>([]);
   const [tier, setTier] = useState<string | null | "loading">("loading");
   const [beginnerUrl, setBeginnerUrl] = useState<string>("#");
   const [upgradeUrl, setUpgradeUrl] = useState<string>("#");
@@ -68,12 +60,19 @@ export default function VideosPage() {
         .select("tier")
         .eq("id", user.id)
         .single();
-      setTier(profile?.tier ?? null);
+      const library = await getBlocVideoLibrary();
+      setFoundationVideos(library.foundations);
+      setBlocsWithVideos(library.blocs);
+      setTier(profile?.tier === "admin" ? "full" : profile?.tier ?? null);
       const urls = await getCheckoutUrls();
       if (urls.beginner) setBeginnerUrl(`${urls.beginner}?client_reference_id=${user.id}`);
       if (urls.upgrade) setUpgradeUrl(`${urls.upgrade}?client_reference_id=${user.id}`);
     };
-    fetchData();
+    fetchData().catch(() => {
+      setFoundationVideos([]);
+      setBlocsWithVideos([]);
+      setTier(null);
+    });
   }, []);
 
   const isLoading = tier === "loading";
@@ -82,7 +81,7 @@ export default function VideosPage() {
 
   const bloc1 = BLOCS_DATA.find((b) => b.id === "1");
   const bloc1Videos = (bloc1 as any)?.videos as { title: string; youtubeId: string; description?: string }[] ?? [];
-  const blocsWithVideos = BLOCS_DATA.filter((b) => b.id !== "1" && (b as any).videos?.length > 0);
+
   const hasFondationsVideos = FONDATIONS_VIDEOS.length > 0;
 
   return (

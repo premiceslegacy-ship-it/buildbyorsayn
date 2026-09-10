@@ -8,7 +8,7 @@ Canonical private skill source is provided by `ORSAYN_AI_ROOT`:
 $ORSAYN_AI_ROOT/skills/
 ```
 
-The canonical published set is limited to the five mappings below. The legacy top-level `expert-backend-v2.md` is retired and must never be mirrored or published. Its maintained authority is `backend-orsayn/references/17-domains.md`.
+The canonical published set is limited to the seven mappings below (catalogue v2). Read `SKILLS-PUBLICATION.md` before publication. The legacy top-level `expert-backend-v2.md` is retired and must never be mirrored or published. Its maintained authority is `backend-orsayn/references/17-domains.md`.
 
 `docs/` is only the BUILD publishing mirror. Never treat it as the source of truth and never edit a skill there first.
 
@@ -16,12 +16,14 @@ When the user says they updated, modified, replaced, added, or published a skill
 
 1. Read and validate the changed source bundle completely.
 2. Mirror it into `docs/` while preserving directory structure and excluding `.DS_Store`:
-   - `oracle-by-orsayn.md` + `oracle-by-orsayn/references/` → `docs/oracle-by-orsayn/SKILL.md` + `docs/oracle-by-orsayn/references/`
+   - `oracle-by-orsayn/SKILL.md` + `oracle-by-orsayn/references/` → `docs/oracle-by-orsayn/SKILL.md` + `docs/oracle-by-orsayn/references/`
    - `oracle-site-web.md` → `docs/oracle-site-web.md`
    - `ux-ui-design-2/` → `docs/ux-ui-design/`
    - `backend-orsayn/` → `docs/backend-orsayn/`
    - `deep-research-vertical/` → `docs/deep-research-vertical/`
-3. Mirror the same source into `~/.hermes/skills/orsayn/` using native Hermes packaging. Keep `expert-backend-v2.md` retired because its content lives in `backend-orsayn/references/17-domains.md`.
+   - `apple-design-skills/` → `docs/apple-design-skills/`
+   - `code-motion-production/` → `docs/code-motion-production/` (BEGINNER explicitly authorized)
+3. Discover the existing native Hermes installation for each skill and preserve its category; do not assume all skills live under orsayn. Keep `expert-backend-v2.md` retired because its content lives in `backend-orsayn/references/17-domains.md`.
 4. Compare source/mirror hashes before publishing.
 5. Synchronize the private BUILD skills to Supabase Storage from the repo root:
 
@@ -29,7 +31,7 @@ When the user says they updated, modified, replaced, added, or published a skill
 npm run skills:sync
 ```
 
-6. `npm run skills:sync` reads every uploaded artifact back, compares exact bytes, then publishes and verifies `manifest.json`. The manifest timestamp is the date shown on the BUILD Skills page and must only advance after every catalog artifact passes readback.
+6. Only after parent review and canonical freeze, `npm run skills:sync` reads every uploaded artifact back, compares exact bytes, then publishes and verifies `catalogs/v2/manifest.json` (schema version 2, catalogVersion 2, exact seven-file set). Legacy `manifest.json` and its immutable releases MUST remain untouched for old apps and rollback. Publish and independently verify v2 before deploying new app code. The manifest timestamp must only advance after every catalog artifact passes readback. No uploads, deployments or watcher acceptance during preparation.
 
 Typical trigger phrases:
 
@@ -43,9 +45,9 @@ If the command is blocked by sandbox/network permissions, request approval and r
 
 Success criteria:
 
-- The output includes `Uploaded <skill-file> to skills (readback verified)` for every catalog artifact and `manifest.json`.
+- The output includes `Uploaded releases/<releaseId>/<skill-file> to skills (readback verified)` for every catalog artifact and `catalogs/v2/manifest.json`.
 - The verified manifest contains the complete expected artifact set and advances its timestamp only after all artifact readbacks pass.
-- Tell the user the latest version is now available from the app only after both checks pass.
+- Tell the user the latest version is available only after independent remote ZIP-member/hash verification, canonical/mirror stability checks and deployed UI/API/MCP access tests. Fixtures do not prove live availability.
 - For existing skill content updates, no GitHub push or Vercel redeploy is required.
 
 Important rules:

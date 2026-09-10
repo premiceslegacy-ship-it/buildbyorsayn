@@ -91,7 +91,7 @@ const SKILL_WORKFLOW = [
   {
     step: "03",
     title: "UX/UI Design",
-    body: "Choisis un design system prêt à l'emploi dans le catalogue, ou envoie une image et le skill en extrait le pattern exact (couleurs, typo, structure) pour que ton produit transpire vraiment cette direction, pas un à-peu-près.",
+    body: "Envoie des sites, images ou interfaces de référence. Le skill observe leurs choix, distingue les mesures des hypothèses, puis construit une direction adaptée à ton projet : structure, copywriting, tokens, icônes et états réels.",
   },
   {
     step: "04",
@@ -199,6 +199,9 @@ export default function SkillsPage() {
             Ce sont les skills que j'ai configurés pour moi et pour mon écosystème. Je les utilise au quotidien pour cadrer, construire et auditer mes projets. Tu peux bien évidemment les adapter à ta manière de travailler, à ton marché et à tes propres projets.
           </p>
           <SkillsFreshness />
+          <Link href="/doctrine" prefetch={false} className="mt-4 inline-block text-sm text-white/60 underline underline-offset-4 hover:text-white focus-visible:outline-2">
+            Doctrine agentique du Coffre
+          </Link>
         </header>
 
         <section className="mb-10">

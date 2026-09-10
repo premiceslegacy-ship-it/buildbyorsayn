@@ -11,6 +11,7 @@
     "test:rls": "tsx scripts/verify-progress-rls.ts",
     "test:accompaniment-access": "tsx scripts/verify-accompaniment-access.ts",
     "lint": "tsc --noEmit",
+    "doctrine:publish": "tsx scripts/publish-doctrine.ts",
     "skills:sync": "tsx scripts/sync-skills-to-supabase.ts",
     "stripe:pricing": "tsx --env-file=.env.local scripts/update-stripe-pricing.ts",
     "knowledge:sync": "tsx scripts/ingest-knowledge.ts",
