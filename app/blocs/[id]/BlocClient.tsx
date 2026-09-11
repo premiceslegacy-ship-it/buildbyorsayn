@@ -11,6 +11,7 @@ import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { LinkifiedText } from "@/components/ui/linkified-text";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { SectionPager } from "@/components/ui/section-pager";
 
 import { toggleBlocCompletion } from "@/app/actions/progress";
 import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK } from "@/lib/pricing";
@@ -99,6 +100,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
     BLOCS_DATA.find(item => item.id === blocId)?.sections.length;
 
   const currentBlocIndex = BLOCS_DATA.findIndex((item) => item.id === blocId);
+  const prevBloc = currentBlocIndex > 0 ? BLOCS_DATA[currentBlocIndex - 1] : undefined;
   const nextBloc = currentBlocIndex >= 0 ? BLOCS_DATA[currentBlocIndex + 1] : undefined;
   const nextBlocId = nextBloc?.id;
   const hasNextBloc = Boolean(nextBlocId);
@@ -130,6 +132,15 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
             Retour au système
           </Link>
         </div>
+
+        {(prevBloc || nextBloc) && (
+          <div className="mb-10">
+            <SectionPager
+              prev={prevBloc ? { href: `/blocs/${prevBloc.id}`, label: prevBloc.titre } : undefined}
+              next={nextBloc ? { href: `/blocs/${nextBloc.id}`, label: nextBloc.titre } : undefined}
+            />
+          </div>
+        )}
 
         <div className="flex flex-col items-start">
           <div className={showPaywall ? "w-full max-w-3xl mx-auto" : "w-full max-w-3xl mx-auto"}>

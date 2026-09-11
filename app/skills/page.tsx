@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Download, FileText, FolderSearch, Lock, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download } from "lucide-react";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 import { SKILLS_CATALOG, SKILL_CATEGORY_LABELS, type SkillCategory } from "@/lib/skillsCatalog";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { IllustratedCard } from "@/components/ui/illustrated-card";
 import { SkillsFreshness } from "@/components/SkillsFreshness";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { illustrationSrc } from "@/lib/illustrations";
 import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
 
 const SKILL_USAGE_STEPS = [
@@ -89,12 +90,20 @@ const SKILL_METHOD_EXAMPLES = [
     body: "Décomposition du métier de directeur artistique : taxonomie des styles, extraction de pattern mesurée, protocole anti AI-slop, systèmes d'icônes et tokens.",
   },
   {
+    skill: "Apple Design Skills",
+    body: "Décomposition de la discipline Apple en 15 sous-skills : mindset, fondations, branding, composants, patterns, états, layout, matériaux, mouvement, accessibilité, contenu, web et quality gates.",
+  },
+  {
     skill: "Backend Orsayn",
     body: "Décomposition de la sécurité et de l'infra en 7 sous-métiers (RLS, API, agents IA, webhooks, perf, conformité, migration) : un sous-skill chacun, mapping OWASP.",
   },
   {
     skill: "ORACLE Site Web",
     body: "Décomposition du site qui vend en 10 sous-domaines : copy et CTA, arborescence, preuve sociale, psychologie de conversion, formulaires, SEO/GEO, performance, mesure.",
+  },
+  {
+    skill: "Motion Design par le code",
+    body: "Décomposition du métier de motion designer : direction visuelle, choréographie d'animation, titres et transitions, vérification d'export - le tout piloté par du code, pas par la souris.",
   },
 ];
 
@@ -116,13 +125,23 @@ const SKILL_WORKFLOW = [
   },
   {
     step: "04",
+    title: "Apple Design Skills",
+    body: "En complément du design system, ce bundle de 15 skills approfondit la discipline Apple quand ton projet vise ce niveau de finition : composants, patterns, matériaux, mouvement et accessibilité, jusqu'aux quality gates avant livraison.",
+  },
+  {
+    step: "05",
     title: "Backend Orsayn",
     body: "Le skill qui empêche ton produit d'exposer les données de tes clients. RLS, validation, sécurité des agents IA, webhooks, performance : il audite l'existant ou construit le neuf, un plan validé avant chaque bloc de code.",
   },
   {
-    step: "05",
+    step: "06",
     title: "ORACLE Site Web",
     body: "Une fois le produit prêt, ce skill écrit la landing page à partir de la recherche marché et du design system du produit : même famille visuelle, copy qui vient des vraies objections du marché, pas de l'imagination.",
+  },
+  {
+    step: "07",
+    title: "Motion Design par le code",
+    body: "Pour finir, ce skill anime la landing page ou le produit : titres, transitions, micro-interactions et séquences complètes, avec une direction visuelle cadrée et des exports vérifiés à chaque étape.",
   },
 ];
 
@@ -143,6 +162,11 @@ const SKILL_PROMPTS = [
     prompt: "Voici mes références [captures/sites], ou dis-moi si je n'ai pas de préférence : recommande-moi un style. Construis la DA et le design system de [mon projet].",
   },
   {
+    skill: "Apple Design Skills",
+    role: "Pousse une interface au niveau de finition Apple : composants, patterns, matériaux, mouvement, accessibilité et quality gates, sur les 15 sous-skills du bundle.",
+    prompt: "Voici mon design system actuel [description/captures]. Passe-le au niveau Apple Design Skills : composants, matériaux, mouvement et accessibilité, avec un quality gate avant chaque livraison.",
+  },
+  {
     skill: "Backend Orsayn",
     role: "Audite ou construit un backend complet - auth, RLS, API, sécurité, performance - avec un plan validé avant chaque bloc de code.",
     prompt: "Audite la sécurité de mon backend [Supabase/Next.js] : RLS, validation des inputs, webhooks, permissions. Classe chaque écart critique/important/mineur.",
@@ -151,6 +175,11 @@ const SKILL_PROMPTS = [
     skill: "ORACLE Site Web",
     role: "Construit une landing page ou un site qui convertit : copy orienté bénéfice, structure, SEO/GEO, performance Lighthouse 100.",
     prompt: "Mon produit est cadré avec ORACLE by Orsayn. Construis la landing page à partir du BRIEF, du DESIGN-SYSTEM et de la recherche marché associée.",
+  },
+  {
+    skill: "Motion Design par le code",
+    role: "Anime une landing page, un produit ou un visuel par le code : titres, transitions, micro-interactions, avec exports vérifiés à chaque étape.",
+    prompt: "Voici ma landing page/mon visuel [description/lien]. Anime [section précise] par le code : direction visuelle cadrée, transitions et micro-interactions, export vérifié.",
   },
 ];
 
@@ -439,58 +468,44 @@ export default function SkillsPage() {
                 <motion.div
                   key={skill.slug}
                   whileHover="hover"
-                  className="group animate-reveal h-full"
+                  className="animate-reveal flex h-full flex-col"
                   style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
                 >
-                  <LiquidCard className="p-6 transition-all duration-500 flex flex-col h-full min-h-[240px]">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
-
-                    <div className="relative z-10 flex h-full flex-col">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#e8d5b0] shadow-[0_4px_16px_rgba(0,0,0,0.2)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_16px_rgba(232,213,176,0.15)] transition-all duration-500">
-                          <AnimatedIcon icon={isFree ? Sparkles : skill.slug === "deep-research-vertical" ? FolderSearch : FileText} className="w-6 h-6 drop-shadow-[0_0_8px_rgba(232,213,176,0.5)]" strokeWidth={1.5} />
-                        </div>
-                        <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 border ${badgeClasses}`}>
-                          {!isFree && <Lock className="w-3 h-3" />}
-                          <span className="text-[11px] font-medium">
-                            {badgeLabel}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="mt-8 flex-1">
-                        <p className="text-[10px] uppercase tracking-[0.14em] text-[#e8d5b0]/60 font-semibold mb-2">
-                          {SKILL_CATEGORY_LABELS[skill.category]}
-                        </p>
-                        <h2 className="text-xl font-semibold tracking-tight text-[#f0ede8] mb-3">
-                          {skill.title}
-                        </h2>
-                        <p className="text-sm text-[rgba(240,237,232,0.48)] leading-relaxed">
-                          {skill.description}
-                        </p>
-                      </div>
-
-                      <div className="mt-8">
-                        {canDownload ? (
-                          <a
-                            href={`/api/skills/${skill.slug}`}
-                            className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-all duration-200 hover:bg-[#f0dfc0] shadow-[0_0_24px_rgba(232,213,176,0.18)]"
-                          >
-                            <Download className="w-4 h-4" />
-                            Télécharger
-                          </a>
-                        ) : (
-                          <a
-                            href={lockedHref}
-                            className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-white/[0.06] border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition-all duration-200 hover:bg-white/[0.1] hover:text-white"
-                          >
-                            {lockedLabel}
-                            <ArrowRight className="w-4 h-4" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </LiquidCard>
+                  <IllustratedCard
+                    title={skill.title}
+                    description={skill.description}
+                    imageSrc={illustrationSrc(`skills-${skill.slug}`)}
+                    locked={!canDownload}
+                  />
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <span className="text-[11px] uppercase tracking-[0.1em] text-white/35">
+                      {SKILL_CATEGORY_LABELS[skill.category]}
+                    </span>
+                    <span
+                      className={`border px-2.5 py-1 text-[11px] font-medium ${badgeClasses}`}
+                    >
+                      {badgeLabel}
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    {canDownload ? (
+                      <a
+                        href={`/api/skills/${skill.slug}`}
+                        className="inline-flex items-center justify-center gap-2 w-full bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-all duration-200 hover:bg-[#f0dfc0] shadow-[0_0_24px_rgba(232,213,176,0.18)]"
+                      >
+                        <Download className="w-4 h-4" />
+                        Télécharger
+                      </a>
+                    ) : (
+                      <a
+                        href={lockedHref}
+                        className="inline-flex items-center justify-center gap-2 w-full bg-white/[0.06] border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition-all duration-200 hover:bg-white/[0.1] hover:text-white"
+                      >
+                        {lockedLabel}
+                        <ArrowRight className="w-4 h-4" />
+                      </a>
+                    )}
+                  </div>
                 </motion.div>
               );
             })}

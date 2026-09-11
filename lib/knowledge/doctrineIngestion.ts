@@ -39,7 +39,7 @@ export async function readDoctrineInventory(readPage: (offset: number, limit: nu
 
 export type DoctrineDependencies = {
   /** Production must use readPublishedDoctrine: no filesystem fallback. */
-  readPublished: () => Promise<DoctrineFile[]>;
+  readPublished: () => Promise<readonly DoctrineFile[]>;
   readPage: (offset: number, limit: number) => Promise<InventoryPage>;
   fingerprint: string;
   embed: (texts: string[]) => Promise<number[][]>;
@@ -54,7 +54,7 @@ export async function runDoctrineIngestion(deps: DoctrineDependencies, options: 
   if (options.apply && (options.exclusiveWritersConfirmed !== true || options.lockSchemaConfirmed !== true)) throw new Error("Unconfirmed ingestion prerequisite");
   const canonical = (rows: DoctrineRow[]) => JSON.stringify(rows.map(row => [key(row), row.title, row.content,
     row.content_hash, row.tier_required, row.metadata.embeddingFingerprint]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))));
-  const sourceSignature = (files: DoctrineFile[]) => JSON.stringify(files.map(f => [f.path, f.content]).sort((a, b) => a[0].localeCompare(b[0])));
+  const sourceSignature = (files: readonly DoctrineFile[]) => JSON.stringify(files.map(f => [f.path, f.content]).sort((a, b) => a[0].localeCompare(b[0])));
   const operation = async () => {
   const files = await deps.readPublished();
   const order = doctrineInventory(files.map(file => file.path));

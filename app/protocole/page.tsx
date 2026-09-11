@@ -6,6 +6,7 @@ import { NavBar } from "@/components/NavBar";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { PHASES } from "@/lib/protocoleContent";
+import { ProtocolePipelineDiagram, LocataireVsCapitalDiagram } from "./diagrams";
 
 export const metadata = {
   title: "Le Protocole Zéro : BUILD by Orsayn",
@@ -80,34 +81,39 @@ export default async function ProtocolePage() {
             <h2 className="text-xs font-semibold uppercase tracking-[3px] text-[#c9b48a]">
               La thèse
             </h2>
+
             <div className="grid sm:grid-cols-2 gap-4">
-              <LiquidCard className="rounded-2xl p-6 sm:p-7">
-                <p className="text-xs text-[#c9b48a] uppercase tracking-[2px] font-medium mb-3">Le locataire numérique</p>
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.035] to-black/20 p-6 sm:p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-24px_40px_-32px_rgba(0,0,0,0.6)]">
+                <p className="text-xs text-white/40 uppercase tracking-[2px] font-medium mb-3">Le locataire numérique</p>
                 <p className="text-sm text-[#8a8070] leading-relaxed">
                   Utilise des outils IA puissants qu&apos;il ne comprend pas, ne possède pas et ne maîtrise pas. Quand les outils changent, il recommence à zéro. Illich avait nommé ça la contre-productivité : l&apos;outil crée la dépendance au lieu de l&apos;autonomie.
                 </p>
-              </LiquidCard>
-              <LiquidCard className="rounded-2xl p-6 sm:p-7">
+              </div>
+              <div className="relative overflow-hidden rounded-2xl border border-[#c9b48a]/25 bg-gradient-to-b from-[#c9b48a]/[0.07] to-black/20 p-6 sm:p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-24px_40px_-32px_rgba(0,0,0,0.6)]">
                 <p className="text-xs text-[#c9b48a] uppercase tracking-[2px] font-medium mb-3">Le capital organique</p>
                 <p className="text-sm text-[#c4b89a] leading-relaxed">
                   Ce qu&apos;on construit par la distillation. L&apos;expertise encodée, les systèmes documentés, la data propriétaire. S&apos;accumule dans le temps. Résiste aux changements d&apos;outils. Appartient entièrement à son propriétaire.
                 </p>
-              </LiquidCard>
+              </div>
             </div>
-            <LiquidCard className="rounded-2xl p-6">
-              <p className="text-sm text-[#8a8070] leading-relaxed italic">
-                &ldquo;Nous façonnons nos outils, puis nos outils nous façonnent.&rdquo; Formule attribuée à John Culkin, dans la lignée de McLuhan. La distillation est l&apos;acte de garder la main sur cette co-évolution. Tu formes le modèle avant qu&apos;il te forme.
-              </p>
-            </LiquidCard>
+
+            <LocataireVsCapitalDiagram />
+
+            <p className="text-sm text-[#8a8070] leading-relaxed italic border-l-2 border-[#c9b48a]/40 pl-4">
+              &ldquo;Nous façonnons nos outils, puis nos outils nous façonnent.&rdquo; Formule attribuée à John Culkin, dans la lignée de McLuhan. La distillation est l&apos;acte de garder la main sur cette co-évolution. Tu formes le modèle avant qu&apos;il te forme.
+            </p>
           </div>
 
           <div className="h-px bg-[#2a2520]" />
 
           {/* Les 3 phases */}
           <div className="flex flex-col gap-16">
-            <h2 className="text-xs font-semibold uppercase tracking-[3px] text-[#c9b48a]">
-              Les trois phases
-            </h2>
+            <div className="flex flex-col gap-4">
+              <h2 className="text-xs font-semibold uppercase tracking-[3px] text-[#c9b48a]">
+                Les trois phases
+              </h2>
+              <ProtocolePipelineDiagram />
+            </div>
 
             {PHASES.map((phase) => (
               <LiquidCard key={phase.num} className="rounded-2xl p-7 sm:p-10">
@@ -137,7 +143,11 @@ export default async function ProtocolePage() {
                   {/* La réponse */}
                   <div className="flex flex-col gap-2.5">
                     <p className="text-[11px] text-[#c9b48a] uppercase tracking-[2.5px] font-semibold">La réponse</p>
-                    <p className="text-[15px] text-[#c4b89a] leading-[1.75]">{phase.solution}</p>
+                    <div className="flex flex-col gap-3.5">
+                      {phase.solution.map((paragraph, i) => (
+                        <p key={i} className="text-[15px] text-[#c4b89a] leading-[1.75]">{paragraph}</p>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Output */}
@@ -171,16 +181,19 @@ export default async function ProtocolePage() {
               Taleb distingue trois types de systèmes : le fragile qui se brise sous le stress, le robuste qui résiste sans en bénéficier, et l&apos;antifragile qui gagne en force sous la volatilité. Le capital organique est antifragile par construction. Chaque changement de modèle IA, chaque régulation, chaque disruption de plateforme renforce tes systèmes au lieu de les détruire.
             </p>
 
-            <div className="grid sm:grid-cols-3 gap-4">
+            <div className="relative overflow-hidden rounded-2xl border border-[#c9b48a]/20 bg-gradient-to-b from-[#c9b48a]/[0.05] to-black/20 divide-y divide-[#c9b48a]/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
               {[
-                { titre: "Lignes verticales IA", desc: "Tu lances des verticales dans des niches précises avec tes systèmes." },
-                { titre: "Investissement réel", desc: "Pierre, équity, actifs physiques. Tu joues sur plusieurs terrains." },
-                { titre: "Liberté totale", desc: "Tu ne subis plus rien. Tu choisis." },
+                { num: "01", titre: "Lignes verticales IA", desc: "Tu lances des verticales dans des niches précises avec tes systèmes." },
+                { num: "02", titre: "Investissement réel", desc: "Pierre, équity, actifs physiques. Tu joues sur plusieurs terrains." },
+                { num: "03", titre: "Liberté totale", desc: "Tu ne subis plus rien. Tu choisis." },
               ].map((item) => (
-                <LiquidCard key={item.titre} className="rounded-2xl p-6">
-                  <p className="text-sm font-semibold text-[#f0ede8] mb-2">{item.titre}</p>
-                  <p className="text-xs text-[#8a8070] leading-relaxed">{item.desc}</p>
-                </LiquidCard>
+                <div key={item.titre} className="flex items-start gap-4 px-6 py-5">
+                  <span className="text-lg font-light tabular-nums leading-none text-[#c9b48a]/50 pt-0.5">{item.num}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-[#f0ede8] mb-1">{item.titre}</p>
+                    <p className="text-xs text-[#8a8070] leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

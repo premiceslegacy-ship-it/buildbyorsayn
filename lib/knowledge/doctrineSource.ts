@@ -1,6 +1,6 @@
 import type { KnowledgeDocument } from "./sources";
 import type { DoctrineFile } from "../doctrine/publication";
-export function doctrineDocuments(files: DoctrineFile[]): KnowledgeDocument[] {
+export function doctrineDocuments(files: readonly DoctrineFile[]): KnowledgeDocument[] {
   return files.map(file => ({
     source: "doctrine",
     sourceId: file.path,

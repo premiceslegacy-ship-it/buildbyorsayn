@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readPublishedDoctrine } from "../lib/doctrine/storage";
+import { readPublishedDoctrine, __resetDoctrineCacheForTests } from "../lib/doctrine/storage";
 
 const encoder = new TextEncoder();
 function streamResponse(chunks: Uint8Array[], headers: Record<string, string> = {}) {
@@ -18,6 +18,9 @@ async function withStorage(responses: Response[], run: (calls: RequestInit[]) =>
   const oldKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   process.env.NEXT_PUBLIC_SUPABASE_URL = "https://storage.example.invalid";
   process.env.SUPABASE_SERVICE_ROLE_KEY = "test-secret-never-leak";
+  // Each test simulates a distinct remote state; the in-memory read cache
+  // must never leak a previous test's result into this one.
+  __resetDoctrineCacheForTests();
   const calls: RequestInit[] = [];
   globalThis.fetch = async (_input, init) => { calls.push(init ?? {}); const response = responses.shift(); if (!response) throw new Error("test-secret-never-leak"); return response; };
   try { await run(calls); } finally {

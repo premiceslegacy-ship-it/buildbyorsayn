@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start -p 3000 -H 0.0.0.0",
     "test": "node --import tsx --test tests/**/*.test.ts",
+    "test:e2e": "playwright test",
+    "bench:doctrine": "tsx --env-file=.env.local scripts/bench-doctrine-read.ts",
     "test:rls": "tsx scripts/verify-progress-rls.ts",
     "test:accompaniment-access": "tsx scripts/verify-accompaniment-access.ts",
     "lint": "tsc --noEmit",

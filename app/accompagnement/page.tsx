@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Logo } from "@/components/Logo";
 import { AccompanimentGuidanceAsset } from "@/components/AccompanimentAssets";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -8,6 +7,11 @@ import {
   SITE_WEB_ACCOMPANIMENT_SLUG,
 } from "@/lib/accompanimentAccess";
 import { ACCOMPAGNEMENTS, ACCOMPANIMENT_CAL_URL } from "@/lib/accompagnements";
+import { IllustratedCard } from "@/components/ui/illustrated-card";
+import { IllustratedCardGrid } from "@/components/ui/illustrated-card-grid";
+import { illustrationSrc } from "@/lib/illustrations";
+import { NavBar } from "@/components/NavBar";
+import { navIdentity } from "@/lib/auth/navIdentity.server";
 
 const CAL_URL = ACCOMPANIMENT_CAL_URL;
 
@@ -48,17 +52,26 @@ export default async function AccompagnementPage({ searchParams }: Props) {
     ? "/accompagnement/espace"
     : `/login?next=${encodeURIComponent("/accompagnement/espace")}`;
 
+  const identity = await navIdentity();
+
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8]">
-      <header className="border-b border-white/[0.08] px-5 py-5 sm:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-5">
-          <Link href="/" aria-label="Retour à l'accueil BUILD"><Logo layout="horizontal" hideText={false} /></Link>
-          <nav className="flex items-center gap-3 text-sm">
+      <NavBar
+        activeLink="accompagnement"
+        tier={identity?.tier ?? null}
+        displayName={identity?.displayName}
+        displayEmail={identity?.displayEmail}
+        initials={identity?.initials}
+      />
+
+      {(isAdmin || (user && hasMemberAccess)) && (
+        <div className="border-b border-white/[0.08] px-5 py-2.5 sm:px-8">
+          <div className="mx-auto flex max-w-7xl items-center justify-end gap-4 text-sm">
             {isAdmin ? <Link className="text-[#c9b48a] hover:text-[#f0ede8]" href="/accompagnement/formateur">Formateur</Link> : null}
-            {user ? <Link className="border border-[#3a3a3e] px-3 py-2 text-[#d8d3c8] hover:border-[#c9b48a]" href={memberHref}>{hasMemberAccess ? "Mon espace" : "Se connecter"}</Link> : null}
-          </nav>
+            {user && hasMemberAccess ? <Link className="text-[#d8d3c8] hover:text-[#c9b48a]" href={memberHref}>Mon espace</Link> : null}
+          </div>
         </div>
-      </header>
+      )}
 
       <section className="border-b border-white/[0.08] px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-7xl">
@@ -91,23 +104,29 @@ export default async function AccompagnementPage({ searchParams }: Props) {
             <p className="mt-5 text-base leading-7 text-[#bdb9b0]">Chaque accompagnement part d'une situation réelle, avance avec toi et vise une sortie que tu peux utiliser ou vendre.</p>
           </div>
 
-          <div className="mt-12 divide-y divide-white/[0.1] border-y border-white/[0.1]">
-            {ACCOMPAGNEMENTS.map((item) =>
-              item.status === "available" && item.href ? (
-                <Link key={item.id} href={item.href} className="group grid gap-5 py-7 transition hover:bg-white/[0.03] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-10 sm:px-4">
-                  <div className="min-w-0">
-                    <p className="text-xs uppercase tracking-[0.16em] text-[#8f8b84]">Disponible</p>
-                    <h3 className="mt-3 text-2xl font-medium text-[#f0ede8]">{item.title}</h3>
-                    <p className="mt-3 max-w-2xl text-sm leading-6 text-[#bdb9b0]">{item.description}</p>
-                  </div>
-                  <span className="text-sm text-[#e8d5b0] underline decoration-[#c9b48a] underline-offset-4">Voir cet accompagnement <span aria-hidden="true">→</span></span>
-                </Link>
-              ) : (
-                <div key={item.id} className="py-7 text-[#8f8b84] sm:px-4">
-                  <p className="text-sm text-[#d8d3c8]">{item.description}</p>
-                </div>
-              )
-            )}
+          <div className="mt-12">
+            <IllustratedCardGrid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {ACCOMPAGNEMENTS.map((item) =>
+                item.status === "available" && item.href ? (
+                  <IllustratedCard
+                    key={item.id}
+                    title={item.title}
+                    description={item.description}
+                    imageSrc={illustrationSrc(`accompagnement-${item.id}`)}
+                    href={item.href}
+                    badge={{ label: "Disponible", tone: "success" }}
+                  />
+                ) : (
+                  <IllustratedCard
+                    key={item.id}
+                    title={item.title}
+                    description={item.description}
+                    locked
+                    badge={{ label: "Bientôt", tone: "default" }}
+                  />
+                )
+              )}
+            </IllustratedCardGrid>
           </div>
 
           <div className="mt-10 flex flex-col items-start gap-5 border-t border-white/[0.08] pt-8 sm:flex-row sm:items-end sm:justify-between">

@@ -47,17 +47,18 @@ export function doctrineArtifactPath(manifest: DoctrineManifest, path: string): 
 }
 export async function verifyDoctrineFiles(
   manifest: DoctrineManifest,
-  download: (storagePath: string) => Promise<Uint8Array>,
+  download: (storagePath: string, artifact: DoctrineManifest["artifacts"][number]) => Promise<Uint8Array>,
 ): Promise<DoctrineFile[]> {
   const valid = parseDoctrineManifest(manifest);
-  const files: DoctrineFile[] = [];
-  for (const artifact of valid.artifacts) {
-    const bytes = await download(doctrineArtifactPath(valid, artifact.path));
+  // Artifacts are independent (no shared mutable state between them once each
+  // gets its own byte/time budget - see readPublishedDoctrine), so they can
+  // download concurrently. Order in the result still follows the manifest.
+  return Promise.all(valid.artifacts.map(async (artifact) => {
+    const bytes = await download(doctrineArtifactPath(valid, artifact.path), artifact);
     if (bytes.byteLength !== artifact.bytes || sha256(bytes) !== artifact.sha256) {
       throw new Error("Doctrine integrity verification failed");
     }
     const content = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-    files.push({ path: artifact.path, content });
-  }
-  return files;
+    return { path: artifact.path, content };
+  }));
 }

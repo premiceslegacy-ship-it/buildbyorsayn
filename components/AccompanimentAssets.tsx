@@ -25,7 +25,7 @@ const BRANDS: Record<BrandId, Brand> = {
   chatgpt: { label: "ChatGPT", src: "/brand-logos/chatgpt.svg" },
   codex: { label: "Codex", src: "/brand-logos/codex.svg" },
   "claude-code": { label: "Claude Code", src: "/brand-logos/claude-code.svg" },
-  "google-ai-studio": { label: "Google AI Studio", src: "/brand-logos/google-ai-studio.svg" },
+  "google-ai-studio": { label: "Google AI Studio", src: "/brand-logos/google-ai-studio.png" },
   github: { label: "GitHub", src: "/brand-logos/github.svg" },
   pinterest: { label: "Pinterest", src: "/brand-logos/pinterest.svg" },
   higgsfield: { label: "Higgsfield", src: "/brand-logos/higgsfield.svg" },

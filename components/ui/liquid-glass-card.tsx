@@ -20,10 +20,6 @@ const VARIANTS = {
     "after:absolute after:inset-0 after:rounded-[inherit] after:pointer-events-none",
     "after:bg-[radial-gradient(120%_80%_at_50%_-10%,rgba(232,213,176,0.07),transparent_60%)]",
     "after:shadow-[inset_0_-24px_40px_-32px_rgba(0,0,0,0.9),inset_0_0_32px_rgba(255,255,255,0.02)]",
-    // hover: the card lifts slightly
-    "transition-[transform,box-shadow,border-color] duration-300 ease-out",
-    "hover:-translate-y-0.5 hover:border-[#c9b48a]/32",
-    "hover:shadow-[0_1px_0_rgba(255,255,255,0.09)_inset,0_32px_64px_-16px_rgba(0,0,0,0.6),0_10px_20px_-8px_rgba(0,0,0,0.45)]",
   ],
 } as const
 

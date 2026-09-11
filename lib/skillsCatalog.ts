@@ -26,7 +26,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "deep-research-vertical",
     title: "Deep Research Verticale",
     description:
-      "Sais si ta niche vaut le coup avant d'y toucher : marché, personas, douleurs réelles et angles publicitaires déjà prouvés par tes concurrents (Meta, TikTok, Google, LinkedIn), condensés en un verdict feu vert/orange/rouge. Pas d'idée ? Le skill t'en propose 3 selon ton profil.",
+      "Sais si ta niche vaut le coup avant d'y toucher : marché, personas, douleurs réelles et angles déjà prouvés par tes concurrents, en un verdict feu vert/orange/rouge.",
     access: "beginner",
     fileName: "deep-research-vertical.zip",
     category: "recherche",
@@ -35,7 +35,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "oracle-by-orsayn",
     title: "ORACLE by Orsayn",
     description:
-      "Le chef d'orchestre avant le code : interview fondatrice, documents et capacités bien rangés, data, sécurité, UX, copy, stratégie GTM et acquisition. Il choisit les réseaux pertinents, le tunnel, le contenu et les ads selon le projet, puis délègue aux bons skills.",
+      "Le chef d'orchestre avant le code : interview fondatrice, documents et capacités bien rangés, data, sécurité, UX, copy, GTM - puis délègue aux bons skills.",
     access: "full",
     fileName: "oracle-by-orsayn.zip",
     category: "produit",
@@ -44,7 +44,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "ux-ui-design",
     title: "UX/UI Design Premium",
     description:
-      "Pars de tes sites et images de référence pour construire une direction adaptée à ton projet : analyse mesurée, copywriting, tokens, icônes originales et audit des états réels. Un cadre compact pour concevoir, auditer ou refondre sans appliquer un style générique.",
+      "Pars de tes sites et images de référence pour construire une direction adaptée à ton projet : analyse mesurée, copywriting, tokens, icônes et audit des états réels.",
     access: "beginner",
     fileName: "ux-ui-design.zip",
     category: "design",
@@ -53,7 +53,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "apple-design-skills",
     title: "Apple Design Skills",
     description:
-      "Un bundle complet de 15 skills pour concevoir des interfaces premium inspirées de la discipline Apple : mindset, fondations, branding, composants, patterns, états, layout, matériaux, mouvement, accessibilité, contenu, web et quality gates.",
+      "Un bundle de 15 skills pour concevoir des interfaces premium inspirées de la discipline Apple : fondations, branding, composants, matériaux, mouvement, quality gates.",
     access: "full",
     fileName: "apple-design-skills.zip",
     category: "design",
@@ -62,7 +62,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "backend-orsayn",
     title: "Backend Orsayn",
     description:
-      "Le skill qui t'évite de faire fuiter les données de tes clients : audite un backend existant ou en construit un neuf, toujours avec un plan validé avant le premier code. Auth, RLS, sécurité des agents IA, webhooks, performance - mapping OWASP inclus, un critique bloque toujours la livraison.",
+      "T'évite de faire fuiter les données de tes clients : audite un backend existant ou en construit un neuf. Auth, RLS, sécurité des agents IA, mapping OWASP inclus.",
     access: "full",
     fileName: "backend-orsayn.zip",
     category: "backend",
@@ -71,7 +71,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "oracle-site-web",
     title: "ORACLE Site Web",
     description:
-      "Construis un site ou une landing page qui vend : cadrage en une session (Ultra Lean) ou site complet, copy qui vient de ta vraie recherche marché, SEO/GEO et score Lighthouse 100 visés dès le départ. Livrable pour tes clients comme pour tes propres projets.",
+      "Construis un site ou une landing page qui vend : cadrage en une session ou site complet, copy issu de ta vraie recherche marché, SEO/GEO et score Lighthouse 100 visés.",
     access: "beginner",
     fileName: "oracle-site-web.md",
     category: "site-web",
@@ -80,7 +80,7 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
     slug: "code-motion-production",
     title: "Motion Design par le code",
     description:
-      "Anime tes visuels par le code plutôt qu'à la souris : titres, transitions, micro-interactions et séquences complètes, avec une direction visuelle cadrée et des exports vérifiés à chaque étape.",
+      "Anime tes visuels par le code plutôt qu'à la souris : titres, transitions, micro-interactions et séquences complètes, exports vérifiés.",
     access: "beginner",
     fileName: "code-motion-production.zip",
     category: "motion",

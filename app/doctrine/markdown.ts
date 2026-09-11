@@ -14,6 +14,18 @@ export function chapterTitle(file: DoctrineFile): string {
   return stripFrontmatter(file.content).match(/^#\s+(.+?)\s*#*$/m)?.[1] || file.path.replace(/\.md$/, "");
 }
 
+/**
+ * Removes the leading "# Title" line already surfaced by `chapterTitle` -
+ * for callers that render that title themselves (as a page <h1>) before
+ * handing the file to `DoctrineMarkdown`, so it doesn't also appear as the
+ * body's own first heading.
+ */
+export function withoutLeadingTitle(file: DoctrineFile): DoctrineFile {
+  const stripped = stripFrontmatter(file.content);
+  const withoutHeading = stripped.replace(/^#\s+.+?\s*#*$(?:\n|$)/m, "");
+  return { ...file, content: withoutHeading };
+}
+
 export function doctrineHref(destination: string, file: DoctrineFile, files: readonly DoctrineFile[]): string | undefined {
   if (/[\s\\\u0000-\u001f\u007f]/.test(destination)) return undefined;
   if (/^https?:\/\//i.test(destination)) {

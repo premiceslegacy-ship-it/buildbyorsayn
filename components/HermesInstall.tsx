@@ -41,7 +41,7 @@ function CopyRow({
         {os}
       </p>
       <div className="relative group">
-        <pre className="bg-black/40 border border-white/10 rounded-lg py-2.5 pl-3 pr-11 text-[12px] font-mono text-[#e8d5b0]/85 overflow-x-auto whitespace-pre">
+        <pre className="bg-black/40 border border-white/10 py-2.5 pl-3 pr-11 text-[12px] font-mono text-[#e8d5b0]/85 overflow-x-auto whitespace-pre">
           {cmd}
         </pre>
         <button
@@ -52,7 +52,7 @@ function CopyRow({
             setTimeout(() => setCopied(false), 2000);
           }}
           aria-label={`Copier la commande ${os}`}
-          className="absolute top-1/2 -translate-y-1/2 right-2 rounded-md border border-white/10 bg-white/10 p-1.5 text-white/60 hover:bg-white/20 hover:text-[#e8d5b0] transition-colors cursor-pointer"
+          className="absolute top-1/2 -translate-y-1/2 right-2 border border-white/10 bg-white/10 p-1.5 text-white/60 hover:bg-white/20 hover:text-[#e8d5b0] transition-colors cursor-pointer"
         >
           {copied ? (
             <Check className="w-3.5 h-3.5 text-[#e8d5b0]" strokeWidth={2.5} />
@@ -69,18 +69,13 @@ export function HermesInstall() {
   return (
     <section
       aria-labelledby="hermes-install"
-      className="rounded-2xl border border-[#e8d5b0]/12 bg-[#e8d5b0]/[0.03] p-5 sm:p-6"
+      className="border border-[#e8d5b0]/12 bg-[#e8d5b0]/[0.03] p-5 sm:p-6"
     >
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-1">
-        <h2 id="hermes-install" className="text-base font-semibold text-[#f0ede8]">
-          Installer Hermes Agent
-        </h2>
-        <span className="text-[10px] uppercase tracking-[0.14em] text-[#e8d5b0]/70 border border-[#e8d5b0]/20 rounded-full px-2 py-0.5">
-          Gratuit - open source MIT
-        </span>
-      </div>
+      <h2 id="hermes-install" className="text-base font-semibold text-[#f0ede8] mb-1">
+        Installer Hermes Agent
+      </h2>
       <p className="text-xs text-white/45 leading-relaxed mb-5 max-w-2xl">
-        Deux façons de l'installer, toutes les deux gratuites. Le terminal si tu veux l'agent en CLI dans tes projets, l'application desktop si tu préfères une interface.
+        Gratuit et open source (licence MIT). Deux façons de l'installer : le terminal si tu veux l'agent en CLI dans tes projets, l'application desktop si tu préfères une interface.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-0">
@@ -107,7 +102,7 @@ export function HermesInstall() {
             href={DESKTOP_URL}
             target="_blank"
             rel="noreferrer noopener"
-            className="mt-auto inline-flex items-center justify-center gap-2 rounded-lg bg-[#e8d5b0] px-4 py-2.5 text-[13px] font-semibold text-[#0e0e0f] hover:bg-[#f0dfc0] transition-colors w-fit"
+            className="mt-auto inline-flex items-center justify-center gap-2 bg-[#e8d5b0] px-4 py-2.5 text-[13px] font-semibold text-[#0e0e0f] hover:bg-[#f0dfc0] transition-colors w-fit"
           >
             Télécharger l'app <ExternalLink className="w-3.5 h-3.5" />
           </a>

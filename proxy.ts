@@ -115,11 +115,13 @@ export async function proxy(request: NextRequest) {
         pathname === "/fin" ||
         pathname === "/intro" ||
         pathname === "/videos/tutos" ||
+        pathname.startsWith("/videos/tutos/") ||
         pathname.startsWith("/admin");
 
     // Routes réservées aux membres beginner ET full (97€+)
     const requiresBeginner =
         pathname === "/beginner" ||
+        pathname.startsWith("/beginner/") ||
         pathname === "/sources" ||
         pathname === "/protocole";
 
@@ -153,5 +155,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/videos/tutos", "/admin/:path*", "/beginner", "/protocole", "/accompagnement/espace/:path*", "/mcp/consent"],
+    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/videos/tutos", "/videos/tutos/:path*", "/admin/:path*", "/beginner", "/beginner/:path*", "/protocole", "/accompagnement/espace/:path*", "/mcp/consent"],
 };

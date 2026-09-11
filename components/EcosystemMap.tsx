@@ -16,151 +16,113 @@ export function EcosystemMap({ variant, tier }: { variant: EcosystemVariant; tie
       <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0]/60 font-medium mb-2">
         L&apos;écosystème Orsayn
       </p>
-      <p className="text-sm text-white/40 leading-relaxed mb-8">
+      <p className="text-sm text-white/40 leading-relaxed mb-8 max-w-2xl">
         {isDashboard
           ? "Le marché est saturé de contenu sur l'IA. Peu de gens buildent vraiment. Voici ce qui est construit, en production, avec les mêmes méthodes que tu apprends ici."
-          : "Pas une formation de plus. Une maison qui construit des systèmes IA réels, en production, sur des marchés précis."}
+          : "Pas une formation de plus. Des systèmes IA réels, construits en production, sur des marchés précis."}
       </p>
 
-      {/* Noeud Orsayn */}
-      <div className="flex justify-center mb-0">
-        <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-[#e8d5b0]/8 blur-xl scale-110 pointer-events-none" />
-          <div className="relative flex flex-col items-center gap-2.5 px-8 py-5 rounded-2xl bg-gradient-to-b from-white/[0.10] to-white/[0.04] border border-[#e8d5b0]/22 shadow-[0_8px_32px_rgba(0,0,0,0.5),0_0_0_1px_rgba(232,213,176,0.06),inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.18)] backdrop-blur-xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* ORSAYN */}
+        <div className="relative flex flex-col justify-between overflow-hidden border border-white/10 bg-gradient-to-br from-white/[0.05] to-transparent p-6 sm:p-8 min-h-[220px]">
+          <div className="flex items-start justify-between gap-3">
+            <span className="text-[10px] font-bold text-white/40 border border-white/15 px-2.5 py-1 leading-none tracking-wide">
+              ORSAYN
+            </span>
+          </div>
+
+          <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-orsayn.svg" alt="Orsayn" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(255,250,241,0.2)]" />
-            <p className="text-[11px] text-[#8a8070] leading-none">Maison-mère</p>
+            <img src="/logo-orsayn.svg" alt="Orsayn" className="w-9 h-9 object-contain mb-3 drop-shadow-[0_0_8px_rgba(255,250,241,0.15)]" />
+            <p className="text-sm text-white/45 leading-relaxed max-w-xs">
+              La structure derrière BUILD et Atelier - même méthode, appliquée à plusieurs marchés.
+            </p>
           </div>
         </div>
-      </div>
-
-      {/* Connecteur central */}
-      <div className="flex justify-center">
-        <div className="w-px h-7 bg-gradient-to-b from-[#e8d5b0]/22 to-[#e8d5b0]/6" />
-      </div>
-
-      {/* Ligne horizontale + 4 branches */}
-      <div className="relative mb-0">
-        <div className="absolute top-0 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-[#e8d5b0]/15 to-transparent" />
-        <div className="grid grid-cols-4 gap-3">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="flex justify-center">
-              <div className="w-px h-7 bg-gradient-to-b from-[#e8d5b0]/15 to-transparent" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 4 cartes */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
 
         {/* ATELIER */}
-        <a href="https://www.atelier-btp.fr" target="_blank" rel="noopener noreferrer" className="group col-span-1 block">
-          <div className="relative rounded-2xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-[#c9b48a]/20 shadow-[0_8px_32px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.09),inset_0_-1px_0_rgba(0,0,0,0.12)] backdrop-blur-xl overflow-hidden transition-all duration-300 group-hover:border-[#c9b48a]/40 group-hover:shadow-[0_12px_40px_rgba(201,180,138,0.12),inset_0_1px_0_rgba(255,255,255,0.12)] group-hover:-translate-y-1 h-full min-h-[210px]">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-10 bg-[#c9b48a]/6 blur-2xl rounded-full pointer-events-none" />
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9b48a]/18 to-transparent" />
-            <div className="relative z-10 p-4 sm:p-6 flex flex-col items-center h-full">
-              <div className="self-end mb-3">
-                <span className="inline-flex items-center gap-1 text-[9px] font-bold text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2 py-0.5 leading-none tracking-wide">
-                  <span className="w-1 h-1 rounded-full bg-[#0e0e0f]/60 animate-pulse" />
-                  LIVE
-                </span>
-              </div>
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-b from-white/[0.08] to-white/[0.03] border border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center p-2.5 mb-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/monogramme-atelier.svg" alt="Atelier" className="w-full h-full object-contain" />
-              </div>
-              <div className="mb-2 w-full flex justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-atelier-blanc.svg" alt="Atelier" className="h-3 sm:h-3.5 object-contain opacity-80 max-w-[80px]" />
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-white/38 text-center leading-relaxed mt-auto px-1">
-                ERP BTP nouvelle génération - devis intelligents, chantiers, rentabilité
-              </p>
-              <div className="flex items-center gap-1 mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="text-[9px] text-[#e8d5b0]/60">atelier-btp.fr</span>
-                <ArrowRight className="w-2.5 h-2.5 text-[#e8d5b0]/60" />
-              </div>
-            </div>
+        <a
+          href="https://www.atelier-btp.fr"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative flex flex-col justify-between overflow-hidden border border-white/10 bg-gradient-to-br from-[#c9b48a]/[0.06] to-transparent p-6 sm:p-8 min-h-[220px] transition-colors duration-200 hover:border-[#c9b48a]/40"
+        >
+          <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-atelier-blanc.svg" alt="Atelier" className="h-4 sm:h-5 object-contain opacity-90 mb-3" />
+            <p className="text-sm text-white/45 leading-relaxed max-w-xs">
+              ERP BTP nouvelle génération - devis intelligents, suivi de chantiers, rentabilité en temps réel.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-1.5 mt-6 text-xs text-[#e8d5b0]/70 group-hover:text-[#e8d5b0] transition-colors">
+            <span className="whitespace-nowrap">Voir le produit</span>
+            <ArrowRight className="w-3.5 h-3.5 shrink-0" />
           </div>
         </a>
 
         {/* BUILD */}
-        <div className="col-span-1">
-          <div className={`relative rounded-2xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] border shadow-[0_8px_32px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.09),inset_0_-1px_0_rgba(0,0,0,0.12)] backdrop-blur-xl overflow-hidden h-full min-h-[210px] ${
-            isDashboard && isMember
-              ? "border-[#e8d5b0]/22"
-              : "border-white/[0.07]"
-          }`}>
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e8d5b0]/12 to-transparent" />
-            {isDashboard && isMember && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-10 bg-[#e8d5b0]/5 blur-2xl rounded-full pointer-events-none" />
-            )}
-            <div className="relative z-10 p-4 sm:p-6 flex flex-col items-center h-full">
-              {/* Badge */}
-              <div className="self-end mb-3">
-                {isDashboard && isMember ? (
-                  <span className="inline-flex items-center gap-1 text-[9px] font-bold text-[#0e0e0f] bg-[#e8d5b0] rounded-full px-2 py-0.5 leading-none tracking-wide">
-                    <span className="w-1 h-1 rounded-full bg-[#0e0e0f]/50" />
-                    TU ES ICI
-                  </span>
-                ) : (
-                  <span className="text-[9px] font-bold text-[#e8d5b0]/45 border border-[#e8d5b0]/15 rounded-full px-2 py-0.5 leading-none tracking-wide">
-                    LIVE
-                  </span>
-                )}
-              </div>
-              {/* Logo BUILD : cubes sans carré + texte identique au header */}
-              <Logo hideText layout="vertical" className="!gap-0 w-10 h-10 mb-2" />
-              <p className={`font-extrabold uppercase leading-none mb-2 ${isDashboard && isMember ? "text-[#f0ede8]" : "text-[#f0ede8]/45"}`} style={{ fontSize: "13px", letterSpacing: "2px" }}>BUILD</p>
-              <p className="text-[10px] sm:text-[11px] text-white/35 text-center leading-relaxed mt-auto px-1">
-                {isDashboard && isMember
-                  ? "La méthode, les skills, les frameworks. Tu en fais partie."
-                  : "Méthode, skills, frameworks. La bibliothèque pour construire des lignes IA."}
-              </p>
-              {/* CTA homepage si pas membre */}
-              {!isDashboard && (
-                <a
-                  href="#pricing"
-                  className="flex items-center gap-1 mt-3 text-[9px] text-[#e8d5b0]/50 hover:text-[#e8d5b0]/80 transition-colors border border-[#e8d5b0]/15 hover:border-[#e8d5b0]/30 rounded-full px-2.5 py-1"
-                >
-                  Tu n&apos;es pas encore à l&apos;intérieur.
-                  <ArrowRight className="w-2.5 h-2.5" />
-                </a>
-              )}
-              {isDashboard && isMember && (
-                <Link href="/dashboard" className="flex items-center gap-1 mt-3 text-[9px] text-[#e8d5b0]/40 hover:text-[#e8d5b0]/70 transition-colors">
-                  Mon espace <ArrowRight className="w-2.5 h-2.5" />
-                </Link>
-              )}
+        <div
+          className={`relative flex flex-col justify-between overflow-hidden border p-6 sm:p-8 min-h-[220px] ${
+            isDashboard && isMember ? "border-[#e8d5b0]/35 bg-gradient-to-br from-[#e8d5b0]/[0.06] to-transparent" : "border-white/10"
+          }`}
+        >
+          {isDashboard && isMember && (
+            <div className="flex items-start justify-between gap-3">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#0e0e0f] bg-[#e8d5b0] px-2.5 py-1 leading-none tracking-wide">
+                TU ES ICI
+              </span>
             </div>
+          )}
+
+          <div>
+            <Logo hideText layout="vertical" className="!gap-0 w-9 h-9 mb-3" />
+            <p className={`font-extrabold uppercase leading-none mb-3 ${isDashboard && isMember ? "text-[#f0ede8]" : "text-[#f0ede8]/60"}`} style={{ fontSize: "13px", letterSpacing: "2px" }}>
+              BUILD
+            </p>
+            <p className="text-sm text-white/45 leading-relaxed max-w-xs">
+              {isDashboard && isMember
+                ? "La méthode, les skills, les frameworks. Tu en fais partie."
+                : "Méthode, skills et frameworks pour construire des lignes IA vendables."}
+            </p>
           </div>
+
+          {!isDashboard && (
+            <a
+              href="#pricing"
+              className="flex items-center gap-1.5 mt-6 text-xs text-[#e8d5b0]/60 hover:text-[#e8d5b0] transition-colors"
+            >
+              <span className="whitespace-nowrap">Rejoindre BUILD</span>
+              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+            </a>
+          )}
+          {isDashboard && isMember && (
+            <Link href="/dashboard" className="flex items-center gap-1.5 mt-6 text-xs text-[#e8d5b0]/50 hover:text-[#e8d5b0] transition-colors">
+              <span className="whitespace-nowrap">Mon espace</span>
+              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+            </Link>
+          )}
         </div>
 
-        {/* Mystère 1 */}
-        <div className="col-span-1 select-none">
-          <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.04] backdrop-blur-xl overflow-hidden opacity-28 h-full min-h-[210px]">
-            <div className="relative z-10 p-4 flex flex-col items-center justify-center h-full gap-3">
-              <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-                <span className="text-white/20 text-2xl font-extralight">?</span>
-              </div>
-              <span className="text-[10px] text-white/18 font-medium">Bientôt</span>
-            </div>
-          </div>
+        {/* Bientôt */}
+        <div className="relative flex flex-col justify-between overflow-hidden border border-dashed border-white/[0.08] p-6 sm:p-8 min-h-[220px] select-none">
+          <span className="text-[10px] font-bold text-white/20 border border-white/[0.08] px-2.5 py-1 leading-none tracking-wide w-fit">
+            BIENTÔT
+          </span>
+          <p className="text-sm text-white/20 leading-relaxed max-w-xs">
+            Une prochaine ligne verticale, construite avec les mêmes méthodes.
+          </p>
         </div>
 
-        {/* Mystère 2 */}
-        <div className="col-span-1 select-none">
-          <div className="relative rounded-2xl bg-white/[0.01] border border-white/[0.02] backdrop-blur-xl overflow-hidden opacity-14 h-full min-h-[210px]">
-            <div className="relative z-10 p-4 flex flex-col items-center justify-center h-full gap-3">
-              <div className="w-12 h-12 rounded-xl bg-white/[0.02] border border-white/[0.03] flex items-center justify-center">
-                <span className="text-white/12 text-2xl font-extralight">?</span>
-              </div>
-              <span className="text-[10px] text-white/10 font-medium">Bientôt</span>
-            </div>
-          </div>
+        {/* Bientôt 2 */}
+        <div className="relative flex flex-col justify-between overflow-hidden border border-dashed border-white/[0.05] p-6 sm:p-8 min-h-[220px] select-none">
+          <span className="text-[10px] font-bold text-white/12 border border-white/[0.05] px-2.5 py-1 leading-none tracking-wide w-fit">
+            BIENTÔT
+          </span>
+          <p className="text-sm text-white/12 leading-relaxed max-w-xs">
+            D&apos;autres verticales arrivent au fil de l&apos;eau.
+          </p>
         </div>
-
       </div>
     </div>
   );

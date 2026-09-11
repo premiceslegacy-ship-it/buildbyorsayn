@@ -17,8 +17,20 @@ Added for the method assets:
 - `cloudflare.svg`: Cloudflare mark from Simple Icons.
 - `github.svg`: GitHub mark from Simple Icons.
 - `pinterest.svg`: Pinterest mark from Simple Icons.
-- `google-ai-studio.svg`: Google AI Studio icon from the public Wikimedia Commons file whose source is documented as Google AI Studio.
+- `google-ai-studio.png`: official Google AI Studio icon, downloaded directly from Google's own branding CDN (`gstatic.com`). Replaces an earlier `google-ai-studio.svg` sourced from Wikimedia Commons that carried ~730KB of embedded base64 raster data and caused a visible loading delay wherever it was rendered at icon size.
 - `higgsfield.svg`: official Higgsfield.ai compact icon from the public Higgsfield AI skills repository.
+
+Added for the Fondations tool references (Section3 "Générer des visuels pro" and others):
+
+- `figma.svg`: Figma mark from Simple Icons.
+- `gemini.svg`: Google Gemini mark from Simple Icons.
+- `hubspot.svg`: HubSpot mark from Simple Icons.
+- `mintlify.svg`: Mintlify mark from Simple Icons.
+- `midjourney.svg`, `cursor.svg`: marks from the versioned `@lobehub/icons-static-svg@1.94.0` set.
+- `lovable.svg`, `kling.svg`, `nano-banana.svg`, `antigravity.svg`: color marks from the versioned `@lobehub/icons-static-svg@1.94.0` set.
+- `refero.png`: official Refero mark, downloaded directly from `https://refero.design/apple-icon-180x180.png`.
+- `rare-ui.svg`: official Rare UI mark, downloaded directly from `https://www.rareui.com/logos/Rareui.svg`.
+- `bolt-new.svg`: official Bolt.new mark, downloaded directly from `https://bolt.new/static/favicon.svg`.
 
 Source URLs:
 
@@ -26,10 +38,23 @@ Source URLs:
 - `https://cdn.simpleicons.org/cloudflare`
 - `https://cdn.simpleicons.org/github`
 - `https://cdn.simpleicons.org/pinterest`
-- `https://upload.wikimedia.org/wikipedia/commons/7/77/Google_AI_Studio_icon_%28May_2026%29.svg`
+- `https://cdn.simpleicons.org/figma`
+- `https://cdn.simpleicons.org/googlegemini`
+- `https://cdn.simpleicons.org/hubspot`
+- `https://cdn.simpleicons.org/mintlify`
+- `https://www.gstatic.com/images/branding/productlogos/ai_studio/v1/web-96dp/logo_ai_studio_color_1x_web_96dp.png`
 - `https://higgsfield.ai/`
 - `https://raw.githubusercontent.com/higgsfield-ai/skills/main/assets/icon.svg`
 - `https://unpkg.com/@lobehub/icons-static-svg@1.94.0/icons/codex-color.svg`
 - `https://unpkg.com/@lobehub/icons-static-svg@1.94.0/icons/claudecode-color.svg`
+- `https://unpkg.com/@lobehub/icons-static-svg@1.94.0/icons/midjourney.svg`
+- `https://unpkg.com/@lobehub/icons-static-svg@1.94.0/icons/cursor.svg`
+- `https://unpkg.com/@lobehub/icons-static-svg@1.94.0/icons/lovable-color.svg`
+- `https://unpkg.com/@lobehub/icons-static-svg@1.94.0/icons/kling-color.svg`
+- `https://unpkg.com/@lobehub/icons-static-svg@1.94.0/icons/nanobanana-color.svg`
+- `https://unpkg.com/@lobehub/icons-static-svg@1.94.0/icons/antigravity-color.svg`
+- `https://refero.design/apple-icon-180x180.png`
+- `https://www.rareui.com/logos/Rareui.svg`
+- `https://bolt.new/static/favicon.svg`
 
 The marks are shown only inside scenes that explain their role in the BUILD method. They are not presented as endorsements, guarantees or the value of the accompaniment itself. Recheck trademark and usage terms before reusing them in a separate commercial support.

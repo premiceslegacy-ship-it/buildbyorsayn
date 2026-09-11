@@ -251,7 +251,7 @@ export default async function HomePage() {
             <h3 className="mb-6 text-xl font-bold leading-snug text-[#f0ede8] sm:text-2xl">
               La valeur n&apos;est pas dans l&apos;outil.
               <br />
-              <span className="text-[#c9b48a]">Elle est dans la façon de construire.</span>
+              <span className="build-hero-gradient">Elle est dans la façon de construire.</span>
             </h3>
             {!isMember && <CtaButton href="#pricing">Combler l&apos;écart</CtaButton>}
           </div>
@@ -397,7 +397,7 @@ export default async function HomePage() {
           <h2 className="text-3xl sm:text-4xl font-bold text-[#f0ede8] mb-5 leading-[1.15]">
             Pendant que les autres louent leur intelligence,
             <br />
-            <span className="text-[#c9b48a]">tu vas la distiller.</span>
+            <span className="build-hero-gradient">tu vas la distiller.</span>
           </h2>
 
           <p className="text-[#8a8070] text-base leading-[1.75] mb-12">

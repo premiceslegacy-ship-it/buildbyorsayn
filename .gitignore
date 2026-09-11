@@ -13,3 +13,7 @@ tsconfig.tsbuildinfo
 .watcher-backups/
 supabase/.temp/
 .vercel
+playwright-report/
+test-results/
+e2e/.auth/
+private/brand-assets/build-collection-cards/

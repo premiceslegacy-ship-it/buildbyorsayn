@@ -240,59 +240,71 @@ export function NavBar({
       <div className="hidden md:flex items-center gap-6 text-sm">
         {desktopNavLinks}
 
-        <div className="relative" ref={desktopDropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
-          >
-            {initials && initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
-          </button>
+        {displayEmail ? (
+          <div className="relative" ref={desktopDropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
+            >
+              {initials && initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
+            </button>
 
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
-              {displayName && (
-                <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
-              )}
-              <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
-              <form action="/api/signout" method="post">
-                <button
-                  type="submit"
-                  className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
-                >
-                  Se déconnecter
-                </button>
-              </form>
-            </div>
-          )}
-        </div>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
+                {displayName && (
+                  <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
+                )}
+                <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
+                <form action="/api/signout" method="post">
+                  <button
+                    type="submit"
+                    className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
+                  >
+                    Se déconnecter
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link href="/login" className="text-[#e8d5b0] hover:text-[#f0ede8] transition-colors font-medium">
+            Se connecter
+          </Link>
+        )}
       </div>
 
       {/* Mobile: hamburger + avatar */}
       <div className="flex md:hidden items-center gap-3">
-        <div className="relative" ref={mobileDropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
-          >
-            {initials && initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
-          </button>
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
-              {displayName && (
-                <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
-              )}
-              <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
-              <form action="/api/signout" method="post">
-                <button
-                  type="submit"
-                  className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
-                >
-                  Se déconnecter
-                </button>
-              </form>
-            </div>
-          )}
-        </div>
+        {displayEmail ? (
+          <div className="relative" ref={mobileDropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
+            >
+              {initials && initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
+                {displayName && (
+                  <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
+                )}
+                <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
+                <form action="/api/signout" method="post">
+                  <button
+                    type="submit"
+                    className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
+                  >
+                    Se déconnecter
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link href="/login" className="text-[#e8d5b0] hover:text-[#f0ede8] transition-colors text-sm font-medium">
+            Se connecter
+          </Link>
+        )}
 
         <div ref={mobileMenuRef} className="relative">
           <button

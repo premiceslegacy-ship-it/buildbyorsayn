@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Logo } from "@/components/Logo";
 import { MethodToolsAsset, StartingPointAsset, ThemeAtlas } from "@/components/AccompanimentAssets";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -9,6 +8,8 @@ import {
 } from "@/lib/accompanimentAccess";
 import { THEMES } from "@/lib/siteWebAccompagnement";
 import { ACCOMPANIMENT_CAL_URL } from "@/lib/accompagnements";
+import { NavBar } from "@/components/NavBar";
+import { navIdentity } from "@/lib/auth/navIdentity.server";
 
 const CAL_URL = ACCOMPANIMENT_CAL_URL;
 
@@ -40,17 +41,26 @@ export default async function SiteWebAccompagnementPage() {
     hasMemberAccess = Boolean(assignment && !error);
   }
 
+  const identity = await navIdentity();
+
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8]">
-      <header className="border-b border-white/[0.08] px-5 py-5 sm:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-5">
-          <Link href="/accompagnement" aria-label="Retour aux accompagnements"><Logo layout="horizontal" hideText={false} /></Link>
-          <nav className="flex items-center gap-4 text-sm">
+      <NavBar
+        activeLink="accompagnement"
+        tier={identity?.tier ?? null}
+        displayName={identity?.displayName}
+        displayEmail={identity?.displayEmail}
+        initials={identity?.initials}
+      />
+
+      {(isAdmin || hasMemberAccess) && (
+        <div className="border-b border-white/[0.08] px-5 py-2.5 sm:px-8">
+          <div className="mx-auto flex max-w-7xl items-center justify-end gap-4 text-sm">
             {isAdmin ? <Link className="text-[#c9b48a] hover:text-[#f0ede8]" href="/accompagnement/formateur">Formateur</Link> : null}
-            {hasMemberAccess ? <Link className="border border-[#3a3a3e] px-3 py-2 text-[#d8d3c8] hover:border-[#c9b48a]" href="/accompagnement/espace">Espace membre</Link> : null}
-          </nav>
+            {hasMemberAccess ? <Link className="text-[#d8d3c8] hover:text-[#c9b48a]" href="/accompagnement/espace">Espace membre</Link> : null}
+          </div>
         </div>
-      </header>
+      )}
 
       <section className="border-b border-white/[0.08] px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-7xl">
