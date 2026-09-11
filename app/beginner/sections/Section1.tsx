@@ -1,4 +1,5 @@
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
+import { ContextFilesDiagram } from "../diagrams";
 
 export function Section1() {
   return (
@@ -17,7 +18,7 @@ export function Section1() {
         <p className="text-white/55 text-sm leading-relaxed mb-8">
           Chaque fois que je commence un projet (site vitrine, app ou outil interne) je réponds à ces questions avant d'ouvrir quoi que ce soit.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 items-start">
           {[
             {
               q: "Qui est l'utilisateur ? Quel comportement je veux qu'il ait ?",
@@ -52,27 +53,27 @@ export function Section1() {
               a: "Pas « avoir un beau site ». Un chiffre, une action, une métrique. 10 demandes de contact par mois. 500 visiteurs uniques. 3 clients signés. Cet objectif conditionne les décisions techniques : si l'objectif est de générer des leads, le SEO et le CTA sont prioritaires.",
             },
           ].map(({ q, a }) => (
-            <LiquidCard key={q} className="rounded-2xl p-5">
-              <p className="text-sm font-semibold text-[#e8d5b0] mb-3">{q}</p>
-              <p className="text-xs text-white/55 leading-relaxed">{a}</p>
+            <LiquidCard key={q} variant="elevated" className="rounded-2xl p-5">
+              <p className="text-sm font-semibold text-[#e8d5b0] mb-3 tracking-tight leading-snug">{q}</p>
+              <p className="text-[13px] text-white/65 leading-[1.65]">{a}</p>
             </LiquidCard>
           ))}
         </div>
       </div>
 
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Pourquoi une IA seule ne suffit pas</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Pourquoi une IA seule ne suffit pas</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           Beaucoup de gens pensent qu'il suffit de demander à l'IA "crée-moi un site pour un plombier" pour avoir un résultat professionnel. En théorie c'est possible. En pratique, le résultat sera générique, sans personnalité, sans compréhension du vrai problème du client.
         </p>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           L'IA est un outil d'exécution extraordinaire. Mais elle a besoin d'un chef de projet qui sait ce qu'il veut. Mon rôle, ce n'est pas d'écrire du code. Mon rôle est de comprendre le problème, prendre les bonnes décisions de structure, et donner à l'IA un contexte suffisamment précis pour qu'elle produise quelque chose qui tient. <strong className="text-[#f0ede8]">L'IA fait l'exécution. Moi je fais le jugement.</strong>
         </p>
       </LiquidCard>
 
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Les automatisations, c'est du code</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Les automatisations, c'est du code</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           Quand un formulaire de contact envoie automatiquement un mail et crée une ligne dans un CRM, c'est de la logique de code. Il y a une condition, une action, un résultat. Mais aujourd'hui, cette logique peut se décrire en langage naturel à une IA.
         </p>
         <div className="bg-black/30 border border-white/5 rounded-xl p-4 mb-4">
@@ -80,14 +81,14 @@ export function Section1() {
             "Quand ce formulaire est soumis, envoie un email de confirmation à l'utilisateur et ajoute son contact dans HubSpot."
           </p>
         </div>
-        <p className="text-sm text-white/55 leading-relaxed">
+        <p className="text-sm text-white/65 leading-relaxed">
           C'est une instruction que je peux donner à Claude ou Cursor, et obtenir le code fonctionnel en retour. La condition : je comprenne ce que je veux.
         </p>
       </LiquidCard>
 
-      <LiquidCard className="rounded-2xl p-6 md:p-8">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Les fichiers .md de contexte</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Les fichiers .md de contexte</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           Avant de lancer quoi que ce soit dans un IDE ou un outil IA, je crée un dossier <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 rounded text-xs">/docs</code> dans mon projet avec des fichiers Markdown :
         </p>
         <ul className="space-y-3 mb-4">
@@ -96,13 +97,14 @@ export function Section1() {
             { file: "PRD.md", desc: "Liste les fonctionnalités et critères d'acceptation" },
             { file: "PROMPT-SYSTEM.md", desc: "Dit à l'IA comment se comporter" },
           ].map(({ file, desc }) => (
-            <li key={file} className="flex items-start gap-3 text-sm text-white/55">
+            <li key={file} className="flex items-start gap-3 text-sm text-white/65">
               <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 rounded text-[11px] font-mono mt-0.5 lg:w-[140px]">{file}</code>
               <span className="flex-1">{desc}</span>
             </li>
           ))}
         </ul>
-        <p className="text-sm text-white/55 leading-relaxed mt-4">
+        <ContextFilesDiagram />
+        <p className="text-sm text-white/65 leading-relaxed mt-4">
           Sans ces fichiers, l'IA avance en aveugle et génère du code générique. Avec eux, elle charge le contexte à chaque session.
         </p>
       </LiquidCard>

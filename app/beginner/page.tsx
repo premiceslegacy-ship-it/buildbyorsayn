@@ -6,6 +6,9 @@ import { NavBar } from "@/components/NavBar";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { HermesInstall } from "@/components/HermesInstall";
+import { FoundationSection } from "./FoundationSection";
 
 import { SectionMindset } from "./sections/SectionMindset";
 import { SectionPsychologie } from "./sections/SectionPsychologie";
@@ -19,15 +22,69 @@ import { Section4 } from "./sections/Section4";
 import { Section5 } from "./sections/Section5";
 
 const SECTIONS = [
-  { id: "mindset", label: "L'état d'esprit qui fait l'argent", Component: SectionMindset },
-  { id: "psychologie", label: "Comprendre les gens", Component: SectionPsychologie },
-  { id: "copywriting", label: "Écrire pour vendre", Component: SectionCopywriting },
-  { id: "vente", label: "Vendre", Component: SectionVente },
-  { id: "marketing", label: "Capter l'attention", Component: SectionMarketing },
-  { id: "penser", label: "Penser avant de construire", Component: Section1 },
-  { id: "environnement", label: "Comprendre l'environnement", Component: Section2 },
-  { id: "visuels", label: "Générer des visuels pro", Component: Section3 },
-  { id: "url", label: "De l'idée à l'URL en ligne", Component: Section4 },
+  {
+    id: "mindset",
+    num: "01",
+    label: "L'état d'esprit qui fait l'argent",
+    summary: "Avant la technique, avant les outils, il y a la tête. Ces principes ne changent pas dans le temps.",
+    Component: SectionMindset,
+  },
+  {
+    id: "psychologie",
+    num: "02",
+    label: "Comprendre les gens",
+    summary: "On répète qu'il faut résoudre un problème. C'est vrai, mais c'est incomplet.",
+    Component: SectionPsychologie,
+  },
+  {
+    id: "copywriting",
+    num: "03",
+    label: "Écrire pour vendre",
+    summary: "Le copywriting, c'est l'art d'écrire pour vendre. Pas pour faire joli.",
+    Component: SectionCopywriting,
+  },
+  {
+    id: "vente",
+    num: "04",
+    label: "Vendre",
+    summary: "La vente fait peur parce qu'on l'imagine comme du baratin de marchand de tapis. C'est l'inverse.",
+    Component: SectionVente,
+  },
+  {
+    id: "marketing",
+    num: "05",
+    label: "Capter l'attention",
+    summary: "Le meilleur produit du monde ne sert à rien si personne ne le connaît.",
+    Component: SectionMarketing,
+  },
+  {
+    id: "penser",
+    num: "06",
+    label: "Penser avant de construire",
+    summary: "Avant de toucher un seul outil, je pose le cadre. C'est l'étape que tout le monde saute.",
+    Component: Section1,
+  },
+  {
+    id: "environnement",
+    num: "07",
+    label: "Comprendre l'environnement",
+    summary: "Pas besoin d'être développeur. Mais comprendre les bases change radicalement la qualité des résultats.",
+    Component: Section2,
+  },
+  {
+    id: "visuels",
+    num: "08",
+    label: "Générer des visuels pro",
+    summary: "Créer une direction visuelle cohérente avec le message, la conversion et le design system.",
+    Component: Section3,
+  },
+  {
+    id: "url",
+    num: "09",
+    label: "De l'idée à l'URL en ligne",
+    summary: "La section la plus concrète. À la fin, tu sais mettre un site en ligne, même si tu n'as jamais codé.",
+    Component: Section4,
+  },
 ] as const;
 
 export default function BeginnerPage() {
@@ -35,6 +92,7 @@ export default function BeginnerPage() {
   const [tier, setTier] = useState<string | null>(null);
   const [upgradeUrl, setUpgradeUrl] = useState<string>("#");
   const [displayEmail, setDisplayEmail] = useState<string>("");
+  const [openId, setOpenId] = useState<string | null>("mindset");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -64,22 +122,42 @@ export default function BeginnerPage() {
         initials={displayEmail ? displayEmail.substring(0, 2).toUpperCase() : "?"}
       />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 pb-32 relative z-10">
-        <div className="pt-6 mb-14">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pb-32 relative z-10">
+        <div className="pt-6 mb-10">
           <p className="text-xs uppercase tracking-[0.15em] text-[#e8d5b0]/60 font-semibold">Fondations</p>
           <p className="mt-2 text-sm text-white/40 leading-relaxed max-w-xl">
-            Les dix blocs, dans l'ordre d'apprentissage. Lis-les à la suite ou saute directement à celui dont tu as besoin.
+            Les dix blocs, dans l'ordre d'apprentissage. Ouvre celui dont tu as besoin, referme-le pour passer au suivant.
           </p>
         </div>
 
-        <div className="flex flex-col gap-20">
-          {SECTIONS.map(({ id, Component }) => (
+        <div className="mb-16">
+          <HermesInstall />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {SECTIONS.map(({ id, num, label, summary, Component }) => (
             <section key={id} id={id} className="scroll-mt-24">
-              <Component />
+              <FoundationSection
+                num={num}
+                title={label}
+                summary={summary}
+                isOpen={openId === id}
+                onToggle={() => setOpenId((current) => (current === id ? null : id))}
+              >
+                <Component />
+              </FoundationSection>
             </section>
           ))}
           <section id="angle-mort" className="scroll-mt-24">
-            <Section5 upgradeUrl={upgradeUrl} isFullUser={tier === "full"} />
+            <FoundationSection
+              num="10"
+              title="Le seuil"
+              summary="Tu as les Fondations entre les mains. Regarde maintenant ce qui te fait sortir de la dépendance pour de bon."
+              isOpen={openId === "angle-mort"}
+              onToggle={() => setOpenId((current) => (current === "angle-mort" ? null : "angle-mort"))}
+            >
+              <Section5 upgradeUrl={upgradeUrl} isFullUser={tier === "full"} />
+            </FoundationSection>
           </section>
         </div>
       </div>
@@ -87,6 +165,7 @@ export default function BeginnerPage() {
       <ScrollProgress
         sections={[...SECTIONS.map((s) => ({ id: s.id, label: s.label })), { id: "angle-mort", label: "L'angle mort" }]}
       />
+      <ScrollToTop />
     </main>
   );
 }

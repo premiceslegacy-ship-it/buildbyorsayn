@@ -1,5 +1,5 @@
-import { ArrowRight } from "lucide-react";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
+import { PromptContextDiagram, ApiFlowDiagram } from "../diagrams";
 
 export function Section2() {
   return (
@@ -13,21 +13,22 @@ export function Section2() {
       </p>
 
       {/* LLM */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Démystifier le LLM</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-6">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Démystifier le LLM</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-6">
           Un LLM c'est le moteur derrière Claude, ChatGPT, Gemini. Il prédit le prochain mot le plus probable. Ce n'est pas une base de données. Il génère une réponse probable en fonction du contexte.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <PromptContextDiagram />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 items-start">
           <div className="bg-black/20 border border-white/5 rounded-xl p-4">
             <p className="text-xs font-semibold text-[#e8d5b0] mb-2">Les tokens</p>
-            <p className="text-xs text-white/50 leading-relaxed">
+            <p className="text-[13px] text-white/60 leading-[1.65]">
               L'IA ne lit pas des mots, elle lit des tokens (env. 0,75 mot). Chaque modèle a une limite de tokens (la fenêtre de contexte). Quand la fenêtre est pleine, le modèle commence à "oublier" ce qui a été dit au début. Une trop longue conversation produit des résultats incohérents.
             </p>
           </div>
           <div className="bg-black/20 border border-white/5 rounded-xl p-4">
             <p className="text-xs font-semibold text-[#e8d5b0] mb-2">Pourquoi un projet Claude change tout</p>
-            <p className="text-xs text-white/50 leading-relaxed">
+            <p className="text-[13px] text-white/60 leading-[1.65]">
               Un projet Claude, c'est une conversation permanente avec un contexte chargé une fois pour toutes. J'y mets des fichiers de connaissances. À chaque session, l'IA sait déjà qui est le client et quelles sont les règles. Je ne répète rien.
             </p>
           </div>
@@ -35,34 +36,22 @@ export function Section2() {
       </LiquidCard>
 
       {/* API */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">L'analogie de l'API</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">L'analogie de l'API</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           Une API, c'est comme un serveur dans un restaurant. Je passe ma commande au serveur, qui transmet à la cuisine, qui prépare et renvoie.
         </p>
-        <div className="bg-black/20 border border-white/5 rounded-xl p-4 mb-4">
-          <div className="flex items-center gap-2 text-[10px] md:text-xs text-white/40 flex-wrap justify-between md:justify-start">
-            <span className="text-[#e8d5b0] whitespace-nowrap">Mon app</span>
-            <ArrowRight className="w-3 h-3 flex-shrink-0" />
-            <span className="whitespace-nowrap">API</span>
-            <ArrowRight className="w-3 h-3 flex-shrink-0" />
-            <span className="whitespace-nowrap">Service externe</span>
-            <ArrowRight className="w-3 h-3 flex-shrink-0" />
-            <span className="whitespace-nowrap">API</span>
-            <ArrowRight className="w-3 h-3 flex-shrink-0" />
-            <span className="text-[#e8d5b0] whitespace-nowrap">Mon app</span>
-          </div>
-        </div>
-        <p className="text-sm text-white/55 leading-relaxed">
+        <ApiFlowDiagram />
+        <p className="text-sm text-white/65 leading-relaxed">
           Je comprends qu'il faut une clé API secrète, et gérer les erreurs. Sans cette compréhension, l'IA produirait du code que je ne saurais pas évaluer.
         </p>
       </LiquidCard>
 
       {/* Prompt structuré */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Le prompt structuré</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-6">Même outil, même modèle, deux résultats radicalement différents.</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Le prompt structuré</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-6">Même outil, même modèle, deux résultats radicalement différents.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-6 items-start">
           <div className="bg-red-500/5 border border-red-500/15 rounded-xl p-4">
             <p className="text-xs font-semibold text-red-400 mb-2">Prompt basique</p>
             <p className="text-xs text-white/50 font-mono">"Fais-moi un site pour un plombier."</p>
@@ -84,7 +73,7 @@ export function Section2() {
               ["La tâche précise", "Une seule chose claire. \"Écris le texte de la section d'accueil\", pas \"fais le site\"."],
               ["Les contraintes", "Ce qu'il ne faut pas faire. Pas de jargon, garder ces couleurs, ce ton, cette longueur."],
             ].map(([label, desc]) => (
-              <li key={label as string} className="flex gap-2 text-xs md:text-sm text-white/50 leading-relaxed">
+              <li key={label as string} className="flex gap-2 text-xs md:text-sm text-white/60 leading-relaxed">
                 <span className="text-[#e8d5b0] flex-shrink-0 font-medium whitespace-nowrap min-w-[110px]">{label} :</span>
                 <span>{desc}</span>
               </li>

@@ -9,7 +9,6 @@ import {
   type ReactNode,
 } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { motion, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -62,7 +61,9 @@ const toItem = (item: GooeyNavItem): NavItem =>
 
 export type GooeyNavProps = Omit<ComponentProps<"nav">, "onChange"> & {
   items: GooeyNavItem[];
+  /** Active tile index; -1 (or any unmatched value) renders a neutral bar with no tile active. */
   value?: number;
+  /** Active index in uncontrolled mode; -1 for neutral. */
   defaultValue?: number;
   onChange?: (index: number) => void;
   size?: GooeyNavSize;
@@ -210,21 +211,12 @@ export function GooeyNav({
   className,
   ...props
 }: GooeyNavProps) {
-  const pathname = usePathname();
   const reduced = useReducedMotion() ?? false;
 
-  const routeIndex = items.findIndex((item) => toItem(item).href === pathname);
-  const [uncontrolled, setUncontrolled] = useState(() =>
-    routeIndex === -1 ? defaultValue : routeIndex,
-  );
-  const [seenRoute, setSeenRoute] = useState(routeIndex);
-
-  // in render, not an effect: an effect here cascades renders
-  if (routeIndex !== seenRoute) {
-    setSeenRoute(routeIndex);
-    if (routeIndex !== -1 && value === undefined) setUncontrolled(routeIndex);
-  }
-
+  // -1 is a valid state: no tile active, the bar renders as a neutral pill.
+  // Route detection lives in the caller (it knows the item list and the current path);
+  // this component just reflects whatever index it's given.
+  const [uncontrolled, setUncontrolled] = useState(defaultValue);
   const active = value ?? uncontrolled;
   const span = separation ?? SIZES[size].separation;
   const corner = radius ?? SIZES[size].radius;

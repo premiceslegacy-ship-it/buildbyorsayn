@@ -25,7 +25,7 @@ export function Section3() {
       {/* Outils */}
       <div className="mb-8">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-6">Les outils et leurs usages</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 items-start">
           {[
             {
               name: "Nano Banana",
@@ -52,18 +52,18 @@ export function Section3() {
               desc: "Figma sert à composer et valider. Un SVG ou un asset HTML est souvent plus juste qu'une image lorsqu'il faut du responsive, des états, du texte accessible ou une animation légère.",
             },
           ].map(({ name, desc }) => (
-            <LiquidCard key={name} className="rounded-2xl p-5">
-              <span className="text-sm font-semibold text-[#f0ede8] block mb-2">{name}</span>
-              <p className="text-xs text-white/50 leading-relaxed">{desc}</p>
+            <LiquidCard key={name} variant="elevated" className="rounded-2xl p-5">
+              <span className="text-sm font-semibold text-[#f0ede8] block mb-2 tracking-tight leading-snug">{name}</span>
+              <p className="text-[13px] text-white/60 leading-[1.65]">{desc}</p>
             </LiquidCard>
           ))}
         </div>
       </div>
 
       {/* Penser comme un photographe */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Penser comme un photographe</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-6">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Penser comme un photographe</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-6">
           Un prompt image se construit comme un brief photo. Ne décris pas ce que tu veux voir, décris <em>comment</em> tu veux le capturer.
         </p>
         <div className="grid grid-cols-2 gap-3 mb-6">
@@ -87,9 +87,9 @@ export function Section3() {
       </LiquidCard>
 
       {/* Cohérence visuelle */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">La règle de la cohérence visuelle</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">La règle de la cohérence visuelle</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           Avant de générer la moindre image, définis le style de ton site dans un fichier <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 rounded text-[11px] font-mono">DESIGN-SYSTEM.md</code>.
         </p>
         <ul className="space-y-3">

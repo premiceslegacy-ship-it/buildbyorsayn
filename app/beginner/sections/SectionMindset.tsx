@@ -12,20 +12,20 @@ export function SectionMindset() {
       </p>
 
       {/* Exécution */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Exécuter au lieu de réfléchir sans fin</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Exécuter au lieu de réfléchir sans fin</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           Les gens qui passent des semaines à "valider leur idée", qui lisent vingt livres avant d'envoyer un seul message, ne gagnent presque jamais d'argent. Ceux qui lancent un truc simple, qui contactent cent personnes, qui prennent des non et ajustent, eux ils en gagnent.
         </p>
-        <p className="text-sm text-white/55 leading-relaxed">
+        <p className="text-sm text-white/65 leading-relaxed">
           Ce n'est pas une question d'intelligence. C'est une question d'action. <strong className="text-[#f0ede8]">Le plan parfait qui reste dans ta tête vaut zéro. Le truc imparfait que tu as livré et qu'on t'a payé vaut quelque chose.</strong> La vraie intelligence dans le business, c'est de bouger vite et d'apprendre sur le terrain.
         </p>
       </LiquidCard>
 
       {/* Volume & abondance */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Le volume et l'abondance</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Le volume et l'abondance</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           "Il n'y a pas assez de clients" est une croyance, pas une réalité. Il y a des millions d'artisans, de commerçants, de petites entreprises qui ont besoin d'un site, d'un outil, d'un système. Le problème n'est jamais le manque de clients. C'est toujours le manque de volume ou le mauvais message.
         </p>
         <div className="bg-black/25 border border-white/5 rounded-xl p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
@@ -36,7 +36,7 @@ export function SectionMindset() {
       </LiquidCard>
 
       {/* Trois règles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-6 items-start">
         {[
           {
             t: "Zéro croyance limitante",
@@ -55,9 +55,9 @@ export function SectionMindset() {
             d: "Chaque chose que tu apprends et que tu encodes en système reste à toi. C'est ton capital. Tu ne loues pas ta compétence à une plateforme, tu construis la tienne, qui grossit dans le temps.",
           },
         ].map(({ t, d }) => (
-          <LiquidCard key={t} className="rounded-2xl p-5">
-            <p className="text-sm font-semibold text-[#e8d5b0] mb-3">{t}</p>
-            <p className="text-xs text-white/55 leading-relaxed">{d}</p>
+          <LiquidCard key={t} variant="elevated" className="rounded-2xl p-5">
+            <p className="text-sm font-semibold text-[#e8d5b0] mb-3 tracking-tight leading-snug">{t}</p>
+            <p className="text-[13px] text-white/65 leading-[1.65]">{d}</p>
           </LiquidCard>
         ))}
       </div>

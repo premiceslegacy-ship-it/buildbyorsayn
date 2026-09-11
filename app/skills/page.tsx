@@ -11,6 +11,7 @@ import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { SkillsFreshness } from "@/components/SkillsFreshness";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
 
 const SKILL_USAGE_STEPS = [
@@ -45,9 +46,9 @@ const SKILL_USAGE_TOOLS = [
     body: "Fonctionne bien pour cadrer et rédiger, moins pour l'exécution technique en autonomie.",
   },
   {
-    name: "Codex (terminal)",
+    name: "Codex",
     logo: "/brand-logos/codex.svg",
-    body: "CLI orientée code, avec accès terminal - solide pour la partie build des skills techniques.",
+    body: "CLI, application desktop et extension IDE - même session, même configuration partout, solide pour la partie build des skills techniques.",
   },
 ];
 
@@ -220,9 +221,6 @@ export default function SkillsPage() {
             Ce sont les skills que j'ai configurés pour moi et pour mon écosystème. Je les utilise au quotidien pour cadrer, construire et auditer mes projets. Tu peux bien évidemment les adapter à ta manière de travailler, à ton marché et à tes propres projets.
           </p>
           <SkillsFreshness />
-          <Link href="/videos/tutos" prefetch={false} className="mt-4 inline-block text-sm text-white/60 underline underline-offset-4 hover:text-white focus-visible:outline-2">
-            Hermes Agent - doctrine agentique du Coffre
-          </Link>
         </header>
 
         <section id="methode" className="mb-10 scroll-mt-24">
@@ -346,18 +344,12 @@ export default function SkillsPage() {
                   Où les utiliser
                 </p>
                 <p className="text-xs text-white/45 mb-3 leading-relaxed">
-                  Ces skills fonctionnent partout : Claude Code, Hermes Agent, ChatGPT, Codex en terminal. Le meilleur résultat vient des outils capables de naviguer le web par eux-mêmes (Hermes Agent, Codex, Claude Code) ou pilotés via une CLI type Playwright pour automatiser la recherche et la vérification.
+                  Ces skills fonctionnent partout : Claude Code, Hermes Agent, ChatGPT, Codex. Le meilleur résultat vient des outils capables de naviguer le web par eux-mêmes (Hermes Agent, Codex, Claude Code) ou pilotés via une CLI type Playwright pour automatiser la recherche et la vérification.
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {SKILL_USAGE_TOOLS.map((tool) => (
-                    <div key={tool.name} className="flex items-start gap-2.5 rounded-lg bg-black/20 px-3 py-2.5">
-                      <div className="mt-0.5 w-6 h-6 shrink-0 rounded-md bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
-                        {tool.logo ? (
-                          <img src={tool.logo} alt="" className="w-4 h-4" />
-                        ) : (
-                          <span className="text-[9px] font-semibold text-[#e8d5b0]/70">H</span>
-                        )}
-                      </div>
+                    <div key={tool.name} className="flex items-start gap-3">
+                      <img src={tool.logo} alt="" className="mt-0.5 w-5 h-5 shrink-0" />
                       <div>
                         <p className="text-xs font-semibold text-white/80">{tool.name}</p>
                         <p className="mt-0.5 text-[11px] leading-relaxed text-white/45">{tool.body}</p>
@@ -514,6 +506,7 @@ export default function SkillsPage() {
           { id: "catalogue", label: "Catalogue" },
         ]}
       />
+      <ScrollToTop />
     </main>
   );
 }

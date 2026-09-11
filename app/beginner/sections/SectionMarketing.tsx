@@ -12,20 +12,20 @@ export function SectionMarketing() {
       </p>
 
       {/* Big idea */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">La grande idée qui te démarque</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">La grande idée qui te démarque</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           Pour exister, il te faut une idée forte. Une idée qui intrigue ta niche, qui remet en question sa façon de faire, qui dérange même un peu. Si tout le monde est d'accord avec toi, c'est que tu es invisible.
         </p>
-        <p className="text-sm text-white/55 leading-relaxed">
+        <p className="text-sm text-white/65 leading-relaxed">
           <strong className="text-[#f0ede8]">Une bonne idée marketing fait réagir : certains adhèrent à fond, d'autres vont presque t'insulter.</strong> C'est bon signe. Une position tranchée attire les bonnes personnes et repousse les autres. Le pire, ce n'est pas d'être critiqué. C'est d'être ignoré.
         </p>
       </LiquidCard>
 
       {/* Le tunnel */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-5">Le parcours en trois temps</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-5">
+        <p className="text-sm text-white/65 leading-relaxed mb-5">
           Un inconnu ne devient pas client d'un coup. Il passe par trois étapes, et ton contenu doit nourrir chacune d'elles.
         </p>
         <div className="space-y-3">
@@ -40,7 +40,7 @@ export function SectionMarketing() {
               </span>
               <div>
                 <p className="text-sm font-semibold text-[#e8d5b0] mb-1">{t}</p>
-                <p className="text-xs text-white/55 leading-relaxed">{d}</p>
+                <p className="text-[13px] text-white/65 leading-[1.65]">{d}</p>
               </div>
             </div>
           ))}
@@ -48,7 +48,7 @@ export function SectionMarketing() {
       </LiquidCard>
 
       {/* Volume puis quali */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-6 items-start">
         {[
           {
             t: "Le hook qui arrête le scroll",
@@ -67,9 +67,9 @@ export function SectionMarketing() {
             d: "Une fois installé dans les têtes, tu peux prendre du recul et viser la qualité. Mais sans disparaître : les gens scrollent en permanence, tu dois rester présent chaque semaine pour ne pas être oublié.",
           },
         ].map(({ t, d }) => (
-          <LiquidCard key={t} className="rounded-2xl p-5">
-            <p className="text-sm font-semibold text-[#e8d5b0] mb-3">{t}</p>
-            <p className="text-xs text-white/55 leading-relaxed">{d}</p>
+          <LiquidCard key={t} variant="elevated" className="rounded-2xl p-5">
+            <p className="text-sm font-semibold text-[#e8d5b0] mb-3 tracking-tight leading-snug">{t}</p>
+            <p className="text-[13px] text-white/65 leading-[1.65]">{d}</p>
           </LiquidCard>
         ))}
       </div>

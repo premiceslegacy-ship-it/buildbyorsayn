@@ -19,7 +19,7 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
 
       {/* Les 4 piliers */}
       <h3 className="text-base font-semibold text-[#f0ede8] mb-6">Ce qui te fait passer de premier cash à capital qui tient :</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-12 items-start">
         {[
           {
             title: "Le framework ORACLE",
@@ -42,9 +42,9 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
             desc: "Comment décomposer un métier en agents, borner leur autorité et rendre une entreprise entière AI-first - pas juste un prompt, une organisation qui capitalise sur sa connaissance et ses process.",
           },
         ].map(({ title, desc }) => (
-          <LiquidCard key={title} className="rounded-2xl p-5">
-            <p className="text-sm font-semibold text-[#e8d5b0] mb-3">{title}</p>
-            <p className="text-xs text-white/55 leading-relaxed">{desc}</p>
+          <LiquidCard key={title} variant="elevated" className="rounded-2xl p-5">
+            <p className="text-sm font-semibold text-[#e8d5b0] mb-3 tracking-tight leading-snug">{title}</p>
+            <p className="text-[13px] text-white/65 leading-[1.65]">{desc}</p>
           </LiquidCard>
         ))}
       </div>

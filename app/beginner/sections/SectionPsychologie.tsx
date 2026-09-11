@@ -11,15 +11,15 @@ export function SectionPsychologie() {
         On répète qu'il faut "résoudre un problème". C'est vrai, mais c'est incomplet. Les gens n'achètent pas que des solutions. Ils achètent des émotions, une image d'eux-mêmes, une place dans un groupe. Plus tu comprends la nature humaine en profondeur, plus tu vends.
       </p>
 
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Le problème n'est qu'un levier parmi d'autres</h3>
-        <p className="text-sm text-white/55 leading-relaxed">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Le problème n'est qu'un levier parmi d'autres</h3>
+        <p className="text-sm text-white/65 leading-relaxed">
           Un site web premium ne se vend pas parce qu'il règle un souci technique. Il se vend parce qu'il dit quelque chose sur celui qui le possède : "je suis un professionnel sérieux". L'achat est rarement rationnel. Il est émotionnel, puis justifié par la raison après coup. Ton travail, c'est de parler à l'émotion d'abord.
         </p>
       </LiquidCard>
 
       {/* Les ressorts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-6 items-start">
         {[
           {
             t: "Le rêve et l'espoir",
@@ -46,9 +46,9 @@ export function SectionPsychologie() {
             d: "Beaucoup d'achats servent juste à dormir tranquille : ne plus rater une facture, ne plus perdre un client, ne plus paniquer. Vendre la tranquillité d'esprit est souvent plus fort que vendre une fonctionnalité.",
           },
         ].map(({ t, d }) => (
-          <LiquidCard key={t} className="rounded-2xl p-5">
-            <p className="text-sm font-semibold text-[#e8d5b0] mb-3">{t}</p>
-            <p className="text-xs text-white/55 leading-relaxed">{d}</p>
+          <LiquidCard key={t} variant="elevated" className="rounded-2xl p-5">
+            <p className="text-sm font-semibold text-[#e8d5b0] mb-3 tracking-tight leading-snug">{t}</p>
+            <p className="text-[13px] text-white/65 leading-[1.65]">{d}</p>
           </LiquidCard>
         ))}
       </div>

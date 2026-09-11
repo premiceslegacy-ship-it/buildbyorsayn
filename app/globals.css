@@ -5,6 +5,13 @@ html {
   scroll-padding-top: 80px;
 }
 
+/* overflow-x: clip (not hidden) so position: sticky keeps working for
+   descendants like the navbar - hidden creates a scroll container that
+   breaks sticky positioning for anything inside it. */
+body {
+  overflow-x: clip;
+}
+
 @theme {
   /* Colors */
   --color-background: #0e0e0f;

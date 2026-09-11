@@ -12,20 +12,20 @@ export function SectionCopywriting() {
       </p>
 
       {/* On ne lit pas */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Les gens ne lisent pas, ils scannent</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-4">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Les gens ne lisent pas, ils scannent</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-4">
           Personne ne lit un texte mot à mot sur un écran. Les yeux glissent, attrapent les titres, les mots en gras, les phrases courtes. Si ton message est un gros bloc compact, il est mort avant d'être lu.
         </p>
-        <p className="text-sm text-white/55 leading-relaxed">
+        <p className="text-sm text-white/65 leading-relaxed">
           Écris pour la partie rapide et instinctive du cerveau, celle qui décide en une seconde si ça vaut la peine de continuer. <strong className="text-[#f0ede8]">Des titres clairs, des phrases courtes, des images mentales simples, de l'air entre les lignes.</strong>
         </p>
       </LiquidCard>
 
       {/* Douleur puis bénéfice */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-4">Parle à la douleur, puis au bénéfice</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-5">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
+        <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Parle à la douleur, puis au bénéfice</h3>
+        <p className="text-sm text-white/65 leading-relaxed mb-5">
           On commence par nommer le problème mieux que le client ne saurait le dire lui-même. Il se reconnaît, il se sent compris. Ensuite seulement on montre le résultat qu'il peut atteindre. Même sur un bouton : il dit le bénéfice, pas l'action mécanique.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -41,9 +41,9 @@ export function SectionCopywriting() {
       </LiquidCard>
 
       {/* Cialdini */}
-      <LiquidCard className="rounded-2xl p-6 md:p-8 mb-6">
+      <LiquidCard variant="elevated" className="rounded-2xl p-6 md:p-8 mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-5">Les grands leviers de persuasion</h3>
-        <p className="text-sm text-white/55 leading-relaxed mb-5">
+        <p className="text-sm text-white/65 leading-relaxed mb-5">
           Le chercheur Robert Cialdini a identifié les ressorts qui poussent un humain à dire oui. Tu les retrouveras partout, dans tes textes comme dans tes ventes.
         </p>
         <ul className="space-y-3">
