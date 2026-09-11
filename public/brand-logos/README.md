@@ -13,6 +13,7 @@ Existing files:
 
 Added for the method assets:
 
+- `hermes-agent.png`: Hermes Agent / Nous Research mark, supplied directly by the BUILD operator (converted from their local `hermesagent.webp`) rather than sourced from the web. Used to represent Hermes Agent where a visual mark is needed. Resized to 256px max dimension for web use.
 - `cloudflare.svg`: Cloudflare mark from Simple Icons.
 - `github.svg`: GitHub mark from Simple Icons.
 - `pinterest.svg`: Pinterest mark from Simple Icons.

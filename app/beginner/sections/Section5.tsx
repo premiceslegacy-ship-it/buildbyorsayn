@@ -37,6 +37,10 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
             title: "L'ingénierie des Skills",
             desc: "Comment encoder ton savoir-faire dans des systèmes réutilisables que tu charges en un clic. C'est ça, ton capital : ce que tu construis une fois et qui travaille pour toi sur tous tes projets suivants.",
           },
+          {
+            title: "La doctrine agentique",
+            desc: "Comment décomposer un métier en agents, borner leur autorité et rendre une entreprise entière AI-first - pas juste un prompt, une organisation qui capitalise sur sa connaissance et ses process.",
+          },
         ].map(({ title, desc }) => (
           <LiquidCard key={title} className="rounded-2xl p-5">
             <p className="text-sm font-semibold text-[#e8d5b0] mb-3">{title}</p>

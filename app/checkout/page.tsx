@@ -15,7 +15,6 @@ const BEGINNER_FEATURES = [
     { icon: Layers, label: "IA, GitHub, IDE, Vercel" },
     { icon: GraduationCap, label: "Skills Deep Research + UX/UI Premium" },
     { icon: Layers, label: "Stack complète + Protocole Zéro" },
-    { icon: Play, label: "Vidéos tutos techniques" },
 ];
 
 const FULL_FEATURES = [
@@ -25,7 +24,7 @@ const FULL_FEATURES = [
     { icon: GraduationCap, label: "Fondations incluses" },
     { icon: Zap, label: "Skills Deep Research + UX/UI Premium" },
     { icon: Layers, label: "Stack complète + Protocole Zéro" },
-    { icon: Play, label: "Vidéos tutos techniques" },
+    { icon: Play, label: "Doctrine agentique : construire des agents, devenir AI-first" },
 ];
 
 export default async function CheckoutPage({
@@ -160,6 +159,10 @@ export default async function CheckoutPage({
                                 <li className="flex items-center gap-2.5 opacity-40">
                                     <Lock className="w-3.5 h-3.5 text-white/40 flex-shrink-0" strokeWidth={1.5} />
                                     <span className="text-xs text-white/40">7 blocs & sources (non inclus)</span>
+                                </li>
+                                <li className="flex items-center gap-2.5 opacity-40">
+                                    <Lock className="w-3.5 h-3.5 text-white/40 flex-shrink-0" strokeWidth={1.5} />
+                                    <span className="text-xs text-white/40">Doctrine agentique (non incluse)</span>
                                 </li>
                                     </ul>
                             <a href={beginnerUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm">

@@ -9,6 +9,7 @@ import { useProgress } from "@/hooks/useProgress";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { LinkifiedText } from "@/components/ui/linkified-text";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 
 import { toggleBlocCompletion } from "@/app/actions/progress";
 import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK } from "@/lib/pricing";
@@ -51,7 +52,6 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
   const blocId = bloc.id;
 
   const { checkedItems, toggleItem, globalProgress, isLoaded, setLastVisitedBloc } = useProgress();
-  const [activeSection, setActiveSection] = useState<string>("");
   const hasMcpAccess = tier === "beginner" || tier === "full" || tier === "admin";
   const [mcpConnectionStatus, setMcpConnectionStatus] = useState<McpConnectionStatus>("unknown");
 
@@ -68,45 +68,6 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
       .then(setMcpConnectionStatus)
       .catch(() => setMcpConnectionStatus("unknown"));
   }, [hasMcpAccess]);
-
-  useEffect(() => {
-    if (bloc && bloc.sections.length > 0) {
-      setActiveSection(bloc.sections[0].id);
-    }
-  }, [bloc]);
-
-  useEffect(() => {
-    if (!bloc.sections.length) return;
-    const handleScroll = () => {
-      const sectionElements = bloc.sections
-        .map((s) => document.getElementById(s.id))
-        .filter(Boolean);
-      if (sectionElements.length === 0) return;
-
-      let currentSectionId = bloc.sections[0].id;
-
-      for (const el of sectionElements) {
-        const rect = el!.getBoundingClientRect();
-        if (rect.top <= 150) {
-          currentSectionId = el!.id;
-        }
-      }
-
-      if (
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 10
-      ) {
-        currentSectionId = bloc.sections[bloc.sections.length - 1].id;
-      }
-
-      setActiveSection(currentSectionId);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [bloc]);
 
   const prevProgress = useRef<number | null>(null);
 
@@ -169,8 +130,8 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
           </Link>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-16 items-start">
-          <div className={showPaywall ? "w-full max-w-3xl mx-auto" : "flex-1 w-full max-w-3xl"}>
+        <div className="flex flex-col items-start">
+          <div className={showPaywall ? "w-full max-w-3xl mx-auto" : "w-full max-w-3xl mx-auto"}>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-10 md:mb-16 tracking-tight text-[#f0ede8]">
               {bloc.titre}
             </h1>
@@ -404,32 +365,14 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
             </>)}
           </div>
 
-          {showContent && (
-          <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-24">
-            <h3 className="text-[11px] uppercase tracking-widest text-white/40 mb-6 font-semibold">
-              Sur cette page
-            </h3>
-            <nav className="flex flex-col gap-4">
-              {bloc.sections.map((section) => {
-                const isActive = activeSection === section.id;
-                return (
-                  <a
-                    key={section.id}
-                    href={`#${section.id}`}
-                    className={`text-[14px] leading-snug transition-all duration-300 ${isActive
-                        ? "text-[#e8d5b0] border-l-2 border-[#e8d5b0] pl-3 font-medium"
-                        : "text-white/40 border-l-2 border-white/10 pl-3 hover:text-white/70"
-                      }`}
-                  >
-                    {section.title}
-                  </a>
-                );
-              })}
-            </nav>
-          </aside>
-          )}
         </div>
       </div>
+
+      {showContent && bloc.sections.length > 0 && (
+        <ScrollProgress
+          sections={bloc.sections.map((section) => ({ id: section.id, label: section.title }))}
+        />
+      )}
     </main>
   );
 }

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { GraduationCap, ShieldCheck, Menu, X, ChevronDown, PhoneCall } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { GooeyNav, type GooeyNavItem } from "@/components/ui/gooey-nav";
 
 interface NavBarProps {
   activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole" | "videos-tutos" | "accompagnement";
@@ -27,12 +29,10 @@ export function NavBar({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFondationsOpen, setIsFondationsOpen] = useState(false);
-  const [isVideosOpen, setIsVideosOpen] = useState(false);
   const desktopDropdownRef = useRef<HTMLDivElement>(null);
   const mobileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const fondationsRef = useRef<HTMLDivElement>(null);
-  const videosRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -50,9 +50,6 @@ export function NavBar({
       if (fondationsRef.current && !fondationsRef.current.contains(target)) {
         setIsFondationsOpen(false);
       }
-      if (videosRef.current && !videosRef.current.contains(target)) {
-        setIsVideosOpen(false);
-      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -65,6 +62,20 @@ export function NavBar({
 
   const hasFoundationAccess = tier === "beginner" || tier === "full" || tier === "admin";
   const hasFullAccess = tier === "full" || tier === "admin";
+  const pathname = usePathname();
+
+  const gooeyItems: GooeyNavItem[] = useMemo(
+    () => [
+      { label: "Tableau de bord", href: "/dashboard" },
+      { label: "Skills", href: "/skills" },
+      { label: "Vidéos", href: "/videos" },
+      { label: "Hermes Agent", href: "/videos/tutos" },
+    ],
+    []
+  );
+  const gooeyActiveIndex = gooeyItems.findIndex(
+    (item) => typeof item !== "string" && item.href === pathname
+  );
 
   const navLinks = (
     <>
@@ -112,8 +123,8 @@ export function NavBar({
         Vidéos
       </Link>
 
-      <Link href="/videos/tutos" className={`${linkClass("videos-tutos")} pl-4`} onClick={() => setIsMobileMenuOpen(false)}>
-        Vidéos tutos
+      <Link href="/videos/tutos" className={linkClass("videos-tutos")} onClick={() => setIsMobileMenuOpen(false)}>
+        Hermes Agent
       </Link>
 
       <Link
@@ -134,10 +145,6 @@ export function NavBar({
 
   const desktopNavLinks = (
     <>
-      <Link href="/dashboard" className={linkClass("dashboard")}>
-        Tableau de bord
-      </Link>
-
       {hasFoundationAccess ? (
         <div className="relative" ref={fondationsRef}>
           <button
@@ -193,42 +200,7 @@ export function NavBar({
         </button>
       )}
 
-      <Link href="/skills" className={linkClass("skills")}>
-        Skills
-      </Link>
-
-      <div className="relative" ref={videosRef}>
-        <button
-          onClick={() => setIsVideosOpen(!isVideosOpen)}
-          className={`${linkClass("videos")} flex items-center gap-1.5 bg-transparent border-none font-[inherit] text-sm cursor-pointer`}
-        >
-          Vidéos
-          <ChevronDown className={`w-3 h-3 transition-transform ${isVideosOpen ? "rotate-180" : ""}`} />
-        </button>
-
-        {isVideosOpen && (
-          <div className="absolute left-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-44 z-50 flex flex-col gap-0.5">
-            <Link
-              href="/videos"
-              onClick={() => setIsVideosOpen(false)}
-              className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
-                activeLink === "videos" ? "text-[#f0ede8] bg-white/5" : "text-white/50 hover:bg-white/5 hover:text-white/80"
-              }`}
-            >
-              Vidéos
-            </Link>
-            <Link
-              href="/videos/tutos"
-              onClick={() => setIsVideosOpen(false)}
-              className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
-                activeLink === "videos-tutos" ? "text-[#f0ede8] bg-white/5" : "text-white/50 hover:bg-white/5 hover:text-white/80"
-              }`}
-            >
-              Vidéos tutos
-            </Link>
-          </div>
-        )}
-      </div>
+      <GooeyNav items={gooeyItems} value={gooeyActiveIndex === -1 ? undefined : gooeyActiveIndex} size="sm" />
 
       <Link
         href="/accompagnement"

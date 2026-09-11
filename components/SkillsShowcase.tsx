@@ -16,6 +16,7 @@ const COFFRE_SKILLS: ShowcaseSkill[] = [
   { title: "ORACLE by Orsayn", outcome: "Un SaaS entier orchestré : produit, GTM, acquisition" },
   { title: "Backend Orsayn", outcome: "Un backend sécurisé, audité, prêt pour de vrais clients" },
   { title: "Apple Design Skills", outcome: "15 skills pour des interfaces premium, jamais AI slop" },
+  { title: "Doctrine agentique", outcome: "Construire des agents et rendre une entreprise AI-first" },
 ];
 
 export function SkillsShowcase() {
