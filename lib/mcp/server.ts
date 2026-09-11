@@ -173,12 +173,20 @@ export function createBuildMcpServer(
 
       const formatted = formatUntrustedKnowledgeResults(results);
 
-      const { count: lockedCount, error: lockedError } = await admin
-        .from("knowledge_chunks")
-        .select("id", { count: "exact", head: true })
-        .not("tier_required", "in", `(${accessibleTierSqlList(auth.tier)})`);
+      // Global count of locked content, independent of the query - never
+      // reveals whether this specific search matched higher-tier content.
+      // Routed through a SECURITY DEFINER function that re-derives the tier
+      // from the bearer token, matching how match_mcp_knowledge_chunks
+      // works: no code path reads knowledge_chunks directly.
+      const { data: lockedCount, error: lockedError } = await admin.rpc(
+        "count_mcp_locked_knowledge_chunks",
+        {
+          p_token_hash: auth.tokenHash,
+          p_expected_resource: getMcpResourceUrl(),
+        }
+      );
       const teaser =
-        !lockedError && lockedCount && lockedCount > 0
+        !lockedError && typeof lockedCount === "number" && lockedCount > 0
           ? "\n\nDes ressources supplementaires existent dans un palier superieur, sans divulgation de leur contenu."
           : "";
 
@@ -201,12 +209,16 @@ export function createBuildMcpServer(
       const skill = getSkillBySlug(slug);
       if (!skill) return toolError("Skill inconnu.");
 
+      // The catalog (titles and slugs) is already public on the BUILD site,
+      // so naming the tier here does not leak anything beyond what's
+      // already visible - it's honest about why the content is withheld
+      // rather than pretending the slug doesn't exist.
       const requiredTier = skillAccessToTier(skill.access);
       if (!canAccess(auth.tier, requiredTier)) {
         return {
           content: [{
             type: "text" as const,
-            text: "Ce skill existe dans un palier superieur. Son contenu et ses metadonnees restent verrouilles.",
+            text: `Ce skill (palier ${requiredTier}) est au-dessus du palier actuel (${auth.tier}). Son contenu reste verrouille.`,
           }],
         };
       }
@@ -264,10 +276,4 @@ export function createBuildMcpServer(
   );
 
   return server;
-}
-
-function accessibleTierSqlList(tier: McpTier): string {
-  const order: McpTier[] = ["free", "preview", "beginner", "full"];
-  const index = order.indexOf(tier);
-  return order.slice(0, index + 1).map((value) => `"${value}"`).join(",");
 }

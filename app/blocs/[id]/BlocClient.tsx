@@ -10,6 +10,7 @@ import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { LinkifiedText } from "@/components/ui/linkified-text";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 import { toggleBlocCompletion } from "@/app/actions/progress";
 import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK } from "@/lib/pricing";
@@ -373,6 +374,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
           sections={bloc.sections.map((section) => ({ id: section.id, label: section.title }))}
         />
       )}
+      <ScrollToTop />
     </main>
   );
 }

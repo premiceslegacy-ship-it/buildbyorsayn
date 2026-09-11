@@ -29,10 +29,18 @@ export function NavBar({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFondationsOpen, setIsFondationsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const desktopDropdownRef = useRef<HTMLDivElement>(null);
   const mobileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const fondationsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -200,7 +208,7 @@ export function NavBar({
         </button>
       )}
 
-      <GooeyNav items={gooeyItems} value={gooeyActiveIndex === -1 ? undefined : gooeyActiveIndex} size="sm" />
+      <GooeyNav items={gooeyItems} value={gooeyActiveIndex} size="sm" />
 
       <Link
         href="/accompagnement"
@@ -218,7 +226,14 @@ export function NavBar({
   );
 
   return (
-    <nav className="w-full max-w-7xl mx-auto flex items-center justify-between py-4 md:py-6 px-4 md:px-12 relative z-20">
+    <header
+      className={`sticky top-0 z-40 w-full backdrop-blur-xl border-b transition-colors duration-300 ${
+        scrolled
+          ? "bg-[#0e0e0f]/70 border-white/[0.07] shadow-[0_8px_32px_-12px_rgba(0,0,0,0.55)]"
+          : "bg-transparent border-transparent"
+      }`}
+    >
+    <nav className="w-full max-w-7xl mx-auto flex items-center justify-between py-4 md:py-6 px-4 md:px-12">
       <Logo layout="horizontal" className="h-6" hideText={false} />
 
       {/* Desktop links */}
@@ -296,5 +311,6 @@ export function NavBar({
         </div>
       </div>
     </nav>
+    </header>
   );
 }

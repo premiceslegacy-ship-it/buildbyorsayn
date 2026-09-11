@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ExternalLink, Play } from "lucide-react";
 import { NavBar } from "@/components/NavBar";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { PHASES } from "@/lib/protocoleContent";
 
 export const metadata = {
@@ -41,7 +42,7 @@ export default async function ProtocolePage() {
   const initials = displayName.substring(0, 2).toUpperCase();
 
   return (
-    <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] flex flex-col relative overflow-hidden">
+    <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] flex flex-col relative overflow-x-clip">
       {/* Halos */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(232,213,176,0.05),transparent_70%)] blur-[80px] pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(50,80,200,0.04),transparent_70%)] blur-[80px] pointer-events-none" />
@@ -243,6 +244,7 @@ export default async function ProtocolePage() {
 
         </div>
       </div>
+      <ScrollToTop />
     </main>
   );
 }

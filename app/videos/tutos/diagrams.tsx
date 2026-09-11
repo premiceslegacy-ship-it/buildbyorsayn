@@ -1,45 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
 
-const GOLD = "#e8d5b0";
-const GOLD_DIM = "#e8d5b0aa";
-const LINE = "#ffffff26";
-const TEXT = "#f0ede8";
-const SUBTEXT = "#d9d5cf";
-
-function Frame({ title, children, viewBox = "0 0 640 220" }: { title: string; children: ReactNode; viewBox?: string }) {
-  return (
-    <figure className="my-6 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
-      <svg viewBox={viewBox} className="w-full h-auto" role="img" aria-label={title}>
-        {children}
-      </svg>
-      <figcaption className="mt-3 text-[11px] uppercase tracking-[0.14em] text-white/35">{title}</figcaption>
-    </figure>
-  );
-}
-
-function Box({ x, y, w, h, label, sub, accent }: { x: number; y: number; w: number; h: number; label: string; sub?: string; accent?: boolean }) {
-  return (
-    <g>
-      <rect x={x} y={y} width={w} height={h} rx={10} fill={accent ? "#e8d5b01a" : "#ffffff0a"} stroke={accent ? GOLD : LINE} strokeWidth={1.25} />
-      <text x={x + w / 2} y={y + h / 2 + (sub ? -4 : 5)} textAnchor="middle" fontSize="12.5" fontWeight={600} fill={TEXT}>{label}</text>
-      {sub && <text x={x + w / 2} y={y + h / 2 + 13} textAnchor="middle" fontSize="10" fill={SUBTEXT}>{sub}</text>}
-    </g>
-  );
-}
-
-function Arrow({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
-  const id = `arrow-${x1}-${y1}-${x2}-${y2}`;
-  return (
-    <g>
-      <defs>
-        <marker id={id} markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill={GOLD_DIM} />
-        </marker>
-      </defs>
-      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={GOLD_DIM} strokeWidth={1.25} markerEnd={`url(#${id})`} />
-    </g>
-  );
-}
+import { Frame, Box, Arrow, GOLD, LINE, SUBTEXT } from "@/components/ui/diagram-primitives";
 
 export function DiagnosticDiagram() {
   const steps = [
