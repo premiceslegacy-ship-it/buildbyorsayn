@@ -57,6 +57,7 @@ export default async function HermesChapterPage({
         </Link>
 
         <article className="doctrine-reader">
+          <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">HERMES AGENT</p>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">{displayTitle}</h1>
           {meta?.summary && <p className="text-white/45 text-sm mb-8 leading-relaxed">{meta.summary}</p>}
 

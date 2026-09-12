@@ -87,7 +87,7 @@ export default async function ProtocolePage() {
         <div className="max-w-4xl mx-auto flex flex-col gap-20 sm:gap-28 pt-12">
           <header id="introduction" className="scroll-mt-24 flex flex-col gap-5 max-w-3xl">
             <p className="text-xs font-semibold tracking-[0.18em] text-[#c9b48a]">
-              Le protocole zéro
+              LE PROTOCOLE ZÉRO
             </p>
             <h1 className="text-3xl sm:text-5xl font-bold leading-[1.08] text-[#f0ede8]">
               Pendant que les autres louent leur intelligence, tu la distilles.
@@ -102,7 +102,7 @@ export default async function ProtocolePage() {
 
           <section id="these" className="scroll-mt-24 flex flex-col gap-7">
             <div className="flex flex-col gap-3 max-w-3xl">
-              <p className="text-xs font-semibold tracking-[0.18em] text-[#c9b48a]">La thèse</p>
+              <p className="text-xs font-semibold tracking-[0.18em] text-[#c9b48a]">LA THÈSE</p>
               <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#f0ede8]">
                 Le même outil peut créer une dépendance ou un actif.
               </h2>
@@ -110,13 +110,13 @@ export default async function ProtocolePage() {
 
             <div className="grid sm:grid-cols-2 border-y border-white/[0.1]">
               <article className="py-6 sm:pr-8 sm:border-r border-white/[0.1]">
-                <p className="text-sm font-semibold text-white/65 mb-3">Le locataire numérique</p>
+                <p className="text-sm font-semibold text-white/65 mb-3">LE LOCATAIRE NUMÉRIQUE</p>
                 <p className="text-sm text-[#8a8070] leading-relaxed">
                   Il utilise des outils puissants sans garder ce qu&apos;ils lui ont appris. Quand l&apos;outil disparaît, son savoir-faire disparaît avec lui. Comme quelqu&apos;un qui loue tout son atelier et ne possède aucune de ses machines.
                 </p>
               </article>
               <article className="py-6 sm:pl-8">
-                <p className="text-sm font-semibold text-[#c9b48a] mb-3">Le capital organique</p>
+                <p className="text-sm font-semibold text-[#c9b48a] mb-3">LE CAPITAL ORGANIQUE</p>
                 <p className="text-sm text-[#c4b89a] leading-relaxed">
                   Il transforme chaque session en méthode, chaque vente en expérience et chaque expérience en système. Les outils peuvent changer, mais ce qui a été appris reste disponible et continue de s&apos;accumuler.
                 </p>
@@ -134,7 +134,7 @@ export default async function ProtocolePage() {
 
           <section id="references" className="scroll-mt-24 flex flex-col gap-7">
             <div className="flex flex-col gap-3 max-w-3xl">
-              <p className="text-xs font-semibold tracking-[0.18em] text-[#c9b48a]">Les références</p>
+              <p className="text-xs font-semibold tracking-[0.18em] text-[#c9b48a]">LES RÉFÉRENCES</p>
               <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#f0ede8]">
                 Les idées derrière le protocole
               </h2>
@@ -167,7 +167,7 @@ export default async function ProtocolePage() {
 
           <section id="phases" className="scroll-mt-24 flex flex-col gap-14">
             <div className="flex flex-col gap-4 max-w-3xl">
-              <p className="text-xs font-semibold tracking-[0.18em] text-[#c9b48a]">Les trois phases</p>
+              <p className="text-xs font-semibold tracking-[0.18em] text-[#c9b48a]">LES TROIS PHASES</p>
               <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#f0ede8]">
                 Tu absorbes, tu produis, tu distilles.
               </h2>
@@ -187,7 +187,7 @@ export default async function ProtocolePage() {
                     <div className="flex flex-col gap-2 pt-1">
                       <h3 className="text-2xl sm:text-3xl font-semibold text-[#f0ede8] tracking-tight">{phase.titre}</h3>
                       <div className="flex flex-wrap items-center gap-3">
-                        <span className="text-xs font-medium text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2.5 py-1">{phase.label}</span>
+                        <span className="text-xs font-medium text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2.5 py-1">{phase.label.toUpperCase()}</span>
                         <span className="text-xs text-[#8a8070]">{phase.duree}</span>
                       </div>
                     </div>
@@ -195,11 +195,11 @@ export default async function ProtocolePage() {
 
                   <div className="mt-8 grid md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] gap-8 sm:gap-12">
                     <div className="flex flex-col gap-2">
-                      <p className="text-[11px] text-[#c9b48a]/75 tracking-[0.16em] font-semibold">Le point de départ</p>
+                      <p className="text-[11px] text-[#c9b48a]/75 tracking-[0.16em] font-semibold">LE POINT DE DÉPART</p>
                       <p className="text-[15px] text-[#8a8070] leading-[1.7]">{phase.douleur}</p>
                     </div>
                     <div className="flex flex-col gap-3.5">
-                      <p className="text-[11px] text-[#c9b48a] tracking-[0.16em] font-semibold">Ce que tu fais</p>
+                      <p className="text-[11px] text-[#c9b48a] tracking-[0.16em] font-semibold">CE QUE TU FAIS</p>
                       {phase.solution.map((paragraph, i) => (
                         <p key={i} className="text-[15px] text-[#c4b89a] leading-[1.75]">{paragraph}</p>
                       ))}
@@ -219,7 +219,7 @@ export default async function ProtocolePage() {
               <span className="text-5xl sm:text-7xl font-light leading-none bg-gradient-to-b from-[#e8d5b0] to-[#c9b48a]/40 bg-clip-text text-transparent select-none">∞</span>
               <div className="flex flex-col gap-2 pt-1">
                 <h2 className="text-2xl sm:text-3xl font-semibold text-[#f0ede8] tracking-tight">L&apos;état final</h2>
-                <span className="text-xs font-medium text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2.5 py-1 w-fit">Antifragile numérique</span>
+                <span className="text-xs font-medium text-[#0e0e0f] bg-[#c9b48a] rounded-full px-2.5 py-1 w-fit">ANTIFRAGILE NUMÉRIQUE</span>
               </div>
             </div>
 
@@ -297,12 +297,12 @@ export default async function ProtocolePage() {
 
       <ScrollProgress
         sections={[
-          { id: "introduction", label: "Introduction" },
-          { id: "these", label: "La thèse" },
-          { id: "references", label: "Les références" },
-          { id: "phases", label: "Les trois phases" },
-          { id: "etat-final", label: "L'état final" },
-          { id: "suite", label: "La suite" },
+          { id: "introduction", label: "INTRODUCTION" },
+          { id: "these", label: "LA THÈSE" },
+          { id: "references", label: "LES RÉFÉRENCES" },
+          { id: "phases", label: "LES TROIS PHASES" },
+          { id: "etat-final", label: "L'ÉTAT FINAL" },
+          { id: "suite", label: "LA SUITE" },
         ]}
       />
       <ScrollToTop />

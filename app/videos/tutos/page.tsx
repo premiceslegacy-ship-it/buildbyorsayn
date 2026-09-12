@@ -137,7 +137,7 @@ export default async function HermesAgentPage() {
         <header id="introduction" className="scroll-mt-24 mb-16 flex items-start justify-between gap-8">
           <div className="min-w-0 max-w-3xl">
             <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">
-              Réservé à {COFFRE_LABEL}
+              RÉSERVÉ À {COFFRE_LABEL.toUpperCase()}
             </p>
             <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">
               Hermes Agent, une IA qui comprend le travail.
@@ -162,7 +162,7 @@ export default async function HermesAgentPage() {
 
         <section id="fondations" className="scroll-mt-24 border-y border-white/[0.1] py-10 sm:py-12 mb-16">
           <div className="max-w-3xl mb-8">
-            <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">Les fondations</p>
+            <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">LES FONDATIONS</p>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Avant de donner des clés à l&apos;IA, donne-lui une carte.</h2>
             <p className="text-white/45 text-sm sm:text-base mt-3 leading-relaxed">
               Une entreprise bien organisée ressemble moins à un cerveau géant qu&apos;à une bonne équipe : chacun sait où trouver l&apos;information, ce qu&apos;il peut décider et quand il doit passer le relais.
@@ -180,7 +180,7 @@ export default async function HermesAgentPage() {
         </section>
 
         <div id="bibliotheque" className="scroll-mt-24 mb-5">
-          <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-2">La bibliothèque</p>
+          <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-2">LA BIBLIOTHÈQUE</p>
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Les chapitres pour passer de l&apos;idée au travail réel.</h2>
           <p className="text-white/45 text-sm sm:text-base mt-3 leading-relaxed max-w-2xl">
             Commence par comprendre le problème, puis regarde comment organiser les rôles, les informations et les outils. Les exemples servent de cartes pour réfléchir, pas de boutons qui activent une entreprise tout seuls.
@@ -194,10 +194,10 @@ export default async function HermesAgentPage() {
 
       <ScrollProgress
         sections={[
-          { id: "introduction", label: "Introduction" },
-          { id: "fondations", label: "Les fondations" },
-          { id: "bibliotheque", label: "La bibliothèque" },
-          { id: "chapitres", label: "Les chapitres" },
+          { id: "introduction", label: "INTRODUCTION" },
+          { id: "fondations", label: "LES FONDATIONS" },
+          { id: "bibliotheque", label: "LA BIBLIOTHÈQUE" },
+          { id: "chapitres", label: "LES CHAPITRES" },
         ]}
       />
       <ScrollToTop />

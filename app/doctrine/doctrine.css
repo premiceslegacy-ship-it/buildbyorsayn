@@ -16,7 +16,9 @@
 .doctrine-markdown h4 { font-size: 1.125rem; }
 .doctrine-markdown > :first-child { margin-top: 0; }
 .doctrine-markdown p, .doctrine-markdown ul, .doctrine-markdown ol { margin-block: 1rem; }
-.doctrine-markdown ul { list-style: disc; padding-left: 1.5rem; }
+.doctrine-markdown ul { list-style: none; padding-left: 0; }
+.doctrine-markdown ul > li { position: relative; padding-left: 1.25rem; }
+.doctrine-markdown ul > li::before { content: "-"; position: absolute; left: 0; color: #c9b48a; }
 .doctrine-markdown ol { list-style: decimal; padding-left: 1.5rem; }
 .doctrine-markdown li + li { margin-top: .5rem; }
 .doctrine-markdown strong { color: #f0ede8; font-weight: 600; }

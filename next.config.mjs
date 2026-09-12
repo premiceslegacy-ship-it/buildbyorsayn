@@ -3,10 +3,14 @@ const nextConfig = {
   // Remove X-Powered-By header
   poweredByHeader: false,
 
-  // No optimized local images are used. Keep the revocable MCP asset out of
-  // /_next/image so its launch gate and no-store response cannot be bypassed.
+  // Keep the revocable MCP asset out of /_next/image so its launch gate and
+  // no-store response cannot be bypassed. Editorial reference covers are
+  // ordinary public assets and may use the optimized local image pipeline.
   images: {
-    localPatterns: [{ pathname: "/_next-image-not-used/**" }],
+    localPatterns: [
+      { pathname: "/_next-image-not-used/**" },
+      { pathname: "/assets/protocole-references/**" },
+    ],
   },
 
   outputFileTracingIncludes: {
