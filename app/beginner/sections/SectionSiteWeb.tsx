@@ -1,122 +1,92 @@
+import Link from "next/link";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { SectionReveal } from "@/components/ui/section-reveal";
 import { MarkdownFilePreview } from "@/components/ui/markdown-file-preview";
 
 const SITE_TYPES = [
-  ["Validation ou waitlist", "Vérifier qu'une promesse intéresse", "Rejoindre la liste", "Demandes et réponses réelles", "Ultra Lean"],
-  ["Landing page", "Convaincre autour d'une offre", "Acheter, réserver ou essayer", "Démo, résultat ou témoignage réel", "Lean"],
-  ["Site vitrine", "Expliquer une activité et rassurer", "Contacter ou prendre rendez-vous", "Réalisations, équipe, méthode", "Standard"],
-  ["Portfolio", "Faire juger la qualité d'un travail", "Voir un cas puis contacter", "Cas, rôle, contraintes, résultat", "Standard"],
-  ["Site de contenu", "Répondre à une demande récurrente", "Lire ou s'abonner", "Sources, auteur, date de revue", "Éditorial"],
-  ["Page produit ou SaaS", "Relier une promesse à un produit", "Voir la démo, essayer ou acheter", "Produit en action, limites, tarifs", "Standard ou écosystème"],
-  ["E-commerce", "Aider à choisir puis acheter", "Ajouter au panier et payer", "Photos, livraison, retours, avis vérifiés", "Connecté"],
-  ["Espace membre", "Fournir un service privé", "Se connecter et accomplir une tâche", "États réels et sécurité", "Connecté"],
+  ["Landing page", "Présenter une offre et obtenir une action précise: appel, devis, essai ou achat."],
+  ["Site vitrine", "Expliquer une activité, montrer des réalisations et faciliter la prise de contact."],
+  ["Portfolio", "Faire voir le travail, le rôle joué et les résultats obtenus sur chaque projet."],
+  ["Site de contenu", "Répondre à des questions utiles avec des articles, guides ou ressources."],
+  ["E-commerce", "Aider à choisir un produit, acheter, puis comprendre la livraison et les retours."],
+  ["Site connecté", "Donner accès à un compte, des données privées, un paiement ou un service en ligne."],
 ] as const;
 
-const PAGE_ANATOMY = [
-  ["En-tête", "Où suis-je et où puis-je aller?", "Identité, navigation courte, action prioritaire"],
-  ["Premier écran", "Est-ce pour moi et pourquoi rester?", "Promesse, cible, mécanisme, CTA, première preuve"],
-  ["Développement", "Comment cela répond à ma situation?", "Problème, solution, démonstration, bénéfices"],
-  ["Preuves", "Pourquoi vous croire?", "Faits, cas, démo et témoignages autorisés"],
-  ["Offre", "Qu'est-ce que j'obtiens?", "Contenu, conditions, limites et prochaine étape"],
-  ["Objections", "Qu'est-ce qui me bloque encore?", "Réponses directes, sans cacher l'essentiel dans une FAQ"],
-  ["Pied de page", "Que faire si je cherche autre chose?", "Contact, légal et navigation secondaire"],
+const PAGE_SECTIONS = [
+  ["Navbar", "Le logo, quelques liens compréhensibles et une action principale."],
+  ["Hero section", "Le premier écran. Il contient le H1, le Sous-titre, le CTA principal et une première preuve."],
+  ["Problème", "La situation que le client reconnaît, avec ses mots et sans dramatisation inventée."],
+  ["Solution", "La façon simple dont l’offre résout ce problème."],
+  ["Démonstration", "Le produit en action, un exemple, une capture annotée ou un avant/après réel."],
+  ["Preuve sociale", "Un cas client, un avis autorisé, un résultat vérifiable ou une expertise démontrée."],
+  ["Offre", "Ce qui est inclus, pour qui, à quelles conditions et ce qui ne l’est pas."],
+  ["FAQ", "Les vraies questions entendues avant l’achat: prix, délai, engagement, fonctionnement."],
+  ["CTA final", "La même prochaine étape que plus haut, avec une réassurance factuelle."],
+  ["Footer", "Le contact, les pages utiles, les mentions légales et une seconde chance de s’orienter."],
 ] as const;
 
-const STYLE_FAMILIES = [
-  ["Éditorial", "Récit, titres expressifs, légendes et images dirigées", "Préserver le scan, le mobile et l'action"],
-  ["Brutalisme", "Structure exposée, contrastes durs, géométrie franche", "Garder focus, ordre, contraste et cibles complets"],
-  ["Skeuomorphism", "Indices d'un objet physique pour rendre un contrôle évident", "Ne pas imiter une matière si elle brouille la fonction"],
-  ["Glassmorphism", "Transparence, flou et profondeur par couches", "Le réserver à un panneau superposé sur un fond stable"],
-  ["Liquid Glass", "Matériau translucide réactif à la couche ou au mouvement", "Prévoir contraste variable, coût et reduced motion"],
-  ["Dither, ASCII ou terminal", "Trame et raster réduit comme signature", "Ne jamais remplacer le contenu accessible ni dégrader un logo"],
+const STYLES = [
+  ["Minimalisme", "Beaucoup d’espace, peu d’éléments, une hiérarchie très nette.", "Une offre simple avec de bonnes photos."],
+  ["Swiss design", "Grille visible, typographie précise, alignements stricts, contraste rouge/noir possible.", "Une marque qui veut paraître méthodique et directe."],
+  ["Éditorial", "Grands titres, rythme de magazine, images légendées, lecture en colonnes.", "Un studio, un média ou une marque avec une histoire forte."],
+  ["Brutalisme", "Structure exposée, contrastes francs, composition volontairement rude.", "Une audience culturelle qui comprend ce choix radical."],
+  ["Néo-brutalisme", "Contours épais, aplats vifs, ombres dures et contrôles très lisibles.", "Une marque jeune et énergique, si la lisibilité reste intacte."],
+  ["Skeuomorphism", "Les contrôles ressemblent à des objets physiques: bouton, molette, carnet.", "Un outil où cette ressemblance aide à comprendre l’action."],
+  ["Glassmorphism", "Panneau translucide et flou posé sur un fond stable.", "Une couche flottante ponctuelle, pas toutes les sections."],
+  ["Liquid Glass", "Surface transparente qui réagit à ce qui passe derrière elle.", "Une navigation ou un contrôle superposé, avec contraste vérifié."],
+  ["Maximalisme", "Couleurs, motifs et typographies abondants, mais organisés par une idée forte.", "Une marque expressive avec assez d’assets propriétaires."],
+  ["Rétro-futurisme", "Vision ancienne du futur: chrome, grilles, cadrans, couleurs spatiales.", "Un univers culturel ou produit qui rend cette référence pertinente."],
+  ["Dither / ASCII", "Images tramées, caractères et pixels limités comme langage graphique.", "Une signature numérique assumée, sans dégrader les logos ni le texte."],
 ] as const;
 
-const SKILLS = [
-  ["deep-research-vertical", "Niche et hypothèses", "Marché sourcé, concurrents, voix client, angles observés", "Ne choisit pas seul la direction artistique"],
-  ["oracle-site-web", "Recherche, offre, objectifs et contraintes", "Classification, sitemap, page blueprint, copy, SEO, performance", "N'invente ni recherche ni identité visuelle"],
-  ["ux-ui-design", "Brief, copy, références et marque", "Thèse visuelle, tokens, composants, assets et responsive", "N'impose pas une esthétique unique"],
-  ["Skills Apple", "Travail utilisateur et composants envisagés", "Hiérarchie, états, clavier, accessibilité et stress tests", "N'imite pas l'apparence d'Apple"],
-  ["backend-orsayn", "Flux, données, rôles et intégrations", "Validation, auth, autorisations, BDD, webhooks et sécurité", "Ne sur-ingénierie pas un site statique"],
+const SKILL_STEPS = [
+  ["1. Comprendre le marché", "deep-research-vertical", "Cherche les concurrents, les objections et les mots employés par les clients. Tu pars de sources, pas d’idées inventées."],
+  ["2. Préparer le site", "oracle-site-web", "Remplace une grande partie du travail manuel de classification, sitemap, structure, copy, SEO, performance et plan de livraison."],
+  ["3. Définir l’expérience", "ux-ui-design", "Transforme le brief et tes références en direction visuelle, composants, responsive et règles concrètes."],
+  ["4. Vérifier l’usage", "Skills Apple", "Aident à contrôler la hiérarchie, les états, le clavier, l’accessibilité et les petits écrans sans copier le style Apple."],
+  ["5. Sécuriser ce qui est connecté", "backend-orsayn", "À utiliser s’il y a comptes, données privées, paiement, base de données, API ou automatisations sensibles."],
 ] as const;
 
-const WORKFLOW = [
-  ["Classer", "Quel site, pour qui, quelle action?", "Fiche de classification", "Un type, un objectif, un niveau"],
-  ["Chercher", "Que savons-nous vraiment?", "Dossier de recherche", "Faits, sources et hypothèses séparés"],
-  ["Cadrer", "Que vend ou montre le site?", "Brief", "Promesse, objection, preuve et limites"],
-  ["Organiser", "Quelles pages et quel chemin?", "Sitemap et parcours", "Une intention et une action par page"],
-  ["Écrire", "Que doit comprendre la personne?", "Blueprint et copy deck", "Clarté sans image et faits non inventés"],
-  ["Diriger", "Quelle perception et quels mécanismes?", "Moodboard, thèse et tokens", "Décisions validées ou marquées comme hypothèses"],
-  ["Spécifier", "Quels composants, états et assets?", "Inventaires et contrats", "Mobile, clavier, erreurs et droits couverts"],
-  ["Construire", "Quel lot borné exécuter?", "Implémentation", "Chaque lot testé avant le suivant"],
-  ["Vérifier", "Qu'est-ce qui fonctionne réellement?", "Rapport de QA", "Aucun défaut critique ouvert"],
-  ["Mesurer", "Où le parcours fuit-il?", "Synthèse des signaux", "Une hypothèse prioritaire"],
+const TOOL_LOGOS = [
+  ["Codex", "/brand-logos/codex.svg"],
+  ["Claude Code", "/brand-logos/claude-code.svg"],
+  ["Antigravity", "/brand-logos/antigravity.svg"],
+  ["GitHub", "/brand-logos/github.svg"],
 ] as const;
 
-const QA_GATES = [
-  ["Vérité", "Sources, droits et promesses relus", "Faux avis, chiffre inventé, asset sans droit"],
-  ["Compréhension", "Une personne cible explique l'offre et la prochaine action", "Hero interchangeable ou CTA concurrents"],
-  ["Parcours", "Action principale testée de bout en bout", "Formulaire ou paiement non confirmé"],
-  ["États", "Focus, pressé, chargement, erreur et succès exercés", "Double envoi ou erreur sans récupération"],
-  ["Accessibilité", "Clavier, noms accessibles, contraste, zoom et reduced motion", "Contrôle inaccessible ou sens porté par la couleur seule"],
-  ["Responsive", "375, 430, 768, 1024, 1280 et 1440 px", "Contenu masqué ou ordre mobile incohérent"],
-  ["Performance", "Mesures mobile et desktop, poids des images et scripts", "Contenu principal retardé ou layout instable"],
-  ["SEO et GEO", "Title, description, canonical, sitemap, robots, schema et sources", "Page utile non indexable"],
-  ["Sécurité", "Entrées serveur validées, secrets hors code et protections proportionnées", "Secret exposé ou écriture non autorisée"],
-  ["Identité", "Test anti-clone et audit anti-slop", "Page interchangeable ou effet sans rôle"],
+const MEASURE_LOGOS = [
+  ["Google Search Console", "/brand-logos/googlesearchconsole.svg"],
+  ["Plausible", "/brand-logos/plausibleanalytics.svg"],
+  ["PostHog", "/brand-logos/posthog.svg"],
+  ["PageSpeed Insights", "/brand-logos/pagespeedinsights.svg"],
 ] as const;
 
 function ChapterTitle({ marker, children }: { marker: string; children: React.ReactNode }) {
   return (
-    <div className="mb-5 border-b border-white/10 pb-4">
+    <div className="mb-6 border-b border-white/10 pb-4">
       <p className="mb-2 font-mono text-[11px] tracking-[0.18em] text-[#e8d5b0]/60">09.{marker}</p>
       <h3 className="text-xl font-semibold tracking-tight text-[#f0ede8] md:text-2xl">{children}</h3>
     </div>
   );
 }
 
-function DecisionTable({
-  caption,
-  headers,
-  rows,
-}: {
-  caption: string;
-  headers: readonly string[];
-  rows: readonly (readonly string[])[];
-}) {
+function PlainNote({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="overflow-x-auto border-y border-white/10">
-      <table className="w-full min-w-[720px] border-collapse text-left text-sm">
-        <caption className="sr-only">{caption}</caption>
-        <thead>
-          <tr className="border-b border-white/10 text-[#e8d5b0]">
-            {headers.map((header) => (
-              <th key={header} scope="col" className="px-3 py-3 font-medium first:pl-0">{header}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/[0.07]">
-          {rows.map((row) => (
-            <tr key={row[0]} className="align-top">
-              {row.map((cell, index) => (
-                <td key={`${row[0]}-${index}`} className={`px-3 py-3 leading-relaxed text-white/55 first:pl-0 ${index === 0 ? "font-medium text-[#f0ede8]" : ""}`}>
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="border-l-2 border-[#e8d5b0]/55 bg-[#e8d5b0]/[0.035] px-5 py-4">
+      <p className="mb-1 text-sm font-semibold text-[#e8d5b0]">{title}</p>
+      <div className="text-sm leading-relaxed text-white/60">{children}</div>
     </div>
   );
 }
 
-function Checkpoint({ children }: { children: React.ReactNode }) {
+function ToolLogo({ name, src }: { name: string; src: string }) {
   return (
-    <div className="mt-6 border-l-2 border-[#e8d5b0]/55 bg-[#e8d5b0]/[0.04] px-5 py-4">
-      <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/70">Décision terminée quand</p>
-      <p className="text-sm leading-relaxed text-white/65">{children}</p>
-    </div>
+    <span className="inline-flex items-center gap-2 text-sm text-white/70">
+      <span className="flex h-9 w-9 items-center justify-center border border-white/10 bg-white/[0.03]">
+        <img src={src} alt="" aria-hidden="true" width={22} height={22} loading="lazy" className="h-[22px] w-[22px] object-contain" />
+      </span>
+      {name}
+    </span>
   );
 }
 
@@ -129,354 +99,370 @@ export function SectionSiteWeb() {
           <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Construire un site web avec l&apos;IA</h2>
         </div>
         <p className="max-w-3xl text-base leading-relaxed text-white/65">
-          Un site n&apos;est pas une affiche. C&apos;est un bâtiment dans lequel une personne entre avec une question, cherche des repères, vérifie qu&apos;elle peut faire confiance, puis choisit une porte. L&apos;IA peut monter les murs vite. Elle ne choisit ni le terrain, ni le plan, ni la bonne porte à ta place.
+          Un bon site aide une personne à comprendre une offre, à vérifier qu&apos;elle est sérieuse et à passer à l&apos;étape suivante. L&apos;IA accélère la recherche, l&apos;écriture et le code. Elle ne connaît pas ton client, tes preuves ni ta marque si tu ne les lui donnes pas.
         </p>
       </header>
 
       <SectionReveal className="mb-16">
         <LiquidCard variant="elevated" className="p-6 md:p-8">
-          <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Ce que tu vas construire</h3>
-          <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-            Pas un prompt magique, mais un dossier qu&apos;une autre personne ou un agent peut suivre sans inventer le contexte. Tu vas choisir, organiser, convaincre, diriger, systématiser, déléguer, vérifier puis améliorer.
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/65">Le but business</p>
+          <h3 className="mb-3 text-xl font-semibold text-[#f0ede8]">Une page, une personne, une prochaine étape</h3>
+          <p className="max-w-3xl text-sm leading-relaxed text-white/60">
+            Avant de choisir les couleurs, complète cette phrase: « Mon client arrive parce que..., il doit comprendre..., puis il peut... ». Si tu ne peux pas la finir simplement, ne demande pas encore à l&apos;IA de construire la page.
           </p>
-          <div className="grid gap-px bg-white/10 md:grid-cols-3">
-            {[
-              ["Comprendre", "Le type de site, son visiteur et son action utile."],
-              ["Produire", "Une arborescence, un plan de page, une copy, une direction et des contrats."],
-              ["Vérifier", "Le rendu réel, les états, les preuves et les mesures."],
-            ].map(([title, detail]) => (
-              <div key={title} className="bg-[#161618] p-4">
-                <p className="mb-1 text-sm font-semibold text-[#e8d5b0]">{title}</p>
-                <p className="text-xs leading-relaxed text-white/50">{detail}</p>
-              </div>
-            ))}
-          </div>
         </LiquidCard>
       </SectionReveal>
 
       <SectionReveal className="mb-16">
-        <ChapterTitle marker="1">Choisir le bon type de site</ChapterTitle>
+        <ChapterTitle marker="1">Quel site faut-il vraiment?</ChapterTitle>
         <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-          Le type vient du travail du visiteur et de l&apos;action finale, jamais d&apos;un style. Termine cette phrase: « Cette personne arrive ici pour..., et la prochaine étape utile est... ». Trois objectifs concurrents signalent un cadrage incomplet.
+          Le format dépend de ce que le visiteur doit accomplir. Une petite landing page peut suffire pour tester une offre. Un site connecté devient nécessaire seulement si la personne doit se connecter, payer ou retrouver ses données.
         </p>
-        <DecisionTable
-          caption="Types de sites selon le travail du visiteur"
-          headers={["Type", "Travail principal", "Action dominante", "Preuve", "Complexité"]}
-          rows={SITE_TYPES}
-        />
-        <Checkpoint>Tu peux nommer un seul type principal, une audience, une action et le niveau de complexité sans parler de couleur ou d&apos;animation.</Checkpoint>
-      </SectionReveal>
-
-      <SectionReveal className="mb-16">
-        <ChapterTitle marker="2">Anatomie et arborescence</ChapterTitle>
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-          La page est une pièce. L&apos;arborescence est le plan du bâtiment. Chaque zone répond à une question, mais aucune n&apos;est obligatoire par tradition. Une page contact n&apos;a pas besoin de la même démonstration qu&apos;une landing froide.
-        </p>
-        <DecisionTable caption="Anatomie fonctionnelle d'une page" headers={["Zone", "Question du visiteur", "Rôle"]} rows={PAGE_ANATOMY} />
-        <div className="mt-8 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <h4 className="mb-3 font-semibold text-[#f0ede8]">Règles d&apos;arborescence</h4>
-            <ol className="space-y-2 text-sm leading-relaxed text-white/55">
-              <li>1. Une page importante reste accessible en trois clics maximum.</li>
-              <li>2. Les libellés reprennent les mots du visiteur.</li>
-              <li>3. Une intention principale correspond à une page.</li>
-              <li>4. Les URLs restent courtes, lisibles et stables.</li>
-              <li>5. Contact, mentions, confidentialité et 404 existent.</li>
-            </ol>
-          </div>
-          <MarkdownFilePreview filename="SITEMAP.md">
-{`# SITEMAP.md
-
-## /
-Intention: orienter vers le bon service
-Action: voir un service
-Preuve: réalisations sélectionnées
-
-- /services
-  - /audit-site-web
-  - /creation-site-vitrine
-- /realisations
-  - /realisations/[cas]
-- /journal
-- /a-propos
-- /contact
-- /mentions-legales
-- /politique-confidentialite`}
-          </MarkdownFilePreview>
-        </div>
-        <div className="mt-6">
-          <MarkdownFilePreview filename="PAGE-BLUEPRINT.md">
-{`# PAGE-BLUEPRINT.md
-
-Page: /creation-site-vitrine
-Audience: [à valider]
-Intention: comprendre l'offre et décider si un échange est utile
-Action principale: demander un échange
-Preuves disponibles: [faits vérifiés seulement]
-Sections: promesse, mécanisme, démonstration, offre, objections
-Liens entrants: /, /services
-Liens sortants: /realisations, /contact`}
-          </MarkdownFilePreview>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {SITE_TYPES.map(([name, role]) => (
+            <div key={name} className="grid gap-1 py-4 sm:grid-cols-[10rem_1fr] sm:gap-6">
+              <p className="font-medium text-[#e8d5b0]">{name}</p>
+              <p className="text-sm leading-relaxed text-white/55">{role}</p>
+            </div>
+          ))}
         </div>
       </SectionReveal>
 
       <SectionReveal className="mb-16">
-        <ChapterTitle marker="3">Faire avancer sans manipuler</ChapterTitle>
-        <p className="mb-5 max-w-3xl text-sm leading-relaxed text-white/60">
-          La conversion consiste à retirer les doutes qui bloquent une personne déjà concernée. L&apos;ordre de départ est simple: promesse, tension réelle, mécanisme, démonstration, preuve, offre, objections, action. Adapte-le au niveau de conscience du visiteur au lieu d&apos;appliquer un framework mécaniquement.
+        <ChapterTitle marker="2">La structure d&apos;une page qui vend</ChapterTitle>
+        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
+          Une page de vente répond aux questions dans l&apos;ordre où elles arrivent. Voici une base complète. Ce n&apos;est pas un modèle rigide: retire ce qui n&apos;aide pas, ajoute une section quand une objection réelle le demande.
         </p>
-        <div className="mb-6 border-y border-white/10 py-5 font-mono text-sm leading-7 text-[#e8d5b0]">
-          Promesse -&gt; mécanisme -&gt; démonstration -&gt; preuve -&gt; offre -&gt; objections -&gt; action
+        <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr]">
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <div className="border border-[#e8d5b0]/25 bg-[#111113]">
+              <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 text-xs text-white/50">
+                <span className="font-semibold text-white/80">Navbar</span><span>Logo · Liens · CTA</span>
+              </div>
+              <div className="px-5 py-8 text-center">
+                <p className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[#e8d5b0]/60">Hero section</p>
+                <p className="mx-auto max-w-xs text-xl font-semibold text-white">H1: le résultat compris en quelques secondes</p>
+                <p className="mx-auto mt-3 max-w-sm text-xs leading-relaxed text-white/55">Sous-titre: pour qui, comment et sans quelle difficulté.</p>
+                <span className="mt-5 inline-block bg-[#e8d5b0] px-4 py-2 text-xs font-semibold text-[#161618]">CTA principal</span>
+                <p className="mt-2 text-[10px] text-white/55">Réponse en 24 h, uniquement si c&apos;est vrai</p>
+              </div>
+              {PAGE_SECTIONS.slice(2, 9).map(([name]) => (
+                <div key={name} className="border-t border-white/10 px-4 py-3 text-xs text-white/55">{name}</div>
+              ))}
+              <div className="border-t border-white/10 bg-white/[0.025] px-4 py-5 text-xs text-white/55">Footer · Contact · Légal · Liens utiles</div>
+            </div>
+          </div>
+          <div className="divide-y divide-white/10 border-y border-white/10">
+            {PAGE_SECTIONS.map(([name, role], index) => (
+              <div key={name} className="grid gap-2 py-4 sm:grid-cols-[2.5rem_9rem_1fr] sm:gap-4">
+                <span className="font-mono text-xs text-[#e8d5b0]/60">{String(index + 1).padStart(2, "0")}</span>
+                <strong className="text-sm text-[#f0ede8]">{name}</strong>
+                <span className="text-sm leading-relaxed text-white/50">{role}</span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-2">
+        <PlainNote title="L&apos;ordre des sections est adaptable">
+          <p>Une personne qui te connaît déjà peut voir l&apos;offre plus tôt. Une personne qui découvre le problème a besoin d&apos;abord de le reconnaître. Garde toujours un fil simple: comprendre, vérifier, décider.</p>
+        </PlainNote>
+      </SectionReveal>
+
+      <SectionReveal className="mb-16">
+        <ChapterTitle marker="3">La proposition de valeur et le copywriting</ChapterTitle>
+        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
+          La proposition de valeur dit qui tu aides, quel résultat la personne obtient et pourquoi elle peut te croire. Le copywriting, ou l&apos;écriture qui aide à vendre, rend cette décision claire. Il ne sert pas à gonfler une promesse.
+        </p>
+        <div className="grid gap-px bg-white/10 md:grid-cols-2">
+          <div className="bg-[#161618] p-5">
+            <p className="mb-3 text-xs uppercase tracking-[0.14em] text-white/55">Faible</p>
+            <p className="text-lg text-white/60">« Des solutions digitales innovantes pour votre croissance. »</p>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">On ne sait ni pour qui, ni quel résultat, ni ce qui est vendu.</p>
+          </div>
+          <div className="bg-[#161618] p-5">
+            <p className="mb-3 text-xs uppercase tracking-[0.14em] text-[#e8d5b0]/70">Mieux</p>
+            <p className="text-lg text-white/80">« Un site clair pour que les artisans reçoivent des demandes de devis qualifiées. »</p>
+            <p className="mt-3 text-sm leading-relaxed text-white/50">La cible, l&apos;outil et le résultat sont visibles. Il reste à ajouter une preuve réelle.</p>
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="border-t border-white/10 pt-5">
+            <p className="mb-2 text-xs uppercase tracking-[0.14em] text-white/55">Fonctionnalité</p>
+            <p className="text-white/70">« Agenda avec rappels automatiques. »</p>
+          </div>
+          <div className="border-t border-[#e8d5b0]/30 pt-5">
+            <p className="mb-2 text-xs uppercase tracking-[0.14em] text-[#e8d5b0]/65">Bénéfice</p>
+            <p className="text-white/80">« Tes clients se souviennent du rendez-vous, sans que tu les relances un par un. »</p>
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <div>
-            <p className="mb-2 text-xs uppercase tracking-wider text-white/35">Formulation vague</p>
-            <p className="border-t border-white/10 pt-3 text-sm text-white/50">Des solutions digitales innovantes pour votre croissance.</p>
+            <h4 className="mb-3 font-semibold text-[#f0ede8]">Écris avec les mots de tes clients</h4>
+            <p className="text-sm leading-relaxed text-white/55">
+              Relis les appels, emails, avis et questions de vente. Si les clients disent « je perds mes soirées à faire les devis », garde ces mots. Ne remplace pas une phrase concrète par « optimiser les opérations ».
+            </p>
           </div>
           <div>
-            <p className="mb-2 text-xs uppercase tracking-wider text-[#e8d5b0]/70">Hypothèse plus claire</p>
-            <p className="border-t border-[#e8d5b0]/25 pt-3 text-sm text-white/70">Une page centrée sur une offre, une preuve disponible et une prochaine action.</p>
+            <h4 className="mb-3 font-semibold text-[#f0ede8]">Un CTA dit ce que la personne obtient</h4>
+            <ul className="space-y-2 text-sm text-white/55">
+              <li><span className="text-white/55">Faible:</span> Envoyer, Soumettre, Cliquez ici.</li>
+              <li><span className="text-[#e8d5b0]">Mieux:</span> Recevoir mon devis, Voir la démo, Réserver mon appel.</li>
+              <li>Garde un seul CTA principal par écran et une réassurance vraie juste dessous.</li>
+            </ul>
           </div>
         </div>
-        <p className="mt-5 text-sm leading-relaxed text-white/55">
-          Le second texte reste une hypothèse tant qu&apos;aucun résultat n&apos;est mesuré. N&apos;invente jamais de témoignage, logo, compteur, délai ou garantie. Un formulaire demande seulement ce qui est nécessaire, garde des labels visibles, explique les erreurs et empêche le double envoi.
-        </p>
-        <div className="mt-6">
+
+        <PlainNote title="Réduis la friction du formulaire">
+          <div className="space-y-3">
+            <p>Demande seulement les informations nécessaires pour la prochaine étape. Pour rappeler un prospect, un nom, un moyen de contact et une question utile peuvent suffire. Chaque champ supplémentaire demande un effort et doit avoir une raison claire.</p>
+            <p>Chaque champ garde un libellé visible. Indique s&apos;il est obligatoire ou facultatif et choisis le bon format, par exemple email pour une adresse email et téléphone pour un numéro. Si une saisie ne convient pas, affiche un message d&apos;erreur près du champ et explique comment la corriger.</p>
+            <p>Après l&apos;envoi, montre une confirmation claire et annonce la suite. Teste aussi où arrive la demande, qui la reçoit et sous quel délai elle sera traitée. Une courte phrase près du bouton doit expliquer au visiteur l&apos;utilisation de ses données et mener vers la politique de confidentialité.</p>
+          </div>
+        </PlainNote>
+
+        <div className="mt-7">
           <MarkdownFilePreview filename="COPY-DECK.md">
 {`# COPY-DECK.md
 
-Audience: [segment validé]
-Niveau de conscience: [problème / solution / produit / décision]
-Promesse: [hypothèse ou fait sourcé]
-Mécanisme: [explication compréhensible]
-Preuves autorisées: [source et droit d'usage]
-Objections: [mots réels du public]
-CTA: [action réellement disponible]
-Réassurance: [condition factuelle uniquement]`}
+Client: [personne précise]
+Problème, dans ses mots: [citation ou note de recherche]
+Résultat attendu: [simple et concret]
+Preuve disponible: [source réelle]
+H1: [une promesse claire]
+Sous-titre: [cible + méthode + limite utile]
+CTA principal: [ce que la personne obtient]
+Réassurance: [fait vérifié]
+Questions de la FAQ: [objections entendues]`}
           </MarkdownFilePreview>
         </div>
       </SectionReveal>
 
       <SectionReveal className="mb-16">
-        <ChapterTitle marker="4">Du moodboard aux règles</ChapterTitle>
+        <ChapterTitle marker="4">Construire une vraie identité</ChapterTitle>
         <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-          Une direction artistique n&apos;est pas une humeur. Donne un rôle à chaque référence: composition, typographie, matière, imagerie, interaction ou anti-référence. Note chaque observation comme exacte, mesurée, inférée ou proposée. Ensuite, écris une thèse visuelle et traduis-la en tokens sémantiques.
+          Le style suit la marque et l&apos;audience. Un cabinet juridique, un festival et un logiciel médical ne doivent pas recevoir la même page. Commence par des références choisies, puis utilise tes propres photos, captures, illustrations, textures, icônes et mots.
         </p>
-        <div className="mb-7 border-y border-white/10 py-5 font-mono text-sm leading-7 text-[#e8d5b0]">
-          Contexte -&gt; références -&gt; observations -&gt; thèse -&gt; tokens -&gt; composants -&gt; fixture -&gt; validation
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {STYLES.map(([name, look, use], index) => (
+            <div
+              key={name}
+              className={`min-h-48 border p-5 ${index % 4 === 0 ? "border-[#e8d5b0]/35 bg-[#e8d5b0]/[0.025]" : index % 4 === 1 ? "border-white/20 bg-white/[0.015]" : index % 4 === 2 ? "border-dashed border-white/20 bg-[#111113]" : "border-white/10 bg-[#1b1b1d]"}`}
+            >
+              <p className={`${index % 3 === 0 ? "font-serif text-2xl" : index % 3 === 1 ? "font-mono text-lg uppercase tracking-tight" : "text-xl font-black"} text-[#f0ede8]`}>{name}</p>
+              <div className={`my-4 h-px ${index % 2 ? "bg-white/20" : "bg-[#e8d5b0]/45"}`} />
+              <p className="text-sm leading-relaxed text-white/55">{look}</p>
+              <p className="mt-3 text-xs leading-relaxed text-[#e8d5b0]/60">Utile pour: {use}</p>
+            </div>
+          ))}
         </div>
-        <h4 className="mb-3 font-semibold text-[#f0ede8]">Familles réelles, mécanismes précis</h4>
-        <DecisionTable caption="Familles stylistiques et garde-fous" headers={["Famille", "Mécanisme", "Garde-fou"]} rows={STYLE_FAMILIES} />
-        <p className="mt-5 text-sm leading-relaxed text-white/55">
-          Les familles peuvent cohabiter si leurs rôles ne se battent pas. Une structure éditoriale peut porter la lecture, un header en Liquid Glass signaler une couche persistante et un asset Dither signer le projet. La hiérarchie doit rester compréhensible sans ces effets.
-        </p>
+
+        <LiquidCard className="mt-8 p-6">
+          <h4 className="mb-3 font-semibold text-[#f0ede8]">Évite le contenu générique produit par l&apos;IA</h4>
+          <p className="mb-4 text-sm leading-relaxed text-white/55">Ce rendu sans personnalité est parfois appelé AI slop. Il apparaît quand l&apos;IA applique les mêmes textes et les mêmes effets à tous les projets.</p>
+          <ul className="grid gap-3 text-sm leading-relaxed text-white/55 md:grid-cols-2">
+            <li>• Pas de gradient violet, verre ou grille de cartes par défaut.</li>
+            <li>• Pas de faux avis, faux logos, faux compteurs ou faux résultats.</li>
+            <li>• Pas de texte qui pourrait vendre n&apos;importe quelle entreprise.</li>
+            <li>• Pas d&apos;icône décorative devant chaque titre.</li>
+            <li>• Utilise des références nommées et explique ce que tu en retiens.</li>
+            <li>• Crée des compositions variées selon le contenu, pas selon un template.</li>
+            <li>• Donne à l&apos;IA tes assets propriétaires et leurs droits d&apos;usage.</li>
+            <li>• Si tu n&apos;as pas encore de preuve, montre une démo honnête et dis ce qui manque.</li>
+          </ul>
+        </LiquidCard>
+
         <div className="mt-7">
           <MarkdownFilePreview filename="DESIGN-SYSTEM.md">
 {`# DESIGN-SYSTEM.md
 
-## Thèse visuelle
-Perception visée: [à valider]
-Mécanisme de composition: [règle]
-Anti-références: [risque évité]
-
-## Tokens sémantiques
-- canvas: #0e0e0f (existant)
-- surface-raised: #1c1c1f (existant)
-- text-primary: #f0ede8 (existant)
-- action-primary: #e8d5b0 (existant)
-- focus-ring: [proposé, à mesurer]
-- state-error: rgba(248,113,113,.80) + message textuel
-
-## Contrats
-Typographie: rôles, taille, ligne, graisse, mesure
-Espace: rythme, largeur de lecture, recomposition mobile
-Géométrie: rayon par rôle, bordures, séparateurs
-Motion: déclencheur, fonction, durée, easing, état final, réduction
-Fixture: titre long, contrôle, vide, erreur, succès`}
+Marque: [ce qu'elle doit faire ressentir]
+Audience: [personnes et contexte]
+Références: [liens + élément observé]
+À éviter: [styles qui contredisent la marque]
+Typographies: [rôle de chaque police]
+Couleurs: [rôle de chaque couleur]
+Images: [photos, captures, illustrations, droits]
+Compositions: [règles pour varier sans perdre la cohérence]
+Mobile: [ce qui change sur petit écran]`}
           </MarkdownFilePreview>
         </div>
-        <Checkpoint>Chaque effet a un rôle, chaque référence une provenance et chaque valeur un statut. « Premium » seul n&apos;est pas une spécification.</Checkpoint>
       </SectionReveal>
 
       <SectionReveal className="mb-16">
-        <ChapterTitle marker="5">Icônes, images, motion et états</ChapterTitle>
+        <ChapterTitle marker="5">Le workflow avec les skills</ChapterTitle>
         <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-          Chaque élément doit aider à comprendre, reconnaître, prouver ou agir. Une icône n&apos;est pas obligatoire devant un titre. Valide d&apos;abord trois glyphes avec une grille, une taille, une épaisseur et un poids optique communs.
+          Les skills évitent de tout expliquer à nouveau dans chaque prompt. Chacun prend une partie du travail. Tu vérifies les faits, les choix de marque, les droits et l&apos;action finale.
+        </p>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {SKILL_STEPS.map(([step, skill, detail]) => (
+            <div key={skill} className="grid gap-2 py-5 md:grid-cols-[12rem_12rem_1fr] md:gap-6">
+              <p className="text-sm font-medium text-white/80">{step}</p>
+              {skill === "oracle-site-web" ? (
+                <Link href="/skills#skill-oracle-site-web" className="text-sm font-semibold text-[#e8d5b0] underline decoration-[#e8d5b0]/30 underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e8d5b0]">
+                  {skill}
+                </Link>
+              ) : (
+                <p className="font-mono text-sm text-[#e8d5b0]">{skill}</p>
+              )}
+              <p className="text-sm leading-relaxed text-white/50">{detail}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 border-t border-white/10 pt-6">
+          <h4 className="mb-4 font-semibold text-[#f0ede8]">Outils qui peuvent exécuter le travail</h4>
+          <div className="flex flex-wrap gap-x-7 gap-y-4">
+            {TOOL_LOGOS.map(([name, src]) => <ToolLogo key={name} name={name} src={src} />)}
+          </div>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/50">
+            Codex, Claude Code ou Antigravity peuvent lire les documents et modifier le projet. GitHub conserve les versions et permet de relire chaque changement. Donne toujours un lot précis: une section, un formulaire ou un contrôle, puis teste avant de continuer.
+          </p>
+        </div>
+      </SectionReveal>
+
+      <SectionReveal className="mb-16">
+        <ChapterTitle marker="6">Les fichiers qui empêchent l&apos;IA d&apos;inventer</ChapterTitle>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <MarkdownFilePreview filename="SITEMAP.md">
+{`# SITEMAP.md
+
+/               Accueil
+/services       Choisir un service
+/realisations   Voir des preuves
+/a-propos       Comprendre qui intervient
+/contact        Demander un échange
+/mentions-legales
+/confidentialite
+
+Pour chaque page:
+- question principale
+- action attendue
+- page qui mène ici
+- page suivante`}
+          </MarkdownFilePreview>
+          <MarkdownFilePreview filename="PAGE-BLUEPRINT.md">
+{`# PAGE-BLUEPRINT.md
+
+Page: Accueil
+Visiteur: [qui arrive]
+But: [ce qu'il doit comprendre]
+Action: [une seule]
+
+Ordre proposé:
+1. Hero
+2. Problème
+3. Solution
+4. Démonstration
+5. Preuves
+6. Offre
+7. FAQ
+8. CTA final
+
+Chaque section: message, contenu, preuve, état mobile.`}
+          </MarkdownFilePreview>
+        </div>
+        <p className="mt-6 text-sm leading-relaxed text-white/55">
+          Ajoute le COPY-DECK.md pour les textes, le DESIGN-SYSTEM.md pour l&apos;identité et le QA-REPORT.md pour noter ce qui a réellement été testé. Ces fichiers peuvent être courts. Leur rôle est de garder les décisions stables pendant que l&apos;IA travaille.
+        </p>
+      </SectionReveal>
+
+      <SectionReveal className="mb-16">
+        <ChapterTitle marker="7">Le SEO, expliqué simplement</ChapterTitle>
+        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
+          Le SEO aide un moteur de recherche à comprendre quelle question ta page résout. Commence par écrire une page utile pour une intention précise. Donne-lui un titre clair, une adresse lisible, des sous-titres logiques et des liens depuis d&apos;autres pages du site.
         </p>
         <div className="grid gap-8 md:grid-cols-2">
           <div>
-            <h4 className="mb-3 font-semibold text-[#f0ede8]">Force de preuve des assets</h4>
-            <ol className="space-y-3 border-l border-white/10 pl-5 text-sm text-white/55">
-              <li><strong className="text-white/80">Produit en action</strong><br />Montre la tâche réelle.</li>
-              <li><strong className="text-white/80">Résultat réel</strong><br />Nomme la source et le contexte.</li>
-              <li><strong className="text-white/80">Photo métier</strong><br />Documente une situation utile.</li>
-              <li><strong className="text-white/80">Illustration explicative</strong><br />Clarifie une relation invisible.</li>
-              <li><strong className="text-white/80">Ambiance ou stock</strong><br />Faible preuve, usage secondaire.</li>
-            </ol>
+            <h4 className="mb-3 font-semibold text-[#f0ede8]">Ce que tu fais</h4>
+            <ul className="space-y-3 text-sm leading-relaxed text-white/55">
+              <li>1. Une question ou un besoin principal par page.</li>
+              <li>2. Un titre qui dit clairement le sujet.</li>
+              <li>3. Une réponse utile avec tes exemples, sources et preuves.</li>
+              <li>4. Des liens qui aident à poursuivre le parcours.</li>
+              <li>5. Une page rapide, lisible sur mobile et accessible.</li>
+            </ul>
           </div>
-          <div>
-            <h4 className="mb-3 font-semibold text-[#f0ede8]">Contrats avant production</h4>
+          <div className="border-l border-white/10 pl-5">
+            <p className="mb-3 text-xs uppercase tracking-[0.14em] text-[#e8d5b0]/65">Deuxième couche: les noms techniques</p>
             <dl className="space-y-3 text-sm leading-relaxed">
-              <div><dt className="text-[#e8d5b0]">Asset</dt><dd className="text-white/55">Rôle, source, droits, cadrage, format, poids, variante mobile et texte alternatif.</dd></div>
-              <div><dt className="text-[#e8d5b0]">Motion</dt><dd className="text-white/55">Déclencheur, fonction, amplitude, durée, easing, fréquence, état final et reduced motion.</dd></div>
-              <div><dt className="text-[#e8d5b0]">État</dt><dd className="text-white/55">Repos, focus, pressé, chargement, vide, erreur, succès, indisponible et permission selon le cas.</dd></div>
+              <div><dt className="text-white/75">Title et description</dt><dd className="text-white/55">Le titre et le résumé vus dans les résultats.</dd></div>
+              <div><dt className="text-white/75">Sitemap</dt><dd className="text-white/55">La liste des pages que le moteur peut découvrir.</dd></div>
+              <div><dt className="text-white/75">Canonical</dt><dd className="text-white/55">L&apos;adresse officielle d&apos;une page.</dd></div>
+              <div><dt className="text-white/75">Indexation</dt><dd className="text-white/55">Le fait qu&apos;une page puisse entrer dans l&apos;index du moteur.</dd></div>
             </dl>
           </div>
         </div>
-        <Checkpoint>Le contenu reste compréhensible sans image, sans couleur et sans animation. Chaque erreur explique une récupération possible.</Checkpoint>
       </SectionReveal>
 
       <SectionReveal className="mb-16">
-        <ChapterTitle marker="6">Réutiliser sans cloner</ChapterTitle>
+        <ChapterTitle marker="8">Mesurer ce qui aide le business</ChapterTitle>
         <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-          Réutiliser une cuisine professionnelle ne signifie pas servir le même plat. Garde le noyau éprouvé, puis requalifie le thème de marque et le contenu métier.
+          Ne pose pas des outils pour collectionner des graphiques. Chaque mesure doit répondre à une question: les bonnes personnes trouvent-elles le site, comprennent-elles l&apos;offre et terminent-elles l&apos;action?
         </p>
+        <div className="mb-7 flex flex-wrap gap-x-7 gap-y-4">
+          {MEASURE_LOGOS.map(([name, src]) => <ToolLogo key={name} name={name} src={src} />)}
+        </div>
         <div className="divide-y divide-white/10 border-y border-white/10">
-          {[
-            ["Noyau éprouvé", "Accessibilité, focus, formulaires, grilles, responsive et contrats d'états", "Plateforme et contraintes réelles"],
-            ["Thème de marque", "Architecture des tokens et mécanisme de thème", "Typographie, couleurs, géométrie, matière et iconographie"],
-            ["Contenu métier", "Modèles de données et gabarits de cas", "Mots, preuves, offres, images, navigation et objets métier"],
-          ].map(([layer, reused, changed]) => (
-            <div key={layer} className="grid gap-2 py-5 md:grid-cols-[0.6fr_1.2fr_1.2fr] md:gap-6">
-              <p className="font-semibold text-[#e8d5b0]">{layer}</p>
-              <p className="text-sm leading-relaxed text-white/55"><span className="text-white/35">Réutilisé: </span>{reused}</p>
-              <p className="text-sm leading-relaxed text-white/55"><span className="text-white/35">Requalifié: </span>{changed}</p>
-            </div>
-          ))}
-        </div>
-        <Checkpoint>Retire le logo et l&apos;accent. Si structure, objets, mots, preuves et imagerie peuvent servir à un autre client sans changement, le site reste un template maquillé.</Checkpoint>
-      </SectionReveal>
-
-      <SectionReveal className="mb-16">
-        <ChapterTitle marker="7">Des skills spécialistes, pas cinq boutons « fais tout »</ChapterTitle>
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-          Un skill reçoit un livrable validé, produit une sortie bornée et la transmet au suivant. Si le produit a déjà été cadré avec oracle-by-orsayn, le site récupère ces documents au lieu de réinventer une identité.
-        </p>
-        <DecisionTable caption="Rôle exact des skills" headers={["Skill", "Entrée", "Sortie", "Limite"]} rows={SKILLS} />
-        <p className="mt-5 text-sm leading-relaxed text-white/55">
-          Le backend devient nécessaire avec authentification, données privées, paiement, API mutante, webhook ou automatisation critique. Un formulaire simple demande une couche proportionnée: validation serveur, anti-spam, limitation de débit, envoi et messages d&apos;état.
-        </p>
-      </SectionReveal>
-
-      <SectionReveal className="mb-16">
-        <ChapterTitle marker="8">Construire par artefacts validés</ChapterTitle>
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-          Ne demande pas « crée le site ». Fournis les documents validés, demande un lot borné et exige un retour sur les critères d&apos;acceptation. Les faits, la direction, les droits, les actions sensibles et la mise en ligne restent des validations humaines.
-        </p>
-        <ol className="divide-y divide-white/10 border-y border-white/10">
-          {WORKFLOW.map(([step, question, output, validation], index) => (
-            <li key={step} className="grid gap-2 py-4 md:grid-cols-[3rem_0.7fr_1.2fr_1fr_1.2fr] md:gap-4">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{String(index + 1).padStart(2, "0")}</span>
-              <strong className="text-sm text-[#f0ede8]">{step}</strong>
-              <span className="text-sm text-white/50">{question}</span>
-              <span className="text-sm text-white/65">{output}</span>
-              <span className="text-sm text-white/45">{validation}</span>
-            </li>
-          ))}
-        </ol>
-        <blockquote className="mt-7 border-l-2 border-[#e8d5b0]/55 pl-5 text-sm leading-relaxed text-white/65">
-          Lis le brief, le plan de page, le copy deck et le design system. Résume l&apos;audience, l&apos;action principale, les contraintes et les interdits. N&apos;implémente que le lot demandé. Si une information manque, marque-la comme bloquante au lieu de l&apos;inventer.
-        </blockquote>
-      </SectionReveal>
-
-      <SectionReveal className="mb-16">
-        <ChapterTitle marker="9">Rendre le site visible et rapide</ChapterTitle>
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-          Le SEO aide une page utile à être comprise, explorée puis proposée à la bonne recherche. La performance évite de perdre la personne avant même qu&apos;elle voie la promesse. Commence par une page sémantique avec un seul titre principal, des sous-titres ordonnés, des liens compréhensibles et un contenu qui répond réellement à une intention.
-        </p>
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div>
-            <h4 className="mb-3 font-semibold text-[#f0ede8]">Le paquet minimum d&apos;une page</h4>
-            <dl className="divide-y divide-white/10 border-y border-white/10 text-sm leading-relaxed">
-              {[
-                ["Title", "Le sujet précis de la page, différencié des autres pages."],
-                ["Description", "Un résumé honnête qui donne une raison de consulter la page."],
-                ["canonical", "L'URL de référence lorsque plusieurs chemins montrent un contenu équivalent."],
-                ["sitemap.xml", "La liste des URLs indexables que le moteur peut découvrir."],
-                ["robots.txt", "Les règles d'exploration, sans jamais l'utiliser comme protection d'un contenu privé."],
-                ["Données structurées", "Seulement un schéma qui décrit fidèlement un contenu visible, par exemple Organization, Product ou Article."],
-              ].map(([term, detail]) => (
-                <div key={term} className="py-3">
-                  <dt className="font-medium text-[#e8d5b0]">{term}</dt>
-                  <dd className="mt-1 text-white/50">{detail}</dd>
-                </div>
-              ))}
-            </dl>
+          <div className="grid gap-2 py-5 md:grid-cols-[14rem_1fr] md:gap-6">
+            <strong className="text-sm text-[#e8d5b0]">Google Search Console</strong>
+            <p className="text-sm leading-relaxed text-white/55">Montre les impressions, les clics, les requêtes, la position moyenne et les problèmes d&apos;indexation. Tu vois comment Google trouve tes pages.</p>
           </div>
-          <div>
-            <h4 className="mb-3 font-semibold text-[#f0ede8]">Le budget de performance</h4>
-            <p className="mb-4 text-sm leading-relaxed text-white/55">
-              Fixe les limites avant de construire: poids maximal du premier écran, nombre de polices, JavaScript initial et poids de chaque image. Une image est recadrée au bon ratio, redimensionnée pour son usage et livrée dans un format moderne. Une police est limitée aux graisses réellement employées. Un script tiers doit justifier son coût.
-            </p>
-            <div className="border-y border-white/10 py-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#e8d5b0]/70">Core Web Vitals</p>
-              <p className="text-sm leading-relaxed text-white/55">
-                <strong className="text-white/75">Largest Contentful Paint</strong> mesure quand le contenu principal devient visible. <strong className="text-white/75">Interaction to Next Paint</strong> mesure la réponse aux interactions. <strong className="text-white/75">Cumulative Layout Shift</strong> mesure les déplacements inattendus de la mise en page.
-              </p>
-            </div>
+          <div className="grid gap-2 py-5 md:grid-cols-[14rem_1fr] md:gap-6">
+            <strong className="text-sm text-[#e8d5b0]">Plausible ou PostHog</strong>
+            <p className="text-sm leading-relaxed text-white/55">Comptent les visiteurs et les événements utiles: clic sur le CTA, formulaire commencé, formulaire envoyé. PostHog peut aussi aider à observer un parcours plus complexe.</p>
+          </div>
+          <div className="grid gap-2 py-5 md:grid-cols-[14rem_1fr] md:gap-6">
+            <strong className="text-sm text-[#e8d5b0]">PageSpeed Insights</strong>
+            <p className="text-sm leading-relaxed text-white/55">Repère ce qui ralentit la page ou fait bouger le contenu. Teste surtout le mobile et corrige les causes indiquées, pas seulement la note.</p>
           </div>
         </div>
-        <p className="mt-6 text-sm leading-relaxed text-white/55">
-          Vérifie d&apos;abord en local avec Lighthouse ou les outils du navigateur, puis mesure l&apos;URL déployée avec PageSpeed Insights et les données réelles de Search Console quand elles existent. Garde une mesure avant et après chaque changement. Un score isolé n&apos;explique pas la cause et ne remplace pas l&apos;observation d&apos;un vrai parcours.
-        </p>
-        <Checkpoint>Chaque page indexable a un sujet, des métadonnées uniques, une URL canonique et des liens entrants. Le premier écran respecte un budget mesuré sur mobile et desktop.</Checkpoint>
-      </SectionReveal>
-
-      <SectionReveal className="mb-16">
-        <ChapterTitle marker="10">Prouver que le site tient</ChapterTitle>
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
-          Relire le code sans ouvrir le site revient à valider une maison depuis son plan. « Ça compile » prouve seulement que le projet peut être construit. La livraison exige le vrai rendu, les vraies interactions et les cas d&apos;échec.
-        </p>
-        <DecisionTable caption="Gates de qualité" headers={["Contrôle", "Preuve attendue", "Blocage typique"]} rows={QA_GATES} />
-        <p className="mt-5 text-sm leading-relaxed text-white/55">
-          Un score de laboratoire est une mesure à un instant donné. Il ne remplace ni le test humain, ni l&apos;interaction réelle, ni le suivi en production. Un verdict reste textuel: PASS, FAIL ou BLOCKED. BLOCKED n&apos;est jamais un succès.
-        </p>
-        <div className="mt-7">
-          <MarkdownFilePreview filename="QA-REPORT.md">
-{`# QA-REPORT.md
-
-Date: [date réelle]
-Version: [commit ou build]
-Navigateurs: [versions testées]
-Viewports: 375, 430, 768, 1024, 1280, 1440
-
-| Gate | Preuve | Verdict | Blocage |
-|---|---|---|---|
-| Parcours principal | [capture ou test] | BLOCKED | [raison] |
-| Clavier et focus | [observation] | FAIL | [récupération] |
-| Responsive | [captures] | PASS | aucun |
-
-Défauts critiques ouverts: [liste]
-Limites non vérifiées: [liste explicite]
-Décision de livraison: [go / no-go et responsable]`}
-          </MarkdownFilePreview>
+        <div className="mt-7 overflow-x-auto border-y border-[#e8d5b0]/25 py-5">
+          <div className="flex min-w-[680px] items-center justify-between gap-3 font-mono text-sm text-[#e8d5b0]">
+            <span>visiteurs</span><span className="text-white/55">→</span><span>CTA</span><span className="text-white/55">→</span><span>formulaire commencé</span><span className="text-white/55">→</span><span>formulaire envoyé</span><span className="text-white/55">→</span><span>client</span>
+          </div>
         </div>
+        <p className="mt-4 text-sm leading-relaxed text-white/50">
+          Ce tunnel simple montre l&apos;endroit où les personnes s&apos;arrêtent. Un chiffre seul ne dit pas pourquoi. Complète-le avec des messages clients, quelques tests utilisateurs et les questions entendues en vente.
+        </p>
       </SectionReveal>
 
       <SectionReveal>
-        <ChapterTitle marker="11">Améliorer depuis le réel</ChapterTitle>
-        <p className="mb-5 max-w-3xl text-sm leading-relaxed text-white/60">
-          Une fois en ligne, le site devient observable. Les données montrent où le parcours fuit. Les appels, messages et tests utilisateurs aident à comprendre pourquoi. Avec peu de trafic, quelques conversations utiles valent mieux qu&apos;un test A/B trop faible pour conclure.
+        <ChapterTitle marker="9">Vérifier, puis passer au Bloc 10</ChapterTitle>
+        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/60">
+          Ouvre le vrai site sur téléphone et ordinateur. Lis-le sans les images, navigue au clavier, envoie le formulaire avec de bonnes et de mauvaises données, vérifie les messages d&apos;erreur, puis contrôle les liens et le poids des images. La mise en ligne elle-même appartient au Bloc 10.
         </p>
-        <div className="mb-7 border-y border-white/10 py-5 font-mono text-sm leading-7 text-[#e8d5b0]">
-          Observer -&gt; localiser la friction -&gt; formuler une hypothèse -&gt; modifier une chose -&gt; vérifier -&gt; mesurer -&gt; documenter
+        <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+          <div className="border-y border-white/10 py-5">
+            <h4 className="mb-3 font-semibold text-[#f0ede8]">Avant de transmettre</h4>
+            <ul className="space-y-3 text-sm leading-relaxed text-white/55">
+              <li>• L&apos;offre et l&apos;action sont comprises sans explication orale.</li>
+              <li>• Toutes les preuves ont une source et un droit d&apos;usage.</li>
+              <li>• Le formulaire confirme le succès et explique les erreurs.</li>
+              <li>• Aucun contenu ne déborde sur petit écran.</li>
+              <li>• Le clavier, le focus et le mouvement réduit fonctionnent.</li>
+              <li>• Les mesures correspondent au tunnel réellement utilisé.</li>
+            </ul>
+          </div>
+          <MarkdownFilePreview filename="QA-REPORT.md">
+{`# QA-REPORT.md
+
+Version testée: [commit]
+Écrans: 375, 430, 768, 1024, 1440
+Navigateurs: [liste réelle]
+
+Parcours principal: PASS / FAIL / BLOQUÉ
+Formulaire: PASS / FAIL / BLOQUÉ
+Clavier et focus: PASS / FAIL / BLOQUÉ
+Responsive: PASS / FAIL / BLOQUÉ
+Performance: PASS / FAIL / BLOQUÉ
+SEO: PASS / FAIL / BLOQUÉ
+
+Preuves: [captures, tests, URLs]
+Défauts ouverts: [liste]
+Décision: prêt ou à corriger`}
+          </MarkdownFilePreview>
         </div>
-        <dl className="grid gap-px bg-white/10 sm:grid-cols-2">
-          {[
-            ["Observation", "Les personnes quittent au champ téléphone."],
-            ["Hypothèse", "Le champ arrive trop tôt ou son usage est flou."],
-            ["Changement", "Le retirer ou expliquer pourquoi il est demandé."],
-            ["Mesure", "Comparer le taux de fin et la qualité des demandes."],
-          ].map(([term, detail]) => (
-            <div key={term} className="bg-[#161618] p-4">
-              <dt className="mb-1 text-sm font-semibold text-[#e8d5b0]">{term}</dt>
-              <dd className="text-sm leading-relaxed text-white/50">{detail}</dd>
-            </div>
-          ))}
-        </dl>
-        <p className="mt-7 text-sm leading-relaxed text-white/65">
-          La vitesse vient de l&apos;IA. La méthode évite d&apos;aller vite dans la mauvaise direction. Construis une première version honnête, vérifie-la dans le réel, puis transforme seulement les apprentissages répétés en système réutilisable.
-        </p>
       </SectionReveal>
     </div>
   );

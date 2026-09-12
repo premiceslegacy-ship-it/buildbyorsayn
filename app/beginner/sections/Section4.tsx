@@ -4,6 +4,7 @@ import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { SectionReveal } from "@/components/ui/section-reveal";
 
 const TUTORIAL_ASSETS = "/assets/tutorials";
+const LOGOS = "/brand-logos";
 
 function Chapter({
   eyebrow,
@@ -16,271 +17,174 @@ function Chapter({
 }) {
   return (
     <SectionReveal className="border-t border-white/10 pt-8 md:pt-10">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/65 mb-2">
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/65">
         {eyebrow}
       </p>
-      <h3 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-5">
+      <h3 className="mb-5 text-xl font-semibold tracking-tight text-[#f0ede8] md:text-2xl">
         {title}
       </h3>
-      <div className="space-y-4 text-sm md:text-[15px] text-white/65 leading-[1.75]">
+      <div className="space-y-4 text-sm leading-[1.75] text-white/65 md:text-[15px]">
         {children}
       </div>
     </SectionReveal>
   );
 }
 
+function ToolLogo({ src, name }: { src: string; name: string }) {
+  return (
+    <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-white/10 bg-white/[0.04] p-2.5">
+      <img src={`${LOGOS}/${src}`} alt="" aria-hidden="true" className="h-full w-full object-contain" loading="lazy" />
+    </span>
+  );
+}
+
+function ToolRow({ logo, name, children }: { logo: string; name: string; children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-[44px_1fr] gap-4 border-b border-white/10 py-5 last:border-b-0 md:gap-6">
+      <ToolLogo src={logo} name={name} />
+      <div>
+        <p className="mb-1 font-semibold text-[#f0ede8]">{name}</p>
+        <p>{children}</p>
+      </div>
+    </div>
+  );
+}
+
 function TutorialImage({ src, alt }: { src: string; alt: string }) {
   return (
-    <figure className="mt-6 border border-white/10 bg-[#111113] overflow-hidden">
-      <img
-        src={`${TUTORIAL_ASSETS}/${src}`}
-        alt={alt}
-        className="block w-full h-auto"
-        loading="lazy"
-        decoding="async"
-      />
+    <figure className="mt-6 overflow-hidden border border-white/10 bg-[#111113]">
+      <img src={`${TUTORIAL_ASSETS}/${src}`} alt={alt} className="block h-auto w-full" loading="lazy" decoding="async" />
     </figure>
   );
 }
 
-function TerminalLine({ prompt, children }: { prompt?: string; children: React.ReactNode }) {
-  return (
-    <p className="font-mono text-xs md:text-[13px] text-[#e8d5b0] leading-7">
-      <span className="text-white/30 select-none" aria-hidden="true">{prompt ?? "$"} </span>
-      {children}
-    </p>
-  );
+function Command({ children }: { children: React.ReactNode }) {
+  return <p className="font-mono text-xs leading-7 text-[#e8d5b0] md:text-[13px]"><span className="select-none text-white/30" aria-hidden="true">$ </span>{children}</p>;
 }
 
 export function Section4() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none space-y-12 md:space-y-16">
+    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-12 duration-500 motion-reduce:animate-none md:space-y-16">
       <div>
-        <div className="flex items-center gap-3 mb-8">
-          <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">10</span>
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">
-            De l&apos;idée à l&apos;URL en ligne
-          </h2>
+        <div className="mb-8 flex items-center gap-3">
+          <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">10</span>
+          <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">De l&apos;idée à l&apos;URL en ligne</h2>
         </div>
-
-        <div className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 px-6 py-5">
-          <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
-            Tu peux commencer dans un IDE, dans Codex CLI ou Claude Code, ou dans un générateur web. Le point de départ change. La discipline reste la même : un dossier que tu contrôles, une histoire Git, un dépôt GitHub, un déploiement vérifié et des comptes remis au client.
-          </p>
+        <div className="border border-[#e8d5b0]/15 bg-[#e8d5b0]/5 px-6 py-5">
+          <p className="text-sm leading-relaxed text-[#e8d5b0]/85">Le vibe coding, c&apos;est simplement coder avec l&apos;IA en décrivant ce que tu veux, puis en regardant, testant et corrigeant le résultat avec elle.</p>
         </div>
       </div>
 
-      <Chapter eyebrow="Le plan" title="Les cinq maisons de ton site">
-        <p>
-          Imagine un chantier. Le dossier local est ton atelier. Git photographie son état au fil du travail. GitHub conserve ces photos à distance et permet de collaborer. L&apos;hébergeur transforme une version choisie en site accessible. Le domaine est l&apos;adresse facile à retenir qui mène jusqu&apos;à lui.
-        </p>
-        <div className="mt-6 border-y border-white/10">
-          <div className="grid grid-cols-2 divide-x divide-white/10 sm:grid-cols-5">
-            {[
-              ["Dossier", "les fichiers de travail"],
-              ["Git", "l'histoire locale"],
-              ["GitHub", "la copie distante"],
-              ["Hébergeur", "le site exécuté"],
-              ["Domaine", "l'adresse publique"],
-            ].map(([name, role]) => (
-              <div key={name} className="px-4 py-5 last:col-span-2 sm:last:col-span-1">
-                <p className="text-sm font-semibold text-[#f0ede8]">{name}</p>
-                <p className="mt-1 text-xs text-white/40 leading-relaxed">{role}</p>
-              </div>
-            ))}
+      <Chapter eyebrow="Avant de commencer" title="Comprendre où vit un site">
+        <p>Le dossier local est le dossier du projet sur ton ordinateur. Il contient les pages, les images et les réglages. Git enregistre des versions de ce dossier afin que tu puisses comprendre les changements et revenir en arrière. GitHub conserve le dépôt en ligne, facilite le partage et peut déclencher la publication.</p>
+        <div className="my-6 flex items-start gap-4 border-y border-white/10 py-5">
+          <ToolLogo src="github.svg" name="GitHub" />
+          <p><strong className="text-[#f0ede8]">GitHub</strong> reçoit le code, mais ne rend pas toujours le site public à lui seul. L&apos;hébergement exécute ou distribue le site sur Internet. Le domaine est l&apos;adresse lisible, par exemple <code className="text-[#e8d5b0]">monsite.fr</code>, qui conduit vers cet hébergement.</p>
+        </div>
+        <p>Ces éléments restent séparés. Un commit enregistre une version avec Git sur ton ordinateur. Un push transmet ces commits à GitHub. L&apos;hébergeur peut ensuite publier automatiquement la branche prévue.</p>
+      </Chapter>
+
+      <Chapter eyebrow="Choisir un départ" title="Trois chemins accessibles aux débutants">
+        <p>Tu peux choisir l&apos;interface qui te rassure. Dans chaque cas, cherche à obtenir un dossier de code que tu peux ouvrir, sauvegarder et transmettre.</p>
+        <div className="border-y border-white/10">
+          <ToolRow logo="antigravity.svg" name="Antigravity">Antigravity réunit l&apos;éditeur, l&apos;agent et l&apos;aperçu. Tu ouvres le dossier du projet, tu expliques une petite tâche, puis tu regardes les fichiers modifiés et le résultat dans le navigateur.</ToolRow>
+          <ToolRow logo="codex.svg" name="application Codex">L&apos;application Codex permet de choisir un dossier et de travailler avec l&apos;agent dans une interface graphique. Le terminal existe aussi, mais il reste une option pour les utilisateurs plus avancés.</ToolRow>
+          <ToolRow logo="claude-code.svg" name="application Claude Code">L&apos;application Claude Code suit le même principe: tu donnes accès au bon dossier, tu formules une demande limitée et tu contrôles le résultat. Son usage dans le terminal est facultatif et peut venir plus tard.</ToolRow>
+        </div>
+        <div className="mt-5 border-y border-white/10">
+          <ToolRow logo="lovable.svg" name="Lovable">Lovable crée une première version dans le navigateur depuis une conversation. Avant d&apos;avancer, vérifie que tu peux synchroniser le projet avec GitHub ou exporter son code. Tu garderas ainsi une copie utilisable en dehors de l&apos;outil.</ToolRow>
+        </div>
+      </Chapter>
+
+      <Chapter eyebrow="Ouvrir le projet" title="Open Folder ou Clone Repository">
+        <p>Choisis <strong className="text-[#f0ede8]">Open Folder</strong> quand le projet est déjà présent sur ton ordinateur. Ouvre le dossier principal, généralement celui qui contient <code className="text-[#e8d5b0]">package.json</code>. Cette action utilise les fichiers existants sans créer une seconde copie.</p>
+        <p>Choisis <strong className="text-[#f0ede8]">Clone Repository</strong> quand le projet existe sur GitHub mais pas encore sur ton ordinateur. Tu copies l&apos;adresse du dépôt, tu choisis où placer la nouvelle copie locale, puis tu vérifies le nom du dossier ouvert.</p>
+        <TutorialImage src="antigravity-ouvrir-ou-cloner.jpg" alt="Écran réel d'Antigravity montrant Open Folder et Clone Repository." />
+      </Chapter>
+
+      <Chapter eyebrow="Créer le dépôt" title="Relier simplement le dossier à GitHub">
+        <div className="flex items-start gap-4"><ToolLogo src="github.svg" name="GitHub" /><p>Pour un projet client, le dépôt GitHub devrait appartenir au client ou à son organisation. Il peut ensuite t&apos;inviter. Choisis un dépôt privé si le code ne doit pas être public.</p></div>
+        <p>Si les fichiers existent déjà sur ton ordinateur, crée un dépôt vide sur GitHub. N&apos;ajoute pas de README depuis le formulaire, car le dossier local peut déjà en contenir un. Le README est un court document qui explique le projet, son installation et ses commandes.</p>
+        <TutorialImage src="github-creer-depot-etape-1.jpg" alt="Formulaire réel de création d'un dépôt GitHub avec son nom et sa visibilité." />
+        <TutorialImage src="github-creer-depot-etape-2.jpg" alt="Fin du formulaire réel GitHub avec l'option README et le bouton de création." />
+        <p>Si le dépôt contient déjà le projet, ouvre le menu <strong className="text-[#f0ede8]">Code</strong>, copie son adresse HTTPS, puis utilise <strong className="text-[#f0ede8]">Clone Repository</strong>.</p>
+        <TutorialImage src="github-copier-url-clone.jpg" alt="Menu Code réel de GitHub avec l'adresse HTTPS à copier." />
+        <p>Si ton projet était d&apos;abord sur ton ordinateur, il faut maintenant activer Git dans ce dossier, puis le relier au dépôt vide. Remplace l&apos;adresse ci-dessous par celle copiée sur GitHub. <code className="text-[#e8d5b0]">git init</code> crée seulement le suivi des versions dans le dossier actuel. Les commandes suivantes donnent un nom à la destination GitHub et à la branche principale.</p>
+        <div className="my-6 overflow-x-auto border border-white/10 bg-black/30 px-5 py-4">
+          <Command>git init</Command>
+          <Command>git remote add origin https://github.com/compte-demo/site-client.git</Command>
+          <Command>git branch -M main</Command>
+        </div>
+        <p>Dans une application graphique, utilise l&apos;action qui publie le dépôt sur GitHub, puis vérifie l&apos;adresse du dépôt proposé avant de confirmer. Si le projet a été cloné depuis GitHub, cette liaison existe déjà.</p>
+      </Chapter>
+
+      <Chapter eyebrow="Lancer en local" title="Lire les indications avant d'exécuter le site">
+        <p>Commence par le README. Regarde ensuite le fichier de verrouillage, souvent nommé <code className="text-[#e8d5b0]">package-lock.json</code>. Il garde les versions exactes des dépendances. Sa présence indique généralement que le projet utilise npm. Un fichier <code className="text-[#e8d5b0]">pnpm-lock.yaml</code> ou <code className="text-[#e8d5b0]">yarn.lock</code> indique un autre outil, qu&apos;il vaut mieux conserver.</p>
+        <div className="my-6 border border-white/10 bg-black/30 px-5 py-4"><Command>npm install</Command><Command>npm run dev</Command></div>
+        <p><code className="text-[#e8d5b0]">npm install</code> télécharge ce dont le projet a besoin. <code className="text-[#e8d5b0]">npm run dev</code> démarre la version locale si ce script est prévu. Ouvre l&apos;adresse affichée, souvent <code className="text-[#e8d5b0]">localhost:3000</code>, et garde la fenêtre de commande ouverte.</p>
+      </Chapter>
+
+      <Chapter eyebrow="Travailler avec l'IA" title="Une demande courte, une vérification réelle">
+        <p>Reprends les fichiers préparés au Bloc 09: contenu, structure des pages, couleurs et références. Demande d&apos;abord à l&apos;IA de les lire et de résumer ce qu&apos;elle va modifier. Confie-lui ensuite une tâche bornée, par exemple créer l&apos;en-tête d&apos;une seule page avec les textes fournis.</p>
+        <p>Quand elle a fini, lis la liste des fichiers touchés, ouvre la page, teste les liens et vérifie le mobile. Signale un problème précis, laisse-la corriger, puis contrôle à nouveau. Passe à la tâche suivante seulement quand cette petite partie fonctionne. Cette boucle simple garde le travail compréhensible.</p>
+      </Chapter>
+
+      <Chapter eyebrow="Enregistrer" title="Commit puis push">
+        <p>Un commit donne un nom à une version cohérente du projet. Avant de le créer, ouvre <code className="text-[#e8d5b0]">.gitignore</code> et vérifie que <code className="text-[#e8d5b0]">.env.local</code> y figure. Lance ensuite <code className="text-[#e8d5b0]">git status</code>. Aucun mot de passe, aucune clé privée et aucun fichier inattendu ne doit apparaître dans la liste à enregistrer.</p>
+        <div className="my-6 overflow-x-auto border border-white/10 bg-black/30 px-5 py-4"><Command>git status</Command><Command>git add app/page.tsx public/logo.svg</Command><Command>git status</Command><Command>git commit -m &quot;Ajoute la page contact&quot;</Command><Command>git push -u origin main</Command></div>
+        <p>Ajoute seulement les fichiers que tu viens de vérifier. Les chemins ci-dessus sont des exemples à remplacer par les tiens. L&apos;option <code className="text-[#e8d5b0]">-u origin main</code> sert au premier envoi; les fois suivantes, <code className="text-[#e8d5b0]">git push</code> suffit. Dans une application graphique, sélectionne les fichiers attendus avant de cliquer sur Commit, puis sur Push. Confirme enfin sur GitHub que la bonne version est visible.</p>
+      </Chapter>
+
+      <Chapter eyebrow="Publier" title="Choisir un hébergement adapté">
+        <p>L&apos;hébergeur relie le dépôt à une adresse publique. Il lit le projet, construit le site et recommence après chaque push sur la branche de production.</p>
+        <div className="border-y border-white/10">
+          <ToolRow logo="vercel.svg" name="Vercel">Convient bien à Next.js et à de nombreux sites modernes. La configuration initiale est souvent détectée automatiquement.</ToolRow>
+          <ToolRow logo="cloudflare.svg" name="Cloudflare">Cloudflare Pages publie les sites statiques et Cloudflare Workers exécute du code côté serveur lorsque le projet est compatible.</ToolRow>
+          <ToolRow logo="netlify.svg" name="Netlify">Publie des sites statiques et plusieurs frameworks, avec des aperçus avant la mise en production.</ToolRow>
+          <ToolRow logo="railway.svg" name="Railway">Est utile pour les serveurs, les backends, c&apos;est-à-dire le code exécuté loin du navigateur, et les bases de données.</ToolRow>
+          <div className="border-b border-white/10 py-6">
+            <div className="mb-4 flex items-start gap-4"><ToolLogo src="railway.svg" name="Railway" /><div><p className="font-semibold text-[#f0ede8]">Publier concrètement sur Railway</p><p className="mt-1">Dans Railway, choisis <strong className="text-[#f0ede8]">New Project</strong>, puis <strong className="text-[#f0ede8]">Deploy from GitHub repo</strong>. Utilise <strong className="text-[#f0ede8]">Connect GitHub</strong> si ton compte n&apos;est pas encore relié, autorise uniquement le bon dépôt, sélectionne-le et vérifie que <code className="text-[#e8d5b0]">main</code> est la branche de production.</p></div></div>
+            <p>Ajoute ensuite les variables d&apos;environnement demandées par le README dans l&apos;onglet <strong className="text-[#f0ede8]">Variables</strong>, sans recopier leurs valeurs dans GitHub. Lance <strong className="text-[#f0ede8]">Deploy</strong>, puis ouvre les logs de build. Si une ligne rouge apparaît, lis la première erreur utile, corrige le projet et relance le déploiement.</p>
+            <p className="mt-3">Quand le déploiement réussit, ouvre <strong className="text-[#f0ede8]">Settings</strong>, puis <strong className="text-[#f0ede8]">Networking</strong> pour générer une adresse publique. Teste cette adresse. Fais ensuite une petite modification, pousse-la sur <code className="text-[#e8d5b0]">main</code> et vérifie que Railway redéploie automatiquement la nouvelle version.</p>
           </div>
+          <ToolRow logo="github.svg" name="GitHub Pages">Héberge uniquement un site statique. Il ne peut pas faire tourner un serveur privé ni garder un secret utilisé pendant l&apos;exécution.</ToolRow>
         </div>
-        <p>
-          Ouvrir un dossier ne l&apos;envoie pas sur GitHub. Un commit reste local. Un push envoie les commits vers GitHub. Il ne publie le site que si un hébergeur est relié au dépôt. Une URL de prévisualisation prouve qu&apos;un déploiement existe, pas encore que le parcours fonctionne.
-        </p>
+        <p>Après le premier déploiement, ouvre l&apos;adresse temporaire. Teste les pages, les liens, les formulaires et l&apos;affichage mobile. Une construction réussie ne garantit pas que tout le parcours fonctionne.</p>
       </Chapter>
 
-      <Chapter eyebrow="Choisir son départ" title="Trois portes, aucun passage obligé">
-        <div className="grid grid-cols-1 md:grid-cols-[150px_1fr] gap-2 md:gap-8 border-b border-white/10 pb-6">
-          <p className="text-[#f0ede8] font-semibold">IDE agentique</p>
-          <p>
-            Dans Antigravity, l&apos;agent est déjà intégré à l&apos;éditeur, au terminal et au navigateur. Dans Visual Studio Code ou un IDE compatible, tu peux installer l&apos;extension de l&apos;agent choisi. Tu décris ton besoin en langage naturel, mais le résultat reste un vrai projet de code à tester et maintenir.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-[150px_1fr] gap-2 md:gap-8 border-b border-white/10 pb-6">
-          <p className="text-[#f0ede8] font-semibold">Agent dans le terminal</p>
-          <p>
-            Codex CLI et Claude Code n&apos;ont pas besoin d&apos;extension. Tu ouvres le terminal dans le bon dossier, tu lances l&apos;agent, puis tu lui demandes de confirmer le chemin et de lire les documents du projet avant toute modification. L&apos;interface change, pas la responsabilité de vérifier ce qu&apos;il exécute.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-[150px_1fr] gap-2 md:gap-8 pb-2">
-          <p className="text-[#f0ede8] font-semibold">Générateur web</p>
-          <p>
-            Lovable, Bolt, v0 ou un outil comparable peut produire la première version dans le navigateur. Cherche ensuite une synchronisation GitHub ou un export du code. Si l&apos;outil ne propose ni l&apos;un ni l&apos;autre, tu restes dépendant de sa plateforme. Ce choix peut être acceptable, mais il doit être décidé avant de promettre une remise autonome.
-          </p>
-        </div>
-        <p className="text-white/80">
-          Le vibe coding peut donc être sans code pour la personne qui formule la demande, tout en produisant du code réel. Il n&apos;est ni réservé au no-code, ni automatiquement amateur. Sa qualité dépend du cadrage, des permissions, des tests et de la relecture.
-        </p>
+      <Chapter eyebrow="Protéger" title="Secrets, domaine, DNS et emails">
+        <p>Une clé privée doit rester hors des fichiers envoyés à GitHub. En local, elle se trouve souvent dans <code className="text-[#e8d5b0]">.env.local</code>, un fichier exclu de Git. Dans l&apos;hébergeur, ajoute-la dans l&apos;écran des variables d&apos;environnement. Si une clé a été publiée, révoque-la et crée-en une nouvelle.</p>
+        <p>Le client devrait posséder le domaine. Pour le relier au site, l&apos;hébergeur fournit des enregistrements DNS, c&apos;est-à-dire les réglages qui indiquent où l&apos;adresse doit conduire. Copie seulement les valeurs demandées. Les réglages MX, SPF, DKIM et DMARC servent souvent aux emails: ne les supprime pas et demande de l&apos;aide si leur rôle n&apos;est pas clair. Vérifie ensuite le domaine avec et sans <code className="text-[#e8d5b0]">www</code>, la connexion HTTPS sécurisée et la réception des emails.</p>
       </Chapter>
 
-      <Chapter eyebrow="Le dossier" title="Open Folder ou Clone Repository ?">
-        <p>
-          Si le projet existe déjà sur ton ordinateur, choisis <strong className="text-[#f0ede8]">Open Folder</strong> et ouvre sa racine, souvent le dossier qui contient <code className="text-[#e8d5b0]">package.json</code>. Ne le clone pas une deuxième fois.
-        </p>
-        <p>
-          Si le projet existe seulement sur GitHub, choisis <strong className="text-[#f0ede8]">Clone Repository</strong>, colle l&apos;URL copiée depuis GitHub et sélectionne l&apos;emplacement où créer la copie locale. Vérifie ensuite le nom du dossier affiché dans l&apos;IDE. Un agent dans le mauvais dossier peut modifier le mauvais projet.
-        </p>
-        <TutorialImage
-          src="antigravity-ouvrir-ou-cloner.jpg"
-          alt="Écran réel d'Antigravity annoté : Open Folder pour un projet local et Clone Repository pour un dépôt GitHub."
-        />
-      </Chapter>
-
-      <Chapter eyebrow="GitHub" title="Créer un dépôt sans fabriquer deux sources de vérité">
-        <p>
-          Crée d&apos;abord un compte GitHub avec une adresse vérifiée et active la double authentification. Pour un projet client, le dépôt appartient idéalement au client ou à son organisation, puis il t&apos;invite. Un code conservé uniquement dans ton compte personnel rend la remise fragile.
-        </p>
-        <p>
-          Sur <strong className="text-[#f0ede8]">Create a new repository</strong>, choisis le propriétaire, donne un nom simple et utilise <strong className="text-[#f0ede8]">Private</strong> par défaut pour un projet client. Si tu vas envoyer un projet déjà présent sur ton ordinateur, garde le dépôt vide : n&apos;ajoute ni README, ni licence, ni fichier Gitignore depuis cet écran.
-        </p>
-        <TutorialImage
-          src="github-creer-depot-etape-1.jpg"
-          alt="Formulaire GitHub réel annoté : nom du dépôt et visibilité."
-        />
-        <p>
-          Si tu crées au contraire un projet neuf directement sur GitHub, ajouter un README peut être utile. Le bouton <strong className="text-[#f0ede8]">Create repository</strong> crée le dépôt, pas encore le site en ligne.
-        </p>
-        <TutorialImage
-          src="github-creer-depot-etape-2.jpg"
-          alt="Bas du formulaire GitHub réel annoté : option Add README et bouton Create repository."
-        />
-        <p>
-          Quand le dépôt contient déjà les fichiers, ouvre <strong className="text-[#f0ede8]">Code</strong>, sélectionne HTTPS si tu n&apos;as pas configuré SSH, copie l&apos;URL, puis retourne dans <strong className="text-[#f0ede8]">Clone Repository</strong>. Ce chemin ne concerne pas le projet qui existe déjà localement.
-        </p>
-        <TutorialImage
-          src="github-copier-url-clone.jpg"
-          alt="Menu Code de GitHub réel annoté : HTTPS et copie de l'URL de clonage."
-        />
-      </Chapter>
-
-      <Chapter eyebrow="En local" title="Installer, lancer, puis regarder le vrai résultat">
-        <p>
-          Lis d&apos;abord le README et le fichier de verrouillage. <code className="text-[#e8d5b0]">package-lock.json</code> indique normalement npm, tandis que <code className="text-[#e8d5b0]">pnpm-lock.yaml</code>, <code className="text-[#e8d5b0]">yarn.lock</code> ou <code className="text-[#e8d5b0]">bun.lock</code> signalent un autre gestionnaire. Ne les mélange pas au hasard.
-        </p>
-        <div className="bg-black/30 border border-white/10 px-5 py-4 my-6">
-          <TerminalLine>npm install</TerminalLine>
-          <TerminalLine>npm run</TerminalLine>
-          <TerminalLine>npm run dev</TerminalLine>
-        </div>
-        <p>
-          <code className="text-[#e8d5b0]">npm install</code> installe les dépendances du projet. <code className="text-[#e8d5b0]">npm run</code> montre les scripts disponibles. Lance <code className="text-[#e8d5b0]">npm run dev</code> seulement si le script existe. Ouvre ensuite l&apos;adresse locale imprimée dans le terminal et garde ce terminal actif.
-        </p>
-        <p>
-          Parcours les pages, recharge une URL intérieure, réduis la largeur, teste le formulaire avec des données de démonstration, puis provoque volontairement une erreur récupérable. Pour un paiement ou un compte, utilise l&apos;environnement de test du fournisseur.
-        </p>
-      </Chapter>
-
-      <Chapter eyebrow="Git" title="Un commit photographie, un push transmet">
-        <p>
-          Après une petite étape stable, regarde les fichiers modifiés et vérifie qu&apos;aucun secret n&apos;apparaît. Prépare les changements, nomme la photo avec un message qui décrit le résultat, puis envoie-la sur GitHub.
-        </p>
-        <div className="bg-black/30 border border-white/10 px-5 py-4 my-6">
-          <TerminalLine>git status</TerminalLine>
-          <TerminalLine>git add .</TerminalLine>
-          <TerminalLine>git commit -m &quot;Ajoute la page contact&quot;</TerminalLine>
-          <TerminalLine>git push</TerminalLine>
-        </div>
-        <p>
-          Pour une modification risquée, travaille sur une branche et vérifie l&apos;URL de prévisualisation avant de fusionner vers la branche de production. GitHub n&apos;est pas seulement une sauvegarde : c&apos;est l&apos;histoire lisible et réversible du projet.
-        </p>
-      </Chapter>
-
-      <Chapter eyebrow="Secrets" title="Les clés vivent hors du code">
-        <p>
-          Une variable d&apos;environnement transmet une valeur au projet sans l&apos;écrire dans ses fichiers. En local, la pile utilise souvent <code className="text-[#e8d5b0]">.env.local</code>. Ce fichier doit être exclu de Git. Un fichier d&apos;exemple peut montrer les noms requis, jamais les vraies valeurs.
-        </p>
-        <p>
-          Sur l&apos;hébergeur, ajoute les valeurs dans <strong className="text-[#f0ede8]">Environment Variables</strong> ou <strong className="text-[#f0ede8]">Secrets</strong>, avec des valeurs distinctes pour la prévisualisation et la production lorsque c&apos;est nécessaire. Une convention contenant le mot <code className="text-[#e8d5b0]">public</code> signifie généralement que la valeur peut atteindre le navigateur. Elle ne protège rien.
-        </p>
-        <p className="text-red-300/80">
-          Si une clé apparaît dans GitHub, une capture ou un journal, considère-la comme compromise. Révoque-la et remplace-la. Effacer la dernière ligne ne retire pas forcément la valeur de l&apos;historique.
-        </p>
-      </Chapter>
-
-      <Chapter eyebrow="Déploiement" title="Choisir l'hébergeur selon le projet">
-        <p>
-          Demande à l&apos;agent d&apos;identifier dans les vrais fichiers le framework, la commande de construction, le dossier de sortie et le besoin éventuel d&apos;un serveur. C&apos;est ce diagnostic qui choisit l&apos;hébergeur, pas le logo préféré.
-        </p>
-        <div className="border-y border-white/10 divide-y divide-white/10 mt-6">
-          {[
-            ["Vercel", "Très direct pour Next.js et de nombreux frameworks détectés automatiquement. Chaque branche peut produire une prévisualisation."],
-            ["Cloudflare Pages ou Workers", "Pages convient au statique et aux piles compatibles. Workers prend le relais lorsqu'un runtime serveur ou un adaptateur spécifique est requis."],
-            ["Netlify", "Adapté aux sites statiques et aux piles prises en charge, avec prévisualisations, fonctions et formulaires selon le projet."],
-            ["GitHub Pages", "Simple pour un site réellement statique. Pas de serveur privé ni de secret d'exécution hébergé dans la page."],
-          ].map(([name, description]) => (
-            <div key={name} className="grid grid-cols-1 md:grid-cols-[190px_1fr] gap-2 md:gap-8 py-5">
-              <p className="font-semibold text-[#f0ede8]">{name}</p>
-              <p>{description}</p>
-            </div>
-          ))}
-        </div>
-        <p>
-          Connecte uniquement le dépôt nécessaire, puis vérifie la branche de production, le dossier racine, la commande de construction, le dossier de sortie, la version de Node et les variables. Ouvre l&apos;URL temporaire après le déploiement et recommence les tests importants. Un journal vert ne prouve pas que le formulaire arrive au bon endroit.
-        </p>
-      </Chapter>
-
-      <Chapter eyebrow="Domaine" title="Donner une adresse au site sans casser les emails">
-        <p>
-          Le client achète et possède idéalement son domaine. Ajoute-le d&apos;abord dans l&apos;hébergeur, puis copie exactement les enregistrements DNS demandés chez le registrar ou le fournisseur DNS. Décide si l&apos;adresse principale utilise <code className="text-[#e8d5b0]">www</code> et redirige l&apos;autre version.
-        </p>
-        <p>
-          Ne remplace jamais toute la zone DNS sans lire ce qui existe. Les enregistrements MX, SPF, DKIM et DMARC peuvent faire fonctionner les adresses professionnelles. Le site peut être en ligne pendant que les emails du client sont cassés. Attends ensuite la validation DNS et vérifie le domaine principal, la redirection et HTTPS.
-        </p>
-      </Chapter>
-
-      <Chapter eyebrow="Autonomie" title="Sanity et les CMS pour un site codé">
-        <p>
-          Un CMS headless sépare le contenu de l&apos;apparence. Le client écrit dans une interface familière, tandis que le site codé récupère ces données et applique le design system. C&apos;est le pont entre la liberté d&apos;un site sur mesure et l&apos;autonomie éditoriale que le client connaît sur WordPress.
-        </p>
-        <LiquidCard variant="elevated" className="p-6 md:p-7 my-6">
-          <p className="text-base font-semibold text-[#f0ede8] mb-3">Quand choisir Sanity</p>
-          <p className="text-sm text-white/60 leading-relaxed">
-            Sanity devient pertinent lorsque le client publie régulièrement des articles, projets, réalisations, membres, produits ou contenus structurés. Tu définis les types de contenu, relies le site au bon projet et au bon jeu de données, déploies Sanity Studio, puis invites le compte réel du client avec le rôle le moins puissant qui suffit.
-          </p>
+      <Chapter eyebrow="Rendre le client autonome" title="Sanity et le rôle d'un CMS">
+        <LiquidCard variant="elevated" className="my-6 p-6 md:p-7">
+          <div className="flex items-start gap-4"><ToolLogo src="sanity.svg" name="Sanity" /><p><strong className="text-[#f0ede8]">Sanity</strong> est un CMS, un système de gestion de contenu. Le client modifie des articles, projets ou fiches dans une interface dédiée, puis le site affiche ces contenus avec le design prévu.</p></div>
         </LiquidCard>
-        <p>
-          La remise n&apos;est pas faite quand l&apos;interface existe. Le client doit créer un contenu de test, le prévisualiser, le publier, observer le résultat sur le site puis le corriger. Il faut aussi expliquer ce qu&apos;il peut modifier seul et ce qui exige encore un changement de code.
-        </p>
-        <p>
-          Un CMS n&apos;est pas obligatoire. Quelques pages rarement modifiées peuvent rester dans des fichiers du dépôt. Decap CMS peut convenir à un petit flux basé sur Git. Un éditeur intégré au générateur peut être le choix le plus simple si le client accepte cette dépendance. Notion, Airtable ou Google Sheets peuvent alimenter un catalogue conçu pour eux, mais ne remplacent pas universellement un CMS avec rôles, versions et contenus privés.
-        </p>
+        <p>Un CMS devient utile quand le contenu change régulièrement. Configure les champs dont le client a réellement besoin, invite son propre compte avec les droits adaptés, puis demande-lui de créer, prévisualiser, publier et corriger un contenu de test. Remets aussi les accès au dépôt, à l&apos;hébergement, au domaine et aux abonnements. Quelques pages rarement modifiées peuvent rester directement dans le code.</p>
       </Chapter>
 
-      <Chapter eyebrow="Remise client" title="Une livraison autonome possède ses comptes">
-        <p>
-          Le client doit contrôler GitHub, l&apos;hébergeur, le domaine, le DNS, le CMS, les emails, l&apos;analyse et les abonnements. Tu conserves uniquement l&apos;accès nécessaire. Les secrets sont transmis dans un gestionnaire de mots de passe, jamais dans un document ou un email.
-        </p>
-        <p>
-          Le dossier de remise explique où vit le code, quelle branche publie, comment lancer le projet, où lire les journaux, où modifier les variables, comment publier dans le CMS, comment revenir à une version précédente et qui paie chaque service. Fais une répétition réelle avec le client depuis ses comptes.
-        </p>
-        <div className="border border-[#e8d5b0]/20 bg-[#e8d5b0]/[0.04] px-6 py-5 mt-6">
-          <p className="text-[#e8d5b0] font-semibold mb-2">Le vrai critère de fin</p>
-          <p>
-            Le site fonctionne en local et en production. Son histoire est sur GitHub. Les secrets restent hors du dépôt. Le domaine répond en HTTPS. Le contenu est modifiable au niveau convenu. Le client possède les comptes et sait accomplir les gestes promis.
-          </p>
+      <Chapter eyebrow="Après la mise en ligne" title="Vérifier que le site est trouvé et utilisé">
+        <div className="border-y border-white/10">
+          <ToolRow logo="googlesearchconsole.svg" name="Google Search Console">Ajoute le domaine, envoie l&apos;adresse du sitemap, c&apos;est-à-dire la liste des pages destinée aux moteurs de recherche, puis utilise l&apos;inspection d&apos;URL sur les pages importantes.</ToolRow>
+          <ToolRow logo="plausibleanalytics.svg" name="Plausible">Plausible fournit des statistiques de visite simples. Vérifie qu&apos;une visite de test apparaît et que les actions importantes sont enregistrées.</ToolRow>
+          <ToolRow logo="posthog.svg" name="PostHog">PostHog permet aussi de mesurer les parcours et les événements. Utilise Plausible ou PostHog selon le besoin, sans installer les deux par réflexe.</ToolRow>
         </div>
+        <p>Teste chaque bouton d&apos;appel à l&apos;action, appelé aussi CTA, et chaque formulaire depuis le domaine public. Confirme que l&apos;événement apparaît dans l&apos;outil choisi et que le message arrive au bon destinataire. Contrôle enfin la vitesse d&apos;affichage sur mobile, le poids des images et les erreurs dans les journaux de l&apos;hébergeur.</p>
       </Chapter>
 
-      <div className="pt-8 border-t border-white/5">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-semibold mb-4">
-          Vidéo liée à cette section
-        </p>
-        <Link href="/videos#fondations" className="inline-flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#e8d5b0]/30 transition-all duration-300">
-            <Play className="w-4 h-4 text-[#e8d5b0]" />
-          </div>
-          <div>
-            <p className="text-[15px] font-medium text-[#f0ede8] group-hover:text-[#e8d5b0] transition-colors duration-300">
-              Voir la vidéo
-            </p>
-            <p className="text-[13px] text-white/40">Accéder à la bibliothèque →</p>
-          </div>
+      <SectionReveal className="border-t border-white/10 pt-8">
+        <LiquidCard variant="elevated" className="p-6 md:p-7">
+          <p className="mb-2 font-semibold text-[#e8d5b0]">Le site est vraiment remis quand le client peut continuer</p>
+          <p className="text-sm leading-relaxed text-white/65">Le code est sur GitHub, le site fonctionne en local et sur son domaine, les secrets sont protégés, les formulaires arrivent, la mesure fonctionne et le client possède ses comptes. Garde un court document qui explique comment lancer le projet, publier un contenu et demander de l&apos;aide.</p>
+        </LiquidCard>
+      </SectionReveal>
+
+      <div className="border-t border-white/5 pt-8">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">Vidéo liée à cette section</p>
+        <Link href="/videos#fondations" className="group inline-flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center border border-white/10 bg-white/5 transition-all duration-300 group-hover:border-[#e8d5b0]/30"><Play className="h-4 w-4 text-[#e8d5b0]" /></div>
+          <div><p className="text-[15px] font-medium text-[#f0ede8] transition-colors duration-300 group-hover:text-[#e8d5b0]">Voir la vidéo</p><p className="text-[13px] text-white/40">Accéder à la bibliothèque →</p></div>
         </Link>
       </div>
     </div>

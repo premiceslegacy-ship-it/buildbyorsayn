@@ -31,6 +31,7 @@ Added for the Fondations tool references (Section3 "Générer des visuels pro" a
 - `refero.png`: official Refero mark, downloaded directly from `https://refero.design/apple-icon-180x180.png`.
 - `rare-ui.svg`: official Rare UI mark, downloaded directly from `https://www.rareui.com/logos/Rareui.svg`.
 - `bolt-new.svg`: official Bolt.new mark, downloaded directly from `https://bolt.new/static/favicon.svg`.
+- `netlify.svg`, `railway.svg`, `sanity.svg`, `plausibleanalytics.svg`, `posthog.svg`, `googlesearchconsole.svg`, `pagespeedinsights.svg`: marks downloaded from the current Simple Icons package through jsDelivr for the Fondations website workflow. They are displayed only to identify the corresponding tool.
 
 Source URLs:
 
@@ -56,5 +57,12 @@ Source URLs:
 - `https://refero.design/apple-icon-180x180.png`
 - `https://www.rareui.com/logos/Rareui.svg`
 - `https://bolt.new/static/favicon.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/netlify.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/railway.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/sanity.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/plausibleanalytics.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/posthog.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googlesearchconsole.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/pagespeedinsights.svg`
 
 The marks are shown only inside scenes that explain their role in the BUILD method. They are not presented as endorsements, guarantees or the value of the accompaniment itself. Recheck trademark and usage terms before reusing them in a separate commercial support.

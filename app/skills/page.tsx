@@ -466,9 +466,10 @@ export default function SkillsPage() {
 
               return (
                 <motion.div
+                  id={`skill-${skill.slug}`}
                   key={skill.slug}
                   whileHover="hover"
-                  className="animate-reveal flex h-full flex-col"
+                  className="animate-reveal flex h-full scroll-mt-24 flex-col"
                   style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
                 >
                   <IllustratedCard
