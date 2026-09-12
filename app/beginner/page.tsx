@@ -36,7 +36,7 @@ export default function BeginnerPage() {
           />
           <p className="text-xs uppercase tracking-[0.15em] text-[#e8d5b0]/60 font-semibold">Fondations</p>
           <p className="mt-2 text-sm text-white/40 leading-relaxed max-w-xl">
-            Les dix blocs, dans l'ordre d'apprentissage. Ouvre celui dont tu as besoin.
+            Les onze blocs, dans l'ordre d'apprentissage. Ouvre celui dont tu as besoin.
           </p>
         </div>
 

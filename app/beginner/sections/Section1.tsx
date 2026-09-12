@@ -41,8 +41,8 @@ const QUESTION_GROUPS = [
     intro: "Ce qui borne la décision de tout le reste.",
     questions: [
       {
-        q: "Quel design ?",
-        a: "Je ne parle pas de couleurs. Je parle de registre. Sobre et premium ? Chaleureux et artisanal ? Tech et dense ? Ce registre doit correspondre à l'utilisateur cible. Un site pour un fonds d'investissement et un site pour un boulanger local n'ont pas le même registre.",
+        q: "Quelle direction artistique ?",
+        a: "Je ne réponds pas avec trois adjectifs. Je décris des mécanismes visibles : grille éditoriale ou composition asymétrique, typographie condensée ou humaniste, rayons de 4 ou 16 px, bordures franches ou séparateurs fins, densité, lumière, traitement photo, famille d'icônes, vitesse des transitions et rôle exact des matières. Le glassmorphism, le skeuomorphism, le Liquid Glass, le brutalisme ou le dither ne sont pas des autocollants de style : chacun doit servir une fonction précise et devenir des tokens, des composants, des états et des règles responsive que l'IA peut exécuter.",
       },
       {
         q: "Quelles fonctionnalités, dans quel ordre ?",

@@ -6,6 +6,7 @@ import { SectionMarketing } from "./sections/SectionMarketing";
 import { Section1 } from "./sections/Section1";
 import { Section2 } from "./sections/Section2";
 import { Section3 } from "./sections/Section3";
+import { SectionSiteWeb } from "./sections/SectionSiteWeb";
 import { Section4 } from "./sections/Section4";
 
 export const SECTIONS = [
@@ -74,10 +75,18 @@ export const SECTIONS = [
     Component: Section3,
   },
   {
-    id: "url",
+    id: "site-web",
     num: "09",
+    label: "Construire un site web avec l'IA",
+    summary: "Choisir le bon site, structurer ses pages, écrire pour convertir et construire une identité complète que l'IA peut exécuter sans produire du générique.",
+    illustrationId: "fondations-site-web",
+    Component: SectionSiteWeb,
+  },
+  {
+    id: "url",
+    num: "10",
     label: "De l'idée à l'URL en ligne",
-    summary: "La section la plus concrète. À la fin, tu sais mettre un site en ligne, même si tu n'as jamais codé.",
+    summary: "Choisir son point de départ, maîtriser GitHub, lancer le projet, le déployer et remettre au client des comptes qu'il contrôle.",
     illustrationId: "fondations-url",
     Component: Section4,
   },
@@ -85,7 +94,7 @@ export const SECTIONS = [
 
 export const ANGLE_MORT = {
   id: "angle-mort",
-  num: "10",
+  num: "11",
   label: "Le seuil",
   summary: "Tu as les Fondations entre les mains. Regarde maintenant ce qui te fait sortir de la dépendance pour de bon.",
   illustrationId: "fondations-seuil",

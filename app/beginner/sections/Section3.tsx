@@ -228,6 +228,34 @@ surfaces.
 - Cartes : 16px
 - Grands conteneurs : 24px
 
+## Iconographie
+- Famille : tracé linéaire simple, sans plaque arrondie automatique.
+- Grille d'usage : 16px pour les actions denses, 20px pour la navigation,
+  24px pour une fonction mise en avant.
+- Épaisseur de départ proposée : 1.5px, à calibrer avec la police réelle.
+- Chaque icône possède un nom accessible lorsqu'elle agit seule.
+- Les logos externes restent des marques officielles, jamais redessinées.
+
+## Composants et états
+Tout contrôle applicable spécifie repos, survol, focus-visible, pressé,
+indisponible, chargement, succès et erreur. Pendant le chargement, le
+libellé explique l'action en cours et le double envoi est bloqué. Une erreur
+conserve la saisie et donne une action de récupération. Une couleur ou un
+spinner seuls ne suffisent pas.
+
+## Assets et illustrations
+Les captures produit prouvent le mécanisme. Les illustrations de features
+possèdent un rôle, une source, des droits, un cadrage desktop et mobile, un
+poids cible, un alt et un fallback. Un asset conçu dans Figma ou dérivé d'un
+motion design conserve son fichier source et une version statique. Aucun
+gradient, halo ou faux écran n'est ajouté uniquement pour remplir une carte.
+
+## Responsive
+Le hero, la navigation, les exemples de code et les preuves sont recomposés
+aux largeurs compactes. L'ordre de lecture et l'action principale restent
+complets. Les titres longs, les erreurs, le zoom et l'absence d'image sont
+testés, pas seulement la maquette idéale.
+
 ## Do
 - Utiliser Inter partout, une seule couleur d'accent fonctionnelle.
 - Réserver le hero au moment expressif, produit réel comme preuve.
@@ -240,8 +268,12 @@ surfaces.
 
 ## Motion
 Non vérifié en runtime : pas de trigger, durée ou easing observés.
-Aucune animation ne doit être inventée à partir de la seule
-impression visuelle - à consigner sur le site en direct avant usage.`}
+Aucune animation ne doit être inventée à partir de la seule impression
+visuelle. Chaque mouvement observé ou proposé documente son déclencheur,
+l'objet, la propriété, la durée, l'easing, l'état final, l'interruption et
+l'alternative reduced motion. Un travail After Effects peut fournir une
+référence ou un asset exporté, mais le comportement web reste spécifié et
+testé dans le navigateur.`}
           </MarkdownFilePreview>
           <p className="text-sm text-white/60 leading-relaxed">
             Remarque la différence avec un prompt de style : chaque token a une valeur, un rôle, parfois une limite assumée ("non vérifié en runtime" plutôt qu'une animation inventée). C&apos;est ce niveau de précision - <span className="text-[#f0ede8]">exactement ce que le skill design formalisé de BUILD applique</span> - qui distingue un design system qui tient dans le temps d&apos;un simple moodboard.

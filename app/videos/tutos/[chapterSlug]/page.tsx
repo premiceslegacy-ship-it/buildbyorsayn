@@ -62,7 +62,7 @@ export default async function HermesChapterPage({
           {meta?.summary && <p className="text-white/45 text-sm mb-8 leading-relaxed">{meta.summary}</p>}
 
           <div className="doctrine-markdown">
-            <DoctrineMarkdown file={withoutLeadingTitle(file)} files={files} />
+            <DoctrineMarkdown file={withoutLeadingTitle(file)} files={files} localLinks="chapter-routes" />
           </div>
           {CHAPTER_DIAGRAMS[file.path]}
         </article>

@@ -15,6 +15,24 @@ test("links only to verified chapters or safe external URLs; raw HTML stays text
   assert.match(html, /&lt;script&gt;/);
 });
 
+test("Hermes chapter pages link internal references to real chapter routes", () => {
+  const corpus = [
+    { path: "00-parcours.md", content: "# Parcours\n\nVoir [la boucle d'exécution](04-evenements-inbox-execution.md)." },
+    { path: "04-evenements-inbox-execution.md", content: "# Boucle d'exécution" },
+  ];
+  const html = renderToStaticMarkup(createElement(DoctrineMarkdown, {
+    file: corpus[0],
+    files: corpus,
+    localLinks: "chapter-routes",
+  }));
+
+  assert.match(html, /href="\/videos\/tutos\/04-evenements-inbox-execution"/);
+  assert.doesNotMatch(html, /href="#chapitre-/);
+
+  const page = readFileSync(new URL("../app/videos/tutos/[chapterSlug]/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /localLinks="chapter-routes"/);
+});
+
 test("renders corpus tables with accessible headers and fenced code as literal text", () => {
   const html = render('# Chapitre\n\n| Notion | Usage |\n| --- | --- |\n| **Preuve** | [Lire](intro.md) |\n\n```html\n<script>danger()</script>\n```');
   assert.match(html, /<table>/);

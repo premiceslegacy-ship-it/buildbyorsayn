@@ -1,6 +1,7 @@
 import { createElement as h, type ReactNode } from "react";
 
 export type DoctrineFile = { path: string; content: string };
+export type DoctrineLocalLinks = "document-anchors" | "chapter-routes";
 
 export function stripFrontmatter(content: string): string {
   const text = content.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
@@ -26,7 +27,12 @@ export function withoutLeadingTitle(file: DoctrineFile): DoctrineFile {
   return { ...file, content: withoutHeading };
 }
 
-export function doctrineHref(destination: string, file: DoctrineFile, files: readonly DoctrineFile[]): string | undefined {
+export function doctrineHref(
+  destination: string,
+  file: DoctrineFile,
+  files: readonly DoctrineFile[],
+  localLinks: DoctrineLocalLinks = "document-anchors",
+): string | undefined {
   if (/[\s\\\u0000-\u001f\u007f]/.test(destination)) return undefined;
   if (/^https?:\/\//i.test(destination)) {
     try { const url = new URL(destination); return url.hostname && !url.username && !url.password ? destination : undefined; } catch { return undefined; }
@@ -38,10 +44,13 @@ export function doctrineHref(destination: string, file: DoctrineFile, files: rea
   if (!path && destination.startsWith("#")) path = file.path;
   if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]*\.md$/.test(path)) return undefined;
   const index = files.findIndex(entry => entry.path === path);
-  return index < 0 ? undefined : `#chapitre-${index}`;
+  if (index < 0) return undefined;
+  return localLinks === "chapter-routes"
+    ? `/videos/tutos/${path.replace(/\.md$/, "").toLowerCase()}`
+    : `#chapitre-${index}`;
 }
 
-function inline(text: string, file: DoctrineFile, files: readonly DoctrineFile[]): ReactNode[] {
+function inline(text: string, file: DoctrineFile, files: readonly DoctrineFile[], localLinks: DoctrineLocalLinks): ReactNode[] {
   const result: ReactNode[] = [];
   const tokens = /(`[^`\n]+`|\[[^\]\n]+\]\([^\s)]+\)|\*\*[^*\n]+\*\*|\*[^*\n]+\*)/g;
   let offset = 0;
@@ -50,8 +59,8 @@ function inline(text: string, file: DoctrineFile, files: readonly DoctrineFile[]
     const token = match[0];
     const link = token.match(/^\[([^\]]+)\]\((.+)\)$/);
     if (link) {
-      const href = doctrineHref(link[2], file, files);
-      result.push(href ? h("a", { key: match.index, href, rel: href.startsWith("http") ? "noreferrer noopener" : undefined }, inline(link[1], file, files)) : link[1]);
+      const href = doctrineHref(link[2], file, files, localLinks);
+      result.push(href ? h("a", { key: match.index, href, rel: href.startsWith("http") ? "noreferrer noopener" : undefined }, inline(link[1], file, files, localLinks)) : link[1]);
     } else {
       result.push(h(token.startsWith("`") ? "code" : token.startsWith("**") ? "strong" : "em", { key: match.index }, token.slice(token.startsWith("**") ? 2 : 1, token.startsWith("**") ? -2 : -1)));
     }
@@ -62,8 +71,8 @@ function inline(text: string, file: DoctrineFile, files: readonly DoctrineFile[]
 }
 
 /** Deliberately constrained Markdown; React escapes all text, never HTML. */
-export function DoctrineMarkdown({ file, files }: { file: DoctrineFile; files: readonly DoctrineFile[] }) {
-  const renderInline = (text: string) => inline(text, file, files);
+export function DoctrineMarkdown({ file, files, localLinks = "document-anchors" }: { file: DoctrineFile; files: readonly DoctrineFile[]; localLinks?: DoctrineLocalLinks }) {
+  const renderInline = (text: string) => inline(text, file, files, localLinks);
   const lines = stripFrontmatter(file.content).split("\n");
   const blocks: ReactNode[] = [];
   for (let i = 0; i < lines.length;) {
