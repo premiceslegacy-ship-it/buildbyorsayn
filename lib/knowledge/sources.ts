@@ -47,7 +47,7 @@ export async function collectProtocoleDocuments(): Promise<KnowledgeDocument[]> 
     content: [
       `Douleur : ${phase.douleur}`,
       `Solution : ${phase.solution.join("\n\n")}`,
-      `Resultat attendu : ${phase.output}`,
+      `Repère à retenir : ${phase.citation}`,
     ].join("\n\n"),
     tier: "beginner" as const,
   }));

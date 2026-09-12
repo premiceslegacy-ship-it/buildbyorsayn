@@ -80,7 +80,7 @@ export function Frame({
       <div className="relative mb-1 flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           <BuildMark className="h-3.5 w-3.5 shrink-0 opacity-40" />
-          <figcaption className="text-[11px] uppercase tracking-[0.14em] text-white/45 font-medium">{title}</figcaption>
+          <figcaption className="text-[12px] text-white/50 font-medium">{title}</figcaption>
         </div>
         <button
           type="button"
@@ -120,7 +120,7 @@ export function Frame({
             <div className="mb-2 flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
                 <BuildMark className="h-4 w-4 shrink-0 opacity-50" />
-                <p className="text-xs uppercase tracking-[0.14em] text-white/50 font-medium">{title}</p>
+                <p className="text-sm text-white/55 font-medium">{title}</p>
               </div>
               <button
                 type="button"

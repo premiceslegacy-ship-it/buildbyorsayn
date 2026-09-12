@@ -27,9 +27,9 @@ function LockedGate() {
         <div className="w-12 h-12 rounded-full bg-[#e8d5b0]/10 flex items-center justify-center mb-6">
           <Lock className="w-5 h-5 text-[#e8d5b0]" />
         </div>
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Hermes Agent - doctrine agentique</h1>
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Hermes Agent : organiser le travail avec l&apos;IA</h1>
         <p className="mt-4 text-white/60 leading-relaxed">
-          Comment décomposer un métier en agents, borner leur autorité et rendre une entreprise entière AI-first - en capitalisant sur sa connaissance et ses process pour les rendre accessibles à des agents IA. Ce contenu est réservé à {COFFRE_LABEL}.
+          Comment partir d&apos;un vrai problème, répartir les rôles, ranger les bonnes informations et donner à chaque outil seulement les accès dont il a besoin. Ce contenu est réservé à {COFFRE_LABEL}.
         </p>
         <Link
           href="/checkout"

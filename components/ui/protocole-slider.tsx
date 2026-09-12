@@ -7,25 +7,25 @@ import Link from "next/link";
 const PHASES = [
   {
     num: "01",
-    titre: "L'Absorption",
-    label: "La Greffe",
+    titre: "L'absorption",
+    label: "La greffe",
     desc: "Tu identifies les compétences des meilleurs et tu les greffes. Tu extrais leurs principes, leurs frameworks, leurs erreurs. Tu l'encodes dans des structures qui t'appartiennent. Pas loué. Pas emprunté. Distillé.",
   },
   {
     num: "02",
-    titre: "Le Sprint Cash",
+    titre: "Le sprint cash",
     label: "Premiers 10k€",
     desc: "Tu utilises ce que tu as absorbé pour générer du cashflow rapidement. Services, SaaS, automatisations. Peu importe le format. L'objectif : une dignité financière de base. Une fois ce coussin en place, tout le reste devient possible.",
   },
   {
     num: "03",
-    titre: "La Grande Distillation",
+    titre: "La grande distillation",
     label: "Capital organique",
     desc: "Tu encodes ce que tu as vécu. Chaque méthode, chaque process qui a fonctionné devient un actif permanent. Ce qui est distillé ne peut pas être retiré. Becker appelait ça le capital humain. Ici, c'est la version 2.0.",
   },
   {
     num: "∞",
-    titre: "L'Antifragile",
+    titre: "L'antifragile",
     label: "Liberté totale",
     desc: "Tu ne subis plus rien. Taleb avait raison : tu sors renforcé de chaque perturbation. Les outils changent, les plateformes ferment. Ton capital organique reste. Tu choisis : lignes verticales, pierre, équity.",
   },

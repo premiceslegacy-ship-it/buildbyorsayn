@@ -49,7 +49,7 @@ export function DecompositionDiagram() {
       caption="Chaque lot doit pouvoir être livré et vérifié seul, sans attendre les deux autres."
       viewBox="0 0 720 330"
     >
-      <Box x={270} y={12} w={180} h={64} label="Résultat attendu" accent />
+      <Box x={270} y={12} w={180} h={64} label="Ce qui doit sortir" accent />
       <Arrow x1={360} y1={76} x2={360} y2={112} />
       <Box x={190} y={114} w={340} h={58} label="Domaines nécessaires" sub="compétences requises, pas des personnes" />
       <Arrow x1={278} y1={172} x2={140} y2={210} />
@@ -286,7 +286,7 @@ export function FederatedBrainDiagram() {
       viewBox="0 0 720 320"
     >
       <text x={360} y={30} textAnchor="middle" fontSize="11" fontWeight={600} letterSpacing="0.08em" fill="#c4bfb799">
-        QUATRE RESPONSABILITÉS SÉPARÉES
+        Quatre responsabilités séparées
       </text>
       {quadrants.map((q, i) => {
         const col = i % 2, row = Math.floor(i / 2);
@@ -329,7 +329,7 @@ export function PoleMapDiagram() {
       viewBox={`0 0 720 ${Math.ceil(poles.length / cols) * (h + gapY) + y0 + 10}`}
     >
       <text x={20} y={26} fontSize="11" fontWeight={600} letterSpacing="0.08em" fill="#c4bfb799">
-        PÔLES IDENTIFIÉS DANS L&apos;ENTREPRISE
+        Pôles identifiés dans l&apos;entreprise
       </text>
       {poles.map((label, i) => {
         const col = i % cols, row = Math.floor(i / cols);

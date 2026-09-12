@@ -29,6 +29,7 @@ export default async function HermesChapterPage({
   if (!file) notFound();
 
   const meta = CHAPTER_META[file.path];
+  const displayTitle = meta?.displayTitle ?? chapterTitle(file);
   const currentIndex = files.findIndex((f) => f.path === file.path);
   const prevFile = currentIndex > 0 ? files[currentIndex - 1] : undefined;
   const nextFile = files[currentIndex + 1];
@@ -56,7 +57,7 @@ export default async function HermesChapterPage({
         </Link>
 
         <article className="doctrine-reader">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">{chapterTitle(file)}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">{displayTitle}</h1>
           {meta?.summary && <p className="text-white/45 text-sm mb-8 leading-relaxed">{meta.summary}</p>}
 
           <div className="doctrine-markdown">
@@ -67,8 +68,8 @@ export default async function HermesChapterPage({
 
         <div className="mt-16">
           <SectionPager
-            prev={prevFile ? { href: `/videos/tutos/${chapterSlug(prevFile.path)}`, label: chapterTitle(prevFile) } : undefined}
-            next={nextFile ? { href: `/videos/tutos/${chapterSlug(nextFile.path)}`, label: chapterTitle(nextFile) } : undefined}
+            prev={prevFile ? { href: `/videos/tutos/${chapterSlug(prevFile.path)}`, label: CHAPTER_META[prevFile.path]?.displayTitle ?? chapterTitle(prevFile) } : undefined}
+            next={nextFile ? { href: `/videos/tutos/${chapterSlug(nextFile.path)}`, label: CHAPTER_META[nextFile.path]?.displayTitle ?? chapterTitle(nextFile) } : undefined}
             nextDisabledLabel="Dernier chapitre"
           />
         </div>
