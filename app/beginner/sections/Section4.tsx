@@ -31,9 +31,10 @@ function Chapter({
 }
 
 function ToolLogo({ src, name }: { src: string; name: string }) {
+  const needsLightInk = ["github.svg", "railway.svg", "googlesearchconsole.svg", "plausibleanalytics.svg", "posthog.svg", "pagespeedinsights.svg"].includes(src);
   return (
-    <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-white/10 bg-white/[0.04] p-2.5">
-      <img src={`${LOGOS}/${src}`} alt="" aria-hidden="true" className="h-full w-full object-contain" loading="lazy" />
+    <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center p-1.5" title={name}>
+      <img src={`${LOGOS}/${src}`} alt="" aria-hidden="true" className={`h-full w-full object-contain ${needsLightInk ? "brightness-0 invert" : ""}`} loading="lazy" />
     </span>
   );
 }
@@ -70,9 +71,7 @@ export function Section4() {
           <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">10</span>
           <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">De l&apos;idée à l&apos;URL en ligne</h2>
         </div>
-        <div className="border border-[#e8d5b0]/15 bg-[#e8d5b0]/5 px-6 py-5">
-          <p className="text-sm leading-relaxed text-[#e8d5b0]/85">Le vibe coding, c&apos;est simplement coder avec l&apos;IA en décrivant ce que tu veux, puis en regardant, testant et corrigeant le résultat avec elle.</p>
-        </div>
+
       </div>
 
       <Chapter eyebrow="Avant de commencer" title="Comprendre où vit un site">
@@ -88,8 +87,9 @@ export function Section4() {
         <p>Tu peux choisir l&apos;interface qui te rassure. Dans chaque cas, cherche à obtenir un dossier de code que tu peux ouvrir, sauvegarder et transmettre.</p>
         <div className="border-y border-white/10">
           <ToolRow logo="antigravity.svg" name="Antigravity">Antigravity réunit l&apos;éditeur, l&apos;agent et l&apos;aperçu. Tu ouvres le dossier du projet, tu expliques une petite tâche, puis tu regardes les fichiers modifiés et le résultat dans le navigateur.</ToolRow>
-          <ToolRow logo="codex.svg" name="application Codex">L&apos;application Codex permet de choisir un dossier et de travailler avec l&apos;agent dans une interface graphique. Le terminal existe aussi, mais il reste une option pour les utilisateurs plus avancés.</ToolRow>
-          <ToolRow logo="claude-code.svg" name="application Claude Code">L&apos;application Claude Code suit le même principe: tu donnes accès au bon dossier, tu formules une demande limitée et tu contrôles le résultat. Son usage dans le terminal est facultatif et peut venir plus tard.</ToolRow>
+          <ToolRow logo="codex.svg" name="Codex">Codex peut travailler depuis son interface, le terminal, une API ou une connexion dans un autre outil comme Hermes Agent. Choisis la forme qui correspond à ton environnement.</ToolRow>
+          <ToolRow logo="claude-code.svg" name="Claude Code">Claude Code peut travailler depuis son interface, le terminal ou au sein d&apos;autres systèmes. Dans tous les cas, donne-lui accès au bon dossier, formule une demande limitée et contrôle le résultat.</ToolRow>
+          <ToolRow logo="google-ai-studio.png" name="Google AI Studio">Google AI Studio permet de tester les modèles Gemini et de préparer des instructions ou des prototypes avant de les relier à un projet. Il complète ces options sans imposer une façon unique de coder.</ToolRow>
         </div>
         <div className="mt-5 border-y border-white/10">
           <ToolRow logo="lovable.svg" name="Lovable">Lovable crée une première version dans le navigateur depuis une conversation. Avant d&apos;avancer, vérifie que tu peux synchroniser le projet avec GitHub ou exporter son code. Tu garderas ainsi une copie utilisable en dehors de l&apos;outil.</ToolRow>
@@ -147,7 +147,7 @@ export function Section4() {
             <p>Ajoute ensuite les variables d&apos;environnement demandées par le README dans l&apos;onglet <strong className="text-[#f0ede8]">Variables</strong>, sans recopier leurs valeurs dans GitHub. Lance <strong className="text-[#f0ede8]">Deploy</strong>, puis ouvre les logs de build. Si une ligne rouge apparaît, lis la première erreur utile, corrige le projet et relance le déploiement.</p>
             <p className="mt-3">Quand le déploiement réussit, ouvre <strong className="text-[#f0ede8]">Settings</strong>, puis <strong className="text-[#f0ede8]">Networking</strong> pour générer une adresse publique. Teste cette adresse. Fais ensuite une petite modification, pousse-la sur <code className="text-[#e8d5b0]">main</code> et vérifie que Railway redéploie automatiquement la nouvelle version.</p>
           </div>
-          <ToolRow logo="github.svg" name="GitHub Pages">Héberge uniquement un site statique. Il ne peut pas faire tourner un serveur privé ni garder un secret utilisé pendant l&apos;exécution.</ToolRow>
+
         </div>
         <p>Après le premier déploiement, ouvre l&apos;adresse temporaire. Teste les pages, les liens, les formulaires et l&apos;affichage mobile. Une construction réussie ne garantit pas que tout le parcours fonctionne.</p>
       </Chapter>

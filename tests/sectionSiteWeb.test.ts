@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const componentPath = new URL(
   "../app/beginner/sections/SectionSiteWeb.tsx",
+  import.meta.url
+);
+const atelierDesignSourcePath = new URL(
+  "../references/design-system-examples/atelier-design-system.md",
   import.meta.url
 );
 
@@ -40,6 +45,10 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
     "Bénéfice",
     "L&apos;ordre des sections",
     "Construire une vraie identité",
+    "Pinterest",
+    "moodboard",
+    "émotion",
+    "statut",
     "AI slop",
     "Glassmorphism",
     "Liquid Glass",
@@ -62,6 +71,7 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
     "Claude Code",
     "Antigravity",
     "GitHub",
+    "Google AI Studio",
     "Google Search Console",
     "impressions",
     "clics",
@@ -79,18 +89,20 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
     "confirmation claire",
     "où arrive la demande",
     "utilisation de ses données",
+    "Un seul skill",
+    "Plusieurs skills",
+    "Workflow complet",
+    "Protocole Zéro",
+    "maillage interne",
+    "cocon sémantique",
+    "Liquid Glass vient du langage visuel d&apos;Apple",
   ]) {
     assert.ok(source.includes(requiredContent), `contenu absent: ${requiredContent}`);
   }
 
-  for (const artifact of [
-    "SITEMAP.md",
-    "PAGE-BLUEPRINT.md",
-    "COPY-DECK.md",
-    "DESIGN-SYSTEM.md",
-    "QA-REPORT.md",
-  ]) {
-    assert.ok(source.includes(artifact), `artefact absent: ${artifact}`);
+  assert.ok(source.includes("DESIGN-SYSTEM.md"));
+  for (const redundantArtifact of ["SITEMAP.md", "PAGE-BLUEPRINT.md", "COPY-DECK.md", "QA-REPORT.md"]) {
+    assert.equal(source.includes(redundantArtifact), false, `aperçu redondant encore présent: ${redundantArtifact}`);
   }
 
   assert.equal(source.includes(String.fromCodePoint(0x2014)), false);
@@ -111,6 +123,7 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
     (source.match(/<LiquidCard/g) ?? []).length <= 3,
     "LiquidCard doit rester rare pour éviter un mur de cartes"
   );
+  assert.doesNotMatch(source, /<ul|<li|•/);
 });
 
 test("le Bloc 09 montre les logos des outils cités", () => {
@@ -120,6 +133,8 @@ test("le Bloc 09 montre les logos des outils cités", () => {
     "claude-code.svg",
     "antigravity.svg",
     "github.svg",
+    "google-ai-studio.png",
+    "pinterest.svg",
     "googlesearchconsole.svg",
     "plausibleanalytics.svg",
     "posthog.svg",
@@ -127,6 +142,7 @@ test("le Bloc 09 montre les logos des outils cités", () => {
   ]) {
     assert.ok(source.includes(logo), `logo absent du Bloc 09: ${logo}`);
   }
+  assert.doesNotMatch(source, /inline-flex h-\d+ w-\d+[^>]*border[^>]*>\s*<img/);
 });
 
 test("le Bloc 09 garde les textes pédagogiques lisibles", () => {
@@ -171,4 +187,14 @@ test("le nouvel asset Fondations appartient au manifeste canonique", () => {
   assert.match(manifest, /pages\/fondations\/09-construire-un-site-web-avec-l-ia/);
   assert.match(manifest, /pages\/fondations\/10-de-l-idee-a-l-url-en-ligne/);
   assert.match(manifest, /pages\/fondations\/11-le-seuil/);
+});
+
+test("l'exemple DESIGN-SYSTEM Atelier reste vérifiable depuis le dépôt", () => {
+  assert.equal(existsSync(atelierDesignSourcePath), true, "source Atelier absente du dépôt");
+  const source = readFileSync(atelierDesignSourcePath, "utf8");
+  assert.equal(
+    createHash("sha256").update(source).digest("hex"),
+    "c6836b967eda983a475d2a99823344c5880d688c7f87e611edf56d4629cbe589",
+    "la copie canonique du design system Atelier a dérivé"
+  );
 });

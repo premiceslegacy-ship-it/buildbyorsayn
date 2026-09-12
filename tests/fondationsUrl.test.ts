@@ -13,8 +13,8 @@ test("le Bloc 10 enseigne les parcours réels sans imposer un générateur no-co
   assert.match(source, /Antigravity/);
   assert.match(source, /Open Folder/);
   assert.match(source, /Clone Repository/);
-  assert.match(source, /application Codex/);
-  assert.match(source, /application Claude Code/);
+  assert.match(source, /Codex/);
+  assert.match(source, /Claude Code/);
   assert.match(source, /Lovable/);
   assert.match(source, /GitHub/);
   assert.match(source, /npm install/);
@@ -28,7 +28,7 @@ test("le Bloc 10 enseigne les parcours réels sans imposer un générateur no-co
   assert.match(source, /Vercel/);
   assert.match(source, /Cloudflare/);
   assert.match(source, /Netlify/);
-  assert.match(source, /GitHub Pages/);
+  assert.doesNotMatch(source, /GitHub Pages/);
   assert.match(source, /Railway/);
   assert.match(source, /Connect GitHub/);
   assert.match(source, /branche de production/);
@@ -37,11 +37,13 @@ test("le Bloc 10 enseigne les parcours réels sans imposer un générateur no-co
   assert.match(source, /adresse publique/i);
   assert.match(source, /redéploie automatiquement/i);
   assert.match(source, /Sanity/);
+  assert.match(source, /Google AI Studio/);
   assert.match(source, /CMS/);
   assert.match(source, /Google Search Console/);
   assert.match(source, /Plausible/);
   assert.match(source, /PostHog/);
-  assert.match(source, /Le vibe coding, c&apos;est simplement coder avec l&apos;IA/);
+  assert.doesNotMatch(source, /Le vibe coding/);
+  assert.doesNotMatch(source, /application Codex|application Claude Code/);
   assert.doesNotMatch(source, /Les cinq maisons|photographie son état|histoire locale/);
   assert.doesNotMatch(source, /no-code[^.]{0,80}bloquent/i);
 });
@@ -60,9 +62,11 @@ test("le Bloc 10 montre les logos des outils à chaque étape", () => {
     "sanity.svg",
     "googlesearchconsole.svg",
     "lovable.svg",
+    "google-ai-studio.png",
   ]) {
     assert.ok(source.includes(logo), `logo absent du Bloc 10: ${logo}`);
   }
+  assert.doesNotMatch(source, /inline-flex h-11 w-11[^>]*border[^>]*>/);
 });
 
 test("tous les logos cités par les Blocs 09 et 10 existent réellement", () => {
@@ -70,7 +74,7 @@ test("tous les logos cités par les Blocs 09 et 10 existent réellement", () => 
     "codex.svg", "claude-code.svg", "antigravity.svg", "github.svg",
     "lovable.svg", "vercel.svg", "cloudflare.svg", "netlify.svg",
     "railway.svg", "sanity.svg", "googlesearchconsole.svg",
-    "plausibleanalytics.svg", "posthog.svg", "pagespeedinsights.svg",
+    "plausibleanalytics.svg", "posthog.svg", "pagespeedinsights.svg", "google-ai-studio.png",
   ]) {
     assert.doesNotThrow(() => read(`public/brand-logos/${logo}`), `fichier logo absent: ${logo}`);
   }
