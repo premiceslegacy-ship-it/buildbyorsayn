@@ -13,9 +13,9 @@ const CARD_IDLE_TOP = 300;
 const CARD_CONVERSATION_TOP = 500;
 
 const PROMPT =
-  "Je veux lancer un SaaS pour les artisans du bâtiment. J'ai une idée, mais je ne sais pas quoi construire en premier.";
+  "Je veux lancer un SaaS pour les artisans du bâtiment. J'ai une idée, mais que devrais-je construire en premier ?";
 const ANSWER =
-  "Commence par les demandes de devis qui se perdent entre WhatsApp, email et téléphone. Vérifie cette scène avec trois artisans, puis montre un flux simple pour suivre une demande, une relance et le résultat.";
+  "Commence par un flux de suivi des demandes de devis : une demande reçue sur WhatsApp, par email ou par téléphone devient une fiche chantier, avec une relance et un statut clair. Teste cette première version avec trois artisans avant d'ajouter la facturation, les plannings ou les tableaux de bord. Si le même besoin revient, tu tiens le premier module de ton SaaS.";
 const PLACEHOLDER = "Essaie : rédiger un email · résumer un document · planifier ta semaine";
 
 type DemoStage = "idle" | "typing" | "sending" | "searching" | "answering" | "complete";
@@ -236,28 +236,55 @@ function ClaudeComposer({
   );
 }
 
-function HermesAvatar() {
+function ClaudeAvatar() {
   return (
     <span
-      data-mcp-assistant-avatar="hermes-agent"
+      data-mcp-assistant-avatar="claude"
       style={{
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         width: 36,
         height: 36,
-        padding: 4,
-        borderRadius: 12,
-        background: "#1F1E1D",
-        border: "1px solid #E8E5DD",
+        padding: 1,
+        borderRadius: 10,
         flexShrink: 0,
         overflow: "hidden",
       }}
     >
       <Image
-        src="/brand-logos/hermes-agent-mark.png"
-        alt="Hermes Agent"
-        width={28}
+        src="/brand-logos/claude.svg"
+        alt=""
+        width={34}
+        height={34}
+        unoptimized
+        loading="eager"
+        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+        draggable={false}
+      />
+    </span>
+  );
+}
+
+function BuildLogo() {
+  return (
+    <span
+      data-mcp-build-logo="true"
+      aria-hidden="true"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 42,
+        height: 28,
+        flexShrink: 0,
+        overflow: "hidden",
+      }}
+    >
+      <Image
+        src="/brand-logos/build-logo-compact.png"
+        alt=""
+        width={42}
         height={28}
         unoptimized
         loading="eager"
@@ -276,15 +303,10 @@ function ClaudeConversation({ stage, answer }: { stage: DemoStage; answer: strin
       className="absolute"
       style={{ left: CARD_LEFT, top: 66, width: CARD_WIDTH, color: "#1F1E1D", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
-        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: 12, background: "#1F1E1D", color: "#FFFFFF", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-          Toi
-        </span>
-        <p style={{ margin: 0, maxWidth: 760, fontSize: 21, lineHeight: 1.4 }}>{PROMPT}</p>
-      </div>
+      <p style={{ margin: 0, maxWidth: 820, fontSize: 21, lineHeight: 1.4 }}>{PROMPT}</p>
 
       <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginTop: 28 }}>
-        <HermesAvatar />
+        <ClaudeAvatar />
         <div style={{ minWidth: 0, maxWidth: 760 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
             <p style={{ margin: 0, fontSize: 21, fontWeight: 600 }}>Claude</p>
@@ -292,9 +314,10 @@ function ClaudeConversation({ stage, answer }: { stage: DemoStage; answer: strin
           </div>
 
           {stage === "searching" ? (
-            <div role="status" aria-live="polite" style={{ marginTop: 18, display: "inline-flex", alignItems: "center", gap: 10, padding: "14px 16px", border: "1px solid #E8E5DD", borderRadius: 14, background: "rgba(255,255,255,.58)", color: "#73726C", fontSize: 17 }}>
+            <div role="status" aria-live="polite" aria-label="Recherche dans le MCP BUILD" style={{ marginTop: 18, display: "inline-flex", alignItems: "center", gap: 10, padding: "14px 16px", border: "1px solid #E8E5DD", borderRadius: 14, background: "rgba(255,255,255,.58)", color: "#73726C", fontSize: 17 }}>
               <SearchIcon size={20} color="#D97757" />
-              <span>Recherche dans le MCP BUILD</span>
+              <span>Recherche dans le MCP</span>
+              <BuildLogo />
             </div>
           ) : (
             <div aria-live={stage === "answering" ? "polite" : undefined} style={{ marginTop: 18, color: "#1F1E1D", fontSize: 20, lineHeight: 1.48, maxWidth: 760 }}>
@@ -314,10 +337,13 @@ export function McpConnectorShowcase() {
   const [visiblePrompt, setVisiblePrompt] = useState("");
   const [visibleAnswer, setVisibleAnswer] = useState("");
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [stageInView, setStageInView] = useState(false);
 
   useEffect(() => {
-    const preload = document.createElement("img");
-    preload.src = "/brand-logos/hermes-agent-mark.png";
+    for (const src of ["/brand-logos/claude.svg", "/brand-logos/build-logo-compact.png"]) {
+      const preload = document.createElement("img");
+      preload.src = src;
+    }
   }, []);
 
   useEffect(() => {
@@ -330,6 +356,23 @@ export function McpConnectorShowcase() {
 
     updateScale();
     const observer = new ResizeObserver(updateScale);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const element = stageRef.current;
+    if (!element) return;
+
+    if (!("IntersectionObserver" in window)) {
+      setStageInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setStageInView(entry.isIntersecting && entry.intersectionRatio >= 0.82),
+      { threshold: [0, 0.82] },
+    );
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
@@ -357,6 +400,14 @@ export function McpConnectorShowcase() {
       setVisiblePrompt("");
       setVisibleAnswer("");
     };
+
+    if (!stageInView) {
+      reset();
+      return () => {
+        active = false;
+        clearAll();
+      };
+    }
 
     if (reducedMotion) {
       setStage("complete");
@@ -418,13 +469,13 @@ export function McpConnectorShowcase() {
     }
 
     reset();
-    timeouts.push(window.setTimeout(startTyping, 850));
+    timeouts.push(window.setTimeout(startTyping, 420));
 
     return () => {
       active = false;
       clearAll();
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, stageInView]);
 
   const conversation = stage === "searching" || stage === "answering" || stage === "complete";
   const typing = stage === "typing" || stage === "sending";

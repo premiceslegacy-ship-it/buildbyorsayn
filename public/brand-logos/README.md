@@ -15,6 +15,7 @@ Added for the method assets:
 
 - `hermes-agent.png`: Hermes Agent / Nous Research flat source mark, supplied directly by the BUILD operator (converted from their local `hermesagent.webp`) rather than sourced from the web.
 - `hermes-agent-mark.png`: transparent gold display variant of the same validated Hermes Agent girl, used on BUILD's dark interfaces so the mark has no opaque card or background.
+- `build-logo-compact.png`: transparent compact full BUILD logo, including the cube mark and the `BUILD` wordmark, derived from the approved private BUILD master for the MCP source-status row.
 - `cloudflare.svg`: Cloudflare mark from Simple Icons.
 - `github.svg`: GitHub mark from Simple Icons.
 - `pinterest.svg`: Pinterest mark from Simple Icons.

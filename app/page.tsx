@@ -118,7 +118,7 @@ export default async function HomePage() {
       ================================================================ */}
       <section className="relative z-10 flex flex-col items-center px-6 pt-14 pb-20 sm:pt-20 sm:pb-24 text-center">
         <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-8">
-          Pour celles et ceux qui veulent faire quelque chose de leurs essais avec l&apos;IA
+          Pour passer de l&apos;IA au concret
         </p>
 
         <h1 className="mx-auto mb-6 max-w-[1000px] text-4xl font-medium leading-[1.04] tracking-[-0.04em] text-[#f0ede8] sm:text-6xl lg:text-7xl">

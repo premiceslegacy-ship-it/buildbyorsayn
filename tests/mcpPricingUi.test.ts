@@ -85,7 +85,7 @@ test("the shared MCP block demonstrates the training benefit with concise copy",
   assert.match(showcase, /Le contenu visible dépend de ton offre/);
   assert.match(showcase, /Claude/);
   assert.match(showcase, /Recherche dans le MCP BUILD/);
-  assert.match(showcase, /Je veux lancer un SaaS pour les artisans du bâtiment/);
+  assert.match(showcase, /J'ai une idée, mais que devrais-je construire en premier \?/);
   assert.match(showcase, /Opus 5\.5/);
   assert.match(showcase, /max-w-\[680px\]/);
   assert.match(showcase, /aspect-video/);
@@ -100,7 +100,11 @@ test("the shared MCP block demonstrates the training benefit with concise copy",
   assert.doesNotMatch(showcase, /whiteSpace: "nowrap"/);
   assert.doesNotMatch(showcase, /absolute inset-2 border/);
   assert.doesNotMatch(showcase, /src="\/api\/mcp\/showcase-asset"/);
-  assert.match(showcase, /hermes-agent-mark\.png/);
+  assert.match(showcase, /brand-logos\/claude\.svg/);
+  assert.match(showcase, /brand-logos\/build-logo-compact\.png/);
+  assert.match(showcase, /fiche chantier/);
+  assert.match(showcase, /premier module de ton SaaS/);
+  assert.doesNotMatch(showcase, /hermes-agent-mark\.png|\bToi\b/);
   assert.doesNotMatch(showcase, /rounded-full/);
   assert.doesNotMatch(showcase, /Garde toute la puissance de ton assistant/);
   assert.doesNotMatch(showcase, /forfait web payant compatible/);
