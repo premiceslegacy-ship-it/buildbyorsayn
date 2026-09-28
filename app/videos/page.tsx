@@ -9,7 +9,8 @@ import { getBlocVideoLibrary } from "@/lib/blocVideos";
 import { VideoCard } from "@/components/VideoCard";
 import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
-import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
+import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE, withClientReferenceId } from "@/lib/pricing";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 
 function PaywallBanner({
@@ -21,7 +22,7 @@ function PaywallBanner({
   label: string;
   description: string;
   ctaLabel: string;
-  ctaHref: string;
+  ctaHref: string | null;
 }) {
   return (
     <div className="flex items-center gap-4 bg-white/[0.03] border border-white/[0.07] rounded-xl p-5 w-fit">
@@ -32,9 +33,13 @@ function PaywallBanner({
         <p className="text-[15px] font-medium text-white/70">{label}</p>
         <p className="text-[13px] text-white/35 mt-0.5">
           {description}{" "}
-          <a href={ctaHref} className="text-[#e8d5b0] hover:underline">
-            {ctaLabel} →
-          </a>
+          {ctaHref ? (
+            <a href={ctaHref} className="text-[#e8d5b0] hover:underline">
+              {ctaLabel} →
+            </a>
+          ) : (
+            <span role="status" className="text-white/45">Le paiement n'est pas encore activé.</span>
+          )}
         </p>
       </div>
     </div>
@@ -45,8 +50,8 @@ export default function VideosPage() {
   const [FONDATIONS_VIDEOS, setFoundationVideos] = useState<BlocVideo[]>([]);
   const [blocsWithVideos, setBlocsWithVideos] = useState<{ id: string; titre: string; videos: BlocVideo[] }[]>([]);
   const [tier, setTier] = useState<string | null | "loading">("loading");
-  const [beginnerUrl, setBeginnerUrl] = useState<string>("#");
-  const [upgradeUrl, setUpgradeUrl] = useState<string>("#");
+  const [beginnerUrl, setBeginnerUrl] = useState<string | null>(null);
+  const [upgradeUrl, setUpgradeUrl] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,10 +68,11 @@ export default function VideosPage() {
       const library = await getBlocVideoLibrary();
       setFoundationVideos(library.foundations);
       setBlocsWithVideos(library.blocs);
-      setTier(profile?.tier === "admin" ? "full" : profile?.tier ?? null);
+      const userTier = normalizeProfileTier(profile?.tier ?? null);
+      setTier(userTier);
       const urls = await getCheckoutUrls();
-      if (urls.beginner) setBeginnerUrl(`${urls.beginner}?client_reference_id=${user.id}`);
-      if (urls.upgrade) setUpgradeUrl(`${urls.upgrade}?client_reference_id=${user.id}`);
+      setBeginnerUrl(withClientReferenceId(urls.beginner, user.id));
+      setUpgradeUrl(withClientReferenceId(urls.upgrade, user.id));
     };
     fetchData().catch(() => {
       setFoundationVideos([]);
@@ -240,7 +246,7 @@ export default function VideosPage() {
                 label={`Accès ${COFFRE_LABEL} requis`}
                 description={`Ces vidéos font partie de ${COFFRE_LABEL} (${COFFRE_PRICE}€).`}
                 ctaLabel={`Accéder à ${COFFRE_LABEL}`}
-                ctaHref={`${STRIPE_FULL_CHECKOUT_LINK}${userId ? `?client_reference_id=${userId}` : ""}`}
+                ctaHref={withClientReferenceId(STRIPE_FULL_CHECKOUT_LINK, userId)}
               />
             )}
           </section>

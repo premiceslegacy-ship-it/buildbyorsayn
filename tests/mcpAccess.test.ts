@@ -7,6 +7,8 @@ import {
   resolveMcpProfileTier,
   tierRank,
 } from "../lib/mcpAccess";
+import { withClientReferenceId } from "../lib/pricing";
+import { resolveDoctrineAccess } from "../lib/doctrine/access";
 
 test("tierRank ranks tiers in ascending order", () => {
   assert.equal(tierRank("free"), 0);
@@ -75,4 +77,26 @@ test("resolveMcpProfileTier rejects a successful lookup without a known profile 
   assert.equal(resolveMcpProfileTier({ tier: null }, null), null);
   assert.equal(resolveMcpProfileTier({ tier: "FULL" }, null), null);
   assert.equal(resolveMcpProfileTier({ tier: "admin" }, null), "full");
+});
+
+test("doctrine access treats an admin profile tier as full", () => {
+  assert.equal(resolveDoctrineAccess({ app_metadata: {} }, { tier: "admin" }), 200);
+});
+
+test("withClientReferenceId preserves safe Stripe URLs and query syntax", () => {
+  assert.equal(withClientReferenceId(null, "user-1"), null);
+  assert.equal(withClientReferenceId("https://checkout.example.test/pay", null), null);
+  assert.equal(withClientReferenceId("http://buy.stripe.com/pay", "user-1"), null);
+  assert.equal(
+    withClientReferenceId("https://buy.stripe.com/pay", "user/id with space"),
+    "https://buy.stripe.com/pay?client_reference_id=user%2Fid%20with%20space",
+  );
+  assert.equal(
+    withClientReferenceId("https://buy.stripe.com/pay?mode=payment#confirm", "user-1"),
+    "https://buy.stripe.com/pay?mode=payment&client_reference_id=user-1#confirm",
+  );
+  assert.equal(
+    withClientReferenceId("https://buy.stripe.com/pay?client_reference_id=other", "user-1"),
+    null,
+  );
 });

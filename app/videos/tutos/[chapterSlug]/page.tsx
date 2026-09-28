@@ -43,6 +43,7 @@ export default async function HermesChapterPage({
       <NavBar
         activeLink="videos-tutos"
         tier={identity?.tier ?? null}
+        isAdmin={identity?.isAdmin}
         displayName={identity?.displayName}
         displayEmail={identity?.displayEmail}
         initials={identity?.initials}

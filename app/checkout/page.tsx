@@ -2,15 +2,15 @@ import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, Zap, Layers, GraduationCap, Lock, Play } from "lucide-react";
 import { BetaCodeForm } from "./BetaCodeForm";
-import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
+import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE, withClientReferenceId } from "@/lib/pricing";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 const STRIPE_FULL_URL = STRIPE_FULL_CHECKOUT_LINK;
-// These will be set once you create the products in Stripe:
-const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? "#";
-const STRIPE_UPGRADE_URL = process.env.STRIPE_UPGRADE_CHECKOUT_LINK ?? "#";
+const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? null;
+const STRIPE_UPGRADE_URL = process.env.STRIPE_UPGRADE_CHECKOUT_LINK ?? null;
 
 const BEGINNER_FEATURES = [
-    { icon: GraduationCap, label: "5 modules fondations complets" },
+    { icon: GraduationCap, label: "11 sections Fondations complètes" },
     { icon: Zap, label: "De zéro à un premier asset vendable" },
     { icon: Layers, label: "IA, GitHub, IDE, Vercel" },
     { icon: GraduationCap, label: "Skills Deep Research + UX/UI Premium" },
@@ -45,20 +45,14 @@ export default async function CheckoutPage({
             .select("tier")
             .eq("id", user.id)
             .single();
-        currentTier = profile?.tier ?? null;
+        currentTier = normalizeProfileTier(profile?.tier ?? null);
     }
 
-    const beginnerUrl = user?.id
-        ? `${STRIPE_BEGINNER_URL}${STRIPE_BEGINNER_URL !== "#" ? "?client_reference_id=" + user.id : ""}`
-        : STRIPE_BEGINNER_URL;
+    const beginnerUrl = withClientReferenceId(STRIPE_BEGINNER_URL, user?.id);
 
-    const fullUrl = user?.id
-        ? `${STRIPE_FULL_URL}?client_reference_id=${user.id}`
-        : STRIPE_FULL_URL;
+    const fullUrl = withClientReferenceId(STRIPE_FULL_URL, user?.id) ?? STRIPE_FULL_URL;
 
-    const upgradeUrl = user?.id
-        ? `${STRIPE_UPGRADE_URL}${STRIPE_UPGRADE_URL !== "#" ? "?client_reference_id=" + user.id : ""}`
-        : STRIPE_UPGRADE_URL;
+    const upgradeUrl = withClientReferenceId(STRIPE_UPGRADE_URL, user?.id);
 
     const isUpgrading = currentTier === "beginner";
     const alreadyFull = currentTier === "full";
@@ -92,7 +86,7 @@ export default async function CheckoutPage({
                             ? `Tu as les fondations. Débloque les 7 blocs et les sources pour ${UPGRADE_PRICE}€.`
                             : fromMcp
                             ? "Ton compte est prêt. Choisis Fondations ou LE COFFRE pour activer l'accès et connecter ton assistant."
-                            : `La plupart des membres qui ont essayé les fondations finissent par prendre ${COFFRE_LABEL}. Autant commencer là.`}
+                            : `Choisis Fondations pour commencer par un premier résultat, ou ${COFFRE_LABEL} pour accéder au système complet.`}
                     </p>
                     {fromMcp && !alreadyFull ? (
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.14em] text-[#e8d5b0]">
@@ -129,10 +123,16 @@ export default async function CheckoutPage({
                                 <span className="text-white/40 text-sm">TTC</span>
                             </div>
                         </div>
-                        <a href={upgradeUrl} className="group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]">
-                            Passer au complet
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                        </a>
+                        {upgradeUrl ? (
+                            <a href={upgradeUrl} className="group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]">
+                                Passer au complet
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                            </a>
+                        ) : (
+                            <p role="status" className="rounded-xl border border-white/10 bg-white/[0.03] px-6 py-4 text-center text-sm text-white/45">
+                                Le paiement de l'upgrade n'est pas encore activé.
+                            </p>
+                        )}
                     </div>
                 ) : (
                     /* Standard flow: 2 options */
@@ -165,10 +165,16 @@ export default async function CheckoutPage({
                                     <span className="text-xs text-white/40">Doctrine agentique (non incluse)</span>
                                 </li>
                                     </ul>
-                            <a href={beginnerUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm">
-                                Commencer pour {FONDATIONS_PRICE}€
-                                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
-                            </a>
+                            {beginnerUrl ? (
+                                <a href={beginnerUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm">
+                                    Commencer pour {FONDATIONS_PRICE}€
+                                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
+                                </a>
+                            ) : (
+                                <p role="status" className="rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-center text-sm text-white/45">
+                                    Le paiement Fondations n'est pas encore activé.
+                                </p>
+                            )}
                         </div>
 
                         {/* Full */}
@@ -202,7 +208,7 @@ export default async function CheckoutPage({
                     </div>
                 )}
 
-                <p className="text-center text-xs text-white/25 mt-6">Paiement sécurisé via Stripe · Satisfait ou remboursé 30 jours</p>
+                <p className="text-center text-xs text-white/25 mt-6">Paiement sécurisé via Stripe · paiement unique · accès à vie</p>
                 <BetaCodeForm />
             </div>
         </main>

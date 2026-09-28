@@ -1,148 +1,186 @@
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { ToolCard } from "@/components/ui/tool-card";
+import Image from "next/image";
 import { SectionReveal } from "@/components/ui/section-reveal";
 import { ContextFilesDiagram, FounderDossierDiagram } from "../diagrams";
+import { FoundationChapter } from "../FoundationChapter";
 
 const QUESTION_GROUPS = [
   {
     label: "Le public",
     intro: "Pour qui, et pour faire quoi.",
     questions: [
-      {
-        q: "Qui est l'utilisateur ? Quel comportement je veux qu'il ait ?",
-        a: "Pas « tout le monde ». Une personne précise, avec un contexte précis. Un artisan de 45 ans qui ne sait pas ce qu'est GitHub. Un directeur marketing qui consulte depuis son téléphone entre deux réunions. Cette personne détermine tout : le design, le niveau de complexité, les mots qu'on utilise, le CTA principal.",
-      },
-      {
-        q: "Quel problème je résous ?",
-        a: "Pas « je veux faire un site web ». Quel est le problème concret de l'utilisateur que ce projet résout ? Il perd du temps à répondre aux mêmes questions par email ? Il n'a pas de vitrine crédible pour convaincre ses prospects ? Le problème se formule toujours depuis le point de vue de l'utilisateur.",
-      },
-      {
-        q: "Quel CTA principal ?",
-        a: "Un seul. Pas cinq. L'utilisateur qui arrive sur le site, quelle est l'action unique que je veux qu'il fasse ? Prendre un rendez-vous, s'inscrire, acheter, télécharger. Je ne construis pas une page avant d'avoir répondu à cette question.",
-      },
+      ["Qui est l'utilisateur ?", "Une personne précise, avec un contexte précis. Cette personne détermine le design, le niveau de complexité, les mots et le CTA principal."],
+      ["Quel problème je résous ?", "Pas « je veux faire un site web ». Le problème se formule depuis le point de vue de l'utilisateur : temps perdu, demandes mal qualifiées, confiance difficile à établir ou information qui se perd."],
+      ["Quel CTA principal ?", "Un seul. L'utilisateur qui arrive sur le site, quelle action unique doit-il pouvoir faire : prendre un rendez-vous, demander un devis, acheter ou télécharger ?"],
     ],
   },
   {
     label: "La technique",
     intro: "Ce que le projet demande vraiment de construire.",
     questions: [
-      {
-        q: "Quelles API vont entrer en jeu ?",
-        a: "Une API, c'est une connexion entre deux services. Si le site doit envoyer un email quand un formulaire est rempli, c'est une API. Si l'application doit se connecter à un service de paiement, c'est une API. Je liste toutes ces connexions dès le départ car elles influencent directement la stack technique.",
-      },
-      {
-        q: "Quel backend ?",
-        a: "Pour un site vitrine simple, il n'y a pas besoin de backend. Pour un site avec un espace membre, une BDD, des abonnements, c'est une autre histoire. Je décide ici si j'ai besoin d'une base de données robuste, de logique côté serveur, ou d'une structure simple.",
-      },
+      ["Quelles connexions ?", "Une connexion entre le formulaire, le mail, le CRM ou le paiement est une dépendance du projet. Liste-la dès le départ et précise les données qui circulent."],
+      ["Quel niveau de backend ?", "Un site vitrine simple n'a pas les mêmes besoins qu'un espace membre, un paiement ou une base de données. Décide ce qui doit être privé, persistant et vérifiable."],
+      ["Quelles limites de sécurité ?", "Identifie les secrets, les permissions, les données sensibles, les comptes responsables et les actions qui devront rester soumises à validation."],
     ],
   },
   {
     label: "Le cadrage business",
     intro: "Ce qui borne la décision de tout le reste.",
     questions: [
-      {
-        q: "Quelle direction artistique ?",
-        a: "Je ne réponds pas avec trois adjectifs. Je décris des mécanismes visibles : grille éditoriale ou composition asymétrique, typographie condensée ou humaniste, rayons de 4 ou 16 px, bordures franches ou séparateurs fins, densité, lumière, traitement photo, famille d'icônes, vitesse des transitions et rôle exact des matières. Le glassmorphism, le skeuomorphism, le Liquid Glass, le brutalisme ou le dither ne sont pas des autocollants de style : chacun doit servir une fonction précise et devenir des tokens, des composants, des états et des règles responsive que l'IA peut exécuter.",
-      },
-      {
-        q: "Quelles fonctionnalités, dans quel ordre ?",
-        a: "Je liste toutes les fonctionnalités envisagées, puis je les classe : P1 (obligatoire pour lancer) et P2 (peut venir après). La règle : P1 complet avant tout P2. Un site avec 5 fonctionnalités à 80% vaut moins qu'un site avec 2 fonctionnalités à 100%.",
-      },
-      {
-        q: "Quel objectif à 90 jours ?",
-        a: "Pas « avoir un beau site ». Un chiffre, une action, une métrique. 10 demandes de contact par mois. 500 visiteurs uniques. 3 clients signés. Cet objectif conditionne les décisions techniques : si l'objectif est de générer des leads, le SEO et le CTA sont prioritaires.",
-      },
+      ["Quelle direction artistique ?", "Décris des décisions visibles : grille, typographie, densité, lumière, matières, icônes, états et mouvement. Trois adjectifs ne suffisent pas."],
+      ["Quelles fonctionnalités, dans quel ordre ?", "Classe les fonctions indispensables et celles qui peuvent attendre. Un résultat réduit mais complet vaut mieux qu'une accumulation partiellement finie."],
+      ["Quel objectif à 90 jours ?", "Choisis une métrique liée à l'action : demandes qualifiées, rendez-vous, ventes, activation ou temps économisé. L'objectif oriente la technique et le contenu."],
     ],
   },
-];
+] as const;
+
+function ToolMark({ name, src }: { name: string; src: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 text-sm text-white/70">
+      <Image src={src} alt="" aria-hidden="true" width={24} height={24} className="h-6 w-6 object-contain" loading="lazy" />
+      {name}
+    </span>
+  );
+}
 
 export function Section1() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center gap-3 mb-8">
-        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">06</span>
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Penser avant de construire</h2>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
+      <div className="mb-8 flex items-center gap-3">
+        <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">06</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Penser avant de construire</h2>
       </div>
-      <p className="text-white/60 text-base leading-relaxed mb-10">
-        Avant de toucher un seul outil, je pose le cadre. C&apos;est l&apos;étape que tout le monde saute et qui explique pourquoi la plupart des projets partent dans tous les sens.
+      <p className="mb-10 max-w-3xl text-base leading-relaxed text-white/60">
+        Avant de toucher un outil, pose le cadre. C'est l'étape qui empêche un projet de devenir une suite de décisions prises au hasard.
       </p>
 
-      {/* Les questions vitales, groupées */}
-      <div className="mb-10">
-        <h3 className="text-lg font-semibold text-[#f0ede8] mb-2">Les questions vitales</h3>
-        <p className="text-white/55 text-sm leading-relaxed mb-8 max-w-2xl">
-          Chaque fois que je commence un projet (site vitrine, app ou outil interne) je réponds à ces huit questions avant d&apos;ouvrir quoi que ce soit - groupées ici en trois familles, pas huit cases égales.
+      <FoundationChapter eyebrow="Chapitre 1" title="Les questions vitales">
+        <p>
+          Réponds à ces questions avant d'ouvrir un éditeur ou de demander une génération. Elles forment un dossier de décision, pas huit cases à remplir pour faire joli.
         </p>
-        <div className="flex flex-col gap-8">
+        <div className="divide-y divide-white/10 border-y border-white/10">
           {QUESTION_GROUPS.map((group) => (
-            <SectionReveal key={group.label}>
-              <p className="text-[11px] uppercase tracking-[0.14em] text-[#e8d5b0]/70 font-semibold mb-1">{group.label}</p>
-              <p className="text-xs text-white/40 leading-relaxed mb-4">{group.intro}</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {group.questions.map(({ q, a }) => (
-                  <div key={q} className="relative border border-[#c9b48a]/25 bg-gradient-to-b from-white/[0.045] to-white/[0.012] p-5">
-                    <div aria-hidden="true" className="pointer-events-none absolute inset-[5px] border border-[#c9b48a]/10" />
-                    <div className="relative z-10">
-                      <p className="text-sm font-semibold text-[#e8d5b0] mb-3 tracking-tight leading-snug">{q}</p>
-                      <p className="text-[13px] text-white/65 leading-[1.65]">{a}</p>
-                    </div>
+            <div key={group.label} className="py-6">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#e8d5b0]/70">{group.label}</p>
+              <p className="mb-4 text-xs leading-relaxed text-white/40">{group.intro}</p>
+              <div className="divide-y divide-white/10">
+                {group.questions.map(([question, answer], index) => (
+                  <div key={question} className="grid gap-3 py-4 sm:grid-cols-[2rem_12rem_1fr] sm:items-start">
+                    <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
+                    <strong className="text-sm text-[#f0ede8]">{question}</strong>
+                    <p className="text-sm leading-relaxed text-white/60">{answer}</p>
                   </div>
                 ))}
               </div>
-            </SectionReveal>
+            </div>
           ))}
         </div>
-      </div>
+      </FoundationChapter>
 
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Pourquoi une IA seule ne suffit pas</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            Beaucoup de gens pensent qu&apos;il suffit de demander à l&apos;IA &quot;crée-moi un site pour un plombier&quot; pour avoir un résultat professionnel. En théorie c&apos;est possible. En pratique, le résultat sera générique, sans personnalité, sans compréhension du vrai problème du client.
-          </p>
-          <p className="text-sm text-white/65 leading-relaxed">
-            L&apos;IA est un outil d&apos;exécution extraordinaire. Mais elle a besoin d&apos;un chef de projet qui sait ce qu&apos;il veut. Mon rôle, ce n&apos;est pas d&apos;écrire du code. Mon rôle est de comprendre le problème, prendre les bonnes décisions de structure, et donner à l&apos;IA un contexte suffisamment précis pour qu&apos;elle produise quelque chose qui tient. <strong className="text-[#f0ede8]">L&apos;IA fait l&apos;exécution. Moi je fais le jugement.</strong>
-          </p>
-        </LiquidCard>
-      </SectionReveal>
+      <FoundationChapter eyebrow="Chapitre 2" title="Pourquoi une IA seule ne suffit pas">
+        <p>
+          Beaucoup de gens pensent qu'il suffit de demander à une IA de créer un site pour un métier précis. En pratique, un résultat professionnel dépend du contexte, des décisions de structure, des preuves disponibles et de critères qui permettent de vérifier le travail.
+        </p>
+        <p>
+          L'IA est un outil d'exécution extraordinaire. Elle a besoin d'un dossier compréhensible : problème, public, offre, références, contraintes, fichiers à lire et définition du résultat terminé. <strong className="text-[#f0ede8]">L'IA exécute. Toi, tu gardes le jugement, le périmètre et la responsabilité de vérifier.</strong>
+        </p>
+        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+          Une source publique peut inspirer un mécanisme, mais elle ne devient pas une méthode parce qu'elle est populaire. Note toujours ce qui a été observé, ce qui reste hypothétique et le test qui permettrait de trancher.
+        </p>
+      </FoundationChapter>
 
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Les automatisations, c&apos;est du code</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            Quand un formulaire de contact envoie automatiquement un mail et crée une ligne dans un CRM, c&apos;est de la logique de code. Il y a une condition, une action, un résultat. Mais aujourd&apos;hui, cette logique peut se décrire en langage naturel à une IA.
-          </p>
-          <div className="bg-black/30 border border-white/5 p-4 mb-4">
-            <p className="text-xs text-[#e8d5b0]/80 font-mono leading-relaxed">
-              &quot;Quand ce formulaire est soumis, envoie un email de confirmation à l&apos;utilisateur et ajoute son contact dans HubSpot.&quot;
-            </p>
-          </div>
-          <p className="text-sm text-white/65 leading-relaxed mb-5">
-            C&apos;est une instruction que je peux donner à Claude ou Cursor, et obtenir le code fonctionnel en retour. La condition : je comprenne ce que je veux.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <ToolCard name="Claude" logoSrc="/brand-logos/claude.svg" description="Le modèle qui comprend l'instruction et écrit le code de l'automatisation." />
-            <ToolCard name="Cursor" logoSrc="/brand-logos/cursor.svg" description="L'IDE où cette instruction devient du code exécuté dans ton projet." />
-            <ToolCard name="HubSpot" logoSrc="/brand-logos/hubspot.svg" description="Le CRM cité en exemple - remplaçable par n'importe quel outil que ton client utilise déjà." />
-          </div>
-        </LiquidCard>
-      </SectionReveal>
+      <FoundationChapter eyebrow="Chapitre 3" title="Les automatisations suivent une logique simple">
+        <p>
+          Quand un formulaire envoie un email et crée une ligne dans un CRM, il y a une condition, une action et un résultat. Le langage naturel peut décrire cette logique, mais tu dois savoir ce qui doit arriver, à qui, avec quelles données et dans quel cas l'automatisation doit s'arrêter.
+        </p>
+        <p className="border-y border-white/10 py-4 font-mono text-xs leading-relaxed text-[#e8d5b0]">
+          « Quand ce formulaire est soumis, envoie une confirmation et crée le contact dans le CRM, sauf si le consentement manque. »
+        </p>
+        <div className="flex flex-wrap gap-x-7 gap-y-4 border-b border-white/10 pb-5">
+          <ToolMark name="Claude" src="/brand-logos/claude.svg" />
+          <ToolMark name="Cursor" src="/brand-logos/cursor.svg" />
+          <ToolMark name="HubSpot" src="/brand-logos/hubspot.svg" />
+        </div>
+        <p>
+          Avant de l'exécuter, vérifie les permissions, le format des données, les doublons, les erreurs et le chemin manuel de récupération. Une automatisation fiable est une petite procédure observable, pas une phrase impressionnante.
+        </p>
+      </FoundationChapter>
 
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Les fichiers .md de contexte</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            Avant de lancer quoi que ce soit dans un IDE ou un outil IA, je crée un dossier <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 rounded text-xs">/docs</code> dans mon projet avec des fichiers Markdown : au minimum un <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 rounded text-xs">BRIEF.md</code> qui résume le projet et son objectif, un <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 rounded text-xs">PRD.md</code> qui liste les fonctionnalités et leurs critères d&apos;acceptation. Sans ces fichiers, l&apos;IA avance en aveugle et génère du code générique. Avec eux, elle charge le contexte à chaque session.
-          </p>
-          <ContextFilesDiagram />
-          <p className="text-sm text-white/65 leading-relaxed mt-6">
-            C&apos;est le strict minimum, et ça s&apos;arrête vite en pratique : sur un vrai projet (app, SaaS, outil métier), deux fichiers ne tiennent jamais plus de quelques jours. Il faut aussi trancher le brand, le design system, le modèle de données, la sécurité, les parcours utilisateur, les hypothèses non validées - et tout ça dans le bon ordre, sinon on code sur du sable.
-          </p>
-          <FounderDossierDiagram />
-          <p className="text-sm text-white/60 leading-relaxed mt-6">
-            C&apos;est exactement ce que formalise <span className="text-[#f0ede8] font-medium">Oracle by Orsayn</span> : un skill qui interviewe le porteur de projet, traduit ses réponses en décisions techniques, puis génère chacun de ces documents dans l&apos;ordre - jusqu&apos;à un <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 rounded text-xs">INDEX.md</code> qui fait carte canonique de tout le dossier. Rien n&apos;est deviné, rien ne part dans tous les sens : chaque décision a une source, une preuve ou un statut d&apos;hypothèse explicite. C&apos;est le niveau de dossier fondateur que reçoit un projet dans <span className="text-[#f0ede8] font-medium">LE COFFRE</span> - non disponible dans Fondations.
-          </p>
-        </LiquidCard>
+      <FoundationChapter eyebrow="Chapitre 4" title="Un workflow agentique n'est pas un prompt géant">
+        <p>
+          Un workflow agentique sépare les responsabilités. Il collecte, interprète, prépare puis demande une autorisation quand l'action touche une personne, un compte, un CRM, une publication ou une dépense. Commence en lecture seule, garde les sources et augmente l'autorité uniquement après des tests réels.
+        </p>
+        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-white/10 py-5">
+          <ToolMark name="Hermes Agent" src="/brand-logos/hermes-agent-mark.png" />
+          <ToolMark name="X" src="/brand-logos/x.svg" />
+          <ToolMark name="TikTok" src="/brand-logos/tiktok.svg" />
+        </div>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {[
+            ["Collecter", "Récupérer des données publiques ou autorisées en conservant l'URL, la date, le statut d'accès et la limite."],
+            ["Interpréter", "Transformer la matière en critères : pertinence, valeur, urgence réelle, risque, coût et prochaine action."],
+            ["Préparer", "Produire un résumé, une segmentation, un brouillon ou une proposition sans déclencher l'action externe."],
+            ["Autoriser", "Faire valider la publication, l'envoi, la modification ou la dépense tant que le flux n'a pas prouvé sa fiabilité."],
+          ].map(([title, description], index) => (
+            <div key={title} className="grid gap-2 py-4 md:grid-cols-[2rem_10rem_1fr]">
+              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
+              <strong className="text-sm text-[#f0ede8]">{title}</strong>
+              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+            </div>
+          ))}
+        </div>
+        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+          Les noms de connexions sont littéraux. Si ton environnement déclare une connexion sous le nom <code className="text-[#e8d5b0]">nom-connexion</code>, utilise exactement ce nom. Ne remplace jamais un identifiant par une variante supposée plus logique.
+        </p>
+      </FoundationChapter>
+
+      <FoundationChapter eyebrow="Chapitre 5" title="Les fichiers de contexte donnent une mémoire de travail au projet">
+        <p>
+          Avant de lancer un outil IA, crée un dossier de contexte. Un brief résume le problème et l'objectif. Un document de critères liste ce qui doit fonctionner. D'autres fichiers peuvent préciser la marque, le modèle de données, la sécurité, les parcours, les hypothèses et les décisions déjà prises.
+        </p>
+        <ContextFilesDiagram />
+        <p>
+          Sur un vrai projet, deux fichiers ne suffisent pas longtemps. L'important n'est pas de produire une documentation décorative, mais de garder une carte canonique qui indique ce qui est décidé, ce qui est prouvé, ce qui est hypothétique et ce qui doit encore être testé.
+        </p>
+        <FounderDossierDiagram />
+        <p>
+          C'est le principe d'un dossier fondateur : chaque décision possède une source, une preuve ou un statut explicite. Le dossier devient ensuite le contexte partagé par les skills et les agents du projet.
+        </p>
+      </FoundationChapter>
+
+      <FoundationChapter eyebrow="Chapitre 6" title="Les workflows se prouvent dans le travail réel">
+        <p>
+          Les méthodes de BUILD viennent de situations concrètes : organiser une recherche, synchroniser des compétences, étudier une source autorisée, transformer une vidéo en dérivés ou relier un contenu à une prochaine étape commerciale. Elles ne sont pas des recettes à recopier. Elles montrent comment choisir un périmètre, ajouter un contrôle et mesurer avant de généraliser.
+        </p>
+        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-white/10 py-5">
+          <ToolMark name="Hermes Agent" src="/brand-logos/hermes-agent-mark.png" />
+          <ToolMark name="TikTok" src="/brand-logos/tiktok.svg" />
+          <ToolMark name="YouTube" src="/brand-logos/youtube.svg" />
+          <ToolMark name="GitHub" src="/brand-logos/github.svg" />
+        </div>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {[
+            ["Recherche vers résultat", "Un brief devient des sources qualifiées, une fiche de mécanisme, une intégration dans le produit puis une validation technique."],
+            ["Skill et synchronisation", "Un pack est comparé à sa source canonique. Si une référence dérive, le processus s'arrête au lieu de publier un résultat incomplet."],
+            ["Source vers contenu", "Une source conservée devient une transcription, une sélection humaine, un dérivé relié à son origine, une approbation et une mesure."],
+            ["Connexion vers action", "Une tâche passe par une compétence, une connexion nommée, une permission limitée, une préparation, une validation et un readback, c'est-à-dire une lecture de l'état réel après l'action."],
+            ["Bots spécialisés", "Un bot spécialisé ne reçoit pas une mission vague : chaque profil a un périmètre, des sources, des outils autorisés, une sortie attendue et une règle d'arrêt."],
+            ["Miniature YouTube", "Le contrat réel de la vidéo devient un angle, un concept, une miniature lisible à petite taille, des contrôles et une approbation artistique séparée."],
+            ["SEO et visibilité générative", "Le SEO (optimisation pour les moteurs de recherche) et le GEO (optimisation pour les moteurs génératifs) commencent par une lecture autorisée des données de recherche pour choisir une page à renforcer. La vérité produit, le maillage, le build et l'approbation passent avant la publication."],
+          ].map(([title, description], index) => (
+            <div key={title} className="grid gap-2 py-4 md:grid-cols-[2rem_12rem_1fr]">
+              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
+              <strong className="text-sm text-[#f0ede8]">{title}</strong>
+              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+            </div>
+          ))}
+        </div>
+        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+          Le résultat n'est considéré comme réutilisable qu'après une lecture du résultat réel, une mesure, une règle d'arrêt et un chemin manuel. Un chiffre de communauté, une promesse publique ou une économie annoncée ne remplace jamais cette preuve.
+        </p>
+      </FoundationChapter>
+
+      <SectionReveal className="border-t border-white/10 pt-8">
+        <p className="text-sm leading-relaxed text-[#e8d5b0]/85">Un bon projet ne commence pas avec le meilleur outil. Il commence avec une situation, une décision à prendre, une preuve à obtenir et une limite à respecter.</p>
       </SectionReveal>
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Download } from "lucide-react";
@@ -13,7 +14,8 @@ import { SkillsFreshness } from "@/components/SkillsFreshness";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { illustrationSrc } from "@/lib/illustrations";
-import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
+import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, withClientReferenceId } from "@/lib/pricing";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 const SKILL_USAGE_STEPS = [
   {
@@ -38,7 +40,7 @@ const SKILL_USAGE_TOOLS = [
   },
   {
     name: "Hermes Agent (Nous Research)",
-    logo: "/brand-logos/hermes-agent.png",
+    logo: "/brand-logos/hermes-agent-mark.png",
     body: "Agent capable de naviguer le web pour enrichir la recherche marché et la veille concurrentielle.",
   },
   {
@@ -183,10 +185,21 @@ const SKILL_PROMPTS = [
   },
 ];
 
+const SKILL_GLOSSARY = [
+  ["Skill", "Un ensemble versionné d’instructions, de ressources, de contrôles et de limites pour une tâche. Ce n’est pas seulement un prompt."],
+  ["LLM", "Un modèle de langage qui génère ou transforme du texte à partir du contexte reçu. Il ne vérifie pas automatiquement que ce contexte est vrai."],
+  ["RLS", "La sécurité au niveau des lignes : une règle de base de données qui limite les enregistrements qu’un utilisateur peut lire ou modifier."],
+  ["GEO", "L’optimisation d’un contenu pour qu’il soit compris et cité par des moteurs de réponse générative. Elle complète le SEO, elle ne le remplace pas."],
+  ["CRO", "L’optimisation d’un parcours pour faciliter une action mesurable, comme demander un diagnostic ou remplir un formulaire."],
+  ["JTBD", "Jobs To Be Done : décrire le progrès qu’une personne cherche à accomplir, plutôt que de la réduire à un profil démographique."],
+  ["GTM", "Go-To-Market : le chemin prévu pour atteindre un marché, proposer une offre, vendre puis livrer."],
+  ["Lighthouse 100", "Un score de contrôle sur certaines dimensions web. Ce n’est ni une garantie de conversion, ni une preuve que le produit est bon pour son marché."],
+] as const;
+
 export default function SkillsPage() {
   const [tier, setTier] = useState<string | null | "loading">("loading");
-  const [checkoutHref, setCheckoutHref] = useState("/checkout");
-  const [beginnerHref, setBeginnerHref] = useState("/checkout");
+  const [checkoutHref, setCheckoutHref] = useState<string | null>(null);
+  const [beginnerHref, setBeginnerHref] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<SkillCategory | "all">("all");
 
   useEffect(() => {
@@ -206,16 +219,12 @@ export default function SkillsPage() {
         getCheckoutUrls(),
       ]);
 
-      const userTier = profile?.tier ?? null;
-      const targetUrl =
-        userTier === "beginner"
-          ? urls.upgrade ?? urls.full
-          : urls.full;
-      const targetBeginnerUrl = urls.beginner ?? urls.full;
+      const userTier = normalizeProfileTier(profile?.tier ?? null);
+      const targetUrl = userTier === "beginner" ? urls.upgrade : urls.full;
 
       setTier(userTier);
-      setCheckoutHref(`${targetUrl}?client_reference_id=${user.id}`);
-      setBeginnerHref(`${targetBeginnerUrl}?client_reference_id=${user.id}`);
+      setCheckoutHref(withClientReferenceId(targetUrl, user.id));
+      setBeginnerHref(withClientReferenceId(urls.beginner, user.id));
     };
 
     fetchProfile();
@@ -263,8 +272,20 @@ export default function SkillsPage() {
                   Comment ces skills ont été pensés - et comment penser les tiens.
                 </h2>
                 <p className="mt-3 text-sm sm:text-base text-white/50 leading-relaxed">
-                  Chaque skill vient du même framework : prendre un métier ou un résultat business, le décomposer en sous-métiers et sous-compétences, puis mettre dans chaque sous-domaine la meilleure expertise disponible - la nôtre quand on a la data, celle des meilleurs praticiens mesurés sinon. C'est le 80/20 de l'IA : le modèle, tout le monde a le même ; le contexte, non. C'est ce qui sépare un actif d'un pack de prompts génériques vendu sur Insta. Le détail complet est dans le Bloc 4.
+                  Chaque skill vient du même framework : prendre un métier ou un résultat business, le décomposer en sous-métiers et sous-compétences, puis mettre dans chaque sous-domaine la meilleure expertise disponible - la nôtre quand on a la data, celle des meilleurs praticiens mesurés sinon. C’est le 80/20 de l’IA : le modèle, tout le monde a le même ; le contexte, non. C’est ce qui sépare un actif d’un pack de prompts génériques vendu sur Insta. Le détail complet est dans le Bloc 4.
                 </p>
+              </div>
+
+              <div className="mt-6 border-y border-white/[0.08] py-5">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/40 font-semibold mb-3">Repères de vocabulaire</p>
+                <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                  {SKILL_GLOSSARY.map(([term, definition]) => (
+                    <div key={term}>
+                      <dt className="text-sm font-semibold text-[#e8d5b0]">{term}</dt>
+                      <dd className="mt-1 text-xs leading-relaxed text-white/50">{definition}</dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
 
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -378,7 +399,7 @@ export default function SkillsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {SKILL_USAGE_TOOLS.map((tool) => (
                     <div key={tool.name} className="flex items-start gap-3">
-                      <img src={tool.logo} alt="" className="mt-0.5 w-5 h-5 shrink-0" />
+                      <Image src={tool.logo} alt="" aria-hidden="true" width={20} height={20} className="mt-0.5 h-5 w-5 shrink-0" />
                       <div>
                         <p className="text-xs font-semibold text-white/80">{tool.name}</p>
                         <p className="mt-0.5 text-[11px] leading-relaxed text-white/45">{tool.body}</p>
@@ -497,7 +518,7 @@ export default function SkillsPage() {
                         <Download className="w-4 h-4" />
                         Télécharger
                       </a>
-                    ) : (
+                    ) : lockedHref ? (
                       <a
                         href={lockedHref}
                         className="inline-flex items-center justify-center gap-2 w-full bg-white/[0.06] border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition-all duration-200 hover:bg-white/[0.1] hover:text-white"
@@ -505,6 +526,13 @@ export default function SkillsPage() {
                         {lockedLabel}
                         <ArrowRight className="w-4 h-4" />
                       </a>
+                    ) : (
+                      <p
+                        role="status"
+                        className="w-full border border-white/10 bg-white/[0.03] px-5 py-3 text-center text-sm text-white/45"
+                      >
+                        Paiement momentanément indisponible.
+                      </p>
                     )}
                   </div>
                 </motion.div>

@@ -104,6 +104,19 @@ test("exact streamed UTF-8 artifacts succeed with no-store GETs and no redirect"
     for (const call of calls) { assert.equal(call.cache, "no-store"); assert.equal(call.method, "GET"); assert.equal(call.redirect, "error"); assert.ok(call.signal?.aborted); }
   });
 });
+test("verified publication is reused during the cache TTL", async () => {
+  const bytes = encoder.encode("cached doctrine");
+  await withStorage(
+    [bucket(), Response.json(manifestFor([bytes])), streamResponse([bytes]).response],
+    async calls => {
+      const first = await readPublishedDoctrine();
+      const second = await readPublishedDoctrine();
+      assert.deepEqual(second, first);
+      assert.equal(calls.length, 3);
+    },
+  );
+});
+
 for (const header of [undefined, "1"]) {
   test(`artifact stream limited by published bytes with header ${header}`, async () => {
     const body = streamResponse([encoder.encode("abc"), encoder.encode("tail")], header ? { "content-length": header } : {});

@@ -21,7 +21,8 @@ import { UpgradedBanner } from "@/components/UpgradedBanner";
 import { McpDashboardEntry } from "@/components/McpDashboardEntry";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { UpgradeCarousel } from "@/components/UpgradeCarousel";
-import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE } from "@/lib/pricing";
+import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE, withClientReferenceId } from "@/lib/pricing";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 export default function DashboardHub() {
   const router = useRouter();
@@ -31,6 +32,7 @@ export default function DashboardHub() {
   const [displayEmail, setDisplayEmail] = useState("");
   const [initials, setInitials] = useState("?");
   const [tier, setTier] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [profileReady, setProfileReady] = useState(false);
   const [modal, setModal] = useState<null | "foundations" | "both">(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -58,6 +60,7 @@ export default function DashboardHub() {
         email.split("@")[0];
       setDisplayName(firstName);
       setDisplayEmail(email);
+      setIsAdmin(user.app_metadata?.role === "admin");
       setInitials(firstName.substring(0, 2).toUpperCase());
       setUserId(user.id);
 
@@ -71,7 +74,7 @@ export default function DashboardHub() {
         .select("tier, completed_blocks")
         .eq("id", user.id)
         .single();
-      const userTier = profile?.tier ?? null;
+      const userTier = normalizeProfileTier(profile?.tier ?? null);
       setTier(userTier);
       setProfileReady(true);
     };
@@ -136,6 +139,7 @@ export default function DashboardHub() {
       <NavBar
         activeLink="dashboard"
         tier={tier}
+        isAdmin={isAdmin}
         displayName={displayName}
         displayEmail={displayEmail}
         initials={initials}
@@ -355,13 +359,10 @@ export default function DashboardHub() {
 
             <UpgradeCarousel
               showFondations={tier !== "beginner" && modal === "both"}
-              fondationsUrl={checkoutUrls.beginner
-                ? `${checkoutUrls.beginner}${userId ? `?client_reference_id=${userId}` : ""}`
-                : "/checkout"
-              }
+              fondationsUrl={withClientReferenceId(checkoutUrls.beginner, userId)}
               systemeUrl={tier === "beginner"
-                ? `${checkoutUrls.upgrade ?? checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
-                : `${checkoutUrls.full}${userId ? `?client_reference_id=${userId}` : ""}`
+                ? withClientReferenceId(checkoutUrls.upgrade, userId)
+                : withClientReferenceId(checkoutUrls.full, userId) ?? checkoutUrls.full
               }
               systemePrice={tier === "beginner" ? String(UPGRADE_PRICE) : String(COFFRE_PRICE)}
             />

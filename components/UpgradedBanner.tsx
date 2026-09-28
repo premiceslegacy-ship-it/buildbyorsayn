@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CheckCircle, Loader2, X } from "lucide-react";
 import { COFFRE_LABEL } from "@/lib/pricing";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 type State = "polling" | "confirmed" | "timeout";
 
@@ -35,7 +36,7 @@ export function UpgradedBanner() {
         .eq("id", user.id)
         .single();
 
-      if (profile?.tier === "full") {
+      if (normalizeProfileTier(profile?.tier ?? null) === "full") {
         setState("confirmed");
         // Nettoie l'URL sans rechargement
         const url = new URL(window.location.href);

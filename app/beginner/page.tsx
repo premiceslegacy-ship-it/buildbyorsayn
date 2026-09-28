@@ -9,7 +9,7 @@ import { useBeginnerAuth } from "./useBeginnerAuth";
 import { SECTIONS, ANGLE_MORT } from "./sections.data";
 
 export default function BeginnerPage() {
-  const { tier, displayEmail } = useBeginnerAuth();
+  const { tier, displayEmail, isAdmin } = useBeginnerAuth();
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans">
@@ -19,6 +19,7 @@ export default function BeginnerPage() {
       <NavBar
         activeLink="beginner"
         tier={tier}
+        isAdmin={isAdmin}
         displayEmail={displayEmail}
         initials={displayEmail ? displayEmail.substring(0, 2).toUpperCase() : "?"}
       />

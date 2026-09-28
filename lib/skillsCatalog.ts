@@ -69,9 +69,9 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
   },
   {
     slug: "oracle-site-web",
-    title: "ORACLE Site Web",
+    title: "ORACLE Site Web + Pack Copy & LP",
     description:
-      "Construis un site ou une landing page qui vend : cadrage en une session ou site complet, copy issu de ta vraie recherche marché, SEO/GEO et score Lighthouse 100 visés.",
+      "Construis un site ou une landing page qui vend : cadrage, pack Copy & LP avec carte de message et hero lisible, vraie recherche marché, SEO/GEO et score Lighthouse 100 visés.",
     access: "beginner",
     fileName: "oracle-site-web.md",
     category: "site-web",

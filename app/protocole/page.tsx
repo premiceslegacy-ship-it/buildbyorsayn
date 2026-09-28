@@ -8,6 +8,7 @@ import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { PHASES } from "@/lib/protocoleContent";
 import { ProtocolePipelineDiagram, LocataireVsCapitalDiagram } from "./diagrams";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 export const metadata = {
   title: "Le protocole zéro : BUILD by Orsayn",
@@ -57,9 +58,9 @@ export default async function ProtocolePage() {
     .eq("id", user.id)
     .single();
 
-  const userTier = profile?.tier ?? null;
+  const userTier = normalizeProfileTier(profile?.tier ?? null);
 
-  if (userTier !== "full" && userTier !== "beginner" && userTier !== "admin") {
+  if (userTier !== "beginner" && userTier !== "full") {
     redirect("/checkout");
   }
 
@@ -78,6 +79,7 @@ export default async function ProtocolePage() {
       <NavBar
         activeLink="protocole"
         tier={userTier}
+        isAdmin={user.app_metadata?.role === "admin"}
         displayName={displayName}
         displayEmail={email}
         initials={initials}

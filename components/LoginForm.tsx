@@ -29,7 +29,7 @@ export function LoginForm({
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    let newErrors = { email: "", password: "", auth: "" };
+    const newErrors = { email: "", password: "", auth: "" };
     let hasError = false;
 
     if (!email) {

@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import {
+    determineStripeTier,
+    escapeIlikePattern,
+    emailsMatch,
+    isUuid,
+    normalizeCustomerEmail,
+    referenceMatchesProfile,
+    type PaidTier,
+} from "@/lib/stripeEntitlements";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -12,19 +21,6 @@ function escapeHtml(value: string) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-}
-
-function determineTier(priceId: string | null | undefined): "beginner" | "full" {
-    if (!priceId) return "beginner"; // Sécurité : si priceId inconnu, on ne promeut pas au-delà de beginner
-    if (priceId === process.env.STRIPE_BEGINNER_PRICE_ID) return "beginner";
-    // FULL (267€) et UPGRADE (170€) donnent tous les deux l'accès complet
-    if (
-        priceId === process.env.STRIPE_FULL_PRICE_ID ||
-        priceId === process.env.STRIPE_UPGRADE_PRICE_ID
-    ) return "full";
-    // Price inconnue : on ne promeut pas
-    console.error(`[Webhook] Price ID inconnu reçu : ${priceId}`);
-    return "beginner";
 }
 
 function buildWelcomeEmailHtml(actionLink: string) {
@@ -137,31 +133,87 @@ async function sendWelcomeEmail(email: string, actionLink: string) {
 
     if (!resendApiKey || !from) return false;
 
-    const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            from,
-            to: [email],
-            subject: "Bienvenue dans BUILD - active ton compte",
-            html: buildWelcomeEmailHtml(actionLink),
-            text: `Bienvenue dans BUILD.\n\nTon paiement est confirmé. Active ton compte et choisis ton mot de passe ici : ${actionLink}`,
-        }),
-    });
+    try {
+        const response = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${resendApiKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                from,
+                to: [email],
+                subject: "Bienvenue dans BUILD - active ton compte",
+                html: buildWelcomeEmailHtml(actionLink),
+                text: `Bienvenue dans BUILD.\n\nTon paiement est confirmé. Active ton compte et choisis ton mot de passe ici : ${actionLink}`,
+            }),
+        });
 
-    if (!response.ok) {
-        console.error("[Webhook] Resend welcome email failed:", await response.text());
+        if (!response.ok) {
+            console.error("[Webhook] Resend welcome email failed");
+            return false;
+        }
+
+        return true;
+    } catch {
+        console.error("[Webhook] Resend welcome email request failed");
         return false;
     }
-
-    return true;
 }
 
 function canSendWelcomeEmail() {
     return Boolean(process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM));
+}
+
+async function persistProfileTier(
+    supabase: SupabaseClient,
+    userId: string,
+    incomingTier: PaidTier,
+    customerEmail: string | null,
+): Promise<string | null> {
+    const payload = {
+        id: userId,
+        tier: incomingTier,
+        ...(customerEmail ? { email: customerEmail } : {}),
+    };
+
+    let updateQuery = supabase
+        .from("profiles")
+        .update(payload)
+        .eq("id", userId)
+        // PostgREST's `neq` does not match NULL. Keep an unassigned profile
+        // eligible while preserving admin access and paid-tier monotonicity.
+        .or("tier.is.null,tier.neq.admin");
+
+    if (incomingTier === "beginner") {
+        updateQuery = updateQuery.or("tier.is.null,tier.neq.full");
+    }
+
+    const { data: updatedProfile, error: updateError } = await updateQuery
+        .select("id")
+        .maybeSingle();
+
+    if (updateError) return updateError.message;
+    if (updatedProfile) return null;
+
+    const { error: insertError } = await supabase.from("profiles").insert(payload);
+    if (!insertError) return null;
+    if (insertError.code !== "23505") return insertError.message;
+
+    // A concurrent webhook inserted the row. Retry the same monotonic update:
+    // a beginner event can never overwrite a full or admin profile.
+    let retryQuery = supabase
+        .from("profiles")
+        .update(payload)
+        .eq("id", userId)
+        .or("tier.is.null,tier.neq.admin");
+
+    if (incomingTier === "beginner") {
+        retryQuery = retryQuery.or("tier.is.null,tier.neq.full");
+    }
+
+    const { error: retryError } = await retryQuery.select("id").maybeSingle();
+    return retryError?.message ?? null;
 }
 
 export async function POST(req: NextRequest) {
@@ -179,33 +231,63 @@ export async function POST(req: NextRequest) {
             signature,
             process.env.STRIPE_WEBHOOK_SECRET!
         );
-    } catch (err) {
+    } catch {
         console.error("Webhook verification failed");
         return NextResponse.json({ error: "Verification failed" }, { status: 400 });
     }
 
     if (event.type === "checkout.session.completed") {
         const session = event.data.object as Stripe.Checkout.Session;
-        let userId = session.client_reference_id;
-        const customerEmail = session.customer_details?.email;
+        const referenceId = session.client_reference_id?.trim() || null;
+        const customerEmail = normalizeCustomerEmail(session.customer_details?.email);
+        let userId: string | null = null;
 
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        // Si on n'a pas de client_reference_id (paiement hors plateforme, ex: lien email)
-        // On essaie de retrouver l'utilisateur via son adresse email
-        if (!userId && customerEmail) {
-            const { data: profile } = await supabase
-                .from("profiles")
-                .select("id")
-                .eq("email", customerEmail)
-                .single();
-            
-            if (profile) {
-                userId = profile.id;
+        // A client-controlled reference is only a hint. Bind it to the
+        // customer email already stored on that profile before granting access.
+        if (referenceId) {
+            if (!isUuid(referenceId) || !customerEmail) {
+                console.warn("[Webhook] Ignoring an unbound client reference");
             } else {
+                const { data: referencedProfile, error: referenceError } = await supabase
+                    .from("profiles")
+                    .select("id, email")
+                    .eq("id", referenceId)
+                    .maybeSingle();
+
+                if (referenceError) {
+                    console.error("[Webhook] Reference profile lookup failed");
+                    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                } else if (
+                    referencedProfile &&
+                    referenceMatchesProfile(referenceId, customerEmail, referencedProfile.email)
+                ) {
+                    userId = referencedProfile.id;
+                } else {
+                    console.warn("[Webhook] Client reference did not match customer email");
+                }
+            }
+        }
+
+        // If the reference is absent or cannot be bound, resolve the account
+        // by the normalized Stripe customer email instead.
+        if (!userId && customerEmail) {
+            const { data: profile, error: profileLookupError } = await supabase
+                .from("profiles")
+                .select("id, email")
+                .ilike("email", escapeIlikePattern(customerEmail))
+                .maybeSingle();
+
+            if (profileLookupError) {
+                console.error("[Webhook] Customer profile lookup failed");
+                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+            } else if (profile && emailsMatch(profile.email, customerEmail)) {
+                userId = profile.id;
+            } else if (!profile) {
                 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://buildbyorsayn.com";
                 const redirectTo = `${appUrl}/update-password`;
 
@@ -218,10 +300,13 @@ export async function POST(req: NextRequest) {
                         }
                     );
                     if (inviteError) {
-                        console.error(`Erreur invitation Supabase pour ${customerEmail}:`, inviteError.message);
-                    } else if (invited?.user?.id) {
-                        userId = invited.user.id;
+                        console.error("[Webhook] Supabase invitation failed");
+                        return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                    } else if (!invited?.user?.id) {
+                        console.error("[Webhook] Supabase invitation returned no user");
+                        return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                     }
+                    userId = invited.user.id;
                 } else {
                     const { data: inviteLink, error: linkError } = await supabase.auth.admin.generateLink({
                         type: "invite",
@@ -234,21 +319,23 @@ export async function POST(req: NextRequest) {
 
                     const actionLink = inviteLink?.properties?.action_link;
                     if (linkError || !inviteLink?.user?.id || !actionLink) {
-                        console.error(`Erreur génération invitation Supabase pour ${customerEmail}:`, linkError?.message);
+                        console.error("[Webhook] Supabase invitation link generation failed");
+                        return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                     } else {
                         userId = inviteLink.user.id;
                         const sent = await sendWelcomeEmail(customerEmail, actionLink);
 
                         if (!sent) {
-                            const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
+                            const { data: fallbackInvited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
                                 customerEmail,
                                 {
                                     redirectTo,
                                     data: { invited_from: "stripe_checkout_fallback" },
                                 }
                             );
-                            if (inviteError) {
-                                console.error(`Erreur fallback invitation Supabase pour ${customerEmail}:`, inviteError.message);
+                            if (inviteError || !fallbackInvited?.user?.id) {
+                                console.error("[Webhook] Fallback Supabase invitation failed");
+                                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                             }
                         }
                     }
@@ -257,42 +344,31 @@ export async function POST(req: NextRequest) {
         }
 
         if (userId) {
-            // Retrieve line items to identify which price was purchased
+            // Retrieve line items to identify which price was purchased.
             let priceId: string | null = null;
             try {
                 const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 });
                 priceId = lineItems.data[0]?.price?.id ?? null;
-            } catch (e) {
-                console.error("Could not retrieve line items:", e);
+            } catch {
+                console.error("[Webhook] Stripe line-item lookup failed");
+                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
             }
 
-            const tier = determineTier(priceId);
+            const tier = determineStripeTier(
+                priceId,
+                process.env.STRIPE_BEGINNER_PRICE_ID,
+                process.env.STRIPE_FULL_PRICE_ID,
+                process.env.STRIPE_UPGRADE_PRICE_ID,
+            );
 
-            // If user is upgrading from beginner to full, always set full
-            // If already full, keep full (upsert-safe)
-            const { data: existingProfile } = await supabase
-                .from("profiles")
-                .select("tier")
-                .eq("id", userId)
-                .single();
-
-            const finalTier = existingProfile?.tier === "full" ? "full" : tier;
-
-            const profilePayload: { id: string; tier: "beginner" | "full"; email?: string } = {
-                id: userId,
-                tier: finalTier,
-            };
-
-            if (customerEmail) {
-                profilePayload.email = customerEmail;
+            if (!tier) {
+                console.error("[Webhook] Stripe price ID is not allowlisted");
+                return NextResponse.json({ received: true }, { status: 200 });
             }
 
-            const { error } = await supabase
-                .from("profiles")
-                .upsert(profilePayload, { onConflict: "id" });
-
-            if (error) {
-                console.error("Profile update failed for session:", session.id);
+            const persistenceError = await persistProfileTier(supabase, userId, tier, customerEmail);
+            if (persistenceError) {
+                console.error("[Webhook] Profile entitlement update failed");
                 return NextResponse.json({ error: "Processing failed" }, { status: 500 });
             }
 

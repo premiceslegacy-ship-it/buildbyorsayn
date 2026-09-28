@@ -1,14 +1,3 @@
-import { SectionMindset } from "./sections/SectionMindset";
-import { SectionPsychologie } from "./sections/SectionPsychologie";
-import { SectionCopywriting } from "./sections/SectionCopywriting";
-import { SectionVente } from "./sections/SectionVente";
-import { SectionMarketing } from "./sections/SectionMarketing";
-import { Section1 } from "./sections/Section1";
-import { Section2 } from "./sections/Section2";
-import { Section3 } from "./sections/Section3";
-import { SectionSiteWeb } from "./sections/SectionSiteWeb";
-import { Section4 } from "./sections/Section4";
-
 export const SECTIONS = [
   {
     id: "mindset",
@@ -16,7 +5,6 @@ export const SECTIONS = [
     label: "L'état d'esprit qui fait l'argent",
     summary: "Avant la technique, avant les outils, il y a la tête. Ces principes ne changent pas dans le temps.",
     illustrationId: "fondations-mindset",
-    Component: SectionMindset,
   },
   {
     id: "psychologie",
@@ -24,7 +12,6 @@ export const SECTIONS = [
     label: "Comprendre les gens",
     summary: "On répète qu'il faut résoudre un problème. C'est vrai, mais c'est incomplet.",
     illustrationId: "fondations-psychologie",
-    Component: SectionPsychologie,
   },
   {
     id: "copywriting",
@@ -32,7 +19,6 @@ export const SECTIONS = [
     label: "Écrire pour vendre",
     summary: "Le copywriting, c'est l'art d'écrire pour vendre. Pas pour faire joli.",
     illustrationId: "fondations-copywriting",
-    Component: SectionCopywriting,
   },
   {
     id: "vente",
@@ -40,7 +26,6 @@ export const SECTIONS = [
     label: "Vendre",
     summary: "La vente fait peur parce qu'on l'imagine comme du baratin de marchand de tapis. C'est l'inverse.",
     illustrationId: "fondations-vente",
-    Component: SectionVente,
   },
   {
     id: "marketing",
@@ -48,7 +33,6 @@ export const SECTIONS = [
     label: "Capter l'attention",
     summary: "Le meilleur produit du monde ne sert à rien si personne ne le connaît.",
     illustrationId: "fondations-marketing",
-    Component: SectionMarketing,
   },
   {
     id: "penser",
@@ -56,7 +40,6 @@ export const SECTIONS = [
     label: "Penser avant de construire",
     summary: "Avant de toucher un seul outil, je pose le cadre. C'est l'étape que tout le monde saute.",
     illustrationId: "fondations-penser",
-    Component: Section1,
   },
   {
     id: "environnement",
@@ -64,7 +47,6 @@ export const SECTIONS = [
     label: "Comprendre l'environnement",
     summary: "Pas besoin d'être développeur. Mais comprendre les bases change radicalement la qualité des résultats.",
     illustrationId: "fondations-environnement",
-    Component: Section2,
   },
   {
     id: "visuels",
@@ -72,7 +54,6 @@ export const SECTIONS = [
     label: "Générer des visuels pro",
     summary: "Créer une direction visuelle cohérente avec le message, la conversion et le design system.",
     illustrationId: "fondations-visuels",
-    Component: Section3,
   },
   {
     id: "site-web",
@@ -80,7 +61,6 @@ export const SECTIONS = [
     label: "Construire un site web avec l'IA",
     summary: "Choisir le bon site, structurer ses pages, écrire pour convertir et construire une identité complète que l'IA peut exécuter sans produire du générique.",
     illustrationId: "fondations-site-web",
-    Component: SectionSiteWeb,
   },
   {
     id: "url",
@@ -88,7 +68,6 @@ export const SECTIONS = [
     label: "De l'idée à l'URL en ligne",
     summary: "Choisir son point de départ, maîtriser GitHub, lancer le projet, le déployer et remettre au client des comptes qu'il contrôle.",
     illustrationId: "fondations-url",
-    Component: Section4,
   },
 ] as const;
 

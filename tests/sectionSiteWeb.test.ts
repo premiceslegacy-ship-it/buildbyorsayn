@@ -11,6 +11,10 @@ const atelierDesignSourcePath = new URL(
   "../references/design-system-examples/atelier-design-system.md",
   import.meta.url
 );
+const brandAssetManifestPath = new URL(
+  "../private/brand-assets/build-collection-cards/manifest/asset-manifest.json",
+  import.meta.url
+);
 
 test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD", () => {
   assert.equal(
@@ -23,32 +27,49 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
 
   for (const requiredImport of [
     "SectionReveal",
-    "LiquidCard",
     "MarkdownFilePreview",
   ]) {
     assert.match(source, new RegExp(`import \\{ ${requiredImport} \\}`));
   }
 
   for (const requiredContent of [
-    "Construire un site web avec l&apos;IA",
-    "La structure d&apos;une page qui vend",
-    "Navbar",
-    "Hero section",
-    "proposition de valeur",
-    "H1",
-    "Sous-titre",
-    "CTA principal",
+    "Construire un site web avec l'IA",
+    "Le but business",
+    "Une page, une personne, une prochaine étape",
+    "Quel site faut-il vraiment?",
+    "Landing page",
+    "Site connecté",
+    "La structure d'une page qui vend",
+    "Page de découverte",
+    "Page d'offre",
+    "Page produit",
+    "Situation",
+    "Progrès",
+    "Mécanisme",
+    "Démonstration",
+    "Preuve",
+    "Adéquation",
+    "Offre",
+    "Action",
+    "Suite",
+    "Réassurance sous le CTA",
     "Réponse en 24 h",
+    "Des solutions digitales innovantes",
+    "Un site clair pour que les artisans",
     "Le copywriting",
     "les mots de tes clients",
     "Fonctionnalité",
     "Bénéfice",
-    "L&apos;ordre des sections",
+    "Réduis la friction du formulaire",
+    "libellé visible",
+    "obligatoire ou facultatif",
+    "message d'erreur près du champ",
+    "confirmation claire",
+    "utilisation de ses données",
     "Construire une vraie identité",
     "Pinterest",
     "moodboard",
     "émotion",
-    "statut",
     "AI slop",
     "Glassmorphism",
     "Liquid Glass",
@@ -61,43 +82,16 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
     "Éditorial",
     "Brutalisme",
     "Dither",
-    "deep-research-vertical",
-    "oracle-site-web",
-    "/skills#skill-oracle-site-web",
-    "ux-ui-design",
-    "Skills Apple",
-    "backend-orsayn",
-    "Codex",
-    "Claude Code",
-    "Antigravity",
-    "GitHub",
-    "Google AI Studio",
-    "Google Search Console",
-    "impressions",
-    "clics",
-    "requêtes",
-    "position moyenne",
-    "Plausible",
-    "PostHog",
-    "visiteurs",
-    "formulaire commencé",
-    "formulaire envoyé",
-    "PageSpeed Insights",
-    "libellé visible",
-    "obligatoire ou facultatif",
-    "message d&apos;erreur près du champ",
-    "confirmation claire",
-    "où arrive la demande",
-    "utilisation de ses données",
-    "Un seul skill",
-    "Plusieurs skills",
-    "Workflow complet",
+    "Donner une vraie mission à l'IA",
+    "Un seul skill peut suffire",
+    "Plusieurs skills si nécessaire",
+    "Workflow complet, si tu le veux",
     "Protocole Zéro",
     "Le Protocole Zéro relie les compétences du projet",
-    "n&apos;est ni une prestation",
+    "n'est ni une prestation",
     "skill réservé au SEO",
     "les métiers et les compétences nécessaires",
-    "La méthode ne s&apos;arrête pas au site",
+    "La méthode ne s'arrête pas au site",
     "Le SEO avancé reste dans BUILD",
     "Le Protocole Zéro intervient quand il faut approfondir une compétence",
     "workflow de <Link",
@@ -113,7 +107,36 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
     "La structure et les standards restent stables",
     "maillage interne",
     "cocon sémantique",
-    "Liquid Glass vient du langage visuel d&apos;Apple",
+    "Liquid Glass vient du langage visuel d'Apple",
+    "Du tableau d'inspiration au site qui fonctionne",
+    "Ce que la vidéo transcrite permet de vérifier",
+    "référence visuelle et une première zone limitée",
+    "tâche bornée",
+    "Collecter",
+    "Trier",
+    "Formuler",
+    "Prototyper",
+    "Construire",
+    "Vérifier",
+    "Le protocole d'adaptation",
+    "Choisir la connexion et l'hébergement selon la stack",
+    "VPS privé",
+    "Tailscale",
+    "Le SEO, expliqué simplement",
+    "Google Search Console",
+    "IndexNow",
+    "Mesurer ce qui aide le business",
+    "impressions",
+    "clics",
+    "requêtes",
+    "position moyenne",
+    "Plausible",
+    "PostHog",
+    "visiteurs",
+    "formulaire commencé",
+    "formulaire envoyé",
+    "PageSpeed Insights",
+    "Tester le vrai parcours avant la mise en ligne",
   ]) {
     assert.ok(source.includes(requiredContent), `contenu absent: ${requiredContent}`);
   }
@@ -129,7 +152,7 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
     "Construire par artefacts validés",
     "tokens sémantiques",
     "requalifié",
-    "Une direction artistique n&apos;est pas une humeur",
+    "Une direction artistique n'est pas une humeur",
   ]) {
     assert.equal(
       source.includes(forbiddenCopy),
@@ -137,11 +160,20 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
       `formulation trop abstraite encore présente: ${forbiddenCopy}`
     );
   }
-  assert.ok(
-    (source.match(/<LiquidCard/g) ?? []).length <= 3,
-    "LiquidCard doit rester rare pour éviter un mur de cartes"
+  assert.equal(
+    source.includes("<LiquidCard"),
+    false,
+    "le bloc 09 doit rester éditorial et ne pas revenir à un mur de cartes"
   );
   assert.doesNotMatch(source, /<ul|<li|•/);
+});
+
+test("le bloc 09 référence plusieurs vidéos Viktor Oddy sans les traiter comme un transcript", () => {
+  const source = readFileSync(componentPath, "utf8");
+  for (const videoId of ["raUcRcrfgoE", "0Uk-CavIjqk", "cNZvyzObZx8", "sEWuM6mkIbQ", "IeR5ZMKssSc"]) {
+    assert.ok(source.includes(videoId), `vidéo Viktor Oddy absente: ${videoId}`);
+  }
+  assert.ok((source.match(/youtube\.com\/watch\?v=/g) ?? []).length >= 5);
 });
 
 test("le Bloc 09 montre les logos des outils cités", () => {
@@ -192,20 +224,18 @@ test("les révélations respectent la préférence de mouvement réduit", () => 
   assert.match(source, /duration: shouldReduceMotion \? 0 : 0\.6/);
 });
 
-test("le nouvel asset Fondations appartient au manifeste canonique", () => {
-  const manifest = readFileSync(
-    new URL(
-      "../private/brand-assets/build-collection-cards/manifest/asset-manifest.json",
-      import.meta.url
-    ),
-    "utf8"
-  );
+test(
+  "le nouvel asset Fondations appartient au manifeste canonique",
+  { skip: !existsSync(brandAssetManifestPath) ? "manifeste privé non fourni" : false },
+  () => {
+    const manifest = readFileSync(brandAssetManifestPath, "utf8");
 
-  assert.match(manifest, /"id": "fondations-site-web"/);
-  assert.match(manifest, /pages\/fondations\/09-construire-un-site-web-avec-l-ia/);
-  assert.match(manifest, /pages\/fondations\/10-de-l-idee-a-l-url-en-ligne/);
-  assert.match(manifest, /pages\/fondations\/11-le-seuil/);
-});
+    assert.match(manifest, /"id": "fondations-site-web"/);
+    assert.match(manifest, /pages\/fondations\/09-construire-un-site-web-avec-l-ia/);
+    assert.match(manifest, /pages\/fondations\/10-de-l-idee-a-l-url-en-ligne/);
+    assert.match(manifest, /pages\/fondations\/11-le-seuil/);
+  }
+);
 
 test("l'exemple DESIGN-SYSTEM Atelier reste vérifiable depuis le dépôt", () => {
   assert.equal(existsSync(atelierDesignSourcePath), true, "source Atelier absente du dépôt");

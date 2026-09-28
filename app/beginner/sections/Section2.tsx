@@ -1,111 +1,122 @@
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { ToolCard } from "@/components/ui/tool-card";
+import Image from "next/image";
 import { SectionReveal } from "@/components/ui/section-reveal";
 import { PromptContextDiagram, ApiFlowDiagram } from "../diagrams";
+import { FoundationChapter } from "../FoundationChapter";
+
+function ToolMark({ name, src }: { name: string; src: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 text-sm text-white/70">
+      <Image src={src} alt="" aria-hidden="true" width={24} height={24} className="h-6 w-6 object-contain" loading="lazy" />
+      {name}
+    </span>
+  );
+}
 
 export function Section2() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center gap-3 mb-8">
-        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">07</span>
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Comprendre l&apos;environnement</h2>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
+      <div className="mb-8 flex items-center gap-3">
+        <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">07</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Comprendre l'environnement</h2>
       </div>
-      <p className="text-white/60 text-base leading-relaxed mb-10">
-        Pas besoin d&apos;être développeur. Mais comprendre les bases change radicalement la qualité des résultats qu&apos;on obtient.
+      <p className="mb-10 max-w-3xl text-base leading-relaxed text-white/60">
+        Pas besoin d'être développeur. Mais comprendre les bases change la qualité des décisions, des demandes et des vérifications que tu peux faire.
       </p>
 
-      {/* LLM */}
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Démystifier le LLM</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            Un LLM c&apos;est le moteur derrière Claude, ChatGPT, Gemini. Il prédit le prochain mot le plus probable. Ce n&apos;est pas une base de données. Il génère une réponse probable en fonction du contexte.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-            <ToolCard name="Claude" logoSrc="/brand-logos/claude.svg" description="Le modèle utilisé comme référence dans BUILD, notamment pour ses &quot;projets&quot; à contexte permanent." />
-            <ToolCard name="ChatGPT" logoSrc="/brand-logos/chatgpt.svg" description="Le plus connu du grand public - bon pour cadrer et rédiger." />
-            <ToolCard name="Gemini" logoSrc="/brand-logos/gemini.svg" description="Le modèle de Google, intégré nativement à son écosystème d'outils." />
-          </div>
-          <PromptContextDiagram />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 items-start mt-6">
-            <div className="bg-black/20 border border-white/5 p-4">
-              <p className="text-xs font-semibold text-[#e8d5b0] mb-2">Les tokens</p>
-              <p className="text-[13px] text-white/60 leading-[1.65]">
-                L&apos;IA ne lit pas des mots, elle lit des tokens (env. 0,75 mot). Chaque modèle a une limite de tokens (la fenêtre de contexte). Quand la fenêtre est pleine, le modèle commence à &quot;oublier&quot; ce qui a été dit au début. Une trop longue conversation produit des résultats incohérents.
-              </p>
-            </div>
-            <div className="bg-black/20 border border-white/5 p-4">
-              <p className="text-xs font-semibold text-[#e8d5b0] mb-2">Pourquoi un projet Claude change tout</p>
-              <p className="text-[13px] text-white/60 leading-[1.65]">
-                Un projet Claude, c&apos;est une conversation permanente avec un contexte chargé une fois pour toutes. J&apos;y mets des fichiers de connaissances. À chaque session, l&apos;IA sait déjà qui est le client et quelles sont les règles. Je ne répète rien.
-              </p>
-            </div>
-          </div>
-        </LiquidCard>
-      </SectionReveal>
+      <FoundationChapter eyebrow="Chapitre 1" title="Démystifier le LLM">
+        <p>
+          Un LLM (<em>Large Language Model</em>, ou grand modèle de langage) est le moteur derrière plusieurs assistants connus. Il produit une suite probable à partir du contexte qu'on lui donne. Ce n'est pas une base de données fiable par défaut et ce n'est pas un expert qui prend automatiquement la responsabilité du résultat.
+        </p>
+        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-white/10 py-5">
+          <ToolMark name="Claude" src="/brand-logos/claude.svg" />
+          <ToolMark name="ChatGPT" src="/brand-logos/chatgpt.svg" />
+          <ToolMark name="Gemini" src="/brand-logos/gemini.svg" />
+        </div>
+        <PromptContextDiagram />
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          <div className="grid gap-3 py-4 md:grid-cols-[9rem_1fr]"><strong className="text-sm text-[#e8d5b0]">Les tokens</strong><p className="text-sm leading-relaxed text-white/60">Les tokens sont les unités de texte que le modèle traite, parfois un mot entier, parfois un morceau de mot. Une conversation est limitée par une fenêtre de contexte. Quand elle devient trop longue, les éléments anciens peuvent peser moins ou être résumés. Un dossier de contexte clair vaut mieux qu'un historique interminable.</p></div>
+          <div className="grid gap-3 py-4 md:grid-cols-[9rem_1fr]"><strong className="text-sm text-[#e8d5b0]">Le projet</strong><p className="text-sm leading-relaxed text-white/60">Un projet ou un dossier de connaissances charge les règles, les fichiers et les décisions utiles. Tu évites de répéter le métier à chaque session, mais tu dois continuer à vérifier que le contexte est à jour.</p></div>
+        </div>
+        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+          Pour une tâche précise, ne charge pas tout le projet par réflexe. Commence par le fichier cible, ses dépendances directes, les règles concernées et les tests associés. Élargis le contexte seulement lorsqu'une dépendance le justifie, puis vérifie que les fichiers modifiés restent dans le périmètre.
+        </p>
+      </FoundationChapter>
 
-      {/* API */}
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">L&apos;analogie de l&apos;API</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            Une API, c&apos;est comme un serveur dans un restaurant. Je passe ma commande au serveur, qui transmet à la cuisine, qui prépare et renvoie.
-          </p>
-          <ApiFlowDiagram />
-          <p className="text-sm text-white/65 leading-relaxed mt-4">
-            Je comprends qu&apos;il faut une clé API secrète, et gérer les erreurs. Sans cette compréhension, l&apos;IA produirait du code que je ne saurais pas évaluer.
-          </p>
-        </LiquidCard>
-      </SectionReveal>
+      <FoundationChapter eyebrow="Chapitre 2" title="L'analogie de l'API">
+        <p>
+          Une API ressemble à un serveur dans un restaurant. Tu envoies une demande structurée, le service distant l'interprète, puis il renvoie une réponse. Il faut connaître le format attendu, la clé d'accès, le coût éventuel, les délais, les erreurs et les données qui sortent de ton système.
+        </p>
+        <ApiFlowDiagram />
+        <p>
+          Ne colle jamais une clé dans un dépôt, une capture ou un prompt partagé. Utilise un secret injecté par l'environnement, limite les permissions et vérifie le chemin de révocation avant de relier un service.
+        </p>
+      </FoundationChapter>
 
-      {/* Prompt structuré */}
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Pourquoi &quot;sois un designer senior&quot; ne suffit pas</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            &quot;Tu es un designer senior spécialisé Apple&quot; est un meilleur prompt qu&apos;une simple instruction brute, mais ça reste une coquille vide : l&apos;IA ne sait pas ce qu&apos;est réellement le design Apple, comment un designer chez eux exécute, quels tokens et quel process il applique. Le rôle donne un ton, jamais une méthode. Même chose en marketing, en vente, en copywriting : nommer un métier n&apos;installe pas son savoir-faire.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-6 items-start">
-            <div className="relative overflow-hidden border border-red-500/20 bg-gradient-to-b from-red-500/[0.06] to-black/20 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-16px_28px_-24px_rgba(0,0,0,0.6)]">
-              <p className="text-xs font-semibold text-red-400 mb-2">Prompt de rôle seul</p>
-              <p className="text-xs text-white/50 font-mono">&quot;Tu es un designer senior spécialisé Apple, fais-moi un site pour un plombier.&quot;</p>
-              <p className="text-xs text-white/35 mt-3 leading-relaxed">Résultat : un vernis de vocabulaire &quot;premium&quot;, mais toujours générique - l&apos;IA improvise le reste.</p>
-            </div>
-            <div className="relative overflow-hidden border border-emerald-500/20 bg-gradient-to-b from-emerald-500/[0.06] to-black/20 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-16px_28px_-24px_rgba(0,0,0,0.6)]">
-              <p className="text-xs font-semibold text-emerald-400 mb-2">Rôle + process formalisé</p>
-              <p className="text-[11px] text-white/50 font-mono leading-relaxed">
-                Contexte : Marc, plombier. Clientèle : propriétaires 35-60 ans. + le process de design (brief, tokens, calibration) déjà écrit une fois pour toutes.
-              </p>
-            </div>
-          </div>
-          <div className="relative overflow-hidden border border-white/10 bg-gradient-to-b from-white/[0.03] to-black/20 p-4 mb-4">
-            <p className="text-xs font-semibold text-[#e8d5b0] mb-3">Ce qui fait vraiment la différence</p>
-            <p className="text-sm text-white/60 leading-relaxed">
-              Au début, ce qui marche c&apos;est le <span className="text-[#f0ede8] font-medium">meta-prompting</span> : demander à l&apos;IA elle-même comment formuler la meilleure instruction pour ce qu&apos;on veut obtenir, plutôt que deviner la formule magique. Mais très vite, ce genre de prompt ponctuel plafonne : sans les tokens de design, les process précis et les standards du métier écrits noir sur blanc, la qualité reste plafonnée au générique.
-            </p>
-          </div>
-          <div className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 p-4">
-            <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
-              Le vrai secret n&apos;est pas le prompt parfait à chaque fois. C&apos;est le contexte chargé une fois pour toutes : tes fichiers de projet, tes règles, tes standards, tes tokens de design réunis dans un système réutilisable. C&apos;est ça qu&apos;on appelle un skill, et c&apos;est ce qui transforme l&apos;IA en collaborateur qui te connaît déjà - sans avoir à réexpliquer le métier à chaque session.
-            </p>
-          </div>
-        </LiquidCard>
-      </SectionReveal>
+      <FoundationChapter eyebrow="Chapitre 3" title="Un rôle ne remplace pas une méthode">
+        <p>
+          « Tu es un designer senior » peut donner un ton, mais cela n'installe ni les critères, ni les fichiers, ni le processus, ni les limites du métier. Un résultat plus fiable vient d'un rôle, d'un contexte, d'une tâche bornée et d'une définition du travail terminé.
+        </p>
+        <div className="grid gap-6 border-y border-white/10 py-5 md:grid-cols-2">
+          <div className="border-t border-red-500/25 pt-4"><p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-red-300/80">Rôle seul</p><p className="font-mono text-xs leading-relaxed text-white/50">« Tu es un designer senior, fais-moi un site pour un plombier. »</p><p className="mt-3 text-xs leading-relaxed text-white/35">Le modèle improvise le reste.</p></div>
+          <div className="border-t border-emerald-500/25 pt-4"><p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300/80">Rôle et méthode</p><p className="font-mono text-[11px] leading-relaxed text-white/50">Contexte, public, offre, références, tokens, critères d'acceptation et vérification du parcours.</p><p className="mt-3 text-xs leading-relaxed text-white/35">Le modèle sait quoi lire et comment vérifier.</p></div>
+        </div>
+        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+          Le vrai levier n'est pas le prompt parfait. C'est le contexte chargé une fois pour toutes et maintenu comme un actif de projet : règles, exemples, exceptions, preuves et décisions.
+        </p>
+      </FoundationChapter>
 
-      {/* De l'assistant à l'agent */}
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">De l&apos;assistant à l&apos;agent</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            Tout ce qu&apos;on vient de voir décrit un assistant : tu poses une question dans une conversation, il répond, tu lis, tu recopies. Un <strong className="text-[#f0ede8]">agent</strong> va plus loin - il ne se contente pas de répondre, il agit : il peut naviguer un site, exécuter du code, appeler des outils, enchaîner plusieurs étapes tout seul, et vérifier lui-même que le résultat correspond à la demande.
-          </p>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            Concrètement : au lieu de copier-coller la réponse d&apos;un chat dans ton code, un agent comme Claude Code ou Cursor lit ton projet, modifie les fichiers directement, lance les tests, corrige ses propres erreurs - et ne s&apos;arrête que quand la tâche est vérifiée, pas quand il a produit une réponse qui a l&apos;air correcte.
-          </p>
-          <p className="text-sm text-white/65 leading-relaxed">
-            C&apos;est la différence entre demander une recette et avoir quelqu&apos;un qui va faire les courses, cuisiner, et goûter avant de servir. Cette bascule - de l&apos;assistant qui répond à l&apos;agent qui exécute et vérifie - est celle qui va le plus vite transformer la manière de travailler dans les prochaines années. LE COFFRE approfondit cette doctrine agentique en détail : comment décomposer un métier en agents et border leur autorité.
-          </p>
-        </LiquidCard>
+      <FoundationChapter eyebrow="Chapitre 4" title="De l'assistant à l'agent">
+        <p>
+          Un assistant répond dans une conversation. Un agent peut lire un dossier, appeler des outils, modifier un fichier, exécuter une étape, contrôler une sortie et s'arrêter sur une exception. Cette capacité ne justifie pas une autonomie illimitée : plus l'agent agit, plus son périmètre doit être explicite.
+        </p>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {[
+            ["Observer", "Lire les fichiers, l'état du projet et les sources autorisées avant d'agir."],
+            ["Décider", "Choisir une prochaine étape à partir de critères visibles, avec une hypothèse si une information manque."],
+            ["Exécuter", "Modifier, appeler ou préparer seulement ce qui entre dans le périmètre donné."],
+            ["Vérifier", "Lancer les tests, relire la sortie, comparer au critère d'acceptation et signaler ce qui reste incertain."],
+          ].map(([title, description], index) => (
+            <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_9rem_1fr] sm:items-start"><span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span><strong className="text-sm text-[#f0ede8]">{title}</strong><p className="text-sm leading-relaxed text-white/60">{description}</p></div>
+          ))}
+        </div>
+        <p>
+          La différence ressemble à une recette et une personne qui fait les courses, cuisine et goûte avant de servir. Le résultat doit être observable, réversible et compréhensible après l'exécution.
+        </p>
+      </FoundationChapter>
+
+      <FoundationChapter eyebrow="Chapitre 5" title="Hermes organise le travail autour du modèle">
+        <p>
+          Le modèle produit une réponse. Hermes organise le travail autour : contexte, skills, outils, mémoire, profils, planification, délégation et contrôles. Si tu changes de modèle, les éléments qui doivent rester stables se trouvent dans tes fichiers, tes méthodes, tes preuves et tes règles, pas dans une conversation fragile.
+        </p>
+        <p>
+          Le MCP (<em>Model Context Protocol</em>) est un standard de connexion entre un assistant et des outils ou des sources autorisées. Claude, ChatGPT ou un autre client compatible peuvent ainsi consulter une même capacité, mais le MCP ne décide pas à ta place : les permissions, le périmètre, la validation humaine et la lecture de l'état réel restent nécessaires.
+        </p>
+        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-white/10 py-5">
+          <ToolMark name="DeepSeek" src="/brand-logos/deepseek.svg" />
+          <ToolMark name="OpenRouter" src="/brand-logos/openrouter.svg" />
+          <ToolMark name="OpenCode" src="/brand-logos/opencode.svg" />
+          <ToolMark name="Hermes Agent" src="/brand-logos/hermes-agent-mark.png" />
+        </div>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {[
+            ["Le modèle", "Un fournisseur ou un routeur produit les réponses. Teste sa qualité sur ta tâche, sa vitesse, son coût, sa sensibilité aux données et son besoin d'outils."],
+            ["La connexion", "Une couche de connexion peut donner accès à des outils ou des données externes. Elle ne choisit pas automatiquement le meilleur modèle et ne remplace pas les contrôles."],
+            ["L'orchestration", "Hermes relie les capacités, garde le contexte utile, déclenche des processus et rend la séparation des responsabilités lisible."],
+            ["La décision", "Tu gardes une règle d'approbation pour les messages, publications, modifications CRM, dépenses et actions qui engagent une autre personne."],
+          ].map(([title, description], index) => (
+            <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start"><span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span><strong className="text-sm text-[#f0ede8]">{title}</strong><p className="text-sm leading-relaxed text-white/60">{description}</p></div>
+          ))}
+        </div>
+        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+          Ne choisis pas un modèle, un routeur ou une interface parce qu'un tutoriel le présente comme universel. Décris d'abord la tâche et le niveau de qualité attendu, puis compare les routes avec un test reproductible.
+        </p>
+        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+          Un autre pattern utile consiste à relier une compétence à ses outils, ses permissions et ses connexions sans remettre les secrets à l'agent. La compétence décrit le travail, la connexion détient l'accès, le journal garde la trace et la personne valide les actions qui franchissent une frontière externe. Tu peux adapter ce pattern à Hermes ou à une autre stack : ce qui compte est la séparation des responsabilités, pas le nom du fournisseur.
+        </p>
+      </FoundationChapter>
+
+      <SectionReveal className="border-t border-white/10 pt-8">
+        <p className="text-sm leading-relaxed text-[#e8d5b0]/85">Comprendre l'environnement, c'est savoir où placer le contexte, où placer l'outil, où placer la décision humaine et comment vérifier que le système a réellement fait ce qu'il prétend.</p>
       </SectionReveal>
     </div>
   );

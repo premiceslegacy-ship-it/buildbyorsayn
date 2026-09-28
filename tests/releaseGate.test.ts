@@ -13,6 +13,7 @@ test("verify:release composes every mandatory release gate in fail-fast order", 
   assert.deepEqual(commands, [
     "npm test",
     "npm run lint",
+    "npm run typecheck",
     "npm audit --omit=dev --audit-level=high",
     "npm run knowledge:sync",
     "npm run test:mcp-postgres",

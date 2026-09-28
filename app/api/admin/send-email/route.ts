@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
-const ADMIN_EMAIL = "mbebourasam@gmail.com";
 const AUDIENCES = new Set(["selected", "all", "free", "beginner", "full"]);
 
 type Profile = {
@@ -96,7 +95,7 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user || user.email !== ADMIN_EMAIL) {
+  if (user?.app_metadata?.role !== "admin") {
     return NextResponse.json({ ok: false, error: "Accès refusé." }, { status: 403 });
   }
 
@@ -152,7 +151,7 @@ export async function POST(req: NextRequest) {
       email: authUser.email ?? "",
       tier: profileMap.get(authUser.id)?.tier ?? null,
     }))
-    .filter((recipient) => recipient.email && recipient.email !== ADMIN_EMAIL)
+    .filter((recipient) => recipient.email && recipient.id !== user.id)
     .filter((recipient) => {
       if (audience === "all") return true;
       if (audience === "selected") return selectedUserIds.includes(recipient.id);

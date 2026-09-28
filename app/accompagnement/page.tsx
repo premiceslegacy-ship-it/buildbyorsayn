@@ -59,6 +59,7 @@ export default async function AccompagnementPage({ searchParams }: Props) {
       <NavBar
         activeLink="accompagnement"
         tier={identity?.tier ?? null}
+        isAdmin={identity?.isAdmin}
         displayName={identity?.displayName}
         displayEmail={identity?.displayEmail}
         initials={identity?.initials}

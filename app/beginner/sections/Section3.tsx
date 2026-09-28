@@ -1,7 +1,7 @@
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { ToolCard } from "@/components/ui/tool-card";
+import Image from "next/image";
 import { SectionReveal } from "@/components/ui/section-reveal";
 import { MarkdownFilePreview } from "@/components/ui/markdown-file-preview";
+import { FoundationChapter } from "../FoundationChapter";
 
 const REFERENCE_TOOLS = [
   {
@@ -78,6 +78,27 @@ const GENERATION_TOOLS = [
   },
 ];
 
+function ToolMark({ name, logoSrc }: { name: string; logoSrc: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 text-sm text-white/70">
+      <Image src={logoSrc} alt="" aria-hidden="true" width={24} height={24} className="h-6 w-6 object-contain" loading="lazy" />
+      {name}
+    </span>
+  );
+}
+
+function ToolRow({ name, logoSrc, description, href }: { name: string; logoSrc: string; description: string; href?: string }) {
+  return (
+    <div className="grid gap-3 border-b border-white/10 py-5 last:border-b-0 sm:grid-cols-[10rem_1fr] sm:items-start">
+      <ToolMark name={name} logoSrc={logoSrc} />
+      <div>
+        <p className="text-sm leading-relaxed text-white/60">{description}</p>
+        {href ? <a href={href} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs text-[#e8d5b0] underline underline-offset-4">Ouvrir la source ↗</a> : null}
+      </div>
+    </div>
+  );
+}
+
 export function Section3() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -95,16 +116,16 @@ export function Section3() {
         <div className="relative z-10">
           <h3 className="text-base font-semibold text-red-400 mb-4">Éviter le &quot;AI slop&quot;</h3>
           <p className="text-sm text-white/60 leading-relaxed mb-4">
-            Le &quot;AI slop&quot;, c&apos;est ce rendu générique, lisse, sur-saturé et artificiel que produisent les IA par défaut. Un utilisateur le repère en une fraction de seconde, et ça détruit instantanément la crédibilité de ton site.
+            Le &quot;AI slop&quot;, c'est ce rendu générique, lisse, sur-saturé et artificiel que produisent les IA par défaut. Un utilisateur le repère en une fraction de seconde, et ça détruit instantanément la crédibilité de ton site.
           </p>
           <div className="relative overflow-hidden border border-white/10 bg-gradient-to-b from-white/[0.03] to-black/20 p-4 mb-4">
             <p className="text-xs font-semibold text-[#e8d5b0] mb-1.5 uppercase tracking-wide">Le test qui ne trompe pas</p>
             <p className="text-sm text-white/65 leading-relaxed">
-              Retire le logo, la marque et la couleur d&apos;accent de ta page : comprend-on encore l&apos;activité, la tâche et les objets du produit ? Si remplacer juste les noms suffit à vendre n&apos;importe quel autre SaaS avec la même page, le problème est dans la structure et le contenu - pas dans un détail visuel à ajuster.
+              Retire le logo, la marque et la couleur d'accent de ta page : comprend-on encore l'activité, la tâche et les objets du produit ? Si remplacer juste les noms suffit à vendre n'importe quel autre SaaS avec la même page, le problème est dans la structure et le contenu - pas dans un détail visuel à ajuster.
             </p>
           </div>
           <p className="text-sm text-white/60 leading-relaxed mb-4">
-            Trois signatures reconnaissables à l&apos;œil, par réflexe plutôt que par choix :
+            Trois signatures reconnaissables à l'œil, par réflexe plutôt que par choix :
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             {SLOP_PATTERNS.map((p) => (
@@ -126,9 +147,9 @@ export function Section3() {
         <p className="text-sm text-white/45 leading-relaxed mb-5 max-w-2xl">
           Chaque référence répond à une question différente. Aucune ne donne, seule, une direction complète.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="divide-y divide-white/10 border-y border-white/10">
           {REFERENCE_TOOLS.map((tool) => (
-            <ToolCard key={tool.name} {...tool} />
+            <ToolRow key={tool.name} {...tool} />
           ))}
         </div>
       </SectionReveal>
@@ -139,17 +160,15 @@ export function Section3() {
         <p className="text-sm text-white/45 leading-relaxed mb-5 max-w-2xl">
           Une fois la direction fixée à partir des références, ces outils produisent les assets.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="divide-y divide-white/10 border-y border-white/10">
           {GENERATION_TOOLS.map((tool) => (
-            <ToolCard key={tool.name} {...tool} />
+            <ToolRow key={tool.name} {...tool} />
           ))}
         </div>
       </SectionReveal>
 
       {/* Penser comme un photographe */}
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Penser comme un photographe</h3>
+      <FoundationChapter eyebrow="Chapitre 3" title="Penser comme un photographe">
           <p className="text-sm text-white/65 leading-relaxed mb-6">
             Un prompt image se construit comme un brief photo. Ne décris pas ce que tu veux voir, décris <em>comment</em> tu veux le capturer.
           </p>
@@ -171,18 +190,15 @@ export function Section3() {
               &quot;Commercial product photography of a minimalist ceramic mug, matte black. Shot with 50mm, f/2.8, soft side lighting...&quot;
             </p>
           </div>
-        </LiquidCard>
-      </SectionReveal>
+      </FoundationChapter>
 
       {/* Cohérence visuelle */}
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">La règle de la cohérence visuelle</h3>
+      <FoundationChapter eyebrow="Chapitre 4" title="La règle de la cohérence visuelle">
           <p className="text-sm text-white/65 leading-relaxed mb-4">
-            &quot;Sois un designer Apple&quot; ne produit rien de sérieux : l&apos;IA ne connaît ni les tokens réels d&apos;Apple, ni son process, ni ce qu&apos;un designer chez eux exécute concrètement. Un prompt de style ne remplace jamais un <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 text-[11px] font-mono">DESIGN-SYSTEM.md</code> : un vrai design system, digne d&apos;un Mintlify ou d&apos;un Linear, ne tient pas en une phrase de style. Il sépare des primitifs (une palette de couleurs brutes, des familles de polices, une échelle d&apos;espacement) et des rôles qui les consomment : fond, surface, texte, bordure, action, état. Chaque token porte un statut - exact quand la variable source est identifiée, mesuré quand il vient d&apos;un état réellement calculé, inféré quand il reconstruit une capture, proposé quand c&apos;est une décision nouvelle qui reste à valider. Une valeur proposée ne se fait jamais passer pour une valeur mesurée.
+            &quot;Sois un designer Apple&quot; ne produit rien de sérieux : l'IA ne connaît ni les tokens réels d'Apple, ni son process, ni ce qu'un designer chez eux exécute concrètement. Un prompt de style ne remplace jamais un <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 text-[11px] font-mono">DESIGN-SYSTEM.md</code> : un vrai design system, digne d'un Mintlify ou d'un Linear, ne tient pas en une phrase de style. Il sépare des primitifs (une palette de couleurs brutes, des familles de polices, une échelle d'espacement) et des rôles qui les consomment : fond, surface, texte, bordure, action, état. Chaque token porte un statut - exact quand la variable source est identifiée, mesuré quand il vient d'un état réellement calculé, inféré quand il reconstruit une capture, proposé quand c'est une décision nouvelle qui reste à valider. Une valeur proposée ne se fait jamais passer pour une valeur mesurée.
           </p>
           <p className="text-sm text-white/60 leading-relaxed mb-2">
-            Avant de livrer, on calibre sur une fixture réelle - titre long, corps de texte, contrôle, état vide, état d&apos;erreur - avec les vraies polices autorisées, pas un Lorem Ipsum dans un rectangle vide. Le statique reste la source canonique avant tout dérivé (image-to-video, animation légère). C&apos;est cette discipline de process, pas un adjectif de style, qui donne un vrai output identique à chaque génération. Voici à quoi ressemble un extrait réel d&apos;un <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 text-[11px] font-mono">DESIGN-SYSTEM.md</code> écrit avec cette rigueur :
+            Avant de livrer, on calibre sur une fixture réelle - titre long, corps de texte, contrôle, état vide, état d'erreur - avec les vraies polices autorisées, pas un Lorem Ipsum dans un rectangle vide. Le statique reste la source canonique avant tout dérivé (image-to-video, animation légère). C'est cette discipline de process, pas un adjectif de style, qui donne un vrai output identique à chaque génération. Voici à quoi ressemble un extrait réel d'un <code className="text-[#e8d5b0] bg-white/5 px-1.5 py-0.5 text-[11px] font-mono">DESIGN-SYSTEM.md</code> écrit avec cette rigueur :
           </p>
           <MarkdownFilePreview filename="Mintlify - Style Reference.md">
 {`# Mintlify - Style Reference
@@ -276,10 +292,9 @@ référence ou un asset exporté, mais le comportement web reste spécifié et
 testé dans le navigateur.`}
           </MarkdownFilePreview>
           <p className="text-sm text-white/60 leading-relaxed">
-            Remarque la différence avec un prompt de style : chaque token a une valeur, un rôle, parfois une limite assumée ("non vérifié en runtime" plutôt qu'une animation inventée). C&apos;est ce niveau de précision - <span className="text-[#f0ede8]">exactement ce que le skill design formalisé de BUILD applique</span> - qui distingue un design system qui tient dans le temps d&apos;un simple moodboard.
+            Remarque la différence avec un prompt de style : chaque token a une valeur, un rôle, parfois une limite assumée ("non vérifié en runtime" plutôt qu'une animation inventée). C'est ce niveau de précision - <span className="text-[#f0ede8]">exactement ce que le skill design formalisé de BUILD applique</span> - qui distingue un design system qui tient dans le temps d'un simple moodboard.
           </p>
-        </LiquidCard>
-      </SectionReveal>
+      </FoundationChapter>
     </div>
   );
 }

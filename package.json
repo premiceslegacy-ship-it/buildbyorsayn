@@ -7,12 +7,13 @@
     "dev": "next dev -p 3000 -H 127.0.0.1",
     "build": "next build",
     "start": "next start -p 3000 -H 0.0.0.0",
-    "test": "node --import tsx --test tests/**/*.test.ts",
+    "test": "node --import tsx --test --test-concurrency=1 tests/**/*.test.ts",
     "test:e2e": "playwright test",
     "bench:doctrine": "tsx --env-file=.env.local scripts/bench-doctrine-read.ts",
     "test:rls": "tsx scripts/verify-progress-rls.ts",
     "test:accompaniment-access": "tsx scripts/verify-accompaniment-access.ts",
-    "lint": "tsc --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit --pretty false",
     "doctrine:publish": "tsx scripts/publish-doctrine.ts",
     "skills:sync": "tsx scripts/sync-skills-to-supabase.ts",
     "stripe:pricing": "tsx --env-file=.env.local scripts/update-stripe-pricing.ts",
@@ -22,7 +23,7 @@
     "test:mcp-e2e": "npm run build && tsx scripts/verify-mcp-e2e.ts && tsx scripts/verify-mcp-e2e.ts && tsx scripts/verify-mcp-e2e.ts",
     "test:mcp-tiers": "tsx scripts/verify-mcp-tier-evidence.ts",
     "test:mcp-postgres": "node scripts/verify-mcp-postgres-gates.mjs",
-    "verify:release": "npm test && npm run lint && npm audit --omit=dev --audit-level=high && npm run knowledge:sync && npm run test:mcp-postgres && npm run test:mcp-postgres && npm run test:mcp-access && npm run test:mcp-e2e && npm run test:mcp-tiers && git diff --check"
+    "verify:release": "npm test && npm run lint && npm run typecheck && npm audit --omit=dev --audit-level=high && npm run knowledge:sync && npm run test:mcp-postgres && npm run test:mcp-postgres && npm run test:mcp-access && npm run test:mcp-e2e && npm run test:mcp-tiers && git diff --check"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -58,7 +59,7 @@
     "@types/react-dom": "19.2.3",
     "autoprefixer": "^10.4.21",
     "browserslist": "^4.28.7",
-    "eslint": "^8.57.1",
+    "eslint": "^9.39.5",
     "eslint-config-next": "16.3.4",
     "postcss": "8.5.26",
     "tailwindcss": "^4.1.14",

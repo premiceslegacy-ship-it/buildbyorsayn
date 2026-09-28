@@ -1,3 +1,4 @@
+import Image from "next/image";
 import "server-only";
 import { Suspense } from "react";
 import { chapterTitle } from "../../doctrine/markdown";
@@ -39,6 +40,25 @@ const HERMES_FOUNDATIONS = [
     body: "Chaque rôle ouvre seulement les portes dont il a besoin. Lire un dossier, préparer un brouillon et envoyer quelque chose sont trois droits différents.",
   },
 ];
+
+const HERMES_LAYERS = [
+  ["hermes-agent-mark.png", "Hermes Agent", "Orchestre le contexte, les skills, la mémoire, les outils, les profils, les cron et la délégation."],
+  ["openrouter.svg", "OpenRouter", "Donne accès à plusieurs providers et modèles quand la comparaison de coût, de qualité ou de latence est utile."],
+  ["deepseek.svg", "DeepSeek", "Une option de modèle parmi d'autres. Elle se choisit sur une tâche mesurée, pas sur une préférence permanente."],
+  ["opencode.svg", "OpenCode", "Fournit un environnement de travail pour coder avec plusieurs providers. Vérifie la route réellement active."],
+  ["tailscale.svg", "Tailscale", "Peut réserver l'administration d'un VPS au réseau privé, sans remplacer les mises à jour, les comptes séparés ni les contrôles."],
+] as const;
+
+const HERMES_PRACTICE = [
+  ["Lire", "Collecter les sources, les signaux et les demandes sans écrire dans un système externe."],
+  ["Comprendre", "Appliquer un skill qui précise les critères, les exceptions, les preuves et les limites."],
+  ["Préparer", "Produire un rapport, un brouillon, une décision proposée ou une prochaine action identifiable."],
+  ["Autoriser", "Faire valider l'envoi, la publication, la modification CRM ou la dépense avant de franchir la frontière externe."],
+] as const;
+
+function LayerLogo({ src, name }: { src: string; name: string }) {
+  return <Image src={`/brand-logos/${src}`} alt={name} width={28} height={28} className="h-7 w-7 object-contain" loading="lazy" draggable={false} />;
+}
 
 function ChaptersSkeleton() {
   return (
@@ -128,6 +148,7 @@ export default async function HermesAgentPage() {
       <NavBar
         activeLink="videos-tutos"
         tier={identity?.tier ?? null}
+        isAdmin={identity?.isAdmin}
         displayName={identity?.displayName}
         displayEmail={identity?.displayEmail}
         initials={identity?.initials}
@@ -149,13 +170,14 @@ export default async function HermesAgentPage() {
               Cette bibliothèque montre comment construire ce cadre : une direction claire, une mémoire bien rangée, un travail visible et des accès limités. L&apos;objectif n&apos;est pas de donner une baguette magique à l&apos;IA. C&apos;est de lui donner une place utile dans une équipe qui sait encore qui décide.
             </p>
           </div>
-          <img
+          <Image
             src="/brand-logos/hermes-agent-mark.png"
             alt=""
             aria-hidden="true"
+            width={144}
+            height={144}
             className="hidden sm:block h-28 w-28 md:h-36 md:w-36 shrink-0 opacity-90"
             loading="eager"
-            decoding="async"
             draggable={false}
           />
         </header>
@@ -179,6 +201,39 @@ export default async function HermesAgentPage() {
           </div>
         </section>
 
+        <section id="pratique" className="scroll-mt-24 border-b border-white/[0.1] pb-12 mb-16">
+          <div className="max-w-3xl mb-8">
+            <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">HERMES EN PRATIQUE</p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Changer de modèle sans perdre le système de travail.</h2>
+            <p className="text-white/45 text-sm sm:text-base mt-3 leading-relaxed">
+              Dans l'usage documenté autour d'un assistant, les bots, les skills, les cron, les connexions et les workflows marketing forment un système. Les modèles et les outils peuvent changer. La méthode doit rester lisible, mesurable et réversible.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 divide-y md:divide-y-0 md:divide-x divide-white/[0.1] border-y border-white/[0.1]">
+            <div className="py-6 md:pr-8">
+              <p className="text-sm font-semibold text-[#f0ede8] mb-4">Les couches ne sont pas interchangeables</p>
+              <div className="divide-y divide-white/[0.1]">
+                {HERMES_LAYERS.map(([src, name, body]) => (
+                  <div key={name} className="grid grid-cols-[2.5rem_8rem_1fr] gap-3 py-4 first:pt-0 last:pb-0 items-start">
+                    <LayerLogo src={src} name={name} />
+                    <strong className="text-sm text-[#f0ede8]">{name}</strong>
+                    <p className="text-xs leading-relaxed text-white/45">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="py-6 md:pl-8">
+              <p className="text-sm font-semibold text-[#f0ede8] mb-4">La boucle d'une mission marketing ou métier</p>
+              <div className="divide-y divide-white/[0.1]">
+                {HERMES_PRACTICE.map(([label, body], index) => (
+                  <div key={label} className="grid grid-cols-[2rem_7rem_1fr] gap-3 py-4 first:pt-0 last:pb-0 items-start"><span className="font-mono text-xs text-[#c9b48a]/65">{index + 1})</span><strong className="text-sm text-[#f0ede8]">{label}</strong><p className="text-xs leading-relaxed text-white/45">{body}</p></div>
+                ))}
+              </div>
+              <div className="mt-6 border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4"><p className="text-xs leading-relaxed text-white/60">Ne transforme pas un brouillon généré en publication automatique. L'autorité se gagne par des tests, des logs, des règles d'arrêt et une validation humaine explicite.</p></div>
+            </div>
+          </div>
+        </section>
+
         <div id="bibliotheque" className="scroll-mt-24 mb-5">
           <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-2">LA BIBLIOTHÈQUE</p>
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Les chapitres pour passer de l&apos;idée au travail réel.</h2>
@@ -196,6 +251,7 @@ export default async function HermesAgentPage() {
         sections={[
           { id: "introduction", label: "INTRODUCTION" },
           { id: "fondations", label: "LES FONDATIONS" },
+          { id: "pratique", label: "HERMES EN PRATIQUE" },
           { id: "bibliotheque", label: "LA BIBLIOTHÈQUE" },
           { id: "chapitres", label: "LES CHAPITRES" },
         ]}

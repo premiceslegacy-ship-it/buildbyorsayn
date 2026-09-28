@@ -1,30 +1,30 @@
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { SectionReveal } from "@/components/ui/section-reveal";
+import { FoundationChapter } from "../FoundationChapter";
 
 const LEVERS = [
   {
-    t: "Le rêve et l'espoir",
-    d: "Les gens veulent croire au raccourci, au \"bouton magique\", à la solution qui change tout. C'est ce qui fait tourner le casino : la promesse du gain facile est irrésistible. Tu n'as pas à mentir. Tu dois savoir formuler une promesse qui donne envie d'y croire.",
+    t: "Le progrès espéré",
+    d: "Les personnes cherchent souvent une situation meilleure : moins de retard, plus de clarté, moins d'erreurs ou une décision plus simple. Décris ce progrès avec précision, sans promettre un raccourci magique ni un résultat que tu ne peux pas contrôler.",
   },
   {
-    t: "L'envie d'appartenir",
-    d: "Acheter, c'est parfois entrer dans un groupe, une identité. \"Les artisans sérieux utilisent cet outil.\" Ton produit peut devenir le ticket d'entrée dans une catégorie à laquelle le client veut appartenir.",
+    t: "L'identité que l'on veut confirmer",
+    d: "Une offre peut aider quelqu'un à se sentir plus professionnel, plus autonome ou plus organisé. Parle de cette identité sans fabriquer de honte et sans présenter un outil comme le ticket d'entrée obligatoire dans une catégorie.",
   },
   {
-    t: "L'effet d'imitation",
-    d: "Si ses concurrents ont quelque chose, il le veut aussi. Pas par besoin réel, mais pour ne pas se sentir en retard. Voir les autres faire un choix rassure et pousse à faire pareil.",
+    t: "La preuve par l'observation",
+    d: "Voir une méthode utilisée par d'autres peut rassurer, mais une preuve sociale ne remplace pas l'adéquation au contexte. Distingue toujours ce qui est observé, ce qui est mesuré et ce qui reste à vérifier pour la personne en face.",
   },
   {
-    t: "Le statut",
-    d: "On paie pour être perçu d'une certaine façon : plus crédible, plus haut de gamme, plus avancé que les autres. Le statut est un moteur d'achat énorme, souvent jamais dit à voix haute.",
+    t: "La crédibilité visible",
+    d: "Une présentation claire, une réponse rapide et un processus lisible peuvent renforcer la confiance. Ne confonds pas apparence premium et preuve de qualité : montre aussi les limites, les conditions et ce qui sera réellement livré.",
   },
   {
-    t: "La peur de perdre",
-    d: "Perdre quelque chose qu'on a fait plus mal que ne pas gagner quelque chose qu'on n'a pas encore. Une nouvelle obligation légale ne se vend pas comme une opportunité, mais comme une protection contre une sanction.",
+    t: "Le coût de l'inaction",
+    d: "Une décision peut être motivée par un coût déjà visible : relances oubliées, informations dispersées, erreurs répétées ou temps perdu. N'utilise ce ressort que si le coût est réel, documentable et présenté sans exagération ni menace.",
   },
   {
     t: "Le besoin de sécurité",
-    d: "Beaucoup d'achats servent juste à dormir tranquille : ne plus rater une facture, ne plus perdre un client, ne plus paniquer. Vendre la tranquillité d'esprit est souvent plus fort que vendre une fonctionnalité.",
+    d: "Beaucoup d'achats servent à réduire l'incertitude : ne plus rater une facture, perdre une information ou bloquer sur une étape. Explique le périmètre, les accès, les sauvegardes, les contrôles et la marche arrière au lieu de vendre une tranquillité abstraite.",
   },
 ];
 
@@ -36,23 +36,23 @@ export function SectionPsychologie() {
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Comprendre ce qui fait agir les gens</h2>
       </div>
       <p className="text-white/60 text-base leading-relaxed mb-10">
-        On répète qu&apos;il faut &quot;résoudre un problème&quot;. C&apos;est vrai, mais c&apos;est incomplet. Les gens n&apos;achètent pas que des solutions. Ils achètent des émotions, une image d&apos;eux-mêmes, une place dans un groupe. Plus tu comprends la nature humaine en profondeur, plus tu vends - et plus tu sais orienter une IA pour écrire un message qui parle vraiment à quelqu&apos;un.
+        On répète qu'il faut &quot;résoudre un problème&quot;. C'est vrai, mais c'est incomplet. Une décision mêle faits, émotions, habitudes, identité et perception du risque. Comprendre ces ressorts sert d'abord à mieux qualifier une situation et à écrire un message honnête, pas à exploiter une vulnérabilité ni à promettre un résultat automatique.
       </p>
 
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Le problème n&apos;est qu&apos;un levier parmi d&apos;autres</h3>
-          <p className="text-sm text-white/65 leading-relaxed">
-            Un site web premium ne se vend pas parce qu&apos;il règle un souci technique. Il se vend parce qu&apos;il dit quelque chose sur celui qui le possède : &quot;je suis un professionnel sérieux&quot;. L&apos;achat est rarement rationnel. Il est émotionnel, puis justifié par la raison après coup. Ton travail, c&apos;est de parler à l&apos;émotion d&apos;abord.
-          </p>
-        </LiquidCard>
-      </SectionReveal>
+      <FoundationChapter eyebrow="Chapitre 1" title="Le problème est aussi une situation humaine">
+        <p>
+          Un site web premium ne se vend pas seulement parce qu'il règle un souci technique. Il peut aider son propriétaire à paraître plus clair, plus fiable ou plus simple à contacter. Observe donc la situation complète : ce que la personne ressent, ce qu'elle doit prouver, ce qu'elle craint et ce qu'elle peut réellement décider.
+        </p>
+        <p>
+          Commence par nommer la situation humaine, puis apporte les faits qui permettent de décider : périmètre, preuve, coût, délai, risques et prochaine étape. L'intuition ouvre l'attention ; la clarté permet un consentement informé.
+        </p>
+      </FoundationChapter>
 
       {/* Les ressorts */}
       <SectionReveal className="mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-2">Six ressorts psychologiques</h3>
         <p className="text-sm text-white/45 leading-relaxed mb-5 max-w-2xl">
-          Chacun répond à un besoin différent - un bon message en active souvent plusieurs à la fois.
+          Chacun répond à un besoin différent. Un bon message reste précis, vérifiable et proportionné au contexte au lieu d'activer artificiellement la peur ou l'urgence.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {LEVERS.map(({ t, d }) => (
@@ -69,7 +69,7 @@ export function SectionPsychologie() {
 
       <SectionReveal className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 px-6 py-5">
         <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
-          Comprendre ces ressorts, ce n&apos;est pas manipuler. C&apos;est parler aux gens là où ils sont vraiment. L&apos;argent récompense ceux qui connaissent la psychologie humaine mieux que les autres.
+          Comprendre ces ressorts, ce n'est pas manipuler. C'est relier une situation réelle, une preuve utile et une décision libre. La qualité commerciale vient de cette compréhension, de la confiance construite et de la valeur livrée, pas d'une pression mieux cachée.
         </p>
       </SectionReveal>
     </div>

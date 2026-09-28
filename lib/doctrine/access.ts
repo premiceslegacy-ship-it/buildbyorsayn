@@ -1,4 +1,5 @@
 import type { DoctrineFile } from "./publication";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 export type DoctrineAccessStatus = 200 | 401 | 403;
 export function resolveDoctrineAccess(
   user: { app_metadata?: Record<string, unknown> } | null,
@@ -8,7 +9,10 @@ export function resolveDoctrineAccess(
 ): DoctrineAccessStatus {
   if (authError || !user) return 401;
   if (profileError || !profile) return 403;
-  return profile.tier === "full" || user.app_metadata?.role === "admin" ? 200 : 403;
+  const normalizedTier = normalizeProfileTier(
+    typeof profile.tier === "string" ? profile.tier : null,
+  );
+  return normalizedTier === "full" || user.app_metadata?.role === "admin" ? 200 : 403;
 }
 export async function serveDoctrine(
   authorize: () => Promise<DoctrineAccessStatus>,

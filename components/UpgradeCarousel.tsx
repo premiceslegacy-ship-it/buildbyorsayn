@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, ArrowLeft, Check, Star, GraduationCap, Zap, Lock } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, GraduationCap, Zap, Lock } from "lucide-react";
 import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
 
 type Plan = {
@@ -13,7 +13,7 @@ type Plan = {
   headline: string;
   outcome: string;
   items: { label: string; locked?: boolean }[];
-  buyers: string;
+  pathLabel: string;
   ctaLabel: string;
 };
 
@@ -30,12 +30,12 @@ const PLANS: Plan[] = [
       { label: "Ton premier asset utile, de l'idée à la livraison" },
       { label: "Comprendre l'IA assez pour ne plus jamais être perdu" },
       { label: "Des visuels pro sans designer ni budget" },
-      { label: "2 skills prêts à l'emploi inclus" },
+      { label: "4 skills prêts à l'emploi inclus" },
       { label: "Framework ORACLE + 7 blocs système", locked: true },
       { label: "Skills encodés complets", locked: true },
       { label: "Doctrine agentique : construire des agents, devenir AI-first", locked: true },
     ],
-    buyers: "121 personnes ont commencé ici",
+    pathLabel: "Point de départ pour construire et tester",
     ctaLabel: `Rester sur Fondations - ${FONDATIONS_PRICE}€`,
   },
   {
@@ -55,20 +55,10 @@ const PLANS: Plan[] = [
       { label: "Doctrine agentique : construire des agents, devenir AI-first" },
       { label: "Sources et ressources complètes" },
     ],
-    buyers: "71 personnes construisent avec",
+    pathLabel: "Parcours complet pour structurer et répéter",
     ctaLabel: `Prendre ${COFFRE_LABEL}`,
   },
 ];
-
-function Stars() {
-  return (
-    <span className="inline-flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} className="w-3.5 h-3.5 text-[#e8d5b0] fill-[#e8d5b0]" strokeWidth={0} />
-      ))}
-    </span>
-  );
-}
 
 /**
  * Carousel fondations / LE COFFRE, utilisé dans la modal upgrade du dashboard.
@@ -83,15 +73,15 @@ export function UpgradeCarousel({
   showFondations = true,
   initialIndex,
 }: {
-  fondationsUrl: string;
+  fondationsUrl: string | null;
   fondationsPrice?: string;
-  systemeUrl: string;
+  systemeUrl: string | null;
   systemePrice?: string;
   showFondations?: boolean;
   initialIndex?: number;
 }) {
   const plans = showFondations ? PLANS : PLANS.filter((p) => p.id === "systeme");
-  const urls: Record<string, string> = { fondations: fondationsUrl, systeme: systemeUrl };
+  const urls: Record<string, string | null> = { fondations: fondationsUrl, systeme: systemeUrl };
   const prices: Record<string, string> = {
     fondations: fondationsPrice ?? PLANS[0].price,
     systeme: systemePrice ?? PLANS[1].price,
@@ -111,7 +101,9 @@ export function UpgradeCarousel({
           {plans.map((plan, i) => (
             <button
               key={plan.id}
+              type="button"
               onClick={() => setIndex(i)}
+              aria-pressed={i === index}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-150 cursor-pointer border ${
                 i === index
                   ? "bg-[#e8d5b0] text-[#0a0908] border-[#e8d5b0]"
@@ -128,16 +120,18 @@ export function UpgradeCarousel({
         {plans.length > 1 && (
           <>
             <button
+              type="button"
               onClick={prev}
               aria-label="Offre précédente"
-              className="absolute left-0 sm:-left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.1] flex items-center justify-center text-[#e8d5b0] hover:bg-white/[0.12] transition-colors cursor-pointer"
+              className="absolute left-0 sm:-left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.1] flex items-center justify-center text-[#e8d5b0] hover:bg-white/[0.12] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
             <button
+              type="button"
               onClick={next}
               aria-label="Offre suivante"
-              className="absolute right-0 sm:-right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.1] flex items-center justify-center text-[#e8d5b0] hover:bg-white/[0.12] transition-colors cursor-pointer"
+              className="absolute right-0 sm:-right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.1] flex items-center justify-center text-[#e8d5b0] hover:bg-white/[0.12] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
             >
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -182,10 +176,7 @@ export function UpgradeCarousel({
                       {plan.outcome}
                     </p>
 
-                    <div className="flex items-center gap-2 mb-4">
-                      <Stars />
-                      <span className="text-xs text-white/45">{plan.buyers}</span>
-                    </div>
+                    <p className="text-xs text-white/45 mb-4">{plan.pathLabel}</p>
 
                     <ul className="flex flex-col gap-2 mb-5 flex-1">
                       {plan.items.map((item) => (
@@ -202,19 +193,25 @@ export function UpgradeCarousel({
                       ))}
                     </ul>
 
-                    <a
-                      href={urls[plan.id]}
-                      className={`relative overflow-hidden group flex items-center justify-center gap-2 w-full py-3.5 px-5 rounded-xl font-bold text-[#0a0908] transition-all duration-[80ms] text-sm ${
-                        isSysteme
-                          ? "bg-[#e8d5b0] hover:bg-[#f0dfc0] shadow-[0_3px_0_rgba(100,76,36,0.9),0_6px_20px_rgba(0,0,0,0.35),0_0_24px_rgba(232,213,176,0.15)]"
-                          : "bg-white/10 hover:bg-white/15 text-[#f0ede8]"
-                      } active:translate-y-[2px]`}
-                    >
-                      <span className="relative z-10 flex items-center gap-2">
-                        {plan.ctaLabel}
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
-                      </span>
-                    </a>
+                    {urls[plan.id] ? (
+                      <a
+                        href={urls[plan.id] ?? undefined}
+                        className={`relative overflow-hidden group flex items-center justify-center gap-2 w-full py-3.5 px-5 rounded-xl font-bold text-[#0a0908] transition-all duration-[80ms] text-sm ${
+                          isSysteme
+                            ? "bg-[#e8d5b0] hover:bg-[#f0dfc0] shadow-[0_3px_0_rgba(100,76,36,0.9),0_6px_20px_rgba(0,0,0,0.35),0_0_24px_rgba(232,213,176,0.15)]"
+                            : "bg-white/10 hover:bg-white/15 text-[#f0ede8]"
+                        } active:translate-y-[2px]`}
+                      >
+                        <span className="relative z-10 flex items-center gap-2">
+                          {plan.ctaLabel}
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
+                        </span>
+                      </a>
+                    ) : (
+                      <p role="status" className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3.5 text-center text-sm text-white/45">
+                        Paiement momentanément indisponible.
+                      </p>
+                    )}
                   </div>
                 </div>
               );
@@ -227,9 +224,11 @@ export function UpgradeCarousel({
             {plans.map((plan, i) => (
               <button
                 key={plan.id}
+                type="button"
                 onClick={() => setIndex(i)}
                 aria-label={`Voir ${plan.badge}`}
-                className={`h-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+                aria-pressed={i === index}
+                className={`h-1.5 rounded-full transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e0f] ${
                   i === index ? "w-6 bg-[#e8d5b0]" : "w-1.5 bg-white/20 hover:bg-white/35"
                 }`}
               />

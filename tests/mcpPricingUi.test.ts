@@ -12,8 +12,8 @@ test("the public pricing presents one shared MCP connector below both offers", a
   assert.match(homepage, /max-w-5xl mx-auto/);
   assert.match(homepage, /<McpConnectorShowcase beta=\{!MCP_CONNECTOR_LAUNCHED\} \/>/);
   assert.ok(homepage.indexOf("<PricingCarousel") < homepage.indexOf("<McpConnectorShowcase"));
-  assert.match(pricing, /BUILD dans Claude et ChatGPT, avec les contenus Fondations/);
-  assert.match(pricing, /BUILD dans Claude et ChatGPT, avec tout ton accès BUILD/);
+  assert.match(pricing, /Ton assistant retrouve les contenus Fondations utiles au moment où tu en as besoin/);
+  assert.match(pricing, /Ton assistant retrouve tout le contenu BUILD inclus dans ton accès/);
   assert.match(pricing, /mcp:\s*true/g);
   assert.match(pricing, /!item\.mcp \|\| MCP_CONNECTOR_VISIBLE/);
 });
@@ -39,7 +39,9 @@ test("beta visibility stays separate from the final launch gate", async () => {
   assert.match(dashboard, /\{disconnected \? \(/);
   assert.doesNotMatch(dashboard, /\{!connected \? \(/);
   assert.match(dashboard, /La connexion à Claude et ChatGPT n&apos;est pas encore ouverte/);
-  assert.match(guide, /forfait web payant compatible/);
+  assert.match(guide, /prise en charge complète/);
+  assert.match(guide, /Business, Enterprise et Edu/);
+  assert.match(guide, /actions de modification ou d&apos;écriture/);
   assert.match(guide, /autorisation de l&apos;administrateur/);
   assert.match(exampleEnv, /NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE="false"/);
   assert.match(exampleEnv, /NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED="false"/);
@@ -53,7 +55,8 @@ test("each accessible study block offers a direct assistant connection path only
 
   assert.match(blockPage, /import \{ McpStudyCallout \}/);
   assert.match(blockPage, /getMcpConnectionStatus/);
-  assert.match(blockPage, /const hasMcpAccess = tier === "beginner" \|\| tier === "full" \|\| tier === "admin"/);
+  assert.match(blockPage, /const normalizedTier = normalizeProfileTier\(tier\);/);
+  assert.match(blockPage, /const hasMcpAccess = normalizedTier !== null/);
   assert.match(blockPage, /MCP_CONNECTOR_VISIBLE && hasMcpAccess && showContent && mcpConnectionStatus === "disconnected"/);
   assert.match(blockPage, /if \(!MCP_CONNECTOR_VISIBLE \|\| !hasMcpAccess\) return/);
   assert.match(callout, /Continue ce bloc dans Claude ou ChatGPT/);

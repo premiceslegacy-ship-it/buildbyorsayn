@@ -32,6 +32,7 @@ export function SectionPager({
       {prev ? (
         <Link
           href={prev.href}
+          aria-label={`Précédent : ${prev.label}`}
           className="group flex min-w-0 flex-1 items-center gap-3 border border-white/10 bg-white/[0.02] px-4 py-3 transition-colors hover:border-[#c9b48a]/40 hover:bg-white/[0.04] sm:flex-initial"
         >
           <ArrowLeft className="w-4 h-4 shrink-0 text-white/40 transition-colors group-hover:text-[#e8d5b0]" />
@@ -46,6 +47,7 @@ export function SectionPager({
       {next ? (
         <Link
           href={next.href}
+          aria-label={`Suivant : ${next.label}`}
           className="group flex min-w-0 flex-1 items-center justify-end gap-3 border border-[#c9b48a]/25 bg-[#e8d5b0]/[0.04] px-4 py-3 transition-colors hover:border-[#c9b48a]/50 hover:bg-[#e8d5b0]/[0.08] sm:flex-initial"
         >
           <span className="min-w-0 flex-1 truncate text-right text-sm font-medium text-[#e8d5b0] sm:max-w-[220px]">

@@ -16,7 +16,7 @@ test("the public BUILD favicon is a valid multi-size ICO asset", async () => {
   assert.ok(bytes.byteLength > 1_000);
 });
 
-test("the MCP setup guide contains real client-specific annotated screens", async () => {
+test("the MCP setup guide contains a verified Claude guide and current ChatGPT route", async () => {
   const guide = await readFile("components/McpSetupGuide.tsx", "utf8");
   const page = await readFile("app/dashboard/mcp/page.tsx", "utf8");
 
@@ -28,19 +28,15 @@ test("the MCP setup guide contains real client-specific annotated screens", asyn
   assert.equal((guide.match(/name="mcp-client-guide"/g) ?? []).length, 2);
   assert.match(guide, /mode développeur/);
   assert.match(guide, /Paramètres/);
-  assert.match(guide, /Sécurité et connexion/);
-  assert.match(guide, /entour/i);
+  assert.match(guide, /Apps/);
+  assert.match(guide, /Créer/);
+  assert.match(guide, /endpoint MCP/);
+  assert.match(guide, /permissions/);
   assert.match(guide, /\/mcp\/setup\/claude-connectors-fr\.png/);
   assert.match(guide, /\/mcp\/setup\/claude-add-fr\.png/);
   assert.match(guide, /\/mcp\/setup\/claude-custom-connector-fr\.png/);
   assert.match(guide, /\/mcp\/setup\/claude-oauth-options-fr\.png/);
   assert.match(guide, /\/mcp\/setup\/claude-oauth-final-fr\.png/);
-  assert.match(guide, /\/mcp\/setup\/chatgpt-developer-mode\.png/);
-  assert.match(guide, /\/mcp\/setup\/chatgpt-custom-plugin\.png/);
-  assert.match(guide, /\/mcp\/setup\/chatgpt-custom-plugin-confirmation\.png/);
-  assert.match(guide, /Nouveau plugin/);
-  assert.match(guide, /URL du serveur/);
-  assert.match(guide, /J&apos;ai compris et je souhaite continuer/);
   assert.match(guide, /procédure officielle OpenAI/);
   assert.doesNotMatch(guide, /\/mcp\/setup\/[^\"]+\.svg/);
 
@@ -49,8 +45,6 @@ test("the MCP setup guide contains real client-specific annotated screens", asyn
   await exists("public/mcp/setup/claude-custom-connector-fr.png");
   await exists("public/mcp/setup/claude-oauth-options-fr.png");
   await exists("public/mcp/setup/claude-oauth-final-fr.png");
-  await exists("public/mcp/setup/chatgpt-developer-mode.png");
-  await exists("public/mcp/setup/chatgpt-custom-plugin.png");
 });
 
 test("the MCP acquisition path starts with account creation and explains the paid access step", async () => {

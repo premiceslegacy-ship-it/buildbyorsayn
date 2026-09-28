@@ -48,6 +48,7 @@ export default async function SiteWebAccompagnementPage() {
       <NavBar
         activeLink="accompagnement"
         tier={identity?.tier ?? null}
+        isAdmin={identity?.isAdmin}
         displayName={identity?.displayName}
         displayEmail={identity?.displayEmail}
         initials={identity?.initials}

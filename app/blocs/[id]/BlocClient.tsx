@@ -14,7 +14,8 @@ import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { SectionPager } from "@/components/ui/section-pager";
 
 import { toggleBlocCompletion } from "@/app/actions/progress";
-import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK } from "@/lib/pricing";
+import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, withClientReferenceId } from "@/lib/pricing";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { McpStudyCallout } from "@/components/McpStudyCallout";
 import { getMcpConnectionStatus } from "@/app/actions/mcpConnections";
 import type { McpConnectionStatus } from "@/lib/mcp/connectionStatus";
@@ -54,7 +55,8 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
   const blocId = bloc.id;
 
   const { checkedItems, toggleItem, globalProgress, isLoaded, setLastVisitedBloc } = useProgress();
-  const hasMcpAccess = tier === "beginner" || tier === "full" || tier === "admin";
+  const normalizedTier = normalizeProfileTier(tier);
+  const hasMcpAccess = normalizedTier !== null;
   const [mcpConnectionStatus, setMcpConnectionStatus] = useState<McpConnectionStatus>("unknown");
 
   useEffect(() => {
@@ -105,9 +107,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
   const nextBlocId = nextBloc?.id;
   const hasNextBloc = Boolean(nextBlocId);
 
-  const checkoutUrl = checkoutUserId
-    ? `${STRIPE_FULL_CHECKOUT_LINK}?client_reference_id=${checkoutUserId}`
-    : STRIPE_FULL_CHECKOUT_LINK;
+  const checkoutUrl = withClientReferenceId(STRIPE_FULL_CHECKOUT_LINK, checkoutUserId) ?? STRIPE_FULL_CHECKOUT_LINK;
   const totalSections = BLOCS_DATA[currentBlocIndex]?.sections.length ?? 0;
   const showPaywall = bloc.sections.length < totalSections;
   const showContent = bloc.sections.length > 0;
@@ -181,7 +181,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
                       Le système pour construire ton business
                     </h2>
                     <p className="text-white/50 text-sm mb-6 leading-relaxed">
-                      6 méthodes complètes pour créer, vendre et scaler. Communauté privée de builders actifs + toutes les mises à jour à vie incluses.
+                      Accède au système complet, à ses ressources et aux mises à jour prévues pour les membres.
                     </p>
                     <div className="flex items-baseline justify-center gap-2 mb-8">
                       <span className="text-3xl font-bold text-[#e8d5b0]">{COFFRE_PRICE}€</span>
@@ -195,7 +195,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                     </a>
                     <p className="text-center text-xs text-white/25 mt-4">
-                      Paiement sécurisé via Stripe · Satisfait ou remboursé 30 jours
+                      Paiement sécurisé via Stripe · paiement unique · accès à vie
                     </p>
                   </div>
                 </div>
@@ -290,7 +290,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
             </div>
 
             {/* Encart vidéos liées */}
-            {(bloc as any).videos?.length > 0 && (
+            {bloc.videos?.length > 0 && (
               <div className="mt-16 pt-8 border-t border-white/5">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-semibold mb-4">
                   Vidéos liées à ce bloc
@@ -304,7 +304,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
                   </div>
                   <div>
                     <p className="text-[15px] font-medium text-[#f0ede8] group-hover:text-[#e8d5b0] transition-colors duration-300">
-                      {(bloc as any).videos.length} vidéo{(bloc as any).videos.length > 1 ? "s" : ""} disponible{(bloc as any).videos.length > 1 ? "s" : ""}
+                      {bloc.videos.length} vidéo{bloc.videos.length > 1 ? "s" : ""} disponible{bloc.videos.length > 1 ? "s" : ""}
                     </p>
                     <p className="text-[13px] text-white/40">Voir dans la bibliothèque →</p>
                   </div>

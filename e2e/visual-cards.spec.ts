@@ -1,5 +1,33 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Locator, type Page } from "@playwright/test";
 import { test as authedTest, expect as authedExpect, hasE2eAccount } from "./fixtures/auth";
+
+async function waitForStableCardGrid(page: Page, grid: Locator) {
+  await grid.scrollIntoViewIfNeeded();
+  await authedExpect(grid.locator("img").first()).toBeVisible({ timeout: 10_000 });
+  await page.evaluate(async () => {
+    await document.fonts?.ready;
+  });
+  await authedExpect
+    .poll(
+      async () =>
+        grid.evaluate((element) => {
+          const items = Array.from(element.children);
+          return (
+            items.length > 0 &&
+            items.every((item) => {
+              const style = window.getComputedStyle(item);
+              const images = Array.from(item.querySelectorAll("img"));
+              return (
+                style.opacity === "1" &&
+                images.every((image) => image.complete && image.naturalWidth > 0)
+              );
+            })
+          );
+        }),
+      { timeout: 10_000 }
+    )
+    .toBe(true);
+}
 
 authedTest.describe("IllustratedCard visual regression (skills, requires a session)", () => {
   authedTest.skip(!hasE2eAccount, "E2E_TEST_EMAIL/E2E_TEST_PASSWORD not configured");
@@ -8,6 +36,7 @@ authedTest.describe("IllustratedCard visual regression (skills, requires a sessi
     await page.goto("/skills");
     const grid = page.locator("#catalogue").locator("xpath=following-sibling::div[1]");
     await authedExpect(grid).toBeVisible({ timeout: 10_000 });
+    await waitForStableCardGrid(page, grid);
     await authedExpect(grid).toHaveScreenshot("skills-card-grid.png");
   });
 });

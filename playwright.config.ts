@@ -6,10 +6,10 @@ const isCI = Boolean(process.env.CI);
 
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
-  workers: isCI ? 1 : undefined,
+  workers: 1,
   reporter: isCI ? [["list"], ["html", { open: "never" }]] : "list",
   timeout: 30_000,
   expect: {
@@ -23,6 +23,7 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
+  snapshotPathTemplate: "{snapshotDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}",
   projects: [
     {
       name: "desktop",

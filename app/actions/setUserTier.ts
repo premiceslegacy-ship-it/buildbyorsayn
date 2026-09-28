@@ -4,7 +4,7 @@ import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { isAccompanimentAdminUser } from "@/lib/accompanimentAccess";
+import { isPlatformAdminUser } from "@/lib/accompanimentAccess";
 
 const userTierSchema = z.object({
   userId: z.string().uuid("Utilisateur invalide."),
@@ -16,7 +16,7 @@ export async function setUserTier(userId: string, tier: string | null) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user || !isAccompanimentAdminUser(user)) throw new Error("Accès administrateur refusé.");
+  if (!user || !isPlatformAdminUser(user)) throw new Error("Accès administrateur refusé.");
   const parsed = userTierSchema.safeParse({ userId, tier });
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Niveau invalide.");
 

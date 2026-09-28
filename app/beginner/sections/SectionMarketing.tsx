@@ -1,108 +1,136 @@
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { SectionReveal } from "@/components/ui/section-reveal";
+import { FoundationChapter } from "../FoundationChapter";
 
 const RULES = [
-  {
-    t: "Le hook qui arrête le scroll",
-    d: "Les trois premières secondes décident de tout. La première phrase, la première image doit stopper le pouce. Sans accroche, le meilleur contenu ne sera jamais vu.",
-  },
-  {
-    t: "Une idée, plusieurs formats",
-    d: "Une vidéo longue ou un article se redécoupe en plusieurs contenus courts, sur plusieurs canaux. Tu produis une fois et tu diffuses dix fois. C'est comme ça qu'on est partout sans s'épuiser.",
-  },
-  {
-    t: "Le mode volume au début",
-    d: "Au démarrage, tu fais du volume sans complexe : du contenu chaque jour, des appels et des messages à froid. C'est brutal mais c'est ce qui rentre du cash et qui te fait connaître vite.",
-  },
-  {
-    t: "Puis moins mais mieux",
-    d: "Une fois installé dans les têtes, tu peux prendre du recul et viser la qualité. Mais sans disparaître : les gens scrollent en permanence, tu dois rester présent chaque semaine pour ne pas être oublié.",
-  },
-];
+  ["Le hook qui arrête le scroll", "Les premières secondes doivent rendre la situation reconnaissable. Sans scène précise, même le meilleur contenu reste invisible."],
+  ["Une idée, plusieurs formats", "Une conversation, une démonstration ou une vidéo longue peut devenir plusieurs contenus, à condition de garder le même problème et la même position."],
+  ["Le volume comme apprentissage", "Au début, le volume sert à apprendre ce qui déclenche une réponse. Il ne remplace ni la qualité de l’offre ni le respect des personnes."],
+  ["Puis moins mais mieux", "Quand un angle est validé, réduis les variations inutiles et améliore la preuve, le rythme et la distribution au lieu de publier pour remplir un calendrier."],
+] as const;
+
+const FUNNEL = [
+  ["Faire découvrir", "Une scène large attire des personnes qui ne te connaissent pas. Le but est de créer un écart compréhensible entre leur manière actuelle de travailler et un progrès possible."],
+  ["Faire considérer", "Des exemples, des mécanismes et des limites montrent que tu sais de quoi tu parles. La personne peut se projeter sans avoir besoin de croire à une promesse absolue."],
+  ["Faire passer à l’action", "Une offre claire, une preuve adaptée et une prochaine étape proportionnée lèvent les derniers doutes sans fabriquer d’urgence."],
+] as const;
+
+const OBSERVATION_FIELDS = [
+  ["Scène", "Que se passe-t-il concrètement avant que le message apparaisse ?"],
+  ["Tension", "Quel coût, risque ou désir est formulé sans slogan ?"],
+  ["Mécanisme", "Quelle explication rend la promesse crédible ?"],
+  ["Preuve", "Quel artefact ou signal soutient la promesse ?"],
+  ["Action", "Que demande le contenu et à quel niveau de confiance ?"],
+  ["Limite", "Qu’est-ce qui montre que le contenu ne convient pas à tout le monde ?"],
+] as const;
 
 export function SectionMarketing() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center gap-3 mb-8">
-        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">05</span>
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Capter l&apos;attention et rester dans les têtes</h2>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
+      <div className="mb-8 flex items-center gap-3">
+        <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">05</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Capter l’attention et rester dans les têtes</h2>
       </div>
-      <p className="text-white/60 text-base leading-relaxed mb-10">
-        Le meilleur produit du monde ne sert à rien si personne ne le connaît. Le marketing, c&apos;est la bataille pour l&apos;attention. Et cette attention est devenue la ressource la plus rare : tu te bats contre des gens qui passent des heures à faire défiler leur écran.
+      <p className="mb-10 max-w-3xl text-base leading-relaxed text-white/60">
+        Le meilleur produit du monde ne sert à rien si personne ne le connaît. Le marketing cherche une attention utile : une personne qui reconnaît sa situation, comprend le progrès possible et peut décider de la prochaine étape sans être poussée artificiellement.
       </p>
 
-      {/* Big idea */}
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">La grande idée qui te démarque</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            Pour exister, il te faut une idée forte. Une idée qui intrigue ta niche, qui remet en question sa façon de faire, qui dérange même un peu. Si tout le monde est d&apos;accord avec toi, c&apos;est que tu es invisible.
-          </p>
-          <p className="text-sm text-white/65 leading-relaxed">
-            <strong className="text-[#f0ede8]">Une bonne idée marketing fait réagir : certains adhèrent à fond, d&apos;autres vont presque t&apos;insulter.</strong> C&apos;est bon signe. Une position tranchée attire les bonnes personnes et repousse les autres. Le pire, ce n&apos;est pas d&apos;être critiqué. C&apos;est d&apos;être ignoré.
-          </p>
-        </LiquidCard>
-      </SectionReveal>
+      <FoundationChapter eyebrow="Chapitre 1" title="Une idée claire vaut mieux qu’un bruit de plus">
+        <p>
+          Pour exister, il te faut une idée forte. Une idée qui intrigue ta niche, qui remet en question sa façon de faire, mais qui reste explicable et vérifiable. Une position nette attire les bonnes personnes et repousse les autres. Le but n’est pas de provoquer pour être vu, mais de rendre une différence immédiatement compréhensible.
+        </p>
+        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+          Si une publication ne contient ni scène, ni tension, ni preuve, ni prochaine étape, elle peut faire des vues sans créer de demande. La portée seule n’est pas un signal de valeur.
+        </p>
+      </FoundationChapter>
 
-      {/* Le tunnel */}
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-5">Le parcours en trois temps</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-5">
-            Un inconnu ne devient pas client d&apos;un coup. Il passe par trois étapes, et ton contenu doit nourrir chacune d&apos;elles.
-          </p>
-          <div className="space-y-3">
-            {[
-              ["Faire découvrir", "Du contenu large qui attire des gens qui ne te connaissent pas encore. Le but : créer l'écart entre leur façon de faire aujourd'hui et là où tu veux les emmener."],
-              ["Faire considérer", "Du contenu qui prouve que tu sais de quoi tu parles : exemples, méthodes, résultats. La personne commence à te faire confiance et à se projeter."],
-              ["Faire passer à l'achat", "Du contenu direct qui lève les derniers doutes et propose de passer à l'action. Témoignages, offre claire, appel à l'action."],
-            ].map(([t, d], i) => (
-              <div key={t} className="flex gap-4 bg-black/25 border border-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                <span className="w-7 h-7 bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 flex items-center justify-center text-xs font-bold text-[#e8d5b0] flex-shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">
-                  {i + 1}
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-[#e8d5b0] mb-1">{t}</p>
-                  <p className="text-[13px] text-white/65 leading-[1.65]">{d}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </LiquidCard>
-      </SectionReveal>
-
-      {/* Volume puis quali */}
-      <SectionReveal className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {RULES.map(({ t, d }) => (
-            <div key={t} className="relative border border-[#c9b48a]/25 bg-gradient-to-b from-white/[0.045] to-white/[0.012] p-5">
-              <div aria-hidden="true" className="pointer-events-none absolute inset-[5px] border border-[#c9b48a]/10" />
-              <div className="relative z-10">
-                <p className="text-sm font-semibold text-[#e8d5b0] mb-2 tracking-tight leading-snug">{t}</p>
-                <p className="text-[13px] text-white/65 leading-[1.65]">{d}</p>
-              </div>
+      <FoundationChapter eyebrow="Chapitre 2" title="Le parcours en trois temps">
+        <p>
+          Un inconnu ne devient pas client d’un coup. Ton contenu doit nourrir le bon niveau de confiance, puis s’arrêter quand la personne n’est pas encore prête.
+        </p>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {FUNNEL.map(([title, description], index) => (
+            <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start">
+              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
+              <strong className="text-sm text-[#e8d5b0]">{title}</strong>
+              <p className="text-sm leading-relaxed text-white/60">{description}</p>
             </div>
           ))}
         </div>
-      </SectionReveal>
+      </FoundationChapter>
 
-      {/* Répurposer avec l'IA */}
-      <SectionReveal>
-        <LiquidCard variant="elevated" className="p-6 md:p-8 mb-6">
-          <h3 className="text-base font-semibold text-[#f0ede8] mb-4 tracking-tight leading-snug">Démultiplier ta production avec l&apos;IA</h3>
-          <p className="text-sm text-white/65 leading-relaxed mb-4">
-            &quot;Une idée, plusieurs formats&quot; devient beaucoup plus rapide avec l&apos;IA : elle peut redécouper un call client, un post long ou une vidéo en une dizaine de variantes courtes, adaptées à chaque canal, en quelques minutes plutôt qu&apos;en une journée de montage.
-          </p>
-          <p className="text-sm text-white/65 leading-relaxed">
-            <strong className="text-[#f0ede8]">Attention au piège du volume sans direction :</strong> répurposer dix fois un contenu générique donne dix contenus génériques. Le format change, mais l&apos;idée forte et la voix restent les tiennes - donne toujours à l&apos;IA ta position, pas juste le sujet.
-          </p>
-        </LiquidCard>
-      </SectionReveal>
+      <FoundationChapter eyebrow="Chapitre 3" title="Observer avant d’imiter">
+        <p>
+          Les bibliothèques publicitaires, les centres créatifs, les posts publics, les fils communautaires et les vidéos longues peuvent aider à trouver des angles. Ils ne disent pas automatiquement ce qui fonctionne. Un contenu doit être retenu pour son mécanisme, son contexte et sa possibilité de test, pas pour son nombre de vues.
+        </p>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {OBSERVATION_FIELDS.map(([label, question], index) => (
+            <div key={label} className="grid gap-3 py-4 sm:grid-cols-[2rem_8rem_1fr] sm:items-start">
+              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
+              <strong className="text-sm text-[#f0ede8]">{label}</strong>
+              <p className="text-sm leading-relaxed text-white/60">{question}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs leading-relaxed text-white/45">Écarte les slogans vagues, les chiffres sans période, les témoignages impossibles à contextualiser, les captures isolées, les contenus conçus uniquement pour provoquer et les conseils qui ne donnent aucun chemin de vérification.</p>
+      </FoundationChapter>
 
-      {/* Capital */}
-      <SectionReveal className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 px-6 py-5">
-        <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
-          Le contenu que tu crées et les compétences que tu développes sont du capital. Ça ne disparaît pas le lendemain : ça s&apos;accumule et ça grossit dans le temps. Chaque vidéo, chaque post, chaque client te rend plus fort pour le suivant.
+      <FoundationChapter eyebrow="Chapitre 4" title="Volume puis qualité, avec un signal de sortie">
+        <div className="grid gap-6 border-y border-white/10 py-5 md:grid-cols-2">
+          {RULES.map(([title, description]) => (
+            <div key={title} className="border-t border-[#c9b48a]/25 pt-4">
+              <p className="mb-2 text-sm font-semibold tracking-tight text-[#e8d5b0]">{title}</p>
+              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+            </div>
+          ))}
+        </div>
+        <p>
+          Fixe un signal de sortie : une réponse qualifiée, une demande de démonstration, un appel réservé, une vente ou un apprentissage explicite. Si rien ne change après plusieurs variantes, ne publie pas simplement davantage. Reviens à la scène, à l’offre ou à la preuve.
+        </p>
+      </FoundationChapter>
+
+      <FoundationChapter eyebrow="Chapitre 5" title="Démultiplier ta production avec l’IA">
+        <p>
+          Une idée, plusieurs formats devient beaucoup plus rapide avec l’IA : elle peut redécouper un échange client, une publication longue ou une vidéo en variantes adaptées à chaque canal. Mais décliner dix fois un contenu générique donne dix contenus génériques. Donne toujours à l’IA ta position, ta scène métier, tes preuves autorisées et la règle qui lui interdit d’inventer.
+        </p>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {[
+            ["Source", "Une conversation, une démonstration ou une décision réellement produite."],
+            ["Extraction", "Les scènes, objections, phrases utiles et mécanismes qui méritent une variante."],
+            ["Adaptation", "Le format, la longueur, le niveau de contexte et l’appel à l’action du canal."],
+            ["Contrôle", "La fidélité aux faits, le respect du consentement, la voix et la possibilité de retirer le contenu."],
+          ].map(([title, description], index) => (
+            <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_8rem_1fr] sm:items-start">
+              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
+              <strong className="text-sm text-[#f0ede8]">{title}</strong>
+              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+            </div>
+          ))}
+        </div>
+      </FoundationChapter>
+
+      <FoundationChapter eyebrow="Chapitre 6" title="Un calendrier que tu peux réellement tenir">
+        <p>Un plan éditorial n’est pas une promesse de publier tous les jours. C’est une cadence assez légère pour observer, produire, mesurer et recommencer sans épuiser la qualité.</p>
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {[
+            ["Jour 1 - scène", "Décris une situation de travail reconnaissable et le coût de la manière actuelle de faire."],
+            ["Jour 2 - mécanisme", "Explique une décision ou une méthode qui rend le progrès compréhensible, avec une limite claire."],
+            ["Jour 3 - preuve", "Montre un artefact, une étape, une source ou une vérification que la personne peut comprendre."],
+            ["Jour 4 - objection", "Réponds à une inquiétude réelle : prix, effort, risque, outil ou changement d’habitude."],
+            ["Jour 5 - prochaine étape", "Propose une action proportionnée : répondre, demander un exemple, réserver un échange ou ne rien faire."],
+          ].map(([title, description], index) => (
+            <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_12rem_1fr] sm:items-start">
+              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
+              <strong className="text-sm text-[#f0ede8]">{title}</strong>
+              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+            </div>
+          ))}
+        </div>
+        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">Adapte le format au canal sans changer le problème : une phrase et une scène pour un post court, une démonstration pour une vidéo, un raisonnement sourcé pour une newsletter, une invitation claire pour un email. Le canal change la forme ; il ne doit pas changer les faits.</p>
+      </FoundationChapter>
+
+      <SectionReveal className="border border-[#e8d5b0]/15 bg-[#e8d5b0]/[0.04] px-6 py-5">
+        <p className="text-sm leading-relaxed text-[#e8d5b0]/85">
+          Le contenu que tu crées et les compétences que tu développes sont du capital. Il s’accumule quand chaque publication produit une preuve, une conversation, une amélioration ou un actif réutilisable.
         </p>
       </SectionReveal>
     </div>

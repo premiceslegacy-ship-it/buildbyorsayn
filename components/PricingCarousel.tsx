@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, ArrowLeft } from "lucide-react";
-import { CheckGlyph, CoffreGlyph, FondationsGlyph, LockGlyph, MarkGlyph } from "@/components/ui/pricing-glyphs";
+import { CheckGlyph, CoffreGlyph, FondationsGlyph, LockGlyph } from "@/components/ui/pricing-glyphs";
 
 import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE } from "@/lib/pricing";
 
@@ -24,17 +24,17 @@ const PLANS: Plan[] = [
     badge: "Fondations",
     icon: FondationsGlyph,
     price: String(FONDATIONS_PRICE),
-    outcome: "À la fin : tu sais transformer une intention en premier asset vendable et le proposer.",
+    outcome: "À la fin : tu sais transformer une intention en premier résultat utile et le proposer.",
     items: [
-      { label: "Ton premier asset utile, de l'idée à la livraison" },
-      { label: "3 skills prêts à l'emploi : site, design, étude de marché" },
+      { label: "Ton premier résultat utile, de l'idée à la livraison" },
+      { label: "4 compétences prêtes à l'emploi : site, design, étude de marché et motion design" },
       { label: "Présenter et livrer un résultat propre" },
-      { label: "BUILD dans Claude et ChatGPT, avec les contenus Fondations", mcp: true },
+      { label: "Ton assistant retrouve les contenus Fondations utiles au moment où tu en as besoin", mcp: true },
       { label: "Framework ORACLE + 7 blocs système", locked: true },
-      { label: "3 skills en plus : SaaS, backend, design Apple", locked: true },
-      { label: "Doctrine agentique : construire des agents, devenir AI-first", locked: true },
+      { label: "3 compétences en plus : cadrage produit, Apple Design et backend & sécurité", locked: true },
+      { label: "Méthode agentique : organiser une activité autour de l'IA", locked: true },
     ],
-    buyers: "121 personnes ont commencé ici",
+    buyers: "Point de départ pour construire et tester",
     cta: `Commencer pour ${FONDATIONS_PRICE}€`,
     highlighted: false,
   },
@@ -43,17 +43,17 @@ const PLANS: Plan[] = [
     badge: COFFRE_LABEL,
     icon: CoffreGlyph,
     price: String(COFFRE_PRICE),
-    outcome: "À la fin : tu sais ce que tu vends, à qui, et tu peux le refaire à volonté.",
+    outcome: "À la fin : tu sais ce que tu peux vendre, à qui, et comment le reconstruire sans repartir de zéro.",
     items: [
       { label: "Tout Fondations inclus" },
-      { label: "Framework ORACLE : l'IA exécute comme un employé senior" },
-      { label: "7 blocs : de l'idée au client qui paye" },
-      { label: "6 skills complets : sites, SaaS, backend sécurisé, design Apple" },
+      { label: "La méthode complète pour construire un produit ou un service autour de l'IA" },
+      { label: "7 blocs : de l'idée à une offre que le marché peut payer" },
+      { label: "7 compétences complètes : recherche, cadrage, design, backend, site web et motion design" },
       { label: "Choisir une niche, vendre d'abord, construire ensuite" },
-      { label: "Doctrine agentique : construire des agents, devenir AI-first" },
-      { label: "BUILD dans Claude et ChatGPT, avec tout ton accès BUILD", mcp: true },
+      { label: "Méthode agentique : organiser une activité autour de l'IA" },
+      { label: "Ton assistant retrouve tout le contenu BUILD inclus dans ton accès", mcp: true },
     ],
-    buyers: "71 personnes construisent avec",
+    buyers: "Parcours complet pour structurer et répéter",
     cta: `Prendre ${COFFRE_LABEL} - ${COFFRE_PRICE}€`,
     highlighted: true,
   },
@@ -63,25 +63,15 @@ const MCP_CONNECTOR_LAUNCHED = process.env.NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED ==
 const MCP_CONNECTOR_BETA_VISIBLE = process.env.NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE === "true";
 const MCP_CONNECTOR_VISIBLE = MCP_CONNECTOR_BETA_VISIBLE || MCP_CONNECTOR_LAUNCHED;
 
-function Marks() {
-  return (
-    <span className="inline-flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <MarkGlyph key={i} className="w-3.5 h-3.5 text-[#e8d5b0] fill-[#e8d5b0]" />
-      ))}
-    </span>
-  );
-}
-
 export function PricingCarousel({
   beginnerUrl,
   fullUrl,
 }: {
-  beginnerUrl: string;
+  beginnerUrl: string | null;
   fullUrl: string;
 }) {
   const [index, setIndex] = useState(1);
-  const urls: Record<string, string> = { fondations: beginnerUrl, systeme: fullUrl };
+  const urls: Record<string, string | null> = { fondations: beginnerUrl, systeme: fullUrl };
 
   const prev = () => setIndex((i) => (i === 0 ? PLANS.length - 1 : i - 1));
   const next = () => setIndex((i) => (i === PLANS.length - 1 ? 0 : i + 1));
@@ -93,7 +83,9 @@ export function PricingCarousel({
         {PLANS.map((plan, i) => (
           <button
             key={plan.id}
+            type="button"
             onClick={() => setIndex(i)}
+            aria-pressed={i === index}
             className={`px-4 py-2 rounded-full text-xs font-bold transition-all duration-150 cursor-pointer border ${
               i === index
                 ? "bg-[#e8d5b0] text-[#0a0908] border-[#e8d5b0] shadow-[0_2px_0_rgba(100,76,36,0.8),0_4px_12px_rgba(232,213,176,0.2)]"
@@ -108,16 +100,18 @@ export function PricingCarousel({
       <div className="relative">
         {/* Flèches */}
         <button
+          type="button"
           onClick={prev}
           aria-label="Offre précédente"
-          className="absolute left-0 sm:-left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/[0.1] flex items-center justify-center text-[#e8d5b0] hover:bg-white/[0.1] transition-colors cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]"
+          className="absolute left-0 sm:-left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/[0.1] flex items-center justify-center text-[#e8d5b0] hover:bg-white/[0.1] transition-colors cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
         >
           <ArrowLeft className="w-4.5 h-4.5" />
         </button>
         <button
+          type="button"
           onClick={next}
           aria-label="Offre suivante"
-          className="absolute right-0 sm:-right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/[0.1] flex items-center justify-center text-[#e8d5b0] hover:bg-white/[0.1] transition-colors cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]"
+          className="absolute right-0 sm:-right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/[0.1] flex items-center justify-center text-[#e8d5b0] hover:bg-white/[0.1] transition-colors cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
         >
           <ArrowRight className="w-4.5 h-4.5" />
         </button>
@@ -158,11 +152,11 @@ export function PricingCarousel({
                       <span className="text-2xl font-bold text-[#f0ede8]">€</span>
                       <span className="text-white/35 text-sm ml-1">TTC</span>
                     </div>
-                    <p className="text-white/35 text-xs mb-4">Accès à vie - paiement unique</p>
+                    <p className="text-white/35 text-xs mb-4">Accès à vie · paiement unique</p>
 
-                    {/* Note et répartition des membres */}
+                    {/* Repère de parcours, sans preuve sociale implicite */}
                     <div className="flex items-center gap-2.5 mb-6">
-                      <Marks />
+                      <CheckGlyph className="h-3.5 w-3.5 flex-shrink-0 text-[#e8d5b0]" />
                       <span className="text-xs text-[#c4b89a]">{plan.buyers}</span>
                     </div>
 
@@ -189,21 +183,27 @@ export function PricingCarousel({
                       ))}
                     </ul>
 
-                    <a
-                      href={urls[plan.id]}
-                      className={`relative overflow-hidden group flex items-center justify-center gap-2 w-full py-4 px-5 rounded-xl font-bold text-[#0a0908] transition-all duration-[80ms] text-sm ${
-                        plan.highlighted
-                          ? "bg-[#e8d5b0] hover:bg-[#f0dfc0] shadow-[0_3px_0_rgba(100,76,36,0.9),0_6px_20px_rgba(0,0,0,0.35),0_0_28px_rgba(232,213,176,0.15),inset_0_1px_0_rgba(255,255,255,0.5)]"
-                          : "bg-[#e8d5b0]/85 hover:bg-[#e8d5b0] shadow-[0_3px_0_rgba(100,76,36,0.85),0_6px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)]"
-                      } active:translate-y-[2px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)] before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/25 before:to-transparent before:pointer-events-none`}
-                    >
-                      <span className="relative z-10 flex items-center gap-2">
-                        {plan.cta}
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
-                      </span>
-                    </a>
+                    {urls[plan.id] ? (
+                      <a
+                        href={urls[plan.id] ?? undefined}
+                        className={`relative overflow-hidden group flex items-center justify-center gap-2 w-full py-4 px-5 rounded-xl font-bold text-[#0a0908] transition-all duration-[80ms] text-sm ${
+                          plan.highlighted
+                            ? "bg-[#e8d5b0] hover:bg-[#f0dfc0] shadow-[0_3px_0_rgba(100,76,36,0.9),0_6px_20px_rgba(0,0,0,0.35),0_0_28px_rgba(232,213,176,0.15),inset_0_1px_0_rgba(255,255,255,0.5)]"
+                            : "bg-[#e8d5b0]/85 hover:bg-[#e8d5b0] shadow-[0_3px_0_rgba(100,76,36,0.85),0_6px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)]"
+                        } active:translate-y-[2px] active:shadow-[0_1px_0_rgba(100,76,36,0.9)] before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/25 before:to-transparent before:pointer-events-none`}
+                      >
+                        <span className="relative z-10 flex items-center gap-2">
+                          {plan.cta}
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
+                        </span>
+                      </a>
+                    ) : (
+                      <p role="status" className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 text-center text-sm text-white/45">
+                        Paiement momentanément indisponible.
+                      </p>
+                    )}
                     <p className="text-center text-xs text-white/25 mt-3">
-                      Paiement sécurisé Stripe - Satisfait ou remboursé 30 jours
+                      Paiement sécurisé Stripe - paiement unique - accès à vie
                     </p>
                   </div>
                 </div>
@@ -217,12 +217,16 @@ export function PricingCarousel({
           {PLANS.map((plan, i) => (
             <button
               key={plan.id}
+              type="button"
               onClick={() => setIndex(i)}
               aria-label={`Voir ${plan.badge}`}
-              className={`h-1.5 rounded-full transition-all duration-200 cursor-pointer ${
-                i === index ? "w-6 bg-[#e8d5b0]" : "w-1.5 bg-white/20 hover:bg-white/35"
-              }`}
-            />
+              aria-pressed={i === index}
+              className="flex h-11 w-11 items-center justify-center rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
+            >
+              <span aria-hidden="true" className={`block h-1.5 rounded-full transition-all duration-200 ${
+                i === index ? "w-6 bg-[#e8d5b0]" : "w-3 bg-white/25 hover:bg-white/40"
+              }`} />
+            </button>
           ))}
         </div>
       </div>

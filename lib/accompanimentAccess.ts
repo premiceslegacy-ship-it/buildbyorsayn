@@ -9,24 +9,23 @@ import type {
 import type { AccompanimentTrack } from "@/lib/siteWebAccompagnement";
 
 export const SITE_WEB_ACCOMPANIMENT_SLUG = "site-web";
-export const ACCOMPANIMENT_ADMIN_EMAIL =
-  process.env.BUILD_ADMIN_EMAIL ?? "mbebourasam@gmail.com";
 
 export const ACCOMPANIMENT_ACCESS_STATUSES: AccompanimentAssignmentStatus[] = [
   "active",
   "completed",
 ];
 
+export function isPlatformAdminUser(
+  user: Pick<User, "app_metadata"> | null | undefined
+) {
+  return Boolean(user && user.app_metadata?.role === "admin");
+}
+
 export function isAccompanimentAdminUser(
-  user: Pick<User, "email" | "app_metadata"> | null | undefined
+  user: Pick<User, "app_metadata"> | null | undefined
 ) {
   const role = user?.app_metadata?.role;
-  return Boolean(
-    user &&
-      (user.email === ACCOMPANIMENT_ADMIN_EMAIL ||
-        role === "admin" ||
-        role === "trainer")
-  );
+  return Boolean(user && (isPlatformAdminUser(user) || role === "trainer"));
 }
 
 export function getUserDisplayName(

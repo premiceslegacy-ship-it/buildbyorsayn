@@ -5,6 +5,7 @@ import { COFFRE_LABEL } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
 import { getSkillBySlug } from "@/lib/skillsCatalog";
 import { getStoredSkillContent } from "@/lib/skills/storage";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -197,10 +198,11 @@ export async function GET(
       .eq("id", user.id)
       .single();
 
+    const normalizedTier = normalizeProfileTier(profile?.tier ?? null);
     const hasAccess =
       skill.access === "full"
-        ? profile?.tier === "full"
-        : profile?.tier === "beginner" || profile?.tier === "full";
+        ? normalizedTier === "full"
+        : normalizedTier === "beginner" || normalizedTier === "full";
 
     if (!hasAccess) {
       return NextResponse.json(

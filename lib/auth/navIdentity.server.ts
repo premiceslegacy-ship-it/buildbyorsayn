@@ -1,8 +1,10 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 export type NavIdentity = {
   tier: string | null;
+  isAdmin: boolean;
   displayName: string;
   displayEmail: string;
   initials: string;
@@ -33,7 +35,8 @@ export async function navIdentity(): Promise<NavIdentity | null> {
     email.split("@")[0];
 
   return {
-    tier: profile?.tier ?? null,
+    tier: normalizeProfileTier(profile?.tier ?? null),
+    isAdmin: user.app_metadata?.role === "admin",
     displayName,
     displayEmail: email,
     initials: displayName.substring(0, 2).toUpperCase(),

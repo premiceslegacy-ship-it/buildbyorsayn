@@ -3,6 +3,7 @@ import Image from "next/image";
 function Screen({ src, alt }: { src: string; alt: string }) {
   return (
     <figure className="mt-4 overflow-hidden rounded-md border border-white/[0.12] bg-[#131315]">
+      {/* eslint-disable-next-line @next/next/no-img-element -- Screenshots keep their source aspect ratio. */}
       <img src={src} alt={alt} className="block h-auto w-full" loading="lazy" />
     </figure>
   );
@@ -82,7 +83,7 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
         Configure ton assistant en quelques minutes
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-[#f0ede8]/60">
-        Ouvre le parcours qui correspond à ton assistant. Chaque étape est accompagnée de la capture réelle du contrôle à utiliser.
+        Ouvre le parcours qui correspond à ton assistant. Claude inclut des captures réelles ; ChatGPT indique les menus et les contrôles à vérifier, car son interface et ses permissions varient selon le forfait et l&apos;espace de travail.
       </p>
 
       <div className="mt-8 border-y border-white/[0.08]">
@@ -137,40 +138,31 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
           <ClientSummary
             logo="/brand-logos/chatgpt.svg"
             name="ChatGPT"
-            description="Active le mode développeur, puis crée un plugin MCP personnalisé."
+            description="Vérifie l'accès de ton espace, active le mode développeur si nécessaire, puis crée une app MCP personnalisée."
           />
           <div className="border-t border-white/[0.08] pb-8">
             <ol className="space-y-8 pt-7">
-              <Step
-                number="1"
-                screenSrc="/mcp/setup/chatgpt-developer-mode.png"
-                screenAlt="Capture réelle de ChatGPT avec Sécurité et connexion et le mode développeur entourés en or"
-              >
-                Clique sur ton profil, ouvre <strong className="font-semibold text-[#f0ede8]">Paramètres</strong>, puis <strong className="font-semibold text-[#f0ede8]">Sécurité et connexion</strong>. Active le <strong className="font-semibold text-[#f0ede8]">mode développeur</strong>.
+              <Step number="1">
+                Vérifie d&apos;abord que ton espace ChatGPT autorise les apps MCP. La prise en charge complète, avec le mode développeur et les actions de modification ou d&apos;écriture, est actuellement déployée en bêta pour Business, Enterprise et Edu. Pour les autres forfaits, ne suppose pas que la création d&apos;une app MCP est disponible : vérifie le menu affiché par ton espace. Selon le forfait et ton rôle, un administrateur ou un propriétaire doit activer le <strong className="font-semibold text-[#f0ede8]">mode développeur</strong>. Dans l&apos;interface actuelle, cherche <strong className="font-semibold text-[#f0ede8]">Paramètres &gt; Apps &gt; Paramètres avancés</strong> ou <strong className="font-semibold text-[#f0ede8]">Paramètres de l&apos;espace de travail &gt; Apps &gt; Créer</strong>.
               </Step>
               <Step number="2">
-                Reviens dans ChatGPT et ouvre <strong className="font-semibold text-[#f0ede8]">Plugins</strong>, puis clique sur le bouton <strong className="font-semibold text-[#f0ede8]">+</strong>.
+                Ouvre la création d&apos;app depuis <strong className="font-semibold text-[#f0ede8]">Apps &gt; Créer</strong>. Selon ton espace, l&apos;option peut apparaître dans les paramètres utilisateur ou dans les paramètres de l&apos;espace de travail.
               </Step>
-              <Step
-                number="3"
-                screenSrc="/mcp/setup/chatgpt-custom-plugin.png"
-                screenAlt="Capture réelle du formulaire ChatGPT Nouveau plugin avec le nom, l'URL du serveur et OAuth entourés en or"
-              >
-                Dans <strong className="font-semibold text-[#f0ede8]">Nouveau plugin</strong>, donne-lui le nom <strong className="font-semibold text-[#f0ede8]">BUILD</strong>, colle l&apos;adresse dans <strong className="font-semibold text-[#f0ede8]">URL du serveur</strong> et laisse <strong className="font-semibold text-[#f0ede8]">OAuth</strong> comme méthode d&apos;authentification.
+              <Step number="3">
+                Dans la nouvelle app, donne-lui le nom <strong className="font-semibold text-[#f0ede8]">BUILD</strong>, ajoute l&apos;adresse ci-dessous comme endpoint MCP distant et choisis <strong className="font-semibold text-[#f0ede8]">OAuth</strong> si le formulaire le propose. Lance ensuite l&apos;analyse des outils et attends la fin du contrôle.
               </Step>
-              <Step
-                number="4"
-                screenSrc="/mcp/setup/chatgpt-custom-plugin-confirmation.png"
-                screenAlt="Capture réelle de ChatGPT avec la case de confirmation et le bouton Créer entourés en or"
-              >
-                Coche <strong className="font-semibold text-[#f0ede8]">J&apos;ai compris et je souhaite continuer</strong>, puis clique sur <strong className="font-semibold text-[#f0ede8]">Créer</strong>.
+              <Step number="4">
+                Vérifie les outils et les permissions annoncés, puis clique sur <strong className="font-semibold text-[#f0ede8]">Créer</strong>. BUILD expose ici des fonctions de recherche, de consultation de contenu et de liste de capacités : l&apos;autorisation ne donne pas un accès général à ton compte.
+              </Step>
+              <Step number="5">
+                Ouvre une nouvelle conversation, sélectionne l&apos;app BUILD dans le menu des outils, puis pose une question située. Vérifie que la réponse distingue le contenu BUILD accessible, les hypothèses et la prochaine action à contrôler.
               </Step>
             </ol>
             <p className="mt-8 text-xs leading-5 text-[#f0ede8]/40">
-              Les libellés peuvent apparaître en français ou en anglais selon la langue de ChatGPT. Si l&apos;écran <strong className="font-semibold text-[#f0ede8]">Nouveau plugin</strong> n&apos;apparaît pas après l&apos;activation du mode développeur, l&apos;accès dépend probablement du forfait ou de l&apos;autorisation de l&apos;administrateur de ton espace ChatGPT.
+              Les libellés peuvent apparaître en français ou en anglais et évoluer. Les apps MCP personnalisées sont disponibles sur le web, pas sur mobile. L&apos;accès dépend du forfait, du rôle dans l&apos;espace et de l&apos;autorisation de l&apos;administrateur. Pour les usages en lecture, vérifie aussi que ton compte est éligible à la route proposée.
             </p>
             <a
-              href="https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt-beta"
+              href="https://help.openai.com/fr-fr/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
               target="_blank"
               rel="noreferrer"
               className="mt-3 inline-flex text-xs text-[#e8d5b0] underline underline-offset-4"
@@ -190,7 +182,7 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
           Ne crée pas une nouvelle adresse et ne colle jamais ton mot de passe ou un token dans ce champ. BUILD te redirigera vers l&apos;autorisation sécurisée.
         </p>
         <p className="mt-3 text-xs leading-5 text-[#f0ede8]/40">
-          Claude ou ChatGPT peut demander un forfait web payant compatible ou l&apos;autorisation de l&apos;administrateur de ton espace.
+          Claude ou ChatGPT peut demander un forfait compatible, une activation du mode développeur ou l&apos;autorisation de l&apos;administrateur de ton espace. Les menus et les permissions peuvent évoluer.
         </p>
       </div>
     </section>

@@ -10,6 +10,10 @@ test('motion pack is explicitly beginner without changing existing UX contract',
   assert.equal(SKILLS_CATALOG.length, 7);
   assert.equal(new Set(SKILLS_CATALOG.map(s => s.slug)).size, 7);
   assert.equal(new Set(SKILLS_CATALOG.map(s => s.fileName)).size, 7);
-  assert.equal(getSkillBySlug('ux-ui-design')?.access, 'beginner');
-  assert.equal(getSkillBySlug('ux-ui-design')?.fileName, 'ux-ui-design.zip');
+  const siteWeb = getSkillBySlug('oracle-site-web');
+  assert.ok(siteWeb, 'ORACLE Site Web pack must exist');
+  assert.equal(siteWeb.title, 'ORACLE Site Web + Pack Copy & LP');
+  assert.equal(siteWeb.fileName, 'oracle-site-web.md');
+  assert.equal(siteWeb.access, 'beginner');
+  assert.equal(SKILLS_CATALOG.length, 7);
 });

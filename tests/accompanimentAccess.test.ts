@@ -4,6 +4,7 @@ import {
   ACCOMPANIMENT_ACCESS_STATUSES,
   isAccompanimentAdminUser,
   isAssignmentCurrentlyAccessible,
+  isPlatformAdminUser,
   mapAssignmentRow,
   mapWorkspaceContextRow,
   normalizeAssignmentStatus,
@@ -60,20 +61,22 @@ test("planned, revoked, future and expired assignments are denied", () => {
   );
 });
 
-test("trainer authorization uses the server user role or the configured admin identity", () => {
+test("trainer authorization uses only the server-issued role, never an email", () => {
   assert.equal(isAccompanimentAdminUser(null), false);
   assert.equal(
-    isAccompanimentAdminUser({ email: "trainer@example.com", app_metadata: { role: "trainer" } }),
+    isAccompanimentAdminUser({ app_metadata: { role: "trainer" } }),
     true
   );
   assert.equal(
-    isAccompanimentAdminUser({ email: "admin@example.com", app_metadata: { role: "admin" } }),
+    isAccompanimentAdminUser({ app_metadata: { role: "admin" } }),
     true
   );
   assert.equal(
-    isAccompanimentAdminUser({ email: "member@example.com", app_metadata: {} }),
+    isAccompanimentAdminUser({ app_metadata: {} }),
     false
   );
+  assert.equal(isPlatformAdminUser({ app_metadata: { role: "trainer" } }), false);
+  assert.equal(isPlatformAdminUser({ app_metadata: { role: "admin" } }), true);
 });
 
 test("assignment rows are normalized before they reach the member interface", () => {

@@ -13,7 +13,8 @@ Existing files:
 
 Added for the method assets:
 
-- `hermes-agent.png`: Hermes Agent / Nous Research mark, supplied directly by the BUILD operator (converted from their local `hermesagent.webp`) rather than sourced from the web. Used to represent Hermes Agent where a visual mark is needed. Resized to 256px max dimension for web use.
+- `hermes-agent.png`: Hermes Agent / Nous Research flat source mark, supplied directly by the BUILD operator (converted from their local `hermesagent.webp`) rather than sourced from the web.
+- `hermes-agent-mark.png`: transparent gold display variant of the same validated Hermes Agent girl, used on BUILD's dark interfaces so the mark has no opaque card or background.
 - `cloudflare.svg`: Cloudflare mark from Simple Icons.
 - `github.svg`: GitHub mark from Simple Icons.
 - `pinterest.svg`: Pinterest mark from Simple Icons.
@@ -32,6 +33,9 @@ Added for the Fondations tool references (Section3 "Générer des visuels pro" a
 - `rare-ui.svg`: official Rare UI mark, downloaded directly from `https://www.rareui.com/logos/Rareui.svg`.
 - `bolt-new.svg`: official Bolt.new mark, downloaded directly from `https://bolt.new/static/favicon.svg`.
 - `netlify.svg`, `railway.svg`, `sanity.svg`, `plausibleanalytics.svg`, `posthog.svg`, `googlesearchconsole.svg`, `pagespeedinsights.svg`: marks downloaded from the current Simple Icons package through jsDelivr for the Fondations website workflow. They are displayed only to identify the corresponding tool.
+- `deepseek.svg`, `openrouter.svg`, `opencode.svg`, `tailscale.svg`, `dribbble.svg`, `reddit.svg`, `youtube.svg`, `x.svg`, `tiktok.svg`, `neon.svg`: transparent marks downloaded from Simple Icons or the provider's public favicon for the provider-agnostic model, research, network, database and deployment examples.
+- `kie-ai.png`, `fal-ai.ico`, `mobbin.png`: public favicons used only as source assets for transparent display variants identifying Kie.ai, fal.ai and Mobbin as alternative media or inspiration routes. They are not placed inside cards or used as decorative backgrounds.
+- `mobbin-mark.png`: transparent off-white display variant of the Mobbin mark for BUILD's dark interfaces.
 
 Source URLs:
 
@@ -57,12 +61,25 @@ Source URLs:
 - `https://refero.design/apple-icon-180x180.png`
 - `https://www.rareui.com/logos/Rareui.svg`
 - `https://bolt.new/static/favicon.svg`
-- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/netlify.svg`
-- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/railway.svg`
-- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/sanity.svg`
-- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/plausibleanalytics.svg`
-- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/posthog.svg`
-- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googlesearchconsole.svg`
-- `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/pagespeedinsights.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/netlify.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/railway.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/sanity.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/plausibleanalytics.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/posthog.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/googlesearchconsole.svg`
+- `https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/pagespeedinsights.svg`
+- `https://cdn.simpleicons.org/deepseek`
+- `https://cdn.simpleicons.org/openrouter`
+- `https://opencode.ai/favicon.svg`
+- `https://cdn.simpleicons.org/tailscale`
+- `https://cdn.simpleicons.org/dribbble`
+- `https://cdn.simpleicons.org/reddit`
+- `https://cdn.simpleicons.org/youtube`
+- `https://cdn.simpleicons.org/x`
+- `https://cdn.simpleicons.org/tiktok`
+- `https://cdn.simpleicons.org/neon`
+- `https://www.google.com/s2/favicons?domain=kie.ai&sz=128`
+- `https://fal.ai/favicon.ico`
+- `https://www.google.com/s2/favicons?domain=mobbin.com&sz=128`
 
 The marks are shown only inside scenes that explain their role in the BUILD method. They are not presented as endorsements, guarantees or the value of the accompaniment itself. Recheck trademark and usage terms before reusing them in a separate commercial support.

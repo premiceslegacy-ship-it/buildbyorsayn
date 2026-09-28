@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { createClient } from "@/lib/supabase/server";
 import { resolveMcpStartDecision } from "@/lib/mcp/startDestination";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 export default async function McpStartPage() {
   const connectorVisible =
@@ -21,7 +22,7 @@ export default async function McpStartPage() {
       .select("tier")
       .eq("id", user.id)
       .maybeSingle();
-    tier = profile?.tier ?? null;
+    tier = normalizeProfileTier(profile?.tier ?? null);
     lookupFailed = Boolean(error);
   }
 

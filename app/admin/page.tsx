@@ -10,7 +10,6 @@ import { AdminAutoRefresh } from "@/components/AdminAutoRefresh";
 import { AdminMailComposer } from "@/components/AdminMailComposer";
 import { AdminUsersTable } from "@/components/AdminUsersTable";
 
-const ADMIN_EMAIL = "mbebourasam@gmail.com";
 const TOTAL_BLOCS = BLOCS_DATA.length;
 
 type Profile = {
@@ -54,7 +53,7 @@ export default async function AdminPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user || user.email !== ADMIN_EMAIL) {
+  if (user?.app_metadata?.role !== "admin") {
     redirect("/dashboard");
   }
 

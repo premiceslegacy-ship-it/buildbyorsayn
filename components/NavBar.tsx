@@ -5,11 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { GraduationCap, ShieldCheck, Menu, X, ChevronDown, PhoneCall } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { GooeyNav, type GooeyNavItem } from "@/components/ui/gooey-nav";
 
 interface NavBarProps {
   activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole" | "videos-tutos" | "accompagnement";
   tier?: string | null;
+  isAdmin?: boolean;
   displayName?: string;
   displayEmail?: string;
   initials?: string;
@@ -20,6 +22,7 @@ interface NavBarProps {
 export function NavBar({
   activeLink,
   tier,
+  isAdmin = false,
   displayName,
   displayEmail,
   initials,
@@ -68,8 +71,8 @@ export function NavBar({
       ? "text-[#f0ede8] font-medium"
       : "text-white/40 hover:text-white/80 transition-colors";
 
-  const hasFoundationAccess = tier === "beginner" || tier === "full" || tier === "admin";
-  const hasFullAccess = tier === "full" || tier === "admin";
+  const normalizedTier = normalizeProfileTier(tier);
+  const hasFoundationAccess = normalizedTier === "beginner" || normalizedTier === "full";
   const pathname = usePathname();
 
   const gooeyItems: GooeyNavItem[] = useMemo(
@@ -143,9 +146,9 @@ export function NavBar({
         <PhoneCall className="w-3.5 h-3.5" /> Accompagnement
       </Link>
 
-      {displayEmail === "mbebourasam@gmail.com" && (
+      {isAdmin && (
         <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-          <ShieldCheck className="w-4 h-4" />
+          <ShieldCheck className="w-4 h-4" aria-label="Administration" />
         </Link>
       )}
     </>
@@ -156,15 +159,19 @@ export function NavBar({
       {hasFoundationAccess ? (
         <div className="relative" ref={fondationsRef}>
           <button
+            type="button"
             onClick={() => setIsFondationsOpen(!isFondationsOpen)}
             className={`${linkClass("beginner")} flex items-center gap-1.5 bg-transparent border-none font-[inherit] text-sm cursor-pointer`}
+            aria-expanded={isFondationsOpen}
+            aria-controls="foundations-navigation"
+            aria-haspopup="menu"
           >
             <GraduationCap className="w-3.5 h-3.5" /> Fondations
             <ChevronDown className={`w-3 h-3 transition-transform ${isFondationsOpen ? "rotate-180" : ""}`} />
           </button>
 
           {isFondationsOpen && (
-            <div className="absolute left-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-44 z-50 flex flex-col gap-0.5">
+            <div id="foundations-navigation" className="absolute left-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-44 z-50 flex flex-col gap-0.5">
               <Link
                 href="/beginner"
                 onClick={() => setIsFondationsOpen(false)}
@@ -208,7 +215,7 @@ export function NavBar({
         </button>
       )}
 
-      <GooeyNav items={gooeyItems} value={gooeyActiveIndex} size="sm" />
+      <GooeyNav items={gooeyItems} value={gooeyActiveIndex} size="sm" aria-label="Navigation secondaire" />
 
       <Link
         href="/accompagnement"
@@ -217,9 +224,9 @@ export function NavBar({
         <PhoneCall className="w-3.5 h-3.5" /> Accompagnement
       </Link>
 
-      {displayEmail === "mbebourasam@gmail.com" && (
+      {isAdmin && (
         <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors">
-          <ShieldCheck className="w-4 h-4" />
+          <ShieldCheck className="w-4 h-4" aria-label="Administration" />
         </Link>
       )}
     </>
@@ -233,8 +240,10 @@ export function NavBar({
           : "bg-transparent border-transparent"
       }`}
     >
-    <nav className="w-full max-w-7xl mx-auto flex items-center justify-between py-4 md:py-6 px-4 md:px-12">
-      <Logo layout="horizontal" className="h-6" hideText={false} />
+    <nav aria-label="Navigation principale" className="w-full max-w-7xl mx-auto flex items-center justify-between py-4 md:py-6 px-4 md:px-12">
+      <Link href="/" aria-label="Accueil BUILD" className="inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e0f]">
+        <Logo layout="horizontal" className="h-6" hideText={false} />
+      </Link>
 
       {/* Desktop links */}
       <div className="hidden md:flex items-center gap-6 text-sm">
@@ -243,14 +252,19 @@ export function NavBar({
         {displayEmail ? (
           <div className="relative" ref={desktopDropdownRef}>
             <button
+              type="button"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
+              aria-label="Menu du compte"
+              aria-expanded={isDropdownOpen}
+              aria-controls="desktop-account-menu"
+              aria-haspopup="menu"
             >
               {initials && initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
+              <div id="desktop-account-menu" className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
                 {displayName && (
                   <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
                 )}
@@ -278,13 +292,18 @@ export function NavBar({
         {displayEmail ? (
           <div className="relative" ref={mobileDropdownRef}>
             <button
+              type="button"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
+              className="min-w-11 min-h-11 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
+              aria-label="Menu du compte"
+              aria-expanded={isDropdownOpen}
+              aria-controls="mobile-account-menu"
+              aria-haspopup="menu"
             >
               {initials && initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
             </button>
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
+              <div id="mobile-account-menu" className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
                 {displayName && (
                   <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
                 )}
@@ -308,15 +327,19 @@ export function NavBar({
 
         <div ref={mobileMenuRef} className="relative">
           <button
+            type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
-            aria-label="Menu"
+            className="min-w-11 min-h-11 bg-white/10 rounded-lg flex items-center justify-center border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
+            aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-navigation"
+            aria-haspopup="menu"
           >
             {isMobileMenuOpen ? <X className="w-4 h-4 text-[#f0ede8]" /> : <Menu className="w-4 h-4 text-[#f0ede8]" />}
           </button>
 
           {isMobileMenuOpen && (
-            <div className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-3 w-52 z-50 flex flex-col gap-1">
+            <div id="mobile-navigation" className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-3 w-52 z-50 flex flex-col gap-1">
               {navLinks}
             </div>
           )}

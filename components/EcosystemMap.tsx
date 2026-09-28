@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 type EcosystemVariant = "dashboard" | "homepage";
 
 export function EcosystemMap({ variant, tier }: { variant: EcosystemVariant; tier?: string | null }) {
   const isDashboard = variant === "dashboard";
-  const isMember = tier === "beginner" || tier === "full";
+  const normalizedTier = normalizeProfileTier(tier);
+  const isMember = normalizedTier === "beginner" || normalizedTier === "full";
 
   return (
     <div className="w-full">
@@ -18,8 +20,8 @@ export function EcosystemMap({ variant, tier }: { variant: EcosystemVariant; tie
       </p>
       <p className="text-sm text-white/40 leading-relaxed mb-8 max-w-2xl">
         {isDashboard
-          ? "Le marché est saturé de contenu sur l'IA. Peu de gens buildent vraiment. Voici ce qui est construit, en production, avec les mêmes méthodes que tu apprends ici."
-          : "Pas une formation de plus. Des systèmes IA réels, construits en production, sur des marchés précis."}
+          ? "Le marché est saturé de contenu sur l'IA. Peu de gens buildent vraiment. Voici quelques lignes et projets qui donnent un contexte concret aux méthodes que tu apprends ici."
+          : "Pas une formation de plus. Des systèmes IA conçus pour des marchés précis, avec une méthode de construction et de livraison."}
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
