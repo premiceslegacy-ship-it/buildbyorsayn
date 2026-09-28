@@ -18,19 +18,23 @@ const MCP_CONNECTOR_VISIBLE = MCP_CONNECTOR_BETA_VISIBLE || MCP_CONNECTOR_LAUNCH
 const FAQ_ITEMS = [
   {
     question: "C'est un paiement unique ou un abonnement ?",
-    answer: "Paiement unique. Aucun abonnement, aucun frais récurrent. Tu payes une fois, l'accès est à vie.",
+    answer: "Paiement unique. Pas d'abonnement ni de frais récurrents. L'accès est à vie.",
   },
   {
     question: "Quelle est la différence entre Fondations et LE COFFRE ?",
-    answer: `Fondations (${FONDATIONS_PRICE}€) t'aide à partir d'un problème concret et à construire un premier résultat que tu peux proposer. ${COFFRE_LABEL} (${COFFRE_PRICE}€) inclut Fondations et ajoute la méthode complète, les compétences prêtes à l'emploi et le cadre pour répéter ce qui fonctionne.`,
+    answer: `Fondations (${FONDATIONS_PRICE}€) t'aide à construire et proposer un premier résultat. ${COFFRE_LABEL} (${COFFRE_PRICE}€) ajoute la méthode complète pour structurer et répéter.`,
   },
   {
     question: "Je n'ai aucune compétence technique, c'est fait pour moi ?",
-    answer: "Oui. Fondations part de zéro et couvre chaque étape concrètement - aucun prérequis technique.",
+    answer: "Oui pour commencer. Tu n'as pas besoin de savoir coder, mais tu dois accepter de choisir un problème, produire et tester.",
   },
   {
     question: "Je peux commencer par Fondations puis passer au COFFRE ?",
     answer: `Oui, à tout moment tu peux upgrader vers LE COFFRE en ne payant que le complément (${UPGRADE_PRICE}€).`,
+  },
+  {
+    question: "BUILD garantit-il des clients ou des revenus ?",
+    answer: "Non. BUILD fournit un cadre, des méthodes et des compétences pour construire et proposer. Le marché, la vente, la livraison et ton exécution restent déterminants.",
   },
 ];
 
@@ -110,43 +114,38 @@ export default async function HomePage() {
       </header>
 
       {/* ================================================================
-          HERO - court, deux CTA, preuve immédiate
+          HERO - reconnaissance de la douleur, CTA unique
       ================================================================ */}
       <section className="relative z-10 flex flex-col items-center px-6 pt-14 pb-20 sm:pt-20 sm:pb-24 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-[4px] text-[#c9b48a] mb-10">
-          BUILD BY ORSAYN
+        <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-8">
+          Pour les builders qui veulent vendre du travail utile
         </p>
 
-        <h1 className="mx-auto mb-6 max-w-5xl text-4xl font-medium leading-[1.02] tracking-[-0.04em] text-[#f0ede8] sm:text-6xl lg:text-7xl">
-          Utilise l&apos;IA pour construire une activité que le marché peut payer.
+        <h1 className="mx-auto mb-6 max-w-4xl text-4xl font-medium leading-[1.04] tracking-[-0.04em] text-[#f0ede8] sm:text-6xl lg:text-7xl">
+          Tu testes l&apos;IA.
           <br />
-          <span className="build-hero-gradient">Pas pour collectionner les outils.</span>
+          <span className="build-hero-gradient">Mais rien ne devient encore vendable.</span>
         </h1>
 
-        <p className="text-[#8a8070] text-lg leading-[1.7] max-w-2xl mx-auto mb-10">
-          BUILD t&apos;aide à repérer un problème que des personnes paient pour résoudre, à construire une offre autour de ce problème et à la livrer plus vite grâce à l&apos;IA. Tu repars avec des méthodes, des compétences prêtes à l&apos;emploi et un assistant capable de retrouver le bon contenu au bon moment. La formation ne garantit ni clients ni revenus : il faut encore parler au marché, produire, proposer, livrer et apprendre.
+        <p className="text-[#8a8070] text-lg leading-[1.6] max-w-xl mx-auto mb-10">
+          BUILD t&apos;aide à passer d&apos;idées et d&apos;outils dispersés à une offre claire, un premier livrable montrable et une méthode réutilisable.
         </p>
 
         {isMember ? (
           <CtaButton href="/dashboard" size="lg">Accéder au système</CtaButton>
         ) : (
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <CtaButton href="#pricing" size="lg">Commencer à construire</CtaButton>
-              <Link
-                href="/login?mode=signup"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[#c9b48a] hover:text-[#f0ede8] border border-[#c9b48a]/25 hover:border-[#c9b48a]/50 rounded-2xl px-7 py-4 transition-colors bg-white/[0.02]"
-              >
-                <UserPlus className="w-4 h-4" />
-                Créer mon compte gratuit
-              </Link>
-            </div>
-            <p className="text-xs text-[#8a8070]">
-              194 membres dans BUILD à ce jour · paiement unique · accès à vie
-            </p>
-            <p className="text-[11px] text-[#6f675a]">
-              Repère de communauté, pas une promesse de résultat.
-            </p>
+          <div className="flex flex-col items-center gap-3">
+            <CtaButton href="#pricing" size="lg">Choisir mon point de départ</CtaButton>
+            <p className="text-xs text-[#c4b89a]">196 membres dans BUILD à ce jour</p>
+            <p className="text-xs text-[#a59b8a]">Repère de communauté, pas une promesse de résultat.</p>
+            <p className="text-[11px] text-[#8a8070]">Paiement unique · accès à vie</p>
+            <Link
+              href="/login?mode=signup"
+              className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 text-sm font-semibold text-[#c9b48a] underline decoration-[#c9b48a]/35 underline-offset-4 hover:text-[#f0ede8] hover:decoration-[#e8d5b0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e0f] transition-colors"
+            >
+              <UserPlus className="w-4 h-4" />
+              Voir l&apos;intérieur gratuitement
+            </Link>
           </div>
         )}
       </section>
@@ -154,31 +153,31 @@ export default async function HomePage() {
       <section className="relative z-10 border-t border-white/[0.05] px-6 py-14 sm:py-16">
         <div className="mx-auto max-w-5xl">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="mb-4 text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a]">Ce que tu viens vraiment chercher</p>
-            <h2 className="mb-4 text-2xl font-bold leading-tight text-[#f0ede8] sm:text-3xl">Plus de revenus possibles, plus de clarté, moins de travail recommencé.</h2>
-            <p className="mx-auto max-w-xl text-base leading-[1.7] text-[#8a8070]">Tu ne viens pas apprendre le nom de quarante outils. Tu viens comprendre quoi vendre, comment le construire et comment utiliser l&apos;IA pour aller plus vite sans perdre la qualité.</p>
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a]">Le vrai blocage</p>
+            <h2 className="mb-4 text-2xl font-bold leading-tight text-[#f0ede8] sm:text-3xl">Tu n&apos;as pas besoin d&apos;un outil de plus. Tu as besoin d&apos;un chemin jusqu&apos;au travail vendable.</h2>
+            <p className="mx-auto max-w-xl text-base leading-[1.65] text-[#8a8070]">Tu peux déjà produire une page, une image ou un prototype. Le plus difficile reste de savoir quoi proposer, à qui, et comment le livrer sans tout recommencer.</p>
           </div>
 
           <div className="mt-10 grid gap-px overflow-hidden border border-white/[0.08] bg-white/[0.08] md:grid-cols-3">
             <div className="bg-[#11100f] p-6 sm:p-7">
               <p className="mb-4 font-mono text-xs text-[#e8d5b0]/70">01</p>
-              <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Trouver quoi vendre</h3>
-              <p className="text-sm leading-relaxed text-white/60">Partir d&apos;un problème réel, d&apos;un marché accessible et d&apos;une personne qui a une raison de payer maintenant.</p>
+              <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Tu te disperses</h3>
+              <p className="text-sm leading-relaxed text-white/60">Tu testes les nouveautés, mais aucune piste ne devient une offre claire.</p>
             </div>
             <div className="bg-[#11100f] p-6 sm:p-7">
               <p className="mb-4 font-mono text-xs text-[#e8d5b0]/70">02</p>
-              <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Construire quelque chose de montrable</h3>
-              <p className="text-sm leading-relaxed text-white/60">Un site, un audit, un contenu, une automatisation ou un outil métier que tu peux expliquer, proposer et améliorer.</p>
+              <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Tu construis trop tôt</h3>
+              <p className="text-sm leading-relaxed text-white/60">Tu produis avant d&apos;avoir validé le problème, la cible et la valeur à montrer.</p>
             </div>
             <div className="bg-[#11100f] p-6 sm:p-7">
               <p className="mb-4 font-mono text-xs text-[#e8d5b0]/70">03</p>
-              <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Livrer sans repartir de zéro</h3>
-              <p className="text-sm leading-relaxed text-white/60">Des méthodes et des compétences déjà préparées, puis un assistant qui retrouve le bon contexte au moment où tu en as besoin.</p>
+              <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Tu recommences</h3>
+              <p className="text-sm leading-relaxed text-white/60">Ton contexte et tes méthodes restent dans ta tête, alors chaque projet repart de zéro.</p>
             </div>
           </div>
 
           <div className="mx-auto mt-8 max-w-3xl border-y border-[#e8d5b0]/20 py-5 text-center text-sm leading-relaxed text-[#c4b89a]">
-            Une <strong className="text-[#f0ede8]">compétence prête à l&apos;emploi</strong>, c&apos;est ce que BUILD appelle un skill. Le MCP (<em>Model Context Protocol</em>, un standard de connexion) permet ensuite à un assistant compatible de retrouver les contenus BUILD disponibles dans ton accès et de t&apos;aider à les appliquer à ton projet, avec les permissions prévues.
+            BUILD prépare les méthodes, les repères et le contexte réutilisable pour cadrer, produire et livrer. Toi, tu gardes le jugement, la relation au marché et la décision de livrer.
           </div>
         </div>
       </section>
@@ -189,37 +188,38 @@ export default async function HomePage() {
       <section className="relative z-10 border-t border-white/[0.05] px-6 py-16 sm:py-20">
         <div className="mx-auto max-w-5xl">
           <div className="mx-auto max-w-2xl text-center">
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a]">Le chemin BUILD</p>
             <h2 className="mb-3 text-2xl font-bold leading-tight text-[#f0ede8] sm:text-3xl">
-              L&apos;IA peut devenir rentable lorsqu&apos;elle sert un travail précis.
+              Un problème. Une offre. Une preuve. Puis une méthode que tu peux refaire.
             </h2>
-            <p className="mx-auto mb-12 max-w-xl text-base text-[#8a8070]">
-              BUILD t&apos;apprend à partir d&apos;un besoin réel, produire une première preuve, la proposer, puis améliorer ce qui fonctionne jusqu&apos;à pouvoir le refaire avec moins d&apos;effort.
-            </p>
+            <p className="mx-auto mb-12 max-w-xl text-base text-[#8a8070]">Tu pars du besoin du marché, pas de la liste des outils.</p>
           </div>
 
           <BuildMethodHeroAsset />
 
-          <div className="mx-auto mt-10 grid max-w-4xl gap-8 border-t border-white/[0.08] pt-8 md:grid-cols-2 md:gap-12">
+          <div className="mx-auto mt-10 grid max-w-4xl gap-px overflow-hidden border border-white/[0.08] bg-white/[0.08] md:grid-cols-3">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[3px] text-white/35">Sans méthode</p>
-              <p className="mt-3 max-w-md text-base leading-7 text-[#8a8070]">
-                Tu testes des outils au hasard, tu copies des réponses et tu recommences à chaque projet. Tu apprends peut-être des choses, mais rien ne devient une offre claire que tu peux vendre.
-              </p>
+              <div className="h-full bg-[#11100f] p-6">
+                <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a]">01 · Clarifier</p>
+                <p className="mt-3 text-sm leading-relaxed text-[#8a8070]">Choisir un problème réel, une cible et une offre compréhensible.</p>
+              </div>
             </div>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#e8d5b0]">Avec BUILD</p>
-              <p className="mt-3 max-w-md text-base leading-7 text-[#c4b89a]">
-                Tu pars d&apos;un problème, d&apos;une offre et d&apos;une preuve. Les méthodes, les compétences déjà préparées et le connecteur de contenu t&apos;aident à construire, vendre et livrer sans tout porter seul.
-              </p>
+              <div className="h-full bg-[#11100f] p-6">
+                <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a]">02 · Construire</p>
+                <p className="mt-3 text-sm leading-relaxed text-[#8a8070]">Produire un premier résultat montrable, puis le proposer au marché.</p>
+              </div>
+            </div>
+            <div>
+              <div className="h-full bg-[#11100f] p-6">
+                <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a]">03 · Réutiliser</p>
+                <p className="mt-3 text-sm leading-relaxed text-[#8a8070]">Garder le contexte et les méthodes pour améliorer la livraison suivante.</p>
+              </div>
             </div>
           </div>
 
           <div className="mt-12 text-center">
-            <h3 className="mb-6 text-xl font-bold leading-snug text-[#f0ede8] sm:text-2xl">
-              La valeur n&apos;est pas dans l&apos;outil.
-              <br />
-              <span className="build-hero-gradient">Elle est dans le travail que tu peux vendre et refaire.</span>
-            </h3>
+            <p className="mb-6 text-base leading-relaxed text-[#c4b89a]">Les outils changent. Une méthode et un contexte réutilisables restent utiles.</p>
             {!isMember && <CtaButton href="#pricing">Voir les offres</CtaButton>}
           </div>
         </div>
@@ -232,13 +232,13 @@ export default async function HomePage() {
         <div className="max-w-xl mx-auto">
           <div className="text-center mb-10">
             <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-5">
-              Choisir son point de départ
+              Commencer par le bon niveau
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-[#f0ede8] mb-4 leading-tight">
-              Le niveau d&apos;aide dont tu as besoin pour travailler vers tes premiers revenus avec l&apos;IA.
+              Choisis le niveau d&apos;aide qu&apos;il te faut maintenant.
             </h2>
             <p className="text-[#8a8070] text-base max-w-md mx-auto leading-[1.7]">
-              Fondations t&apos;aide à construire et proposer un premier résultat. {COFFRE_LABEL} ajoute la méthode complète, davantage de compétences prêtes à l&apos;emploi et le cadre pour répéter ce qui fonctionne. Paiement unique, accès à vie. Les résultats dépendent de ton marché, de ton exécution et de tes efforts.
+              Fondations t&apos;aide à construire et proposer un premier résultat. {COFFRE_LABEL} ajoute la méthode complète pour structurer et répéter. Paiement unique, accès à vie. Les résultats dépendent de ton marché et de ton exécution.
             </p>
           </div>
 
@@ -262,7 +262,7 @@ export default async function HomePage() {
         {!isMember && (
           <>
             <div className="mx-auto mt-12 max-w-3xl border-y border-[#e8d5b0]/15 py-5 text-center text-sm leading-relaxed text-[#c4b89a]">
-              Les compétences prêtes à l&apos;emploi sont déjà incluses dans les offres. Tu n&apos;as pas besoin de savoir les configurer avant de commencer.
+              Les compétences sont déjà préparées. Tu n&apos;as pas besoin de savoir les configurer pour commencer.
             </div>
             <div className="max-w-5xl mx-auto">
               <AccompanimentFolderCard />
@@ -278,22 +278,18 @@ export default async function HomePage() {
         <section className="relative z-10 px-6 py-12 sm:py-16 border-t border-white/[0.05]">
           <div className="max-w-xl mx-auto text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#f0ede8] mb-4 leading-tight">
-              Pas encore décidé ?
-              <br />
-              <span className="text-[#8a8070] font-normal">Entre d&apos;abord. Regarde de l&apos;intérieur.</span>
+              Tu veux regarder avant de choisir ?
             </h2>
             <p className="text-[#8a8070] text-base leading-[1.7] max-w-md mx-auto mb-8">
-              Crée ton compte gratuit et découvre comment le système est construit
-              avant de sortir la carte.
+              Crée ton compte gratuit et regarde l&apos;intérieur. Aucune carte demandée.
             </p>
             <Link
               href="/login?mode=signup"
               className="relative overflow-hidden inline-flex items-center justify-center gap-2 bg-white/[0.04] hover:bg-white/[0.07] text-[#e8d5b0] font-bold text-sm px-8 py-4 rounded-xl border border-[#e8d5b0]/25 hover:border-[#e8d5b0]/45 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.06)]"
             >
               <UserPlus className="w-4 h-4" />
-              Créer mon compte gratuit
+              Voir l&apos;intérieur gratuitement
             </Link>
-            <p className="text-xs text-white/25 mt-3">Aucune carte demandée</p>
           </div>
         </section>
       )}
@@ -304,7 +300,7 @@ export default async function HomePage() {
       <section className="relative z-10 px-6 py-12 sm:py-16 border-t border-white/[0.05]">
         <div className="max-w-2xl mx-auto">
           <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-7 text-center">
-            Questions fréquentes
+            Avant de choisir
           </p>
           <div className="flex flex-col gap-3 mb-10">
             {FAQ_ITEMS.map(({ question, answer }) => (
@@ -334,25 +330,23 @@ export default async function HomePage() {
           <Logo layout="vertical" className="mx-auto mb-12" />
 
           <h2 className="text-3xl sm:text-4xl font-bold text-[#f0ede8] mb-5 leading-[1.15]">
-            Ne collectionne pas les outils.
+            Arrête de collectionner les outils.
             <br />
-            <span className="build-hero-gradient">Construis quelque chose que des gens peuvent acheter.</span>
+            <span className="build-hero-gradient">Construis du travail vendable.</span>
           </h2>
 
-          <p className="text-[#8a8070] text-base leading-[1.75] mb-12">
-            BUILD ne promet pas de faire apparaître de l&apos;argent par magie. Il te donne un chemin plus court entre un problème réel, une offre claire, une première livraison et les améliorations qui peuvent rendre cette activité plus rentable.
-          </p>
+          <p className="text-[#8a8070] text-base leading-[1.7] mb-12">Commence par un problème réel, construis une preuve, puis apprends à refaire une livraison utile.</p>
 
           {isMember ? (
             <CtaButton href="/dashboard" size="lg">Accéder au système</CtaButton>
           ) : (
             <div className="flex flex-col items-center gap-4">
-              <CtaButton href="#pricing" size="lg">Commencer à construire</CtaButton>
+              <CtaButton href="#pricing" size="lg">Choisir mon point de départ</CtaButton>
               <Link
                 href="/login?mode=signup"
                 className="text-sm text-[#c9b48a]/70 hover:text-[#e8d5b0] transition-colors underline underline-offset-4"
               >
-                Ou crée ton compte gratuit pour voir l&apos;intérieur
+                Ou voir l&apos;intérieur gratuitement
               </Link>
             </div>
           )}

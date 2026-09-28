@@ -5,14 +5,21 @@ import { AuthProvider } from "@/components/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const SITE_TITLE = "Construire, vendre et livrer avec l'IA | BUILD by Orsayn";
+const SITE_DESCRIPTION = "BUILD t'aide à passer d'idées et d'outils dispersés à une offre claire, un livrable montrable et une méthode réutilisable.";
+const SITE_URL = "https://buildbyorsayn.com";
+
 export const metadata: Metadata = {
-  title: "BUILD by Orsayn : Le système pour vendre dans le business IA",
-  description: "La méthode pour arrêter de louer l'IA et commencer à posséder. Skills, frameworks, systèmes : du capital organique prêt à copier.",
-  metadataBase: new URL("https://build-system-three.vercel.app"),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "BUILD by Orsayn : Le système pour vendre dans le business IA",
-    description: "La méthode pour arrêter de louer l'IA et commencer à posséder. Skills, frameworks, systèmes : du capital organique prêt à copier.",
-    url: "https://buildbyorsayn.com",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
     siteName: "BUILD",
     images: [
       {
@@ -27,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BUILD by Orsayn : Le système pour vendre dans le business IA",
-    description: "La méthode pour arrêter de louer l'IA et commencer à posséder. Skills, frameworks, systèmes : du capital organique prêt à copier.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: ["/open-graph-build.png"],
   },
 };
