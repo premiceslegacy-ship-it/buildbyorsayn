@@ -21,13 +21,13 @@ const PHASES = [
     num: "03",
     titre: "La grande distillation",
     label: "Capital organique",
-    desc: "Tu encodes ce que tu as vécu. Chaque méthode, chaque process qui a fonctionné devient un actif permanent. Ce qui est distillé ne peut pas être retiré. Becker appelait ça le capital humain. Ici, c'est la version 2.0.",
+    desc: "Tu encodes ce que tu as vécu. Chaque méthode, chaque process qui a fonctionné devient un actif permanent. Ce qui est distillé ne peut pas être retiré. Le capital humain devient une capacité réutilisable.",
   },
   {
     num: "∞",
     titre: "L'antifragile",
     label: "Liberté totale",
-    desc: "Tu ne subis plus rien. Taleb avait raison : tu sors renforcé de chaque perturbation. Les outils changent, les plateformes ferment. Ton capital organique reste. Tu choisis : lignes verticales, pierre, équity.",
+    desc: "Tu ne subis plus rien. Tu sors renforcé de chaque perturbation : les outils changent, les plateformes ferment, mais ton capital organique reste. Tu choisis : lignes verticales, pierre, équity.",
   },
 ];
 

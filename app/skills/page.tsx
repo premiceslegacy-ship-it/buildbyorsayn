@@ -81,11 +81,11 @@ const SKILL_METHOD_STEPS = [
 const SKILL_METHOD_EXAMPLES = [
   {
     skill: "Deep Research Verticale",
-    body: "Décomposition du métier d'analyste marché : Schwartz (conscience), Hormozi (offre), Wiebe (langage client), ad libraries publiques (angles prouvés par l'argent dépensé).",
+    body: "Décomposition du métier d'analyste marché : conscience du problème, construction de l'offre, langage client et angles publicitaires soutenus par des données publiques.",
   },
   {
     skill: "ORACLE by Orsayn",
-    body: "Décomposition du métier de product manager : positionnement (Dunford), JTBD, PRD des meilleures équipes produit, benchmarks d'activation et de monétisation.",
+    body: "Décomposition du métier de product manager : positionnement, JTBD, PRD des meilleures équipes produit, benchmarks d'activation et de monétisation.",
   },
   {
     skill: "UX/UI Design",

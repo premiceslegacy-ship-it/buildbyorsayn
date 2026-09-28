@@ -44,8 +44,11 @@ test("les Fondations rendent visibles les workflows du chantier E", () => {
 
 test("la preuve sociale de la homepage reste contextualisée", () => {
   const source = readFileSync(homepagePath, "utf8");
-  assert.ok(source.includes("196 membres dans BUILD à ce jour"));
-  assert.ok(source.includes("Repère de communauté, pas une promesse de résultat."));
+  assert.ok(source.includes("196 membres dans BUILD au 28 septembre 2026"));
+  assert.equal(source.includes("Repère de communauté, pas une promesse de résultat."), false);
+  assert.ok(source.includes("Construis avec l&apos;IA des projets"));
+  assert.ok(source.includes("qu&apos;un client peut acheter."));
+  assert.ok(source.includes("construis une première version montrable"));
   assert.equal(source.includes("194 membres ont déjà commencé"), false);
 });
 

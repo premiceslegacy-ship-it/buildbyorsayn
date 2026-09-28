@@ -118,17 +118,17 @@ export default async function HomePage() {
       ================================================================ */}
       <section className="relative z-10 flex flex-col items-center px-6 pt-14 pb-20 sm:pt-20 sm:pb-24 text-center">
         <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-8">
-          Pour les builders qui veulent vendre du travail utile
+          Pour celles et ceux qui veulent faire quelque chose de leurs essais avec l&apos;IA
         </p>
 
-        <h1 className="mx-auto mb-6 max-w-4xl text-4xl font-medium leading-[1.04] tracking-[-0.04em] text-[#f0ede8] sm:text-6xl lg:text-7xl">
-          Tu testes l&apos;IA.
-          <br />
-          <span className="build-hero-gradient">Mais rien ne devient encore vendable.</span>
+        <h1 className="mx-auto mb-6 max-w-[1000px] text-4xl font-medium leading-[1.04] tracking-[-0.04em] text-[#f0ede8] sm:text-6xl lg:text-7xl">
+          Construis avec l&apos;IA des projets
+          <br className="hidden sm:block" />
+          <span className="build-hero-gradient"> qu&apos;un client peut acheter.</span>
         </h1>
 
         <p className="text-[#8a8070] text-lg leading-[1.6] max-w-xl mx-auto mb-10">
-          BUILD t&apos;aide à passer d&apos;idées et d&apos;outils dispersés à une offre claire, un premier livrable montrable et une méthode réutilisable.
+          Un SaaS, un site web, une automatisation ou un contenu : pars d&apos;un problème réel, construis une première version montrable, puis apprends à la proposer et à la livrer.
         </p>
 
         {isMember ? (
@@ -136,8 +136,8 @@ export default async function HomePage() {
         ) : (
           <div className="flex flex-col items-center gap-3">
             <CtaButton href="#pricing" size="lg">Choisir mon point de départ</CtaButton>
-            <p className="text-xs text-[#c4b89a]">196 membres dans BUILD à ce jour</p>
-            <p className="text-xs text-[#a59b8a]">Repère de communauté, pas une promesse de résultat.</p>
+            <p className="text-xs text-[#c4b89a]">196 membres dans BUILD au 28 septembre 2026</p>
+
             <p className="text-[11px] text-[#8a8070]">Paiement unique · accès à vie</p>
             <Link
               href="/login?mode=signup"
@@ -154,30 +154,45 @@ export default async function HomePage() {
         <div className="mx-auto max-w-5xl">
           <div className="mx-auto max-w-2xl text-center">
             <p className="mb-4 text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a]">Le vrai blocage</p>
-            <h2 className="mb-4 text-2xl font-bold leading-tight text-[#f0ede8] sm:text-3xl">Tu n&apos;as pas besoin d&apos;un outil de plus. Tu as besoin d&apos;un chemin jusqu&apos;au travail vendable.</h2>
-            <p className="mx-auto max-w-xl text-base leading-[1.65] text-[#8a8070]">Tu peux déjà produire une page, une image ou un prototype. Le plus difficile reste de savoir quoi proposer, à qui, et comment le livrer sans tout recommencer.</p>
+            <h2 className="mb-4 text-2xl font-bold leading-tight text-[#f0ede8] sm:text-3xl">Une idée de SaaS, de site web ou d&apos;automatisation ne devient pas une offre toute seule.</h2>
+            <p className="mx-auto max-w-xl text-base leading-[1.65] text-[#8a8070]">Il faut encore choisir le bon problème, montrer une première réponse crédible et savoir l&apos;expliquer à quelqu&apos;un qui pourrait l&apos;acheter.</p>
           </div>
 
-          <div className="mt-10 grid gap-px overflow-hidden border border-white/[0.08] bg-white/[0.08] md:grid-cols-3">
-            <div className="bg-[#11100f] p-6 sm:p-7">
-              <p className="mb-4 font-mono text-xs text-[#e8d5b0]/70">01</p>
-              <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Tu te disperses</h3>
-              <p className="text-sm leading-relaxed text-white/60">Tu testes les nouveautés, mais aucune piste ne devient une offre claire.</p>
+          <div className="mt-10 grid gap-px overflow-hidden border border-[#e8d5b0]/20 bg-[#e8d5b0]/10 md:grid-cols-3">
+            <div className="relative bg-[#11100f] p-6 sm:p-7">
+              <div className="relative">
+                <div className="mb-8">
+                  <p className="font-mono text-xs text-[#e8d5b0]/70">01</p>
+
+                </div>
+                <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Les outils s&apos;empilent</h3>
+                <p className="text-sm leading-relaxed text-white/60">Tu passes d&apos;un SaaS à un autre, d&apos;un prompt à un nouveau modèle, sans savoir quel projet mérite ton temps.</p>
+              </div>
             </div>
-            <div className="bg-[#11100f] p-6 sm:p-7">
-              <p className="mb-4 font-mono text-xs text-[#e8d5b0]/70">02</p>
-              <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Tu construis trop tôt</h3>
-              <p className="text-sm leading-relaxed text-white/60">Tu produis avant d&apos;avoir validé le problème, la cible et la valeur à montrer.</p>
+            <div className="relative bg-[#11100f] p-6 sm:p-7">
+              <div className="relative">
+                <div className="mb-8">
+                  <p className="font-mono text-xs text-[#e8d5b0]/70">02</p>
+
+                </div>
+                <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Le projet part avant le besoin</h3>
+                <p className="text-sm leading-relaxed text-white/60">Tu construis une page, une démo ou une automatisation avant d&apos;avoir clarifié pour qui elle compte et ce qu&apos;elle doit changer.</p>
+              </div>
             </div>
-            <div className="bg-[#11100f] p-6 sm:p-7">
-              <p className="mb-4 font-mono text-xs text-[#e8d5b0]/70">03</p>
-              <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Tu recommences</h3>
-              <p className="text-sm leading-relaxed text-white/60">Ton contexte et tes méthodes restent dans ta tête, alors chaque projet repart de zéro.</p>
+            <div className="relative bg-[#11100f] p-6 sm:p-7">
+              <div className="relative">
+                <div className="mb-8">
+                  <p className="font-mono text-xs text-[#e8d5b0]/70">03</p>
+
+                </div>
+                <h3 className="mb-3 text-lg font-semibold text-[#f0ede8]">Chaque livraison recommence</h3>
+                <p className="text-sm leading-relaxed text-white/60">Le cadrage, les fichiers et les décisions restent dispersés. Le projet suivant repart presque de zéro.</p>
+              </div>
             </div>
           </div>
 
           <div className="mx-auto mt-8 max-w-3xl border-y border-[#e8d5b0]/20 py-5 text-center text-sm leading-relaxed text-[#c4b89a]">
-            BUILD prépare les méthodes, les repères et le contexte réutilisable pour cadrer, produire et livrer. Toi, tu gardes le jugement, la relation au marché et la décision de livrer.
+            BUILD te donne un cadre pour cadrer le problème, construire une première preuve et garder ce qui te sert pour la suite. Le jugement, les échanges avec le marché et la livraison restent les tiens.
           </div>
         </div>
       </section>
@@ -190,9 +205,9 @@ export default async function HomePage() {
           <div className="mx-auto max-w-2xl text-center">
             <p className="mb-4 text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a]">Le chemin BUILD</p>
             <h2 className="mb-3 text-2xl font-bold leading-tight text-[#f0ede8] sm:text-3xl">
-              Un problème. Une offre. Une preuve. Puis une méthode que tu peux refaire.
+              Tu pars d&apos;un besoin réel, tu construis une première preuve et tu gardes ce qui fonctionne pour la prochaine livraison.
             </h2>
-            <p className="mx-auto mb-12 max-w-xl text-base text-[#8a8070]">Tu pars du besoin du marché, pas de la liste des outils.</p>
+            <p className="mx-auto mb-12 max-w-xl text-base text-[#8a8070]">Le point de départ n&apos;est pas l&apos;outil choisi, mais le problème que tu veux résoudre.</p>
           </div>
 
           <BuildMethodHeroAsset />
@@ -254,8 +269,8 @@ export default async function HomePage() {
         </div>
 
         {!isMember && MCP_CONNECTOR_VISIBLE ? (
-          <div className="max-w-5xl mx-auto">
-            <McpConnectorShowcase beta={!MCP_CONNECTOR_LAUNCHED} />
+          <div className="mx-auto max-w-6xl">
+            <McpConnectorShowcase />
           </div>
         ) : null}
 

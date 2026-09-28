@@ -10,6 +10,7 @@ const nextConfig = {
     localPatterns: [
       { pathname: "/_next-image-not-used/**" },
       { pathname: "/assets/protocole-references/**" },
+      { pathname: "/brand-logos/**" },
     ],
   },
 

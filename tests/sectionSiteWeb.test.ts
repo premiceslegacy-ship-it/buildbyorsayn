@@ -168,10 +168,10 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
   assert.doesNotMatch(source, /<ul|<li|•/);
 });
 
-test("le bloc 09 référence plusieurs vidéos Viktor Oddy sans les traiter comme un transcript", () => {
+test("le bloc 09 référence plusieurs vidéos de travail sans les traiter comme un transcript", () => {
   const source = readFileSync(componentPath, "utf8");
   for (const videoId of ["raUcRcrfgoE", "0Uk-CavIjqk", "cNZvyzObZx8", "sEWuM6mkIbQ", "IeR5ZMKssSc"]) {
-    assert.ok(source.includes(videoId), `vidéo Viktor Oddy absente: ${videoId}`);
+    assert.ok(source.includes(videoId), `vidéo de référence absente: ${videoId}`);
   }
   assert.ok((source.match(/youtube\.com\/watch\?v=/g) ?? []).length >= 5);
 });

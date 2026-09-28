@@ -9,8 +9,8 @@ test("the public pricing presents one shared MCP connector below both offers", a
   assert.doesNotMatch(pricing, /import \{ McpConnectorShowcase \}|<McpConnectorShowcase/);
   assert.match(homepage, /import \{ McpConnectorShowcase \}/);
   assert.match(homepage, /MCP_CONNECTOR_VISIBLE/);
-  assert.match(homepage, /max-w-5xl mx-auto/);
-  assert.match(homepage, /<McpConnectorShowcase beta=\{!MCP_CONNECTOR_LAUNCHED\} \/>/);
+  assert.match(homepage, /max-w-6xl/);
+  assert.match(homepage, /<McpConnectorShowcase \/>/);
   assert.ok(homepage.indexOf("<PricingCarousel") < homepage.indexOf("<McpConnectorShowcase"));
   assert.match(pricing, /Ton assistant retrouve les contenus Fondations utiles au moment où tu en as besoin/);
   assert.match(pricing, /Ton assistant retrouve tout le contenu BUILD inclus dans ton accès/);
@@ -79,21 +79,33 @@ test("the shared MCP block demonstrates the training benefit with concise copy",
   const showcase = await readFile("components/McpConnectorShowcase.tsx", "utf8");
 
   assert.match(showcase, /Inclus dans les deux offres/);
-  assert.match(showcase, /Bêta/);
-  assert.match(showcase, /Fondations/);
-  assert.match(showcase, /LE COFFRE/);
-  assert.match(showcase, /Tu peux enfin poser la question qui te bloque\./);
-  assert.match(showcase, /Ton assistant retrouve le contenu BUILD utile/);
-  assert.match(showcase, /Comment j&apos;applique ce contenu à mon projet/);
-  assert.match(showcase, /Quel skill peut m&apos;aider ici/);
-  assert.match(showcase, /Fondations ou LE COFFRE : ton assistant voit uniquement les contenus inclus/);
+  assert.doesNotMatch(showcase, /bêta/i);
+  assert.match(showcase, /Tu n&apos;apprends plus seul/);
+  assert.match(showcase, /retrouve le contenu BUILD utile/);
+  assert.match(showcase, /Le contenu visible dépend de ton offre/);
+  assert.match(showcase, /Claude/);
+  assert.match(showcase, /Recherche dans le MCP BUILD/);
+  assert.match(showcase, /Je veux lancer un SaaS pour les artisans du bâtiment/);
+  assert.match(showcase, /Opus 5\.5/);
+  assert.match(showcase, /max-w-\[680px\]/);
+  assert.match(showcase, /aspect-video/);
+  assert.match(showcase, /prefers-reduced-motion/);
   assert.match(showcase, /href="\/mcp\/start"/);
   assert.match(showcase, /Connecter mon assistant/);
-  assert.doesNotMatch(showcase, /brand-logos|rounded-full/);
+  assert.doesNotMatch(showcase, /Illustration|DANS CET EXEMPLE|Contexte BUILD connecté|Prochaine étape|Pose une autre question/);
+  assert.match(showcase, /Aperçu animé, pas une réponse en direct/);
+  assert.match(showcase, /role="region"/);
+  assert.match(showcase, /aria-live/);
+  assert.doesNotMatch(showcase, /role="img"/);
+  assert.doesNotMatch(showcase, /whiteSpace: "nowrap"/);
+  assert.doesNotMatch(showcase, /absolute inset-2 border/);
+  assert.doesNotMatch(showcase, /src="\/api\/mcp\/showcase-asset"/);
+  assert.match(showcase, /hermes-agent-mark\.png/);
+  assert.doesNotMatch(showcase, /rounded-full/);
   assert.doesNotMatch(showcase, /Garde toute la puissance de ton assistant/);
   assert.doesNotMatch(showcase, /forfait web payant compatible/);
   assert.doesNotMatch(showcase, /administrateur de ton espace/);
-  assert.doesNotMatch(showcase, /ACCESS_LEVELS|<Check|space-y-3/);
+  assert.doesNotMatch(showcase, /ACCESS_LEVELS|<Check/);
   assert.match(showcase, /focus-visible:ring-2/);
 });
 
@@ -120,13 +132,16 @@ test("the MCP asset follows BUILD hierarchy and records mark provenance", async 
   assert.match(assetReadme, /brand approval/i);
 });
 
-test("the public connector uses one useful reference image instead of decorative UI", async () => {
+test("the public connector uses a direct Claude conversation instead of a reference image", async () => {
   const showcase = await readFile("components/McpConnectorShowcase.tsx", "utf8");
 
-  assert.match(showcase, /src="\/api\/mcp\/showcase-asset"/);
-  assert.match(showcase, /alt="Contexte BUILD transmis à ton assistant"/);
-  assert.match(showcase, /TON CONTEXTE BUILD/);
-  assert.match(showcase, /Exemples de questions/);
-  assert.doesNotMatch(showcase, /useState|aria-pressed|setLevel/);
+  assert.match(showcase, /role="region"/);
+  assert.match(showcase, /setStage/);
+  assert.match(showcase, /setVisiblePrompt/);
+  assert.match(showcase, /setVisibleAnswer/);
+  assert.match(showcase, /Recherche dans le MCP BUILD/);
+  assert.doesNotMatch(showcase, /src="\/api\/mcp\/showcase-asset"/);
+  assert.match(showcase, /useState/);
+  assert.doesNotMatch(showcase, /aria-pressed|setLevel/);
   assert.doesNotMatch(showcase, /rounded-2xl/g);
 });

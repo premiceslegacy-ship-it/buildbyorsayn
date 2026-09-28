@@ -14,7 +14,7 @@ export const PHASES = [
       "Deuxième technique, plus terrain et souvent plus rentable : observe le tunnel de vente d'un acteur qui obtient déjà des résultats dans ta ville ou ta niche. Tu peux demander un appel de découverte, étudier son offre, regarder les questions posées et analyser les relances que tu reçois. Tu observes les publicités, la landing page, le formulaire, le devis, les paliers de prix et les objections traitées avant même que tu les formules. Tu ne voles pas son identité ni ses textes. Tu récupères l'ingénierie commerciale qu'il a probablement affinée au fil de nombreux essais, puis tu la reconstruis avec ton offre, ton angle et tes contraintes.",
       "Une vidéo t'apporte une théorie. Un transcript bien interrogé t'aide à extraire une méthode. Un tunnel observé te montre ce qui rencontre réellement un marché. La compétence apparaît lorsque tu peux expliquer le mécanisme, l'exécuter, constater son effet et dire dans quels cas il ne faut pas l'utiliser.",
     ],
-    citation: "McLuhan avait raison : nous façonnons nos outils, puis nos outils nous façonnent. La méthode Sharingan inverse le rapport. Tu formes l'outil, tu vérifies ce qu'il te rend et tu gardes la capacité derrière l'outil.",
+    citation: "Une idée ancienne résume bien ce mouvement : nous façonnons nos outils, puis nos outils nous façonnent. La méthode Sharingan inverse le rapport. Tu formes l'outil, tu vérifies ce qu'il te rend et tu gardes la capacité derrière l'outil.",
   },
   {
     num: "02",

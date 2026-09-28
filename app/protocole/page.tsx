@@ -17,25 +17,25 @@ export const metadata = {
 
 const REFERENCE_BOOKS = [
   {
-    author: "Marshall McLuhan",
+    author: "Médias et outils",
     title: "Understanding Media",
     note: "Un outil ne se contente pas de t'aider. Il change aussi ta façon de travailler.",
     cover: "/assets/protocole-references/marshall-mcluhan-understanding-media.jpg",
   },
   {
-    author: "Ivan Illich",
+    author: "Autonomie et outils",
     title: "Tools for Conviviality",
     note: "Un bon outil doit augmenter ton autonomie, pas organiser ta dépendance.",
     cover: "/assets/protocole-references/ivan-illich-tools-for-conviviality.jpg",
   },
   {
-    author: "Gary Becker",
+    author: "Capital humain",
     title: "Human Capital",
     note: "Une compétence devient un actif quand elle continue de produire de la valeur.",
     cover: "/assets/protocole-references/gary-becker-human-capital.jpg",
   },
   {
-    author: "Nassim Nicholas Taleb",
+    author: "Adaptation au changement",
     title: "Antifragile",
     note: "Le but n'est pas seulement de résister aux changements, mais d'en sortir plus fort.",
     cover: "/assets/protocole-references/nassim-taleb-antifragile.jpg",

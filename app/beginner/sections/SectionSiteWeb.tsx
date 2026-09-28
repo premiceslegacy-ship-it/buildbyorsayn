@@ -82,7 +82,7 @@ const INSPIRATION_LOGOS = [
   ["Figma", "/brand-logos/figma.svg", false],
 ] as const;
 
-const VIKTOR_ODDY_VIDEOS = [
+const SITE_REFERENCE_VIDEOS = [
   ["Web design pour startup IA", "https://www.youtube.com/watch?v=raUcRcrfgoE"],
   ["Site animé avec outils gratuits", "https://www.youtube.com/watch?v=0Uk-CavIjqk"],
   ["Site Awwwards avec Claude Design", "https://www.youtube.com/watch?v=cNZvyzObZx8"],
@@ -284,7 +284,7 @@ Travaille dans /projets/mon-site, ne modifie pas les autres dossiers et montre-m
 
       <SectionReveal className="mb-16">
         <ChapterTitle marker="5 bis">Du tableau d'inspiration au site qui fonctionne</ChapterTitle>
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/65">Les démonstrations de Viktor Oddy et les méthodes de designers web plus anciennes convergent sur un point : le site ne commence pas par un prompt de génération. Il commence par une collecte de références, un tri, une direction visuelle, une architecture de contenu et une vérification progressive. L'IA accélère chaque étape, mais elle ne décide pas à ta place ce qui est pertinent pour ton marché.</p>
+        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/65">Les démonstrations disponibles et les méthodes de designers web plus anciennes convergent sur un point : le site ne commence pas par un prompt de génération. Il commence par une collecte de références, un tri, une direction visuelle, une architecture de contenu et une vérification progressive. L'IA accélère chaque étape, mais elle ne décide pas à ta place ce qui est pertinent pour ton marché.</p>
         <PlainNote title="Ce que la vidéo transcrite permet de vérifier"><div className="space-y-3"><p>Dans l'exemple étudié, le travail commence par une référence visuelle et une première zone limitée : navigation, titre et hero. Le reste de la page arrive ensuite, une fois la direction et le cadrage plus stables.</p><p>Le créateur sépare aussi les tâches : un outil produit ou anime un asset, puis l'outil de construction l'intègre et reçoit des demandes ciblées sur le cadrage, le point focal, le responsive, les boutons et le menu mobile.</p><p>La méthode BUILD n'en déduit pas une recette à recopier. Elle en retient une règle testable : référence précise, tâche bornée, retour visuel, correction locale, puis extension et contrôle du vrai parcours.</p></div></PlainNote>
         <div className="mb-8 flex flex-wrap items-center gap-x-7 gap-y-4 border-y border-white/10 py-5">
           <ToolLogo name="YouTube" src="/brand-logos/youtube.svg" invert />
@@ -293,7 +293,7 @@ Travaille dans /projets/mon-site, ne modifie pas les autres dossiers et montre-m
           <ToolLogo name="Refero" src="/brand-logos/refero.png" />
           <ToolLogo name="Dribbble" src="/brand-logos/dribbble.svg" />
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
-            {VIKTOR_ODDY_VIDEOS.map(([title, href]) => (
+            {SITE_REFERENCE_VIDEOS.map(([title, href]) => (
               <Link key={href} href={href} target="_blank" rel="noreferrer" className="text-[#e8d5b0] underline underline-offset-4">{title} ↗</Link>
             ))}
           </div>
