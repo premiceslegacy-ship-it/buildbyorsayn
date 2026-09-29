@@ -104,6 +104,9 @@ test("the shared MCP block demonstrates the training benefit with concise copy",
   assert.match(showcase, /brand-logos\/build-logo-compact\.png/);
   assert.match(showcase, /fiche chantier/);
   assert.match(showcase, /premier module de ton SaaS/);
+  assert.match(showcase, /mcp-claude-thinking/);
+  assert.match(showcase, /mcp-loading-dot/);
+  assert.match(showcase, /data-mcp-loading-dots="true"/);
   assert.doesNotMatch(showcase, /hermes-agent-mark\.png|\bToi\b/);
   assert.doesNotMatch(showcase, /rounded-full/);
   assert.doesNotMatch(showcase, /Garde toute la puissance de ton assistant/);

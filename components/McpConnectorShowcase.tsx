@@ -236,7 +236,7 @@ function ClaudeComposer({
   );
 }
 
-function ClaudeAvatar() {
+function ClaudeAvatar({ searching, reducedMotion }: { searching: boolean; reducedMotion: boolean }) {
   return (
     <span
       data-mcp-assistant-avatar="claude"
@@ -259,9 +259,34 @@ function ClaudeAvatar() {
         height={34}
         unoptimized
         loading="eager"
-        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          transformOrigin: "center",
+          animation: searching && !reducedMotion ? "mcp-claude-thinking 1.6s ease-in-out infinite" : "none",
+        }}
         draggable={false}
       />
+    </span>
+  );
+}
+
+function LoadingDots({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <span data-mcp-loading-dots="true" aria-hidden="true" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginLeft: 1 }}>
+      {[0, 1, 2].map((index) => (
+        <span
+          key={index}
+          style={{
+            width: 4,
+            height: 4,
+            borderRadius: "100%",
+            background: "#A3A097",
+            animation: reducedMotion ? "none" : `mcp-loading-dot 1.1s ${index * 140}ms ease-in-out infinite`,
+          }}
+        />
+      ))}
     </span>
   );
 }
@@ -295,7 +320,7 @@ function BuildLogo() {
   );
 }
 
-function ClaudeConversation({ stage, answer }: { stage: DemoStage; answer: string }) {
+function ClaudeConversation({ stage, answer, reducedMotion }: { stage: DemoStage; answer: string; reducedMotion: boolean }) {
   if (stage === "idle" || stage === "typing" || stage === "sending") return null;
 
   return (
@@ -306,7 +331,7 @@ function ClaudeConversation({ stage, answer }: { stage: DemoStage; answer: strin
       <p style={{ margin: 0, maxWidth: 820, fontSize: 21, lineHeight: 1.4 }}>{PROMPT}</p>
 
       <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginTop: 28 }}>
-        <ClaudeAvatar />
+        <ClaudeAvatar searching={stage === "searching"} reducedMotion={reducedMotion} />
         <div style={{ minWidth: 0, maxWidth: 760 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
             <p style={{ margin: 0, fontSize: 21, fontWeight: 600 }}>Claude</p>
@@ -317,6 +342,7 @@ function ClaudeConversation({ stage, answer }: { stage: DemoStage; answer: strin
             <div role="status" aria-live="polite" aria-label="Recherche dans le MCP BUILD" style={{ marginTop: 18, display: "inline-flex", alignItems: "center", gap: 10, padding: "14px 16px", border: "1px solid #E8E5DD", borderRadius: 14, background: "rgba(255,255,255,.58)", color: "#73726C", fontSize: 17 }}>
               <SearchIcon size={20} color="#D97757" />
               <span>Recherche dans le MCP</span>
+              <LoadingDots reducedMotion={reducedMotion} />
               <BuildLogo />
             </div>
           ) : (
@@ -443,7 +469,7 @@ export function McpConnectorShowcase() {
     function startSearch() {
       if (!active) return;
       setStage("searching");
-      timeouts.push(window.setTimeout(startAnswer, 1750));
+      timeouts.push(window.setTimeout(startAnswer, 2050));
     }
 
     function startSending() {
@@ -482,7 +508,7 @@ export function McpConnectorShowcase() {
 
   return (
     <section aria-labelledby="mcp-connector-title" className="mt-16 py-10 sm:py-14">
-      <style>{`@keyframes mcp-send-pulse { from { opacity: .55; transform: scale(.92); } to { opacity: 0; transform: scale(1.35); } }`}</style>
+      <style>{`@keyframes mcp-send-pulse { from { opacity: .55; transform: scale(.92); } to { opacity: 0; transform: scale(1.35); } } @keyframes mcp-claude-thinking { 0%, 100% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); } 50% { opacity: .78; transform: translateY(-1px) rotate(2deg) scale(1.04); } } @keyframes mcp-loading-dot { 0%, 60%, 100% { opacity: .35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }`}</style>
       <div className="mb-10 h-px bg-white/[0.08] sm:mb-14" aria-hidden="true" />
 
       <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[minmax(0,1.18fr)_minmax(300px,0.82fr)] lg:gap-14">
@@ -503,7 +529,7 @@ export function McpConnectorShowcase() {
               className="absolute left-1/2 top-1/2"
               style={{ width: REFERENCE_WIDTH, height: REFERENCE_HEIGHT, transform: `translate(-50%, -50%) scale(${stageScale})`, transformOrigin: "center center" }}
             >
-              <ClaudeConversation stage={stage} answer={visibleAnswer} />
+              <ClaudeConversation stage={stage} answer={visibleAnswer} reducedMotion={reducedMotion} />
               <ClaudeComposer conversation={conversation} text={typing ? visiblePrompt : ""} showSend={typing && visiblePrompt.length > 0} sendPressed={stage === "sending"} reducedMotion={reducedMotion} />
             </div>
           </div>

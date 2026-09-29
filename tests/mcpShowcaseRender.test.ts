@@ -20,6 +20,10 @@ test("the showcase renders a direct Claude conversation with BUILD context", asy
   assert.match(source, /useState|useEffect/);
   assert.match(source, /IntersectionObserver/);
   assert.match(source, /stageInView/);
+  assert.match(source, /mcp-claude-thinking/);
+  assert.match(source, /mcp-loading-dot/);
+  assert.match(source, /data-mcp-loading-dots="true"/);
+  assert.match(source, /startAnswer, 2050/);
   assert.match(source, /prefers-reduced-motion/);
   assert.doesNotMatch(source, /Illustration|DANS CET EXEMPLE/);
   assert.doesNotMatch(source, /aria-pressed/);
