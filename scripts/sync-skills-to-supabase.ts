@@ -10,6 +10,15 @@ import {
   type SkillsPublicationArtifact,
 } from "../lib/skillsMetadata";
 
+const cliArgs = process.argv.slice(2);
+if (cliArgs.includes("--help") || cliArgs.includes("-h")) {
+  console.log("Usage: npm run skills:sync");
+  process.exit(0);
+}
+if (cliArgs.length > 0) {
+  throw new Error("skills:sync accepts no arguments. Run npm run skills:sync to publish.");
+}
+
 loadEnv({ path: ".env.local", quiet: true });
 loadEnv({ quiet: true });
 

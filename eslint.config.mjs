@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "coverage/**",
     "test-results/**",
     "e2e/.auth/**",
+    // Downloadable HyperFrames starters are independently validated by their
+    // own `npm run check`; linting their bundled vendor/runtime code as app code
+    // produces false production failures.
+    "docs/product-film-factory/template/**",
   ]),
   ...nextVitals,
   ...nextTypescript,

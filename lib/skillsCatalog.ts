@@ -20,8 +20,8 @@ export type SkillCatalogItem = {
   category: SkillCategory;
 };
 
-// Ordre de workflow : recherche marché -> cadrage produit -> design -> backend -> site web -> motion.
-export const SKILLS_CATALOG: SkillCatalogItem[] = [
+// Catalogue v2 figé. Il reste la source de compatibilité des lecteurs déjà déployés.
+export const SKILLS_CATALOG_V2: SkillCatalogItem[] = [
   {
     slug: "deep-research-vertical",
     title: "Deep Research Verticale",
@@ -83,6 +83,20 @@ export const SKILLS_CATALOG: SkillCatalogItem[] = [
       "Anime tes visuels par le code plutôt qu'à la souris : titres, transitions, micro-interactions et séquences complètes, exports vérifiés.",
     access: "beginner",
     fileName: "code-motion-production.zip",
+    category: "motion",
+  },
+];
+
+// Catalogue v3 courant. Toute modification future de set exige une nouvelle identité de catalogue.
+export const SKILLS_CATALOG: SkillCatalogItem[] = [
+  ...SKILLS_CATALOG_V2,
+  {
+    slug: "product-film-factory",
+    title: "Product Film Factory",
+    description:
+      "Transforme une scène métier en film produit narré : script, HyperFrames, voix, musique, SFX et rendu vérifié, sans reprendre la vidéo de quelqu'un d'autre.",
+    access: "beginner",
+    fileName: "product-film-factory.zip",
     category: "motion",
   },
 ];

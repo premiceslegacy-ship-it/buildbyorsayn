@@ -8,7 +8,7 @@ Canonical private skill source is provided by `ORSAYN_AI_ROOT`:
 $ORSAYN_AI_ROOT/skills/
 ```
 
-The canonical published set is limited to the seven mappings below (catalogue v2). Read `SKILLS-PUBLICATION.md` before publication. The legacy top-level `expert-backend-v2.md` is retired and must never be mirrored or published. Its maintained authority is `backend-orsayn/references/17-domains.md`.
+The canonical published set is limited to the eight mappings below (catalogue v3). Read `SKILLS-PUBLICATION.md` before publication. The legacy top-level `expert-backend-v2.md` is retired and must never be mirrored or published. Its maintained authority is `backend-orsayn/references/17-domains.md`.
 
 `docs/` is only the BUILD publishing mirror. Never treat it as the source of truth and never edit a skill there first.
 
@@ -23,6 +23,7 @@ When the user says they updated, modified, replaced, added, or published a skill
    - `deep-research-vertical/` → `docs/deep-research-vertical/`
    - `apple-design-skills/` → `docs/apple-design-skills/`
    - `code-motion-production/` → `docs/code-motion-production/` (BEGINNER explicitly authorized)
+   - `product-film-factory/` → `docs/product-film-factory/` (BEGINNER explicitly authorized, generic starter only)
 3. Discover the existing native Hermes installation for each skill and preserve its category; do not assume all skills live under orsayn. Keep `expert-backend-v2.md` retired because its content lives in `backend-orsayn/references/17-domains.md`.
 4. Compare source/mirror hashes before publishing.
 5. Synchronize the private BUILD skills to Supabase Storage from the repo root:
@@ -31,7 +32,7 @@ When the user says they updated, modified, replaced, added, or published a skill
 npm run skills:sync
 ```
 
-6. Only after parent review and canonical freeze, `npm run skills:sync` reads every uploaded artifact back, compares exact bytes, then publishes and verifies `catalogs/v2/manifest.json` (schema version 2, catalogVersion 2, exact seven-file set). Legacy `manifest.json` and its immutable releases MUST remain untouched for old apps and rollback. Publish and independently verify v2 before deploying new app code. The manifest timestamp must only advance after every catalog artifact passes readback. No uploads, deployments or watcher acceptance during preparation.
+6. Only after parent review and canonical freeze, `npm run skills:sync` reads every uploaded artifact back, compares exact bytes, then publishes and verifies `catalogs/v3/manifest.json` (schema version 2, catalogVersion 3, exact eight-file set). Legacy `manifest.json`, `catalogs/v2/manifest.json` and their immutable releases MUST remain untouched for old apps and rollback. Publish and independently verify v3 before deploying new app code. The manifest timestamp must only advance after every catalog artifact passes readback. No uploads, deployments or watcher acceptance during preparation.
 
 Typical trigger phrases:
 
@@ -45,7 +46,7 @@ If the command is blocked by sandbox/network permissions, request approval and r
 
 Success criteria:
 
-- The output includes `Uploaded releases/<releaseId>/<skill-file> to skills (readback verified)` for every catalog artifact and `catalogs/v2/manifest.json`.
+- The output includes `Uploaded releases/<releaseId>/<skill-file> to skills (readback verified)` for every catalog artifact and `catalogs/v3/manifest.json`.
 - The verified manifest contains the complete expected artifact set and advances its timestamp only after all artifact readbacks pass.
 - Tell the user the latest version is available only after independent remote ZIP-member/hash verification, canonical/mirror stability checks and deployed UI/API/MCP access tests. Fixtures do not prove live availability.
 - For existing skill content updates, no GitHub push or Vercel redeploy is required.
