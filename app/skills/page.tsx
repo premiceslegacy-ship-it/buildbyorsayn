@@ -104,8 +104,8 @@ const SKILL_METHOD_EXAMPLES = [
     body: "Décomposition du site qui vend en 10 sous-domaines : copy et CTA, arborescence, preuve sociale, psychologie de conversion, formulaires, SEO/GEO, performance, mesure.",
   },
   {
-    skill: "Motion Design par le code",
-    body: "Décomposition du métier de motion designer : direction visuelle, choréographie d'animation, titres et transitions, vérification d'export - le tout piloté par du code, pas par la souris.",
+    skill: "Motion Design avec HyperFrames, V1",
+    body: "Décomposition du métier de motion designer avec HyperFrames : direction visuelle, storytelling, caméra motivée, interfaces vivantes, transitions, son causal et vérification d'export.",
   },
 ];
 
@@ -142,8 +142,8 @@ const SKILL_WORKFLOW = [
   },
   {
     step: "07",
-    title: "Motion Design par le code",
-    body: "Pour finir, ce skill anime la landing page ou le produit : titres, transitions, micro-interactions et séquences complètes, avec une direction visuelle cadrée et des exports vérifiés à chaque étape.",
+    title: "Motion Design avec HyperFrames, V1",
+    body: "Pour finir, ce skill transforme une landing page, un produit ou une scène métier en séquence HyperFrames : narration, interfaces vivantes, caméra utile, transitions et exports vérifiés à chaque étape.",
   },
 ];
 
@@ -179,9 +179,9 @@ const SKILL_PROMPTS = [
     prompt: "Mon produit est cadré avec ORACLE by Orsayn. Construis la landing page à partir du BRIEF, du DESIGN-SYSTEM et de la recherche marché associée.",
   },
   {
-    skill: "Motion Design par le code",
-    role: "Anime une landing page, un produit ou un visuel par le code : titres, transitions, micro-interactions, avec exports vérifiés à chaque étape.",
-    prompt: "Voici ma landing page/mon visuel [description/lien]. Anime [section précise] par le code : direction visuelle cadrée, transitions et micro-interactions, export vérifié.",
+    skill: "Motion Design avec HyperFrames, V1",
+    role: "Crée une séquence de motion design avec HyperFrames : narration, titrage, interface, caméra motivée, transitions et export vérifié.",
+    prompt: "Voici ma landing page, mon produit ou ma scène métier [description/lien]. Construis une séquence HyperFrames pour [moment précis] : storyboard, direction visuelle, mouvement local, transition, CTA et export vérifié.",
   },
 ];
 

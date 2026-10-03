@@ -7,6 +7,8 @@ test('motion packs are explicitly beginner and catalogue identities stay unique'
   assert.ok(motion, 'code motion pack must exist');
   assert.equal(motion.access, 'beginner');
   assert.equal(motion.fileName, 'code-motion-production.zip');
+  assert.equal(motion.title, 'Motion Design avec HyperFrames, V1');
+  assert.match(motion.description, /HyperFrames/);
 
   const productFilm = getSkillBySlug('product-film-factory');
   assert.ok(productFilm, 'product film factory pack must exist');

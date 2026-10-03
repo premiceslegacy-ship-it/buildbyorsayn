@@ -78,9 +78,9 @@ export const SKILLS_CATALOG_V2: SkillCatalogItem[] = [
   },
   {
     slug: "code-motion-production",
-    title: "Motion Design par le code",
+    title: "Motion Design avec HyperFrames, V1",
     description:
-      "Anime tes visuels par le code plutôt qu'à la souris : titres, transitions, micro-interactions et séquences complètes, exports vérifiés.",
+      "Apprends le motion design avec HyperFrames : films narrés, interfaces vivantes, transitions, caméra utile et exports vérifiés, directement en HTML, CSS et JavaScript.",
     access: "beginner",
     fileName: "code-motion-production.zip",
     category: "motion",
