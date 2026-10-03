@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SectionReveal } from "@/components/ui/section-reveal";
 import { MarkdownFilePreview } from "@/components/ui/markdown-file-preview";
+import { FoundationEditorialNote } from "../FoundationEditorialNote";
 
 const SITE_TYPES = [
   ["Landing page", "Présenter une offre et obtenir une action précise: appel, devis, essai ou achat."],
@@ -133,10 +134,7 @@ function ChapterTitle({ marker, children }: { marker: string; children: React.Re
 
 function PlainNote({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mt-7 border-l-2 border-[#e8d5b0]/55 bg-[#e8d5b0]/[0.035] px-5 py-4">
-      <p className="mb-1 text-sm font-semibold text-[#e8d5b0]">{title}</p>
-      <div className="text-sm leading-relaxed text-white/65">{children}</div>
-    </div>
+    <FoundationEditorialNote label={title}>{children}</FoundationEditorialNote>
   );
 }
 
@@ -212,11 +210,12 @@ export function SectionSiteWeb() {
       </SectionReveal>
 
       <SectionReveal className="mb-16">
-        <ChapterTitle marker="3">La proposition de valeur et le copywriting</ChapterTitle>
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/65">La proposition de valeur dit qui tu aides, quel résultat la personne obtient et pourquoi elle peut te croire. Le copywriting aide à rendre la décision claire sans gonfler la promesse.</p>
-        <div className="grid gap-px bg-white/10 md:grid-cols-2"><div className="bg-[#161618] p-5"><p className="mb-3 text-xs uppercase tracking-[0.14em] text-white/60">Faible</p><p className="text-lg text-white/65">« Des solutions digitales innovantes pour votre croissance. »</p></div><div className="bg-[#161618] p-5"><p className="mb-3 text-xs uppercase tracking-[0.14em] text-[#e8d5b0]/70">Mieux</p><p className="text-lg text-white/80">« Un site clair pour que les artisans reçoivent des demandes de devis qualifiées. »</p></div></div>
-        <div className="mt-8 grid gap-6 md:grid-cols-2"><div className="border-t border-white/10 pt-5"><p className="mb-2 text-xs uppercase tracking-[0.14em] text-white/60">Fonctionnalité</p><p className="text-white/70">« Agenda avec rappels automatiques. »</p></div><div className="border-t border-[#e8d5b0]/30 pt-5"><p className="mb-2 text-xs uppercase tracking-[0.14em] text-[#e8d5b0]/65">Bénéfice</p><p className="text-white/80">« Tes clients se souviennent du rendez-vous, sans relance manuelle. »</p></div></div>
-        <div className="mt-8 grid gap-8 md:grid-cols-2"><div><h4 className="mb-3 font-semibold text-[#f0ede8]">Écris avec les mots de tes clients</h4><p className="text-sm leading-relaxed text-white/60">Relis appels, emails, avis et questions de vente. Garde une phrase concrète comme « je perds mes soirées à faire les devis » plutôt que « optimiser les opérations ».</p></div><div><h4 className="mb-3 font-semibold text-[#f0ede8]">Un CTA dit ce que la personne obtient</h4><div className="space-y-2 text-sm text-white/60"><p>Faible: Envoyer, Soumettre, Cliquez ici.</p><p>Mieux: Recevoir mon devis, Voir la démo, Réserver mon appel.</p><p>Garde un CTA principal par écran et une réassurance vraie dessous.</p></div></div></div>
+        <ChapterTitle marker="3">Écrire pour que la personne comprenne</ChapterTitle>
+        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-white/65">Avant de parler de ton site, montre le moment que ton client vit. Il doit pouvoir se dire : « Oui, c'est exactement ça. » Puis explique simplement ce qui peut changer et ce qu'il peut faire maintenant.</p>
+        <div className="grid gap-px bg-white/10 md:grid-cols-2"><div className="bg-[#161618] p-5"><p className="mb-3 text-xs uppercase tracking-[0.14em] text-white/60">On ne comprend pas</p><p className="text-lg text-white/65">« Nous créons des solutions digitales pour faire grandir votre entreprise. »</p></div><div className="bg-[#161618] p-5"><p className="mb-3 text-xs uppercase tracking-[0.14em] text-[#e8d5b0]/70">On voit la scène</p><p className="text-lg text-white/80">« Vos demandes de devis arrivent par téléphone et WhatsApp. Le site les rassemble pour que vous sachiez qui rappeler. »</p></div></div>
+        <div className="mt-8 grid gap-6 md:grid-cols-2"><div className="border-t border-white/10 pt-5"><p className="mb-2 text-xs uppercase tracking-[0.14em] text-white/60">Nommer l'objet</p><p className="text-white/70">« Un agenda avec des rappels automatiques. »</p></div><div className="border-t border-[#e8d5b0]/30 pt-5"><p className="mb-2 text-xs uppercase tracking-[0.14em] text-[#e8d5b0]/65">Dire ce qui change</p><p className="text-white/80">« Les clients reçoivent le rappel avant le rendez-vous. Tu n'as plus besoin de les appeler un par un. »</p></div></div>
+        <div className="mt-8 grid gap-8 md:grid-cols-2"><div><h4 className="mb-3 font-semibold text-[#f0ede8]">Utilise leurs vrais mots</h4><p className="text-sm leading-relaxed text-white/60">Relis les appels, emails, avis et questions. Garde une phrase comme « je perds mes soirées à refaire les devis » plutôt que « optimiser les opérations ».</p></div><div><h4 className="mb-3 font-semibold text-[#f0ede8]">Le bouton dit ce qui se passe ensuite</h4><div className="space-y-2 text-sm text-white/60"><p>Flou : Envoyer, Soumettre, Cliquez ici.</p><p>Clair : Recevoir mon devis, Voir la démo, Réserver mon appel.</p><p>Garde un bouton principal par écran et une vraie explication juste dessous.</p></div></div></div>
+        <PlainNote title="Avant de publier"><p>Lis la page à voix haute. Si un enfant de 10 ans ne voit pas qui est concerné, ce qui bloque, ce qui change et ce qu'il doit faire, simplifie encore. Ne promets pas un résultat que tu ne peux pas montrer.</p></PlainNote>
         <PlainNote title="Réduis la friction du formulaire"><div className="space-y-3"><p>Demande seulement ce qui sert à la prochaine étape. Chaque champ garde un libellé visible et indique s'il est obligatoire ou facultatif.</p><p>Affiche un message d'erreur près du champ et explique comment corriger la saisie. Après l'envoi, montre une confirmation claire, vérifie où arrive la demande et qui la traite.</p><p>Près du bouton, explique l'utilisation de ses données et donne accès à la politique de confidentialité.</p></div></PlainNote>
       </SectionReveal>
 

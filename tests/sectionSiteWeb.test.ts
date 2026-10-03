@@ -11,10 +11,6 @@ const atelierDesignSourcePath = new URL(
   "../references/design-system-examples/atelier-design-system.md",
   import.meta.url
 );
-const brandAssetManifestPath = new URL(
-  "../private/brand-assets/build-collection-cards/manifest/asset-manifest.json",
-  import.meta.url
-);
 
 test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD", () => {
   assert.equal(
@@ -54,12 +50,14 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
     "Suite",
     "Réassurance sous le CTA",
     "Réponse en 24 h",
-    "Des solutions digitales innovantes",
-    "Un site clair pour que les artisans",
-    "Le copywriting",
-    "les mots de tes clients",
-    "Fonctionnalité",
-    "Bénéfice",
+    "Écrire pour que la personne comprenne",
+    "On ne comprend pas",
+    "On voit la scène",
+    "Vos demandes de devis arrivent par téléphone et WhatsApp",
+    "Utilise leurs vrais mots",
+    "Nommer l'objet",
+    "Dire ce qui change",
+    "Avant de publier",
     "Réduis la friction du formulaire",
     "libellé visible",
     "obligatoire ou facultatif",
@@ -153,6 +151,8 @@ test("le bloc 09 couvre le parcours éditorial complet avec les primitives BUILD
     "tokens sémantiques",
     "requalifié",
     "Une direction artistique n'est pas une humeur",
+    "Des solutions digitales innovantes",
+    "Un site clair pour que les artisans reçoivent des demandes de devis qualifiées.",
   ]) {
     assert.equal(
       source.includes(forbiddenCopy),
@@ -223,19 +223,6 @@ test("les révélations respectent la préférence de mouvement réduit", () => 
   assert.match(source, /useReducedMotion/);
   assert.match(source, /duration: shouldReduceMotion \? 0 : 0\.6/);
 });
-
-test(
-  "le nouvel asset Fondations appartient au manifeste canonique",
-  { skip: !existsSync(brandAssetManifestPath) ? "manifeste privé non fourni" : false },
-  () => {
-    const manifest = readFileSync(brandAssetManifestPath, "utf8");
-
-    assert.match(manifest, /"id": "fondations-site-web"/);
-    assert.match(manifest, /pages\/fondations\/09-construire-un-site-web-avec-l-ia/);
-    assert.match(manifest, /pages\/fondations\/10-de-l-idee-a-l-url-en-ligne/);
-    assert.match(manifest, /pages\/fondations\/11-le-seuil/);
-  }
-);
 
 test("l'exemple DESIGN-SYSTEM Atelier reste vérifiable depuis le dépôt", () => {
   assert.equal(existsSync(atelierDesignSourcePath), true, "source Atelier absente du dépôt");

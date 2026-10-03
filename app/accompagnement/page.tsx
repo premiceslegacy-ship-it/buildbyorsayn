@@ -77,8 +77,9 @@ export default async function AccompagnementPage({ searchParams }: Props) {
       <section className="border-b border-white/[0.08] px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-7xl">
           {resolvedSearchParams?.access === "restricted" ? (
-            <div className="mx-auto mb-10 max-w-2xl border-l-2 border-[#c9b48a] pl-4 text-left text-sm leading-6 text-[#d8d3c8]" role="status">
-              Cet espace est réservé aux personnes inscrites. Le formateur ouvre l'accès et définit les thèmes à travailler.
+            <div className="mx-auto mb-10 grid max-w-2xl gap-2 border-y border-[#c9b48a]/25 py-5 text-left sm:grid-cols-[7rem_1fr] sm:gap-5" role="status">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#c9b48a]/75">Accès</p>
+              <p className="text-sm leading-6 text-[#d8d3c8]">Cet espace est réservé aux personnes inscrites. Le formateur ouvre l'accès et définit les thèmes à travailler.</p>
             </div>
           ) : null}
           <div className="mx-auto max-w-4xl text-center">

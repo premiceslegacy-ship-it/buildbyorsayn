@@ -2,6 +2,7 @@ import { Play } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { SectionReveal } from "@/components/ui/section-reveal";
+import { FoundationEditorialNote } from "../FoundationEditorialNote";
 
 const TUTORIAL_ASSETS = "/assets/tutorials";
 const LOGOS = "/brand-logos";
@@ -172,7 +173,7 @@ export function Section4() {
           <div className="grid gap-2 py-5 md:grid-cols-[2rem_11rem_1fr]"><span className="font-mono text-xs text-[#e8d5b0]/60">4)</span><strong className="text-[#f0ede8]">Séparer les missions</strong><p>Crée un profil Hermes par usage important : recherche, contenu, support ou automatisation. Chaque profil garde ses clés, sa mémoire, ses sessions, ses skills et ses cron. Commence avec des outils de lecture et un compte agent dédié.</p></div>
           <div className="grid gap-2 py-5 md:grid-cols-[2rem_11rem_1fr]"><span className="font-mono text-xs text-[#e8d5b0]/60">5)</span><strong className="text-[#f0ede8]">Observer et restaurer</strong><p>Journalise les exécutions, les coûts, les erreurs, les appels d’outils et les livraisons. Teste une restauration avant d’en avoir besoin. Un cron qui tourne sans rapport de santé ni sauvegarde est une dette cachée.</p></div>
         </div>
-        <div className="mt-6 border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4"><p className="font-semibold text-[#e8d5b0]">Le bon niveau de départ</p><p className="mt-2">Pour un premier déploiement, garde Hermes privé sur le tailnet, limite les outils, utilise des secrets injectés hors du dépôt, exige une validation humaine pour les messages ou publications externes et conserve un chemin de retour manuel. Tu pourras élargir l’autorité après avoir observé plusieurs exécutions réussies.</p></div>
+        <FoundationEditorialNote label="Le bon niveau de départ">Pour un premier déploiement, garde Hermes privé sur le tailnet, limite les outils, utilise des secrets injectés hors du dépôt, exige une validation humaine pour les messages ou publications externes et conserve un chemin de retour manuel. Tu pourras élargir l’autorité après avoir observé plusieurs exécutions réussies.</FoundationEditorialNote>
       </Chapter>
 
       <Chapter eyebrow="Exercice antifragile" title="Préparer la panne avant de généraliser">
@@ -210,12 +211,9 @@ export function Section4() {
         <p>Teste chaque bouton d’appel à l’action, appelé aussi CTA, et chaque formulaire depuis le domaine public. Confirme que l’événement apparaît dans l’outil choisi et que le message arrive au bon destinataire. Contrôle enfin la vitesse d’affichage sur mobile, le poids des images et les erreurs dans les journaux de l’hébergeur.</p>
       </Chapter>
 
-      <SectionReveal className="border-t border-white/10 pt-8">
-        <div className="border-y border-white/10 py-6">
-          <p className="mb-2 font-semibold text-[#e8d5b0]">Le site est vraiment remis quand le client peut continuer</p>
-          <p className="text-sm leading-relaxed text-white/65">Le code est sur GitHub, le site fonctionne en local et sur son domaine, les secrets sont protégés, les formulaires arrivent, la mesure fonctionne et le client possède ses comptes. Garde un court document qui explique comment lancer le projet, publier un contenu et demander de l’aide.</p>
-        </div>
-      </SectionReveal>
+      <FoundationEditorialNote label="Le site est vraiment remis quand le client peut continuer" className="mt-14">
+        Le code est sur GitHub, le site fonctionne en local et sur son domaine, les secrets sont protégés, les formulaires arrivent, la mesure fonctionne et le client possède ses comptes. Garde un court document qui explique comment lancer le projet, publier un contenu et demander de l’aide.
+      </FoundationEditorialNote>
 
       <div className="border-t border-white/5 pt-8">
         <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">Vidéo liée à cette section</p>

@@ -1,5 +1,5 @@
-import { SectionReveal } from "@/components/ui/section-reveal";
 import { FoundationChapter } from "../FoundationChapter";
+import { FoundationEditorialNote } from "../FoundationEditorialNote";
 
 const DISCOVERY_QUESTIONS = [
   ["La dernière fois", "Quand ce problème s’est-il présenté pour la dernière fois ?"],
@@ -46,9 +46,9 @@ export function SectionVente() {
             </div>
           ))}
         </div>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+        <FoundationEditorialNote label="Ce que tu cherches">
           Une question sur un comportement passé vaut mieux qu’une question qui demande si quelqu’un aimerait une solution imaginaire. Une intention déclarée n’est pas une vente. Cherche un document, un paiement, un temps déjà consacré ou une décision réellement prise.
-        </p>
+        </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 2" title="Le déroulé d’une vente, dans l’ordre">
@@ -118,14 +118,12 @@ export function SectionVente() {
             </div>
           ))}
         </div>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">Une séquence simple peut suffire : premier message ancré dans une scène métier, réponse ou silence, relance courte quelques jours plus tard, puis arrêt documenté. Mesure les réponses et les objections pour améliorer l’offre, sans transformer une observation interne en preuve commerciale.</p>
+        <FoundationEditorialNote label="Une relance suffit">Une séquence simple peut suffire : premier message ancré dans une scène métier, réponse ou silence, relance courte quelques jours plus tard, puis arrêt documenté. Mesure les réponses et les objections pour améliorer l’offre, sans transformer une observation interne en preuve commerciale.</FoundationEditorialNote>
       </FoundationChapter>
 
-      <SectionReveal className="border-t border-white/10 pt-8">
-        <p className="text-sm leading-relaxed text-[#e8d5b0]/85">
-          Vendre, c’est écouter, diagnostiquer, puis prescrire. Pose plus de questions que tu ne fais de promesses. Le calme et la compréhension vendent mieux que la pression.
-        </p>
-      </SectionReveal>
+      <FoundationEditorialNote label="À retenir" className="mt-14 mb-4">
+        Vendre, c’est écouter, diagnostiquer, puis prescrire. Pose plus de questions que tu ne fais de promesses. Le calme et la compréhension vendent mieux que la pression.
+      </FoundationEditorialNote>
     </div>
   );
 }

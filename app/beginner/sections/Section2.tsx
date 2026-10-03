@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { SectionReveal } from "@/components/ui/section-reveal";
 import { PromptContextDiagram, ApiFlowDiagram } from "../diagrams";
 import { FoundationChapter } from "../FoundationChapter";
+import { FoundationEditorialNote } from "../FoundationEditorialNote";
 
 function ToolMark({ name, src }: { name: string; src: string }) {
   return (
@@ -37,9 +37,9 @@ export function Section2() {
           <div className="grid gap-3 py-4 md:grid-cols-[9rem_1fr]"><strong className="text-sm text-[#e8d5b0]">Les tokens</strong><p className="text-sm leading-relaxed text-white/60">Les tokens sont les unités de texte que le modèle traite, parfois un mot entier, parfois un morceau de mot. Une conversation est limitée par une fenêtre de contexte. Quand elle devient trop longue, les éléments anciens peuvent peser moins ou être résumés. Un dossier de contexte clair vaut mieux qu'un historique interminable.</p></div>
           <div className="grid gap-3 py-4 md:grid-cols-[9rem_1fr]"><strong className="text-sm text-[#e8d5b0]">Le projet</strong><p className="text-sm leading-relaxed text-white/60">Un projet ou un dossier de connaissances charge les règles, les fichiers et les décisions utiles. Tu évites de répéter le métier à chaque session, mais tu dois continuer à vérifier que le contexte est à jour.</p></div>
         </div>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+        <FoundationEditorialNote label="Le bon contexte">
           Pour une tâche précise, ne charge pas tout le projet par réflexe. Commence par le fichier cible, ses dépendances directes, les règles concernées et les tests associés. Élargis le contexte seulement lorsqu'une dépendance le justifie, puis vérifie que les fichiers modifiés restent dans le périmètre.
-        </p>
+        </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 2" title="L'analogie de l'API">
@@ -60,9 +60,9 @@ export function Section2() {
           <div className="border-t border-red-500/25 pt-4"><p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-red-300/80">Rôle seul</p><p className="font-mono text-xs leading-relaxed text-white/50">« Tu es un designer senior, fais-moi un site pour un plombier. »</p><p className="mt-3 text-xs leading-relaxed text-white/35">Le modèle improvise le reste.</p></div>
           <div className="border-t border-emerald-500/25 pt-4"><p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300/80">Rôle et méthode</p><p className="font-mono text-[11px] leading-relaxed text-white/50">Contexte, public, offre, références, tokens, critères d'acceptation et vérification du parcours.</p><p className="mt-3 text-xs leading-relaxed text-white/35">Le modèle sait quoi lire et comment vérifier.</p></div>
         </div>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+        <FoundationEditorialNote label="Le vrai levier">
           Le vrai levier n'est pas le prompt parfait. C'est le contexte chargé une fois pour toutes et maintenu comme un actif de projet : règles, exemples, exceptions, preuves et décisions.
-        </p>
+        </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 4" title="De l'assistant à l'agent">
@@ -107,17 +107,15 @@ export function Section2() {
             <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start"><span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span><strong className="text-sm text-[#f0ede8]">{title}</strong><p className="text-sm leading-relaxed text-white/60">{description}</p></div>
           ))}
         </div>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+        <FoundationEditorialNote label="Comparer avant de choisir">
           Ne choisis pas un modèle, un routeur ou une interface parce qu'un tutoriel le présente comme universel. Décris d'abord la tâche et le niveau de qualité attendu, puis compare les routes avec un test reproductible.
-        </p>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+        </FoundationEditorialNote>
+        <FoundationEditorialNote label="Les responsabilités restent séparées">
           Un autre pattern utile consiste à relier une compétence à ses outils, ses permissions et ses connexions sans remettre les secrets à l'agent. La compétence décrit le travail, la connexion détient l'accès, le journal garde la trace et la personne valide les actions qui franchissent une frontière externe. Tu peux adapter ce pattern à Hermes ou à une autre stack : ce qui compte est la séparation des responsabilités, pas le nom du fournisseur.
-        </p>
+        </FoundationEditorialNote>
       </FoundationChapter>
 
-      <SectionReveal className="border-t border-white/10 pt-8">
-        <p className="text-sm leading-relaxed text-[#e8d5b0]/85">Comprendre l'environnement, c'est savoir où placer le contexte, où placer l'outil, où placer la décision humaine et comment vérifier que le système a réellement fait ce qu'il prétend.</p>
-      </SectionReveal>
+      <FoundationEditorialNote label="À retenir" className="mt-14 mb-4">Comprendre l'environnement, c'est savoir où placer le contexte, où placer l'outil, où placer la décision humaine et comment vérifier que le système a réellement fait ce qu'il prétend.</FoundationEditorialNote>
     </div>
   );
 }

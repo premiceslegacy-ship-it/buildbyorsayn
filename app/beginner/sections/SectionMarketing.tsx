@@ -1,5 +1,5 @@
-import { SectionReveal } from "@/components/ui/section-reveal";
 import { FoundationChapter } from "../FoundationChapter";
+import { FoundationEditorialNote } from "../FoundationEditorialNote";
 
 const RULES = [
   ["Le hook qui arrête le scroll", "Les premières secondes doivent rendre la situation reconnaissable. Sans scène précise, même le meilleur contenu reste invisible."],
@@ -38,9 +38,9 @@ export function SectionMarketing() {
         <p>
           Pour exister, il te faut une idée forte. Une idée qui intrigue ta niche, qui remet en question sa façon de faire, mais qui reste explicable et vérifiable. Une position nette attire les bonnes personnes et repousse les autres. Le but n’est pas de provoquer pour être vu, mais de rendre une différence immédiatement compréhensible.
         </p>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+        <FoundationEditorialNote label="Le test">
           Si une publication ne contient ni scène, ni tension, ni preuve, ni prochaine étape, elle peut faire des vues sans créer de demande. La portée seule n’est pas un signal de valeur.
-        </p>
+        </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 2" title="Le parcours en trois temps">
@@ -125,14 +125,12 @@ export function SectionMarketing() {
             </div>
           ))}
         </div>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">Adapte le format au canal sans changer le problème : une phrase et une scène pour un post court, une démonstration pour une vidéo, un raisonnement sourcé pour une newsletter, une invitation claire pour un email. Le canal change la forme ; il ne doit pas changer les faits.</p>
+        <FoundationEditorialNote label="Le même fond">Adapte le format au canal sans changer le problème : une phrase et une scène pour un post court, une démonstration pour une vidéo, un raisonnement sourcé pour une newsletter, une invitation claire pour un email. Le canal change la forme ; il ne doit pas changer les faits.</FoundationEditorialNote>
       </FoundationChapter>
 
-      <SectionReveal className="border border-[#e8d5b0]/15 bg-[#e8d5b0]/[0.04] px-6 py-5">
-        <p className="text-sm leading-relaxed text-[#e8d5b0]/85">
-          Le contenu que tu crées et les compétences que tu développes sont du capital. Il s’accumule quand chaque publication produit une preuve, une conversation, une amélioration ou un actif réutilisable.
-        </p>
-      </SectionReveal>
+      <FoundationEditorialNote label="À retenir" className="mt-14 mb-4">
+        Le contenu que tu crées et les compétences que tu développes sont du capital. Il s’accumule quand chaque publication produit une preuve, une conversation, une amélioration ou un actif réutilisable.
+      </FoundationEditorialNote>
     </div>
   );
 }

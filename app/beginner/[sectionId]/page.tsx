@@ -119,7 +119,7 @@ export default async function BeginnerSectionPage({ params }: Props) {
         </div>
 
         {!isAngleMort && (
-          <div className="mt-10">
+          <div className="mt-16 border-t border-white/10 pt-8 sm:mt-20 sm:pt-10">
             <SectionPager prev={prev} next={next ?? undefined} nextDisabledLabel="Dernière section" />
           </div>
         )}

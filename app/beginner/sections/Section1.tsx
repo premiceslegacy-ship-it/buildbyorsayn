@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { SectionReveal } from "@/components/ui/section-reveal";
 import { ContextFilesDiagram, FounderDossierDiagram } from "../diagrams";
 import { FoundationChapter } from "../FoundationChapter";
+import { FoundationEditorialNote } from "../FoundationEditorialNote";
 
 const QUESTION_GROUPS = [
   {
@@ -83,9 +83,9 @@ export function Section1() {
         <p>
           L'IA est un outil d'exécution extraordinaire. Elle a besoin d'un dossier compréhensible : problème, public, offre, références, contraintes, fichiers à lire et définition du résultat terminé. <strong className="text-[#f0ede8]">L'IA exécute. Toi, tu gardes le jugement, le périmètre et la responsabilité de vérifier.</strong>
         </p>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+        <FoundationEditorialNote label="À noter">
           Une source publique peut inspirer un mécanisme, mais elle ne devient pas une méthode parce qu'elle est populaire. Note toujours ce qui a été observé, ce qui reste hypothétique et le test qui permettrait de trancher.
-        </p>
+        </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 3" title="Les automatisations suivent une logique simple">
@@ -128,9 +128,9 @@ export function Section1() {
             </div>
           ))}
         </div>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+        <FoundationEditorialNote label="Les noms comptent">
           Les noms de connexions sont littéraux. Si ton environnement déclare une connexion sous le nom <code className="text-[#e8d5b0]">nom-connexion</code>, utilise exactement ce nom. Ne remplace jamais un identifiant par une variante supposée plus logique.
-        </p>
+        </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 5" title="Les fichiers de contexte donnent une mémoire de travail au projet">
@@ -174,14 +174,12 @@ export function Section1() {
             </div>
           ))}
         </div>
-        <p className="border-l-2 border-[#e8d5b0]/45 bg-[#e8d5b0]/[0.035] px-5 py-4 text-sm leading-relaxed text-white/65">
+        <FoundationEditorialNote label="Ce qui compte">
           Le résultat n'est considéré comme réutilisable qu'après une lecture du résultat réel, une mesure, une règle d'arrêt et un chemin manuel. Un chiffre de communauté, une promesse publique ou une économie annoncée ne remplace jamais cette preuve.
-        </p>
+        </FoundationEditorialNote>
       </FoundationChapter>
 
-      <SectionReveal className="border-t border-white/10 pt-8">
-        <p className="text-sm leading-relaxed text-[#e8d5b0]/85">Un bon projet ne commence pas avec le meilleur outil. Il commence avec une situation, une décision à prendre, une preuve à obtenir et une limite à respecter.</p>
-      </SectionReveal>
+      <FoundationEditorialNote label="À retenir" className="mt-14 mb-4">Un bon projet ne commence pas avec le meilleur outil. Il commence avec une situation, une décision à prendre, une preuve à obtenir et une limite à respecter.</FoundationEditorialNote>
     </div>
   );
 }
