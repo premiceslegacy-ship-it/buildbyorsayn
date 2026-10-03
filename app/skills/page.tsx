@@ -142,8 +142,8 @@ const SKILL_WORKFLOW = [
   },
   {
     step: "07",
-    title: "Motion Design avec HyperFrames, V1",
-    body: "Pour finir, ce skill transforme une landing page, un produit ou une scène métier en séquence HyperFrames : narration, interfaces vivantes, caméra utile, transitions et exports vérifiés à chaque étape.",
+    title: "Product Film Factory",
+    body: "Pour finir, ce skill transforme une landing page, un produit ou une scène métier en film complet : brief, direction artistique, narration, caméra, son, export et contrôle de livraison. Il assemble les savoir-faire précédents dans un résultat prêt à montrer.",
   },
 ];
 
