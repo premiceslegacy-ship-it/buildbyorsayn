@@ -98,7 +98,7 @@ test("la page Hermes Agent commence par une mission et range les chapitres comme
 
   for (const required of [
     "Choisis une tâche avant de choisir un outil.",
-    "Deux scènes de travail, deux limites claires.",
+    "Trois cas d'usage, avec leur état réel.",
     "Un parcours, pas une liste de mots compliqués.",
     "Installe Hermes après avoir choisi le premier travail à lui confier.",
     "Un carrousel Atelier",

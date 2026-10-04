@@ -25,6 +25,32 @@ const FIRST_MISSION = [
   ["04", "Prévois la vérification humaine", "La tâche est terminée seulement quand une personne sait quoi relire, quoi accepter et quelle suite donner."],
 ] as const;
 
+const MASTERCLASS_SYNTHESIS = [
+  {
+    number: "01",
+    title: "Partir d'un travail réel",
+    body: "L'outil vient après la scène métier. Une bonne mission commence par une tâche qui revient, une personne responsable et un résultat lisible.",
+  },
+  {
+    number: "02",
+    title: "Rendre le chemin explicite",
+    body: "Le contexte, les sources autorisées, les étapes et la sortie attendue doivent être nommés. Sinon, ce n'est pas un workflow : c'est une conversation floue.",
+  },
+  {
+    number: "03",
+    title: "Garder la décision humaine",
+    body: "Un agent peut préparer, comparer, classer ou rédiger. Publier, engager une dépense ou modifier une donnée importante reste une décision séparée.",
+  },
+] as const;
+
+const WORKFLOW_BUILDING_BLOCKS = [
+  ["01", "Mission", "Le travail précis à faire, pour qui et à quel moment."],
+  ["02", "Contexte autorisé", "Les fichiers, données ou outils que le workflow a le droit de consulter."],
+  ["03", "Méthode", "Les étapes répétables : lire, vérifier, comparer, préparer."],
+  ["04", "Outils autorisés", "Par exemple Treg, les fichiers et le navigateur, seulement dans le périmètre utile."],
+  ["05", "Sortie vérifiable et contrôle humain", "Un brouillon ou rapport relu avant tout effet réel."],
+] as const;
+
 const REAL_CASES = [
   {
     label: "CAS 01",
@@ -37,6 +63,12 @@ const REAL_CASES = [
     title: "Google Search Console avec Treg, puis un brouillon contrôlé",
     body: "Dans le cas Atelier, Treg lit les données first-party de Google Search Console, relie une requête à la page concernée et prépare un brouillon. Un cron borne le moment où ce travail est préparé, sans remplacer le choix humain.",
     limit: "Le cron ne publie pas, ne pousse pas et ne demande pas d'indexation sans validation humaine.",
+  },
+  {
+    label: "CAS 03",
+    title: "Le brief du lundi pour une petite équipe",
+    body: "Un workflow peut rassembler les décisions, les blocages et la prochaine action dans une note de préparation. La personne responsable choisit ensuite ce qui devient prioritaire.",
+    limit: "Cible à construire, pas une intégration active. Aucun outil de messagerie ou de gestion de projet n'est connecté par défaut.",
   },
 ] as const;
 
@@ -173,6 +205,23 @@ export default async function HermesAgentPage() {
           </div>
         </header>
 
+        <section id="etude-masterclass" className="scroll-mt-24 border-y border-white/[0.1] py-10 sm:py-12 mb-16">
+          <div className="max-w-3xl mb-8">
+            <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">CE QUE NOUS AVONS RETENU</p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Ce que ce parcours retient d'une étude de masterclass.</h2>
+            <p className="text-white/50 text-sm sm:text-base mt-3 leading-relaxed">L'étude a servi à rendre le cours plus concret : une situation, une configuration, une action, un résultat, une limite et la prochaine étape. Le transcript externe n'est ni reproduit ni traduit ici.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3 md:divide-x divide-white/[0.1]">
+            {MASTERCLASS_SYNTHESIS.map((item, index) => (
+              <article key={item.number} className={index === 0 ? "md:pr-6" : index === MASTERCLASS_SYNTHESIS.length - 1 ? "md:pl-6" : "md:px-6"}>
+                <p className="text-2xl font-light tabular-nums text-[#c9b48a]/65 mb-4">{item.number}</p>
+                <h3 className="text-sm font-semibold text-[#f0ede8]">{item.title}</h3>
+                <p className="mt-2 text-xs leading-relaxed text-white/50">{item.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <section id="premier-pas" className="scroll-mt-24 border-y border-white/[0.1] py-10 sm:py-12 mb-16">
           <div className="max-w-3xl mb-8">
             <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">LE PREMIER PAS</p>
@@ -190,15 +239,32 @@ export default async function HermesAgentPage() {
           </div>
         </section>
 
+        <section id="workflows" className="scroll-mt-24 mb-16">
+          <div className="max-w-3xl mb-8">
+            <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">LE WORKFLOW, VISIBLE</p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Les cinq briques d'un workflow utile.</h2>
+            <p className="text-white/50 text-sm sm:text-base mt-3 leading-relaxed">Ce n'est pas un outil de plus. C'est une petite chaîne de travail que l'on peut relire, corriger et améliorer sans déléguer le jugement.</p>
+          </div>
+          <ol className="grid border-y border-white/[0.1] sm:grid-cols-2 lg:grid-cols-5 lg:divide-x divide-white/[0.1]">
+            {WORKFLOW_BUILDING_BLOCKS.map(([number, title, body]) => (
+              <li key={number} className="border-b border-white/[0.1] p-5 last:border-b-0 sm:nth-[2n]:border-l lg:border-b-0 lg:border-l-0">
+                <p className="text-2xl font-light tabular-nums text-[#c9b48a]/65 mb-4">{number}</p>
+                <h3 className="text-sm font-semibold text-[#f0ede8]">{title}</h3>
+                <p className="mt-2 text-xs leading-relaxed text-white/50">{body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
         <section id="cas-concrets" className="scroll-mt-24 mb-16">
           <div className="max-w-3xl mb-8">
             <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">CE QUE ÇA CHANGE EN VRAI</p>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Deux scènes de travail, deux limites claires.</h2>
-            <p className="text-white/50 text-sm sm:text-base mt-3 leading-relaxed">Une démonstration utile montre le mécanisme, les droits et la relecture humaine. Elle ne transforme pas un résultat isolé en promesse générale.</p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Trois cas d'usage, avec leur état réel.</h2>
+            <p className="text-white/50 text-sm sm:text-base mt-3 leading-relaxed">Une démonstration utile montre le mécanisme, les droits, le résultat attendu et la relecture humaine. Elle ne transforme pas un résultat isolé en promesse générale.</p>
           </div>
-          <div className="grid gap-8 border-y border-white/[0.1] py-7 md:grid-cols-2 md:divide-x divide-white/[0.1]">
+          <div className="grid gap-8 border-y border-white/[0.1] py-7 md:grid-cols-3 md:divide-x divide-white/[0.1]">
             {REAL_CASES.map((item, index) => (
-              <article key={item.label} className={index === 0 ? "md:pr-8" : "md:pl-8"}>
+              <article key={item.label} className={index === 0 ? "md:pr-8" : index === REAL_CASES.length - 1 ? "md:pl-8" : "md:px-8"}>
                 <p className="text-[10px] tracking-[0.18em] font-semibold text-[#e8d5b0]/75 mb-3">{item.label}</p>
                 <h3 className="text-lg font-semibold tracking-tight text-[#f0ede8]">{item.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-white/55">{item.body}</p>
@@ -222,7 +288,9 @@ export default async function HermesAgentPage() {
       <ScrollProgress
         sections={[
           { id: "introduction", label: "INTRODUCTION" },
+          { id: "etude-masterclass", label: "ÉTUDE" },
           { id: "premier-pas", label: "PREMIER PAS" },
+          { id: "workflows", label: "WORKFLOWS" },
           { id: "cas-concrets", label: "CAS CONCRETS" },
           { id: "bibliotheque", label: "PARCOURS" },
           { id: "chapitres", label: "CHAPITRES" },
