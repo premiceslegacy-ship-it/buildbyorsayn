@@ -369,7 +369,7 @@ export default async function HermesAgentPage() {
               <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold">TREG, EN PRATIQUE</p>
             </div>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Treg : des idées de workflows, par métier.</h2>
-            <p className="text-white/50 text-sm sm:text-base mt-3 leading-relaxed">Treg range des outils par catégories. Voici des possibilités utiles pour une petite équipe, expliquées sans jargon. Ce sont des exemples à construire, pas des connexions déjà actives dans BUILD.</p>
+            <p className="text-white/50 text-sm sm:text-base mt-3 leading-relaxed">Treg range des outils par catégories. Il peut proposer plusieurs services pour une même tâche, mais il ne choisit pas tout seul à notre place. Voici des possibilités utiles pour une petite équipe, expliquées sans jargon. Ce sont des exemples à construire, pas des connexions déjà actives dans BUILD.</p>
           </div>
           <div className="border-y border-white/[0.1] divide-y divide-white/[0.1]">
             {TREG_DEPARTMENT_WORKFLOWS.map((workflow) => (
