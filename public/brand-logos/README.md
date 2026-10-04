@@ -35,6 +35,7 @@ Added for the Fondations tool references (Section3 "Générer des visuels pro" a
 - `bolt-new.svg`: official Bolt.new mark, downloaded directly from `https://bolt.new/static/favicon.svg`.
 - `netlify.svg`, `railway.svg`, `sanity.svg`, `plausibleanalytics.svg`, `posthog.svg`, `googlesearchconsole.svg`, `pagespeedinsights.svg`: marks downloaded from the current Simple Icons package through jsDelivr for the Fondations website workflow. They are displayed only to identify the corresponding tool.
 - `deepseek.svg`, `openrouter.svg`, `opencode.svg`, `tailscale.svg`, `dribbble.svg`, `reddit.svg`, `youtube.svg`, `x.svg`, `tiktok.svg`, `neon.svg`: transparent marks downloaded from Simple Icons or the provider's public favicon for the provider-agnostic model, research, network, database and deployment examples.
+- `treg.svg`, `treg-google-analytics.svg`, `treg-google-ads.svg`, `treg-meta-ads.svg`, `treg-linkedin.svg`, `treg-slack.svg`, `treg-companies.svg`, `treg-people.svg`, `treg-web.svg`: compact marks downloaded from the public Treg catalog. They identify the Treg categories used in the Hermes Agent workflow examples and do not claim a partnership or an active BUILD connection.
 - `kie-ai.png`, `fal-ai.ico`, `mobbin.png`: public favicons used only as source assets for transparent display variants identifying Kie.ai, fal.ai and Mobbin as alternative media or inspiration routes. They are not placed inside cards or used as decorative backgrounds.
 - `mobbin-mark.png`: transparent off-white display variant of the Mobbin mark for BUILD's dark interfaces.
 

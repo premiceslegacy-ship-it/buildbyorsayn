@@ -28,18 +28,33 @@ const FIRST_MISSION = [
 const MASTERCLASS_SYNTHESIS = [
   {
     number: "01",
-    title: "Partir d'un travail réel",
-    body: "L'outil vient après la scène métier. Une bonne mission commence par une tâche qui revient, une personne responsable et un résultat lisible.",
+    title: "Un chat, une règle et un agent ne font pas la même chose",
+    body: "Un chat répond à une question. Une règle répète toujours la même action. Un agent prépare un travail avec un but, un périmètre et une vérification.",
   },
   {
     number: "02",
-    title: "Rendre le chemin explicite",
-    body: "Le contexte, les sources autorisées, les étapes et la sortie attendue doivent être nommés. Sinon, ce n'est pas un workflow : c'est une conversation floue.",
+    title: "Un agent utile suit cinq briques simples",
+    body: "Mission, contexte autorisé, méthode, outils autorisés, puis un résultat que quelqu'un relit. Sans ces briques, on demande juste quelque chose à une IA.",
   },
   {
     number: "03",
-    title: "Garder la décision humaine",
-    body: "Un agent peut préparer, comparer, classer ou rédiger. Publier, engager une dépense ou modifier une donnée importante reste une décision séparée.",
+    title: "Le résultat doit rester contrôlable",
+    body: "L'agent peut lire, comparer et préparer. Publier, envoyer un message, changer le CRM ou dépenser reste une décision séparée.",
+  },
+  {
+    number: "04",
+    title: "Un skill est une fiche recette",
+    body: "Il dit quoi lire, dans quel ordre travailler, quoi vérifier et ce qu'il ne faut pas faire. La mémoire aide à reprendre le contexte. Le Second Brain garde les vraies décisions et les preuves.",
+  },
+  {
+    number: "05",
+    title: "Un cron est un réveil, pas un pilote automatique",
+    body: "Il peut lancer une lecture ou préparer un brouillon à heure fixe. Il ne rend pas une tâche plus intelligente et ne doit pas décider seul d'une action importante.",
+  },
+  {
+    number: "06",
+    title: "Le bon départ tient dans une petite scène",
+    body: "Choisis une tâche qui revient chaque semaine et dure moins de 30 minutes. Décris ce qui entre, ce qui doit sortir et ce que l'agent ne doit jamais décider seul.",
   },
 ] as const;
 
@@ -71,6 +86,79 @@ const REAL_CASES = [
     limit: "Cible à construire, pas une intégration active. Aucun outil de messagerie ou de gestion de projet n'est connecté par défaut.",
   },
 ] as const;
+
+const TREG_DEPARTMENT_WORKFLOWS = [
+  {
+    department: "MARKETING",
+    title: "Trouver les sujets qui intéressent vraiment",
+    purpose: "Lire quelques posts ou pages autorisés, puis préparer trois idées de contenu avec leurs sources.",
+    tools: [
+      ["LinkedIn", "/brand-logos/treg-linkedin.svg"],
+      ["X", "/brand-logos/x.svg"],
+      ["Web", "/brand-logos/treg-web.svg"],
+    ],
+    output: "Un petit brief à relire. Rien n'est publié automatiquement.",
+  },
+  {
+    department: "VENTES",
+    title: "Préparer une courte liste de bonnes entreprises",
+    purpose: "Chercher des entreprises qui correspondent à une règle simple, puis vérifier le rôle, le site et les signaux publics utiles avant une première relecture humaine.",
+    tools: [
+      ["Entreprises", "/brand-logos/treg-companies.svg"],
+      ["Contacts", "/brand-logos/treg-people.svg"],
+      ["LinkedIn", "/brand-logos/treg-linkedin.svg"],
+    ],
+    output: "Une liste à vérifier, pas des messages envoyés en masse.",
+  },
+  {
+    department: "PUBLICITÉ",
+    title: "Préparer le point clair sur une campagne",
+    purpose: "Rassembler les chiffres utiles et regarder quelques annonces publiques pour signaler une tendance ou une question à creuser.",
+    tools: [
+      ["Google Ads", "/brand-logos/treg-google-ads.svg"],
+      ["Meta Ads", "/brand-logos/treg-meta-ads.svg"],
+      ["Analytics", "/brand-logos/treg-google-analytics.svg"],
+    ],
+    output: "Un rapport et une proposition. Aucun budget n'est modifié par défaut.",
+  },
+  {
+    department: "SEO / GEO",
+    title: "Passer d'une requête observée à un brouillon",
+    purpose: "Lire une requête et la page concernée, vérifier ce qui existe déjà, puis préparer un angle ou un brouillon à corriger.",
+    tools: [
+      ["Search Console", "/brand-logos/googlesearchconsole.svg"],
+      ["Analytics", "/brand-logos/treg-google-analytics.svg"],
+      ["Web", "/brand-logos/treg-web.svg"],
+    ],
+    output: "Un brouillon contrôlé. Une impression Google ne prouve ni une vente ni une réponse des IA.",
+  },
+  {
+    department: "CRM",
+    title: "Préparer une fiche propre avant de toucher au CRM",
+    purpose: "Comparer les informations déjà autorisées, signaler ce qui manque et proposer une fiche courte à valider avant toute écriture.",
+    tools: [
+      ["Entreprises", "/brand-logos/treg-companies.svg"],
+      ["Contacts", "/brand-logos/treg-people.svg"],
+    ],
+    output: "Une proposition de fiche. Le CRM doit être connecté séparément et rien n'est modifié sans accord.",
+  },
+  {
+    department: "ÉQUIPE",
+    title: "Préparer le brief du lundi",
+    purpose: "Lire les messages d'un espace autorisé, repérer les blocages et préparer les trois prochaines actions à discuter.",
+    tools: [["Slack", "/brand-logos/treg-slack.svg"]],
+    output: "Une note de préparation. Aucun message n'est envoyé automatiquement.",
+  },
+] as const;
+
+function ToolMark({ name, src }: { name: string; src: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 border border-white/[0.1] bg-white/[0.025] px-2.5 py-1.5 text-[11px] text-white/60">
+      <Image src={src} alt="" width={16} height={16} className="size-4 shrink-0" />
+      {name}
+    </span>
+  );
+}
 
 function ChaptersSkeleton() {
   return (
@@ -207,13 +295,13 @@ export default async function HermesAgentPage() {
 
         <section id="etude-masterclass" className="scroll-mt-24 border-y border-white/[0.1] py-10 sm:py-12 mb-16">
           <div className="max-w-3xl mb-8">
-            <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">CE QUE NOUS AVONS RETENU</p>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Ce que ce parcours retient d'une étude de masterclass.</h2>
-            <p className="text-white/50 text-sm sm:text-base mt-3 leading-relaxed">L'étude a servi à rendre le cours plus concret : une situation, une configuration, une action, un résultat, une limite et la prochaine étape. Le transcript externe n'est ni reproduit ni traduit ici.</p>
+            <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">LA MASTERCLASS, EN CLAIR</p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Ce que la masterclass montre, et ce que BUILD reprend.</h2>
+            <p className="text-white/50 text-sm sm:text-base mt-3 leading-relaxed">Ce que ce parcours retient d'une étude de masterclass : partir d'une tâche réelle, rendre le chemin visible et garder la bonne décision à la bonne personne. Ces six idées sont reprises dans les leçons, les cas et les workflows ci-dessous. Le transcript externe n'est ni reproduit ni traduit ici.</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3 md:divide-x divide-white/[0.1]">
-            {MASTERCLASS_SYNTHESIS.map((item, index) => (
-              <article key={item.number} className={index === 0 ? "md:pr-6" : index === MASTERCLASS_SYNTHESIS.length - 1 ? "md:pl-6" : "md:px-6"}>
+          <div className="grid gap-x-6 gap-y-8 md:grid-cols-3">
+            {MASTERCLASS_SYNTHESIS.map((item) => (
+              <article key={item.number} className="border-t border-white/[0.1] pt-5">
                 <p className="text-2xl font-light tabular-nums text-[#c9b48a]/65 mb-4">{item.number}</p>
                 <h3 className="text-sm font-semibold text-[#f0ede8]">{item.title}</h3>
                 <p className="mt-2 text-xs leading-relaxed text-white/50">{item.body}</p>
@@ -274,6 +362,38 @@ export default async function HermesAgentPage() {
           </div>
         </section>
 
+        <section id="treg-workflows" className="scroll-mt-24 border-y border-white/[0.1] py-10 sm:py-12 mb-16">
+          <div className="max-w-3xl mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <Image src="/brand-logos/treg.svg" alt="Treg" width={22} height={22} className="size-[22px]" />
+              <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold">TREG, EN PRATIQUE</p>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Treg : des idées de workflows, par métier.</h2>
+            <p className="text-white/50 text-sm sm:text-base mt-3 leading-relaxed">Treg range des outils par catégories. Voici des possibilités utiles pour une petite équipe, expliquées sans jargon. Ce sont des exemples à construire, pas des connexions déjà actives dans BUILD.</p>
+          </div>
+          <div className="border-y border-white/[0.1] divide-y divide-white/[0.1]">
+            {TREG_DEPARTMENT_WORKFLOWS.map((workflow) => (
+              <article key={workflow.department} className="grid gap-5 py-6 lg:grid-cols-[9rem_minmax(0,1fr)_minmax(15rem,0.8fr)] lg:gap-8">
+                <p className="text-[10px] tracking-[0.18em] font-semibold text-[#e8d5b0]/75 pt-1">{workflow.department}</p>
+                <div>
+                  <h3 className="text-base font-semibold tracking-tight text-[#f0ede8]">{workflow.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/55">{workflow.purpose}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {workflow.tools.map(([name, src]) => (
+                      <ToolMark key={name} name={name} src={src} />
+                    ))}
+                  </div>
+                </div>
+                <p className="border-l border-white/[0.1] pl-4 text-xs leading-relaxed text-white/45 lg:mt-0">{workflow.output}</p>
+              </article>
+            ))}
+          </div>
+          <div className="mt-7 max-w-3xl border-t border-[#e8d5b0]/45 pt-4">
+            <p className="text-sm font-medium text-[#f0ede8]">Les garde-fous restent les mêmes, même si un outil est disponible.</p>
+            <p className="mt-2 text-xs leading-relaxed text-white/50">On connecte seulement une source autorisée. On commence par lire et préparer. Une personne valide avant de publier, envoyer un message, modifier un CRM ou dépenser. Les données de contact ne servent pas à arroser des inconnus. Les appels payants et les outils qui peuvent agir demandent un plafond et un accord séparé.</p>
+          </div>
+        </section>
+
         <section id="bibliotheque" className="scroll-mt-24 mb-8">
           <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">LE PARCOURS</p>
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Un parcours, pas une liste de mots compliqués.</h2>
@@ -292,6 +412,7 @@ export default async function HermesAgentPage() {
           { id: "premier-pas", label: "PREMIER PAS" },
           { id: "workflows", label: "WORKFLOWS" },
           { id: "cas-concrets", label: "CAS CONCRETS" },
+          { id: "treg-workflows", label: "TREG" },
           { id: "bibliotheque", label: "PARCOURS" },
           { id: "chapitres", label: "CHAPITRES" },
           { id: "installer", label: "INSTALLER" },
