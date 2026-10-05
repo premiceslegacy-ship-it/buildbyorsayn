@@ -238,7 +238,7 @@ export async function GET(
   }
 
   const ZIP_DIR_SKILLS: Record<string, string> = {
-    "code-motion-production": "code-motion-production",
+    "product-film-factory": "product-film-factory",
     "apple-design-skills": "apple-design-skills",
     "oracle-by-orsayn": "oracle-by-orsayn",
     "ux-ui-design": "ux-ui-design",

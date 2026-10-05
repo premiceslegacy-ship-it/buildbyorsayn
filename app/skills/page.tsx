@@ -104,8 +104,8 @@ const SKILL_METHOD_EXAMPLES = [
     body: "Décomposition du site qui vend en 10 sous-domaines : copy et CTA, arborescence, preuve sociale, psychologie de conversion, formulaires, SEO/GEO, performance, mesure.",
   },
   {
-    skill: "Motion Design avec HyperFrames, V1",
-    body: "Décomposition du métier de motion designer avec HyperFrames : direction visuelle, storytelling, caméra motivée, interfaces vivantes, transitions, son causal et vérification d'export.",
+    skill: "Product Film Factory",
+    body: "Décomposition d'un film produit de motion design : interview, direction artistique, narration, caméra, voix, musique, bruitages, rendu et contrôle de livraison.",
   },
 ];
 
@@ -179,9 +179,9 @@ const SKILL_PROMPTS = [
     prompt: "Mon produit est cadré avec ORACLE by Orsayn. Construis la landing page à partir du BRIEF, du DESIGN-SYSTEM et de la recherche marché associée.",
   },
   {
-    skill: "Motion Design avec HyperFrames, V1",
-    role: "Crée une séquence de motion design avec HyperFrames : narration, titrage, interface, caméra motivée, transitions et export vérifié.",
-    prompt: "Voici ma landing page, mon produit ou ma scène métier [description/lien]. Construis une séquence HyperFrames pour [moment précis] : storyboard, direction visuelle, mouvement local, transition, CTA et export vérifié.",
+    skill: "Product Film Factory",
+    role: "Crée un film produit de motion design avec HyperFrames : interview, narration, direction artistique, caméra, son et rendu vérifié.",
+    prompt: "Voici ma landing page, mon produit ou ma scène métier [description/lien]. Construis un film produit avec Product Film Factory : brief, storyboard, direction visuelle, voix, mouvement, son, CTA et export vérifié.",
   },
 ];
 
@@ -196,11 +196,73 @@ const SKILL_GLOSSARY = [
   ["Lighthouse 100", "Un score de contrôle sur certaines dimensions web. Ce n’est ni une garantie de conversion, ni une preuve que le produit est bon pour son marché."],
 ] as const;
 
+type SkillsPublicationMetadata = {
+  publishedAt: string;
+  releaseId: string;
+  artifacts: Array<{ fileName: string; sha256: string }>;
+};
+
+type SkillDownloadRecord = {
+  sha256: string;
+  downloadedAt: string;
+  publishedAt: string;
+};
+
+type SkillDownloadRecords = Record<string, SkillDownloadRecord>;
+
+const SKILL_DOWNLOADS_STORAGE_KEY = "build-skill-downloads";
+
+function isSkillsPublicationMetadata(value: unknown): value is SkillsPublicationMetadata {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.publishedAt === "string" &&
+    !Number.isNaN(Date.parse(candidate.publishedAt)) &&
+    typeof candidate.releaseId === "string" &&
+    Array.isArray(candidate.artifacts) &&
+    candidate.artifacts.every(
+      (artifact) =>
+        artifact &&
+        typeof artifact === "object" &&
+        typeof (artifact as Record<string, unknown>).fileName === "string" &&
+        typeof (artifact as Record<string, unknown>).sha256 === "string"
+    )
+  );
+}
+
+function readSkillDownloadRecords(): SkillDownloadRecords {
+  try {
+    const value = JSON.parse(window.localStorage.getItem(SKILL_DOWNLOADS_STORAGE_KEY) ?? "{}");
+    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+
+    return Object.fromEntries(
+      Object.entries(value).flatMap(([slug, record]) => {
+        if (!record || typeof record !== "object") return [];
+        const candidate = record as Record<string, unknown>;
+        if (
+          typeof candidate.sha256 !== "string" ||
+          typeof candidate.downloadedAt !== "string" ||
+          typeof candidate.publishedAt !== "string"
+        ) {
+          return [];
+        }
+        return [[slug, candidate as SkillDownloadRecord]];
+      })
+    );
+  } catch {
+    return {};
+  }
+}
+
 export default function SkillsPage() {
   const [tier, setTier] = useState<string | null | "loading">("loading");
   const [checkoutHref, setCheckoutHref] = useState<string | null>(null);
   const [beginnerHref, setBeginnerHref] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<SkillCategory | "all">("all");
+  const [publication, setPublication] = useState<SkillsPublicationMetadata | null>(null);
+  const [downloadRecords, setDownloadRecords] = useState<SkillDownloadRecords>(() =>
+    typeof window === "undefined" ? {} : readSkillDownloadRecords()
+  );
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -229,6 +291,42 @@ export default function SkillsPage() {
 
     fetchProfile();
   }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadPublication() {
+      try {
+        const response = await fetch("/api/skills/metadata", {
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+        const payload: unknown = await response.json();
+        if (isSkillsPublicationMetadata(payload)) setPublication(payload);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+
+    void loadPublication();
+    return () => controller.abort();
+  }, []);
+
+  function rememberDownload(slug: string, fileName: string) {
+    const artifact = publication?.artifacts.find((item) => item.fileName === fileName);
+    if (!publication || !artifact) return;
+
+    const nextRecords = {
+      ...downloadRecords,
+      [slug]: {
+        sha256: artifact.sha256,
+        downloadedAt: new Date().toISOString(),
+        publishedAt: publication.publishedAt,
+      },
+    };
+    window.localStorage.setItem(SKILL_DOWNLOADS_STORAGE_KEY, JSON.stringify(nextRecords));
+    setDownloadRecords(nextRecords);
+  }
 
   const isLoading = tier === "loading";
 
@@ -259,6 +357,7 @@ export default function SkillsPage() {
             Ce sont les skills que j'ai configurés pour moi et pour mon écosystème. Je les utilise au quotidien pour cadrer, construire et auditer mes projets. Tu peux bien évidemment les adapter à ta manière de travailler, à ton marché et à tes propres projets.
           </p>
           <SkillsFreshness />
+          <p className="mt-3 max-w-2xl text-xs leading-relaxed text-white/45">Chaque téléchargement est une copie locale. Cette page peut signaler une version plus récente dans ce navigateur, puis tu choisis de la télécharger. Elle n'écrase jamais tes adaptations.</p>
         </header>
 
         <section id="methode" className="mb-10 scroll-mt-24">
@@ -484,6 +583,13 @@ export default function SkillsPage() {
               const lockedLabel = isBeginner
                 ? `Débloquer les fondations - ${FONDATIONS_PRICE}€`
                 : `Prendre ${COFFRE_LABEL} - ${COFFRE_PRICE}€`;
+              const currentArtifact = publication?.artifacts.find((artifact) => artifact.fileName === skill.fileName);
+              const downloadedRecord = downloadRecords[skill.slug];
+              const hasUpdate = Boolean(
+                currentArtifact &&
+                downloadedRecord &&
+                currentArtifact.sha256 !== downloadedRecord.sha256
+              );
 
               return (
                 <motion.div
@@ -513,10 +619,11 @@ export default function SkillsPage() {
                     {canDownload ? (
                       <a
                         href={`/api/skills/${skill.slug}`}
+                        onClick={() => rememberDownload(skill.slug, skill.fileName)}
                         className="inline-flex items-center justify-center gap-2 w-full bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-all duration-200 hover:bg-[#f0dfc0] shadow-[0_0_24px_rgba(232,213,176,0.18)]"
                       >
                         <Download className="w-4 h-4" />
-                        Télécharger
+                        {hasUpdate ? "Mettre à jour" : "Télécharger"}
                       </a>
                     ) : lockedHref ? (
                       <a
@@ -534,6 +641,9 @@ export default function SkillsPage() {
                         Paiement momentanément indisponible.
                       </p>
                     )}
+                    {canDownload && hasUpdate ? (
+                      <p role="status" className="mt-2 text-xs leading-relaxed text-[#e8d5b0]/85">Une nouvelle version est disponible. Télécharge-la, puis compare-la à ta copie locale avant de remplacer tes propres adaptations.</p>
+                    ) : null}
                   </div>
                 </motion.div>
               );

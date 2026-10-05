@@ -92,27 +92,37 @@ test("les collections Hermes Agent et Fondations partagent chacune une seule ill
   assert.equal(sha256("public/assets/illustrations/fondations-tech-foundation.png"), "d3115fbcedc8944d02533b4923f85beecc1338cd474f7bf156a6ce9b09bb080d");
 });
 
-test("la page Hermes Agent commence par une mission et range les chapitres comme un parcours", () => {
+test("la page Hermes Agent reste légère et ses blocs donnent une méthode réutilisable", () => {
   const page = read("app/videos/tutos/page.tsx");
+  const learning = read("app/videos/tutos/learn/content.tsx");
   const chapters = read("app/videos/tutos/chapters.tsx");
 
   for (const required of [
-    "Choisis une tâche avant de choisir un outil.",
-    "Trois cas d'usage, avec leur état réel.",
+    "APPRENDRE PAR BLOCS",
+    "Trois chemins pour passer d'une idée à une méthode qui te reste.",
     "Un parcours, pas une liste de mots compliqués.",
     "Installe Hermes après avoir choisi le premier travail à lui confier.",
-    "Un carrousel Atelier",
-    "Google Search Console avec Treg, puis un brouillon contrôlé",
-    "Treg lit les données first-party de Google Search Console",
-    "sans remplacer le choix humain.",
-    "Le cron ne publie pas, ne pousse pas et ne demande pas d'indexation sans validation humaine.",
   ]) {
     assert.match(page, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+
+  for (const required of [
+    "Faire un carrousel qui reste fidèle à ton idée",
+    "Une slide porte une idée, un chiffre, une tension ou une décision.",
+    "Transformer un signal de recherche en page plus utile",
+    "Relier Treg à Hermes et créer tes propres workflows.",
+    "Tu décides jusqu'où l'agent va.",
+    "TREG_TOKEN",
+    "Chaque bon essai devient une méthode plus simple à refaire.",
+  ]) {
+    assert.match(learning, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
 
   for (const section of ["start", "first-workflow", "reliable", "team"]) {
     assert.match(chapters, new RegExp(`key: "${section}"`));
   }
 
+  assert.doesNotMatch(page, /masterclass/i);
+  assert.doesNotMatch(learning, /\bAtelier\b/);
   assert.doesNotMatch(page, /HERMES_LAYERS|OpenRouter|DeepSeek|OpenCode|Tailscale/);
 });

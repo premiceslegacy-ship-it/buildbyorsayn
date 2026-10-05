@@ -2,23 +2,20 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { SKILLS_CATALOG, getSkillBySlug } from '../lib/skillsCatalog';
 
-test('motion packs are explicitly beginner and catalogue identities stay unique', () => {
-  const motion = getSkillBySlug('code-motion-production');
-  assert.ok(motion, 'code motion pack must exist');
-  assert.equal(motion.access, 'beginner');
-  assert.equal(motion.fileName, 'code-motion-production.zip');
-  assert.equal(motion.title, 'Motion Design avec HyperFrames, V1');
-  assert.match(motion.description, /HyperFrames/);
+test('Product Film Factory opens the current catalogue and identities stay unique', () => {
+  assert.equal(getSkillBySlug('code-motion-production'), undefined);
 
   const productFilm = getSkillBySlug('product-film-factory');
   assert.ok(productFilm, 'product film factory pack must exist');
   assert.equal(productFilm.access, 'beginner');
   assert.equal(productFilm.fileName, 'product-film-factory.zip');
   assert.equal(productFilm.category, 'motion');
+  assert.match(productFilm.description, /motion design/i);
+  assert.equal(SKILLS_CATALOG.at(0), productFilm);
 
-  assert.equal(SKILLS_CATALOG.length, 8);
-  assert.equal(new Set(SKILLS_CATALOG.map(s => s.slug)).size, 8);
-  assert.equal(new Set(SKILLS_CATALOG.map(s => s.fileName)).size, 8);
+  assert.equal(SKILLS_CATALOG.length, 7);
+  assert.equal(new Set(SKILLS_CATALOG.map(s => s.slug)).size, 7);
+  assert.equal(new Set(SKILLS_CATALOG.map(s => s.fileName)).size, 7);
 
   const siteWeb = getSkillBySlug('oracle-site-web');
   assert.ok(siteWeb, 'ORACLE Site Web pack must exist');

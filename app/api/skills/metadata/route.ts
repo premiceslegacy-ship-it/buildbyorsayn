@@ -52,7 +52,14 @@ export async function GET() {
   }
 
   return NextResponse.json(
-    { publishedAt: manifest.publishedAt },
+    {
+      publishedAt: manifest.publishedAt,
+      releaseId: manifest.releaseId,
+      artifacts: manifest.artifacts.map(({ fileName, sha256 }) => ({
+        fileName,
+        sha256,
+      })),
+    },
     {
       headers: {
         "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",

@@ -87,18 +87,27 @@ export const SKILLS_CATALOG_V2: SkillCatalogItem[] = [
   },
 ];
 
-// Catalogue v3 courant. Toute modification future de set exige une nouvelle identité de catalogue.
-export const SKILLS_CATALOG: SkillCatalogItem[] = [
+const PRODUCT_FILM_FACTORY: SkillCatalogItem = {
+  slug: "product-film-factory",
+  title: "Product Film Factory",
+  description:
+    "Le workflow complet de motion design pour transformer une scène métier en film produit narré : script, HyperFrames, voix, musique, SFX et rendu vérifié.",
+  access: "beginner",
+  fileName: "product-film-factory.zip",
+  category: "motion",
+};
+
+// Catalogue v3 figé. Il reste la source de compatibilité des lecteurs déjà déployés.
+export const SKILLS_CATALOG_V3: SkillCatalogItem[] = [
   ...SKILLS_CATALOG_V2,
-  {
-    slug: "product-film-factory",
-    title: "Product Film Factory",
-    description:
-      "Transforme une scène métier en film produit narré : script, HyperFrames, voix, musique, SFX et rendu vérifié, sans reprendre la vidéo de quelqu'un d'autre.",
-    access: "beginner",
-    fileName: "product-film-factory.zip",
-    category: "motion",
-  },
+  PRODUCT_FILM_FACTORY,
+];
+
+// Catalogue v4 courant. Product Film Factory ouvre la bibliothèque et le pack
+// Motion Design avec HyperFrames, V1 n'est plus proposé dans BUILD.
+export const SKILLS_CATALOG: SkillCatalogItem[] = [
+  PRODUCT_FILM_FACTORY,
+  ...SKILLS_CATALOG_V2.filter((skill) => skill.slug !== "code-motion-production"),
 ];
 
 export function getSkillBySlug(slug: string) {

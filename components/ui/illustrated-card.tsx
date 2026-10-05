@@ -87,7 +87,7 @@ function CardShell({
       <div className="relative z-10 shrink-0 pt-3 pb-1">
         <p className="line-clamp-2 text-sm font-semibold leading-snug tracking-tight text-[#f0ede8]">{title}</p>
         {description && (
-          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-white/50">{description}</p>
+          <p className="mt-1 text-xs leading-relaxed text-white/50">{description}</p>
         )}
       </div>
 
