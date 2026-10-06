@@ -307,17 +307,21 @@ export default function DashboardHub() {
           const progress = isLoaded ? getBlocProgress("7") : 0;
           return (
             <div
-              className="mt-6 relative overflow-hidden border border-white/10 bg-[#08080a] px-6 py-7 sm:px-8 sm:py-8 cursor-pointer transition-colors duration-200 hover:border-[#e8d5b0]/35"
+              className="mt-6 relative min-h-[232px] overflow-hidden border border-white/10 bg-[#08080a] px-6 py-7 sm:min-h-[276px] sm:px-8 sm:py-8 cursor-pointer transition-colors duration-200 hover:border-[#e8d5b0]/35"
               onClick={() => tier === "full" ? router.push("/blocs/7") : setModal("both")}
             >
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 right-0 w-[64%] bg-[radial-gradient(circle_at_72%_50%,rgba(232,213,176,0.14),transparent_57%)] sm:w-[52%]"
+              />
               <Image
                 src={illustrationSrc("blocs-7")}
                 alt=""
                 aria-hidden="true"
-                width={244}
-                height={244}
-                sizes="(min-width: 640px) 244px, 184px"
-                className="pointer-events-none absolute right-0 top-1/2 h-[184px] w-[184px] -translate-y-1/2 object-contain mix-blend-screen sm:h-[244px] sm:w-[244px]"
+                width={360}
+                height={360}
+                sizes="(min-width: 640px) 360px, 244px"
+                className="pointer-events-none absolute -right-4 top-1/2 h-[244px] w-[244px] -translate-y-1/2 object-contain brightness-125 contrast-125 sm:right-5 sm:h-[360px] sm:w-[360px]"
               />
               {tier !== "full" && (
                 <div className="absolute top-5 right-6 z-10 sm:right-8 flex items-center gap-1.5 border border-white/10 px-2.5 py-1">
