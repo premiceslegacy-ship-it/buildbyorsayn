@@ -29,12 +29,28 @@ const DECAL_SIZE = 100;
 const DECAL_INSET = 0.18;
 const TOP_FACE_DEPTH = 0.2115;
 const MIN_DECORATED_CRATE_WIDTH = 18;
+const FIRST_CARGO_SERIAL = 141;
 
 function crateGroups(svg: SVGSVGElement) {
   return [...svg.querySelectorAll("g")]
     .filter((group): group is SVGGElement => group instanceof SVGGElement)
     .filter((group) => group.querySelectorAll(":scope > ellipse").length === 9)
     .slice(0, LOGOS.length);
+}
+
+function cargoSerial(crate: SVGGElement) {
+  return [...crate.querySelectorAll(":scope > ellipse")].reduce(
+    (serial, dot, index) =>
+      dot.classList.contains("off") ? serial : serial + (1 << index),
+    0,
+  );
+}
+
+function cargoLogo(crate: SVGGElement) {
+  const serial = cargoSerial(crate);
+  const index =
+    ((serial - FIRST_CARGO_SERIAL) % LOGOS.length + LOGOS.length) % LOGOS.length;
+  return LOGOS[index];
 }
 
 function placeDecal(crate: SVGGElement, logo: ToolLogo) {
@@ -114,43 +130,38 @@ function placeDecal(crate: SVGGElement, logo: ToolLogo) {
   shadow.setAttribute("fill", "#020202");
   shadow.setAttribute("fill-opacity", "0.92");
   inlay.setAttribute("d", inlayPath);
-  inlay.setAttribute("fill", logo.accent);
   inlay.setAttribute("fill-opacity", "0.16");
-  inlay.setAttribute("stroke", logo.accent);
   inlay.setAttribute("stroke-opacity", "0.7");
   inlay.setAttribute("stroke-width", "0.62");
   inlay.setAttribute("vector-effect", "non-scaling-stroke");
 
-  depth.setAttribute("href", logo.src);
-  depth.style.filter = "brightness(0) opacity(0.76)";
+  const logoChanged = image.getAttribute("data-build-tool-logo") !== logo.src;
+  if (logoChanged) {
+    inlay.setAttribute("fill", logo.accent);
+    inlay.setAttribute("stroke", logo.accent);
+    depth.setAttribute("href", logo.src);
+    depth.style.filter = "brightness(0) opacity(0.76)";
+    image.setAttribute("href", logo.src);
+    image.setAttribute("data-build-tool-logo", logo.src);
+    image.style.filter = `${"filter" in logo ? logo.filter : ""} drop-shadow(0 0.45px 0 ${logo.accent})`;
+  }
+
   depth.setAttribute(
     "transform",
     `matrix(${xScale} ${yScale} ${-xScale} ${yScale} ${originX} ${originY + 1.05})`,
   );
-  image.setAttribute("href", logo.src);
-  image.style.filter = `${"filter" in logo ? logo.filter : ""} drop-shadow(0 0.45px 0 ${logo.accent})`;
   image.setAttribute(
     "transform",
     `matrix(${xScale} ${yScale} ${-xScale} ${yScale} ${originX} ${originY})`,
   );
 }
 
-function syncDecals(
-  host: HTMLDivElement,
-  decals: WeakMap<SVGGElement, ToolLogo>,
-  nextLogo: { current: number },
-) {
+function syncDecals(host: HTMLDivElement) {
   const svg = host.querySelector("svg");
   if (!svg) return;
 
   crateGroups(svg).forEach((crate) => {
-    let logo = decals.get(crate);
-    if (!logo) {
-      logo = LOGOS[nextLogo.current % LOGOS.length];
-      decals.set(crate, logo);
-      nextLogo.current += 1;
-    }
-    placeDecal(crate, logo);
+    placeDecal(crate, cargoLogo(crate));
   });
 }
 
@@ -175,8 +186,6 @@ function preloadToolMarks() {
  */
 export function BuildMethodHairline() {
   const hostRef = useRef<HTMLDivElement>(null);
-  const decalByCrate = useRef(new WeakMap<SVGGElement, ToolLogo>());
-  const nextLogo = useRef(0);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -187,17 +196,15 @@ export function BuildMethodHairline() {
     let cancelled = false;
 
     const animate = () => {
-      syncDecals(host, decalByCrate.current, nextLogo);
+      syncDecals(host);
       frame = window.requestAnimationFrame(animate);
     };
 
     void preloadToolMarks().then(() => {
       if (cancelled) return;
 
-      decalByCrate.current = new WeakMap<SVGGElement, ToolLogo>();
-      nextLogo.current = 0;
       figure = slow(host, { intensity: 0.2, theme: "dark" });
-      syncDecals(host, decalByCrate.current, nextLogo);
+      syncDecals(host);
       frame = window.requestAnimationFrame(animate);
     });
 
