@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Lock, X, PhoneCall } from "lucide-react";
 import Link from "next/link";
@@ -276,6 +277,7 @@ export default function DashboardHub() {
                 key={bloc.id}
                 title={bloc.titre}
                 imageSrc={illustrationSrc(`blocs-${bloc.id}`)}
+                visualTone="black-gallery"
                 locked={isLocked}
                 badge={badge}
                 onClick={() => (isLocked ? setModal("both") : router.push(`/blocs/${bloc.id}`))}
@@ -305,30 +307,41 @@ export default function DashboardHub() {
           const progress = isLoaded ? getBlocProgress("7") : 0;
           return (
             <div
-              className="mt-6 relative border border-white/10 px-6 py-7 sm:px-8 sm:py-8 cursor-pointer transition-colors duration-200 hover:border-[#e8d5b0]/35"
+              className="mt-6 relative overflow-hidden border border-white/10 bg-[#08080a] px-6 py-7 sm:px-8 sm:py-8 cursor-pointer transition-colors duration-200 hover:border-[#e8d5b0]/35"
               onClick={() => tier === "full" ? router.push("/blocs/7") : setModal("both")}
             >
+              <Image
+                src={illustrationSrc("blocs-7")}
+                alt=""
+                aria-hidden="true"
+                width={244}
+                height={244}
+                sizes="(min-width: 640px) 244px, 184px"
+                className="pointer-events-none absolute right-0 top-1/2 h-[184px] w-[184px] -translate-y-1/2 object-contain mix-blend-screen sm:h-[244px] sm:w-[244px]"
+              />
               {tier !== "full" && (
-                <div className="absolute top-5 right-6 sm:right-8 flex items-center gap-1.5 border border-white/10 px-2.5 py-1">
+                <div className="absolute top-5 right-6 z-10 sm:right-8 flex items-center gap-1.5 border border-white/10 px-2.5 py-1">
                   <Lock className="w-3 h-3 text-white/30" />
                   <span className="text-[11px] text-white/30 font-medium">Premium</span>
                 </div>
               )}
 
-              <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0] font-medium mb-2">
-                Synthèse finale
-              </p>
-              <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-4">
-                {recap.titre}
-              </h2>
-              <div className="flex items-center gap-4 max-w-xs">
-                <div className="flex-1 h-1.5 bg-black/40 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-[#e8d5b0]/40 to-[#e8d5b0] rounded-full transition-all duration-500"
-                    style={{ width: `${progress}%` }}
-                  />
+              <div className="relative z-10 max-w-xs pr-10 sm:max-w-sm sm:pr-20">
+                <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0] font-medium mb-2">
+                  Synthèse finale
+                </p>
+                <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-4">
+                  {recap.titre}
+                </h2>
+                <div className="flex items-center gap-4 max-w-xs">
+                  <div className="flex-1 h-1.5 bg-black/40 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-[#e8d5b0]/40 to-[#e8d5b0] rounded-full transition-all duration-500"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-[#e8d5b0] font-medium flex-shrink-0">{progress}%</span>
                 </div>
-                <span className="text-xs text-[#e8d5b0] font-medium flex-shrink-0">{progress}%</span>
               </div>
             </div>
           );

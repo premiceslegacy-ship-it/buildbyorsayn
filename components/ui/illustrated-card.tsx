@@ -23,6 +23,7 @@ export type IllustratedCardProps = {
   badge?: IllustratedCardBadge;
   className?: string;
   footer?: React.ReactNode;
+  visualTone?: "default" | "black-gallery";
 };
 
 function CardShell({
@@ -34,18 +35,29 @@ function CardShell({
   badge,
   className,
   footer,
+  visualTone = "default",
   interactive,
 }: IllustratedCardProps & { interactive: boolean }) {
   return (
     <div
       className={cn(
-        "group relative flex aspect-square flex-col overflow-hidden border border-[#c9b48a]/25 bg-gradient-to-b from-white/[0.045] to-white/[0.012] p-3 transition-colors duration-200",
-        interactive && "cursor-pointer hover:border-[#c9b48a]/45",
+        visualTone === "black-gallery"
+          ? "group relative flex aspect-square flex-col overflow-hidden border border-white/[0.10] bg-[#09090a] p-2.5 shadow-[0_22px_55px_rgba(0,0,0,0.22)] transition-[border-color,transform,box-shadow] duration-300"
+          : "group relative flex aspect-square flex-col overflow-hidden border border-[#c9b48a]/25 bg-gradient-to-b from-white/[0.045] to-white/[0.012] p-3 transition-colors duration-200",
+        interactive && (visualTone === "black-gallery"
+          ? "cursor-pointer hover:-translate-y-0.5 hover:border-[#e8d5b0]/40 hover:shadow-[0_26px_70px_rgba(0,0,0,0.36)]"
+          : "cursor-pointer hover:border-[#c9b48a]/45"),
         className
       )}
     >
-      {/* Inset liseré: a second thin border set back from the card edge for a "windowed" double-border look. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-[5px] border border-[#c9b48a]/10" />
+      {/* The gallery variant uses a quieter inset so the image remains the subject. */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute inset-[5px] border",
+          visualTone === "black-gallery" ? "border-white/[0.045]" : "border-[#c9b48a]/10"
+        )}
+      />
 
       {badge && (
         <span
@@ -58,14 +70,21 @@ function CardShell({
         </span>
       )}
 
-      <div className="relative min-h-0 flex-1 overflow-hidden border border-white/[0.08] bg-white/[0.02]">
+      <div
+        className={cn(
+          "relative min-h-0 flex-1 overflow-hidden border",
+          visualTone === "black-gallery" ? "border-white/[0.055] bg-[#070708]" : "border-white/[0.08] bg-white/[0.02]"
+        )}
+      >
         {imageSrc ? (
           <img
             src={imageSrc}
             alt={imageAlt ?? ""}
             aria-hidden={imageAlt ? undefined : true}
             className={cn(
-              "h-full w-full object-cover",
+              visualTone === "black-gallery"
+                ? "h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]"
+                : "h-full w-full object-cover",
               locked && "opacity-50 grayscale"
             )}
             loading="lazy"
@@ -75,10 +94,12 @@ function CardShell({
         ) : (
           <div
             aria-hidden="true"
-            className="h-full w-full opacity-[0.12]"
+            className={cn("h-full w-full", visualTone === "black-gallery" ? "opacity-[0.16]" : "opacity-[0.12]")}
             style={{
-              backgroundImage: "radial-gradient(#e8d5b0 1px, transparent 1px)",
-              backgroundSize: "10px 10px",
+              backgroundImage: visualTone === "black-gallery"
+                ? "radial-gradient(#f0ede8 0.7px, transparent 0.7px)"
+                : "radial-gradient(#e8d5b0 1px, transparent 1px)",
+              backgroundSize: visualTone === "black-gallery" ? "13px 13px" : "10px 10px",
             }}
           />
         )}

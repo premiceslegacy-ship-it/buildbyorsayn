@@ -603,6 +603,7 @@ export default function SkillsPage() {
                     title={skill.title}
                     description={skill.description}
                     imageSrc={illustrationSrc(`skills-${skill.slug}`)}
+                    visualTone="black-gallery"
                     locked={!canDownload}
                   />
                   <div className="mt-3 flex items-center justify-between gap-2">
