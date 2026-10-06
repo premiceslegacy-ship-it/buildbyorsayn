@@ -1,23 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
-import { Slow } from "@lucasmarkes/hairline/react";
-
-type CratePosition = {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-};
+import { slow } from "@lucasmarkes/hairline";
 
 const LOGOS = [
-  "/brand-logos/chatgpt.svg",
-  "/brand-logos/claude-code.svg",
-  "/brand-logos/vercel.svg",
-  "/brand-logos/supabase.svg",
-  "/brand-logos/stripe.svg",
-  "/brand-logos/cloudflare.svg",
+  { src: "/brand-logos/chatgpt.svg" },
+  { src: "/brand-logos/claude-code.svg" },
+  { src: "/brand-logos/vercel.svg", filter: "invert(1)" },
+  { src: "/brand-logos/supabase.svg" },
+  { src: "/brand-logos/stripe.svg" },
+  { src: "/brand-logos/cloudflare.svg" },
 ];
 
 const HAIRLINE_TOKENS = {
@@ -29,91 +22,107 @@ const HAIRLINE_TOKENS = {
   "--hairline-stroke": "0.85",
 } as CSSProperties;
 
-function getCrates(host: HTMLDivElement): CratePosition[] {
-  const figureBounds = host.getBoundingClientRect();
-  const svg = host.querySelector("svg");
-  if (!svg) return [];
+const SVG_NS = "http://www.w3.org/2000/svg";
 
-  return [...svg.querySelectorAll("g")]
+function stampLogo(crate: SVGGElement, logo: (typeof LOGOS)[number], bounds: DOMRect) {
+  const size = Math.min(bounds.width * 0.8, bounds.height * 0.65);
+  const centerX = bounds.x + bounds.width / 2;
+  const centerY = bounds.y + bounds.height * 0.31;
+  const image = document.createElementNS(SVG_NS, "image");
+
+  image.setAttribute("href", logo.src);
+  image.setAttribute("width", String(size));
+  image.setAttribute("height", String(size));
+  image.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  image.setAttribute("aria-hidden", "true");
+  if (logo.filter) image.style.filter = logo.filter;
+  image.setAttribute(
+    "transform",
+    `matrix(0.58 0.29 -0.58 0.29 ${centerX} ${centerY - size * 0.29})`,
+  );
+
+  crate.appendChild(image);
+}
+
+function freezeConveyor(host: HTMLDivElement) {
+  const svg = host.querySelector("svg");
+  if (!svg) return;
+
+  const sourceCrates = [...svg.querySelectorAll("g")]
+    .filter((group): group is SVGGElement => group instanceof SVGGElement)
     .filter((group) => group.querySelectorAll(":scope > ellipse").length === 9)
-    .map((group) => {
-      const bounds = group.getBoundingClientRect();
-      return {
-        left: bounds.left - figureBounds.left,
-        top: bounds.top - figureBounds.top,
-        width: bounds.width,
-        height: bounds.height,
-      };
-    })
-    .filter(({ width, height }) => width > 8 && height > 8)
-    .sort((a, b) => a.left - b.left)
     .slice(0, LOGOS.length);
+  const crateBounds = sourceCrates.map((crate) => crate.getBBox());
+  const frozen = svg.cloneNode(true) as SVGSVGElement;
+  const crates = [...frozen.querySelectorAll("g")]
+    .filter((group): group is SVGGElement => group instanceof SVGGElement)
+    .filter((group) => group.querySelectorAll(":scope > ellipse").length === 9)
+    .slice(0, LOGOS.length);
+
+  crates.forEach((crate, index) => stampLogo(crate, LOGOS[index], crateBounds[index]));
+  frozen.setAttribute("aria-hidden", "true");
+  frozen.setAttribute("focusable", "false");
+  const style = host.querySelector("style");
+  host.replaceChildren(style?.cloneNode(true) ?? document.createTextNode(""), frozen);
 }
 
 /**
  * Lucas Marques' Hairline, @lucasmarkes/hairline@0.3.0, MIT.
- * Figure: Slow. Each tool logo is placed directly on a native crate from the
- * conveyor, so the tool moves with the conveyor rather than in a separate UI.
+ * Figure: Slow. BUILD freezes one conveyor frame: tool logos are stamped into
+ * the native 3D crates, so nothing floats, drifts or exceeds the conveyor.
  */
 export function BuildMethodHairline() {
   const hostRef = useRef<HTMLDivElement>(null);
-  const [crates, setCrates] = useState<CratePosition[]>([]);
 
   useEffect(() => {
-    let frame = 0;
-    let mounted = true;
+    const host = hostRef.current;
+    if (!host) return;
 
-    const sync = () => {
-      const host = hostRef.current;
-      if (host) {
-        const next = getCrates(host);
-        if (next.length === LOGOS.length && mounted) setCrates(next);
-      }
-      frame = window.requestAnimationFrame(sync);
-    };
+    const figure = slow(host, { intensity: 0.2, theme: "dark" });
+    let secondFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        freezeConveyor(host);
+        figure.destroy();
+        host.setAttribute("data-hairline", "slow");
+        host.setAttribute("data-hairline-theme", "dark");
+      });
+    });
 
-    frame = window.requestAnimationFrame(sync);
     return () => {
-      mounted = false;
-      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+      figure.destroy();
     };
   }, []);
 
   return (
     <figure
       aria-labelledby="build-method-hairline-caption"
-      className="relative isolate mx-auto max-w-5xl overflow-hidden border-y border-white/[0.08] bg-[#0d0c0b] px-2 py-5 sm:px-5 sm:py-7"
+      className="relative isolate mx-auto max-w-6xl overflow-hidden border-y border-white/[0.08] bg-[#0d0c0b] px-1 py-3 sm:px-3 sm:py-5"
     >
-      <div ref={hostRef} className="relative h-[238px] overflow-hidden sm:h-[310px]">
-        <Slow
-          aria-hidden="true"
-          intensity={0.34}
-          theme="dark"
-          className="pointer-events-auto absolute inset-0 h-full w-full"
-          style={HAIRLINE_TOKENS}
-        />
+      <div
+        ref={hostRef}
+        aria-hidden="true"
+        className="build-method-conveyor h-[330px] w-full sm:h-[470px] lg:h-[540px]"
+        style={HAIRLINE_TOKENS}
+      />
 
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-10">
-          {crates.map((crate, index) => (
-            <img
-              key={`${LOGOS[index]}-${index}`}
-              src={LOGOS[index]}
-              alt=""
-              draggable={false}
-              className="absolute object-contain drop-shadow-[0_1px_1px_rgba(0,0,0,0.65)]"
-              style={{
-                left: crate.left + crate.width * 0.21,
-                top: crate.top + crate.height * 0.15,
-                width: crate.width * 0.58,
-                height: crate.height * 0.45,
-              }}
-            />
-          ))}
-        </div>
-      </div>
+      <style>{`
+        .build-method-conveyor > svg {
+          transform: scale(1.14);
+          transform-origin: center;
+        }
+
+        @media (max-width: 639px) {
+          .build-method-conveyor > svg {
+            transform: scale(1.04);
+          }
+        }
+      `}</style>
 
       <figcaption id="build-method-hairline-caption" className="sr-only">
-        Les outils défilent sur le convoyeur. BUILD apporte le cadre réutilisable pour les transformer en projets montrables, vendables et livrables.
+        Des logos d&apos;outils sont estampés sur les blocs d&apos;un convoyeur fixe. BUILD apporte le cadre réutilisable pour transformer les outils en projets montrables, vendables et livrables.
       </figcaption>
     </figure>
   );
