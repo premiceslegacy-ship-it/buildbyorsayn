@@ -7,7 +7,7 @@ import { slow } from "@lucasmarkes/hairline";
 const LOGOS = [
   { src: "/brand-logos/codex.svg", accent: "#7a9dff" },
   { src: "/brand-logos/claude-code.svg", accent: "#d97757" },
-  { src: "/brand-logos/vercel.svg", accent: "#f0ede8", filter: "invert(1)" },
+  { src: "/brand-logos/vercel-light.svg", accent: "#f0ede8" },
   { src: "/brand-logos/supabase.svg", accent: "#3ecf8e" },
   { src: "/brand-logos/stripe.svg", accent: "#635bff" },
   { src: "/brand-logos/cloudflare.svg", accent: "#f38020" },
@@ -28,7 +28,8 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 const DECAL_SIZE = 100;
 const DECAL_INSET = 0.18;
 const TOP_FACE_DEPTH = 0.2115;
-const MIN_DECORATED_CRATE_WIDTH = 18;
+const DECAL_REVEAL_START = 13;
+const DECAL_REVEAL_END = 23;
 const FIRST_CARGO_SERIAL = 141;
 
 function crateGroups(svg: SVGSVGElement) {
@@ -119,12 +120,19 @@ function placeDecal(crate: SVGGElement, logo: ToolLogo) {
     crate.insertBefore(image, firstDot);
   }
 
-  const isLargeEnoughForMark = bounds.width >= MIN_DECORATED_CRATE_WIDTH;
-  const decorationVisibility = isLargeEnoughForMark ? "visible" : "hidden";
+  const reveal = Math.min(
+    1,
+    Math.max(0, (bounds.width - DECAL_REVEAL_START) / (DECAL_REVEAL_END - DECAL_REVEAL_START)),
+  );
+  const decorationVisibility = reveal > 0 ? "visible" : "hidden";
   shadow.setAttribute("visibility", decorationVisibility);
   inlay.setAttribute("visibility", decorationVisibility);
   depth.setAttribute("visibility", decorationVisibility);
   image.setAttribute("visibility", decorationVisibility);
+  shadow.setAttribute("opacity", String(reveal));
+  inlay.setAttribute("opacity", String(reveal));
+  depth.setAttribute("opacity", String(reveal));
+  image.setAttribute("opacity", String(reveal));
 
   shadow.setAttribute("d", shadowPath);
   shadow.setAttribute("fill", "#020202");
@@ -182,7 +190,8 @@ function preloadToolMarks() {
 /**
  * Lucas Marques' Hairline, @lucasmarkes/hairline@0.3.0, MIT.
  * Figure: Slow. Tool logos are mapped inside the native 3D crate top faces
- * on every frame, so the decals stay aligned while the conveyor runs.
+ * immediately after every library render pass, so the decals stay aligned
+ * while the conveyor runs without a stale frame during pool recycling.
  */
 export function BuildMethodHairline() {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -192,12 +201,17 @@ export function BuildMethodHairline() {
     if (!host) return;
 
     let figure: ReturnType<typeof slow> | undefined;
-    let frame = 0;
+    let observer: MutationObserver | undefined;
     let cancelled = false;
+    let syncQueued = false;
 
-    const animate = () => {
-      syncDecals(host);
-      frame = window.requestAnimationFrame(animate);
+    const scheduleSync = () => {
+      if (cancelled || syncQueued) return;
+      syncQueued = true;
+      queueMicrotask(() => {
+        syncQueued = false;
+        if (!cancelled) syncDecals(host);
+      });
     };
 
     void preloadToolMarks().then(() => {
@@ -205,12 +219,28 @@ export function BuildMethodHairline() {
 
       figure = slow(host, { intensity: 0.2, theme: "dark" });
       syncDecals(host);
-      frame = window.requestAnimationFrame(animate);
+      observer = new MutationObserver((records) => {
+        if (
+          records.some(
+            (record) =>
+              record.type === "attributes" &&
+              record.target instanceof SVGPathElement &&
+              record.target.classList.contains("sil"),
+          )
+        ) {
+          scheduleSync();
+        }
+      });
+      observer.observe(host, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["d"],
+      });
     });
 
     return () => {
       cancelled = true;
-      window.cancelAnimationFrame(frame);
+      observer?.disconnect();
       figure?.destroy();
     };
   }, []);

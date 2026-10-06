@@ -5,7 +5,7 @@ const firstCargoSerial = 141;
 const logos = [
   "/brand-logos/codex.svg",
   "/brand-logos/claude-code.svg",
-  "/brand-logos/vercel.svg",
+  "/brand-logos/vercel-light.svg",
   "/brand-logos/supabase.svg",
   "/brand-logos/stripe.svg",
   "/brand-logos/cloudflare.svg",
@@ -31,12 +31,14 @@ function cargoSnapshot() {
         0,
       );
       const bounds = cube.getBBox();
-      if (bounds.width < 18) return null;
+      if (bounds.width < 23) return null;
 
       return {
+        renderer: crate.getAttribute("data-build-renderer"),
         serial,
         x: Number(bounds.x.toFixed(2)),
         logo: logo.getAttribute("href"),
+        visible: logo.getAttribute("visibility") !== "hidden",
       };
     })
     .filter(Boolean)
@@ -49,6 +51,14 @@ try {
   await page.goto(origin, { waitUntil: "networkidle" });
   await page.locator(".build-method-conveyor").scrollIntoViewIfNeeded();
   await page.waitForTimeout(1200);
+
+  await page.evaluate(() => {
+    const crates = [...document.querySelectorAll(".build-method-conveyor svg g")].filter(
+      (crate) =>
+        [...crate.children].filter((node) => node.tagName?.toLowerCase() === "ellipse").length === 9,
+    );
+    crates.forEach((crate, index) => crate.setAttribute("data-build-renderer", String(index)));
+  });
 
   const samples = [];
   for (const waitMs of [0, 6500, 6500]) {
@@ -68,6 +78,21 @@ try {
 
   if (mismatches.length) {
     throw new Error(`A cargo identity changed its logo while moving: ${JSON.stringify(mismatches)}`);
+  }
+
+  const runtimeMismatches = [];
+  for (let frame = 0; frame < 120; frame += 1) {
+    const current = await page.evaluate(cargoSnapshot);
+    for (const cargo of current) {
+      if (cargo.visible && cargo.logo !== expectedLogo(cargo.serial)) {
+        runtimeMismatches.push({ frame, cargo, expected: expectedLogo(cargo.serial) });
+      }
+    }
+    await page.waitForTimeout(33);
+  }
+
+  if (runtimeMismatches.length) {
+    throw new Error(`A visible cargo rendered a stale logo: ${JSON.stringify(runtimeMismatches)}`);
   }
 
   console.log(JSON.stringify({ status: "PASS", samples }, null, 2));
