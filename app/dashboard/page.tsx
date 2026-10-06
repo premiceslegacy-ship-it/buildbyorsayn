@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+
 import { useRouter } from "next/navigation";
 import { ArrowRight, Lock, X, PhoneCall } from "lucide-react";
 import Link from "next/link";
@@ -314,13 +314,12 @@ export default function DashboardHub() {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-y-0 right-0 w-[64%] bg-[radial-gradient(circle_at_72%_50%,rgba(232,213,176,0.14),transparent_57%)] sm:w-[52%]"
               />
-              <Image
+              <img
                 src={illustrationSrc("blocs-7")}
                 alt=""
                 aria-hidden="true"
                 width={360}
                 height={360}
-                sizes="(min-width: 640px) 360px, 244px"
                 className="pointer-events-none absolute -right-4 top-1/2 h-[244px] w-[244px] -translate-y-1/2 object-contain brightness-125 contrast-125 sm:right-5 sm:h-[360px] sm:w-[360px]"
               />
               {tier !== "full" && (
