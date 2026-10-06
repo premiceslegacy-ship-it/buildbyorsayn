@@ -211,7 +211,7 @@ export function BuildMethodHairline() {
   return (
     <figure
       aria-labelledby="build-method-hairline-caption"
-      className="relative isolate mx-auto max-w-6xl overflow-hidden border-y border-white/[0.08] bg-[#0d0c0b] px-1 py-3 sm:px-3 sm:py-5"
+      className="relative isolate mx-auto max-w-6xl"
     >
       <div
         ref={hostRef}
