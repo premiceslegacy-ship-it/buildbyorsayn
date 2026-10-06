@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
-import { ArrowRight, Lock, X, PhoneCall } from "lucide-react";
+import { ArrowRight, X, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { BLOCS_DATA } from "@/lib/blocCatalog";
@@ -258,9 +258,9 @@ export default function DashboardHub() {
 
         <McpDashboardEntry tier={tier} profileReady={profileReady} resumeTitle={resumeBloc.titre} />
 
-        {/* 3. La Grille des Blocs (Le Menu), blocs 1 à 6 */}
+        {/* 3. La Grille des Blocs */}
         <IllustratedCardGrid className="sm:grid-cols-2 lg:grid-cols-3">
-          {BLOCS_DATA.filter((b) => b.id !== "7").map((bloc) => {
+          {BLOCS_DATA.map((bloc) => {
             const progress = isLoaded ? getBlocProgress(bloc.id) : 0;
             const isLocked = tier !== "full" && bloc.id !== "1";
             const isCompleted = progress === 100;
@@ -299,56 +299,6 @@ export default function DashboardHub() {
             );
           })}
         </IllustratedCardGrid>
-
-        {/* 3b. Bloc 7 Récapitulatif, pleine largeur, layout horizontal */}
-        {(() => {
-          const recap = BLOCS_DATA.find((b) => b.id === "7");
-          if (!recap) return null;
-          const progress = isLoaded ? getBlocProgress("7") : 0;
-          return (
-            <div
-              className="mt-6 relative min-h-[232px] overflow-hidden border border-white/10 bg-[#08080a] px-6 py-7 sm:min-h-[276px] sm:px-8 sm:py-8 cursor-pointer transition-colors duration-200 hover:border-[#e8d5b0]/35"
-              onClick={() => tier === "full" ? router.push("/blocs/7") : setModal("both")}
-            >
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-0 w-[64%] bg-[radial-gradient(circle_at_72%_50%,rgba(232,213,176,0.14),transparent_57%)] sm:w-[52%]"
-              />
-              <img
-                src={illustrationSrc("blocs-7")}
-                alt=""
-                aria-hidden="true"
-                width={360}
-                height={360}
-                className="pointer-events-none absolute -right-4 top-1/2 h-[244px] w-[244px] -translate-y-1/2 object-contain brightness-125 contrast-125 sm:right-5 sm:h-[360px] sm:w-[360px]"
-              />
-              {tier !== "full" && (
-                <div className="absolute top-5 right-6 z-10 sm:right-8 flex items-center gap-1.5 border border-white/10 px-2.5 py-1">
-                  <Lock className="w-3 h-3 text-white/30" />
-                  <span className="text-[11px] text-white/30 font-medium">Premium</span>
-                </div>
-              )}
-
-              <div className="relative z-10 max-w-xs pr-10 sm:max-w-sm sm:pr-20">
-                <p className="text-[13px] uppercase tracking-[0.08em] text-[#e8d5b0] font-medium mb-2">
-                  Synthèse finale
-                </p>
-                <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-[#f0ede8] mb-4">
-                  {recap.titre}
-                </h2>
-                <div className="flex items-center gap-4 max-w-xs">
-                  <div className="flex-1 h-1.5 bg-black/40 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-[#e8d5b0]/40 to-[#e8d5b0] rounded-full transition-all duration-500"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  <span className="text-xs text-[#e8d5b0] font-medium flex-shrink-0">{progress}%</span>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
 
         {/* 4. Écosystème Orsayn */}
         <div className="mt-6">
