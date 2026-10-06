@@ -5,7 +5,7 @@ import { ArrowRight, UserPlus } from "lucide-react";
 import { PricingCarousel } from "@/components/PricingCarousel";
 import { McpConnectorShowcase } from "@/components/McpConnectorShowcase";
 import { AccompanimentFolderCard } from "@/components/AccompanimentFolderCard";
-import { BuildMethodHeroAsset } from "@/components/AccompanimentAssets";
+import { BuildMethodHairline } from "@/components/BuildMethodHairline";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, sanitizeStripeCheckoutUrl, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE, withClientReferenceId } from "@/lib/pricing";
 
@@ -210,7 +210,7 @@ export default async function HomePage() {
             <p className="mx-auto mb-12 max-w-xl text-base text-[#8a8070]">Le point de départ n&apos;est pas l&apos;outil choisi, mais le problème que tu veux résoudre.</p>
           </div>
 
-          <BuildMethodHeroAsset />
+          <BuildMethodHairline />
 
           <div className="mx-auto mt-10 grid max-w-4xl gap-px overflow-hidden border border-white/[0.08] bg-white/[0.08] md:grid-cols-3">
             <div>
