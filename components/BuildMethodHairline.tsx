@@ -11,7 +11,9 @@ const LOGOS = [
   { src: "/brand-logos/supabase.svg" },
   { src: "/brand-logos/stripe.svg" },
   { src: "/brand-logos/cloudflare.svg" },
-];
+] as const;
+
+type ToolLogo = (typeof LOGOS)[number];
 
 const HAIRLINE_TOKENS = {
   "--hairline-plate": "#0d0c0b",
@@ -23,75 +25,97 @@ const HAIRLINE_TOKENS = {
 } as CSSProperties;
 
 const SVG_NS = "http://www.w3.org/2000/svg";
+const DECAL_SIZE = 100;
+const DECAL_INSET = 0.235;
+const TOP_FACE_DEPTH = 0.2115;
 
-function stampLogo(crate: SVGGElement, logo: (typeof LOGOS)[number], bounds: DOMRect) {
-  const size = Math.min(bounds.width * 0.8, bounds.height * 0.65);
-  const centerX = bounds.x + bounds.width / 2;
-  const centerY = bounds.y + bounds.height * 0.31;
-  const image = document.createElementNS(SVG_NS, "image");
-
-  image.setAttribute("href", logo.src);
-  image.setAttribute("width", String(size));
-  image.setAttribute("height", String(size));
-  image.setAttribute("preserveAspectRatio", "xMidYMid meet");
-  image.setAttribute("aria-hidden", "true");
-  if (logo.filter) image.style.filter = logo.filter;
-  image.setAttribute(
-    "transform",
-    `matrix(0.58 0.29 -0.58 0.29 ${centerX} ${centerY - size * 0.29})`,
-  );
-
-  crate.appendChild(image);
+function crateGroups(svg: SVGSVGElement) {
+  return [...svg.querySelectorAll("g")]
+    .filter((group): group is SVGGElement => group instanceof SVGGElement)
+    .filter((group) => group.querySelectorAll(":scope > ellipse").length === 9)
+    .slice(0, LOGOS.length);
 }
 
-function freezeConveyor(host: HTMLDivElement) {
+function placeDecal(crate: SVGGElement, logo: ToolLogo) {
+  const cube = crate.querySelector(":scope > path.sil") as SVGPathElement | null;
+  if (!cube) return;
+
+  const bounds = cube.getBBox();
+  const halfWidth = bounds.width / 2;
+  const topDepth = bounds.height * TOP_FACE_DEPTH;
+  const inner = 1 - DECAL_INSET * 2;
+  const topX = bounds.x + halfWidth;
+  const topY = bounds.y;
+  const originX = topX;
+  const originY = topY + topDepth * DECAL_INSET * 2;
+  const xScale = (halfWidth * inner) / DECAL_SIZE;
+  const yScale = (topDepth * inner) / DECAL_SIZE;
+  let image = crate.querySelector(":scope > image[data-build-tool-decal]") as SVGImageElement | null;
+
+  if (!image) {
+    image = document.createElementNS(SVG_NS, "image");
+    image.setAttribute("data-build-tool-decal", "true");
+    image.setAttribute("width", String(DECAL_SIZE));
+    image.setAttribute("height", String(DECAL_SIZE));
+    image.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    image.setAttribute("aria-hidden", "true");
+    image.style.pointerEvents = "none";
+    const firstDot = crate.querySelector(":scope > ellipse");
+    crate.insertBefore(image, firstDot);
+  }
+
+  image.setAttribute("href", logo.src);
+  image.style.filter = "filter" in logo ? logo.filter : "";
+  image.setAttribute(
+    "transform",
+    `matrix(${xScale} ${yScale} ${-xScale} ${yScale} ${originX} ${originY})`,
+  );
+}
+
+function syncDecals(
+  host: HTMLDivElement,
+  decals: WeakMap<SVGGElement, ToolLogo>,
+  nextLogo: { current: number },
+) {
   const svg = host.querySelector("svg");
   if (!svg) return;
 
-  const sourceCrates = [...svg.querySelectorAll("g")]
-    .filter((group): group is SVGGElement => group instanceof SVGGElement)
-    .filter((group) => group.querySelectorAll(":scope > ellipse").length === 9)
-    .slice(0, LOGOS.length);
-  const crateBounds = sourceCrates.map((crate) => crate.getBBox());
-  const frozen = svg.cloneNode(true) as SVGSVGElement;
-  const crates = [...frozen.querySelectorAll("g")]
-    .filter((group): group is SVGGElement => group instanceof SVGGElement)
-    .filter((group) => group.querySelectorAll(":scope > ellipse").length === 9)
-    .slice(0, LOGOS.length);
-
-  crates.forEach((crate, index) => stampLogo(crate, LOGOS[index], crateBounds[index]));
-  frozen.setAttribute("aria-hidden", "true");
-  frozen.setAttribute("focusable", "false");
-  const style = host.querySelector("style");
-  host.replaceChildren(style?.cloneNode(true) ?? document.createTextNode(""), frozen);
+  crateGroups(svg).forEach((crate) => {
+    let logo = decals.get(crate);
+    if (!logo) {
+      logo = LOGOS[nextLogo.current % LOGOS.length];
+      decals.set(crate, logo);
+      nextLogo.current += 1;
+    }
+    placeDecal(crate, logo);
+  });
 }
 
 /**
  * Lucas Marques' Hairline, @lucasmarkes/hairline@0.3.0, MIT.
- * Figure: Slow. BUILD freezes one conveyor frame: tool logos are stamped into
- * the native 3D crates, so nothing floats, drifts or exceeds the conveyor.
+ * Figure: Slow. Tool logos are mapped inside the native 3D crate top faces
+ * on every frame, so the decals stay aligned while the conveyor runs.
  */
 export function BuildMethodHairline() {
   const hostRef = useRef<HTMLDivElement>(null);
+  const decalByCrate = useRef(new WeakMap<SVGGElement, ToolLogo>());
+  const nextLogo = useRef(0);
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
 
     const figure = slow(host, { intensity: 0.2, theme: "dark" });
-    let secondFrame = 0;
-    const firstFrame = window.requestAnimationFrame(() => {
-      secondFrame = window.requestAnimationFrame(() => {
-        freezeConveyor(host);
-        figure.destroy();
-        host.setAttribute("data-hairline", "slow");
-        host.setAttribute("data-hairline-theme", "dark");
-      });
-    });
+    let frame = 0;
+    const animate = () => {
+      syncDecals(host, decalByCrate.current, nextLogo);
+      frame = window.requestAnimationFrame(animate);
+    };
+
+    frame = window.requestAnimationFrame(animate);
 
     return () => {
-      window.cancelAnimationFrame(firstFrame);
-      window.cancelAnimationFrame(secondFrame);
+      window.cancelAnimationFrame(frame);
       figure.destroy();
     };
   }, []);
@@ -122,7 +146,7 @@ export function BuildMethodHairline() {
       `}</style>
 
       <figcaption id="build-method-hairline-caption" className="sr-only">
-        Des logos d&apos;outils sont estampés sur les blocs d&apos;un convoyeur fixe. BUILD apporte le cadre réutilisable pour transformer les outils en projets montrables, vendables et livrables.
+        Des logos d&apos;outils sont estampés sur les blocs d&apos;un convoyeur en mouvement. Le mouvement se stabilise lorsque la préférence de réduction du mouvement est active. BUILD apporte le cadre réutilisable pour transformer les outils en projets montrables, vendables et livrables.
       </figcaption>
     </figure>
   );
