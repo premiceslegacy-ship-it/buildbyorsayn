@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readPublishedDoctrine, __resetDoctrineCacheForTests } from "../lib/doctrine/storage";
+import { DOCTRINE_INVENTORIES } from "../lib/doctrine/inventory";
 
 const encoder = new TextEncoder();
 function streamResponse(chunks: Uint8Array[], headers: Record<string, string> = {}) {
@@ -74,8 +75,13 @@ test("expired total deadline rejects before reading another response", async () 
 
 
 import { sha256 } from "../lib/doctrine/publication";
+const TEST_INVENTORY = DOCTRINE_INVENTORIES["socle-v1"];
+function fixtureArtifactBytes(contents: Uint8Array[]) {
+  return TEST_INVENTORY.map((name, index) => contents[index] ?? encoder.encode(`# Synthetic ${name}\n`));
+}
 function manifestFor(contents: Uint8Array[]) {
-  return { schemaVersion: 1, tier: "full", releaseId: "fixture", artifacts: contents.map((bytes, i) => ({ path: `file${i}.md`, bytes: bytes.length, sha256: sha256(bytes) })) };
+  const artifacts = fixtureArtifactBytes(contents);
+  return { schemaVersion: 1, tier: "full", releaseId: "fixture", artifacts: TEST_INVENTORY.map((path, i) => ({ path, bytes: artifacts[i].length, sha256: sha256(artifacts[i]) })) };
 }
 test("stalled stream and never-resolving cancel cannot defeat deadline", async () => {
   let cancelled = false;
@@ -98,21 +104,25 @@ test("storage refuses aggregate published artifact sizes above 8MB before downlo
 
 test("exact streamed UTF-8 artifacts succeed with no-store GETs and no redirect", async () => {
   const bytes = encoder.encode("doctrine é test");
-  await withStorage([bucket(), Response.json(manifestFor([bytes])), streamResponse([bytes.slice(0, 10), bytes.slice(10)], { "content-length": String(bytes.length) }).response], async calls => {
-    assert.deepEqual(await readPublishedDoctrine(), [{ path: "file0.md", content: "doctrine é test" }]);
-    assert.equal(calls.length, 3);
+  const artifacts = fixtureArtifactBytes([bytes]);
+  await withStorage([bucket(), Response.json(manifestFor([bytes])), streamResponse([bytes.slice(0, 10), bytes.slice(10)], { "content-length": String(bytes.length) }).response, ...artifacts.slice(1).map(artifact => streamResponse([artifact]).response)], async calls => {
+    const files = await readPublishedDoctrine();
+    assert.equal(files[0].content, "doctrine é test");
+    assert.equal(files.length, TEST_INVENTORY.length);
+    assert.equal(calls.length, TEST_INVENTORY.length + 2);
     for (const call of calls) { assert.equal(call.cache, "no-store"); assert.equal(call.method, "GET"); assert.equal(call.redirect, "error"); assert.ok(call.signal?.aborted); }
   });
 });
 test("verified publication is reused during the cache TTL", async () => {
   const bytes = encoder.encode("cached doctrine");
+  const artifacts = fixtureArtifactBytes([bytes]);
   await withStorage(
-    [bucket(), Response.json(manifestFor([bytes])), streamResponse([bytes]).response],
+    [bucket(), Response.json(manifestFor([bytes])), ...artifacts.map(artifact => streamResponse([artifact]).response)],
     async calls => {
       const first = await readPublishedDoctrine();
       const second = await readPublishedDoctrine();
       assert.deepEqual(second, first);
-      assert.equal(calls.length, 3);
+      assert.equal(calls.length, TEST_INVENTORY.length + 2);
     },
   );
 });
@@ -122,7 +132,7 @@ for (const header of [undefined, "1"]) {
     const body = streamResponse([encoder.encode("abc"), encoder.encode("tail")], header ? { "content-length": header } : {});
     await withStorage([bucket(), Response.json(manifestFor([encoder.encode("a")])), body.response], async calls => {
       await assert.rejects(readPublishedDoctrine(), { message: "Published doctrine unavailable" });
-      assert.equal(body.cancelled(), true); assert.equal(body.pulls(), 1); assert.equal(calls.length, 3);
+      assert.equal(body.cancelled(), true); assert.equal(body.pulls(), 1); assert.equal(calls.length, TEST_INVENTORY.length + 2);
     });
   });
 }
@@ -164,7 +174,7 @@ test("cumulative deadline is not reset for each Storage response", async t => {
     const fetch = globalThis.fetch;
     globalThis.fetch = async (input, init) => { const response = await fetch(input, init); now += 4000; return response; };
     await assert.rejects(readPublishedDoctrine(), { message: "Published doctrine unavailable" });
-    assert.equal(calls.length, 3);
+    assert.equal(calls.length, TEST_INVENTORY.length + 2);
   });
 });
 import { withinDoctrineReadDeadline } from "../lib/doctrine/readbounded";
@@ -186,7 +196,8 @@ test("browser runtime guard rejects before any request", async () => {
 test("manifest exactly 64KiB and artifact exactly 2MB are accepted", async () => {
   const bytes = new Uint8Array(2_000_000).fill(65);
   const manifest = encoder.encode(JSON.stringify(manifestFor([bytes])).padEnd(65536, " "));
-  await withStorage([bucket(), streamResponse([manifest]).response, streamResponse([bytes]).response], async () => {
+  const artifacts = fixtureArtifactBytes([bytes]);
+  await withStorage([bucket(), streamResponse([manifest]).response, ...artifacts.map(artifact => streamResponse([artifact]).response)], async () => {
     const files = await readPublishedDoctrine(); assert.equal(files[0].content.length, 2_000_000);
   });
 });
@@ -215,5 +226,59 @@ test("unchanged v1 reader accepts all 18 approved artifacts with exact hashes", 
     const files = await readPublishedDoctrine();
     assert.deepEqual(files.map(f => f.path), [...names]);
     assert.equal(calls.length, 20);
+  });
+});
+
+test("reader accepts the approved Coffre corpus with exact hashes", async () => {
+  const { DOCTRINE_INVENTORIES } = await import("../lib/doctrine/inventory");
+  const { sha256 } = await import("../lib/doctrine/publication");
+  const names = (DOCTRINE_INVENTORIES as Record<string, readonly string[]>)["coffre-v1"];
+  assert.ok(names, "coffre-v1 doctrine inventory is required");
+  const bytes = names.map(name => encoder.encode(`# Synthetic ${name}\n`));
+  const manifest = {
+    schemaVersion: 1,
+    tier: "full",
+    releaseId: "coffre-v1",
+    artifacts: names.map((path, i) => ({ path, bytes: bytes[i].length, sha256: sha256(bytes[i]) })),
+  };
+  await withStorage([bucket(), Response.json(manifest), ...bytes.map(byte => streamResponse([byte]).response)], async calls => {
+    const files = await readPublishedDoctrine();
+    assert.deepEqual(files.map(file => file.path), [...names]);
+    assert.equal(calls.length, names.length + 2);
+  });
+});
+
+test("reader rejects an unapproved doctrine inventory before artifact downloads", async () => {
+  const { DOCTRINE_INVENTORIES } = await import("../lib/doctrine/inventory");
+  const { sha256 } = await import("../lib/doctrine/publication");
+  const names = DOCTRINE_INVENTORIES["agentique-v1"].slice(0, -1);
+  const bytes = names.map(name => encoder.encode(`# Synthetic ${name}\n`));
+  const manifest = {
+    schemaVersion: 1,
+    tier: "full",
+    releaseId: "partial-corpus",
+    artifacts: names.map((path, i) => ({ path, bytes: bytes[i].length, sha256: sha256(bytes[i]) })),
+  };
+  await withStorage([bucket(), Response.json(manifest)], async calls => {
+    await assert.rejects(readPublishedDoctrine(), { message: "Published doctrine unavailable" });
+    assert.equal(calls.length, 2);
+  });
+});
+
+test("reader rejects a same-size Coffre inventory with a substituted private path before downloads", async () => {
+  const names: string[] = [...DOCTRINE_INVENTORIES["coffre-v1"]];
+  const replacement = names.indexOf("09-message-decision-preuve.md");
+  assert.notEqual(replacement, -1);
+  names[replacement] = "private-note.md";
+  const bytes = names.map(name => encoder.encode(`# Synthetic ${name}\n`));
+  const manifest = {
+    schemaVersion: 1,
+    tier: "full",
+    releaseId: "substituted-corpus",
+    artifacts: names.map((path, i) => ({ path, bytes: bytes[i].length, sha256: sha256(bytes[i]) })),
+  };
+  await withStorage([bucket(), Response.json(manifest)], async calls => {
+    await assert.rejects(readPublishedDoctrine(), { message: "Published doctrine unavailable" });
+    assert.equal(calls.length, 2);
   });
 });

@@ -19,8 +19,8 @@ Seuls les membres `full` et les administrateurs peuvent lire `/doctrine`. La sou
 1. Valider localement sans écriture : `node --import tsx scripts/publish-doctrine.ts --source="$DOCTRINE_SOURCE_DIR"`.
 2. Après les revues, publier Storage avec la même commande et `--apply`. Chaque artefact immuable est relu et comparé octet pour octet avant la mise à jour de `doctrine/v1/manifest.json`. Le manifeste et les artefacts sont à nouveau relus après cette mise à jour.
 3. Déployer le commit applicatif compatible avec la source `doctrine` et vérifier le SHA distant, le déploiement et les parcours autorisés/refusés.
-4. Ingestion de l’extension BLOQUÉE dans cette livraison : le script courant ne possède pas de mode doctrine-only et son `--max-chunks` peut supprimer des versions différées. Ne pas utiliser `knowledge:sync --apply` pour cette opération. Un plan paginé borné à doctrine, sans modification des autres sources, et son readback exact doivent être implémentés/revus séparément. Ne pas activer le scan du vault.
-5. Vérifier les lignes ingérées, leur niveau `full`, les refus MCP pour Aperçu/Fondations et la lecture positive Coffre.
+4. Après le pointeur Storage relu, exécuter l’ingestion bornée à `doctrine` avec `--apply --exclusive-writers-confirmed --lock-schema-confirmed`. Le script lit uniquement le manifeste publié, vérifie l'empreinte d'embedding active, verrouille la clé `doctrine`, relit l'inventaire avant apply puis relit exactement les lignes écrites. Ne pas utiliser `knowledge:sync --apply` pour cette opération et ne pas activer le scan du vault.
+5. Vérifier les lignes ingérées, leur niveau `full`, les refus MCP pour Aperçu/Fondations et la lecture positive Coffre avec les trois nouveaux chapitres.
 
 L'ancien serveur MCP rejette la nouvelle valeur de source. L'ingestion avant le déploiement compatible peut donc casser les réponses de l'ancien serveur, même sans filtre explicite sur la doctrine.
 
@@ -48,13 +48,13 @@ Préserver les anciennes releases immuables et une copie privée du manifeste pr
 
 Les enseignements issus des audits sont des exigences et des exemples pédagogiques, pas une preuve d'exploitation. Obsidian reste le Second Brain. Cette livraison n'installe et n'active aucun runtime opérationnel supplémentaire, scheduler, agent permanent ni connecteur.
 
-## Inventaires versionnés et compatibilité corpus18
+## Inventaires versionnés et compatibilité Coffre
 
-`lib/doctrine/inventory.ts` autorise exactement `socle-v1` (9 noms) ou `agentique-v1` (18 noms : socle9, README, extension8). Le publisher reconnaît le lot par égalité exacte de noms ; aucun scan récursif, dossier supplémentaire ou document privé n’est admis. `.DS_Store` seul est ignoré. Le socle conserve ses neuf premières positions. Les fixtures ne contiennent aucun contenu canonique.
+`lib/doctrine/inventory.ts` autorise exactement `socle-v1` (9 noms), `agentique-v1` (18 noms : socle9, README, extension8) ou `coffre-v1` (21 noms : agentique18 plus trois chapitres pédagogiques curatés). Le publisher reconnaît le lot par égalité exacte de noms ; aucun scan récursif, dossier supplémentaire ou document privé n’est admis. `.DS_Store` seul est ignoré. Le socle conserve ses neuf premières positions. Les fixtures ne contiennent aucun contenu canonique.
 
-Le schéma et le pointeur restent `schemaVersion: 1` et `doctrine/v1/manifest.json`. Décision minimale : le reader déployable existant accepte déjà 1..100 artefacts et ses tests couvrent maintenant 18. Aucun pointeur v2 ni migration reader/UI n’est nécessaire. **Une future publication corpus18 sur ce pointeur modifiera aussi le contenu lu par les anciennes instances compatibles** : sauvegarder le manifeste précédent et faire approuver explicitement cette bascule avant apply. Aucune bascule n’est exécutée par cette préparation.
+Le schéma et le pointeur restent `schemaVersion: 1` et `doctrine/v1/manifest.json`. Le format de manifeste accepte structurellement 1..100 artefacts, mais le reader déployable n'accepte que les inventaires exacts `socle-v1`, `agentique-v1` ou `coffre-v1`. Aucun pointeur v2 ni migration reader/UI n’est nécessaire. **Une publication Coffre sur ce pointeur modifie aussi le contenu lu par les anciennes instances compatibles** : sauvegarder le manifeste précédent et faire approuver explicitement cette bascule avant apply.
 
-Le dry-run ne charge pas `.env.local` et ne fait aucun appel réseau. Pour 18 fichiers :
+Le dry-run ne charge pas `.env.local` et ne fait aucun appel réseau. Pour les 21 fichiers de `coffre-v1` :
 
 ```sh
 npm run doctrine:publish -- --source="$DOCTRINE_SOURCE_DIR"

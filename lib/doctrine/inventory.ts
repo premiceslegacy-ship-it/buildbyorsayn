@@ -1,6 +1,5 @@
 // Approved publishing inventories, not a filesystem wildcard. Schema/pointer stay v1.
-export const DOCTRINE_INVENTORIES = {
-  "socle-v1": [
+const SOCLE_V1 = [
   "00-parcours.md",
   "01-diagnostic-et-offre.md",
   "02-decomposition-et-agents.md",
@@ -10,17 +9,10 @@ export const DOCTRINE_INVENTORIES = {
   "06-preuve-iteration-skills.md",
   "07-methode-offre-transmission.md",
   "08-fiches-atelier.md"
-],
-  "agentique-v1": [
-  "00-parcours.md",
-  "01-diagnostic-et-offre.md",
-  "02-decomposition-et-agents.md",
-  "03-connaissance-memoire-contexte.md",
-  "04-evenements-inbox-execution.md",
-  "05-autorite-outils-couts.md",
-  "06-preuve-iteration-skills.md",
-  "07-methode-offre-transmission.md",
-  "08-fiches-atelier.md",
+] as const;
+
+const AGENTIQUE_V1 = [
+  ...SOCLE_V1,
   "README.md",
   "entreprise-01-cerveau-federe.md",
   "entreprise-02-cartographie-poles.md",
@@ -30,7 +22,19 @@ export const DOCTRINE_INVENTORIES = {
   "entreprise-07-adoption-preuves-promotion.md",
   "entreprise-08-templates-et-exercices.md",
   "entreprise-formats.md"
-]
+] as const;
+
+const COFFRE_V1 = [
+  ...AGENTIQUE_V1,
+  "09-message-decision-preuve.md",
+  "10-qualification-experimentation-premiere-valeur.md",
+  "entreprise-09-gouvernance-capacites-et-reprise.md",
+] as const;
+
+export const DOCTRINE_INVENTORIES = {
+  "socle-v1": SOCLE_V1,
+  "agentique-v1": AGENTIQUE_V1,
+  "coffre-v1": COFFRE_V1,
 } as const;
 
 export function doctrineInventory(names: readonly string[]): readonly string[] {
