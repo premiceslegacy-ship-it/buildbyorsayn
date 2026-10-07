@@ -37,9 +37,9 @@ const TOOLS_LIST_P95_LIMIT_MS = MCP_TIER_THRESHOLDS.toolsListP95MsLessThan;
 const CONCURRENT_LIMIT_MS = MCP_TIER_THRESHOLDS.concurrentBatchMsLessThan;
 const KNOWLEDGE_SEARCH_LIMIT_MS = MCP_TIER_THRESHOLDS.knowledgeSearchMsLessThan;
 const LOCKED_SKILL_RESPONSE =
-  "Ce skill existe dans un palier superieur. Son contenu et ses metadonnees restent verrouilles.";
+  "Ce skill (palier full) est au-dessus du palier actuel (beginner). Son contenu reste verrouillé.";
 const ARCHIVED_SKILL_RESPONSE =
-  "Ce skill est distribue en archive depuis le tableau de bord BUILD et n'est pas servi par le MCP.";
+  "Ce skill est distribué en archive depuis le tableau de bord BUILD et n'est pas servi par le MCP.";
 const OAUTH_FIXTURE_TABLES = [
   ["temporaryAuthorizationRequestsRemaining", "mcp_authorization_requests"],
   ["temporaryAuthorizationCodesRemaining", "mcp_authorization_codes"],
@@ -497,6 +497,36 @@ async function main(): Promise<void> {
       assert.ok(String(match.content).trim().length > 0);
     }
 
+    const doctrineSearch = await mcpRequest(firstAccessToken, {
+      jsonrpc: "2.0",
+      id: 10,
+      method: "tools/call",
+      params: {
+        name: "search_knowledge",
+        arguments: {
+          query: "qualification et première valeur",
+          source: "doctrine",
+          limit: 5,
+        },
+      },
+    });
+    assert.equal(doctrineSearch.status, 200);
+    const doctrineResult = assertMcpSuccess(doctrineSearch.payload, 10);
+    const doctrineMatches = (
+      doctrineResult.structuredContent as { matches?: Array<Record<string, unknown>> } | undefined
+    )?.matches;
+    if (E2E_TIER === "full") {
+      assert.ok(Array.isArray(doctrineMatches));
+      assert.ok(doctrineMatches.length > 0);
+      assert.ok(doctrineMatches.every((match) => match.source === "doctrine" && match.tier_required === "full"));
+      assert.ok(doctrineMatches.some((match) => match.title === "Qualification, expérimentation et première valeur"));
+    } else {
+      const doctrineText = (doctrineResult.content as Array<{ text?: unknown }> | undefined)?.[0]?.text;
+      assert.equal(doctrineText, "Aucun résultat pour cette recherche à ton palier d'accès actuel.");
+      assert.equal(doctrineMatches, undefined);
+    }
+    report.doctrineTierBoundary = "PASS";
+
     const getSkill = await mcpRequest(firstAccessToken, {
       jsonrpc: "2.0",
       id: 4,
@@ -532,9 +562,9 @@ async function main(): Promise<void> {
       assert.match(availableContentText, new RegExp(`\\(${slug}\\)`));
     }
     if (E2E_TIER === "full") {
-      assert.doesNotMatch(availableContentText, /skill\(s\) supplementaire\(s\)/);
+      assert.doesNotMatch(availableContentText, /skill\(s\) supplémentaire\(s\)/);
     } else {
-      assert.match(availableContentText, /3 skill\(s\) supplementaire\(s\)/);
+      assert.match(availableContentText, /3 skill\(s\) supplémentaire\(s\)/);
       assert.doesNotMatch(availableContentText, /\((?:oracle-by-orsayn|backend-orsayn|apple-design-skills)\)/);
     }
     const tierBoundary = await mcpRequest(firstAccessToken, {
