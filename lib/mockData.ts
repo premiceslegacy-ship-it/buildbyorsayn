@@ -1,71 +1,55 @@
 const BLOCS_DATA_SOURCE = [
   {
     id: "1",
-    titre: "Bloc 1 : La logique du système",
+    titre: "Bloc 1 : Lire l'opportunité et choisir une ligne",
     sections: [
       {
         id: "b1-s0",
-        title: "Le marché IA fabrique des locataires numériques",
+        title: "Le décalage se creuse déjà",
         content:
-          "Soyons directs. La plupart des gens utilisent l'IA depuis des mois sans avoir construit quoi que ce soit qui leur appartient. Ils optimisent des interfaces qu'ils ne possèdent pas, avec des modèles qu'ils ne contrôlent pas, pour produire des livrables qui dépendent de plateformes qui peuvent changer demain.\n\n" +
-          "Marx avait théorisé ça au 19e siècle pour les usines : celui qui ne possède pas les moyens de production est contraint de vendre sa force de travail à celui qui les possède. L'IA est le nouveau moyen de production intellectuel. Claude, GPT, Gemini sont les machines du 21e siècle. Le locataire numérique les utilise sans les comprendre ni les posséder. Quand ils changent, régulation, arrêt de modèle, décision de plateforme, il recommence à zéro.\n\n" +
-          "La fenêtre actuelle est asymétrique. L'accès à des modèles exceptionnels est disponible, bon marché, et sans précédent historique. Cette fenêtre va se fermer progressivement : régulation européenne avec l'AI Act, commoditisation, protectionnisme digital. Ceux qui utilisent cette fenêtre pour construire du capital organique sortiront indépendants. Ceux qui l'utilisent pour louer de l'intelligence sortiront dépendants.\n\n" +
-          "La distillation, c'est l'acte de reprendre possession des moyens de production. Encoder ce qu'on sait faire : expertise, processus, systèmes, vision. Le placer dans des structures qu'on possède. Pas utiliser l'IA. Se distiller dedans. Ce qui est distillé ne peut pas être retiré.\n\n" +
-          "Ce bloc pose la logique du système. Pas la liste des outils. Pas les prompts à copier-coller. La structure de pensée qui fait que tout le reste tient.",
+          "L'IA ne crée pas deux catégories de business parce que certains ont trouvé le meilleur prompt. Elle crée deux vitesses. D'un côté, des équipes continuent à traiter chaque devis, relance, contenu, page, reporting et compte rendu comme une tâche isolée. De l'autre, des équipes commencent à transformer ces gestes répétitifs en systèmes : elles captent mieux le contexte, produisent plus vite, gardent les décisions et améliorent leur méthode à chaque cycle.\n\n" +
+          "Le retard ne vient donc pas d'un outil manqué. Il s'accumule. Pendant qu'un concurrent repart de zéro à chaque demande, l'autre enrichit une bibliothèque de messages, d'angles, de preuves, de visuels, de procédures et de retours terrain. Au bout de quelques mois, il ne dispose pas seulement de plus de vitesse. Il comprend mieux ce qui déclenche une réponse, ce qui bloque une vente et ce qu'il faut automatiser ou laisser à une personne.\n\n" +
+          "C'est la vraie opportunité : aider un business existant à faire mieux circuler son travail, pas lui vendre une démonstration d'IA. Le bon projet part toujours d'une scène concrète : des demandes qui arrivent mal qualifiées, des relances oubliées, des commerciaux qui réécrivent les mêmes réponses, des contenus qui n'atteignent personne, des vidéos trop coûteuses à produire, des données qui restent dans des messages et des fichiers. Là, une capacité IA peut créer un avantage mesurable.",
       },
       {
         id: "b1-s1",
-        title: "Ce que l'IA a vraiment changé",
+        title: "Une IA utile commence dans le métier",
         content:
-          "Soyons directs. L'IA n'a pas tout révolutionné du jour au lendemain. Mais elle a rendu certaines choses obsolètes très vite, et créé de nouvelles opportunités que très peu de gens exploitent encore correctement.\n\n" +
-          "Ce qui est mort ou en train de mourir : les sites WordPress avec des templates achetés 30 euros sur ThemeForest. Les sites Webflow revendus avec un abonnement mensuel sans valeur ajoutée. L'intégrateur HTML/CSS qui passe deux semaines sur un formulaire de contact. Le designer qui livre un Figma sans penser à l'implémentation.\n\n" +
-          "Ces marchés ne disparaissent pas du jour au lendemain. Il y a encore des clients qui achètent ça parce qu'ils ne savent pas qu'il existe mieux. Mais construire un business là-dessus aujourd'hui, c'est construire sur du sable.\n\n" +
-          "Ce qui résiste et va continuer à résister : la compréhension du problème client avant de toucher un outil. Le jugement design, savoir ce qui est bon et pourquoi. La sécurité et l'architecture backend complexe. Le conseil stratégique. La relation client dans des secteurs exigeants. La capacité à assembler un système cohérent plutôt que des pièces qui ne se parlent pas.\n\n" +
-          "La formule qui tient : Valeur = Jugement x Exécution IA x Compréhension métier.\n\n" +
-          "L'IA est un multiplicateur. Un multiplicateur de zéro reste zéro. C'est ton jugement et ta compréhension du métier de ton client qui font la différence.",
+          "Un modèle ne connaît ni la marge de ton client, ni ses délais, ni la phrase qui fait hésiter un prospect, ni les erreurs qu'il ne peut pas se permettre. C'est le métier qui donne une direction à l'IA. Avant de parler de stack, tu dois pouvoir montrer le geste qui revient, la perte qu'il crée et le résultat que la personne voudrait obtenir à la place.\n\n" +
+          "Exemple : un artisan ne veut pas \"un agent IA\". Il veut arrêter de perdre une soirée à transformer des photos de chantier et des notes vocales en devis clair, répondre avant que le prospect appelle ailleurs, puis savoir quelles relances méritent vraiment son attention. Une agence ne veut pas \"une automatisation\". Elle veut éviter que chaque nouveau client recommence son onboarding depuis une feuille blanche, conserver les décisions et produire plus de créations qui parlent au bon marché.\n\n" +
+          "Ta valeur n'est pas de brancher un outil. Ta valeur est de relier trois choses que le client possède déjà, mais qui vivent séparément : son contexte métier, ses gestes répétitifs et ses décisions commerciales. L'IA accélère cette boucle. Ton jugement décide où elle s'arrête, où un humain reprend la main et comment on vérifie que le système aide vraiment au lieu de produire plus de bruit.",
       },
       {
         id: "b1-s2",
-        title: "Le vrai game : l'idée, pas la structure",
+        title: "Choisir une ligne qui peut prendre de la valeur",
         content:
-          "Avant, le business en ligne c'était une question d'exécution. Aujourd'hui, avec l'IA qui code, qui rédige, qui design, et les agents qui exécutent à ta place, l'exécution devient une commodité. Ce qui reste rare, ce qui fait toute la différence, c'est l'idée. La bonne idée, dans la bonne niche, au bon moment.\n\n" +
-          "Et la bonne niche, ce n'est pas une affaire de passion. C'est une affaire de froideur. Une bonne niche réunit deux choses : tu peux communiquer avec elle (tu as un canal pour l'atteindre, tu peux lui parler dans sa langue), et elle a l'argent pour payer. Si l'une des deux manque, ce n'est pas une niche, c'est un loisir.\n\n" +
-          "À partir de là, il existe cinq modèles. Mais deux logiques dominent quand tu raisonnes comme un investisseur, pas comme un artisan.\n\n" +
-          "La première logique, le projet qui lock. Tu construis un système, souvent un SaaS, dans lequel tu fais entrer leurs données et leurs process. Une fois que toute leur opération vit dans ton système, ils ne peuvent plus partir sans tout perdre. C'est du revenu récurrent, prévisible, défendable. C'est ce que je construis avec mes lignes verticales : une niche, un système, un canal, du MRR.\n\n" +
-          "La seconde logique, le one-shot à gros ticket. Tu vends des projets uniques à des prix élevés. Pas de récurrence, mais du cashflow immédiat que tu réinjectes. Tu prends ce cash, tu le distilles en systèmes, tu le réinvestis dans la prochaine ligne, et tu recommences. C'est une mentalité de capital : des lignes verticales qui printent, et toi qui alloues.\n\n" +
-          "Les trois autres modèles existent et sont viables. L'agence IA : tu livres sites, apps et SaaS dix fois plus vite qu'une agence classique, tu gardes la marge. L'automatisation et les agents : tu construis des workflows IA pour des entreprises, gros tickets, peu de concurrence compétente. L'éducation : tu vends ce que tu sais faire, mais ça demande une pratique réelle à transmettre et une audience déjà là. Le modèle hybride, prestation plus produit plus éducation, c'est le mien, mais c'est là où les profils solides arrivent après 12 à 24 mois de terrain. Pas au départ.\n\n" +
-          "Une vérité froide à intégrer tout de suite : sur du SaaS et du B2B, le client achète rarement une personne. Il achète un système qui résout sa douleur. Tu peux print du cash sans qu'il sache qui tu es, sans attache, sans émotion. Pure froideur d'investisseur. L'infoproduit, lui, repose sur une personal brand et une relation. Ce sont deux jeux différents. Sache lequel tu joues.",
+          "Ne commence pas par \"je fais de l'IA pour tout le monde\". Choisis une ligne : un type de business, un problème coûteux, un canal pour joindre ces personnes et une première capacité que tu peux démontrer. Plus la scène est précise, plus ton message devient crédible et plus ton delivery peut devenir une méthode.\n\n" +
+          "Une ligne saine réunit quatre éléments. Premièrement, une douleur qui revient assez souvent pour justifier un changement. Deuxièmement, une personne qui a autorité ou peut réellement porter le projet. Troisièmement, un résultat visible assez vite pour apprendre et obtenir une preuve. Quatrièmement, une suite logique : une première capacité peut ouvrir vers plus de suivi, de contenu, de vente, de service ou de données sans inventer un nouveau business à chaque fois.\n\n" +
+          "Tu peux commencer par une prestation concrète, parce qu'elle te donne des conversations, du cash et du terrain. Puis tu observes ce qui revient, tu le rends plus simple, tu le documentes et tu le transformes en actif. C'est ainsi qu'une mission ponctuelle peut nourrir une ligne verticale. Pas en promettant un SaaS avant d'avoir compris le travail réel, mais en capitalisant chaque décision qui a survécu au terrain.",
       },
       {
         id: "b1-s3",
-        title: "Le conseil pour démarrer : du grind, pas de la bureaucratie",
+        title: "L'AI Growth Operating : faire circuler le travail",
         content:
-          "Si tu débutes, oublie l'idée de monter une agence avec des process, une équipe, une structure et toute la bureaucratie qui va avec. Ce n'est pas ton problème à ce stade. Ton seul problème, c'est de trouver les idées qui font du cash et de les exécuter vite.\n\n" +
-          "Mets-toi en solo, ou en duo si tu as un vrai partenaire business. Pas plus. Tu cherches à printer du premier cashflow, loin des organigrammes et des outils de gestion de projet. À ce stade, c'est du grind pur et dur. Du sauvage. Tu testes des idées, tu vends, tu livres, tu encaisses, tu recommences.\n\n" +
-          "C'est exactement ce que décrit le Protocole Zéro : absorber les compétences, sprinter pour le cash, puis distiller. Si tu pars de zéro, c'est ta feuille de route. Ouvre l'onglet Protocole Zéro et suis-le à la lettre.\n\n" +
-          "Une fois que le cash rentre, alors seulement tu structures. Pas avant.",
+          "Un AI Growth Operating n'est pas un dashboard avec des logos de modèles. C'est une façon d'organiser la croissance d'un business autour de boucles qui s'améliorent : comprendre un marché, formuler un message, produire une démonstration, capter les réponses, qualifier, relancer, livrer, puis apprendre de ce qui s'est passé. L'IA peut accélérer chacune de ces étapes. Le système existe quand elles se répondent au lieu de rester dans six outils séparés.\n\n" +
+          "Imagine une entreprise qui reçoit une demande. Le contexte utile est récupéré, la bonne personne voit le dossier, une proposition est préparée à partir de ses règles, les objections entendues sont rangées, les contenus futurs parlent de ces objections et l'équipe sait ce qui doit être relancé. Le gain n'est pas seulement du temps. C'est un système qui apprend à chaque cycle, au lieu de laisser l'intelligence commerciale se dissoudre dans des appels, des messages et la mémoire de quelques personnes.\n\n" +
+          "C'est le type de projet que tu dois apprendre à voir. Tu peux commencer par une seule boucle, par exemple les demandes entrantes, les devis, les relances ou la production de contenu. Quand elle devient fiable, tu ajoutes la suivante. L'objectif n'est pas d'automatiser une entreprise entière en une semaine. L'objectif est de créer une première capacité utile, prouvable et réutilisable.",
       },
       {
         id: "b1-s4b",
-        title: "Le positionnement : froid et chirurgical",
+        title: "Le motion design IA devient un avantage commercial",
         content:
-          "Le positionnement reste une décision stratégique. Mais ne réduis pas tout au \"problème à résoudre\". Le problème n'est qu'un levier parmi d'autres. Les gens, et même les entreprises, agissent par statut, par peur de perdre, par envie d'appartenir, par besoin de sécurité. Plus tu comprends ce qui les fait vraiment agir, plus tu vends. (On creuse ça dans les Fondations, section \"Comprendre ce qui fait agir les gens\".)\n\n" +
-          "Cela dit, le framework qui suit reste un excellent point de départ pour clarifier ta cible. Quatre questions, à répondre avec précision, pas avec des généralités.\n\n" +
-          "Question 1, pour qui précisément : \"Pour les PME\" n'est pas une réponse. \"Pour les cabinets de gestion de patrimoine indépendants de 5 à 20 personnes\" est une réponse. Plus c'est précis, plus c'est accessible et vendable.\n\n" +
-          "Question 2, quel problème précis tu résous : pas \"je crée des sites web\". Le problème formulé comme ton client le formule dans sa tête à 3h du matin quand ça l'empêche de dormir. Je suis passé de \"je crée des sites performants\" à \"je corrige la dissonance de prestige : l'écart entre excellence réelle et présence digitale\". L'humain déteste l'incohérence, et c'est sur ce genre de biais que je joue.\n\n" +
-          "Les biais universels à connaître pour convaincre, persuader, convertir : la réciprocité, l'engagement et la cohérence, la preuve sociale, l'autorité, la rareté, et la sympathie. Ce sont des leviers psychologiques observables, à replacer dans leur contexte.\n\n" +
-          "Question 3, pourquoi toi : au début, parce que tu comprends leur secteur mieux qu'un généraliste. Tu préfères manger des pâtes chez l'italien ou chez le mec qui vend des grecs, des burgers, des tacos et du poulet ? À long terme : parce que tu as des résultats documentés dans ce secteur.\n\n" +
-          "Question 4, comment tu le prouves : études de cas, résultats chiffrés, témoignages. Si tu n'as rien, montre ce que tu fais vraiment. Une démo solide est un vrai levier de preuve sociale.\n\n" +
-          "Formule de positionnement : J'aide [QUI PRÉCISÉMENT] à [RÉSOUDRE QUEL PROBLÈME] grâce à [TON APPROCHE] pour qu'ils puissent [RÉSULTAT MESURABLE]. La phrase que tu dois pouvoir dire à n'importe qui en moins de 15 secondes.",
+          "Le motion design n'est plus réservé aux marques capables de financer une grosse production à chaque campagne. Une bonne démonstration peut maintenant partir d'une scène métier, d'une direction artistique claire et d'un système de production plus léger : script, storyboard, références, images ou plans générés, montage, voix, musique, effets puis vérification. Le résultat utile n'est pas \"une vidéo IA\". C'est une séquence qui fait comprendre une offre, montre un avant et un après, donne envie de regarder la suite ou aide un commercial à ouvrir une conversation.\n\n" +
+          "Claude Opus 5.5 n'est pas le modèle qui rend la vidéo finale. Sa place est avant et pendant la production : organiser un brief, transformer une promesse en scènes, analyser des références, écrire des consignes de production, maintenir une direction cohérente et vérifier qu'un film reste fidèle à l'offre. Les plans sont ensuite produits avec les outils image, vidéo et motion adaptés, puis revus par une personne. Cela permet de travailler une idée créative avec une profondeur qui rend le motion design IA exploitable dans un vrai système commercial.\n\n" +
+          "C'est pour cela que BUILD possède le skill adapté. Il ne sert pas à demander une vidéo vague puis à espérer un miracle. Il aide à passer d'un message commercial à un film court : angle, scènes, direction artistique, génération, voix, musique, effets, rendu et contrôle. Utilisé avec une vraie compréhension du business, ce type de capacité peut faire passer une offre de \"je l'explique\" à \"je te la fais voir\".",
       },
       {
         id: "b1-s4",
-        title: "La formule qui tient",
+        title: "Ta première décision maintenant",
         content:
-          "Ce système a été construit à partir d'une pratique réelle : des projets livrés, des clients payants, des erreurs corrigées. Tout ce qui est ici est actionnable, pas de théorie creuse.\n\n" +
-          "Ce système est une base. Pas une fin en soi. Le vrai avantage compétitif dans le business IA, c'est la curiosité et la profondeur. Les outils changent tous les trois mois. Les fondamentaux, eux, restent. Ce que tu vas trouver ici te donne le cadre. À toi d'aller chercher le contexte de ton secteur, d'expérimenter, d'itérer.\n\n" +
-          "La règle numéro un : le focus paye. La dispersion tue. Ceux qui réussissent dans ce domaine ne font pas 15 choses en même temps. Ils maîtrisent un système, ils l'exécutent en profondeur, ils mesurent, ils améliorent. C'est tout.\n\n" +
-          "La valeur se crée dans la profondeur, pas dans la diversité des outils. Maîtrise un modèle, exécute-le à fond, mesure les résultats, améliore. Puis, et seulement ensuite, tu ajoutes une couche. C'est cette discipline qui fait la différence entre un projet abandonné et un business qui tient dans la durée.",
+          "Ne repars pas de ce bloc avec l'idée qu'il faut apprendre tous les outils avant de bouger. Choisis un business que tu peux comprendre, une scène qui coûte du temps, de l'argent ou des occasions, puis une première capacité que tu serais fier de montrer. Écris en une phrase : \"J'aide [qui] à [faire avancer quoi] en améliorant [le geste qui bloque] grâce à [la capacité construite].\"\n\n" +
+          "Ensuite, vérifie la réalité. Parle à des personnes du secteur, écoute leurs mots, regarde leurs documents, note leurs exceptions. Si personne ne reconnaît la scène, tu n'as pas encore le bon point de départ. Si la scène revient et que tu peux montrer un premier changement, tu tiens quelque chose.\n\n" +
+          "La suite consiste à choisir les outils qui servent cette ligne, pas ceux qui font le plus de bruit. Tu es prêt à voir comment construire ta stack, cadrer le premier système et éviter de te disperser."
       },
     ],
     videos: [

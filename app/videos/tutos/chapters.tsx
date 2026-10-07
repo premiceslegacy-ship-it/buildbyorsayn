@@ -128,6 +128,24 @@ export const CHAPTER_META: Record<string, ChapterMeta> = {
     order: 2,
     summary: "Transformer une expérience de terrain en méthode compréhensible, transmissible et proportionnée à la preuve disponible.",
   },
+  "09-message-decision-preuve.md": {
+    path: "09-message-decision-preuve.md",
+    displayTitle: "Faire un message qui aide vraiment à décider",
+    illustrationId: "hermes-agent-unified",
+    group: "socle",
+    section: "reliable",
+    order: 3,
+    summary: "Partir d'une scène vécue, expliquer le changement possible et rendre la preuve lisible sans gonfler une promesse.",
+  },
+  "10-qualification-experimentation-premiere-valeur.md": {
+    path: "10-qualification-experimentation-premiere-valeur.md",
+    displayTitle: "Tester une idée et atteindre une première valeur",
+    illustrationId: "hermes-agent-unified",
+    group: "socle",
+    section: "reliable",
+    order: 4,
+    summary: "Choisir un premier test utile, vérifier qu'il aide la bonne personne et apprendre avant d'élargir une capacité.",
+  },
   "entreprise-01-cerveau-federe.md": {
     path: "entreprise-01-cerveau-federe.md",
     displayTitle: "Une équipe, pas un super-agent",
@@ -200,7 +218,36 @@ export const CHAPTER_META: Record<string, ChapterMeta> = {
     order: 8,
     summary: "Les modèles pour préparer un dossier compréhensible par l'équipe, sans remplir les blancs au hasard.",
   },
+  "entreprise-09-gouvernance-capacites-et-reprise.md": {
+    path: "entreprise-09-gouvernance-capacites-et-reprise.md",
+    displayTitle: "Garder la main quand une capacité grandit",
+    illustrationId: "hermes-agent-unified",
+    group: "entreprise",
+    section: "team",
+    order: 9,
+    summary: "Nommer qui décide, qui peut arrêter, comment reprendre le travail et quand une automatisation mérite de rester en place.",
+  },
 };
+
+const CURRICULUM_SECTION_ORDER = new Map(
+  CURRICULUM_SECTIONS.map((section, index) => [section.key, index]),
+);
+
+/** Keep the reader pager and the visible curriculum on the same path. */
+export function orderCurriculumFiles<T extends { path: string }>(files: readonly T[]): T[] {
+  return [...files].sort((left, right) => {
+    const leftMeta = CHAPTER_META[left.path];
+    const rightMeta = CHAPTER_META[right.path];
+    const leftSection = leftMeta ? (CURRICULUM_SECTION_ORDER.get(leftMeta.section) ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER;
+    const rightSection = rightMeta ? (CURRICULUM_SECTION_ORDER.get(rightMeta.section) ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER;
+
+    if (leftSection !== rightSection) return leftSection - rightSection;
+    const leftOrder = leftMeta?.order ?? Number.MAX_SAFE_INTEGER;
+    const rightOrder = rightMeta?.order ?? Number.MAX_SAFE_INTEGER;
+    if (leftOrder !== rightOrder) return leftOrder - rightOrder;
+    return left.path.localeCompare(right.path, "fr");
+  });
+}
 
 export function chapterSlug(path: string): string {
   return path.replace(/\.md$/, "").toLowerCase();

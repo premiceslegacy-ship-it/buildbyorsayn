@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { chapterTitle, withoutLeadingTitle, DoctrineMarkdown } from "../../../doctrine/markdown";
-import { CHAPTER_META, chapterSlug, chapterPathFromSlug } from "../chapters";
+import { CHAPTER_META, chapterSlug, chapterPathFromSlug, orderCurriculumFiles } from "../chapters";
 import { CHAPTER_DIAGRAMS } from "../chapterDiagrams";
 import { hermesGate } from "../gate.server";
 import { NavBar } from "@/components/NavBar";
@@ -30,9 +30,10 @@ export default async function HermesChapterPage({
 
   const meta = CHAPTER_META[file.path];
   const displayTitle = meta?.displayTitle ?? chapterTitle(file);
-  const currentIndex = files.findIndex((f) => f.path === file.path);
-  const prevFile = currentIndex > 0 ? files[currentIndex - 1] : undefined;
-  const nextFile = files[currentIndex + 1];
+  const curriculumFiles = orderCurriculumFiles(files);
+  const currentIndex = curriculumFiles.findIndex((entry) => entry.path === file.path);
+  const prevFile = currentIndex > 0 ? curriculumFiles[currentIndex - 1] : undefined;
+  const nextFile = curriculumFiles[currentIndex + 1];
 
   const identity = await navIdentity();
 

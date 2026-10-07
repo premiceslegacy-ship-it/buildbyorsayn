@@ -289,6 +289,21 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
               ))}
             </div>
 
+            {blocId === "1" ? (
+              <section className="mt-16 border-y border-[#e8d5b0]/20 py-8 sm:py-10">
+                <p className="text-[11px] tracking-[0.18em] font-semibold text-[#e8d5b0]">PROCHAINE DÉCISION</p>
+                <h2 className="mt-3 max-w-2xl text-2xl font-semibold tracking-tight text-[#f0ede8]">Choisis les outils qui servent ta ligne, pas ceux qui font le plus de bruit.</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/55">Le Bloc 2 t'aide à composer une stack simple pour rechercher, produire, construire et garder ce qui apprend de ton terrain.</p>
+                <Link
+                  href="/blocs/2"
+                  className="mt-6 inline-flex items-center gap-2 rounded-[4px] border border-[#e8d5b0]/75 bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] shadow-[0_3px_0_rgba(147,123,80,0.9)] transition-all hover:bg-[#f0dfc0] active:translate-y-px active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f0ede8]"
+                >
+                  Voir comment construire ta stack
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </section>
+            ) : null}
+
             {/* Encart vidéos liées */}
             {bloc.videos?.length > 0 && (
               <div className="mt-16 pt-8 border-t border-white/5">

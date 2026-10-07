@@ -2,9 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import "server-only";
 import { Suspense } from "react";
-import { chapterTitle } from "../../doctrine/markdown";
-import { COFFRE_LABEL } from "@/lib/pricing";
-import { CHAPTER_META, CURRICULUM_SECTIONS, chapterSlug } from "./chapters";
+import { CHAPTER_META, CURRICULUM_SECTIONS, chapterSlug, orderCurriculumFiles } from "./chapters";
 import { hermesGate } from "./gate.server";
 import { NavBar } from "@/components/NavBar";
 import { HermesInstall } from "@/components/HermesInstall";
@@ -46,14 +44,11 @@ async function HermesChapters() {
   const gate = await hermesGate();
   if (gate.files === null) return gate.render;
 
+  const curriculumFiles = orderCurriculumFiles(gate.files);
   const groups = CURRICULUM_SECTIONS.map((section) => ({
     ...section,
-    files: gate.files
-      .filter((file) => CHAPTER_META[file.path]?.section === section.key)
-      .sort((left, right) => (CHAPTER_META[left.path]?.order ?? 999) - (CHAPTER_META[right.path]?.order ?? 999)),
+    files: curriculumFiles.filter((file) => CHAPTER_META[file.path]?.section === section.key),
   })).filter((section) => section.files.length > 0);
-
-  const unknownFiles = gate.files.filter((file) => !CHAPTER_META[file.path]);
 
   return (
     <section id="chapitres" className="scroll-mt-24">
@@ -83,24 +78,6 @@ async function HermesChapters() {
               </IllustratedCardGrid>
             </section>
           ))}
-
-          {unknownFiles.length > 0 ? (
-            <section aria-label="Chapitres supplémentaires">
-              <div className="mb-6 max-w-2xl">
-                <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">CHAPITRES SUPPLÉMENTAIRES</p>
-                <p className="text-sm text-white/50 leading-relaxed">Ces chapitres n'ont pas encore reçu de place dans le parcours. Ils restent accessibles sans être mélangés aux premières missions.</p>
-              </div>
-              <IllustratedCardGrid>
-                {unknownFiles.map((file) => (
-                  <IllustratedCard
-                    key={file.path}
-                    title={chapterTitle(file)}
-                    href={`/videos/tutos/${chapterSlug(file.path)}`}
-                  />
-                ))}
-              </IllustratedCardGrid>
-            </section>
-          ) : null}
 
           <section id="installer" className="scroll-mt-24 border-y border-white/[0.1] py-10 sm:py-12">
             <div className="max-w-2xl mb-7">
@@ -135,7 +112,7 @@ export default async function HermesAgentPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 relative z-10">
         <header id="introduction" className="scroll-mt-24 mb-16 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,25rem)] lg:gap-16">
           <div className="min-w-0 max-w-3xl">
-            <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">RÉSERVÉ À {COFFRE_LABEL.toUpperCase()}</p>
+            <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">HERMES AGENT</p>
             <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Hermes Agent, pour faire avancer un vrai travail.</h1>
             <p className="text-white/60 text-base sm:text-[17px] mt-5 leading-relaxed max-w-2xl">Une mission précise, le bon contexte, une méthode qui tient dans le temps et un niveau d'autonomie choisi par toi. C'est ainsi qu'Hermes devient utile au quotidien.</p>
             <p className="text-white/45 text-sm sm:text-base mt-3 leading-relaxed max-w-2xl">Commence par les blocs ci-dessous, puis avance dans les chapitres lorsque tu veux aller plus loin.</p>

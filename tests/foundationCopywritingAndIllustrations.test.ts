@@ -77,7 +77,7 @@ test("les collections Hermes Agent et Fondations partagent chacune une seule ill
 
   assert.equal((foundations.match(/illustrationId: "fondations-tech-foundation"/g) ?? []).length, 11);
   assert.doesNotMatch(foundations, /illustrationId: "fondations-(?!tech-foundation)/);
-  assert.equal((chapters.match(/illustrationId: "hermes-agent-unified"/g) ?? []).length, 18);
+  assert.equal((chapters.match(/illustrationId: "hermes-agent-unified"/g) ?? []).length, 21);
 
   for (const relativePath of [
     "public/assets/illustrations/hermes-agent-unified.png",
