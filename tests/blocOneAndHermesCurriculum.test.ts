@@ -58,5 +58,9 @@ test("le Bloc 1 donne une projection business IA concrète et se termine par la 
 
   assert.doesNotMatch(copy, /locataires numériques/i);
   assert.match(blocClient, /blocId === "1"/);
-  assert.match(blocClient, /Voir comment construire ta stack/);
+  const firstBlocIndex = BLOCS_DATA.findIndex((entry) => entry.id === "1");
+  assert.equal(BLOCS_DATA[firstBlocIndex + 1]?.id, "5");
+  assert.match(blocClient, /href=\{`\/blocs\/\$\{nextBloc\.id\}`\}/);
+  assert.match(blocClient, /Continuer avec \{nextBlocLabel\.toLowerCase\(\)\}/);
+  assert.doesNotMatch(blocClient, /Voir comment construire ta stack/);
 });
