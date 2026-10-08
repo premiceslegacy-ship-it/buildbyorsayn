@@ -346,21 +346,33 @@ export default function SkillsPage() {
           </Link>
         </div>
 
-        <header className="mb-14">
+        <header className="mb-8 sm:mb-14">
           <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-3">
             Bibliothèque
           </p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#f0ede8]">
             Skills
           </h1>
-          <p className="text-white/50 text-[17px] mt-4 max-w-2xl leading-relaxed">
+          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/55 sm:hidden">
+            Choisis une capacité à renforcer, télécharge-la puis adapte-la à ton projet.
+          </p>
+          <p className="hidden sm:block text-white/50 text-[17px] mt-4 max-w-2xl leading-relaxed">
             Ce sont les skills que j'ai configurés pour moi et pour mon écosystème. Je les utilise au quotidien pour cadrer, construire et auditer mes projets. Tu peux bien évidemment les adapter à ta manière de travailler, à ton marché et à tes propres projets.
           </p>
-          <SkillsFreshness />
-          <p className="mt-3 max-w-2xl text-xs leading-relaxed text-white/45">Chaque téléchargement est une copie locale. Cette page peut signaler une version plus récente dans ce navigateur, puis tu choisis de la télécharger. Elle n'écrase jamais tes adaptations.</p>
+          <a
+            href="#catalogue"
+            className="mt-5 inline-flex items-center gap-2 rounded-[4px] border border-[#e8d5b0]/75 bg-[#e8d5b0] px-4 py-2.5 text-sm font-semibold text-[#0e0e0f] shadow-[0_3px_0_rgba(147,123,80,0.9)] transition-all active:translate-y-px active:shadow-none sm:hidden"
+          >
+            Voir les skills
+            <ArrowRight className="h-4 w-4" />
+          </a>
+          <div className="hidden sm:block">
+            <SkillsFreshness />
+            <p className="mt-3 max-w-2xl text-xs leading-relaxed text-white/45">Chaque téléchargement est une copie locale. Cette page peut signaler une version plus récente dans ce navigateur, puis tu choisis de la télécharger. Elle n'écrase jamais tes adaptations.</p>
+          </div>
         </header>
 
-        <section id="methode" className="mb-10 scroll-mt-24">
+        <section id="methode" className="mb-10 scroll-mt-24 hidden md:block">
           <LiquidCard className="p-5 sm:p-6">
             <div className="relative z-10">
               <div className="max-w-3xl">
@@ -425,7 +437,7 @@ export default function SkillsPage() {
           </LiquidCard>
         </section>
 
-        <section id="workflow" className="mb-10 scroll-mt-24">
+        <section id="workflow" className="mb-10 scroll-mt-24 hidden md:block">
           <LiquidCard className="p-5 sm:p-6">
             <div className="relative z-10">
               <div className="max-w-3xl">
@@ -460,7 +472,7 @@ export default function SkillsPage() {
           </LiquidCard>
         </section>
 
-        <section id="mode-emploi" className="mb-10 scroll-mt-24">
+        <section id="mode-emploi" className="mb-10 scroll-mt-24 hidden md:block">
           <LiquidCard className="p-5 sm:p-6">
             <div className="relative z-10">
               <div className="max-w-3xl">
@@ -651,9 +663,23 @@ export default function SkillsPage() {
             })}
           </div>
         )}
+
+        <section className="mt-10 md:hidden">
+          <details className="group border border-white/[0.1] bg-white/[0.025] px-4 py-3">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#f0ede8]">
+              Comprendre comment les adapter
+              <span className="text-lg leading-none text-[#e8d5b0]/70 transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <div className="pt-3 text-sm leading-relaxed text-white/55">
+              <p>Un skill est une base de travail, pas une recette à copier. Donne-lui ton marché, tes références et tes contraintes, puis garde les règles qui fonctionnent sur tes projets.</p>
+              <p className="mt-3">La méthode détaillée reste disponible sur ordinateur quand tu veux aller plus loin.</p>
+            </div>
+          </details>
+        </section>
       </div>
 
       <ScrollProgress
+        className="hidden md:block"
         sections={[
           { id: "methode", label: "La méthode" },
           { id: "workflow", label: "Le workflow" },
