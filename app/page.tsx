@@ -244,8 +244,8 @@ export default async function HomePage() {
           PRICING - remonté pour réduire la distance à la conversion
       ================================================================ */}
       <section id="pricing" className="relative z-10 px-6 py-16 sm:py-20 border-t border-white/[0.05]">
-        <div className="max-w-xl mx-auto">
-          <div className="text-center mb-10">
+        <div className="mx-auto max-w-4xl">
+          <div className="mx-auto mb-10 max-w-xl text-center">
             <p className="text-[11px] font-bold uppercase tracking-[3px] text-[#c9b48a] mb-5">
               Commencer par le bon niveau
             </p>

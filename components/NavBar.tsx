@@ -240,13 +240,13 @@ export function NavBar({
           : "bg-transparent border-transparent"
       }`}
     >
-    <nav aria-label="Navigation principale" className="w-full max-w-7xl mx-auto flex items-center justify-between py-4 md:py-6 px-4 md:px-12">
+    <nav aria-label="Navigation principale" className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 py-4 md:px-8 xl:px-12 xl:py-6">
       <Link href="/" aria-label="Accueil BUILD" className="inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e0f]">
         <Logo layout="horizontal" className="h-6" hideText={false} />
       </Link>
 
       {/* Desktop links */}
-      <div className="hidden md:flex items-center gap-6 text-sm">
+      <div className="hidden xl:flex items-center gap-6 text-sm">
         {desktopNavLinks}
 
         {displayEmail ? (
@@ -288,7 +288,7 @@ export function NavBar({
       </div>
 
       {/* Mobile: hamburger + avatar */}
-      <div className="flex md:hidden items-center gap-3">
+      <div className="flex xl:hidden items-center gap-3">
         {displayEmail ? (
           <div className="relative" ref={mobileDropdownRef}>
             <button
