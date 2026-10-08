@@ -294,7 +294,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
               <section className="mt-16 border-y border-[#e8d5b0]/20 py-8 sm:py-10">
                 <p className="text-[11px] tracking-[0.18em] font-semibold text-[#e8d5b0]">PROCHAINE DÉCISION</p>
                 <h2 className="mt-3 max-w-2xl text-2xl font-semibold tracking-tight text-[#f0ede8]">Choisis les outils qui servent ta ligne, pas ceux qui font le plus de bruit.</h2>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/55">Après avoir identifié l'opportunité, pose les bases commerciales qui te permettent de parler à un marché, apprendre du terrain et ne pas te perdre dans les outils.</p>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/55">Maintenant que ta ligne est claire, compose une stack simple pour rechercher, produire, construire et garder ce qui apprend de ton terrain.</p>
                 {nextBloc ? (
                   <Link
                     href={`/blocs/${nextBloc.id}`}

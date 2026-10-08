@@ -459,7 +459,7 @@ const BLOCS_DATA_SOURCE = [
   },
 ];
 
-const CHRONOLOGICAL_BLOCK_ORDER = ["1", "5", "3", "6", "2", "4", "7"];
+const CHRONOLOGICAL_BLOCK_ORDER = ["1", "2", "5", "3", "6", "4", "7"];
 const DISPLAY_NUMBER_BY_SOURCE_NUMBER: Record<string, number> = Object.fromEntries(
   CHRONOLOGICAL_BLOCK_ORDER.map((sourceId, index) => [sourceId, index + 1])
 );
