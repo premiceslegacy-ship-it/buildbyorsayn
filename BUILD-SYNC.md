@@ -29,6 +29,12 @@ jour. Les versions précédentes restent sous `~/.build-sync/rollbacks/`.
 4. Tester une connexion réelle, un téléchargement Beginner puis Full, un refus
    401 sans jeton, un refus 403 hors niveau et une rotation du refresh token.
 
+Le contrôle live reproductible utilise les comptes E2E dédiés :
+
+```bash
+npm run test:build-sync-live
+```
+
 La migration garde BUILD Sync séparé du MCP : portée `skills:read`, tables,
 jetons et révocation distincts. Les jetons d'accès expirent après 15 minutes ;
 les refresh tokens tournent à chaque usage et leur famille expire après 90 jours.

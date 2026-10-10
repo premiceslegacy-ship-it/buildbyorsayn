@@ -9,6 +9,7 @@
     "start": "next start -p 3000 -H 0.0.0.0",
     "test": "node --import tsx --test --test-concurrency=1 tests/**/*.test.ts",
     "test:e2e": "playwright test",
+    "test:build-sync-live": "node --env-file=.env.e2e.local scripts/verify-build-sync-live.mjs",
     "verify:build-conveyor": "node scripts/verify-build-conveyor-flow.mjs",
     "bench:doctrine": "tsx --env-file=.env.local scripts/bench-doctrine-read.ts",
     "test:rls": "tsx scripts/verify-progress-rls.ts",

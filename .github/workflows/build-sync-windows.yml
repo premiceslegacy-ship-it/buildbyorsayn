@@ -1,0 +1,42 @@
+name: BUILD Sync Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "public/build-sync/**"
+      - ".github/workflows/build-sync-windows.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  installer-smoke:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Parse and install BUILD Sync
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $null = [scriptblock]::Create((Get-Content -Raw public/build-sync/install.ps1))
+          node --check public/build-sync/build.mjs
+          $server = Start-Process python -ArgumentList "-m", "http.server", "8765", "--directory", "public" -PassThru
+          try {
+            Start-Sleep -Seconds 2
+            $env:BUILD_SYNC_BASE_URL = "http://127.0.0.1:8765"
+            $env:BUILD_SYNC_INSTALL_ONLY = "1"
+            $env:LOCALAPPDATA = Join-Path $env:RUNNER_TEMP "build-sync-localappdata"
+            & ./public/build-sync/install.ps1
+            $wrapper = Join-Path $env:LOCALAPPDATA "BUILD Sync/bin/build-skills.cmd"
+            if (-not (Test-Path $wrapper)) { throw "BUILD Sync wrapper was not installed" }
+            & $wrapper help
+          }
+          finally {
+            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+          }

@@ -173,6 +173,7 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   const catalog = readFileSync(new URL("../app/api/build-sync/catalog/route.ts", import.meta.url), "utf8");
   const artifact = readFileSync(new URL("../app/api/build-sync/artifacts/[slug]/route.ts", import.meta.url), "utf8");
   const session = readFileSync(new URL("../app/api/build-sync/session/route.ts", import.meta.url), "utf8");
+  const windowsInstaller = readFileSync(new URL("../public/build-sync/install.ps1", import.meta.url), "utf8");
   assert.doesNotMatch(cli, /showDirectoryPicker|FileSystemDirectoryHandle/);
   assert.match(cli, /CUSTOM\.md/);
   assert.match(cli, /artifact\.sha256/);
@@ -187,4 +188,5 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   assert.match(artifact, /getStoredSkillContent/);
   assert.match(artifact, /status: 403/);
   assert.match(session, /revoke_build_sync_user_connections/);
+  assert.match(windowsInstaller, /BUILD_SYNC_INSTALL_ONLY/);
 });
