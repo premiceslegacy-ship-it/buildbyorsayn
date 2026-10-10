@@ -21,39 +21,40 @@ export function BuildSyncInstall() {
   const [copied, setCopied] = useState<string | null>(null);
 
   return (
-    <section aria-labelledby="build-sync-title" className="mb-10 border border-[#e8d5b0]/20 bg-[#e8d5b0]/[0.045] p-5 sm:p-6">
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-        <div>
+    <section aria-labelledby="build-sync-title" className="mb-10 overflow-hidden border border-[#e8d5b0]/20 bg-[#e8d5b0]/[0.045] p-4 sm:p-6">
+      <div className="grid min-w-0 gap-7 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+        <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e8d5b0]">BUILD Sync</p>
-          <h2 id="build-sync-title" className="mt-2 text-2xl font-semibold tracking-tight text-[#f0ede8]">
+          <h2 id="build-sync-title" className="mt-2 text-xl font-semibold tracking-tight text-[#f0ede8] sm:text-2xl">
             Installe une fois. Les skills restent à jour.
           </h2>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/55">
+          <p className="mt-3 max-w-xl text-[13px] leading-relaxed text-white/55 sm:text-sm">
             BUILD détecte Codex, Claude Code et Hermes, installe les skills accessibles avec ton abonnement puis vérifie automatiquement les nouvelles versions.
           </p>
           <div className="mt-4 grid gap-2 text-xs text-white/55 sm:grid-cols-2">
-            <p className="flex items-start gap-2"><RefreshCw className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#e8d5b0]" />Contrôle automatique toutes les six heures</p>
-            <p className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#e8d5b0]" />Tes adaptations restent dans CUSTOM.md</p>
+            <p className="flex items-start gap-2"><RefreshCw className="mt-0.5 size-3.5 shrink-0 text-[#e8d5b0]" />Contrôle automatique toutes les six heures</p>
+            <p className="flex items-start gap-2"><ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-[#e8d5b0]" />Tes adaptations restent dans CUSTOM.md</p>
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="flex min-w-0 flex-col gap-3">
           {COMMANDS.map(({ label, command }) => (
-            <div key={label}>
+            <div key={label} className="min-w-0">
               <p className="mb-1.5 text-[10px] uppercase tracking-[0.14em] text-white/35">{label}</p>
-              <div className="relative border border-white/10 bg-black/35">
-                <pre className="overflow-x-auto py-3 pl-3 pr-12 text-[11px] text-[#e8d5b0]/85"><code>{command}</code></pre>
+              <div className="flex min-w-0 items-stretch border border-white/10 bg-black/35">
+                <pre className="min-w-0 flex-1 overflow-x-auto p-3 text-[10px] leading-5 text-[#e8d5b0]/85 sm:text-[11px]"><code>{command}</code></pre>
                 <button
                   type="button"
-                  aria-label={`Copier la commande ${label}`}
+                  aria-label={copied === label ? `Commande ${label} copiée` : `Copier la commande ${label}`}
+                  title={copied === label ? "Commande copiée" : "Copier la commande"}
                   onClick={() => {
                     void navigator.clipboard.writeText(command);
                     setCopied(label);
                     window.setTimeout(() => setCopied(null), 2_000);
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 border border-white/10 bg-white/[0.06] p-2 text-white/55 transition hover:text-[#e8d5b0]"
+                  className="flex size-11 shrink-0 items-center justify-center border-l border-white/10 bg-white/[0.06] text-white/55 transition hover:text-[#e8d5b0]"
                 >
-                  {copied === label ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied === label ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
                 </button>
               </div>
             </div>
@@ -63,6 +64,10 @@ export function BuildSyncInstall() {
           </p>
         </div>
       </div>
+      <p className="mt-5 border-t border-white/[0.08] pt-4 text-[11px] leading-relaxed text-white/45 sm:text-xs">
+        <strong className="font-semibold text-[#e8d5b0]/85">Déjà téléchargé manuellement ?</strong>{" "}
+        Lance l’installation une fois : l’ancien dossier sera sauvegardé, puis BUILD Sync prendra le relais. Si tu avais modifié SKILL.md, reporte seulement tes règles dans CUSTOM.md.
+      </p>
     </section>
   );
 }
