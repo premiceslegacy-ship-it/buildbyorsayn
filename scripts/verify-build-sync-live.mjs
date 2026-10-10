@@ -97,7 +97,7 @@ async function authorize(browser, email, password, tier) {
       await page.locator('input[name="password"]').fill(password);
       await page.locator('button[type="submit"]').click();
     }
-    await page.getByRole("heading", { name: "Activer BUILD Sync" }).waitFor({ timeout: 20_000 });
+    await page.getByRole("heading", { name: "Connecter cet ordinateur à BUILD" }).waitFor({ timeout: 20_000 });
     await page.getByRole("button", { name: "Autoriser les mises à jour" }).click();
     const code = await Promise.race([
       callback.grant,
@@ -203,9 +203,10 @@ async function approveCliAuthorization(browser, authorizeUrl, email, password) {
       await page.locator('input[name="password"]').fill(password);
       await page.locator('button[type="submit"]').click();
     }
-    await page.getByRole("heading", { name: "Activer BUILD Sync" }).waitFor({ timeout: 20_000 });
+    await page.getByRole("heading", { name: "Connecter cet ordinateur à BUILD" }).waitFor({ timeout: 20_000 });
     await page.getByRole("button", { name: "Autoriser les mises à jour" }).click();
     await page.getByText("BUILD Sync est connecté").waitFor({ timeout: 20_000 });
+    await page.getByRole("img", { name: "BUILD" }).waitFor({ timeout: 20_000 });
   } finally {
     await context.close();
   }
@@ -314,7 +315,10 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  process.stderr.write(`BUILD Sync live E2E failed: ${error?.message ?? "unknown error"}\n`);
-  process.exitCode = 1;
-});
+main().then(
+  () => process.exit(0),
+  (error) => {
+    process.stderr.write(`BUILD Sync live E2E failed: ${error?.message ?? "unknown error"}\n`);
+    process.exit(1);
+  }
+);

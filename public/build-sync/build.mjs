@@ -195,7 +195,29 @@ function openBrowser(url) {
   return false;
 }
 
-function connectedBrowserPage() {
+async function fetchBrandLogoDataUrl(baseUrl) {
+  try {
+    const response = await fetch(new URL("/brand-logos/build-logo-compact.png", baseUrl), {
+      headers: { Accept: "image/png" },
+      redirect: "error",
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!response.ok || response.headers.get("content-type")?.split(";", 1)[0] !== "image/png") return null;
+    const declaredSize = Number(response.headers.get("content-length") || 0);
+    if (declaredSize > 256 * 1024) return null;
+    const bytes = Buffer.from(await response.arrayBuffer());
+    const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    if (!bytes.length || bytes.length > 256 * 1024 || !bytes.subarray(0, 8).equals(pngSignature)) return null;
+    return `data:image/png;base64,${bytes.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
+function connectedBrowserPage(brandLogoDataUrl) {
+  const brandMark = brandLogoDataUrl
+    ? `<img src="${brandLogoDataUrl}" alt="BUILD">`
+    : '<span class="wordmark" aria-label="BUILD">BUILD</span>';
   return `<!doctype html>
 <html lang="fr">
 <meta charset="utf-8">
@@ -205,7 +227,7 @@ function connectedBrowserPage() {
   :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0e0e0f;color:#f0ede8}
   *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 0,rgba(232,213,176,.08),transparent 38%),#0e0e0f}
   main{width:min(100%,560px);border:1px solid rgba(232,213,176,.2);border-radius:18px;padding:32px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:0 24px 70px rgba(0,0,0,.5)}
-  .mark{display:grid;place-items:center;width:58px;height:58px;margin:0 auto 20px;border-radius:16px;background:#e8d5b0;color:#0e0e0f;font-weight:900;font-size:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .mark{display:grid;place-items:center;width:112px;height:84px;margin:0 auto 20px;border-radius:18px;background:#e8d5b0;color:#0e0e0f;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}.mark img{display:block;width:106px;height:auto}.wordmark{font-size:18px;font-weight:900;letter-spacing:.08em}
   .eyebrow{text-align:center;color:rgba(232,213,176,.72);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
   h1{margin:8px 0 0;text-align:center;font-size:clamp(25px,6vw,34px);letter-spacing:-.035em}p{margin:12px auto 0;max-width:430px;text-align:center;color:rgba(240,237,232,.62);font-size:14px;line-height:1.65}
   ol{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:28px 0 0;padding:0;list-style:none}.step{text-align:center;min-width:0}.dot{display:grid;place-items:center;width:30px;height:30px;margin:auto;border:1px solid rgba(255,255,255,.1);border-radius:999px;color:rgba(255,255,255,.35);font-size:11px;font-weight:700}.done .dot{border-color:rgba(232,213,176,.35);background:rgba(232,213,176,.12);color:#e8d5b0}.active .dot{border-color:#e8d5b0;background:#e8d5b0;color:#0e0e0f}.label{display:block;margin-top:7px;overflow:hidden;color:rgba(255,255,255,.38);font-size:10px;text-overflow:ellipsis;white-space:nowrap}.active .label{color:#e8d5b0}
@@ -213,7 +235,7 @@ function connectedBrowserPage() {
   @media(max-width:420px){main{padding:24px 18px}ol{gap:4px}.label{font-size:9px}}
 </style>
 <main>
-  <div class="mark" aria-hidden="true">B</div>
+  <div class="mark">${brandMark}</div>
   <div class="eyebrow">Connexion réussie</div>
   <h1>BUILD Sync est connecté</h1>
   <p>Tu peux revenir dans ton terminal. BUILD vérifie maintenant les versions et installe automatiquement les skills inclus dans ton accès.</p>
@@ -232,6 +254,7 @@ async function waitForAuthorization(baseUrl, quiet) {
   const verifier = randomBytes(48).toString("base64url");
   const challenge = createHash("sha256").update(verifier, "ascii").digest("base64url");
   const state = randomBytes(24).toString("base64url");
+  const brandLogoDataUrl = await fetchBrandLogoDataUrl(baseUrl);
 
   let resolveCallback;
   let rejectCallback;
@@ -264,7 +287,7 @@ async function waitForAuthorization(baseUrl, quiet) {
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
       });
-      response.end(connectedBrowserPage());
+      response.end(connectedBrowserPage(brandLogoDataUrl));
       resolveCallback({ code, verifier, redirectUri });
     } catch (error) {
       rejectCallback(error);

@@ -201,6 +201,9 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   assert.match(cli, /BUILD Sync — installation guidée/);
   assert.match(cli, /BUILD Sync est prêt/);
   assert.match(cli, /Progression de l'installation/);
+  assert.match(cli, /\/brand-logos\/build-logo-compact\.png/);
+  assert.match(cli, /data:image\/png;base64/);
+  assert.doesNotMatch(cli, /class="mark" aria-hidden="true">B/);
   assert.match(proxy, /\/build-sync\/consent/);
   assert.match(catalog, /resolveBuildSyncAuth/);
   assert.match(catalog, /canDownload/);
