@@ -11,6 +11,7 @@ import { SKILLS_CATALOG, SKILL_CATEGORY_LABELS, type SkillCategory } from "@/lib
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { IllustratedCard } from "@/components/ui/illustrated-card";
 import { SkillsFreshness } from "@/components/SkillsFreshness";
+import { BuildSyncInstall } from "@/components/BuildSyncInstall";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { illustrationSrc } from "@/lib/illustrations";
@@ -368,9 +369,11 @@ export default function SkillsPage() {
           </a>
           <div className="hidden sm:block">
             <SkillsFreshness />
-            <p className="mt-3 max-w-2xl text-xs leading-relaxed text-white/45">Chaque téléchargement est une copie locale. Cette page peut signaler une version plus récente dans ce navigateur, puis tu choisis de la télécharger. Elle n'écrase jamais tes adaptations.</p>
+            <p className="mt-3 max-w-2xl text-xs leading-relaxed text-white/45">BUILD Sync maintient automatiquement les installations gérées et n'écrase jamais tes adaptations placées dans CUSTOM.md. Les téléchargements manuels restent disponibles comme solution de secours.</p>
           </div>
         </header>
+
+        {!isLoading && (tier === "beginner" || tier === "full") ? <BuildSyncInstall /> : null}
 
         <section id="methode" className="mb-10 scroll-mt-24 hidden md:block">
           <LiquidCard className="p-5 sm:p-6">

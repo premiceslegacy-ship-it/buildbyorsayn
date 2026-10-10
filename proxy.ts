@@ -74,7 +74,9 @@ export async function proxy(request: NextRequest) {
 
     if (!user) {
         const requiresLoginRedirect =
-            pathname.startsWith("/accompagnement/espace") || pathname === "/mcp/consent";
+            pathname.startsWith("/accompagnement/espace") ||
+            pathname === "/mcp/consent" ||
+            pathname === "/build-sync/consent";
         const destination = requiresLoginRedirect
             ? `/login?next=${encodeURIComponent(pathname + request.nextUrl.search)}`
             : "/";
@@ -155,5 +157,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/videos/tutos", "/videos/tutos/:path*", "/admin/:path*", "/beginner", "/beginner/:path*", "/protocole", "/accompagnement/espace/:path*", "/mcp/consent"],
+    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/videos/tutos", "/videos/tutos/:path*", "/admin/:path*", "/beginner", "/beginner/:path*", "/protocole", "/accompagnement/espace/:path*", "/mcp/consent", "/build-sync/consent"],
 };

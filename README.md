@@ -55,6 +55,8 @@ Les pages et API réservées vérifient l'identité et le tier côté serveur. M
 
 La publication des skills est une opération séparée. Lire `SKILLS-PUBLICATION.md` et `AGENTS.md` avant toute synchronisation. `npm run skills:sync` ne doit être exécuté qu'après revue du diff, gel des bundles canoniques, validation des prérequis et autorisation explicite de l'opération distante.
 
+La synchronisation locale destinée aux utilisateurs est documentée dans `BUILD-SYNC.md`. Elle utilise une portée OAuth `skills:read` distincte du MCP, vérifie les SHA-256 publiés et conserve les adaptations dans `CUSTOM.md`.
+
 ## Qualité avant livraison
 
 Avant un commit ou une mise en ligne, rejouer les tests, le lint, TypeScript, le build, l'audit des dépendances et les E2E pertinents. Vérifier aussi le diff, les snapshots, les secrets, les routes protégées et les readbacks des systèmes externes lorsqu'une publication ou une mutation a été autorisée.

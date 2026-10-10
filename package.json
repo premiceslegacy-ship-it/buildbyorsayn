@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit --pretty false",
     "doctrine:publish": "tsx scripts/publish-doctrine.ts",
     "skills:sync": "tsx scripts/sync-skills-to-supabase.ts",
+    "build-skills": "node public/build-sync/build.mjs skills",
     "stripe:pricing": "tsx --env-file=.env.local scripts/update-stripe-pricing.ts",
     "knowledge:sync": "tsx scripts/ingest-knowledge.ts",
     "knowledge:sync:apply": "tsx scripts/ingest-knowledge.ts --apply",

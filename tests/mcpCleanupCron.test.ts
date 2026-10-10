@@ -106,13 +106,22 @@ test("cleanup route accepts a valid secret and returns the validated structured 
     rate_limits_deleted: 11,
     clients_deleted: 13,
   };
+  const buildSyncCleaned = {
+    authorization_requests_deleted: 17,
+    authorization_codes_deleted: 19,
+    access_tokens_deleted: 23,
+    refresh_tokens_deleted: 29,
+  };
   const rpcCalls: Array<{ name: string; args: unknown }> = [];
   const logRecords: unknown[] = [];
   const handler = createMcpCleanupHandler({
     createAdmin: () => ({
       rpc: async (name: string, args: unknown) => {
         rpcCalls.push({ name, args });
-        return { data: [cleaned], error: null };
+        return {
+          data: [name === "cleanup_build_sync_oauth_state" ? buildSyncCleaned : cleaned],
+          error: null,
+        };
       },
     }),
     getCronSecret: () => secret,
@@ -130,11 +139,11 @@ test("cleanup route accepts a valid secret and returns the validated structured 
   assert.equal(response.headers.get("cache-control"), "no-store");
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   assert.equal(response.headers.get("x-request-id"), "cleanup-regression-1");
-  assert.deepEqual(await response.json(), { cleaned });
-  assert.deepEqual(rpcCalls, [{
-    name: "cleanup_mcp_oauth_state",
-    args: { p_batch_size: 500 },
-  }]);
+  assert.deepEqual(await response.json(), { cleaned, buildSyncCleaned });
+  assert.deepEqual(rpcCalls.sort((a, b) => a.name.localeCompare(b.name)), [
+    { name: "cleanup_build_sync_oauth_state", args: { p_batch_size: 500 } },
+    { name: "cleanup_mcp_oauth_state", args: { p_batch_size: 500 } },
+  ]);
   assert.equal(logRecords.length, 1);
   const logRecord = logRecords[0] as Record<string, unknown>;
   assert.equal(logRecord.event, "mcp.cleanup");
@@ -150,7 +159,7 @@ test("cleanup route accepts a valid secret and returns the validated structured 
   );
 });
 
-test("cleanup is scheduled daily and calls only the bounded cleanup RPC", async () => {
+test("cleanup is scheduled daily and calls only the bounded cleanup RPCs", async () => {
   const config = JSON.parse(await readFile("vercel.json", "utf8")) as {
     crons?: Array<{ path?: string; schedule?: string }>;
   };
@@ -159,6 +168,7 @@ test("cleanup is scheduled daily and calls only the bounded cleanup RPC", async 
   const handler = await readFile("lib/mcp/cleanupRoute.ts", "utf8");
   assert.match(route, /createMcpCleanupHandler/);
   assert.match(handler, /cleanup_mcp_oauth_state/);
+  assert.match(handler, /cleanup_build_sync_oauth_state/);
   assert.match(handler, /p_batch_size:\s*500/);
   assert.match(handler, /CLEANUP_RESULT_SCHEMA\.safeParse/);
   assert.doesNotMatch(handler, /refresh_token_hash|access_token_hash|\.select\(\s*["']\*["']\s*\)/i);

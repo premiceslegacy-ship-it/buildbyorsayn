@@ -14,6 +14,13 @@ const CLEANUP_RESULT_SCHEMA = z.array(z.object({
   clients_deleted: z.number().int().nonnegative(),
 }).strict()).length(1);
 
+const BUILD_SYNC_CLEANUP_RESULT_SCHEMA = z.array(z.object({
+  authorization_requests_deleted: z.number().int().nonnegative(),
+  authorization_codes_deleted: z.number().int().nonnegative(),
+  access_tokens_deleted: z.number().int().nonnegative(),
+  refresh_tokens_deleted: z.number().int().nonnegative(),
+}).strict()).length(1);
+
 type CleanupRpcResult = {
   data: unknown;
   error: unknown;
@@ -76,15 +83,24 @@ export function createMcpCleanupHandler(
 
     try {
       const admin = createAdmin();
-      const { data, error } = await admin.rpc("cleanup_mcp_oauth_state", {
-        p_batch_size: 500,
-      });
-      if (error) return respond({ error: "cleanup_failed" }, 500, "failed");
+      const [mcpResult, buildSyncResult] = await Promise.all([
+        admin.rpc("cleanup_mcp_oauth_state", { p_batch_size: 500 }),
+        admin.rpc("cleanup_build_sync_oauth_state", { p_batch_size: 500 }),
+      ]);
+      if (mcpResult.error || buildSyncResult.error) {
+        return respond({ error: "cleanup_failed" }, 500, "failed");
+      }
 
-      const parsed = CLEANUP_RESULT_SCHEMA.safeParse(data);
-      if (!parsed.success) return respond({ error: "cleanup_failed" }, 500, "failed");
+      const parsed = CLEANUP_RESULT_SCHEMA.safeParse(mcpResult.data);
+      const buildSyncParsed = BUILD_SYNC_CLEANUP_RESULT_SCHEMA.safeParse(buildSyncResult.data);
+      if (!parsed.success || !buildSyncParsed.success) {
+        return respond({ error: "cleanup_failed" }, 500, "failed");
+      }
 
-      return respond({ cleaned: parsed.data[0] }, 200, "allowed");
+      return respond({
+        cleaned: parsed.data[0],
+        buildSyncCleaned: buildSyncParsed.data[0],
+      }, 200, "allowed");
     } catch {
       return respond({ error: "cleanup_failed" }, 500, "failed");
     }
