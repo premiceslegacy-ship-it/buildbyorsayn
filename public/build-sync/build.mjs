@@ -62,6 +62,10 @@ function output(message, quiet = false) {
   if (!quiet) process.stdout.write(`${message}\n`);
 }
 
+function terminalText(value) {
+  return String(value).replace(/[\u0000-\u001f\u007f-\u009f]/g, " ").trim().slice(0, 120);
+}
+
 function fail(message) {
   const error = new Error(message);
   error.name = "BuildSyncError";
@@ -191,6 +195,39 @@ function openBrowser(url) {
   return false;
 }
 
+function connectedBrowserPage() {
+  return `<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BUILD Sync connecté</title>
+<style>
+  :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0e0e0f;color:#f0ede8}
+  *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 0,rgba(232,213,176,.08),transparent 38%),#0e0e0f}
+  main{width:min(100%,560px);border:1px solid rgba(232,213,176,.2);border-radius:18px;padding:32px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:0 24px 70px rgba(0,0,0,.5)}
+  .mark{display:grid;place-items:center;width:58px;height:58px;margin:0 auto 20px;border-radius:16px;background:#e8d5b0;color:#0e0e0f;font-weight:900;font-size:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .eyebrow{text-align:center;color:rgba(232,213,176,.72);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+  h1{margin:8px 0 0;text-align:center;font-size:clamp(25px,6vw,34px);letter-spacing:-.035em}p{margin:12px auto 0;max-width:430px;text-align:center;color:rgba(240,237,232,.62);font-size:14px;line-height:1.65}
+  ol{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:28px 0 0;padding:0;list-style:none}.step{text-align:center;min-width:0}.dot{display:grid;place-items:center;width:30px;height:30px;margin:auto;border:1px solid rgba(255,255,255,.1);border-radius:999px;color:rgba(255,255,255,.35);font-size:11px;font-weight:700}.done .dot{border-color:rgba(232,213,176,.35);background:rgba(232,213,176,.12);color:#e8d5b0}.active .dot{border-color:#e8d5b0;background:#e8d5b0;color:#0e0e0f}.label{display:block;margin-top:7px;overflow:hidden;color:rgba(255,255,255,.38);font-size:10px;text-overflow:ellipsis;white-space:nowrap}.active .label{color:#e8d5b0}
+  .note{margin-top:26px;border-top:1px solid rgba(255,255,255,.09);padding-top:18px;font-size:12px;color:rgba(255,255,255,.42)}
+  @media(max-width:420px){main{padding:24px 18px}ol{gap:4px}.label{font-size:9px}}
+</style>
+<main>
+  <div class="mark" aria-hidden="true">B</div>
+  <div class="eyebrow">Connexion réussie</div>
+  <h1>BUILD Sync est connecté</h1>
+  <p>Tu peux revenir dans ton terminal. BUILD vérifie maintenant les versions et installe automatiquement les skills inclus dans ton accès.</p>
+  <ol aria-label="Progression de l'installation">
+    <li class="step done"><span class="dot">✓</span><span class="label">Commande</span></li>
+    <li class="step done"><span class="dot">✓</span><span class="label">Autorisation</span></li>
+    <li class="step active"><span class="dot">3</span><span class="label">Installation</span></li>
+    <li class="step"><span class="dot">4</span><span class="label">Mises à jour</span></li>
+  </ol>
+  <p class="note">Garde le terminal ouvert jusqu'au message « BUILD Sync est prêt ».</p>
+</main>
+</html>`;
+}
+
 async function waitForAuthorization(baseUrl, quiet) {
   const verifier = randomBytes(48).toString("base64url");
   const challenge = createHash("sha256").update(verifier, "ascii").digest("base64url");
@@ -222,8 +259,12 @@ async function waitForAuthorization(baseUrl, quiet) {
         rejectCallback(new Error("Connexion BUILD Sync annulée."));
         return;
       }
-      response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-      response.end("<!doctype html><meta charset=utf-8><title>BUILD Sync</title><style>body{font-family:system-ui;background:#0e0e0f;color:#f0ede8;display:grid;place-items:center;min-height:100vh;margin:0}main{max-width:520px;padding:40px;text-align:center}h1{color:#e8d5b0}</style><main><h1>BUILD Sync est connecté</h1><p>Tu peux fermer cette fenêtre. Les skills vont être installés automatiquement.</p></main>");
+      response.writeHead(200, {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+      });
+      response.end(connectedBrowserPage());
       resolveCallback({ code, verifier, redirectUri });
     } catch (error) {
       rejectCallback(error);
@@ -543,7 +584,9 @@ async function syncSkills(config, paths, quiet = false) {
   try {
     const catalog = await fetchCatalog(config, paths, quiet);
     const summary = { installed: 0, updated: 0, current: 0, backups: [] };
-    for (const artifact of catalog.artifacts) {
+    output(`→ Vérification de ${catalog.artifacts.length} skill(s) BUILD…`, quiet);
+    for (const [artifactIndex, artifact] of catalog.artifacts.entries()) {
+      output(`  ${String(artifactIndex + 1).padStart(2, "0")}/${String(catalog.artifacts.length).padStart(2, "0")}  ${terminalText(artifact.title)}`, quiet);
       let units = null;
       for (const agentId of config.agents) {
         const root = AGENTS[agentId].root(paths.userHome);
@@ -560,9 +603,9 @@ async function syncSkills(config, paths, quiet = false) {
     }
     const nextConfig = { ...config, lastCheckedAt: new Date().toISOString(), lastReleaseId: catalog.releaseId };
     await writeJsonSecure(paths.config, nextConfig);
-    output(`BUILD Sync : ${summary.installed} installé(s), ${summary.updated} mis à jour, ${summary.current} déjà à jour.`, quiet);
+    output(`✓ BUILD Sync : ${summary.installed} installé(s), ${summary.updated} mis à jour, ${summary.current} déjà à jour.`, quiet);
     if (summary.backups.length) {
-      output(`Des modifications locales ont été sauvegardées dans ${paths.backups}.`, quiet);
+      output(`  Sauvegarde créée : ${paths.backups}`, quiet);
     }
     return summary;
   } finally {
@@ -621,18 +664,25 @@ async function installScheduler(paths, quiet) {
 async function setup(flags) {
   const paths = homePaths();
   const baseUrl = normalizeBaseUrl(typeof flags["base-url"] === "string" ? flags["base-url"] : DEFAULT_BASE_URL);
+  output("\nBUILD Sync — installation guidée\n");
+  output("[1/4] Détection des assistants");
   const detected = await detectAgents(paths.userHome);
   const agents = parseAgentSelection(flags.agents, detected);
   if (!agents.length) fail("Aucun agent détecté. Relance avec --agents=codex,claude,hermes ou --agents=all.");
   const config = { schemaVersion: 1, baseUrl, agents, createdAt: new Date().toISOString() };
   await writeJsonSecure(paths.config, config);
-  output(`Agents détectés : ${agents.map((id) => AGENTS[id].label).join(", ")}.`);
+  output(`✓ Agents détectés : ${agents.map((id) => AGENTS[id].label).join(", ")}.`);
+  output("\n[2/4] Connexion au compte BUILD");
   await login(baseUrl, paths, false);
+  output("✓ Compte BUILD autorisé.");
+  output("\n[3/4] Installation des skills");
   await syncSkills(config, paths, false);
+  output("\n[4/4] Mises à jour automatiques");
   const scheduled = flags["no-schedule"] ? false : await installScheduler(paths, false);
   output(scheduled
     ? "Mises à jour automatiques activées toutes les six heures."
     : "Synchronisation installée. Lance `build-skills update` pour vérifier les mises à jour.");
+  output("\n✓ BUILD Sync est prêt. Tu peux fermer ce terminal.\n");
 }
 
 async function loadConfig(paths) {
@@ -718,7 +768,7 @@ if (isMain) {
   main().catch((error) => {
     if (process.argv.includes("--quiet")) process.exitCode = 1;
     else {
-      process.stderr.write(`BUILD Sync : ${error?.message || "erreur inconnue"}\n`);
+      process.stderr.write(`\n✗ BUILD Sync : ${error?.message || "erreur inconnue"}\n`);
       process.exitCode = 1;
     }
   });

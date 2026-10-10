@@ -185,6 +185,8 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   const artifact = readFileSync(new URL("../app/api/build-sync/artifacts/[slug]/route.ts", import.meta.url), "utf8");
   const session = readFileSync(new URL("../app/api/build-sync/session/route.ts", import.meta.url), "utf8");
   const authorize = readFileSync(new URL("../app/api/build-sync/oauth/authorize/route.ts", import.meta.url), "utf8");
+  const consent = readFileSync(new URL("../app/build-sync/consent/page.tsx", import.meta.url), "utf8");
+  const posixInstaller = readFileSync(new URL("../public/build-sync/install.sh", import.meta.url), "utf8");
   const windowsInstaller = readFileSync(new URL("../public/build-sync/install.ps1", import.meta.url), "utf8");
   assert.doesNotMatch(cli, /showDirectoryPicker|FileSystemDirectoryHandle/);
   assert.match(cli, /CUSTOM\.md/);
@@ -192,8 +194,13 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   assert.match(cli, /StartInterval/);
   assert.match(page, /install\.sh/);
   assert.match(page, /install\.ps1/);
+  assert.match(page, /Étapes de l’installation BUILD Sync/);
+  assert.match(page, /Synchroniser/);
   assert.doesNotMatch(page, /buildbyorsayn\.com/);
   assert.doesNotMatch(cli, /buildbyorsayn\.com/);
+  assert.match(cli, /BUILD Sync — installation guidée/);
+  assert.match(cli, /BUILD Sync est prêt/);
+  assert.match(cli, /Progression de l'installation/);
   assert.match(proxy, /\/build-sync\/consent/);
   assert.match(catalog, /resolveBuildSyncAuth/);
   assert.match(catalog, /canDownload/);
@@ -202,5 +209,9 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   assert.match(session, /revoke_build_sync_user_connections/);
   assert.match(authorize, /canUseBuildSync/);
   assert.match(authorize, /access_denied/);
+  assert.match(consent, /Étape 2 sur 4/);
+  assert.match(consent, /L’installation reprendra automatiquement dans ton terminal/);
+  assert.match(posixInstaller, /https:\/\/nodejs\.org/);
+  assert.match(windowsInstaller, /https:\/\/nodejs\.org/);
   assert.match(windowsInstaller, /BUILD_SYNC_INSTALL_ONLY/);
 });

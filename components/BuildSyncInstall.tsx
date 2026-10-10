@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, RefreshCw, ShieldCheck } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, RefreshCw, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
 const BUILD_SYNC_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL ?? "https://build-system-three.vercel.app")
@@ -15,6 +15,13 @@ const COMMANDS = [
     label: "Windows PowerShell",
     command: `irm ${BUILD_SYNC_ORIGIN}/build-sync/install.ps1 | iex`,
   },
+] as const;
+
+const EXPERIENCE_STEPS = [
+  { label: "Copier", detail: "La commande", icon: Copy },
+  { label: "Autoriser", detail: "Dans BUILD", icon: ExternalLink },
+  { label: "Installer", detail: "Les bons skills", icon: Download },
+  { label: "Synchroniser", detail: "Toutes les 6 h", icon: RefreshCw },
 ] as const;
 
 export function BuildSyncInstall() {
@@ -64,7 +71,21 @@ export function BuildSyncInstall() {
           </p>
         </div>
       </div>
-      <p className="mt-5 border-t border-white/[0.08] pt-4 text-[11px] leading-relaxed text-white/45 sm:text-xs">
+      <ol aria-label="Étapes de l’installation BUILD Sync" className="mt-5 grid grid-cols-2 gap-px overflow-hidden border border-white/[0.08] bg-white/[0.08] sm:grid-cols-4">
+        {EXPERIENCE_STEPS.map(({ label, detail, icon: Icon }, index) => (
+          <li key={label} className="flex min-w-0 items-center gap-2.5 bg-[#121214] px-3 py-3">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-[#e8d5b0]/20 text-[#e8d5b0]">
+              <Icon className="size-3.5" aria-hidden="true" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[9px] uppercase tracking-[0.14em] text-white/30">0{index + 1}</span>
+              <span className="block truncate text-xs font-medium text-[#f0ede8]/85">{label}</span>
+              <span className="block truncate text-[10px] text-white/35">{detail}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-4 text-[11px] leading-relaxed text-white/45 sm:text-xs">
         <strong className="font-semibold text-[#e8d5b0]/85">Déjà téléchargé manuellement ?</strong>{" "}
         Lance l’installation une fois : l’ancien dossier sera sauvegardé, puis BUILD Sync prendra le relais. Si tu avais modifié SKILL.md, reporte seulement tes règles dans CUSTOM.md.
       </p>
