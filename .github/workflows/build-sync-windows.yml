@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   installer-smoke:
+    # Native Windows validation for the published PowerShell installer.
     runs-on: windows-latest
     timeout-minutes: 10
     steps:
