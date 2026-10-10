@@ -1,7 +1,12 @@
 import { resolveMcpIssuer } from "@/lib/mcp/config";
+import type { McpTier } from "@/lib/mcpAccess";
 
 export const BUILD_SYNC_CLIENT_ID = "build-sync-cli";
 export const BUILD_SYNC_SCOPE = "skills:read";
+
+export function canUseBuildSync(tier: McpTier | null): tier is "beginner" | "full" {
+  return tier === "beginner" || tier === "full";
+}
 
 export function getBuildSyncIssuer(): string {
   return resolveMcpIssuer(

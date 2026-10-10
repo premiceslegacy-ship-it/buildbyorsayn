@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { getBuildSyncResourceUrl } from "@/lib/buildSync/config";
+import { canUseBuildSync, getBuildSyncResourceUrl } from "@/lib/buildSync/config";
 import { createBuildSyncAuthorizationSchema } from "@/lib/buildSync/oauth";
 import { generateOpaqueToken, hashToken } from "@/lib/mcp/oauth";
+import { resolveMcpProfileTier } from "@/lib/mcpAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -39,9 +40,22 @@ export async function GET(request: Request) {
     return NextResponse.redirect(loginUrl, { headers: NO_STORE });
   }
 
-  const input = parsed.data;
-  const requestHandle = generateOpaqueToken();
   const admin = createAdminSupabase({ signal: request.signal });
+  const { data: profile, error: profileError } = await admin
+    .from("profiles")
+    .select("tier")
+    .eq("id", user.id)
+    .maybeSingle();
+  const tier = resolveMcpProfileTier(profile, profileError);
+  const input = parsed.data;
+  if (!canUseBuildSync(tier)) {
+    const callback = new URL(input.redirect_uri);
+    callback.searchParams.set("error", "access_denied");
+    callback.searchParams.set("state", input.state);
+    return NextResponse.redirect(callback, { headers: NO_STORE });
+  }
+
+  const requestHandle = generateOpaqueToken();
   const { data: status, error } = await admin.rpc("create_build_sync_authorization_request", {
     p_request_hash: hashToken(requestHandle),
     p_user_id: user.id,

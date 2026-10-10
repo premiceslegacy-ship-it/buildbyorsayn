@@ -6,6 +6,9 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import {
+  canUseBuildSync,
+} from "../lib/buildSync/config";
+import {
   createBuildSyncAuthorizationSchema,
   isBuildSyncRedirectUri,
   parseBuildSyncTokenRequest,
@@ -13,6 +16,14 @@ import {
 import { artifactUnits, installUnit, readStoredZip } from "../public/build-sync/build.mjs";
 
 const resource = "https://build.example/api/build-sync";
+
+test("BUILD Sync is paid-only for Beginner and Full", () => {
+  assert.equal(canUseBuildSync("beginner"), true);
+  assert.equal(canUseBuildSync("full"), true);
+  assert.equal(canUseBuildSync("free"), false);
+  assert.equal(canUseBuildSync("preview"), false);
+  assert.equal(canUseBuildSync(null), false);
+});
 
 function storedZip(files: Record<string, string>): Buffer {
   const chunks: Buffer[] = [];
@@ -173,6 +184,7 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   const catalog = readFileSync(new URL("../app/api/build-sync/catalog/route.ts", import.meta.url), "utf8");
   const artifact = readFileSync(new URL("../app/api/build-sync/artifacts/[slug]/route.ts", import.meta.url), "utf8");
   const session = readFileSync(new URL("../app/api/build-sync/session/route.ts", import.meta.url), "utf8");
+  const authorize = readFileSync(new URL("../app/api/build-sync/oauth/authorize/route.ts", import.meta.url), "utf8");
   const windowsInstaller = readFileSync(new URL("../public/build-sync/install.ps1", import.meta.url), "utf8");
   assert.doesNotMatch(cli, /showDirectoryPicker|FileSystemDirectoryHandle/);
   assert.match(cli, /CUSTOM\.md/);
@@ -188,5 +200,7 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   assert.match(artifact, /getStoredSkillContent/);
   assert.match(artifact, /status: 403/);
   assert.match(session, /revoke_build_sync_user_connections/);
+  assert.match(authorize, /canUseBuildSync/);
+  assert.match(authorize, /access_denied/);
   assert.match(windowsInstaller, /BUILD_SYNC_INSTALL_ONLY/);
 });

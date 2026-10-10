@@ -1,6 +1,10 @@
 import { hashToken } from "@/lib/mcp/oauth";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { getBuildSyncResourceUrl, BUILD_SYNC_SCOPE } from "@/lib/buildSync/config";
+import {
+  canUseBuildSync,
+  getBuildSyncResourceUrl,
+  BUILD_SYNC_SCOPE,
+} from "@/lib/buildSync/config";
 import { resolveMcpProfileTier, type McpTier } from "@/lib/mcpAccess";
 
 export type BuildSyncAuthContext = {
@@ -35,7 +39,7 @@ export async function resolveBuildSyncAuth(
     .eq("id", stored.user_id)
     .maybeSingle();
   const tier = resolveMcpProfileTier(profile, profileError);
-  if (!tier) return null;
+  if (!canUseBuildSync(tier)) return null;
 
   return { userId: stored.user_id, tier, tokenHash };
 }
