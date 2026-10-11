@@ -10,7 +10,11 @@ Claude Code et Hermes Agent. Le site ne reçoit aucun accès aux projets locaux.
 3. L'API retourne uniquement les artefacts inclus dans le niveau du compte.
 4. Le CLI vérifie le SHA-256, extrait les ZIP sans dépendance et installe chaque
    skill de manière atomique.
-5. Une tâche locale vérifie les versions toutes les six heures.
+5. Une tâche locale vérifie les versions toutes les heures.
+
+Le programme BUILD Sync se met également à jour depuis l'origine BUILD avant
+chaque contrôle. Les changements futurs de fréquence sont ainsi appliqués à la
+planification locale sans demander une nouvelle installation.
 
 Les adaptations doivent vivre dans `CUSTOM.md`. Ce fichier est injecté dans le
 contrat du skill et n'est jamais remplacé. Si un autre fichier géré a été modifié,

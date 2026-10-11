@@ -32,7 +32,7 @@ mv "$BUILD_SYNC_DATA_DIR/build.mjs.tmp" "$BUILD_SYNC_DATA_DIR/build.mjs"
 
 {
   echo '#!/bin/sh'
-  printf 'exec "%s" "%s" "$@"\n' "$(command -v node)" "$BUILD_SYNC_DATA_DIR/build.mjs"
+  printf 'BUILD_SYNC_CLI_PATH="%s" exec "%s" "%s" "$@"\n' "$BUILD_SYNC_DATA_DIR/build.mjs" "$(command -v node)" "$BUILD_SYNC_DATA_DIR/build.mjs"
 } > "$BUILD_SYNC_BIN_DIR/build-skills"
 chmod 700 "$BUILD_SYNC_BIN_DIR/build-skills"
 

@@ -78,7 +78,7 @@ export default async function BuildSyncConsentPage({
           <ul className="flex flex-col gap-3 text-sm text-[#f0ede8]/78">
             <li className="flex items-start gap-3"><Download className="mt-0.5 size-4 shrink-0 text-[#e8d5b0]" aria-hidden="true" /><span>Télécharger uniquement les skills inclus dans ton accès.</span></li>
             <li className="flex items-start gap-3"><HardDrive className="mt-0.5 size-4 shrink-0 text-[#e8d5b0]" aria-hidden="true" /><span>Sauvegarder les anciennes installations avant de les remplacer.</span></li>
-            <li className="flex items-start gap-3"><RefreshCw className="mt-0.5 size-4 shrink-0 text-[#e8d5b0]" aria-hidden="true" /><span>Vérifier automatiquement les nouvelles versions toutes les six heures.</span></li>
+            <li className="flex items-start gap-3"><RefreshCw className="mt-0.5 size-4 shrink-0 text-[#e8d5b0]" aria-hidden="true" /><span>Vérifier automatiquement les nouvelles versions toutes les heures.</span></li>
             <li className="flex items-start gap-3"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#e8d5b0]" aria-hidden="true" /><span>Ne jamais accéder à tes projets, tes conversations ou tes mots de passe.</span></li>
           </ul>
         </section>

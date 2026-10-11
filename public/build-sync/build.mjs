@@ -2,7 +2,7 @@
 
 import { createHash, randomBytes } from "node:crypto";
 import { createServer } from "node:http";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import {
   access,
   chmod,
@@ -22,6 +22,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const CLIENT_ID = "build-sync-cli";
 const SCOPE = "skills:read";
 const DEFAULT_BASE_URL = "https://build-system-three.vercel.app";
+const CLI_VERSION = 2;
+const SCHEDULER_VERSION = 2;
+const SCHEDULER_INTERVAL_SECONDS = 60 * 60;
+const MAX_CLI_BYTES = 512 * 1024;
 const MAX_ARTIFACT_BYTES = 50 * 1024 * 1024;
 const MAX_ARCHIVE_ENTRIES = 5_000;
 const CUSTOM_FILE = "CUSTOM.md";
@@ -141,6 +145,32 @@ async function acquireLocalLock(paths, name, staleMs = 15 * 60_000) {
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
+}
+
+async function readBoundedBody(response, maximumBytes) {
+  const declared = Number(response.headers.get("content-length") || 0);
+  if (declared > maximumBytes) throw new Error("fichier trop volumineux");
+  if (!response.body) {
+    const bytes = Buffer.from(await response.arrayBuffer());
+    if (bytes.length > maximumBytes) throw new Error("fichier trop volumineux");
+    return bytes;
+  }
+  const reader = response.body.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maximumBytes) throw new Error("fichier trop volumineux");
+      chunks.push(Buffer.from(value));
+    }
+  } catch (error) {
+    await reader.cancel().catch(() => null);
+    throw error;
+  }
+  return Buffer.concat(chunks, total);
 }
 
 function parseArgs(argv) {
@@ -418,6 +448,57 @@ async function downloadArtifact(config, paths, artifact, quiet) {
   return bytes;
 }
 
+function managedCliPath() {
+  const actual = path.resolve(fileURLToPath(import.meta.url));
+  const declared = process.env.BUILD_SYNC_CLI_PATH;
+  const defaultInstall = process.platform === "win32"
+    ? process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, "BUILD Sync", "build.mjs")
+    : path.join(process.env.XDG_DATA_HOME || path.join(os.homedir(), ".local", "share"), "build-sync", "build.mjs");
+  const trustedPaths = [declared, defaultInstall].filter(Boolean).map((value) => path.resolve(value));
+  return trustedPaths.includes(actual) ? actual : null;
+}
+
+async function refreshManagedCli(config, quiet) {
+  const script = managedCliPath();
+  if (!script || process.env.BUILD_SYNC_SKIP_SELF_UPDATE === "1") return false;
+  let temporary = null;
+  try {
+    const response = await fetch(new URL("/build-sync/build.mjs", config.baseUrl), {
+      headers: { Accept: "application/javascript" },
+      redirect: "error",
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) throw new Error("téléchargement refusé");
+    const contentType = response.headers.get("content-type")?.split(";", 1)[0];
+    if (!contentType || !["application/javascript", "text/javascript", "text/plain"].includes(contentType)) {
+      throw new Error("format inattendu");
+    }
+    const bytes = await readBoundedBody(response, MAX_CLI_BYTES);
+    if (!bytes.length || bytes.length > MAX_CLI_BYTES) throw new Error("fichier invalide");
+    const source = bytes.toString("utf8");
+    const version = source.match(/\nconst CLI_VERSION = (\d+);/)?.[1];
+    if (!source.startsWith("#!/usr/bin/env node") || !version || Number(version) < CLI_VERSION) {
+      throw new Error("signature BUILD Sync invalide");
+    }
+    const current = await readFile(script);
+    if (sha256(current) === sha256(bytes)) return false;
+    temporary = `${script}.tmp-${process.pid}-${randomBytes(4).toString("hex")}.mjs`;
+    await writeFile(temporary, bytes, { mode: 0o700 });
+    await chmod(temporary, 0o700);
+    const checked = spawnSync(process.execPath, ["--check", temporary], { stdio: "ignore" });
+    if (checked.status !== 0) throw new Error("contrôle JavaScript échoué");
+    await rename(temporary, script);
+    temporary = null;
+    output("✓ BUILD Sync a actualisé son programme local.", quiet);
+    return true;
+  } catch (error) {
+    output(`⚠ Mise à jour du programme BUILD Sync reportée (${terminalText(error?.message || "erreur inconnue")}).`, quiet);
+    return false;
+  } finally {
+    if (temporary) await rm(temporary, { force: true }).catch(() => null);
+  }
+}
+
 function normalizeArchivePath(raw) {
   if (!raw || raw.includes("\0") || raw.includes("\\")) fail("Archive BUILD invalide.");
   if (raw.split("/").some((segment) => segment === "..")) fail("Archive BUILD invalide.");
@@ -644,7 +725,17 @@ function systemdQuote(value) {
   return `"${String(value).replace(/([\\"])/g, "\\$1")}"`;
 }
 
-async function installScheduler(paths, quiet) {
+async function reloadMacScheduler() {
+  if (process.platform !== "darwin") return;
+  await new Promise((resolve) => setTimeout(resolve, 1_500));
+  const paths = homePaths();
+  const plist = path.join(paths.userHome, "Library", "LaunchAgents", "com.buildbyorsayn.skills-sync.plist");
+  const domain = `gui/${process.getuid?.() || 0}`;
+  spawnSync("launchctl", ["bootout", domain, plist], { stdio: "ignore" });
+  spawnSync("launchctl", ["bootstrap", domain, plist], { stdio: "ignore" });
+}
+
+async function installScheduler(paths, quiet, deferMacReload = false) {
   const script = fileURLToPath(import.meta.url);
   if (process.platform === "darwin") {
     const launchAgents = path.join(paths.userHome, "Library", "LaunchAgents");
@@ -657,11 +748,21 @@ async function installScheduler(paths, quiet) {
 <plist version="1.0"><dict>
 <key>Label</key><string>com.buildbyorsayn.skills-sync</string>
 <key>ProgramArguments</key><array><string>${xmlEscape(process.execPath)}</string><string>${xmlEscape(script)}</string><string>skills</string><string>update</string><string>--quiet</string></array>
-<key>RunAtLoad</key><true/><key>StartInterval</key><integer>21600</integer>
+<key>EnvironmentVariables</key><dict><key>BUILD_SYNC_CLI_PATH</key><string>${xmlEscape(script)}</string></dict>
+<key>RunAtLoad</key><true/><key>StartInterval</key><integer>${SCHEDULER_INTERVAL_SECONDS}</integer>
 <key>StandardOutPath</key><string>${xmlEscape(path.join(logDir, "sync.log"))}</string>
 <key>StandardErrorPath</key><string>${xmlEscape(path.join(logDir, "sync-error.log"))}</string>
 </dict></plist>\n`;
     await writeFile(plist, body, { mode: 0o600 });
+    if (deferMacReload) {
+      const reloader = spawn(process.execPath, [script, "skills", "scheduler-reload"], {
+        detached: true,
+        env: { ...process.env, BUILD_SYNC_SKIP_SELF_UPDATE: "1" },
+        stdio: "ignore",
+      });
+      reloader.unref();
+      return true;
+    }
     spawnSync("launchctl", ["bootout", `gui/${process.getuid?.() || 0}`, plist], { stdio: "ignore" });
     const loaded = spawnSync("launchctl", ["bootstrap", `gui/${process.getuid?.() || 0}`, plist], { stdio: "ignore" });
     if (loaded.status !== 0) output("La tâche automatique sera chargée à la prochaine connexion macOS.", quiet);
@@ -670,18 +771,31 @@ async function installScheduler(paths, quiet) {
   if (process.platform === "linux" && commandExists("systemctl")) {
     const unitDir = path.join(paths.userHome, ".config", "systemd", "user");
     await mkdir(unitDir, { recursive: true, mode: 0o700 });
-    await writeFile(path.join(unitDir, "build-skills-sync.service"), `[Unit]\nDescription=Synchronise les skills BUILD\n\n[Service]\nType=oneshot\nExecStart=${systemdQuote(process.execPath)} ${systemdQuote(script)} skills update --quiet\n`, { mode: 0o600 });
-    await writeFile(path.join(unitDir, "build-skills-sync.timer"), `[Unit]\nDescription=Vérifie les skills BUILD\n\n[Timer]\nOnBootSec=2min\nOnUnitActiveSec=6h\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n`, { mode: 0o600 });
+    await writeFile(path.join(unitDir, "build-skills-sync.service"), `[Unit]\nDescription=Synchronise les skills BUILD\n\n[Service]\nType=oneshot\nEnvironment=${systemdQuote(`BUILD_SYNC_CLI_PATH=${script}`)}\nExecStart=${systemdQuote(process.execPath)} ${systemdQuote(script)} skills update --quiet\n`, { mode: 0o600 });
+    await writeFile(path.join(unitDir, "build-skills-sync.timer"), `[Unit]\nDescription=Vérifie les skills BUILD\n\n[Timer]\nOnBootSec=2min\nOnUnitActiveSec=1h\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n`, { mode: 0o600 });
     spawnSync("systemctl", ["--user", "daemon-reload"], { stdio: "ignore" });
     const enabled = spawnSync("systemctl", ["--user", "enable", "--now", "build-skills-sync.timer"], { stdio: "ignore" });
     return enabled.status === 0;
   }
   if (process.platform === "win32") {
     const command = `"${process.execPath}" "${script}" skills update --quiet`;
-    const created = spawnSync("schtasks.exe", ["/Create", "/F", "/SC", "HOURLY", "/MO", "6", "/TN", "BUILD Skills Sync", "/TR", command], { stdio: "ignore" });
+    const created = spawnSync("schtasks.exe", ["/Create", "/F", "/SC", "HOURLY", "/MO", "1", "/TN", "BUILD Skills Sync", "/TR", command], { stdio: "ignore" });
     return created.status === 0;
   }
   return false;
+}
+
+async function reconcileScheduler(config, paths, quiet) {
+  if (config.schedulerEnabled === false || config.schedulerVersion === SCHEDULER_VERSION) return;
+  const scheduled = await installScheduler(paths, quiet, true);
+  if (!scheduled) return;
+  const currentConfig = await readJson(paths.config, config);
+  await writeJsonSecure(paths.config, {
+    ...currentConfig,
+    schedulerEnabled: true,
+    schedulerVersion: SCHEDULER_VERSION,
+  });
+  output("✓ Planification BUILD Sync actualisée : contrôle toutes les heures.", quiet);
 }
 
 async function setup(flags) {
@@ -692,7 +806,13 @@ async function setup(flags) {
   const detected = await detectAgents(paths.userHome);
   const agents = parseAgentSelection(flags.agents, detected);
   if (!agents.length) fail("Aucun agent détecté. Relance avec --agents=codex,claude,hermes ou --agents=all.");
-  const config = { schemaVersion: 1, baseUrl, agents, createdAt: new Date().toISOString() };
+  const config = {
+    schemaVersion: 1,
+    baseUrl,
+    agents,
+    createdAt: new Date().toISOString(),
+    schedulerEnabled: flags["no-schedule"] ? false : true,
+  };
   await writeJsonSecure(paths.config, config);
   output(`✓ Agents détectés : ${agents.map((id) => AGENTS[id].label).join(", ")}.`);
   output("\n[2/4] Connexion au compte BUILD");
@@ -702,8 +822,14 @@ async function setup(flags) {
   await syncSkills(config, paths, false);
   output("\n[4/4] Mises à jour automatiques");
   const scheduled = flags["no-schedule"] ? false : await installScheduler(paths, false);
+  const currentConfig = await readJson(paths.config, config);
+  await writeJsonSecure(paths.config, {
+    ...currentConfig,
+    schedulerEnabled: scheduled,
+    schedulerVersion: scheduled ? SCHEDULER_VERSION : null,
+  });
   output(scheduled
-    ? "Mises à jour automatiques activées toutes les six heures."
+    ? "Mises à jour automatiques activées toutes les heures."
     : "Synchronisation installée. Lance `build-skills update` pour vérifier les mises à jour.");
   output("\n✓ BUILD Sync est prêt. Tu peux fermer ce terminal.\n");
 }
@@ -773,15 +899,32 @@ Les versions officielles sont mises à jour automatiquement. Écris tes adaptati
 dans CUSTOM.md : ce fichier n'est jamais remplacé.`);
 }
 
+async function update(flags) {
+  const paths = homePaths();
+  const config = await loadConfig(paths);
+  const quiet = Boolean(flags.quiet);
+  if (await refreshManagedCli(config, quiet)) {
+    const script = managedCliPath();
+    const args = [script, "skills", "update", ...(quiet ? ["--quiet"] : [])];
+    const resumed = spawnSync(process.execPath, args, {
+      env: { ...process.env, BUILD_SYNC_SKIP_SELF_UPDATE: "1" },
+      stdio: "inherit",
+    });
+    if (resumed.status !== 0) fail("La synchronisation n'a pas pu reprendre après la mise à jour de BUILD Sync.");
+    return;
+  }
+  const summary = await syncSkills(config, paths, quiet);
+  await reconcileScheduler(config, paths, quiet);
+  return summary;
+}
+
 export async function main(argv = process.argv.slice(2)) {
   const { command, flags } = parseArgs(argv);
   if (command === "setup" || command === "install") return setup(flags);
-  if (command === "update") {
-    const paths = homePaths();
-    return syncSkills(await loadConfig(paths), paths, Boolean(flags.quiet));
-  }
+  if (command === "update") return update(flags);
   if (command === "status") return status();
   if (command === "logout") return logout();
+  if (command === "scheduler-reload") return reloadMacScheduler();
   if (command === "help" || flags.help) return help();
   fail(`Commande inconnue : ${command}`);
 }

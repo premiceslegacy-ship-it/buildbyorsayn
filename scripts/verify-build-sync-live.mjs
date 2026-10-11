@@ -238,12 +238,15 @@ async function verifyManagedSetup(browser, email, password) {
   const setup = runCli(["setup", `--base-url=${BASE_URL}`, "--agents=all"], env);
   await approveCliAuthorization(browser, await waitForText(capturedUrl), email, password);
   const setupResult = await setup;
-  assert.match(setupResult.stdout, /Mises à jour automatiques activées toutes les six heures/);
+  assert.match(setupResult.stdout, /Mises à jour automatiques activées toutes les heures/);
   const plist = await readFile(
     path.join(temporaryHome, "Library", "LaunchAgents", "com.buildbyorsayn.skills-sync.plist"),
     "utf8"
   );
-  assert.match(plist, /<key>StartInterval<\/key><integer>21600<\/integer>/);
+  assert.match(plist, /<key>StartInterval<\/key><integer>3600<\/integer>/);
+  const syncConfig = JSON.parse(await readFile(path.join(syncHome, "config.json"), "utf8"));
+  assert.equal(syncConfig.schedulerEnabled, true);
+  assert.equal(syncConfig.schedulerVersion, 2);
   for (const root of [
     path.join(temporaryHome, ".codex", "skills"),
     path.join(temporaryHome, ".claude", "skills"),

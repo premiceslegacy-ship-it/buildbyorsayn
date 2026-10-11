@@ -27,7 +27,7 @@ Invoke-WebRequest -UseBasicParsing "$BuildSyncOrigin/build-sync/build.mjs" -OutF
 Move-Item -Force $TempPath $CliPath
 
 $Wrapper = Join-Path $BinRoot "build-skills.cmd"
-Set-Content -Encoding Ascii -Path $Wrapper -Value "@echo off`r`n`"$($Node.Source)`" `"$CliPath`" %*`r`n"
+Set-Content -Encoding Ascii -Path $Wrapper -Value "@echo off`r`nset `"BUILD_SYNC_CLI_PATH=$CliPath`"`r`n`"$($Node.Source)`" `"$CliPath`" %*`r`n"
 
 if ($env:BUILD_SYNC_INSTALL_ONLY -ne "1") {
   & $Node.Source $CliPath skills setup "--base-url=$BuildSyncOrigin"

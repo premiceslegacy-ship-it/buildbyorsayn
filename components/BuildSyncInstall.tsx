@@ -21,7 +21,7 @@ const EXPERIENCE_STEPS = [
   { label: "Copier", detail: "La commande", icon: Copy },
   { label: "Autoriser", detail: "Dans BUILD", icon: ExternalLink },
   { label: "Installer", detail: "Les bons skills", icon: Download },
-  { label: "Synchroniser", detail: "Toutes les 6 h", icon: RefreshCw },
+  { label: "Synchroniser", detail: "Chaque heure", icon: RefreshCw },
 ] as const;
 
 export function BuildSyncInstall() {
@@ -39,7 +39,7 @@ export function BuildSyncInstall() {
             BUILD détecte Codex, Claude Code et Hermes, installe les skills accessibles avec ton abonnement puis vérifie automatiquement les nouvelles versions.
           </p>
           <div className="mt-4 grid gap-2 text-xs text-white/55 sm:grid-cols-2">
-            <p className="flex items-start gap-2"><RefreshCw className="mt-0.5 size-3.5 shrink-0 text-[#e8d5b0]" />Contrôle automatique toutes les six heures</p>
+            <p className="flex items-start gap-2"><RefreshCw className="mt-0.5 size-3.5 shrink-0 text-[#e8d5b0]" />Contrôle automatique toutes les heures</p>
             <p className="flex items-start gap-2"><ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-[#e8d5b0]" />Tes adaptations restent dans CUSTOM.md</p>
           </div>
         </div>

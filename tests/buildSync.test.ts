@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { createServer } from "node:http";
+import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -156,6 +158,79 @@ test("managed updates preserve CUSTOM.md and back up unexpected edits", async ()
   }
 });
 
+test("the managed CLI updates itself atomically before synchronizing", async () => {
+  const temporary = await realpath(await mkdtemp(path.join(os.tmpdir(), "build-sync-self-update-")));
+  const dataHome = path.join(temporary, "data");
+  const syncHome = path.join(temporary, "state");
+  const cliDirectory = path.join(dataHome, "build-sync");
+  const cliPath = path.join(cliDirectory, "build.mjs");
+  const currentCli = await readFile(new URL("../public/build-sync/build.mjs", import.meta.url));
+  const server = createServer((request, response) => {
+    if (request.url === "/build-sync/build.mjs") {
+      response.writeHead(200, {
+        "Content-Type": "application/javascript",
+        "Content-Length": String(currentCli.length),
+      }).end(currentCli);
+      return;
+    }
+    if (request.url === "/api/build-sync/catalog") {
+      response.writeHead(200, { "Content-Type": "application/json" })
+        .end(JSON.stringify({ releaseId: "self-update-test", artifacts: [] }));
+      return;
+    }
+    response.writeHead(404).end();
+  });
+  try {
+    await mkdir(cliDirectory, { recursive: true });
+    await mkdir(syncHome, { recursive: true });
+    await writeFile(cliPath, Buffer.concat([currentCli, Buffer.from("\n// ancienne copie locale\n")]), { mode: 0o700 });
+    await new Promise<void>((resolve, reject) => {
+      server.once("error", reject);
+      server.listen(0, "127.0.0.1", resolve);
+    });
+    const address = server.address();
+    assert.ok(address && typeof address !== "string");
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+    await writeFile(path.join(syncHome, "config.json"), JSON.stringify({
+      schemaVersion: 1,
+      baseUrl,
+      agents: ["codex"],
+      schedulerEnabled: false,
+    }));
+    await writeFile(path.join(syncHome, "credentials.json"), JSON.stringify({
+      baseUrl,
+      accessToken: "test-access-token",
+      refreshToken: "test-refresh-token",
+      accessExpiresAt: Date.now() + 10 * 60_000,
+    }));
+    const result = await new Promise<{ code: number | null; stdout: string; stderr: string }>((resolve, reject) => {
+      const child = spawn(process.execPath, [cliPath, "skills", "update"], {
+        env: {
+          ...process.env,
+          HOME: temporary,
+          XDG_DATA_HOME: dataHome,
+          BUILD_SYNC_HOME: syncHome,
+          BUILD_SYNC_CLI_PATH: cliPath,
+        },
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      let stdout = "";
+      let stderr = "";
+      child.stdout.on("data", (chunk) => { stdout += chunk; });
+      child.stderr.on("data", (chunk) => { stderr += chunk; });
+      child.once("error", reject);
+      child.once("close", (code) => resolve({ code, stdout, stderr }));
+    });
+    assert.equal(result.code, 0, result.stderr || result.stdout);
+    assert.deepEqual(await readFile(cliPath), currentCli, result.stdout);
+    const config = JSON.parse(await readFile(path.join(syncHome, "config.json"), "utf8"));
+    assert.equal(config.lastReleaseId, "self-update-test");
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
 test("BUILD Sync OAuth storage is private, scoped and rotatable", () => {
   const sql = readFileSync(new URL("../supabase/migrations/20261010130000_build_sync_oauth.sql", import.meta.url), "utf8");
   for (const table of [
@@ -192,6 +267,13 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   assert.match(cli, /CUSTOM\.md/);
   assert.match(cli, /artifact\.sha256/);
   assert.match(cli, /StartInterval/);
+  assert.match(cli, /SCHEDULER_INTERVAL_SECONDS = 60 \* 60/);
+  assert.match(cli, /OnUnitActiveSec=1h/);
+  assert.match(cli, /"HOURLY", "\/MO", "1"/);
+  assert.match(cli, /refreshManagedCli/);
+  assert.match(cli, /reconcileScheduler/);
+  assert.match(cli, /EnvironmentVariables/);
+  assert.match(cli, /Environment=.*BUILD_SYNC_CLI_PATH/);
   assert.match(page, /install\.sh/);
   assert.match(page, /install\.ps1/);
   assert.match(page, /Étapes de l’installation BUILD Sync/);
@@ -215,6 +297,8 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   assert.match(consent, /Étape 2 sur 4/);
   assert.match(consent, /L’installation reprendra automatiquement dans ton terminal/);
   assert.match(posixInstaller, /https:\/\/nodejs\.org/);
+  assert.match(posixInstaller, /BUILD_SYNC_CLI_PATH/);
   assert.match(windowsInstaller, /https:\/\/nodejs\.org/);
+  assert.match(windowsInstaller, /BUILD_SYNC_CLI_PATH/);
   assert.match(windowsInstaller, /BUILD_SYNC_INSTALL_ONLY/);
 });
