@@ -10,10 +10,8 @@ export function canReadBlocSection(tier: string | null, blocId: string, sectionI
 
 // Only this projected result may cross the server/client boundary.
 export function projectBlocForTier(bloc: DeliveredBloc, tier: string | null): DeliveredBloc {
-  const normalized = normalizeProfileTier(tier);
   return {
     id: bloc.id, titre: bloc.titre, displayNumber: bloc.displayNumber,
-    sections: bloc.sections.filter(section => canReadBlocSection(tier, bloc.id, section.id)),
-    videos: normalized === "full" || (normalized === "beginner" && bloc.id === "1") ? bloc.videos : [],
+    sections: bloc.sections.filter(section => canReadBlocSection(tier, bloc.id, section.id))
   };
 }

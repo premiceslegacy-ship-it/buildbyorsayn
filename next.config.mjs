@@ -19,6 +19,11 @@ const nextConfig = {
     "/api/mcp/logo": ["./private/brand-assets/build-logo.png"],
   },
 
+  async redirects() {
+    // Exact path only: /videos/tutos (Hermes Agent) keeps its own route.
+    return [{ source: "/videos", destination: "/nouveautes", permanent: true }];
+  },
+
   async headers() {
     const isDev = process.env.NODE_ENV === "development";
     if (isDev) return [];
@@ -35,11 +40,14 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://src.litix.io",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: blob: https:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://generativelanguage.googleapis.com",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://generativelanguage.googleapis.com https://*.mux.com https://*.litix.io",
+              // Mux HLS playback: segments over https, MSE blob URLs and a blob worker.
+              "media-src 'self' blob: https://*.mux.com",
+              "worker-src 'self' blob:",
               "frame-src https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",

@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:at="http://purl.org/atompub/tombstones/1.0" xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns="http://www.w3.org/2005/Atom">
+  <at:deleted-entry ref="yt:video:DELETEDvid1" when="2026-10-18T10:00:00+00:00">
+    <link href="https://www.youtube.com/watch?v=DELETEDvid1"/>
+  </at:deleted-entry>
+  <entry>
+    <id>yt:video:AAAAAAAAAAA</id>
+    <yt:videoId>AAAAAAAAAAA</yt:videoId>
+    <yt:channelId>UCmine</yt:channelId>
+    <title>Première &amp; meilleure vidéo</title>
+    <published>2026-10-01T09:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>yt:video:BBBBBBBBBBB</id>
+    <yt:videoId>BBBBBBBBBBB</yt:videoId>
+    <yt:channelId>UCmine</yt:channelId>
+    <title>Deuxième vidéo</title>
+    <published>2026-10-10T09:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>yt:video:CCCCCCCCCCC</id>
+    <yt:videoId>CCCCCCCCCCC</yt:videoId>
+    <yt:channelId>UCsomeoneelse</yt:channelId>
+    <title>Vidéo d'une autre chaîne</title>
+    <published>2026-10-11T09:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>yt:video:bad</id>
+    <yt:videoId>bad</yt:videoId>
+    <yt:channelId>UCmine</yt:channelId>
+    <title>Identifiant invalide</title>
+    <published>2026-10-12T09:00:00+00:00</published>
+  </entry>
+</feed>

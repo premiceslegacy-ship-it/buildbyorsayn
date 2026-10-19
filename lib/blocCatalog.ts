@@ -1,7 +1,8 @@
 // Public navigation metadata only. Never import the private corpus here.
-export type BlocVideo = { title: string; youtubeId: string; description?: string };
-export type BlocSection = { id: string; title: string; content: string; skillFiles?: { slug: string; title: string; description: string }[] };
-export type DeliveredBloc = { id: string; titre: string; displayNumber: number; sections: BlocSection[]; videos: BlocVideo[] };
+export type SectionLesson = { durationSeconds: number; deliverables: string[] };
+export type LessonRecord = { sectionId: string; muxAssetId: string | null; playbackId: string | null; durationSeconds: number | null; deliverables: string[] };
+export type BlocSection = { id: string; title: string; content: string; skillFiles?: { slug: string; title: string; description: string }[]; lesson?: SectionLesson };
+export type DeliveredBloc = { id: string; titre: string; displayNumber: number; sections: BlocSection[] };
 
 const entries: [string, string, [string, string][]][] = [
   ["1", "Lire l'opportunité et choisir une ligne", [["b1-s0", "Le décalage se creuse déjà"], ["b1-s1", "Une IA utile commence dans le métier"], ["b1-s2", "Choisir une ligne qui peut prendre de la valeur"], ["b1-s3", "L'AI Growth Operating : faire circuler le travail"], ["b1-s4b", "Le motion design IA devient un avantage commercial"], ["b1-s4", "Ta première décision maintenant"]]],
@@ -13,13 +14,7 @@ const entries: [string, string, [string, string][]][] = [
   ["7", "Récapitulatif", [["b7-s1", "Tout processiser"], ["b7-s2", "L'audit avant l'automatisation"], ["b7-s3", "Les skills comme infrastructure de connaissance"], ["b7-s4", "Itérer en continu"]]],
 ];
 
-export const PUBLIC_BLOC_ONE_VIDEOS: BlocVideo[] = [{
-  title: "Arrête de vendre de l'IA", youtubeId: "uhp4L3y_Jco",
-  description: "L'approche one-shot est une impasse. Comment passer d'exécutant technique à architecte de systèmes et déployer un OS complet pour une niche en 30 minutes.",
-}];
-
 export const BLOCS_DATA = entries.map(([id, title, sections], index) => ({
   id, titre: `Bloc ${index + 1} : ${title}`, displayNumber: index + 1,
   sections: sections.map(([id, title]) => ({ id, title })),
-  videos: id === "1" ? PUBLIC_BLOC_ONE_VIDEOS : [] as BlocVideo[],
 }));

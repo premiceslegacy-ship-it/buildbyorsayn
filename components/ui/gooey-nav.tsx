@@ -52,7 +52,7 @@ const SIZES = {
 
 export type GooeyNavSize = keyof typeof SIZES;
 
-type NavItem = { label: string; href?: string; icon?: ReactNode };
+type NavItem = { label: string; href?: string; icon?: ReactNode; badge?: ReactNode };
 
 export type GooeyNavItem = string | NavItem;
 
@@ -166,6 +166,7 @@ function NavLabel({
   label,
   href,
   icon,
+  badge,
   isActive,
   size,
   activeLabelColor,
@@ -189,11 +190,13 @@ function NavLabel({
     <Link href={href} {...props}>
       {icon}
       {label}
+      {badge}
     </Link>
   ) : (
     <button type="button" {...props}>
       {icon}
       {label}
+      {badge}
     </button>
   );
 }

@@ -1,3 +1,18 @@
+import lessonsFile from "./blocLessons.json";
+import type { LessonRecord, SectionLesson } from "./blocCatalog";
+
+// Private lesson data. The playbackId never leaves the server: only the
+// duration and deliverables are attached to a section.
+const LESSONS_BY_SECTION = new Map<string, LessonRecord>(
+  (lessonsFile.lessons as LessonRecord[]).map((lesson) => [lesson.sectionId, lesson])
+);
+
+function lessonFor(sectionId: string): SectionLesson | undefined {
+  const lesson = LESSONS_BY_SECTION.get(sectionId);
+  if (!lesson?.playbackId || !lesson.durationSeconds) return undefined;
+  return { durationSeconds: lesson.durationSeconds, deliverables: lesson.deliverables };
+}
+
 const BLOCS_DATA_SOURCE = [
   {
     id: "1",
@@ -52,13 +67,6 @@ const BLOCS_DATA_SOURCE = [
           "La suite consiste à choisir les outils qui servent cette ligne, pas ceux qui font le plus de bruit. Tu es prêt à voir comment construire ta stack, cadrer le premier système et éviter de te disperser."
       },
     ],
-    videos: [
-      {
-        title: "Arrête de vendre de l'IA",
-        youtubeId: "uhp4L3y_Jco",
-        description: "L'approche one-shot est une impasse. Comment passer d'exécutant technique à architecte de systèmes et déployer un OS complet pour une niche en 30 minutes.",
-      },
-    ],
   },
   {
     id: "2",
@@ -105,18 +113,6 @@ const BLOCS_DATA_SOURCE = [
           "MCP qui restent utiles à configurer selon le projet. Supabase MCP pour que l'IA voie le schéma de base de données en temps réel. GitHub MCP pour accéder à l'historique du code et pouvoir soumettre des modifications. Vercel MCP pour voir les logs de déploiement et les variables d'environnement. Figma MCP pour lire les specs de design directement depuis Figma sans copier-coller. Stripe MCP pour accéder à la documentation API Stripe en contexte. Sur chacun de ces cas, vérifie d'abord s'il n'existe pas un CLI ou une API directe qui ferait le même travail plus proprement.\n\n" +
           "Un Skill, c'est un fichier Markdown qui encode une compétence, un process, ou un système de décision. Tu le charges dans ton environnement et l'IA opère avec cette expertise intégrée, au lieu d'improviser un jugement moyen.\n\n" +
           "Le Bloc 4 est entièrement dédié aux skills : la méthode pour les construire (décomposer un métier en sous-compétences, capturer l'expertise, formaliser, chaîner), comment ils s'articulent en système, et comment en faire ton second cerveau. Ici, retiens juste l'essentiel pour comprendre la stack : un Skill se charge à côté du CLI, de l'API ou du MCP dans ton IDE, et les deux jouent des rôles différents et complémentaires. La connexion outil donne à l'IA l'accès à tes données réelles - ton schéma BDD, ton historique Git, tes designs Figma. Le Skill lui donne le jugement pour bien s'en servir - les règles, les critères de décision, les interdits d'un praticien réel. L'un sans l'autre est incomplet : des données réelles jugées avec un jugement générique, ou un bon jugement appliqué à des données inventées.",
-      },
-    ],
-    videos: [
-      {
-        title: "La stack complète",
-        youtubeId: "6kTB2MAQthk",
-        description: "Présentation des outils, pourquoi cette stack fixe, et comment les utiliser ensemble pour construire vite et bien.",
-      },
-      {
-        title: "Tu ne verras plus jamais les skills de la même manière.",
-        youtubeId: "KCpUmE2Xi9U",
-        description: "Comment les skills changent fondamentalement ta façon de travailler avec l'IA.",
       },
     ],
   },
@@ -194,13 +190,6 @@ const BLOCS_DATA_SOURCE = [
           "Modèle puissant pour penser, modèle adapté pour exécuter, session fraîche pour construire. Le plan coûte un peu plus cher au départ ; il évite des semaines de correction après.",
       },
     ],
-    videos: [
-      {
-        title: "L'ordre mental avant de construire",
-        youtubeId: "UbCE1m0DYe8",
-        description: "Comment structurer un projet web : du brief au développement, sans sauter les étapes.",
-      },
-    ],
   },
   {
     id: "4",
@@ -274,7 +263,6 @@ const BLOCS_DATA_SOURCE = [
           "Ceux qui te vendent des packs de 3000 produits gagnants à scraper ou des bibliothèques de prompts génériques n'ont pas compris ça. Un skill sans application terrain, c'est du bruit. Un skill extrait d'un vrai projet, c'est un actif.",
       },
     ],
-    videos: [],
   },
   {
     id: "5",
@@ -323,7 +311,6 @@ const BLOCS_DATA_SOURCE = [
           "Exemple pratique : j'ai récemment audité un projet où la route de paiement Stripe n'était pas protégée par une vérification côté serveur. N'importe qui pouvait appeler la route directement et déclencher un accès premium sans payer. C'est une erreur CRITIQUE. L'interface était belle, le produit fonctionnait bien en apparence, mais cette faille suffisait à le rendre non livrable.",
       },
     ],
-    videos: [],
   },
   {
     id: "6",
@@ -400,7 +387,6 @@ const BLOCS_DATA_SOURCE = [
           "La règle de fond reste identique à celle d'ORACLE produit : calibrer d'abord le niveau de complexité du site, puis ne produire que les documents et décisions réellement nécessaires à ce niveau. Un site vitrine simple n'a pas besoin du même appareil documentaire qu'une landing page de SaaS B2B avec plusieurs segments et un tunnel GTM complexe. ORACLE Site Web s'adapte à l'un comme à l'autre sans jamais imposer une lourdeur que le projet ne justifie pas.",
       },
     ],
-    videos: [],
   },
   {
     id: "7",
@@ -455,7 +441,6 @@ const BLOCS_DATA_SOURCE = [
           "La question maintenant : quel est ton prochain projet ? Lance ORACLE. Décris-le. Commence.",
       },
     ],
-    videos: [],
   },
 ];
 
@@ -481,6 +466,7 @@ export const BLOCS_DATA = CHRONOLOGICAL_BLOCK_ORDER
     sections: bloc.sections.map((section) => ({
       ...section,
       content: renumberBlockReferences(section.content),
+      lesson: lessonFor(section.id),
     })),
   }));
 

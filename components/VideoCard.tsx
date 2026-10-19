@@ -16,6 +16,9 @@ export function VideoCard({ title, youtubeId, description }: VideoCardProps) {
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           title={title}
+          // The site sends Cross-Origin-Embedder-Policy: credentialless; without this attribute Chromium refuses to load
+          // the YouTube document (it sends no COEP header) and the player stays blank.
+          {...{ credentialless: "true" }}
         />
       </div>
       <div>

@@ -261,7 +261,7 @@ export default async function ProtocolePage() {
               </div>
               <div className="flex flex-col gap-2 sm:flex-row">
                 <Link
-                  href="/videos#fondations"
+                  href="/nouveautes"
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#c9b48a] px-4 py-2.5 text-sm font-semibold text-[#0e0e0f] transition-colors hover:bg-[#e8d5b0]"
                 >
                   Ouvrir dans BUILD

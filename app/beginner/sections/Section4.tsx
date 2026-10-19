@@ -217,7 +217,7 @@ export function Section4() {
 
       <div className="border-t border-white/5 pt-8">
         <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">Vidéo liée à cette section</p>
-        <Link href="/videos#fondations" className="group inline-flex items-center gap-3">
+        <Link href="/nouveautes" className="group inline-flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center border border-white/10 bg-white/5 transition-all duration-300 group-hover:border-[#e8d5b0]/30"><Play className="h-4 w-4 text-[#e8d5b0]" /></div>
           <div><p className="text-[15px] font-medium text-[#f0ede8] transition-colors duration-300 group-hover:text-[#e8d5b0]">Voir la vidéo</p><p className="text-[13px] text-white/40">Accéder à la bibliothèque →</p></div>
         </Link>

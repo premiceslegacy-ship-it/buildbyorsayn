@@ -7,9 +7,11 @@ import { GraduationCap, ShieldCheck, Menu, X, ChevronDown, PhoneCall } from "luc
 import { Logo } from "@/components/Logo";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { GooeyNav, type GooeyNavItem } from "@/components/ui/gooey-nav";
+import { NouveautesBadge, NouveautesNavLink } from "@/components/nouveautes/NouveautesNavLink";
+import { useNouveautesUnseenCount } from "@/components/nouveautes/useNouveautesUnseenCount";
 
 interface NavBarProps {
-  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "videos" | "protocole" | "videos-tutos" | "accompagnement";
+  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "nouveautes" | "protocole" | "videos-tutos" | "accompagnement";
   tier?: string | null;
   isAdmin?: boolean;
   displayName?: string;
@@ -74,15 +76,16 @@ export function NavBar({
   const normalizedTier = normalizeProfileTier(tier);
   const hasFoundationAccess = normalizedTier === "beginner" || normalizedTier === "full";
   const pathname = usePathname();
+  const nouveautesUnseen = useNouveautesUnseenCount();
 
   const gooeyItems: GooeyNavItem[] = useMemo(
     () => [
       { label: "Tableau de bord", href: "/dashboard" },
       { label: "Skills", href: "/skills" },
-      { label: "Vidéos", href: "/videos" },
+      { label: "Nouveautés", href: "/nouveautes", badge: <NouveautesBadge count={nouveautesUnseen} /> },
       { label: "Hermes Agent", href: "/videos/tutos" },
     ],
-    []
+    [nouveautesUnseen]
   );
   const gooeyActiveIndex = gooeyItems.findIndex(
     (item) => typeof item !== "string" && item.href === pathname
@@ -130,9 +133,7 @@ export function NavBar({
         Skills
       </Link>
 
-      <Link href="/videos" className={linkClass("videos")} onClick={() => setIsMobileMenuOpen(false)}>
-        Vidéos
-      </Link>
+      <NouveautesNavLink count={nouveautesUnseen} className={linkClass("nouveautes")} onClick={() => setIsMobileMenuOpen(false)} />
 
       <Link href="/videos/tutos" className={linkClass("videos-tutos")} onClick={() => setIsMobileMenuOpen(false)}>
         Hermes Agent

@@ -163,7 +163,10 @@ test("cleanup is scheduled daily and calls only the bounded cleanup RPCs", async
   const config = JSON.parse(await readFile("vercel.json", "utf8")) as {
     crons?: Array<{ path?: string; schedule?: string }>;
   };
-  assert.deepEqual(config.crons, [{ path: "/api/cron/mcp-cleanup", schedule: "17 3 * * *" }]);
+  assert.deepEqual(config.crons, [
+    { path: "/api/cron/mcp-cleanup", schedule: "17 3 * * *" },
+    { path: "/api/cron/youtube-sync", schedule: "23 6 * * *" },
+  ]);
   const route = await readFile("app/api/cron/mcp-cleanup/route.ts", "utf8");
   const handler = await readFile("lib/mcp/cleanupRoute.ts", "utf8");
   assert.match(route, /createMcpCleanupHandler/);

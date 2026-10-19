@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Check, Copy, Lock, ArrowRight, Play, Download, FileText } from "lucide-react";
+import { ArrowLeft, Check, Copy, Lock, ArrowRight, Download, FileText } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BLOCS_DATA, type DeliveredBloc } from "@/lib/blocCatalog";
@@ -12,6 +12,8 @@ import { LinkifiedText } from "@/components/ui/linkified-text";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { SectionPager } from "@/components/ui/section-pager";
+import { LessonPlayer } from "@/components/lessons/LessonPlayer";
+import { LessonMeta } from "@/components/lessons/LessonMeta";
 
 import { toggleBlocCompletion } from "@/app/actions/progress";
 import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, withClientReferenceId } from "@/lib/pricing";
@@ -117,6 +119,23 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
     sessionStorage.setItem("build_session_advances", String(current + 1));
   };
 
+  const renderSectionContent = (section: DeliveredBloc["sections"][number]) => {
+    const segments = section.content.split(/(```[\s\S]*?```)/g);
+    return segments.map((segment, segIdx) => {
+      if (segment.startsWith("```") && segment.endsWith("```")) {
+        const inner = segment.slice(3, -3);
+        const firstNewline = inner.indexOf("\n");
+        const code = firstNewline === -1 ? inner.trim() : inner.slice(firstNewline + 1);
+        return <CodeBlock key={segIdx} code={code} />;
+      }
+      return segment.trim().split("\n\n").filter(Boolean).map((para, paraIdx) => (
+        <p key={`${segIdx}-${paraIdx}`}>
+          <LinkifiedText text={para} />
+        </p>
+      ));
+    });
+  };
+
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] font-sans relative selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
       {/* Background Halos */}
@@ -212,22 +231,20 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
                   <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
                     {section.title}
                   </h2>
-                  {(() => {
-                    const segments = section.content.split(/(```[\s\S]*?```)/g);
-                    return segments.map((segment, segIdx) => {
-                      if (segment.startsWith("```") && segment.endsWith("```")) {
-                        const inner = segment.slice(3, -3);
-                        const firstNewline = inner.indexOf("\n");
-                        const code = firstNewline === -1 ? inner.trim() : inner.slice(firstNewline + 1);
-                        return <CodeBlock key={segIdx} code={code} />;
-                      }
-                      return segment.trim().split("\n\n").filter(Boolean).map((para, paraIdx) => (
-                        <p key={`${segIdx}-${paraIdx}`}>
-                          <LinkifiedText text={para} />
-                        </p>
-                      ));
-                    });
-                  })()}
+                  {section.lesson ? (
+                    <>
+                      <LessonPlayer
+                        sectionId={section.id}
+                        title={section.title}
+                        onCompleted={() => { if (!checkedItems.includes(section.id)) toggleItem(section.id); }}
+                      />
+                      <LessonMeta lesson={section.lesson} />
+                      <details className="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+                        <summary className="cursor-pointer text-[15px] font-medium text-white/70">Transcription</summary>
+                        <div className="mt-4 space-y-6">{renderSectionContent(section)}</div>
+                      </details>
+                    </>
+                  ) : renderSectionContent(section)}
                   {"skillFiles" in section && Array.isArray((section as { skillFiles?: { slug: string; title: string; description: string }[] }).skillFiles) &&
                     (section as { skillFiles: { slug: string; title: string; description: string }[] }).skillFiles.map((skill) => (
                       <div key={skill.slug} className="pt-2">
@@ -306,29 +323,6 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
                 ) : null}
               </section>
             ) : null}
-
-            {/* Encart vidéos liées */}
-            {bloc.videos?.length > 0 && (
-              <div className="mt-16 pt-8 border-t border-white/5">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-semibold mb-4">
-                  Vidéos liées à ce bloc
-                </p>
-                <Link
-                  href={`/videos#bloc-${blocId}`}
-                  className="inline-flex items-center gap-3 group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.15)] transition-all duration-300">
-                    <Play className="w-4 h-4 text-[#e8d5b0]" />
-                  </div>
-                  <div>
-                    <p className="text-[15px] font-medium text-[#f0ede8] group-hover:text-[#e8d5b0] transition-colors duration-300">
-                      {bloc.videos.length} vidéo{bloc.videos.length > 1 ? "s" : ""} disponible{bloc.videos.length > 1 ? "s" : ""}
-                    </p>
-                    <p className="text-[13px] text-white/40">Voir dans la bibliothèque →</p>
-                  </div>
-                </Link>
-              </div>
-            )}
 
             <LiquidCard className="p-6 md:p-10 mt-16 sm:mt-24 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
               <div className="flex items-center justify-between mb-8 relative z-10">
