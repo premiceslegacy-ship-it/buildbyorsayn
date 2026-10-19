@@ -7,7 +7,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 const SITE_TITLE = "Construire, vendre et livrer avec l'IA | BUILD by Orsayn";
 const SITE_DESCRIPTION = "BUILD t'aide à passer d'idées et d'outils dispersés à une offre claire, un livrable montrable et une méthode réutilisable.";
-const SITE_URL = "https://buildbyorsayn.com";
+// The host that really serves the app (Vercel sets it per environment); localhost when unset in dev.
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   title: SITE_TITLE,

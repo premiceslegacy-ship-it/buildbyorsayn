@@ -288,7 +288,12 @@ export async function POST(req: NextRequest) {
             } else if (profile && emailsMatch(profile.email, customerEmail)) {
                 userId = profile.id;
             } else if (!profile) {
-                const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://buildbyorsayn.com";
+                const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+                if (!appUrl) {
+                    // Never invent a host: an invitation pointing at a dead domain strands a paying customer. Stripe retries on 500.
+                    console.error("[Webhook] NEXT_PUBLIC_APP_URL is not configured");
+                    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                }
                 const redirectTo = `${appUrl}/update-password`;
 
                 if (!canSendWelcomeEmail()) {

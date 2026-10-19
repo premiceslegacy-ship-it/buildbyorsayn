@@ -45,7 +45,7 @@ test("websub GET verifies only the expected topic and echoes the challenge", asy
   const previous = process.env.YOUTUBE_CHANNEL_ID;
   process.env.YOUTUBE_CHANNEL_ID = "UCmine";
   try {
-    const url = (params: Record<string, string>) => `https://buildbyorsayn.com/api/youtube/websub?${new URLSearchParams(params)}`;
+    const url = (params: Record<string, string>) => `https://app.example.com/api/youtube/websub?${new URLSearchParams(params)}`;
     const ok = await GET(new Request(url({ "hub.mode": "subscribe", "hub.topic": websubTopic("UCmine"), "hub.challenge": "abc123" })));
     assert.equal(ok.status, 200);
     assert.equal(await ok.text(), "abc123");
@@ -72,11 +72,11 @@ test("websub POST acknowledges but ignores a forged signature without touching s
   delete process.env.SUPABASE_SERVICE_ROLE_KEY;
   try {
     for (const signature of [null, "sha1=deadbeef", `sha1=${createHmac("sha1", "wrong").update(xml).digest("hex")}`]) {
-      const response = await POST(new Request("https://buildbyorsayn.com/api/youtube/websub", { method: "POST", body: xml, headers: signature ? { "x-hub-signature": signature } : {} }));
+      const response = await POST(new Request("https://app.example.com/api/youtube/websub", { method: "POST", body: xml, headers: signature ? { "x-hub-signature": signature } : {} }));
       assert.equal(response.status, 202);
     }
     const signed = `sha1=${createHmac("sha1", "s".repeat(32)).update(xml).digest("hex")}`;
-    const failing = await POST(new Request("https://buildbyorsayn.com/api/youtube/websub", { method: "POST", body: xml, headers: { "x-hub-signature": signed } }));
+    const failing = await POST(new Request("https://app.example.com/api/youtube/websub", { method: "POST", body: xml, headers: { "x-hub-signature": signed } }));
     assert.equal(failing.status, 500, "a valid signature that cannot be stored must ask the hub to retry");
   } finally {
     for (const [name, value] of [["YOUTUBE_WEBSUB_SECRET", previous.secret], ["YOUTUBE_CHANNEL_ID", previous.channel], ["NEXT_PUBLIC_SUPABASE_URL", previous.url], ["SUPABASE_SERVICE_ROLE_KEY", previous.key]] as const) {
@@ -91,7 +91,7 @@ test("youtube cron refuses requests without the exact CRON_SECRET before any net
   process.env.CRON_SECRET = "c".repeat(32);
   try {
     for (const authorization of [undefined, "Bearer nope", `Bearer ${"d".repeat(32)}`]) {
-      const response = await GET(new Request("https://buildbyorsayn.com/api/cron/youtube-sync", { headers: authorization ? { authorization } : {} }));
+      const response = await GET(new Request("https://app.example.com/api/cron/youtube-sync", { headers: authorization ? { authorization } : {} }));
       assert.equal(response.status, 401);
       assert.equal(response.headers.get("cache-control"), "no-store");
     }
@@ -155,9 +155,9 @@ test("the XML parser survives entity-expansion bombs and large feeds within a ti
 
 test("websub POST refuses oversized bodies before hashing or storing them", async () => {
   const { POST } = await import("../app/api/youtube/websub/route");
-  const declared = await POST(new Request("https://buildbyorsayn.com/api/youtube/websub", { method: "POST", body: "x", headers: { "content-length": String(300 * 1024) } }));
+  const declared = await POST(new Request("https://app.example.com/api/youtube/websub", { method: "POST", body: "x", headers: { "content-length": String(300 * 1024) } }));
   assert.equal(declared.status, 413);
-  const actual = await POST(new Request("https://buildbyorsayn.com/api/youtube/websub", { method: "POST", body: "x".repeat(300 * 1024) }));
+  const actual = await POST(new Request("https://app.example.com/api/youtube/websub", { method: "POST", body: "x".repeat(300 * 1024) }));
   assert.equal(actual.status, 413);
 });
 
@@ -180,7 +180,7 @@ test("WebSub subscribes with a callback on the host that really serves the app, 
       return new Response(null, { status: 202 });
     }) as typeof fetch);
     assert.equal(sent!.url, "https://pubsubhubbub.appspot.com/subscribe");
-    assert.equal(sent!.body.get("hub.callback"), "https://build-system-three.vercel.app/api/youtube/websub", "trailing slash trimmed, no buildbyorsayn.com");
+    assert.equal(sent!.body.get("hub.callback"), "https://build-system-three.vercel.app/api/youtube/websub", "trailing slash trimmed, taken from NEXT_PUBLIC_APP_URL");
     assert.equal(sent!.body.get("hub.topic"), websubTopic("UCmine"));
     assert.equal(sent!.body.get("hub.mode"), "subscribe");
     assert.equal(sent!.body.get("hub.secret"), "s".repeat(32));
