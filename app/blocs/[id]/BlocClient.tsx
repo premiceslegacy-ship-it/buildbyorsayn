@@ -14,6 +14,7 @@ import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { SectionPager } from "@/components/ui/section-pager";
 import { LessonPlayer } from "@/components/lessons/LessonPlayer";
 import { LessonMeta } from "@/components/lessons/LessonMeta";
+import { VideoComingBanner } from "@/components/VideoComingBanner";
 
 import { toggleBlocCompletion } from "@/app/actions/progress";
 import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, withClientReferenceId } from "@/lib/pricing";
@@ -164,9 +165,11 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
 
         <div className="flex flex-col items-start">
           <div className={showPaywall ? "w-full max-w-3xl mx-auto" : "w-full max-w-3xl mx-auto"}>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-10 md:mb-16 tracking-tight text-[#f0ede8]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 md:mb-8 tracking-tight text-[#f0ede8]">
               {bloc.titre}
             </h1>
+
+            <VideoComingBanner />
 
             {MCP_CONNECTOR_VISIBLE && hasMcpAccess && showContent && mcpConnectionStatus === "disconnected" ? (
               <McpStudyCallout />

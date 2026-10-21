@@ -19,6 +19,7 @@ import { createClient } from "@/lib/supabase/client";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
 import { Suspense } from "react";
 import { UpgradedBanner } from "@/components/UpgradedBanner";
+import { VideoComingBanner } from "@/components/VideoComingBanner";
 import { McpDashboardEntry } from "@/components/McpDashboardEntry";
 import { EcosystemMap } from "@/components/EcosystemMap";
 import { UpgradeCarousel } from "@/components/UpgradeCarousel";
@@ -158,6 +159,8 @@ export default function DashboardHub() {
           <p className="text-[rgba(240,237,232,0.60)] text-[16px]">
             {isLoaded ? getGreeting(globalProgress) : "Chargement de ta progression..."}
           </p>
+
+          <VideoComingBanner className="w-full max-w-2xl" />
 
           {sessionAdvances >= 2 && (
             <LiquidCard className="w-full max-w-2xl p-4">
