@@ -33,3 +33,17 @@ if ($env:BUILD_SYNC_INSTALL_ONLY -ne "1") {
   & $Node.Source $CliPath skills setup "--base-url=$BuildSyncOrigin"
 }
 Write-Host "✓ Commande disponible : $Wrapper"
+
+# La synchronisation planifiée utilise le chemin complet ; la commande tapée à la main a besoin du PATH.
+# On l'ajoute au PATH de l'utilisateur une seule fois (BUILD_SYNC_NO_PROFILE=1 pour ne pas y toucher).
+$UserPath = [Environment]::GetEnvironmentVariable("Path", "User")
+$UserPathEntries = @($UserPath -split ";" | Where-Object { $_ })
+if ($UserPathEntries -notcontains $BinRoot) {
+  if ($env:BUILD_SYNC_NO_PROFILE -eq "1") {
+    Write-Host "→ $BinRoot n'est pas dans ton PATH (laissé intact, BUILD_SYNC_NO_PROFILE=1)."
+  } else {
+    [Environment]::SetEnvironmentVariable("Path", (($UserPathEntries + $BinRoot) -join ";"), "User")
+    Write-Host "✓ $BinRoot ajouté à ton PATH. Les nouveaux terminaux trouveront build-skills."
+  }
+}
+if (($env:Path -split ";") -notcontains $BinRoot) { $env:Path = "$env:Path;$BinRoot" }
