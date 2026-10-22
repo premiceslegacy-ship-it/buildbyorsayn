@@ -35,3 +35,14 @@ test("le retour d'authentification refuse tout ce qui sort du site ou des chemin
     assert.equal(resolveCallbackRedirect(value), "/dashboard", JSON.stringify(value));
   }
 });
+
+test("la migration retire aux rôles navigateur les droits de table et de fonction inutiles", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const sql = await readFile("supabase/migrations/20261023150000_revoke_excess_client_grants.sql", "utf8");
+  assert.match(sql, /revoke all on table public\.profiles from anon/);
+  assert.match(sql, /revoke insert, update, delete, truncate, references, trigger\s+on table public\.profiles from authenticated/);
+  assert.match(sql, /revoke all on table public\.member_presence from anon, authenticated/);
+  assert.match(sql, /revoke all on table public\.member_activity_events from anon, authenticated/);
+  assert.match(sql, /revoke execute on function public\.has_current_accompaniment\(uuid, text\) from anon/);
+  assert.doesNotMatch(sql, /grant (insert|update|delete)/i);
+});
