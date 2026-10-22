@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  CURSOR_MCP_CALLBACK,
   hashToken,
   isRedirectUriAllowed,
   isRedirectUriRegistrable,
@@ -130,6 +131,19 @@ test("isRedirectUriRegistrable accepts https and loopback http", () => {
   assert.equal(isRedirectUriRegistrable("http://127.0.0.1:9999/cb"), true);
   assert.equal(isRedirectUriRegistrable("http://localhost/cb"), true);
   assert.equal(isRedirectUriRegistrable("http://[::1]:9999/cb"), true);
+});
+
+test("Cursor's custom callback is accepted only as one exact allowlisted string", () => {
+  assert.equal(isRedirectUriRegistrable(CURSOR_MCP_CALLBACK), true);
+  assert.equal(isRedirectUriAllowed(CURSOR_MCP_CALLBACK, [CURSOR_MCP_CALLBACK]), true);
+  assert.equal(isRedirectUriRegistrable(`${CURSOR_MCP_CALLBACK}/extra`), false);
+  assert.equal(isRedirectUriRegistrable("cursor://anysphere.cursor-retrieval/oauth/callback"), false);
+  assert.equal(isRedirectUriRegistrable("cursor://user@anysphere.cursor-mcp/oauth/callback"), false);
+  assert.equal(isRedirectUriRegistrable(`${CURSOR_MCP_CALLBACK}\n`), false);
+  assert.equal(
+    isRedirectUriAllowed(CURSOR_MCP_CALLBACK, [`${CURSOR_MCP_CALLBACK}/extra`]),
+    false,
+  );
 });
 
 test("isRedirectUriRegistrable rejects non-loopback http and other schemes", () => {

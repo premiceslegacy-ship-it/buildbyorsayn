@@ -76,9 +76,10 @@ const checks: Check[] = [
     },
   },
   {
-    name: "WebSub secret and CRON_SECRET are long enough",
+    name: "Webhook and cron secrets are long enough",
     run: async () => {
       if (need("YOUTUBE_WEBSUB_SECRET").length < 32) throw new Error("YOUTUBE_WEBSUB_SECRET must be 32+ characters");
+      if (need("MUX_WEBHOOK_SECRET").length < 16) throw new Error("MUX_WEBHOOK_SECRET must be 16+ characters");
       if (need("CRON_SECRET").length < 32) throw new Error("CRON_SECRET must be 32+ characters");
       return "ok";
     },

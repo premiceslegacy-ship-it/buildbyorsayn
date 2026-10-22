@@ -6,6 +6,8 @@ import { resolveMcpProfileTier } from "@/lib/mcpAccess";
 import { canReadBlocSection } from "@/lib/blocAccess";
 import lessonsFile from "@/lib/blocLessons.json";
 import type { LessonRecord } from "@/lib/blocCatalog";
+import { createAdminSupabase } from "@/lib/supabase/admin";
+import { tierForSection } from "@/lib/mux/adminLessons";
 
 export type LessonPlayback =
   | {
@@ -42,7 +44,29 @@ export async function getLessonPlayback(sectionId: string): Promise<LessonPlayba
     const bloc = BLOCS_DATA.find((item) => item.sections.some((section) => section.id === sectionId));
     if (!bloc || !canReadBlocSection(tier, bloc.id, sectionId)) return { ok: false };
 
-    const lesson = (lessonsFile.lessons as LessonRecord[]).find((item) => item.sectionId === sectionId);
+    const staticLesson = (lessonsFile.lessons as LessonRecord[]).find((item) => item.sectionId === sectionId);
+    let lesson = staticLesson;
+    try {
+      const admin = createAdminSupabase();
+      const { data: published, error: videoError } = await admin
+        .from("video_lessons")
+        .select("playback_id,duration_seconds,tier_required")
+        .eq("section_id", sectionId)
+        .eq("status", "ready")
+        .not("published_at", "is", null)
+        .maybeSingle();
+      if (!videoError && published && published.tier_required === tierForSection(sectionId)) {
+        lesson = {
+          sectionId,
+          muxAssetId: null,
+          playbackId: published.playback_id,
+          durationSeconds: published.duration_seconds,
+          deliverables: [],
+        };
+      }
+    } catch {
+      // Le JSON reste le repli pendant la migration vers la table administrée.
+    }
     if (!lesson?.playbackId) return { ok: false };
 
     const claims: Record<string, string> = process.env.MUX_PLAYBACK_RESTRICTION_ID

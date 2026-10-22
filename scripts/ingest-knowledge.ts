@@ -20,7 +20,9 @@ import {
   collectProtocoleDocuments,
   collectSkillsCatalogDocuments,
   collectSkillsContentDocuments,
+  collectVideoTranscriptDocuments,
   type KnowledgeDocument,
+  type PublishedVideoTranscriptRow,
 } from "@/lib/knowledge/sources";
 
 loadEnv({ path: ".env.local", quiet: true });
@@ -70,6 +72,17 @@ async function collectAllDocuments(): Promise<{
   documents.push(...(await collectSkillsCatalogDocuments()));
   documents.push(...(await collectSkillsContentDocuments()));
   documents.push(...(await collectDoctrineDocuments()));
+  const { data: publishedVideos, error: publishedVideosError } = await admin
+    .from("video_lessons")
+    .select("id,section_id,title,transcript,chapters,duration_seconds,tier_required")
+    .eq("status", "ready")
+    .not("published_at", "is", null);
+  if (publishedVideosError) {
+    throw new Error("Published video transcripts could not be read.");
+  }
+  documents.push(...collectVideoTranscriptDocuments(
+    (publishedVideos ?? []) as PublishedVideoTranscriptRow[]
+  ));
 
   const scannedSources = new Set<string>(ALWAYS_SCANNED_SOURCES);
   let obsidianReport: {
@@ -115,7 +128,8 @@ function prepareChunks(documents: KnowledgeDocument[]): PreparedKnowledgeChunk[]
         title: draft.title,
         content: draft.content,
         tier: document.tier,
-        contentHash: computeContentHash(document.tier, draft.title, draft.content),
+        contentHash: computeContentHash(document.tier, draft.title, draft.content, document.metadata),
+        metadata: document.metadata,
       });
     }
   }
@@ -195,9 +209,11 @@ async function main() {
   for (const chunk of chunks) {
     bySource.set(chunk.source, (bySource.get(chunk.source) ?? 0) + 1);
   }
+  const videoTranscriptCount = collected.documents.filter((document) => document.sourceId.startsWith("video:")).length;
 
   console.log("\n--- Chunk counts by source ---");
   for (const [source, count] of bySource) console.log(`  ${source}: ${count} chunk(s)`);
+  console.log(`  published video transcript chapters: ${videoTranscriptCount}`);
   printObsidianReport(collected.obsidianReport);
 
   if (!process.env.OBSIDIAN_VAULT_PATH) {
@@ -269,7 +285,7 @@ async function main() {
         content_hash: chunk.contentHash,
         tier_required: chunk.tier,
         embedding: embeddings[embeddingIndex],
-        metadata: { embeddingFingerprint: fingerprint },
+        metadata: { ...chunk.metadata, embeddingFingerprint: fingerprint },
       }))
     );
   }
@@ -309,6 +325,7 @@ main().catch((error: unknown) => {
     "Embedding provider returned an incomplete batch.",
     "Atomic knowledge snapshot publication failed.",
     "Knowledge ingestion refused because a possible secret was detected.",
+    "Published video transcripts could not be read.",
     "Atomic Obsidian revocation failed.",
     "Obsidian revocation verification failed.",
   ]);

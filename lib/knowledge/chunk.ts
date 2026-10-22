@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { McpTier } from "@/lib/mcpAccess";
+import type { KnowledgeMetadata } from "@/lib/knowledge/sources";
 
 const MAX_CHUNK_SIZE = 1500;
 const MIN_CHUNK_SIZE = 1200;
@@ -73,6 +74,12 @@ export function chunkText(title: string, content: string): KnowledgeChunkDraft[]
   return chunks;
 }
 
-export function computeContentHash(tier: McpTier, title: string, content: string): string {
-  return createHash("sha256").update(`${tier}\n${title}\n${content}`, "utf8").digest("hex");
+export function computeContentHash(
+  tier: McpTier,
+  title: string,
+  content: string,
+  metadata: KnowledgeMetadata = {},
+): string {
+  const stableMetadata = JSON.stringify(Object.fromEntries(Object.entries(metadata).sort(([left], [right]) => left.localeCompare(right))));
+  return createHash("sha256").update(`${tier}\n${title}\n${content}\n${stableMetadata}`, "utf8").digest("hex");
 }

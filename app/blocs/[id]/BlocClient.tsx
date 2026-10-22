@@ -277,7 +277,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
                       />
                       <LessonMeta lesson={section.lesson} />
                       <details className="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
-                        <summary className="cursor-pointer text-[15px] font-medium text-white/70">Transcription</summary>
+                        <summary className="cursor-pointer text-[15px] font-medium text-white/70">Texte du chapitre</summary>
                         <div className="mt-4 space-y-6">{renderSectionContent(section)}</div>
                       </details>
                     </>

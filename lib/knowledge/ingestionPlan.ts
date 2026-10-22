@@ -1,4 +1,5 @@
 import type { McpTier } from "@/lib/mcpAccess";
+import type { KnowledgeMetadata } from "@/lib/knowledge/sources";
 
 export type PreparedKnowledgeChunk = {
   source: string;
@@ -8,6 +9,7 @@ export type PreparedKnowledgeChunk = {
   content: string;
   tier: McpTier;
   contentHash: string;
+  metadata?: KnowledgeMetadata;
 };
 
 export type ExistingChunkIdentity = {

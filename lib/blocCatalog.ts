@@ -1,5 +1,10 @@
 // Public navigation metadata only. Never import the private corpus here.
-export type SectionLesson = { durationSeconds: number; deliverables: string[] };
+export type SectionLesson = {
+  durationSeconds: number;
+  deliverables: string[];
+  transcript?: string;
+  chapters?: { index: number; title: string; startSeconds: number }[];
+};
 export type LessonRecord = { sectionId: string; muxAssetId: string | null; playbackId: string | null; durationSeconds: number | null; deliverables: string[] };
 export type BlocSection = { id: string; title: string; content: string; skillFiles?: { slug: string; title: string; description: string }[]; lesson?: SectionLesson };
 export type DeliveredBloc = { id: string; titre: string; displayNumber: number; sections: BlocSection[] };

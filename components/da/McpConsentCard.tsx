@@ -13,7 +13,7 @@ const TIER_LABEL: Record<McpTier, string> = {
 type FormAction = (formData: FormData) => void | Promise<void>;
 
 /**
- * Carte d'autorisation d'un assistant (Claude, ChatGPT ou autre) : rendu seul, sans accès aux données.
+ * Carte d'autorisation d'un assistant : rendu seul, sans accès aux données.
  * À placer dans <DaRoot>, avec app/da-mcp.css chargé par la page.
  */
 export function McpConsentCard({
@@ -59,7 +59,15 @@ export function McpConsentCard({
           </p>
         </div>
 
-        {!presentation.verified ? (
+        {presentation.trust === "local" ? (
+          <p className="mx-alert" role="note">
+            <b>Application sur ton ordinateur.</b> Le nom et l&apos;adresse de retour correspondent au flux local documenté de {presentation.displayName}. Ce repère est moins fort qu&apos;un domaine vérifié. Continue seulement si tu as lancé la connexion depuis {presentation.displayName}.
+          </p>
+        ) : presentation.trust === "documented" ? (
+          <p className="mx-alert" role="note">
+            <b>Adresse documentée.</b> Le nom et l&apos;adresse de retour correspondent à {presentation.displayName}, sans le niveau de vérification réservé à Claude et ChatGPT.
+          </p>
+        ) : presentation.trust === "unrecognized" ? (
           <p className="mx-alert" role="note">
             <b>Application non confirmée.</b> L’identité de cette application n’a pas pu être confirmée. Contrôle l’adresse de retour avant de continuer.
           </p>

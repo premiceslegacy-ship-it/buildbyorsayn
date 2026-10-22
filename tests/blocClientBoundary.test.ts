@@ -9,6 +9,8 @@ import { BLOCS_DATA as corpus } from "../lib/mockData";
 import { BLOCS_DATA as catalog } from "../lib/blocCatalog";
 import * as access from "../lib/blocAccess";
 import * as tiers from "../lib/mcpAccess";
+import * as adminLessons from "../lib/mux/adminLessons";
+import { z } from "zod";
 
 test("client entry points never import the private bloc corpus", () => {
   for (const path of ["app/blocs/[id]/page.tsx", "app/blocs/[id]/BlocClient.tsx", "app/dashboard/page.tsx", "app/nouveautes/page.tsx", "components/lessons/LessonPlayer.tsx", "components/nouveautes/NouveautesGrid.tsx", "hooks/useProgress.ts", "lib/blocCatalog.ts"]) {
@@ -50,15 +52,29 @@ function loadServer(path: string, tier: string | null, authenticated = true, pro
     auth: { async getUser() { calls.push("auth"); return { data: { user: authenticated ? { id: "verified-user", email: "viewer@example.com" } : null }, error: null }; } },
     from(name: string) { assert.ok(name === "profiles" || name === "lesson_progress", name); return table(name); },
   };
+  const adminQuery = {
+    select() { return adminQuery; },
+    in() { return adminQuery; },
+    eq() { return adminQuery; },
+    not() { return adminQuery; },
+    async maybeSingle() { return { data: null, error: null }; },
+    then(resolve: (value: { data: never[]; error: null }) => unknown) {
+      return Promise.resolve({ data: [], error: null }).then(resolve);
+    },
+  };
+  const adminSupabase = { from(name: string) { assert.equal(name, "video_lessons"); return adminQuery; } };
   const output = ts.transpileModule(readFileSync(path, "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
   const exports: Record<string, (...args: any[]) => Promise<any>> = {};
   runInNewContext(output, { exports, console: { error() {} }, process: { env: { ...serverEnv } }, require(name: string) {
+    if (name in extraMocks) return extraMocks[name];
     if (name === "server-only") return {};
     if (name === "@/lib/supabase/server") return { createClient: async () => supabase };
     if (name === "@/lib/mcpAccess") return tiers;
     if (name === "@/lib/blocAccess") return access;
+    if (name === "@/lib/supabase/admin") return { createAdminSupabase: () => adminSupabase };
+    if (name === "@/lib/mux/adminLessons") return adminLessons;
+    if (name === "zod") return { z };
     if (name === "@/lib/mockData") { calls.push("corpus"); return { BLOCS_DATA: corpus }; }
-    if (name in extraMocks) return extraMocks[name];
     throw new Error(`Unexpected import: ${name}`);
   } });
   return { exports, calls };
@@ -129,6 +145,37 @@ test("lesson playback signs tokens only for the tiers entitled to that section",
       }
     }
   }
+});
+
+test("lesson playback uses only a published ready database video with the server-derived tier", async () => {
+  const row = { playback_id: "published-playback", duration_seconds: 720, tier_required: "full" };
+  const query = {
+    select() { return query; },
+    eq() { return query; },
+    not() { return query; },
+    async maybeSingle() { return { data: row, error: null }; },
+  };
+  const signed: string[] = [];
+  class FakeMux {
+    jwt = { async signPlaybackId(playbackId: string) {
+      signed.push(playbackId);
+      return { "playback-token": "v", "thumbnail-token": "t", "storyboard-token": "s" };
+    } };
+  }
+  const loader = loadServer("app/actions/lessonPlayback.ts", "full", true, false, {
+    "@mux/ts": { __esModule: true, default: FakeMux },
+    "@/lib/blocLessons.json": { lessons: [] },
+    "@/lib/supabase/admin": { createAdminSupabase: () => ({ from: () => query }) },
+  });
+  const result = await loader.exports.getLessonPlayback("b2-s1");
+  assert.equal(result.ok, true);
+  assert.equal(result.playbackId, "published-playback");
+  assert.deepEqual(signed, ["published-playback"]);
+
+  row.tier_required = "beginner";
+  signed.length = 0;
+  assert.deepEqual(plain(await loader.exports.getLessonPlayback("b2-s1")), { ok: false });
+  assert.deepEqual(signed, []);
 });
 
 test("lesson playback fails closed without a session, with a profile error, or on bad input", async () => {

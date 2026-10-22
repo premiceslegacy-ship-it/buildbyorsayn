@@ -9,6 +9,8 @@ import { BLOCS_DATA } from "@/lib/mockData";
 import { AdminAutoRefresh } from "@/components/AdminAutoRefresh";
 import { AdminMailComposer } from "@/components/AdminMailComposer";
 import { AdminUsersTable } from "@/components/AdminUsersTable";
+import { AdminVideoManager } from "./AdminVideoManager";
+import type { AdminVideoLessonRow } from "@/lib/mux/adminServer";
 
 const TOTAL_BLOCS = BLOCS_DATA.length;
 
@@ -21,6 +23,7 @@ type Profile = {
 type EnrichedUser = Profile & {
   email: string;
   lastSignIn: string | null;
+  createdAt: string;
   currentPath: string | null;
   lastActivity: string | null;
   lastEvent: string | null;
@@ -67,6 +70,7 @@ export default async function AdminPage() {
     { data: authData },
     { data: presenceData, error: presenceError },
     { data: eventData, error: eventError },
+    { data: videoData, error: videoError },
   ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id, tier, completed_blocks").order("id"),
     supabaseAdmin.auth.admin.listUsers({ perPage: 1000 }),
@@ -80,6 +84,11 @@ export default async function AdminPage() {
       .select("user_id, event_type, path, created_at")
       .order("created_at", { ascending: false })
       .limit(1000),
+    supabaseAdmin
+      .from("video_lessons")
+      .select("id,section_id,title,summary,transcript,deliverables,chapters,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,approved_at,created_at")
+      .order("created_at", { ascending: false })
+      .limit(100),
   ]);
 
   const emailMap = new Map<string, string>(
@@ -87,6 +96,9 @@ export default async function AdminPage() {
   );
   const lastSignInMap = new Map<string, string | null>(
     (authData?.users ?? []).map((u) => [u.id, u.last_sign_in_at ?? null])
+  );
+  const createdAtMap = new Map<string, string>(
+    (authData?.users ?? []).map((u) => [u.id, u.created_at])
   );
   const presenceMap = new Map<string, Presence>(
     ((presenceData as Presence[] | null) ?? []).map((p) => [p.user_id, p])
@@ -127,6 +139,7 @@ export default async function AdminPage() {
     ...p,
     email: emailMap.get(p.id) ?? p.id,
     lastSignIn: lastSignInMap.get(p.id) ?? null,
+    createdAt: createdAtMap.get(p.id) ?? new Date(0).toISOString(),
     currentPath: presenceMap.get(p.id)?.current_path ?? null,
     lastActivity: presenceMap.get(p.id)?.last_seen_at ?? null,
     lastEvent: presenceMap.get(p.id)?.last_event ?? null,
@@ -245,12 +258,25 @@ export default async function AdminPage() {
           </div>
         )}
 
+        <AdminVideoManager
+          sections={BLOCS_DATA.flatMap((bloc) => bloc.sections.map((section) => ({
+            id: section.id,
+            title: section.title,
+            blocTitle: bloc.titre,
+          })))}
+          initialVideos={(videoData ?? []) as AdminVideoLessonRow[]}
+          setupMissing={Boolean(videoError)}
+        />
+
         <div className="mb-10">
           <AdminMailComposer
             users={users.map((u) => ({
               id: u.id,
               email: u.email,
               tier: u.tier,
+              inactiveForEmail: (u.tier === null || u.tier === "free")
+                && now - new Date(u.createdAt).getTime() >= 14 * 24 * 60 * 60 * 1000
+                && (!u.lastSignIn || now - new Date(u.lastSignIn).getTime() >= 90 * 24 * 60 * 60 * 1000),
             }))}
           />
         </div>

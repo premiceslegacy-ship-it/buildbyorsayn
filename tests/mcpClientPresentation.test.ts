@@ -10,6 +10,7 @@ test("recognizes Claude only from its exact OAuth callback", () => {
       displayName: "Claude",
       destinationLabel: "claude.ai",
       logoSrc: "/da/logos/claude.svg",
+      trust: "verified",
       verified: true,
     },
   );
@@ -20,6 +21,7 @@ test("recognizes ChatGPT from its documented stable and per-connection callbacks
     displayName: "ChatGPT",
     destinationLabel: "chatgpt.com",
     logoSrc: "/da/logos/openai.svg",
+    trust: "verified",
     verified: true,
   };
   assert.deepEqual(
@@ -43,9 +45,73 @@ test("does not trust a claimed assistant name on another callback", () => {
   ] as const) {
     assert.deepEqual(
       resolveMcpClientPresentation(name, uri),
-      { displayName: name, destinationLabel: host, logoSrc: null, verified: false },
+      { displayName: name, destinationLabel: host, logoSrc: null, trust: "unrecognized", verified: false },
       uri,
     );
+  }
+});
+
+test("recognizes Hermes Agent only with its declared name and documented loopback callback", () => {
+  assert.deepEqual(
+    resolveMcpClientPresentation("Hermes Agent", "http://127.0.0.1:49231/callback"),
+    {
+      displayName: "Hermes Agent",
+      destinationLabel: "ton ordinateur",
+      logoSrc: "/da/logos/hermes.svg",
+      trust: "local",
+      verified: false,
+    },
+  );
+  assert.equal(
+    resolveMcpClientPresentation("Claude", "http://127.0.0.1:49231/callback").trust,
+    "unrecognized",
+  );
+});
+
+test("recognizes Oh My Pi only with its DCR name and documented loopback callback", () => {
+  assert.deepEqual(
+    resolveMcpClientPresentation("oh-my-pi", "http://localhost:3000/callback"),
+    {
+      displayName: "Oh My Pi",
+      destinationLabel: "ton ordinateur",
+      logoSrc: "/da/logos/omp.svg",
+      trust: "local",
+      verified: false,
+    },
+  );
+  assert.equal(
+    resolveMcpClientPresentation("Oh My Pi", "https://example.com/callback").trust,
+    "unrecognized",
+  );
+});
+
+test("recognizes Cursor callbacks without granting the verified status", () => {
+  for (const [uri, trust] of [
+    ["cursor://anysphere.cursor-mcp/oauth/callback", "local"],
+    ["http://localhost:8787/callback", "local"],
+    ["https://www.cursor.com/agents/mcp/oauth/callback", "documented"],
+  ] as const) {
+    const presentation = resolveMcpClientPresentation("Cursor", uri);
+    assert.equal(presentation.displayName, "Cursor");
+    assert.equal(presentation.logoSrc, "/da/logos/cursor.svg");
+    assert.equal(presentation.trust, trust);
+    assert.equal(presentation.verified, false);
+  }
+});
+
+test("does not recognize spoofed local names, modified Cursor schemes or credentialed callbacks", () => {
+  for (const [name, uri] of [
+    ["Hermes Agent", "http://127.0.0.1:49231/not-callback"],
+    ["Hermes", "http://127.0.0.1:49231/callback"],
+    ["oh-my-pi", "http://example.com:3000/callback"],
+    ["Cursor", "cursor://anysphere.cursor-mcp/oauth/callback/extra"],
+    ["Cursor", "cursor://anysphere.cursor-retrieval/oauth/callback"],
+    ["Cursor", "http://user@localhost:8787/callback"],
+  ] as const) {
+    const presentation = resolveMcpClientPresentation(name, uri);
+    assert.equal(presentation.trust, "unrecognized", `${name}: ${uri}`);
+    assert.equal(presentation.logoSrc, null, `${name}: ${uri}`);
+    assert.equal(presentation.verified, false, `${name}: ${uri}`);
   }
 });
 
@@ -56,6 +122,7 @@ test("fails closed when the callback cannot be parsed", () => {
       displayName: "Assistant",
       destinationLabel: "Adresse non reconnue",
       logoSrc: null,
+      trust: "unrecognized",
       verified: false,
     },
   );

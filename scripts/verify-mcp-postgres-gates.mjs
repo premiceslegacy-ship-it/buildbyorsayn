@@ -204,16 +204,16 @@ assert.equal(sql("select count(*) from public.mcp_refresh_tokens where family_ex
 const zeroVector = `[${Array(768).fill(0).join(",")}]`;
 const fpA = "a".repeat(64);
 const fpB = "b".repeat(64);
-function row(source, sourceId, index, hash = "c".repeat(64), tier = "preview") {
-  return { source, source_id: sourceId, chunk_index: index, title: `${source}-${sourceId}`, content: "synthetic content", content_hash: hash, tier_required: tier, embedding: zeroVector, metadata: { embeddingFingerprint: fpA } };
+function row(source, sourceId, index, hash = "c".repeat(64), tier = "preview", metadata = {}) {
+  return { source, source_id: sourceId, chunk_index: index, title: `${source}-${sourceId}`, content: "synthetic content", content_hash: hash, tier_required: tier, embedding: zeroVector, metadata: { embeddingFingerprint: fpA, ...metadata } };
 }
 function literal(value) {
   return `'${JSON.stringify(value).replaceAll("'", "''")}'::jsonb`;
 }
-const initialRows = [row("obsidian", "note-a", 0), row("blocs", "block-a", 0)];
-assert.equal(sql(`select upserted_count || ':' || deleted_count from public.apply_mcp_knowledge_snapshot(${literal(initialRows)},${literal(initialRows.map(({source,source_id,chunk_index}) => ({source,source_id,chunk_index})))},array['obsidian','blocs'],true)`), "2:0");
+const initialRows = [row("obsidian", "note-a", 0), row("protocole", "protocol-a", 0)];
+assert.equal(sql(`select upserted_count || ':' || deleted_count from public.apply_mcp_knowledge_snapshot(${literal(initialRows)},${literal(initialRows.map(({source,source_id,chunk_index}) => ({source,source_id,chunk_index})))},array['obsidian','protocole'],true)`), "2:0");
 assert.equal(sql(`select upserted_count || ':' || deleted_count from public.apply_mcp_knowledge_snapshot(${literal([row("obsidian","note-a",0,"d".repeat(64))])},${literal([{source:"obsidian",source_id:"note-a",chunk_index:0}])},array['obsidian'],false)`), "1:0");
-assert.equal(sql("select count(*) from public.knowledge_chunks where source='blocs'"), "1");
+assert.equal(sql("select count(*) from public.knowledge_chunks where source='blocs'"), "0");
 sql(`do $$ begin begin perform * from public.apply_mcp_knowledge_snapshot('[{"source":"obsidian"}]'::jsonb,'[]'::jsonb,array['obsidian'],true); exception when others then null; end; end $$;`);
 assert.equal(sql("select count(*) from public.knowledge_chunks"), "2");
 for (const payload of ["null,'[]'::jsonb", "'[]'::jsonb,null"]) {
@@ -227,8 +227,26 @@ for (const payload of ["null,'[]'::jsonb", "'[]'::jsonb,null"]) {
 }
 assert.equal(sql(`select upserted_count || ':' || deleted_count from public.apply_mcp_knowledge_snapshot('[]'::jsonb,'[]'::jsonb,array['obsidian'],true)`), "0:1");
 assert.equal(sql("select count(*) from public.knowledge_chunks where source='obsidian'"), "0");
-assert.equal(sql(`select upserted_count from public.apply_mcp_knowledge_snapshot(${literal([row("blocs","full-only",0,"e".repeat(64),"full")])},${literal([{source:"blocs",source_id:"full-only",chunk_index:0}])},array['blocs'],false)`), "1");
+const fullVideoRows = [
+  row("blocs", "full-only", 0, "e".repeat(64), "full"),
+  row("blocs", "video:b2-s1:chapter:1", 0, "f".repeat(64), "full", {
+    kind: "transcript",
+    videoId: "77777777-7777-4777-8777-777777777777",
+    bloc: 2,
+    sectionId: "b2-s1",
+    chapterIndex: 1,
+    startSeconds: 0,
+    endSeconds: 120,
+    durationSeconds: 600,
+  }),
+];
+assert.equal(sql(`select upserted_count from public.apply_mcp_knowledge_snapshot(${literal(fullVideoRows)},${literal(fullVideoRows.map(({source,source_id,chunk_index}) => ({source,source_id,chunk_index})))},array['blocs'],false)`), "2");
 assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,null,'${fpA}')`), "1");
+assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,'blocs','${fpA}')`), "0");
+sql(`update public.profiles set tier='beginner' where id='${userId}'`);
+assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,'blocs','${fpA}')`), "0");
+sql(`update public.profiles set tier='preview' where id='${userId}'`);
+assert.equal(sql("select metadata->>'sectionId' || ':' || metadata->>'startSeconds' || ':' || tier_required from public.knowledge_chunks where source_id='video:b2-s1:chapter:1'"), "b2-s1:0:full");
 const unknownAccessHash = sha256("unknown-knowledge-access-token");
 const expiredAccessHash = sha256("expired-knowledge-access-token");
 const revokedAccessHash = sha256("revoked-knowledge-access-token");
@@ -249,7 +267,8 @@ assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVe
 sql(`delete from public.profiles where id='${userId}'`);
 assertSqlFails(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,null,'${fpA}')`, "missing profile row must fail");
 sql(`insert into public.profiles(id,tier) values ('${userId}','full')`);
-assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,null,'${fpA}')`), "2");
+assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,null,'${fpA}')`), "3");
+assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,'blocs','${fpA}')`), "2");
 let mismatchFailed = false;
 try {
   sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',8,null,'${fpB}')`);

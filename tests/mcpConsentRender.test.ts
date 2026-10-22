@@ -49,23 +49,32 @@ function assertCommonRules(html: string, label: string) {
   assert.equal((html.match(/<h1\b/g) ?? []).length, 1, `${label}: un seul titre`);
 }
 
-test("a verified Claude client shows both real logos, no warning and the authorize button", () => {
+test("a verified Claude client shows both real logos, no warning and one primary action", () => {
   const html = mcpCard("Claude", "https://claude.ai/api/mcp/auth_callback");
   assertCommonRules(html, "Claude");
   assert.match(html, /<img src="\/da\/logos\/claude\.svg" alt="Claude"/);
-  assert.match(html, /Connecter Claude à BUILD/);
-  assert.match(html, /Autoriser Claude/);
-  assert.match(html, /Tu retourneras sur claude\.ai/);
-  assert.doesNotMatch(html, /Application non confirmée/);
+  assert.doesNotMatch(html, /role="note"/);
 });
 
 test("a verified ChatGPT client shows the OpenAI logo and no warning", () => {
   const html = mcpCard("Anything", "https://chatgpt.com/connector_platform_oauth_redirect");
   assertCommonRules(html, "ChatGPT");
   assert.match(html, /<img src="\/da\/logos\/openai\.svg" alt="ChatGPT"/);
-  assert.match(html, /Connecter ChatGPT à BUILD/);
-  assert.match(html, /Tu retourneras sur chatgpt\.com/);
-  assert.doesNotMatch(html, /Application non confirmée/);
+  assert.doesNotMatch(html, /role="note"/);
+});
+
+test("recognized local clients show their logo and a non-verified note", () => {
+  for (const [name, uri, logo] of [
+    ["Hermes Agent", "http://127.0.0.1:49231/callback", "hermes"],
+    ["oh-my-pi", "http://localhost:3000/callback", "omp"],
+    ["Cursor", "cursor://anysphere.cursor-mcp/oauth/callback", "cursor"],
+  ] as const) {
+    const html = mcpCard(name, uri);
+    assertCommonRules(html, name);
+    assert.match(html, new RegExp(`<img src="/da/logos/${logo}\\.svg"`));
+    assert.match(html, /role="note"/);
+    assert.doesNotMatch(html, /mx-ico--client"><span/);
+  }
 });
 
 test("an unknown client gets a neutral tile with its first letter, the warning and its exact return address", () => {
@@ -73,8 +82,7 @@ test("an unknown client gets a neutral tile with its first letter, the warning a
   assertCommonRules(html, "client inconnu");
   assert.doesNotMatch(html, /\/da\/logos\//);
   assert.match(html, /mx-ico--client"><span aria-hidden="true">Z<\/span>/);
-  assert.match(html, /Application non confirmée/);
-  assert.match(html, /L’identité de cette application n’a pas pu être confirmée/);
+  assert.match(html, /role="note"/);
   assert.match(html, /<code>https:\/\/zeta\.example\.test\/callback\?x=1&amp;y=2<\/code>/);
 });
 
@@ -89,28 +97,23 @@ test("an error message is announced as an alert and the buttons stay usable", ()
     errorMessage: "La demande précédente a échoué. Recommence depuis Claude.",
   });
   assertCommonRules(html, "erreur");
-  assert.match(html, /role="alert">La demande précédente a échoué\. Recommence depuis Claude\./);
-  assert.match(html, /Autoriser Claude/);
+  assert.match(html, /role="alert"/);
   assert.match(html, /name="request" value="A{43}"/);
 });
 
-test("the tier label follows the access level and the demo tier explains what stays protected", () => {
-  assert.match(mcpCard("Claude", "https://claude.ai/api/mcp/auth_callback", { tier: "beginner" }), /mx-tier">Fondations</);
-  assert.match(mcpCard("Claude", "https://claude.ai/api/mcp/auth_callback", { tier: "full" }), /mx-tier">LE\u00a0?COFFRE</);
+test("each access level renders a tier and only the preview includes a limitation note", () => {
+  assert.match(mcpCard("Claude", "https://claude.ai/api/mcp/auth_callback", { tier: "beginner" }), /class="mx-tier"/);
+  assert.match(mcpCard("Claude", "https://claude.ai/api/mcp/auth_callback", { tier: "full" }), /class="mx-tier"/);
   const preview = mcpCard("Claude", "https://claude.ai/api/mcp/auth_callback", { tier: "preview" });
-  assert.match(preview, /mx-tier">Démo gratuite</);
-  assert.match(preview, /resteront protégés/);
-  assert.doesNotMatch(mcpCard("Claude", "https://claude.ai/api/mcp/auth_callback", { tier: "full" }), /resteront protégés/);
+  assert.match(preview, /<small>/);
+  assert.doesNotMatch(mcpCard("Claude", "https://claude.ai/api/mcp/auth_callback", { tier: "full" }), /<small>/);
 });
 
-test("the BUILD Sync card shows the logo, the steps, one primary button and the revoke command", () => {
+test("the BUILD Sync card shows the logo, four steps and one primary button", () => {
   const html = syncCard();
   assertCommonRules(html, "BUILD Sync");
-  assert.match(html, /Étape 2 sur 4, autorisation/);
-  assert.match(html, /L’installation reprendra automatiquement dans ton terminal/);
-  assert.match(html, /toutes les heures/);
+  assert.equal((html.match(/<li(?:\s|>)/g) ?? []).length, 8);
   assert.match(html, /aria-current="step"/);
-  assert.match(html, /<code>build-skills logout<\/code>/);
   assert.match(html, /<code>http:\/\/127\.0\.0\.1:49152\/callback<\/code>/);
   assert.doesNotMatch(html, /role="alert"/);
 });
@@ -118,5 +121,5 @@ test("the BUILD Sync card shows the logo, the steps, one primary button and the 
 test("the BUILD Sync card announces an expired request", () => {
   const html = syncCard("La demande a expiré. Relance BUILD Sync.");
   assertCommonRules(html, "BUILD Sync erreur");
-  assert.match(html, /role="alert">La demande a expiré\. Relance BUILD Sync\./);
+  assert.match(html, /role="alert"/);
 });

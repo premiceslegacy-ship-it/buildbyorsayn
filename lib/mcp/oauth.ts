@@ -37,6 +37,14 @@ export function verifyCodeChallenge(
 }
 
 const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+const URI_CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/;
+
+/**
+ * URI de retour MCP historique de Cursor. Les versions récentes peuvent aussi
+ * enregistrer leurs adresses HTTP(S) documentées, mais aucun autre schéma
+ * personnalisé n'est accepté.
+ */
+export const CURSOR_MCP_CALLBACK = "cursor://anysphere.cursor-mcp/oauth/callback";
 
 /**
  * Redirect URIs must match one of the client's registered URIs by exact
@@ -70,6 +78,9 @@ export function isRedirectUriAllowed(
 }
 
 export function isRedirectUriRegistrable(candidate: string): boolean {
+  if (URI_CONTROL_CHARACTERS.test(candidate)) return false;
+  if (candidate === CURSOR_MCP_CALLBACK) return true;
+
   let url: URL;
   try {
     url = new URL(candidate);

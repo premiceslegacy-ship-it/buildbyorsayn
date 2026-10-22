@@ -1,5 +1,14 @@
 import type { McpTier } from "@/lib/mcpAccess";
 import type { SkillAccess } from "@/lib/skillsCatalog";
+import { z } from "zod";
+import {
+  formatTimecode,
+  parseTranscriptSegments,
+  tierForSection,
+  videoChapterSchema,
+} from "@/lib/mux/adminLessons";
+
+export type KnowledgeMetadata = Record<string, string | number | boolean | null>;
 
 export type KnowledgeDocument = {
   source: string;
@@ -7,6 +16,17 @@ export type KnowledgeDocument = {
   title: string;
   content: string;
   tier: McpTier;
+  metadata?: KnowledgeMetadata;
+};
+
+export type PublishedVideoTranscriptRow = {
+  id: string;
+  section_id: string;
+  title: string;
+  transcript: string;
+  chapters: unknown;
+  duration_seconds: number;
+  tier_required: string;
 };
 
 function skillAccessToTier(access: SkillAccess): McpTier {
@@ -114,6 +134,60 @@ export async function collectSkillsContentDocuments(): Promise<KnowledgeDocument
       title: skill.title,
       content: stored.body,
       tier: skillAccessToTier(skill.access),
+    });
+  }
+
+  return documents;
+}
+
+/**
+ * Une vidéo publiée produit un document par chapitre. La source reste `blocs`
+ * pour être immédiatement compatible avec le contrat MCP existant ; sourceId et
+ * métadonnées la distinguent du texte pédagogique de la même section.
+ */
+export function collectVideoTranscriptDocuments(rows: PublishedVideoTranscriptRow[]): KnowledgeDocument[] {
+  const documents: KnowledgeDocument[] = [];
+
+  for (const row of rows) {
+    const expectedTier = tierForSection(row.section_id);
+    if (row.tier_required !== expectedTier) {
+      throw new Error(`Video tier mismatch for ${row.section_id}`);
+    }
+    if (!Number.isSafeInteger(row.duration_seconds) || row.duration_seconds <= 0) {
+      throw new Error(`Video duration missing for ${row.section_id}`);
+    }
+    const parsedChapters = z.array(videoChapterSchema).min(1).safeParse(row.chapters);
+    if (!parsedChapters.success) throw new Error(`Video chapters invalid for ${row.section_id}`);
+    const segments = parseTranscriptSegments(row.transcript);
+    if (segments.length === 0) throw new Error(`Video transcript empty for ${row.section_id}`);
+
+    parsedChapters.data.forEach((chapter, chapterOffset) => {
+      const endSeconds = parsedChapters.data[chapterOffset + 1]?.startSeconds ?? row.duration_seconds;
+      const chapterSegments = segments.filter((segment) => (
+        segment.startSeconds >= chapter.startSeconds && segment.startSeconds < endSeconds
+      ));
+      if (chapterSegments.length === 0) return;
+
+      documents.push({
+        source: "blocs",
+        sourceId: `video:${row.section_id}:chapter:${chapter.index}`,
+        title: `${row.title} - ${chapter.title}`,
+        content: chapterSegments
+          .map((segment) => `[${formatTimecode(segment.startSeconds)}] ${segment.text}`)
+          .join("\n\n"),
+        tier: expectedTier,
+        metadata: {
+          videoId: row.id,
+          sectionId: row.section_id,
+          bloc: Number(row.section_id.slice(1).split("-")[0]),
+          chapterIndex: chapter.index,
+          chapterTitle: chapter.title,
+          startSeconds: chapter.startSeconds,
+          endSeconds,
+          durationSeconds: row.duration_seconds,
+          kind: "transcript",
+        },
+      });
     });
   }
 

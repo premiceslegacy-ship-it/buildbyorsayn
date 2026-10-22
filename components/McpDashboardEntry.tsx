@@ -12,6 +12,14 @@ const MCP_CONNECTOR_VISIBLE =
   process.env.NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE === "true" ||
   process.env.NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED === "true";
 
+const MCP_CLIENT_LOGOS = [
+  { name: "Claude", src: "/brand-logos/claude.svg" },
+  { name: "ChatGPT", src: "/brand-logos/chatgpt.svg" },
+  { name: "Hermes Agent", src: "/brand-logos/hermes-agent-mark.png" },
+  { name: "Oh My Pi", src: "/brand-logos/omp.svg" },
+  { name: "Cursor", src: "/brand-logos/cursor.svg" },
+] as const;
+
 const COPY = {
   locked: {
     title: "BUILD dans ton assistant",
@@ -88,9 +96,17 @@ export function McpDashboardEntry({
     <section aria-label="Connexion BUILD à ton assistant" className="mb-12 border-y border-white/[0.08] py-5">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-5">
-          <div className="flex flex-none items-center gap-3" aria-label="Claude ou ChatGPT">
-            <Image src="/brand-logos/claude.svg" alt="Claude" width={24} height={24} className="h-6 w-6 opacity-80" />
-            <Image src="/brand-logos/chatgpt.svg" alt="ChatGPT" width={24} height={24} className="h-6 w-6 opacity-80" />
+          <div className="flex flex-none items-center gap-2" aria-label="Claude, ChatGPT, Hermes Agent, Oh My Pi et Cursor">
+            {MCP_CLIENT_LOGOS.map((client) => (
+              <Image
+                key={client.name}
+                src={client.src}
+                alt={client.name}
+                width={24}
+                height={24}
+                className="h-6 w-6 object-contain opacity-80"
+              />
+            ))}
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">

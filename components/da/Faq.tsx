@@ -2,7 +2,7 @@ import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_LABEL, FONDATIONS_PRICE, UPGRADE
 import { getOfferFacts } from "@/lib/pricingView";
 import { DaIcon } from "./DaIcon";
 
-/** Les six questions de l'accueil. Prix et chiffres viennent du code. */
+/** Les questions de l'accueil. Prix et chiffres viennent du code. */
 function faqItems() {
   const facts = getOfferFacts();
   return [
@@ -25,6 +25,10 @@ function faqItems() {
     {
       q: "Comment j'accède à BUILD après avoir payé ?",
       a: "Tu paies sur Stripe, puis ton accès apparaît en quelques instants. Sinon, écris-nous.",
+    },
+    {
+      q: "Je peux utiliser BUILD dans mon assistant ?",
+      a: "Oui, avec Claude, ChatGPT, Hermes Agent, Oh My Pi et Cursor. Le connecteur MCP limite l'assistant aux contenus inclus dans ton accès BUILD.",
     },
     {
       q: "BUILD garantit des clients ou des revenus ?",

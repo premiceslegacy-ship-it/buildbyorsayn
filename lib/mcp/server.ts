@@ -2,6 +2,14 @@ import { buildAssistantInstructions } from "@/lib/mcp/assistantInstructions";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { canAccess, type McpTier } from "@/lib/mcpAccess";
+import {
+  COFFRE_LABEL,
+  COFFRE_PRICE,
+  FONDATIONS_LABEL,
+  FONDATIONS_PRICE,
+  UPGRADE_PRICE,
+  formatEuro,
+} from "@/lib/pricing";
 import { getSkillBySlug, SKILLS_CATALOG } from "@/lib/skillsCatalog";
 import { getStoredSkillContent } from "@/lib/skills/storage";
 import { createMcpSupabaseAdmin } from "@/lib/mcp/supabaseAdmin";
@@ -147,7 +155,7 @@ export function createBuildMcpServer(
     {
       title: "Rechercher dans le savoir-faire BUILD",
       description:
-        "Recherche dans les contenus BUILD accessibles au palier de la personne et dans la matière dont ils sont tirés : blocs, protocole, accompagnement, catalogue des skills, texte des skills publiés en markdown, notes de travail et doctrine. Donne une question située, un objectif et, si possible, le secteur ou le projet. La réponse doit servir à comparer, décider ou exécuter, pas seulement à retrouver un mot-clé.",
+        "Cherche un passage de savoir-faire BUILD quand la personne demande une explication, un choix, une méthode ou un plan. Donne une question autonome avec le contexte utile, pas une liste de mots. Utilise source seulement si tu sais où se trouve la réponse : blocs pour le programme, protocole pour les trois phases, accompagnement pour la remise d'un site, skills-catalog pour choisir un skill, skills-content pour le texte markdown publié, doctrine pour LE COFFRE. Pour le palier, les prix et la liste des skills accessibles, appelle plutôt list_available_content.",
       inputSchema: SEARCH_KNOWLEDGE_INPUT_SHAPE,
       annotations: READ_ONLY_TOOL_ANNOTATIONS,
     },
@@ -232,7 +240,7 @@ export function createBuildMcpServer(
     {
       title: "Récupérer un skill BUILD",
       description:
-        "Récupère le texte complet d'un skill BUILD accessible, mais seulement pour les skills publiés en markdown. Les autres skills sont livrés en archive : cet outil ne les sert pas, ils s'installent avec BUILD Sync. Utilise cet outil quand la tâche demande une procédure réutilisable, des contrôles de qualité ou une méthode versionnée, puis adapte le skill au projet au lieu de le recopier aveuglément.",
+        "Lit le texte d'un skill précis après avoir vérifié avec list_available_content qu'il est accessible et pertinent. Seuls les skills publiés en markdown sont servis ici. Les archives s'installent avec BUILD Sync et ne doivent jamais être reconstruites. Utilise le slug exact renvoyé par list_available_content, puis adapte la méthode au projet au lieu de la recopier.",
       inputSchema: GET_SKILL_INPUT_SHAPE,
       annotations: READ_ONLY_TOOL_ANNOTATIONS,
     },
@@ -285,7 +293,7 @@ export function createBuildMcpServer(
     {
       title: "Lister le contenu accessible",
       description:
-        "Liste le palier de la personne, les skills accessibles et le nombre de skills verrouillés. Utilise cette vue pour choisir une capacité disponible avant de demander une action, sans tenter de contourner les permissions.",
+        "Source de vérité pour le palier actuel, les prix BUILD et les skills réellement accessibles. Appelle cet outil avant de conseiller un skill, de répondre sur une offre ou un complément, ou de lire un skill avec get_skill. Un titre public ne donne jamais accès au contenu verrouillé.",
       inputSchema: {},
       annotations: READ_ONLY_TOOL_ANNOTATIONS,
     },
@@ -297,13 +305,37 @@ export function createBuildMcpServer(
       const lines = [
         `Palier actuel : ${auth.tier}`,
         "",
+        "Offres BUILD :",
+        `- ${FONDATIONS_LABEL} : ${formatEuro(FONDATIONS_PRICE)}`,
+        `- ${COFFRE_LABEL} : ${formatEuro(COFFRE_PRICE)}`,
+        `- Complément de ${FONDATIONS_LABEL} vers ${COFFRE_LABEL} : ${formatEuro(UPGRADE_PRICE)}, réservé aux comptes ${FONDATIONS_LABEL}`,
+        "",
         "Skills accessibles :",
         ...availableSkills.map((skill, index) => `${index + 1}) ${skill.title} (${skill.slug}) : ${skill.description}`),
       ];
       if (lockedSkillsCount > 0) {
         lines.push("", `${lockedSkillsCount} skill(s) supplémentaire(s) existent à un palier supérieur.`);
       }
-      return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+      return {
+        content: [{ type: "text" as const, text: lines.join("\n") }],
+        structuredContent: {
+          kind: "available_build_content",
+          tier: auth.tier,
+          offers: {
+            foundations: { label: FONDATIONS_LABEL, price: FONDATIONS_PRICE },
+            full: { label: COFFRE_LABEL, price: COFFRE_PRICE },
+            upgrade: { price: UPGRADE_PRICE, eligibleTier: "beginner" },
+          },
+          skills: availableSkills.map(({ slug, title, description, access, fileName }) => ({
+            slug,
+            title,
+            description,
+            access,
+            delivery: fileName.endsWith(".md") ? "markdown" : "archive",
+          })),
+          lockedSkillsCount,
+        },
+      };
     }
   );
 

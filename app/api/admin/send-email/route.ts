@@ -7,10 +7,13 @@ import {
   MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS,
   sendAdminBroadcast,
 } from "@/lib/resendTransport";
+import { recordAdminAction } from "@/lib/mux/adminServer";
 
 const MAX_ADMIN_EMAIL_BODY_BYTES = 25 * 1024;
 const MAX_DYNAMIC_AUDIENCE_USERS = 500;
 const ADMIN_BROADCAST_ROUTE_TIMEOUT_MS = 15_000;
+const INACTIVE_FREE_ACCOUNT_MS = 90 * 24 * 60 * 60 * 1000;
+const NEW_ACCOUNT_GRACE_MS = 14 * 24 * 60 * 60 * 1000;
 const ADMIN_EMAIL_SCHEMA = z.object({
   campaignId: z.string().uuid(),
   audience: z.enum(["selected", "all", "free", "beginner", "full"]),
@@ -30,6 +33,8 @@ const ADMIN_EMAIL_SCHEMA = z.object({
       return false;
     }
   }, "ctaUrl must be an HTTPS URL").default(""),
+  approved: z.literal(true),
+  confirmation: z.literal("ENVOYER"),
 }).strict();
 
 type Profile = {
@@ -41,7 +46,18 @@ type Recipient = {
   id: string;
   email: string;
   tier: string | null;
+  createdAt: string;
+  lastSignInAt: string | null;
 };
+
+function isInactiveFreeRecipient(recipient: Recipient, now = Date.now()) {
+  if (recipient.tier !== null && recipient.tier !== "free") return false;
+  const createdAt = new Date(recipient.createdAt).getTime();
+  if (!Number.isFinite(createdAt) || now - createdAt < NEW_ACCOUNT_GRACE_MS) return false;
+  if (!recipient.lastSignInAt) return true;
+  const lastSignInAt = new Date(recipient.lastSignInAt).getTime();
+  return Number.isFinite(lastSignInAt) && now - lastSignInAt >= INACTIVE_FREE_ACCOUNT_MS;
+}
 
 function escapeHtml(value: string) {
   return value
@@ -165,7 +181,7 @@ export async function POST(req: NextRequest) {
   }
 
   const supabaseAdmin = createAdminSupabase({ signal: routeSignal });
-  const authUsers: Array<{ id: string; email?: string }> = [];
+  const authUsers: Array<{ id: string; email?: string; created_at: string; last_sign_in_at?: string }> = [];
 
   if (audience === "selected") {
     const selectedUsers = await Promise.all(selectedUserIds.map((id) =>
@@ -178,6 +194,8 @@ export async function POST(req: NextRequest) {
     authUsers.push(...selectedUsers.map(({ data }) => ({
       id: data.user!.id,
       email: data.user!.email,
+      created_at: data.user!.created_at,
+      last_sign_in_at: data.user!.last_sign_in_at,
     })));
   } else {
     const firstPage = await supabaseAdmin.auth.admin.listUsers({
@@ -212,7 +230,7 @@ export async function POST(req: NextRequest) {
   }
 
   const profiles: Profile[] = [];
-  const audienceNeedsProfiles = audience === "free" || audience === "beginner" || audience === "full";
+  const audienceNeedsProfiles = authUsers.length > 0;
   if (audienceNeedsProfiles && authUsers.length > 0) {
     const { data, error } = await supabaseAdmin
       .from("profiles")
@@ -237,8 +255,11 @@ export async function POST(req: NextRequest) {
       id: authUser.id,
       email: authUser.email ?? "",
       tier: profileMap.get(authUser.id)?.tier ?? null,
+      createdAt: authUser.created_at,
+      lastSignInAt: authUser.last_sign_in_at ?? null,
     }))
     .filter((recipient) => recipient.email && recipient.id !== user.id)
+    .filter((recipient) => !isInactiveFreeRecipient(recipient))
     .filter((recipient) => {
       if (audience === "all") return true;
       if (audience === "selected") return selectedUserSet.has(recipient.id);
@@ -260,6 +281,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  try {
+    await recordAdminAction({
+      actorUserId: user.id,
+      action: "email.broadcast",
+      targetType: "campaign",
+      targetId: campaignId,
+      result: "pending",
+      approved: true,
+      details: { audience, recipientCount: recipients.length },
+    });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "Le journal administrateur est indisponible. Aucun email n'a été envoyé." },
+      { status: 503 }
+    );
+  }
+
   const html = buildEmailHtml({
     preheader,
     body: messageBody,
@@ -278,6 +316,19 @@ export async function POST(req: NextRequest) {
   }, { signal: routeSignal });
 
   if (result.ok === false) {
+    try {
+      await recordAdminAction({
+        actorUserId: user.id,
+        action: "email.broadcast",
+        targetType: "campaign",
+        targetId: campaignId,
+        result: "failed",
+        approved: true,
+        details: { audience, recipientCount: recipients.length, acceptedCount: result.accepted },
+      });
+    } catch {
+      console.error("admin.email.audit_failed");
+    }
     if (result.reason === "too_large") {
       return NextResponse.json(
         {
@@ -294,6 +345,20 @@ export async function POST(req: NextRequest) {
       { ok: false, accepted: result.accepted, total: result.total, error },
       { status: 502 }
     );
+  }
+
+  try {
+    await recordAdminAction({
+      actorUserId: user.id,
+      action: "email.broadcast",
+      targetType: "campaign",
+      targetId: campaignId,
+      result: "completed",
+      approved: true,
+      details: { audience, recipientCount: recipients.length, acceptedCount: result.accepted },
+    });
+  } catch {
+    console.error("admin.email.audit_failed");
   }
 
   return NextResponse.json({ ok: true, accepted: result.accepted, total: result.total });

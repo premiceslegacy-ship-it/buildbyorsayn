@@ -5,6 +5,7 @@ import {
   dcrMetadataSchema,
   parseTokenRequest,
 } from "../lib/mcp/oauthSchemas";
+import { CURSOR_MCP_CALLBACK } from "../lib/mcp/oauth";
 
 const CHALLENGE = "A".repeat(43);
 
@@ -23,6 +24,23 @@ test("DCR accepts public-client metadata and ignores unsupported display metadat
   }).success, true);
   assert.equal(dcrMetadataSchema.safeParse({ ...valid, token_endpoint_auth_method: "client_secret_post" }).success, false);
   assert.equal(dcrMetadataSchema.safeParse({ ...valid, redirect_uris: [valid.redirect_uris[0], valid.redirect_uris[0]] }).success, false);
+});
+
+test("DCR accepts only Cursor's exact allowlisted custom callback", () => {
+  const metadata = {
+    client_name: "Cursor",
+    redirect_uris: [CURSOR_MCP_CALLBACK],
+    token_endpoint_auth_method: "none",
+  };
+  assert.equal(dcrMetadataSchema.safeParse(metadata).success, true);
+  assert.equal(dcrMetadataSchema.safeParse({
+    ...metadata,
+    redirect_uris: [`${CURSOR_MCP_CALLBACK}/extra`],
+  }).success, false);
+  assert.equal(dcrMetadataSchema.safeParse({
+    ...metadata,
+    redirect_uris: ["cursor://attacker.example/oauth/callback"],
+  }).success, false);
 });
 
 test("authorization requests require exact resource, scope and S256 challenge", () => {

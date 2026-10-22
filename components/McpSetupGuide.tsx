@@ -23,8 +23,8 @@ function Step({
   return (
     <li className="space-y-4 text-sm leading-6 text-[#f0ede8]/70">
       <div className="flex gap-3">
-        <span className="flex h-6 w-6 flex-none items-center justify-center rounded-full border border-[#e8d5b0]/45 text-xs font-bold text-[#e8d5b0]">
-          {number}
+        <span className="flex h-6 w-7 flex-none items-center justify-center rounded-full border border-[#e8d5b0]/45 text-xs font-bold text-[#e8d5b0]">
+          {number})
         </span>
         <div className="min-w-0 flex-1">{children}</div>
       </div>
@@ -103,6 +103,17 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
     null,
     2
   );
+  const cursorConfig = JSON.stringify(
+    {
+      mcpServers: {
+        build: {
+          url: mcpUrl,
+        },
+      },
+    },
+    null,
+    2
+  );
 
   return (
     <section aria-labelledby="mcp-setup-guide-title" className="mt-12 border-t border-white/[0.08] pt-10">
@@ -111,7 +122,7 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
         Configure ton assistant en quelques minutes
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-[#f0ede8]/60">
-        Ouvre le parcours qui correspond à ton assistant. Claude inclut des captures réelles. ChatGPT, Hermes et Oh My Pi suivent les réglages publiés par chaque outil.
+        Ouvre le parcours qui correspond à ton assistant. Claude inclut des captures réelles. ChatGPT, Hermes Agent, Oh My Pi et Cursor suivent les réglages publiés par chaque outil.
       </p>
 
       <div className="mt-8 border-y border-white/[0.08]">
@@ -149,7 +160,7 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
                 screenSrc="/mcp/setup/claude-oauth-options-fr.png"
                 screenAlt="Capture réelle des options OAuth françaises de Claude avec Toujours requis et l'enregistrement automatique du client entourés en or"
               >
-                Laisse <strong className="font-semibold text-[#f0ede8]">Toujours requis</strong> pour l&apos;authentification et <strong className="font-semibold text-[#f0ede8]">Aucun identifiant client - en enregistrer un automatiquement</strong> pour le client OAuth.
+                Laisse <strong className="font-semibold text-[#f0ede8]">Toujours requis</strong> pour l&apos;authentification et <strong className="font-semibold text-[#f0ede8]">Aucun identifiant client, en enregistrer un automatiquement</strong> pour le client OAuth.
               </Step>
               <Step
                 number="5"
@@ -203,8 +214,8 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
         <details name="mcp-client-guide" className="group border-t border-white/[0.08] px-0">
           <ClientSummary
             logo="/brand-logos/hermes-agent-mark.png"
-            name="Hermes"
-            description="Ajoute BUILD comme serveur distant OAuth dans ton profil Hermes."
+            name="Hermes Agent"
+            description="Ajoute BUILD comme serveur distant OAuth dans ton profil Hermes Agent."
           />
           <div className="border-t border-white/[0.08] pb-8">
             <ol className="space-y-8 pt-7">
@@ -268,6 +279,42 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
               className="mt-8 inline-flex text-xs text-[#e8d5b0] underline underline-offset-4"
             >
               Voir la procédure officielle Oh My Pi
+            </a>
+          </div>
+        </details>
+
+        <details name="mcp-client-guide" className="group border-t border-white/[0.08] px-0">
+          <ClientSummary
+            logo="/brand-logos/cursor.svg"
+            name="Cursor"
+            description="Ajoute BUILD dans le fichier MCP global ou dans celui de ton projet."
+          />
+          <div className="border-t border-white/[0.08] pb-8">
+            <ol className="space-y-8 pt-7">
+              <Step number="1">
+                Ouvre <code className="text-[#e8d5b0]">~/.cursor/mcp.json</code> pour tous tes projets, ou <code className="text-[#e8d5b0]">.cursor/mcp.json</code> à la racine du projet courant.
+              </Step>
+              <Step number="2">
+                Ajoute ce bloc, puis enregistre le fichier.
+                <ConfigBlock>{cursorConfig}</ConfigBlock>
+              </Step>
+              <Step number="3">
+                Dans Cursor, ouvre <strong className="font-semibold text-[#f0ede8]">Customize &gt; MCPs</strong>. Active BUILD, puis lance l&apos;authentification si Cursor la demande.
+              </Step>
+              <Step number="4">
+                Connecte-toi à BUILD dans le navigateur, contrôle l&apos;adresse et les permissions, puis autorise la connexion. Reviens ensuite dans Cursor.
+              </Step>
+              <Step number="5">
+                Ouvre une nouvelle conversation Agent et demande la liste de tes contenus BUILD accessibles. Si Cursor affiche un besoin d&apos;authentification, relance la connexion depuis la fiche BUILD.
+              </Step>
+            </ol>
+            <a
+              href="https://cursor.com/docs/mcp"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-8 inline-flex text-xs text-[#e8d5b0] underline underline-offset-4"
+            >
+              Voir la procédure officielle Cursor
             </a>
           </div>
         </details>

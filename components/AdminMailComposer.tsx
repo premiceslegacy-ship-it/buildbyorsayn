@@ -9,6 +9,7 @@ type MailUser = {
   id: string;
   email: string;
   tier: string | null;
+  inactiveForEmail: boolean;
 };
 
 type Audience = "selected" | "all" | "free" | "beginner" | "full";
@@ -70,6 +71,7 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
   const [ctaLabel, setCtaLabel] = useState("");
   const [ctaUrl, setCtaUrl] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [approved, setApproved] = useState(false);
   const [result, setResult] = useState<SendResult | null>(null);
   const campaignRef = useRef<{ id: string; fingerprint: string } | null>(null);
 
@@ -86,10 +88,12 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
   );
 
   const expectedRecipients = useMemo(() => {
-    if (audience === "selected") return selectedUsers.length;
-    if (audience === "free") return users.filter((user) => !user.tier || user.tier === "free").length;
-    return users.filter((user) => audience === "all" || user.tier === audience).length;
-  }, [audience, selectedUsers.length, users]);
+    const eligibleUsers = users.filter((user) => !user.inactiveForEmail);
+    if (audience === "selected") return selectedUsers.filter((user) => !user.inactiveForEmail).length;
+    if (audience === "free") return eligibleUsers.filter((user) => !user.tier || user.tier === "free").length;
+    return eligibleUsers.filter((user) => audience === "all" || user.tier === audience).length;
+  }, [audience, selectedUsers, users]);
+  const excludedInactiveCount = users.filter((user) => user.inactiveForEmail).length;
 
   const toggleUser = (id: string) => {
     setSelectedIds((current) => {
@@ -121,6 +125,10 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
   };
 
   const sendEmail = async () => {
+    if (!approved) {
+      setResult({ ok: false, error: "Confirme l'audience et le contenu avant l'envoi." });
+      return;
+    }
     setIsSending(true);
     setResult(null);
 
@@ -144,6 +152,8 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           campaignId: campaignRef.current.id,
+          approved: true,
+          confirmation: "ENVOYER",
           ...requestPayload,
         }),
       });
@@ -151,7 +161,10 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
       const payload = (await response.json().catch(() => ({}))) as SendResult;
       const succeeded = response.ok && payload.ok;
       setResult({ ok: succeeded, ...payload });
-      if (succeeded) campaignRef.current = null;
+      if (succeeded) {
+        campaignRef.current = null;
+        setApproved(false);
+      }
     } catch {
       setResult({
         ok: false,
@@ -319,6 +332,9 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
           <p className="text-[11px] text-white/30">
             Sélection individuelle : {MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS} destinataires maximum.
           </p>
+          <p className="text-[11px] text-white/30">
+            {excludedInactiveCount} compte{excludedInactiveCount > 1 ? "s" : ""} gratuit{excludedInactiveCount > 1 ? "s" : ""} inactif{excludedInactiveCount > 1 ? "s" : ""} depuis trois mois ne reçoivent jamais de mail.
+          </p>
           <div className="max-h-72 overflow-y-auto rounded-xl border border-white/8 bg-black/15">
             {users.map((user) => (
               <label
@@ -330,6 +346,8 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
                   checked={selectedIds.includes(user.id)}
                   onChange={() => toggleUser(user.id)}
                   disabled={
+                    user.inactiveForEmail
+                    ||
                     !selectedIds.includes(user.id)
                     && selectedIds.length >= MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS
                   }
@@ -347,6 +365,11 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
             </p>
           )}
 
+          <label className="flex items-start gap-3 rounded-lg border border-white/8 bg-black/15 px-3 py-3 text-xs leading-relaxed text-white/50">
+            <input type="checkbox" checked={approved} onChange={(event) => setApproved(event.target.checked)} className="mt-0.5 h-4 w-4 accent-[#e8d5b0]" />
+            J'ai relu l'audience, l'objet, le message et le lien. Je confirme cet envoi réel.
+          </label>
+
           <button
             type="button"
             onClick={sendEmail}
@@ -356,6 +379,7 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
               || expectedRecipients > MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS
               || !subject.trim()
               || !body.trim()
+              || !approved
             }
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#c9b48a] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-colors hover:bg-[#e8d5b0] disabled:cursor-not-allowed disabled:opacity-40"
           >

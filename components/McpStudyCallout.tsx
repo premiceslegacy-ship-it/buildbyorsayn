@@ -18,6 +18,9 @@ export function McpStudyCallout() {
           <p className="mt-1.5 text-sm leading-6 text-white/65">
             Pose tes questions comme d&apos;habitude. Ton assistant voit uniquement les contenus inclus dans ton accès BUILD.
           </p>
+          <p className="mt-1 text-xs leading-5 text-white/50">
+            Compatible avec Claude, ChatGPT, Hermes Agent, Oh My Pi et Cursor.
+          </p>
         </div>
         <Link
           href="/dashboard/mcp"
