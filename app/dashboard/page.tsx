@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
-import { ArrowRight, X, PhoneCall } from "lucide-react";
+import { ArrowRight, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { BLOCS_DATA } from "@/lib/blocCatalog";
@@ -22,8 +22,10 @@ import { UpgradedBanner } from "@/components/UpgradedBanner";
 import { VideoComingBanner } from "@/components/VideoComingBanner";
 import { McpDashboardEntry } from "@/components/McpDashboardEntry";
 import { EcosystemMap } from "@/components/EcosystemMap";
-import { UpgradeCarousel } from "@/components/UpgradeCarousel";
-import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE, withClientReferenceId } from "@/lib/pricing";
+import { DaRoot } from "@/components/da/DaRoot";
+import { DaIcon } from "@/components/da/DaIcon";
+import { PricingSection } from "@/components/da/PricingSection";
+import { COFFRE_LABEL, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE, resolveCheckoutLinks, type CheckoutBaseLinks } from "@/lib/pricing";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 export default function DashboardHub() {
@@ -36,11 +38,11 @@ export default function DashboardHub() {
   const [tier, setTier] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [profileReady, setProfileReady] = useState(false);
-  const [modal, setModal] = useState<null | "foundations" | "both">(null);
+  const [pricingOpen, setPricingOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [animatedProgress, setAnimatedProgress] = useState(0);
   const [sessionAdvances, setSessionAdvances] = useState(0);
-  const [checkoutUrls, setCheckoutUrls] = useState<{ beginner: string | null; upgrade: string | null; full: string }>({
+  const [checkoutUrls, setCheckoutUrls] = useState<CheckoutBaseLinks>({
     beginner: null,
     upgrade: null,
     full: STRIPE_FULL_CHECKOUT_LINK,
@@ -66,10 +68,6 @@ export default function DashboardHub() {
       setInitials(firstName.substring(0, 2).toUpperCase());
       setUserId(user.id);
 
-      // Fetch checkout URLs via server action
-      const urls = await getCheckoutUrls();
-      setCheckoutUrls(urls);
-
       // Récupérer tier depuis la table profiles
       const { data: profile } = await supabase
         .from("profiles")
@@ -79,9 +77,20 @@ export default function DashboardHub() {
       const userTier = normalizeProfileTier(profile?.tier ?? null);
       setTier(userTier);
       setProfileReady(true);
+
+      // Liens Stripe : après le niveau, pour ne jamais retarder l'accès aux cartes (le niveau pilote les cartes verrouillées)
+      setCheckoutUrls(await getCheckoutUrls());
     };
     fetchUser();
   }, [router]);
+
+  // Échap ferme la fenêtre des offres
+  useEffect(() => {
+    if (!pricingOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setPricingOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [pricingOpen]);
 
   // Animate progress on load
   useEffect(() => {
@@ -145,8 +154,8 @@ export default function DashboardHub() {
         displayName={displayName}
         displayEmail={displayEmail}
         initials={initials}
-        onFondationsClick={() => setModal("foundations")}
-        onStackClick={() => setModal("both")}
+        onFondationsClick={() => setPricingOpen(true)}
+        onStackClick={() => setPricingOpen(true)}
       />
 
       <div className="max-w-7xl mx-auto px-4 md:px-12 pb-24 relative z-10">
@@ -191,7 +200,7 @@ export default function DashboardHub() {
                 <p className="text-xs text-white/40 mt-0.5">Le Bloc 1 est gratuit. Le reste du système te donne les fichiers, skills et méthodes pour construire des lignes verticales IA qui rapportent.</p>
               </div>
               <button
-                onClick={() => setModal("both")}
+                onClick={() => setPricingOpen(true)}
                 className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap cursor-pointer"
               >
                 Voir les offres <ArrowRight className="w-3 h-3" />
@@ -207,7 +216,7 @@ export default function DashboardHub() {
                 <p className="text-xs text-white/40 mt-0.5">Débloque les 7 blocs, les sources et les méthodes complètes. {UPGRADE_PRICE}€ de complément - une seule fois.</p>
               </div>
               <button
-                onClick={() => setModal("both")}
+                onClick={() => setPricingOpen(true)}
                 className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-[80ms] px-4 py-2.5 rounded-lg shadow-[0_3px_0_rgba(140,110,65,0.8)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(140,110,65,0.8)] whitespace-nowrap cursor-pointer"
               >
                 Passer au complet <ArrowRight className="w-3 h-3" />
@@ -283,7 +292,7 @@ export default function DashboardHub() {
                 visualTone="black-gallery"
                 locked={isLocked}
                 badge={badge}
-                onClick={() => (isLocked ? setModal("both") : router.push(`/blocs/${bloc.id}`))}
+                onClick={() => (isLocked ? setPricingOpen(true) : router.push(`/blocs/${bloc.id}`))}
                 footer={
                   <div className="relative z-10 pt-1">
                     <div className="flex items-center justify-between mb-1.5">
@@ -311,43 +320,31 @@ export default function DashboardHub() {
 
       </div>
 
-      {/* Pricing Modal */}
-      {modal && (
+      {/* Fenêtre des offres : la même zone que l'accueil et /checkout, adaptée à l'accès de la personne connectée */}
+      {pricingOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 sm:p-6"
-          onClick={() => setModal(null)}
+          onClick={() => setPricingOpen(false)}
         >
-          <div className="relative w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-            {/* Close button */}
-            <button
-              onClick={() => setModal(null)}
-              className="absolute -top-10 right-0 text-white/40 hover:text-white transition-colors cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <UpgradeCarousel
-              showFondations={tier !== "beginner" && modal === "both"}
-              fondationsUrl={withClientReferenceId(checkoutUrls.beginner, userId)}
-              systemeUrl={tier === "beginner"
-                ? withClientReferenceId(checkoutUrls.upgrade, userId)
-                : withClientReferenceId(checkoutUrls.full, userId) ?? checkoutUrls.full
-              }
-              systemePrice={tier === "beginner" ? String(UPGRADE_PRICE) : String(COFFRE_PRICE)}
-            />
-
-            <div className="mt-6 text-center">
-              <p className="text-xs text-white/35 mb-2">
-                Tu préfères qu&apos;on construise ça ensemble, en direct ?
-              </p>
-              <Link
-                href="/accompagnement"
-                onClick={() => setModal(null)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8d5b0]/80 hover:text-[#e8d5b0] underline underline-offset-4 transition-colors"
-              >
-                Découvrir l&apos;accompagnement 1:1
-              </Link>
-            </div>
+          <div
+            className="relative w-full max-w-[1040px]"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Les offres BUILD"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DaRoot className="px-modal">
+              <button type="button" className="px-fermer verre" aria-label="Fermer" onClick={() => setPricingOpen(false)}>
+                <DaIcon name="x" />
+              </button>
+              <PricingSection tier={tier} links={resolveCheckoutLinks(checkoutUrls, userId)} compact />
+              <div className="wrap px-bas">
+                <p className="t-meta">Tu préfères qu&apos;on construise ça ensemble, en direct ?</p>
+                <Link href="/accompagnement" onClick={() => setPricingOpen(false)} className="px-lien">
+                  Découvrir l&apos;accompagnement
+                </Link>
+              </div>
+            </DaRoot>
           </div>
         </div>
       )}

@@ -99,7 +99,7 @@ export function McpDashboardEntry({
                 <span className="text-xs font-semibold text-emerald-300">Connecté</span>
               ) : null}
             </div>
-            <p className="mt-1 text-xs leading-5 text-white/45">{description}</p>
+            <p className="mt-1 text-xs leading-5 text-white/65">{description}</p>
           </div>
         </div>
 

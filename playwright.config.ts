@@ -33,6 +33,17 @@ export default defineConfig({
       name: "mobile",
       use: { ...devices["Desktop Chrome"], viewport: { width: 375, height: 800 } },
     },
+    // Tablette et grand écran : seulement les parcours de l'accueil, qui doivent tenir à toutes les largeurs.
+    {
+      name: "tablet",
+      testMatch: /landing-.*\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"], viewport: { width: 834, height: 1112 } },
+    },
+    {
+      name: "large",
+      testMatch: /landing-.*\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1920, height: 1080 } },
+    },
   ],
   webServer: {
     // Reuses a production build for realistic timing (important for the

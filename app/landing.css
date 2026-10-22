@@ -1,0 +1,136 @@
+/* BUILD · accueil public : scène du premier écran, avant et après, vignettes. S'appuie sur da.css. */
+
+/* ───────── premier écran ───────── */
+.da .hero { padding-top: clamp(128px, 15vw, 188px); padding-bottom: clamp(24px, 4vw, 48px); position: relative; text-align: center; }
+.da .hero::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 900px; z-index: 0; pointer-events: none;
+  background: radial-gradient(60% 44% at 50% 36%, rgba(34,217,110,.17), rgba(34,217,110,0) 72%), radial-gradient(40% 30% at 18% 62%, rgba(185,245,207,.07), rgba(185,245,207,0) 70%), radial-gradient(40% 30% at 84% 70%, rgba(34,217,110,.08), rgba(34,217,110,0) 70%); }
+.da .hero > * { position: relative; z-index: 1; }
+.da .hero__txt { display: grid; gap: 26px; justify-items: center; }
+.da .hero__txt .t-aff { max-width: 11em; }
+.da .hero__act { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 6px; }
+.da .preuve { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; font: 500 19px/1 var(--font); color: var(--t2); }
+.da .preuve b { color: var(--encre); font-weight: 650; }
+
+.da .scene { position: relative; width: min(1060px, 100%); height: clamp(380px, 50vw, 560px); margin: clamp(24px, 4vw, 56px) auto 0; }
+.da .scene .tuile, .da .scene .puce { position: absolute; left: var(--x); top: var(--y); translate: -50% -50%; animation: entre 1s var(--ease) var(--ent, 0s) backwards, flotte var(--dur, 7s) ease-in-out var(--del, 0s) infinite; }
+.da .scene .tuile--xl { --s: clamp(116px, 17vw, 184px); }
+.da .scene .tuile--l { --s: clamp(70px, 10vw, 118px); }
+.da .scene .tuile--m { --s: clamp(60px, 8.4vw, 98px); }
+.da .scene .tuile--s { --s: clamp(54px, 7vw, 84px); }
+.da .scene .halo { position: absolute; left: 50%; top: 56%; width: 62%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(closest-side, rgba(34,217,110,.3), rgba(34,217,110,0)); filter: blur(10px); animation: respire 7s ease-in-out infinite; }
+.da .scene .anneau { position: absolute; left: 50%; top: 52%; width: 74%; aspect-ratio: 2.1; translate: -50% -50%; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(241,245,242,.1); }
+.da .scene .anneau--2 { width: 52%; aspect-ratio: 1.9; box-shadow: inset 0 0 0 1px rgba(34,217,110,.2); }
+.da .puce { height: 44px; padding: 0 18px 0 12px; border-radius: 999px; display: none; align-items: center; gap: 10px; font: 600 15px/1 var(--font); color: var(--encre); white-space: nowrap; }
+.da .puce i { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--em); color: var(--sur-em); }
+.da .puce i .ic { width: 14px; height: 14px; stroke-width: 2.6; }
+@media (min-width: 700px) { .da .scene .puce { display: inline-flex; } }
+@keyframes flotte { 0%, 100% { translate: -50% -50%; } 50% { translate: -50% calc(-50% - 11px); } }
+@keyframes entre { from { opacity: 0; scale: .78; filter: blur(8px); } to { opacity: 1; scale: 1; filter: blur(0); } }
+@keyframes respire { 0%, 100% { opacity: .8; scale: 1; } 50% { opacity: 1; scale: 1.07; } }
+
+/* ───────── avant et après ───────── */
+.da .cmp { display: grid; gap: 20px; grid-template-columns: 1fr; max-width: 1040px; margin-inline: auto; }
+@media (min-width: 860px) { .da .cmp { grid-template-columns: 1fr 1fr; } }
+.da .cmp__col { padding: clamp(28px, 3.4vw, 44px); border-radius: var(--r-l); display: grid; gap: 28px; align-content: start; background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .cmp__col--apres { background: linear-gradient(180deg, #0f2a1b 0%, #0a1710 55%, #0a0f0c 100%); box-shadow: inset 0 0 0 1px rgba(34,217,110,.34), 0 40px 90px -44px rgba(34,217,110,.5); }
+.da .cmp__tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.da .cmp__tete .pastille { background: rgba(241,245,242,.1); }
+.da .cmp__col--apres .pastille { background: rgba(34,217,110,.16); color: var(--menthe); }
+.da .cmp__lignes { display: grid; gap: 22px; }
+.da .cmp__lignes li { display: grid; grid-template-columns: 30px 1fr; gap: 16px; align-items: start; font: 500 clamp(17px, 1.5vw, 19px)/1.4 var(--font); color: var(--t1); text-wrap: pretty; }
+.da .cmp__col:not(.cmp__col--apres) .cmp__lignes li { color: var(--t2); }
+.da .cmp__lignes i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgba(241,245,242,.1); color: var(--t2); margin-top: -2px; }
+.da .cmp__col--apres .cmp__lignes i { background: var(--em); color: var(--sur-em); }
+.da .cmp__lignes i .ic { width: 16px; height: 16px; stroke-width: 2.4; }
+
+/* ───────── vignettes : chaque carte montre un petit morceau d'interface, comme une vraie capture ───────── */
+.da .bento { display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .da .bento { grid-template-columns: repeat(12, 1fr); } .da .vig--7 { grid-column: span 7; } .da .vig--5 { grid-column: span 5; } .da .vig--4 { grid-column: span 4; } }
+.da .vig { display: grid; grid-template-rows: 1fr auto; border-radius: var(--r-l); background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); overflow: hidden; }
+.da .vig__vis { position: relative; min-height: clamp(260px, 30vw, 360px); display: grid; place-items: center; overflow: hidden; isolation: isolate; padding: 28px; margin: 10px 10px 0; border-radius: 20px; background: radial-gradient(90% 80% at 50% 0%, rgba(241,245,242,.09), rgba(241,245,242,0) 72%), var(--carte-2); box-shadow: inset 0 0 0 1px rgba(241,245,242,.06); }
+.da .vig__vis::before { content: ""; position: absolute; left: 50%; top: 62%; width: 80%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(closest-side, rgba(34,217,110,.17), rgba(34,217,110,0)); z-index: -1; }
+.da .vig__txt { display: grid; gap: 6px; padding: 22px 28px 28px; align-content: start; }
+.da .vig__txt p { font: 400 16px/1.4 var(--font); color: var(--t2); text-wrap: pretty; }
+@media (max-width: 699px) { .da .vig__txt p { display: none; } .da .vig__txt { padding-bottom: 24px; } .da .vig__vis { min-height: 240px; padding: 20px; } }
+
+/* petits composants d'interface communs */
+.da .ui { background: #0b0e0c; border-radius: 16px; box-shadow: inset 0 0 0 1px rgba(241,245,242,.1), 0 24px 50px -22px rgba(0,0,0,.9); }
+.da .ui__pill { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; font: 600 12px/1 var(--font); background: rgba(34,217,110,.16); color: var(--menthe); white-space: nowrap; }
+.da .ui__pill .ic { width: 12px; height: 12px; stroke-width: 2.8; }
+.da .ui__pill--g { background: rgba(241,245,242,.1); color: var(--t2); }
+.da .ui__pill b { width: 6px; height: 6px; border-radius: 50%; background: var(--em); box-shadow: 0 0 8px var(--em); animation: respire 2.4s ease-in-out infinite; }
+
+/* 1) lecteur : vidéo, barre de lecture, chapitres */
+.da .lecteur { width: min(560px, 100%); display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 560px) { .da .lecteur { grid-template-columns: 1.55fr 1fr; } }
+.da .lecteur__ecran { position: relative; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 10; box-shadow: 0 30px 60px -22px rgba(0,0,0,.95), 0 0 0 1px rgba(241,245,242,.2); }
+.da .lecteur__ecran > img { width: 100%; height: 100%; object-fit: cover; }
+.da .lecteur__seg { position: absolute; left: 10px; top: 10px; display: inline-flex; padding: 3px; border-radius: 999px; font: 600 12px/1 var(--font); }
+.da .lecteur__seg span { padding: 7px 11px; border-radius: 999px; color: var(--t2); }
+.da .lecteur__seg span:first-child { background: var(--encre); color: var(--sur-em); }
+.da .lecteur__barre { position: absolute; left: 10px; right: 10px; bottom: 10px; height: 40px; border-radius: 999px; display: flex; align-items: center; gap: 12px; padding: 0 14px 0 6px; }
+.da .lecteur__barre i { width: 30px; height: 30px; border-radius: 50%; background: var(--encre); color: var(--sur-em); display: grid; place-items: center; flex: none; }
+.da .lecteur__barre i .ic { width: 14px; height: 14px; fill: currentColor; stroke: none; margin-left: 2px; }
+.da .lecteur__prog { flex: 1; height: 4px; border-radius: 4px; background: rgba(241,245,242,.25); overflow: hidden; }
+.da .lecteur__prog::after { content: ""; display: block; height: 100%; width: 42%; border-radius: 4px; background: var(--em); }
+.da .lecteur__t { font: 600 12px/1 var(--font); color: var(--t1); font-variant-numeric: tabular-nums; }
+.da .chap { display: none; align-content: center; gap: 8px; padding: 12px; }
+@media (min-width: 560px) { .da .chap { display: grid; } }
+.da .chap li { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: 12px; background: rgba(241,245,242,.05); font: 500 14px/1.2 var(--font); color: var(--t2); }
+.da .chap li i { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--em); color: var(--sur-em); flex: none; }
+.da .chap li i .ic { width: 11px; height: 11px; stroke-width: 3; }
+.da .chap li.on { background: rgba(34,217,110,.14); color: var(--encre); }
+.da .chap li.on i { background: transparent; box-shadow: inset 0 0 0 2px var(--em); }
+.da .chap li.off i { background: rgba(241,245,242,.14); }
+
+/* 2) skills : liste avec statut */
+.da .skl { width: min(400px, 100%); padding: 10px; display: grid; gap: 8px; }
+.da .skl li { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border-radius: 12px; background: rgba(241,245,242,.05); }
+.da .skl li img { width: 44px; height: 44px; border-radius: 11px; object-fit: cover; box-shadow: 0 0 0 1px rgba(241,245,242,.14); }
+.da .skl li span { flex: 1; font: 600 15px/1.2 var(--font-t); color: var(--encre); min-width: 0; overflow-wrap: anywhere; }
+
+/* 3) assistant : les tâches arrivent, l'agent les fait */
+.da .flux { position: relative; width: min(320px, 100%); aspect-ratio: 1.12; }
+.da .flux > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.da .flux > svg path { fill: none; stroke: url(#fluxg); stroke-width: 2; stroke-dasharray: 5 7; animation: coule 1.6s linear infinite; }
+.da .flux .tuile { position: absolute; translate: -50% -50%; }
+.da .flux .tuile--p { --s: 54px; }
+.da .flux .tuile--c { --s: 96px; }
+.da .flux .ui__pill { position: absolute; left: 50%; top: 92%; translate: -50% -50%; height: 28px; }
+@keyframes coule { to { stroke-dashoffset: -24; } }
+
+/* 4) connecteur : une conversation qui s'appuie sur BUILD */
+.da .chat { width: min(380px, 100%); padding: 14px; display: grid; gap: 12px; }
+.da .chat__tete { display: flex; align-items: center; gap: 8px; }
+.da .chat__tete .tuile { --s: 30px; box-shadow: inset 0 1px 1px rgba(255,255,255,.9), 0 2px 0 #b5beb8, 0 5px 8px -2px rgba(0,0,0,.6); }
+.da .chat__tete .ui__pill { margin-left: auto; }
+.da .bulle { max-width: 82%; padding: 11px 14px; border-radius: 16px; font: 500 14px/1.35 var(--font); }
+.da .bulle--moi { justify-self: end; background: var(--encre); color: var(--sur-em); border-bottom-right-radius: 5px; }
+.da .bulle--ia { background: rgba(241,245,242,.08); color: var(--t1); border-bottom-left-radius: 5px; display: grid; gap: 7px; width: 82%; }
+.da .bulle--ia s { display: block; height: 7px; border-radius: 7px; background: rgba(241,245,242,.22); text-decoration: none; }
+.da .bulle--ia s:nth-child(2) { width: 86%; } .da .bulle--ia s:nth-child(3) { width: 58%; }
+.da .source { justify-self: start; display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px 0 6px; border-radius: 999px; background: rgba(34,217,110,.14); color: var(--menthe); font: 600 12px/1 var(--font); }
+.da .source img { width: 20px; height: 20px; border-radius: 6px; background: var(--ivoire); padding: 2px; }
+
+/* 5) projet : quatre étapes, les trois premières faites */
+.da .etapes { width: min(440px, 100%); position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.da .etapes::before { content: ""; position: absolute; left: 12.5%; right: 12.5%; top: 42px; height: 3px; border-radius: 3px; background: rgba(241,245,242,.14); }
+.da .etapes::after { content: ""; position: absolute; left: 12.5%; top: 42px; height: 3px; width: 50%; border-radius: 3px; background: linear-gradient(90deg, var(--dense), var(--em)); box-shadow: 0 0 12px rgba(34,217,110,.6); }
+.da .etapes figure { position: relative; z-index: 1; display: grid; gap: 10px; justify-items: center; }
+.da .etapes img { width: min(100%, 88px); aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 14px 14px rgba(0,0,0,.6)); }
+.da .etapes figcaption { font: 600 13px/1 var(--font); color: var(--t1); }
+.da .etapes figure em { position: absolute; top: -4px; right: calc(50% - 50px); width: 22px; height: 22px; border-radius: 50%; background: var(--em); color: var(--sur-em); display: grid; place-items: center; box-shadow: 0 0 0 3px var(--carte-2); }
+.da .etapes figure em .ic { width: 12px; height: 12px; stroke-width: 3; }
+.da .etapes figure:last-child img { animation: flotte-s 6s ease-in-out infinite; }
+.da .etapes .ui__pill { position: absolute; left: 50%; top: calc(100% + 18px); translate: -50% 0; }
+
+@keyframes flotte-s { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+
+/* ───────── appel final ───────── */
+.da .final { text-align: center; padding-block: var(--air); position: relative; overflow: hidden; }
+.da .final::before { content: ""; position: absolute; inset: 10% 0 auto; height: 620px; background: radial-gradient(50% 50% at 50% 50%, rgba(34,217,110,.2), rgba(34,217,110,0) 70%); pointer-events: none; }
+.da .final .wrap { position: relative; display: grid; gap: 28px; justify-items: center; }
+
+@media (max-width: 699px) { .da .sec__tete .t-lede { display: none; } .da .sec__tete { margin-bottom: 32px; } }
+@media (max-width: 520px) { .da .skl .ui__pill u { display: none; } .da .skl .ui__pill { padding: 0; width: 26px; height: 26px; justify-content: center; } .da .skl li { gap: 12px; } .da .skl li span { font-size: 15px; } }
+.da .ui__pill u { text-decoration: none; }

@@ -73,6 +73,7 @@ export function LessonPlayer({ sectionId, title, onCompleted }: LessonPlayerProp
         tokens={playback.tokens}
         startTime={playback.startSeconds}
         streamType="on-demand"
+        disableCookies
         metadata={{ video_id: sectionId, video_title: title }}
         style={{ width: "100%", height: "100%" }}
         onTimeUpdate={(event) => { const { time, duration } = readTime(event); report(time, duration); }}

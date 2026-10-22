@@ -801,7 +801,7 @@ async function reconcileScheduler(config, paths, quiet) {
 async function setup(flags) {
   const paths = homePaths();
   const baseUrl = normalizeBaseUrl(typeof flags["base-url"] === "string" ? flags["base-url"] : DEFAULT_BASE_URL);
-  output("\nBUILD Sync — installation guidée\n");
+  output("\nBUILD Sync : installation guidée\n");
   output("[1/4] Détection des assistants");
   const detected = await detectAgents(paths.userHome);
   const agents = parseAgentSelection(flags.agents, detected);

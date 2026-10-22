@@ -6,7 +6,7 @@ BUILD_SYNC_DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/build-sync"
 BUILD_SYNC_BIN_DIR="$HOME/.local/bin"
 
 echo
-echo "BUILD Sync — préparation de l'installation"
+echo "BUILD Sync : préparation de l'installation"
 echo
 
 if ! command -v node >/dev/null 2>&1; then

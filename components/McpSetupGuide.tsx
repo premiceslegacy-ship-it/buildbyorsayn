@@ -47,7 +47,7 @@ function ClientHeading({
       <Image src={logo} alt="" width={28} height={28} className="h-7 w-7 flex-none" />
       <div className="min-w-0">
         <h3 className="text-xl font-medium text-[#f0ede8]">{name}</h3>
-        <p className="mt-1 text-sm leading-6 text-[#f0ede8]/50">{description}</p>
+        <p className="mt-1 text-sm leading-6 text-[#f0ede8]/65">{description}</p>
       </div>
     </div>
   );
@@ -158,7 +158,7 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
                 Ouvre une nouvelle conversation, sélectionne l&apos;app BUILD dans le menu des outils, puis pose une question située. Vérifie que la réponse distingue le contenu BUILD accessible, les hypothèses et la prochaine action à contrôler.
               </Step>
             </ol>
-            <p className="mt-8 text-xs leading-5 text-[#f0ede8]/40">
+            <p className="mt-8 text-xs leading-5 text-[#f0ede8]/65">
               Les libellés peuvent apparaître en français ou en anglais et évoluer. Les apps MCP personnalisées sont disponibles sur le web, pas sur mobile. L&apos;accès dépend du forfait, du rôle dans l&apos;espace et de l&apos;autorisation de l&apos;administrateur. Pour les usages en lecture, vérifie aussi que ton compte est éligible à la route proposée.
             </p>
             <a
@@ -174,14 +174,14 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
       </div>
 
       <div className="mt-8">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#f0ede8]/45">Adresse MCP BUILD</p>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#f0ede8]/65">Adresse MCP BUILD</p>
         <code className="mt-3 block select-all break-all border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-[#e8d5b0]">
           {mcpUrl}
         </code>
-        <p className="mt-3 text-xs leading-5 text-[#f0ede8]/40">
+        <p className="mt-3 text-xs leading-5 text-[#f0ede8]/65">
           Ne crée pas une nouvelle adresse et ne colle jamais ton mot de passe ou un token dans ce champ. BUILD te redirigera vers l&apos;autorisation sécurisée.
         </p>
-        <p className="mt-3 text-xs leading-5 text-[#f0ede8]/40">
+        <p className="mt-3 text-xs leading-5 text-[#f0ede8]/65">
           Claude ou ChatGPT peut demander un forfait compatible, une activation du mode développeur ou l&apos;autorisation de l&apos;administrateur de ton espace. Les menus et les permissions peuvent évoluer.
         </p>
       </div>

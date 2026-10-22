@@ -1,0 +1,38 @@
+/* BUILD · zone « Offres » partagée (accueil, /checkout, fenêtre du tableau de bord). S'appuie sur da.css. */
+
+/* une seule carte d'achat (montée vers LE COFFRE) ou une seule confirmation */
+.da .offres.px-un { grid-template-columns: minmax(0, 600px); justify-content: center; }
+.da .px-fleche { width: 34px; height: 34px; color: var(--em); stroke-width: 2.4; align-self: center; margin-inline: 4px; }
+.da .px-gain { font: 500 17px/1.4 var(--font); color: var(--t2); text-wrap: pretty; }
+
+/* bouton d'achat indisponible : visible, jamais un lien mort */
+.da .offre button.btn:disabled { cursor: not-allowed; }
+.da .px-note { font: 500 14px/1.45 var(--font); color: var(--t2); text-align: center; text-wrap: pretty; }
+.da .px-note a { color: var(--menthe); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+/* version compacte, dans une fenêtre ou une page d'achat */
+.da .px-compact { padding-block: clamp(36px, 5vw, 64px); }
+.da .px-compact .sec__tete { margin-bottom: clamp(28px, 4vw, 48px); }
+.da .px-bas { display: grid; gap: 6px; justify-items: center; text-align: center; margin-top: 28px; }
+.da.px-modal .px-bas { padding-bottom: 36px; }
+.da .px-lien { color: var(--menthe); font: 600 15px/1.3 var(--font); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.da .px-lien:hover { color: var(--encre); }
+
+/* fenêtre d'achat du tableau de bord */
+.da.px-modal { min-height: 0; max-height: min(90vh, 920px); overflow-x: clip; overflow-y: auto; border-radius: var(--r-l); box-shadow: inset 0 0 0 1px var(--trait-f), 0 40px 120px -20px rgba(0,0,0,.9); overscroll-behavior: contain; }
+.da .px-fermer { position: sticky; top: 14px; z-index: 5; margin: 14px 14px -58px auto; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--encre); }
+.da .px-fermer .ic { width: 20px; height: 20px; }
+
+/* page /checkout */
+.da .px-page { padding-top: clamp(96px, 11vw, 132px); }
+.da .px-beta { max-width: 560px; margin: 40px auto 0; padding-bottom: clamp(48px, 7vw, 96px); }
+.da .px-beta__form { display: grid; gap: 12px; }
+.da .px-beta__form label { font: 500 15px/1.3 var(--font); color: var(--t2); text-align: center; }
+.da .px-beta__ligne { display: flex; gap: 10px; }
+.da .px-beta__ligne input { flex: 1; min-width: 0; height: 48px; padding: 0 20px; border-radius: 999px; border: 0; background: var(--carte); color: var(--encre); font: 500 16px/1 var(--font); box-shadow: inset 0 0 0 1px var(--trait-f); }
+.da .px-beta__ligne input::placeholder { color: var(--t3); }
+.da .px-beta__ligne .btn:disabled { opacity: .5; cursor: wait; }
+.da .px-erreur { font: 500 15px/1.4 var(--font); color: #ffa3a3; text-align: center; }
+
+/* les ancres de la barre flottante ne passent pas sous la barre */
+.da section[id] { scroll-margin-top: 84px; }

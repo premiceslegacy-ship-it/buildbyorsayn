@@ -52,7 +52,6 @@ test("the MCP acquisition path starts with account creation and explains the pai
   const checkout = await readFile("app/checkout/page.tsx", "utf8");
 
   assert.match(start, /\/login\?mode=signup&next=%2Fmcp%2Fstart/);
-  assert.match(checkout, /fromMcp/);
+  assert.match(checkout, /from === "mcp"/);
   assert.match(checkout, /connecter ton assistant/i);
-  assert.match(checkout, /MCP/);
 });

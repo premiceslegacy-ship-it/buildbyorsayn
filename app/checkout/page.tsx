@@ -1,31 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
-import { Logo } from "@/components/Logo";
-import { ArrowRight, Zap, Layers, GraduationCap, Lock, Play } from "lucide-react";
-import { BetaCodeForm } from "./BetaCodeForm";
-import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK, UPGRADE_PRICE, withClientReferenceId } from "@/lib/pricing";
+import { DaRoot } from "@/components/da/DaRoot";
+import { DaNav } from "@/components/da/DaNav";
+import { DaFooter } from "@/components/da/DaFooter";
+import { PricingSection } from "@/components/da/PricingSection";
+import { getCheckoutLinks } from "@/lib/checkoutLinks";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
+import { selectPricingView } from "@/lib/pricingView";
+import { BetaCodeForm } from "./BetaCodeForm";
 
-const STRIPE_FULL_URL = STRIPE_FULL_CHECKOUT_LINK;
-const STRIPE_BEGINNER_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK ?? null;
-const STRIPE_UPGRADE_URL = process.env.STRIPE_UPGRADE_CHECKOUT_LINK ?? null;
-
-const BEGINNER_FEATURES = [
-    { icon: GraduationCap, label: "11 sections Fondations complètes" },
-    { icon: Zap, label: "De zéro à un premier asset vendable" },
-    { icon: Layers, label: "IA, GitHub, IDE, Vercel" },
-    { icon: GraduationCap, label: "Skills Deep Research + UX/UI Premium" },
-    { icon: Layers, label: "Stack complète + Protocole Zéro" },
-];
-
-const FULL_FEATURES = [
-    { icon: Layers, label: "7 blocs de système complets" },
-    { icon: Zap, label: "Méthodes actionnables et directes" },
-    { icon: GraduationCap, label: "Sources et ressources" },
-    { icon: GraduationCap, label: "Fondations incluses" },
-    { icon: Zap, label: "Skills Deep Research + UX/UI Premium" },
-    { icon: Layers, label: "Stack complète + Protocole Zéro" },
-    { icon: Play, label: "Doctrine agentique : construire des agents, devenir AI-first" },
-];
+export const metadata = {
+    title: "Choisir mon niveau | BUILD by Orsayn",
+};
 
 export default async function CheckoutPage({
     searchParams,
@@ -37,180 +22,35 @@ export default async function CheckoutPage({
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Check current tier for upgrade flow
-    let currentTier: string | null = null;
+    let tier: string | null = null;
     if (user?.id) {
         const { data: profile } = await supabase
             .from("profiles")
             .select("tier")
             .eq("id", user.id)
             .single();
-        currentTier = normalizeProfileTier(profile?.tier ?? null);
+        tier = normalizeProfileTier(profile?.tier ?? null);
     }
 
-    const beginnerUrl = withClientReferenceId(STRIPE_BEGINNER_URL, user?.id);
-
-    const fullUrl = withClientReferenceId(STRIPE_FULL_URL, user?.id) ?? STRIPE_FULL_URL;
-
-    const upgradeUrl = withClientReferenceId(STRIPE_UPGRADE_URL, user?.id);
-
-    const isUpgrading = currentTier === "beginner";
-    const alreadyFull = currentTier === "full";
+    const links = getCheckoutLinks(user?.id);
+    const showsBothOffers = selectPricingView({ tier }).blocks.includes("fondations");
 
     return (
-        <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans flex flex-col items-center justify-center relative overflow-hidden px-4 sm:px-6">
-            {/* Halos */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-5 blur-[120px] w-[600px] h-[300px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-0 right-0 bg-blue-500 opacity-5 blur-[120px] w-[400px] h-[400px] rounded-full pointer-events-none" />
-
-            {/* Logo */}
-            <div className="absolute top-6 left-1/2 -translate-x-1/2">
-                <Logo layout="horizontal" className="h-6" hideText={false} />
-            </div>
-
-            <div className="relative z-10 w-full max-w-2xl mt-20 pb-16">
-                <div className="text-center mb-10">
-                    <h1 className="text-3xl font-semibold tracking-tight text-[#f0ede8] mb-3">
-                        {alreadyFull
-                            ? "Tu as déjà l'accès complet"
-                            : isUpgrading
-                            ? `Passe à ${COFFRE_LABEL}`
-                            : fromMcp
-                            ? "Connecte ton assistant à BUILD"
-                            : "Accès réservé"}
-                    </h1>
-                    <p className="text-[rgba(240,237,232,0.55)] text-base leading-relaxed">
-                        {alreadyFull
-                            ? "Tu as accès à l'ensemble du système Build, y compris les fondations."
-                            : isUpgrading
-                            ? `Tu as les fondations. Débloque les 7 blocs et les sources pour ${UPGRADE_PRICE}€.`
-                            : fromMcp
-                            ? "Ton compte est prêt. Choisis Fondations ou LE COFFRE pour activer l'accès et connecter ton assistant."
-                            : `Choisis Fondations pour commencer par un premier résultat, ou ${COFFRE_LABEL} pour accéder au système complet.`}
-                    </p>
-                    {fromMcp && !alreadyFull ? (
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.14em] text-[#e8d5b0]">
-                            Le connecteur MCP est inclus dans les deux offres
-                        </p>
-                    ) : null}
+        <DaRoot>
+            <DaNav loggedIn={Boolean(user)} homeBase="/" />
+            <main className="px-page">
+                <PricingSection
+                    tier={tier}
+                    links={links}
+                    headingLevel="h1"
+                    compact
+                    lede={fromMcp && showsBothOffers ? "Ton compte est prêt. Choisis ton niveau pour connecter ton assistant à BUILD." : undefined}
+                />
+                <div className="wrap">
+                    <div className="px-beta"><BetaCodeForm /></div>
                 </div>
-
-                {alreadyFull ? (
-                    /* Already full: show dashboard link */
-                    <div className="bg-white/[0.04] border border-[#e8d5b0]/20 rounded-2xl p-6 sm:p-8 backdrop-blur-xl text-center">
-                        <p className="text-white/50 text-sm mb-6">Retourne au tableau de bord pour accéder à tes blocs et tes sources.</p>
-                        <a href="/dashboard" className="group inline-flex items-center justify-center gap-2 py-4 px-8 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)]">
-                            Tableau de bord
-                        </a>
-                    </div>
-                ) : isUpgrading ? (
-                    /* Upgrade flow: beginner → full */
-                    <div className="bg-white/[0.04] border border-[#e8d5b0]/20 rounded-2xl p-6 backdrop-blur-xl">
-                        <ul className="space-y-3 mb-8">
-                            {FULL_FEATURES.map(({ icon: Icon, label }) => (
-                                <li key={label} className="flex items-center gap-3 bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-3">
-                                    <div className="flex-shrink-0 w-8 h-8 bg-[#e8d5b0]/10 rounded-lg flex items-center justify-center">
-                                        <Icon className="w-4 h-4 text-[#e8d5b0]" strokeWidth={1.5} />
-                                    </div>
-                                    <span className="text-sm text-[rgba(240,237,232,0.75)]">{label}</span>
-                                </li>
-                            ))}
-                        </ul>
-                        <div className="flex items-baseline justify-between mb-6">
-                            <span className="text-white/40 text-sm">Complément accès complet</span>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-bold text-[#f0ede8]">{UPGRADE_PRICE}€</span>
-                                <span className="text-white/40 text-sm">TTC</span>
-                            </div>
-                        </div>
-                        {upgradeUrl ? (
-                            <a href={upgradeUrl} className="group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]">
-                                Passer au complet
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                            </a>
-                        ) : (
-                            <p role="status" className="rounded-xl border border-white/10 bg-white/[0.03] px-6 py-4 text-center text-sm text-white/45">
-                                Le paiement de l'upgrade n'est pas encore activé.
-                            </p>
-                        )}
-                    </div>
-                ) : (
-                    /* Standard flow: 2 options */
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        {/* Beginner */}
-                        <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 backdrop-blur-xl flex flex-col">
-                            <div className="mb-5">
-                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#e8d5b0] bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-full px-3 py-1 mb-4">
-                                    <GraduationCap className="w-3 h-3" /> Fondations
-                                </span>
-                                <div className="flex items-baseline gap-1 mb-1">
-                                    <span className="text-3xl font-bold text-[#f0ede8]">{FONDATIONS_PRICE}€</span>
-                                    <span className="text-white/40 text-sm">TTC</span>
-                                </div>
-                                <span className="text-white/40 text-xs">Accès à vie aux fondations</span>
-                            </div>
-                            <ul className="space-y-2 mb-6 flex-1">
-                                {BEGINNER_FEATURES.map(({ icon: Icon, label }) => (
-                                    <li key={label} className="flex items-center gap-2.5">
-                                        <Icon className="w-3.5 h-3.5 text-[#e8d5b0] flex-shrink-0" strokeWidth={1.5} />
-                                        <span className="text-xs text-[rgba(240,237,232,0.65)]">{label}</span>
-                                    </li>
-                                ))}
-                                <li className="flex items-center gap-2.5 opacity-40">
-                                    <Lock className="w-3.5 h-3.5 text-white/40 flex-shrink-0" strokeWidth={1.5} />
-                                    <span className="text-xs text-white/40">7 blocs & sources (non inclus)</span>
-                                </li>
-                                <li className="flex items-center gap-2.5 opacity-40">
-                                    <Lock className="w-3.5 h-3.5 text-white/40 flex-shrink-0" strokeWidth={1.5} />
-                                    <span className="text-xs text-white/40">Doctrine agentique (non incluse)</span>
-                                </li>
-                                    </ul>
-                            {beginnerUrl ? (
-                                <a href={beginnerUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0]/80 hover:bg-[#e8d5b0] transition-all duration-200 text-sm">
-                                    Commencer pour {FONDATIONS_PRICE}€
-                                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
-                                </a>
-                            ) : (
-                                <p role="status" className="rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-center text-sm text-white/45">
-                                    Le paiement Fondations n'est pas encore activé.
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Full */}
-                        <div className="bg-white/[0.04] border border-[#e8d5b0]/25 rounded-2xl p-6 backdrop-blur-xl flex flex-col relative">
-                            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                                <span className="text-xs font-semibold text-[#0e0e0f] bg-[#e8d5b0] rounded-full px-3 py-1">Recommandé</span>
-                            </div>
-                            <div className="mb-5">
-                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#e8d5b0] bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-full px-3 py-1 mb-4">
-                                    <Zap className="w-3 h-3" /> {COFFRE_LABEL}
-                                </span>
-                                <div className="flex items-baseline gap-1 mb-1">
-                                    <span className="text-3xl font-bold text-[#f0ede8]">{COFFRE_PRICE}€</span>
-                                    <span className="text-white/40 text-sm">TTC</span>
-                                </div>
-                                <span className="text-white/40 text-xs">Accès à vie à tout le système</span>
-                            </div>
-                            <ul className="space-y-2 mb-6 flex-1">
-                                {FULL_FEATURES.map(({ icon: Icon, label }) => (
-                                    <li key={label} className="flex items-center gap-2.5">
-                                        <Icon className="w-3.5 h-3.5 text-[#e8d5b0] flex-shrink-0" strokeWidth={1.5} />
-                                        <span className="text-xs text-[rgba(240,237,232,0.65)]">{label}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <a href={fullUrl} className="group flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)] text-sm">
-                                Prendre {COFFRE_LABEL} - {COFFRE_PRICE}€
-                                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
-                            </a>
-                        </div>
-                    </div>
-                )}
-
-                <p className="text-center text-xs text-white/25 mt-6">Paiement sécurisé via Stripe · paiement unique · accès à vie</p>
-                <BetaCodeForm />
-            </div>
-        </main>
+            </main>
+            <DaFooter homeBase="/" />
+        </DaRoot>
     );
 }

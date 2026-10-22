@@ -6,7 +6,6 @@ const sectionPath = new URL(
   "../app/beginner/sections/Section1.tsx",
   import.meta.url
 );
-const homepagePath = new URL("../app/page.tsx", import.meta.url);
 const foundationGridPath = new URL("../app/beginner/page.tsx", import.meta.url);
 const foundationDataPath = new URL("../app/beginner/sections.data.ts", import.meta.url);
 const foundationComponentsPath = new URL("../app/beginner/sections.components.tsx", import.meta.url);
@@ -42,16 +41,6 @@ test("les Fondations rendent visibles les workflows du chantier E", () => {
   assert.equal(source.includes(String.fromCodePoint(0x2014)), false);
 });
 
-test("la preuve sociale de la homepage reste contextualisée", () => {
-  const source = readFileSync(homepagePath, "utf8");
-  assert.ok(source.includes("196 membres dans BUILD au 28 septembre 2026"));
-  assert.equal(source.includes("Repère de communauté, pas une promesse de résultat."), false);
-  assert.ok(source.includes("Construis avec l&apos;IA des projets"));
-  assert.ok(source.includes("qu&apos;un client peut acheter."));
-  assert.ok(source.includes("construis une première version montrable"));
-  assert.equal(source.includes("194 membres ont déjà commencé"), false);
-});
-
 test("la grille client des Fondations ne transporte pas les chapitres payants", () => {
   const gridSource = readFileSync(foundationGridPath, "utf8");
   const dataSource = readFileSync(foundationDataPath, "utf8");
@@ -73,11 +62,4 @@ test("les actifs publics n'exposent pas de connexion interne ni de preuve social
 
   assert.equal(brandLogoReadme.includes("treg.to"), false);
   assert.equal(blocClient.includes("Communauté privée de builders actifs"), false);
-});
-
-test("un checkout Fondations absent reste réellement désactivé", () => {
-  const source = readFileSync(homepagePath, "utf8");
-  assert.ok(source.includes("const STRIPE_BEGINNER_URL = sanitizeStripeCheckoutUrl(process.env.STRIPE_BEGINNER_CHECKOUT_LINK);"));
-  assert.ok(source.includes("const beginnerUrl = withClientReferenceId(STRIPE_BEGINNER_URL, user?.id);"));
-  assert.equal(source.includes('STRIPE_BEGINNER_URL !== "#"'), false);
 });

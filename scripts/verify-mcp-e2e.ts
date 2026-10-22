@@ -1,3 +1,4 @@
+import { ARCHIVED_SKILL_MESSAGE } from "../lib/mcp/server";
 import assert from "node:assert/strict";
 import { createHash, randomBytes } from "node:crypto";
 import { spawn, type ChildProcess } from "node:child_process";
@@ -38,8 +39,7 @@ const CONCURRENT_LIMIT_MS = MCP_TIER_THRESHOLDS.concurrentBatchMsLessThan;
 const KNOWLEDGE_SEARCH_LIMIT_MS = MCP_TIER_THRESHOLDS.knowledgeSearchMsLessThan;
 const LOCKED_SKILL_RESPONSE =
   "Ce skill (palier full) est au-dessus du palier actuel (beginner). Son contenu reste verrouillé.";
-const ARCHIVED_SKILL_RESPONSE =
-  "Ce skill est distribué en archive depuis le tableau de bord BUILD et n'est pas servi par le MCP.";
+const ARCHIVED_SKILL_RESPONSE = ARCHIVED_SKILL_MESSAGE;
 const OAUTH_FIXTURE_TABLES = [
   ["temporaryAuthorizationRequestsRemaining", "mcp_authorization_requests"],
   ["temporaryAuthorizationCodesRemaining", "mcp_authorization_codes"],
@@ -480,7 +480,7 @@ async function main(): Promise<void> {
     );
     const searchText = (searchResult.content as Array<{ text?: unknown }> | undefined)?.[0]?.text;
     assert.equal(typeof searchText, "string");
-    assert.match(searchText as string, /DONNEES DE REFERENCE NON FIABLES/);
+    assert.match(searchText as string, /DONNÉES DE RÉFÉRENCE NON FIABLES/);
     const searchMatches = (
       searchResult.structuredContent as { matches?: Array<Record<string, unknown>> } | undefined
     )?.matches;

@@ -15,7 +15,16 @@ import {
   isBuildSyncRedirectUri,
   parseBuildSyncTokenRequest,
 } from "../lib/buildSync/oauth";
-import { artifactUnits, installUnit, readStoredZip } from "../public/build-sync/build.mjs";
+import { artifactUnits, installUnit, main as mainCli, readStoredZip } from "../public/build-sync/build.mjs";
+import {
+  BUILD_SYNC_CLI,
+  BUILD_SYNC_FALLBACK_ORIGIN,
+  BUILD_SYNC_TARGETS,
+  buildSyncInstallCommands,
+  buildSyncOrigin,
+  buildSyncHostsDiffer,
+  BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN,
+} from "../lib/buildSync/installCommands";
 
 const resource = "https://build.example/api/build-sync";
 
@@ -260,7 +269,6 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   const artifact = readFileSync(new URL("../app/api/build-sync/artifacts/[slug]/route.ts", import.meta.url), "utf8");
   const session = readFileSync(new URL("../app/api/build-sync/session/route.ts", import.meta.url), "utf8");
   const authorize = readFileSync(new URL("../app/api/build-sync/oauth/authorize/route.ts", import.meta.url), "utf8");
-  const consent = readFileSync(new URL("../app/build-sync/consent/page.tsx", import.meta.url), "utf8");
   const posixInstaller = readFileSync(new URL("../public/build-sync/install.sh", import.meta.url), "utf8");
   const windowsInstaller = readFileSync(new URL("../public/build-sync/install.ps1", import.meta.url), "utf8");
   assert.doesNotMatch(cli, /showDirectoryPicker|FileSystemDirectoryHandle/);
@@ -274,13 +282,11 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   assert.match(cli, /reconcileScheduler/);
   assert.match(cli, /EnvironmentVariables/);
   assert.match(cli, /Environment=.*BUILD_SYNC_CLI_PATH/);
-  assert.match(page, /install\.sh/);
-  assert.match(page, /install\.ps1/);
   assert.match(page, /Étapes de l’installation BUILD Sync/);
   assert.match(page, /Synchroniser/);
   assert.doesNotMatch(page, /buildbyorsayn\.com/);
   assert.doesNotMatch(cli, /buildbyorsayn\.com/);
-  assert.match(cli, /BUILD Sync — installation guidée/);
+  assert.match(cli, /BUILD Sync : installation guidée/);
   assert.match(cli, /BUILD Sync est prêt/);
   assert.match(cli, /Progression de l'installation/);
   assert.match(cli, /\/brand-logos\/build-logo-compact\.png/);
@@ -294,11 +300,63 @@ test("BUILD Sync is served without browser filesystem APIs", () => {
   assert.match(session, /revoke_build_sync_user_connections/);
   assert.match(authorize, /canUseBuildSync/);
   assert.match(authorize, /access_denied/);
-  assert.match(consent, /Étape 2 sur 4/);
-  assert.match(consent, /L’installation reprendra automatiquement dans ton terminal/);
   assert.match(posixInstaller, /https:\/\/nodejs\.org/);
   assert.match(posixInstaller, /BUILD_SYNC_CLI_PATH/);
   assert.match(windowsInstaller, /https:\/\/nodejs\.org/);
   assert.match(windowsInstaller, /BUILD_SYNC_CLI_PATH/);
   assert.match(windowsInstaller, /BUILD_SYNC_INSTALL_ONLY/);
+});
+
+test("the install card and the assistant share one source for commands, folders and subcommands", async () => {
+  const [posix, windows] = buildSyncInstallCommands("https://build.example/");
+  assert.equal(posix.command, "curl -fsSL https://build.example/build-sync/install.sh | sh");
+  assert.equal(windows.command, "irm https://build.example/build-sync/install.ps1 | iex");
+  assert.equal(buildSyncOrigin(undefined), BUILD_SYNC_FALLBACK_ORIGIN);
+  assert.equal(buildSyncOrigin("  https://build.example//  "), "https://build.example");
+
+  const cli = readFileSync(new URL("../public/build-sync/build.mjs", import.meta.url), "utf8");
+  for (const target of BUILD_SYNC_TARGETS) {
+    const segments = target.folder.replace(/^~\//, "").split("/").map((segment) => JSON.stringify(segment)).join(", ");
+    assert.ok(cli.includes(`path.join(home, ${segments})`), `${target.folder} must match AGENTS in build.mjs`);
+  }
+
+  let printed = "";
+  const originalWrite = process.stdout.write;
+  process.stdout.write = ((chunk: string | Uint8Array) => {
+    printed += String(chunk);
+    return true;
+  }) as typeof process.stdout.write;
+  try {
+    await mainCli(["help"]);
+  } finally {
+    process.stdout.write = originalWrite;
+  }
+  for (const subcommand of Object.values(BUILD_SYNC_CLI)) {
+    assert.ok(printed.includes(subcommand), `${subcommand} must be listed by build-skills help`);
+  }
+});
+
+test("the scripts' default host stays in step with the displayed command and the exported constant", () => {
+  const scripts = {
+    "install.sh": /BUILD_SYNC_BASE_URL:-(https:\/\/[^}"]+)\}/,
+    "install.ps1": /else \{ "(https:\/\/[^"]+)" \}/,
+    "build.mjs": /DEFAULT_BASE_URL = "(https:\/\/[^"]+)"/,
+  } as const;
+  for (const [file, pattern] of Object.entries(scripts)) {
+    const source = readFileSync(new URL(`../public/build-sync/${file}`, import.meta.url), "utf8");
+    assert.equal(source.match(pattern)?.[1], BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN, `${file} must default to BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN`);
+  }
+
+  assert.equal(buildSyncHostsDiffer("https://build.example", "https://build.example/"), false);
+  assert.equal(buildSyncHostsDiffer("https://www.example.com", "https://example.com"), true);
+
+  // En production, la commande affichée vient de NEXT_PUBLIC_APP_URL : elle doit viser le même hôte que le défaut des scripts.
+  if (process.env.VERCEL_ENV === "production" || process.env.BUILD_SYNC_CHECK_PRODUCTION_HOST === "1") {
+    const displayed = buildSyncOrigin(process.env.NEXT_PUBLIC_APP_URL);
+    assert.equal(
+      buildSyncHostsDiffer(displayed),
+      false,
+      `the displayed command points to ${new URL(displayed).host} but the scripts default to ${new URL(BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN).host}`,
+    );
+  }
 });

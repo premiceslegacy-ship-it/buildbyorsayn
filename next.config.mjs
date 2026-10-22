@@ -11,12 +11,13 @@ const nextConfig = {
       { pathname: "/_next-image-not-used/**" },
       { pathname: "/assets/protocole-references/**" },
       { pathname: "/brand-logos/**" },
+      { pathname: "/da/**" },
     ],
   },
 
   outputFileTracingIncludes: {
     "/api/mcp/showcase-asset": ["./private/brand-assets/build-mcp-connector-characters.webp"],
-    "/api/mcp/logo": ["./private/brand-assets/build-logo.png"],
+    "/api/mcp/logo": ["./public/mcp/build-logo.png"],
   },
 
   async redirects() {

@@ -2,7 +2,13 @@ export const FONDATIONS_PRICE = 97;
 export const COFFRE_PRICE = 267;
 export const UPGRADE_PRICE = COFFRE_PRICE - FONDATIONS_PRICE;
 
-export const COFFRE_LABEL = "LE COFFRE";
+/** Espace insécable dans LE COFFRE : le nom ne se coupe jamais en fin de ligne. */
+export const COFFRE_LABEL = "LE\u00a0COFFRE";
+
+/** Prix écrit pour l'écran, avec espace insécable avant le symbole. */
+export function formatEuro(amount: number): string {
+  return `${amount}\u00a0€`;
+}
 export const FONDATIONS_LABEL = "Fondations";
 
 export const STRIPE_FULL_CHECKOUT_LINK = "https://buy.stripe.com/bJeaEYe46bxT00I0PC5AQ0c";
@@ -47,4 +53,33 @@ export function withClientReferenceId(
   const hash = hashIndex === -1 ? "" : safeBaseUrl.slice(hashIndex);
   const separator = path.includes("?") ? "&" : "?";
   return `${path}${separator}client_reference_id=${encodeURIComponent(userId)}${hash}`;
+}
+
+/** Liens Stripe de base, déjà validés (ou null quand le lien est absent ou invalide). */
+export type CheckoutBaseLinks = {
+  beginner: string | null;
+  upgrade: string | null;
+  full: string | null;
+};
+
+/** Liens prêts à ouvrir pour un visiteur donné. null = bouton désactivé, jamais un lien mort. */
+export type CheckoutLinks = {
+  fondations: string | null;
+  coffre: string | null;
+  upgrade: string | null;
+};
+
+/**
+ * Point unique de résolution des liens de paiement (accueil, /checkout, tableau de bord).
+ * Chaque lien est validé ; l'identifiant du compte est ajouté une seule fois quand le visiteur est connecté.
+ */
+export function resolveCheckoutLinks(
+  base: CheckoutBaseLinks,
+  userId?: string | null,
+): CheckoutLinks {
+  return {
+    fondations: withClientReferenceId(base.beginner, userId),
+    coffre: withClientReferenceId(base.full, userId),
+    upgrade: withClientReferenceId(base.upgrade, userId),
+  };
 }

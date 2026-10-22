@@ -9,22 +9,44 @@ test("recognizes Claude only from its exact OAuth callback", () => {
     {
       displayName: "Claude",
       destinationLabel: "claude.ai",
-      logoSrc: "/brand-logos/claude.svg",
+      logoSrc: "/da/logos/claude.svg",
       verified: true,
     },
   );
 });
 
-test("does not trust a claimed Claude name on another callback", () => {
+test("recognizes ChatGPT from its documented stable and per-connection callbacks", () => {
+  const expected = {
+    displayName: "ChatGPT",
+    destinationLabel: "chatgpt.com",
+    logoSrc: "/da/logos/openai.svg",
+    verified: true,
+  };
   assert.deepEqual(
-    resolveMcpClientPresentation("Claude", "https://example.com/callback"),
-    {
-      displayName: "Claude",
-      destinationLabel: "example.com",
-      logoSrc: null,
-      verified: false,
-    },
+    resolveMcpClientPresentation("ChatGPT", "https://chatgpt.com/connector_platform_oauth_redirect"),
+    expected,
   );
+  assert.deepEqual(
+    resolveMcpClientPresentation("Anything", "https://chatgpt.com/connector/oauth/a1B2_c3-D4"),
+    expected,
+  );
+});
+
+test("does not trust a claimed assistant name on another callback", () => {
+  for (const [name, uri, host] of [
+    ["Claude", "https://example.com/callback", "example.com"],
+    ["ChatGPT", "https://chatgpt.com.evil.test/connector_platform_oauth_redirect", "chatgpt.com.evil.test"],
+    ["ChatGPT", "http://chatgpt.com/connector_platform_oauth_redirect", "chatgpt.com"],
+    ["ChatGPT", "https://chatgpt.com/connector_platform_oauth_redirect/extra", "chatgpt.com"],
+    ["ChatGPT", "https://chatgpt.com/connector/oauth/abc/def", "chatgpt.com"],
+    ["ChatGPT", "https://chatgpt.com/other/callback", "chatgpt.com"],
+  ] as const) {
+    assert.deepEqual(
+      resolveMcpClientPresentation(name, uri),
+      { displayName: name, destinationLabel: host, logoSrc: null, verified: false },
+      uri,
+    );
+  }
 });
 
 test("fails closed when the callback cannot be parsed", () => {

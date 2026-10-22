@@ -173,15 +173,12 @@ test("hardening removes the obsolete non-PKCE code-consumption RPC", async () =>
   );
 });
 
-test("dynamic OAuth clients remain unverified and keep their exact redirect available", async () => {
+test("the consent page hands the exact stored redirect and the resolved client to the card", async () => {
   const consent = await readFile("app/mcp/consent/page.tsx", "utf8");
-  assert.match(consent, /!presentation\.verified/);
-  assert.match(consent, /L’identité de cette application n’a pas pu être confirmée/);
   assert.match(consent, /const redirectUri = authorizationRequest\.redirect_uri/);
-  assert.match(consent, /Afficher les détails techniques/);
-  assert.match(consent, /Adresse de retour/);
-  assert.match(consent, />\{redirectUri\}<\/p>/);
-  assert.doesNotMatch(consent, /<h1[^>]*>Connecter \{clientName\}<\/h1>/);
+  assert.match(consent, /resolveMcpClientPresentation\(clientName, redirectUri\)/);
+  assert.match(consent, /redirectUri=\{redirectUri\}/);
+  assert.match(consent, /presentation=\{presentation\}/);
 });
 
 test("final hardening rejects SQL NULL snapshots and bounds refresh families", async () => {
