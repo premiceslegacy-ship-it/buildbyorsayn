@@ -5,12 +5,17 @@ import { resolveUpgradeRedirect } from "@/lib/checkoutUpgrade";
 import {
   buildUpgradeCheckoutParams,
   safeStripeCheckoutUrl,
+  UPGRADE_CHECKOUT_WINDOW_MS,
   upgradeCheckoutIdempotencyKey,
 } from "@/lib/stripeCheckout";
+import { createUpgradeCheckoutCache } from "@/lib/upgradeCheckoutCache";
 import { requireSiteOrigin } from "@/lib/siteOrigin";
 
 // Réponse propre à chaque personne : jamais mise en cache.
 export const dynamic = "force-dynamic";
+
+// Les rejeux de cette navigation GET (lien tiers, prefetch, scanner) ne rappellent pas Stripe dans la fenêtre d'idempotence.
+const upgradeUrlCache = createUpgradeCheckoutCache(UPGRADE_CHECKOUT_WINDOW_MS);
 
 /**
  * Porte du complément Fondations vers LE COFFRE. Pour un compte Fondations, le serveur
@@ -34,9 +39,10 @@ export async function GET() {
 
   let upgradeUrl: string | null = null;
   if (user && tier === "beginner" && !profileError) {
+    upgradeUrl = upgradeUrlCache.get(user.id);
     const secretKey = process.env.STRIPE_SECRET_KEY;
     const priceId = process.env.STRIPE_UPGRADE_PRICE_ID;
-    if (secretKey && priceId) {
+    if (!upgradeUrl && secretKey && priceId) {
       try {
         const stripe = new Stripe(secretKey);
         const checkout = await stripe.checkout.sessions.create(
@@ -49,6 +55,7 @@ export async function GET() {
           { idempotencyKey: upgradeCheckoutIdempotencyKey(user.id) },
         );
         upgradeUrl = safeStripeCheckoutUrl(checkout.url);
+        if (upgradeUrl) upgradeUrlCache.set(user.id, upgradeUrl);
       } catch {
         console.error("[Checkout] Upgrade session creation failed");
       }

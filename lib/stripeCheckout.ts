@@ -3,7 +3,7 @@ import type Stripe from "stripe";
 import { isUuid, normalizeCustomerEmail } from "@/lib/stripeEntitlements";
 
 export const STRIPE_UPGRADE_PURCHASE_KIND = "build_upgrade";
-const UPGRADE_CHECKOUT_WINDOW_MS = 15 * 60 * 1_000;
+export const UPGRADE_CHECKOUT_WINDOW_MS = 15 * 60 * 1_000;
 
 type UpgradeCheckoutInput = {
   userId: string;

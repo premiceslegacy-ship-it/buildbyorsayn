@@ -5,6 +5,8 @@ import {
     SITE_WEB_ACCOMPANIMENT_SLUG,
 } from "@/lib/accompanimentAccess";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
+import { buildContentSecurityPolicy, createCspNonce } from "@/lib/csp";
+import { secureSessionCookie } from "@/lib/supabase/cookieSecurity";
 
 // Security headers applied to every middleware response
 const SECURITY_HEADERS: Record<string, string> = {
@@ -38,8 +40,58 @@ export function createRedirectWithCookies(
     return response;
 }
 
+/** Chemins qui exigent une session (et parfois un palier) : l'ancien matcher du proxy, à l'identique. */
+export function isGuardedPath(rawPathname: string): boolean {
+    let decoded = rawPathname;
+    try {
+        decoded = decodeURIComponent(rawPathname);
+    } catch {
+        // Un chemin mal encodé reste évalué tel quel, et aussi sous sa forme brute ci-dessous.
+    }
+    return guardsPathname(rawPathname) || guardsPathname(decoded);
+}
+
+function guardsPathname(pathname: string): boolean {
+    const under = (base: string) => pathname === base || pathname.startsWith(`${base}/`);
+    return (
+        under("/dashboard") ||
+        under("/blocs") ||
+        pathname === "/sources" ||
+        pathname === "/skills" ||
+        pathname === "/fin" ||
+        pathname === "/intro" ||
+        under("/videos/tutos") ||
+        under("/admin") ||
+        under("/beginner") ||
+        pathname === "/protocole" ||
+        under("/accompagnement/espace") ||
+        pathname === "/mcp/consent" ||
+        pathname === "/build-sync/consent"
+    );
+}
+
 export async function proxy(request: NextRequest) {
-    let supabaseResponse = NextResponse.next({ request });
+    // Nonce par requête : Next.js le lit dans l'en-tête de requête pour signer ses scripts inline.
+    const nonce = createCspNonce();
+    const contentSecurityPolicy = buildContentSecurityPolicy({
+        nonce,
+        deployed: Boolean(process.env.VERCEL),
+        development: process.env.NODE_ENV === "development",
+    });
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-nonce", nonce);
+    requestHeaders.set("Content-Security-Policy", contentSecurityPolicy);
+
+    if (!isGuardedPath(request.nextUrl.pathname)) {
+        const publicResponse = NextResponse.next({ request: { headers: requestHeaders } });
+        Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+            publicResponse.headers.set(key, value);
+        });
+        publicResponse.headers.set("Content-Security-Policy", contentSecurityPolicy);
+        return publicResponse;
+    }
+
+    let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -53,9 +105,11 @@ export async function proxy(request: NextRequest) {
                     cookiesToSet.forEach(({ name, value }) =>
                         request.cookies.set(name, value)
                     );
-                    supabaseResponse = NextResponse.next({ request });
+                    // Les cookies rafraîchis doivent aussi être vus par la page rendue.
+                    requestHeaders.set("cookie", request.headers.get("cookie") ?? "");
+                    supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
                     cookiesToSet.forEach(({ name, value, options }) =>
-                        supabaseResponse.cookies.set(name, value, options)
+                        supabaseResponse.cookies.set(name, value, secureSessionCookie(options, Boolean(process.env.VERCEL)))
                     );
                 },
             },
@@ -148,11 +202,17 @@ export async function proxy(request: NextRequest) {
     Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
         supabaseResponse.headers.set(key, value);
     });
+    supabaseResponse.headers.set("Content-Security-Policy", contentSecurityPolicy);
 
     // IMPORTANT : toujours retourner supabaseResponse pour propager les cookies
     return supabaseResponse;
 }
 
+// Toutes les pages HTML passent par le proxy : il pose le nonce de la CSP (lib/csp.ts). Seuls les fichiers
+// statiques sont exclus. Les routes d'API ont leur propre politique (next.config.mjs) et ne servent pas de page.
+// Attention : ne jamais exclure par "contient un point" : /fin.rsc doit rester filtré.
 export const config = {
-    matcher: ["/dashboard/:path*", "/blocs/:path*", "/sources", "/skills", "/fin", "/intro", "/videos/tutos", "/videos/tutos/:path*", "/admin/:path*", "/beginner", "/beginner/:path*", "/protocole", "/accompagnement/espace/:path*", "/mcp/consent", "/build-sync/consent"],
+    matcher: [
+        "/((?!api/|_next/static|_next/image|favicon\\.ico|\\.well-known/|.*\\.(?:png|jpe?g|webp|avif|gif|svg|ico|mp4|webm|woff2?|txt|xml|pdf|webmanifest)$).*)",
+    ],
 };

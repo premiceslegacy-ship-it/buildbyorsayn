@@ -38,27 +38,8 @@ const nextConfig = {
         source: "/((?!api/mcp|\\.well-known).*)",
         headers: [
           // --- HIGH / CRITICAL ---
-          {
-            key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://src.litix.io",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com data:",
-              "img-src 'self' data: blob: https:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.mux.com https://*.litix.io",
-              // Mux HLS playback: segments over https, MSE blob URLs and a blob worker.
-              "media-src 'self' blob: https://*.mux.com",
-              "worker-src 'self' blob:",
-              "frame-src https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com",
-              "frame-ancestors 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "object-src 'none'",
-              // Safari applique cette directive aussi sur http://127.0.0.1 : les CSS et scripts seraient demandés en https et la page s'afficherait sans style. On ne la pose que sur le vrai déploiement.
-              ...(process.env.VERCEL ? ["upgrade-insecure-requests"] : []),
-            ].join("; "),
-          },
+          // La CSP des pages (avec nonce par requête) est posée par proxy.ts (lib/csp.ts), jamais ici :
+          // une seconde CSP statique avec 'unsafe-inline' s'ajouterait à celle du proxy sans la durcir.
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
@@ -96,6 +77,17 @@ const nextConfig = {
           {
             key: "Cross-Origin-Embedder-Policy",
             value: "credentialless",
+          },
+        ],
+      },
+      {
+        // Réponses d'API (hors connecteur MCP) : aucune ressource à charger, aucune intégration possible.
+        // Même valeur que API_CONTENT_SECURITY_POLICY dans lib/csp.ts (ce fichier n'importe pas de TypeScript).
+        source: "/api/((?!mcp(?:/|$)).*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
           },
         ],
       },

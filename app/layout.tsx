@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
@@ -43,11 +44,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+// Rendu à la demande : le nonce de la CSP (proxy.ts) ne peut pas être gravé dans du HTML prérendu.
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await connection();
   return (
     <html lang="fr" className="dark" data-scroll-behavior="smooth">
       <body className={`${inter.className} bg-[#0e0e0f] text-[#f0ede8] antialiased min-h-screen w-full`}>
