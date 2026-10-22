@@ -127,3 +127,32 @@ test("fails closed when the callback cannot be parsed", () => {
     },
   );
 });
+
+test("live spoof matrix: look-alike hosts, IDN, ports and wrong loopback shapes never get a logo or trust", () => {
+  for (const [name, uri] of [
+    ["Claude", "http://127.0.0.1:5000/callback"],
+    ["Claude", "https://claude.ai.evil.com/api/mcp/auth_callback"],
+    ["Claude", "https://evil.claude.ai/api/mcp/auth_callback"],
+    ["Claude", "https://clаude.ai/api/mcp/auth_callback"],
+    ["Claude", "https://xn--clude-xxa.ai/api/mcp/auth_callback"],
+    ["Claude", "https://claude.ai:8443/api/mcp/auth_callback"],
+    ["Claude", "https://claude.ai/api/mcp/auth_callback/"],
+    ["Claude", "https://claude.ai./api/mcp/auth_callback"],
+    ["Claude", "cursor://anysphere.cursor-mcp/oauth/callback"],
+    ["ChatGPT", "https://CHATGPT.com/connector_platform_oauth_redirect"],
+    ["ChatGPT", "https://chatgpt.com/connector_platform_oauth_redirect?x=1"],
+    ["Hermes Agent", "https://evil.example/callback"],
+    ["Hermes Agent", "http://127.0.0.1/callback"],
+    ["Hermes Agent", "http://[::1]:5000/callback"],
+    ["Hermes Agent", "http://127.0.0.1:5000/callback?x=1"],
+    ["hermes agent", "http://127.0.0.1:5000/callback"],
+    ["Oh My Pi", "http://127.0.0.1:5000/callback"],
+    ["Cursor", "https://evil.example/cb"],
+    ["Cursor", "http://localhost:9999/callback"],
+  ] as const) {
+    const result = resolveMcpClientPresentation(name, uri);
+    assert.equal(result.logoSrc, null, `${name} ${uri}`);
+    assert.equal(result.verified, false, `${name} ${uri}`);
+    assert.equal(result.trust, "unrecognized", `${name} ${uri}`);
+  }
+});

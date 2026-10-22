@@ -160,6 +160,11 @@ test("sanitizeClientName strips angle brackets and truncates", () => {
   assert.equal(sanitizeClientName("a".repeat(200)).length, 100);
 });
 
+test("sanitizeClientName removes control, zero-width and bidirectional override characters", () => {
+  assert.equal(sanitizeClientName("Cl\u202eaude\u200b\u0007\n"), "Claude");
+  assert.equal(sanitizeClientName("\u200e\u2066\u2069"), "Application inconnue");
+});
+
 test("sanitizeClientName falls back on missing or empty input", () => {
   assert.equal(sanitizeClientName(undefined), "Application inconnue");
   assert.equal(sanitizeClientName(""), "Application inconnue");

@@ -94,7 +94,10 @@ export function McpConsentCard({
           </div>
           <div className="mx-row">
             <dt>Après autorisation</dt>
-            <dd>Tu retourneras sur {presentation.destinationLabel}.</dd>
+            <dd>
+              Tu retourneras sur {presentation.destinationLabel}.
+              {presentation.verified ? <span className="mx-seal">Adresse vérifiée par BUILD.</span> : null}
+            </dd>
           </div>
         </dl>
 

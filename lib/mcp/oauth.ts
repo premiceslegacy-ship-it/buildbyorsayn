@@ -115,12 +115,17 @@ const MAX_CLIENT_NAME_LENGTH = 100;
 /**
  * Client names are attacker-controlled input (DCR is an unauthenticated
  * write endpoint) and are rendered on the consent screen. Strip anything
- * that isn't plain text before it ever reaches JSX.
+ * that isn't plain text before it ever reaches JSX: angle brackets, control
+ * characters, zero-width characters and bidirectional overrides (which can
+ * visually reorder the consent title).
  */
+const INVISIBLE_CLIENT_NAME_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g;
+
 export function sanitizeClientName(rawName: unknown): string {
   const name = typeof rawName === "string" ? rawName : "Application inconnue";
   return name
     .replace(/[<>]/g, "")
+    .replace(INVISIBLE_CLIENT_NAME_CHARACTERS, "")
     .slice(0, MAX_CLIENT_NAME_LENGTH)
     .trim() || "Application inconnue";
 }

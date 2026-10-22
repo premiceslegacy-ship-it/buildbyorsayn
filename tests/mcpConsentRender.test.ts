@@ -54,6 +54,7 @@ test("a verified Claude client shows both real logos, no warning and one primary
   assertCommonRules(html, "Claude");
   assert.match(html, /<img src="\/da\/logos\/claude\.svg" alt="Claude"/);
   assert.doesNotMatch(html, /role="note"/);
+  assert.match(html, /Adresse vérifiée par BUILD/);
 });
 
 test("a verified ChatGPT client shows the OpenAI logo and no warning", () => {
@@ -61,6 +62,20 @@ test("a verified ChatGPT client shows the OpenAI logo and no warning", () => {
   assertCommonRules(html, "ChatGPT");
   assert.match(html, /<img src="\/da\/logos\/openai\.svg" alt="ChatGPT"/);
   assert.doesNotMatch(html, /role="note"/);
+  assert.match(html, /Adresse vérifiée par BUILD/);
+});
+
+test("only Claude and ChatGPT carry the verified address mention", () => {
+  for (const [name, uri] of [
+    ["Hermes Agent", "http://127.0.0.1:49231/callback"],
+    ["oh-my-pi", "http://localhost:3000/callback"],
+    ["Cursor", "cursor://anysphere.cursor-mcp/oauth/callback"],
+    ["Cursor", "https://www.cursor.com/agents/mcp/oauth/callback"],
+    ["Claude", "https://claude.ai.evil.example/api/mcp/auth_callback"],
+    ["ChatGPT", "http://127.0.0.1:5000/callback"],
+  ] as const) {
+    assert.doesNotMatch(mcpCard(name, uri), /vérifiée par BUILD/, `${name} ${uri}`);
+  }
 });
 
 test("recognized local clients show their logo and a non-verified note", () => {
