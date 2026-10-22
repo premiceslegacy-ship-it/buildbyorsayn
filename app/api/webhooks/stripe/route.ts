@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import {
+    decideUpgradeAccess,
     determineStripeTier,
     escapeIlikePattern,
     emailsMatch,
@@ -11,6 +12,11 @@ import {
     referenceMatchesProfile,
     type PaidTier,
 } from "@/lib/stripeEntitlements";
+import { buildUpgradeRefusalEmail, refuseUpgradePurchase } from "@/lib/stripeUpgradeRefusal";
+import { optionalSiteOrigin, requireSiteOrigin } from "@/lib/siteOrigin";
+import { getLegalEntity } from "@/lib/legal/entity";
+import { buildPurchaseConfirmation } from "@/lib/legal/consent";
+import { COFFRE_LABEL, FONDATIONS_LABEL } from "@/lib/pricing";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -161,6 +167,69 @@ async function sendWelcomeEmail(email: string, actionLink: string) {
     }
 }
 
+async function sendUpgradeRefusalEmail(email: string) {
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const from = process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM;
+    if (!resendApiKey || !from) return false;
+
+    const { subject, text, html } = buildUpgradeRefusalEmail(optionalSiteOrigin());
+    const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ from, to: [email], subject, html, text }),
+    });
+    return response.ok;
+}
+
+/**
+ * Confirmation d'achat sur support durable (contrat, prix, accès immédiat, renonciation au droit de rétractation).
+ * Ne fait jamais échouer le webhook : un client qui a payé ne doit pas recevoir une erreur parce que l'e-mail n'est pas parti.
+ */
+async function sendPurchaseConfirmationEmail(
+    email: string,
+    offerName: string,
+    amountCents: number | null,
+    createdSeconds: number,
+) {
+    try {
+        const resendApiKey = process.env.RESEND_API_KEY;
+        const from = process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM;
+        const baseUrl = optionalSiteOrigin();
+        if (!resendApiKey || !from || !baseUrl || !amountCents || amountCents <= 0) {
+            console.error("[Webhook] Purchase confirmation skipped (missing configuration or amount)");
+            return false;
+        }
+        const { entity } = getLegalEntity();
+        const { subject, text, html } = buildPurchaseConfirmation({
+            offerName,
+            amountCents,
+            purchasedAt: new Date(createdSeconds * 1000),
+            baseUrl,
+            seller: {
+                fullName: entity.fullName,
+                tradeName: entity.tradeName,
+                siret: entity.siret,
+                address: entity.address,
+                contactEmail: entity.contactEmail,
+                vatMention: entity.vatMention,
+            },
+        });
+        const response = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ from, to: [email], subject, html, text }),
+        });
+        if (!response.ok) console.error("[Webhook] Resend purchase confirmation failed");
+        return response.ok;
+    } catch {
+        console.error("[Webhook] Purchase confirmation failed");
+        return false;
+    }
+}
+
 function canSendWelcomeEmail() {
     return Boolean(process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM));
 }
@@ -288,10 +357,12 @@ export async function POST(req: NextRequest) {
             } else if (profile && emailsMatch(profile.email, customerEmail)) {
                 userId = profile.id;
             } else if (!profile) {
-                const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-                if (!appUrl) {
+                let appUrl: string;
+                try {
+                    appUrl = requireSiteOrigin();
+                } catch {
                     // Never invent a host: an invitation pointing at a dead domain strands a paying customer. Stripe retries on 500.
-                    console.error("[Webhook] NEXT_PUBLIC_APP_URL is not configured");
+                    console.error("[Webhook] NEXT_PUBLIC_APP_URL is not configured or invalid");
                     return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                 }
                 const redirectTo = `${appUrl}/update-password`;
@@ -371,6 +442,35 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ received: true }, { status: 200 });
             }
 
+            // Dernier rempart : le complément n'ouvre jamais LE COFFRE à un compte sans Fondations.
+            if (priceId && priceId === process.env.STRIPE_UPGRADE_PRICE_ID) {
+                const { data: currentProfile, error: currentTierError } = await supabase
+                    .from("profiles")
+                    .select("tier")
+                    .eq("id", userId)
+                    .maybeSingle();
+                if (currentTierError) {
+                    console.error("[Webhook] Current tier lookup failed");
+                    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                }
+
+                const decision = decideUpgradeAccess(priceId, process.env.STRIPE_UPGRADE_PRICE_ID, currentProfile?.tier ?? null);
+                if (decision === "refuse") {
+                    const result = await refuseUpgradePurchase(
+                        {
+                            createRefund: (params, options) => stripe.refunds.create(params, options),
+                            notifyCustomer: sendUpgradeRefusalEmail,
+                            log: (message) => console.error(message),
+                        },
+                        { sessionId: session.id, paymentIntent: session.payment_intent, customerEmail },
+                    );
+                    if (result.outcome === "refund_failed") {
+                        return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                    }
+                    return NextResponse.json({ received: true }, { status: 200 });
+                }
+            }
+
             const persistenceError = await persistProfileTier(supabase, userId, tier, customerEmail);
             if (persistenceError) {
                 console.error("[Webhook] Profile entitlement update failed");
@@ -378,6 +478,14 @@ export async function POST(req: NextRequest) {
             }
 
             revalidatePath("/", "layout");
+
+            if (customerEmail) {
+                const isUpgrade = Boolean(priceId && priceId === process.env.STRIPE_UPGRADE_PRICE_ID);
+                const offerName = isUpgrade
+                    ? `Passage de ${FONDATIONS_LABEL} à ${COFFRE_LABEL}`
+                    : tier === "beginner" ? FONDATIONS_LABEL : COFFRE_LABEL;
+                await sendPurchaseConfirmationEmail(customerEmail, offerName, session.amount_total ?? null, event.created);
+            }
         }
     }
 

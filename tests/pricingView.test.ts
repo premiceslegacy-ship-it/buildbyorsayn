@@ -8,7 +8,7 @@ import {
   resolveCheckoutLinks,
   type CheckoutBaseLinks,
 } from "../lib/pricing";
-import { readCheckoutBaseLinks } from "../lib/checkoutLinks";
+import { getUpgradeCheckoutLink, readCheckoutBaseLinks } from "../lib/checkoutLinks";
 import { getOfferFacts, selectPricingView } from "../lib/pricingView";
 import { BLOCS_DATA } from "../lib/blocCatalog";
 import { SKILLS_CATALOG } from "../lib/skillsCatalog";
@@ -53,7 +53,6 @@ test("les chiffres de l'offre viennent du catalogue", () => {
 
 const BASE: CheckoutBaseLinks = {
   beginner: "https://buy.stripe.com/aaa",
-  upgrade: "https://buy.stripe.com/bbb?prefilled_promo_code=X",
   full: "https://buy.stripe.com/ccc",
 };
 
@@ -61,14 +60,13 @@ test("visiteur anonyme : les liens de base, sans identifiant", () => {
   assert.deepEqual(resolveCheckoutLinks(BASE, null), {
     fondations: "https://buy.stripe.com/aaa",
     coffre: "https://buy.stripe.com/ccc",
-    upgrade: "https://buy.stripe.com/bbb?prefilled_promo_code=X",
   });
 });
 
 test("visiteur connecté : l'identifiant du compte est ajouté une seule fois, bien encodé", () => {
   const links = resolveCheckoutLinks(BASE, "user 1&x=2");
   assert.equal(links.fondations, "https://buy.stripe.com/aaa?client_reference_id=user%201%26x%3D2");
-  assert.equal(links.upgrade, "https://buy.stripe.com/bbb?prefilled_promo_code=X&client_reference_id=user%201%26x%3D2");
+  assert.equal(links.coffre, "https://buy.stripe.com/ccc?client_reference_id=user%201%26x%3D2");
   for (const url of Object.values(links)) {
     assert.equal(new URL(url!).searchParams.getAll("client_reference_id").length, 1);
   }
@@ -78,12 +76,11 @@ test("lien absent, invalide ou déjà marqué : null, jamais un lien mort", () =
   const links = resolveCheckoutLinks(
     {
       beginner: null,
-      upgrade: "http://buy.stripe.com/insecure",
       full: "https://buy.stripe.com/ccc?client_reference_id=autre",
     },
     "abc",
   );
-  assert.deepEqual(links, { fondations: null, coffre: null, upgrade: null });
+  assert.deepEqual(links, { fondations: null, coffre: null });
 });
 
 test("la lecture de l'environnement refuse tout ce qui n'est pas un lien Stripe https", () => {
@@ -92,10 +89,21 @@ test("la lecture de l'environnement refuse tout ce qui n'est pas un lien Stripe 
     STRIPE_UPGRADE_CHECKOUT_LINK: "https://buy.stripe.com/up",
   });
   assert.equal(base.beginner, null);
-  assert.equal(base.upgrade, "https://buy.stripe.com/up");
   assert.ok(base.full, "le lien LE COFFRE reste disponible");
+  assert.equal("upgrade" in base, false, "le lien du complément n'est jamais exposé avec les liens publics");
 
-  const empty = readCheckoutBaseLinks({});
-  assert.equal(empty.beginner, null);
-  assert.equal(empty.upgrade, null);
+  assert.equal(readCheckoutBaseLinks({}).beginner, null);
+});
+
+test("accès impossible à vérifier : aucune carte d'achat, quel que soit le niveau lu", () => {
+  for (const tier of [null, "free", "beginner", "full"]) {
+    assert.deepEqual(selectPricingView({ tier, unverified: true }).blocks, ["unverified"], String(tier));
+  }
+});
+
+test("le lien du complément n'existe que pour un compte identifié et reste validé", () => {
+  const env = { STRIPE_UPGRADE_CHECKOUT_LINK: "https://buy.stripe.com/up" };
+  assert.equal(getUpgradeCheckoutLink("abc", env), "https://buy.stripe.com/up?client_reference_id=abc");
+  assert.equal(getUpgradeCheckoutLink("abc", {}), null);
+  assert.equal(getUpgradeCheckoutLink("abc", { STRIPE_UPGRADE_CHECKOUT_LINK: "https://evil.example/up" }), null);
 });

@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { ArrowRight, Lock } from "lucide-react";
 import { SectionReveal } from "@/components/ui/section-reveal";
 import { COFFRE_LABEL, COFFRE_PRICE, UPGRADE_PRICE } from "@/lib/pricing";
 
-export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string | null; isFullUser: boolean }) {
+export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFullUser: boolean }) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3 mb-8">
@@ -68,25 +67,19 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string | null
                 Les Fondations t'aident à préparer un problème, une offre et un premier flux de travail. {COFFRE_LABEL} va plus loin : structurer des projets de long terme, des suivis qui peuvent être facturés régulièrement quand une demande réelle existe, et ta propre expertise dans des systèmes que tu peux exporter, vérifier et faire évoluer. Aucun contenu ne supprime le besoin de vendre, livrer et apprendre du terrain. Les 7 blocs, les sources et les méthodes exactes t'attendent.
               </p>
 
-              {upgradeUrl ? (
-                <Link
-                  href={upgradeUrl}
-                  className="inline-flex items-center justify-between w-full p-1 rounded-full bg-white/[0.03] border border-white/10 hover:border-[#e8d5b0]/40 transition-colors group/btn"
-                >
-                  <div className="flex items-center gap-3 pl-4 pr-2">
-                    <span className="text-sm font-medium text-[#f0ede8]">{COFFRE_LABEL}</span>
-                    <span className="text-xs text-white/40 line-through">{COFFRE_PRICE}€</span>
-                  </div>
-                  <div className="flex items-center gap-3 bg-[#e8d5b0] text-[#0e0e0f] px-5 py-2.5 rounded-full text-sm font-semibold">
-                    Passer au complet - {UPGRADE_PRICE}€
-                    <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
-                  </div>
-                </Link>
-              ) : (
-                <p role="status" className="rounded-full border border-white/10 bg-white/[0.03] px-5 py-3 text-sm text-white/45">
-                  Le paiement de l'upgrade n'est pas encore activé.
-                </p>
-              )}
+              <a
+                href={upgradeUrl}
+                className="inline-flex items-center justify-between w-full p-1 rounded-full bg-white/[0.03] border border-white/10 hover:border-[#e8d5b0]/40 transition-colors group/btn"
+              >
+                <div className="flex items-center gap-3 pl-4 pr-2">
+                  <span className="text-sm font-medium text-[#f0ede8]">{COFFRE_LABEL}</span>
+                  <span className="text-xs text-white/40 line-through">{COFFRE_PRICE}€</span>
+                </div>
+                <div className="flex items-center gap-3 bg-[#e8d5b0] text-[#0e0e0f] px-5 py-2.5 rounded-full text-sm font-semibold">
+                  Passer au complet - {UPGRADE_PRICE}€
+                  <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
+                </div>
+              </a>
               <p className="text-xs text-white/30 mt-4 text-center">Complément pour passer à {COFFRE_LABEL}.</p>
             </div>
           </div>

@@ -21,7 +21,7 @@ type Props = {
   href: LegalHref;
   intro?: string;
   sections: readonly LegalSection[];
-  /** Vrai quand l'identité de la société vient des valeurs d'exemple : un bandeau le dit clairement. */
+  /** Vrai quand l'identité de l'éditeur vient des valeurs d'exemple : un bandeau le dit clairement. */
   isSample: boolean;
 };
 
@@ -44,7 +44,7 @@ export function LegalPage({ href, intro, sections, isSample }: Props) {
         <div className="wrap">
           {isSample ? (
             <p className="lg-alerte" role="note" data-testid="legal-sample-banner">
-              <strong>Valeurs d&apos;exemple.</strong> L&apos;identité de la société (nom, adresse, numéro d&apos;immatriculation, médiateur) n&apos;est pas encore renseignée sur ce serveur. Cette page ne doit pas être publiée en l&apos;état.
+              <strong>Valeurs d&apos;exemple.</strong> L&apos;identité de l&apos;éditeur (code postal, ville, médiateur de la consommation) n&apos;est pas encore renseignée sur ce serveur. Cette page ne doit pas être publiée en l&apos;état.
             </p>
           ) : null}
 
@@ -90,20 +90,21 @@ export function ContactLink({ entity }: { entity: LegalEntity }) {
   return <a href={`mailto:${entity.contactEmail}`}>{entity.contactEmail}</a>;
 }
 
-/** Qui est la société, tel que la loi demande de l'indiquer. Les lignes facultatives n'apparaissent que si elles sont renseignées. */
+/** Qui est l'éditeur, tel que la loi demande de l'indiquer. Les lignes facultatives n'apparaissent que si elles sont renseignées. */
 export function IdentityTable({ entity }: { entity: LegalEntity }) {
   return (
     <table>
       <tbody>
-        <tr><th scope="row">Société</th><td>{entity.companyName}</td></tr>
-        <tr><th scope="row">Forme juridique</th><td>{entity.legalForm}</td></tr>
+        <tr><th scope="row">Éditeur</th><td>{entity.fullName}</td></tr>
+        <tr><th scope="row">Statut</th><td>{entity.legalForm}</td></tr>
+        <tr><th scope="row">Nom commercial</th><td>{entity.tradeName}</td></tr>
+        <tr><th scope="row">SIRET</th><td>{entity.siret}</td></tr>
         {entity.capital ? <tr><th scope="row">Capital social</th><td>{entity.capital}</td></tr> : null}
-        <tr><th scope="row">SIREN</th><td>{entity.siren}</td></tr>
         {entity.registry ? <tr><th scope="row">Immatriculation</th><td>{entity.registry}</td></tr> : null}
-        {entity.vatNumber ? <tr><th scope="row">TVA intracommunautaire</th><td>{entity.vatNumber}</td></tr> : null}
-        <tr><th scope="row">Siège</th><td>{entity.address}</td></tr>
-        <tr><th scope="row">Contact</th><td><ContactLink entity={entity} /></td></tr>
-        {entity.phone ? <tr><th scope="row">Téléphone</th><td>{entity.phone}</td></tr> : null}
+        <tr><th scope="row">TVA</th><td>{entity.vatMention}</td></tr>
+        <tr><th scope="row">Adresse</th><td>{entity.address}</td></tr>
+        <tr><th scope="row">E-mail</th><td><ContactLink entity={entity} /></td></tr>
+        <tr><th scope="row">Téléphone</th><td><a href={`tel:${entity.phone.replace(/[^+\d]/g, "")}`}>{entity.phone}</a></td></tr>
       </tbody>
     </table>
   );

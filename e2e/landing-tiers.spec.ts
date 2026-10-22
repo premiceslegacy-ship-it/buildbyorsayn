@@ -13,15 +13,11 @@ async function expectOnlyUpgradeCard(page: Page, scope: string) {
   await expect(zone.locator("article.offre")).toHaveCount(1);
   await expect(zone.locator("article.offre")).toContainText(/170\s€/);
 
+  // Le lien Stripe du complément n'est jamais dans la page : la carte passe par la porte serveur.
   const card = zone.locator("article.offre");
-  const link = card.locator('a.btn[href^="https://buy.stripe.com/"]');
-  const off = card.locator("button.btn[disabled]");
-  await expect(link.or(off)).toHaveCount(1);
-  if (await link.count()) {
-    await expect(link).toHaveAttribute("href", /client_reference_id=/);
-  } else {
-    await expect(card.getByRole("status")).toContainText(/pas disponible/);
-  }
+  await expect(card.locator('a.btn[href="/checkout/upgrade"]')).toBeVisible();
+  await expect(card.locator('a[href*="buy.stripe.com"]')).toHaveCount(0);
+  expect(await page.content()).not.toContain("buy.stripe.com");
 }
 
 async function expectNoPurchaseCard(page: Page, scope: string) {
@@ -45,6 +41,14 @@ test.describe("Offres pour un compte Fondations", () => {
   test("/checkout ne montre que la carte de montée vers LE COFFRE", async ({ beginnerPage: page }) => {
     await page.goto("/checkout");
     await expectOnlyUpgradeCard(page, "main");
+  });
+
+  test("la porte /checkout/upgrade envoie vers le paiement du complément, sans que le lien soit dans une page", async ({ beginnerPage: page }) => {
+    const response = await page.request.get("/checkout/upgrade", { maxRedirects: 0 });
+    expect(response.status()).toBe(303);
+    const location = response.headers()["location"] ?? "";
+    // Stripe si le lien est configuré, sinon page honnête : jamais un lien mort.
+    expect(location).toMatch(/^https:\/\/buy\.stripe\.com\/.*client_reference_id=|\/checkout\?upgrade=indisponible$/);
   });
 });
 

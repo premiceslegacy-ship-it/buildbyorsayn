@@ -21,7 +21,7 @@ export default async function MentionsLegalesPage() {
       title: "Qui édite BUILD",
       children: (
         <>
-          <p>Le site BUILD est édité par la société suivante.</p>
+          <p>Le site BUILD est édité par un entrepreneur individuel.</p>
           <IdentityTable entity={entity} />
           <p>Le directeur de la publication est {entity.director}.</p>
         </>
@@ -35,7 +35,7 @@ export default async function MentionsLegalesPage() {
           <table>
             <tbody>
               <tr><th scope="row">Hébergeur du site</th><td>{vercel.company}{vercel.address ? `, ${vercel.address}` : ""}</td></tr>
-              <tr><th scope="row">Comptes, base de données et fichiers</th><td>{supabase.company}</td></tr>
+              <tr><th scope="row">Comptes, base de données et fichiers</th><td>{supabase.company}{supabase.dataLocation ? `, données stockées en ${supabase.dataLocation}` : ""}</td></tr>
               <tr><th scope="row">Diffusion des vidéos</th><td>{mux.company}</td></tr>
               <tr><th scope="row">Paiement</th><td>{stripe.company}</td></tr>
             </tbody>

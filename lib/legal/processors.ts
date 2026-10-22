@@ -21,6 +21,8 @@ export type Processor = {
   seat: string;
   /** Adresse postale du siège, quand elle est publiée par la société (mentions légales). */
   address?: string;
+  /** Lieu où les données sont stockées, uniquement quand il est vérifié (région du projet). Absent si inconnu. */
+  dataLocation?: string;
   /** Ce que le prestataire fait pour BUILD, en une phrase. */
   role: string;
   /** Ce qu'il reçoit. */
@@ -40,13 +42,18 @@ export const PROCESSORS: readonly Processor[] = [
     role: "Il héberge le site et l'application, et lance les tâches planifiées (nettoyage des connexions du connecteur, mise à jour des vidéos de la chaîne YouTube).",
     data: "Les requêtes qui arrivent sur le site : adresse réseau, navigateur, pages demandées, et le contenu de ce que tu envoies au site.",
     hosts: ["vercel.com", "vercel.app"],
-    evidence: [{ file: "vercel.json", needle: "crons" }],
+    evidence: [
+      { file: "vercel.json", needle: "crons" },
+      { file: "lib/mcp/config.ts", needle: "VERCEL_URL" },
+    ],
   },
   {
     id: "supabase",
     name: "Supabase",
     company: "Supabase Inc.",
     seat: "États-Unis",
+    // Région eu-west-1 du projet Supabase de BUILD, relevée en lecture seule avec la CLI Supabase.
+    dataLocation: "Irlande",
     role: "Il gère les comptes et les connexions, la base de données (profils, progression, suivi d'activité, accompagnements, connexions du connecteur) et le stockage des fichiers de skills.",
     data: "Ton adresse e-mail, ton mot de passe sous une forme qui ne peut pas être relue, ton niveau d'accès, ta progression, ton suivi d'activité et les données de tes accompagnements.",
     hosts: ["supabase.co"],

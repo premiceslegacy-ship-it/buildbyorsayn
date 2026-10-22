@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { useRouter } from "next/navigation";
 import { ArrowRight, PhoneCall } from "lucide-react";
@@ -39,12 +39,14 @@ export default function DashboardHub() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [profileReady, setProfileReady] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
+  const [accessUnverified, setAccessUnverified] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [animatedProgress, setAnimatedProgress] = useState(0);
   const [sessionAdvances, setSessionAdvances] = useState(0);
   const [checkoutUrls, setCheckoutUrls] = useState<CheckoutBaseLinks>({
     beginner: null,
-    upgrade: null,
     full: STRIPE_FULL_CHECKOUT_LINK,
   });
 
@@ -69,11 +71,13 @@ export default function DashboardHub() {
       setUserId(user.id);
 
       // Récupérer tier depuis la table profiles
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("tier, completed_blocks")
         .eq("id", user.id)
         .single();
+      // PGRST116 = aucune ligne : profil absent, pas une panne. Toute autre erreur ne doit jamais ouvrir de carte d'achat.
+      setAccessUnverified(Boolean(profileError && profileError.code !== "PGRST116"));
       const userTier = normalizeProfileTier(profile?.tier ?? null);
       setTier(userTier);
       setProfileReady(true);
@@ -84,12 +88,30 @@ export default function DashboardHub() {
     fetchUser();
   }, [router]);
 
-  // Échap ferme la fenêtre des offres
+  // Fenêtre des offres : le focus entre sur Fermer, la tabulation reste dans la fenêtre, Échap ferme, le focus revient au bouton d'origine
   useEffect(() => {
     if (!pricingOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setPricingOpen(false); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const origin = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setPricingOpen(false); return; }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+      );
+      if (focusable.length === 0) { e.preventDefault(); return; }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (!dialogRef.current.contains(active)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      origin?.focus();
+    };
   }, [pricingOpen]);
 
   // Animate progress on load
@@ -328,16 +350,17 @@ export default function DashboardHub() {
         >
           <div
             className="relative w-full max-w-[1040px]"
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Les offres BUILD"
             onClick={(e) => e.stopPropagation()}
           >
             <DaRoot className="px-modal">
-              <button type="button" className="px-fermer verre" aria-label="Fermer" onClick={() => setPricingOpen(false)}>
+              <button type="button" ref={closeRef} className="px-fermer verre" aria-label="Fermer" onClick={() => setPricingOpen(false)}>
                 <DaIcon name="x" />
               </button>
-              <PricingSection tier={tier} links={resolveCheckoutLinks(checkoutUrls, userId)} compact />
+              <PricingSection tier={tier} links={resolveCheckoutLinks(checkoutUrls, userId)} compact unverified={accessUnverified} />
               <div className="wrap px-bas">
                 <p className="t-meta">Tu préfères qu&apos;on construise ça ensemble, en direct ?</p>
                 <Link href="/accompagnement" onClick={() => setPricingOpen(false)} className="px-lien">

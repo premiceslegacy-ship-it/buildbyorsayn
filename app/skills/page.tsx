@@ -15,7 +15,7 @@ import { BuildSyncInstall } from "@/components/BuildSyncInstall";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { illustrationSrc } from "@/lib/illustrations";
-import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, withClientReferenceId } from "@/lib/pricing";
+import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, UPGRADE_PATH, withClientReferenceId } from "@/lib/pricing";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 const SKILL_USAGE_STEPS = [
@@ -283,10 +283,10 @@ export default function SkillsPage() {
       ]);
 
       const userTier = normalizeProfileTier(profile?.tier ?? null);
-      const targetUrl = userTier === "beginner" ? urls.upgrade : urls.full;
 
       setTier(userTier);
-      setCheckoutHref(withClientReferenceId(targetUrl, user.id));
+      // Le complément passe par la porte serveur : son lien Stripe n'arrive jamais dans le navigateur.
+      setCheckoutHref(userTier === "beginner" ? UPGRADE_PATH : withClientReferenceId(urls.full, user.id));
       setBeginnerHref(withClientReferenceId(urls.beginner, user.id));
     };
 

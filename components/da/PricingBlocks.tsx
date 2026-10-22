@@ -6,6 +6,7 @@ import {
   COFFRE_PRICE,
   FONDATIONS_LABEL,
   FONDATIONS_PRICE,
+  UPGRADE_PATH,
   UPGRADE_PRICE,
   formatEuro,
   type CheckoutLinks,
@@ -52,8 +53,8 @@ function Liste({ items }: { items: string[] }) {
  * Les blocs d'achat, choisis par `selectPricingView` selon l'accès du visiteur.
  * Les prix et les chiffres viennent du code, jamais des textes.
  */
-export function PricingBlocks({ tier, links }: { tier: string | null | undefined; links: CheckoutLinks }) {
-  const { blocks } = selectPricingView({ tier });
+export function PricingBlocks({ tier, links, unverified = false }: { tier: string | null | undefined; links: CheckoutLinks; unverified?: boolean }) {
+  const { blocks } = selectPricingView({ tier, unverified });
   const facts = getOfferFacts();
   const show = (name: (typeof blocks)[number]) => blocks.includes(name);
 
@@ -146,9 +147,14 @@ export function PricingBlocks({ tier, links }: { tier: string | null | undefined
                 "Ton assistant IA connaît tout BUILD",
               ]}
             />
-            <BuyButton href={links.upgrade} tone="btn--p" describedBy="px-up-off">Passer à {COFFRE_LABEL}</BuyButton>
+            {/* Le lien Stripe du complément n'est jamais dans la page : la porte serveur décide selon le niveau du compte. */}
+            <a className="btn btn--p" href={UPGRADE_PATH}>Passer à {COFFRE_LABEL}</a>
           </article>
         </div>
+      ) : null}
+
+      {show("unverified") ? (
+        <p className="px-note" role="status">Impossible de vérifier ton accès pour le moment. Réessaie dans un instant.</p>
       ) : null}
 
       {show("owned") ? (

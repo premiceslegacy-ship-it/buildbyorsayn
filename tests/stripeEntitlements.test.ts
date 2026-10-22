@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
+  decideUpgradeAccess,
   determineStripeTier,
   escapeIlikePattern,
   emailsMatch,
@@ -51,4 +52,30 @@ test("Stripe persistence includes NULL profiles and tier mutation is admin-only"
   assert.match(webhook, /invitation link generation failed[\s\S]*status: 500/);
   assert.match(tierAction, /isPlatformAdminUser/);
   assert.doesNotMatch(tierAction, /isAccompanimentAdminUser/);
+});
+
+test("le complément n'est accordé qu'aux comptes Fondations, full ou admin", () => {
+  for (const tier of ["beginner", "full", "admin"]) {
+    assert.equal(decideUpgradeAccess("price_upgrade", "price_upgrade", tier), "grant", tier);
+  }
+  for (const tier of [null, undefined, "free", "preview", "inconnu", ""]) {
+    assert.equal(decideUpgradeAccess("price_upgrade", "price_upgrade", tier), "refuse", String(tier));
+  }
+});
+
+test("un autre prix, ou une configuration sans prix de complément, n'est jamais traité comme le complément", () => {
+  assert.equal(decideUpgradeAccess("price_full", "price_upgrade", "free"), "noop");
+  assert.equal(decideUpgradeAccess("price_beginner", "price_upgrade", null), "noop");
+  assert.equal(decideUpgradeAccess(null, "price_upgrade", "free"), "noop");
+  assert.equal(decideUpgradeAccess("price_upgrade", undefined, "free"), "noop");
+  assert.equal(decideUpgradeAccess(undefined, undefined, "free"), "noop");
+});
+
+test("le webhook consulte le niveau actuel avant d'accorder le complément", async () => {
+  const webhook = await readFile("app/api/webhooks/stripe/route.ts", "utf8");
+  const decision = webhook.indexOf("decideUpgradeAccess(");
+  const persist = webhook.indexOf("await persistProfileTier(");
+  assert.ok(decision > 0 && persist > decision, "la décision précède l'écriture du niveau");
+  assert.match(webhook, /refuseUpgradePurchase/);
+  assert.match(webhook, /refund_failed[\s\S]*status: 500/);
 });

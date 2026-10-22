@@ -15,10 +15,11 @@ import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { getCheckoutLinks } from "@/lib/checkoutLinks";
 import { MEMBERS_COUNT } from "@/lib/siteFacts";
+import { getSiteOrigin } from "@/lib/siteOrigin";
 
 const PAGE_TITLE = "Ton business avec l'IA, sans prise de tête | BUILD by Orsayn";
 const PAGE_DESCRIPTION = "Trouve quoi vendre, construis-le avec les skills d'une agence, puis vends-le. Sans être ingénieur.";
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const SITE_URL = getSiteOrigin();
 
 // Une `openGraph` définie ici remplace celle du layout en entier : on remet donc le site, l'image et la langue.
 export const metadata: Metadata = {
@@ -81,8 +82,11 @@ export default async function HomePage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   let tier: string | null = null;
+  let accessUnverified = false;
   if (user?.id) {
-    const { data: profile } = await supabase.from("profiles").select("tier").eq("id", user.id).single();
+    // maybeSingle : un profil absent n'est pas une erreur ; une vraie erreur de lecture ne doit jamais ouvrir de carte d'achat.
+    const { data: profile, error } = await supabase.from("profiles").select("tier").eq("id", user.id).maybeSingle();
+    accessUnverified = Boolean(error);
     tier = normalizeProfileTier(profile?.tier ?? null);
   }
 
@@ -164,7 +168,7 @@ export default async function HomePage() {
 
         <LandingBento />
 
-        <PricingSection tier={tier} links={links} id="prix" />
+        <PricingSection tier={tier} links={links} id="prix" unverified={accessUnverified} />
 
         <Faq />
 

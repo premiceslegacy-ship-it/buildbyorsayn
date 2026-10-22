@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Mail, Send, Users, Video, RefreshCw, FileText } from "lucide-react";
+import { resolveSiteOrigin } from "@/lib/siteOrigin";
 
 type MailUser = {
   id: string;
@@ -53,7 +54,8 @@ const TEMPLATES: Record<TemplateKey, { label: string; icon: React.ReactNode; fil
       preheader: "Le contenu vient d'être mis à jour.",
       body: `BUILD vient d'être mis à jour.\n\n${updateTitle}\n\n${updateDesc}\n\nConnecte-toi pour voir les changements.`,
       ctaLabel: "Voir la mise à jour →",
-      ctaUrl: "https://build-system-three.vercel.app/dashboard",
+      // Lecture littérale de NEXT_PUBLIC_APP_URL : seule forme que Next remplace dans le code envoyé au navigateur.
+      ctaUrl: `${resolveSiteOrigin(process.env.NEXT_PUBLIC_APP_URL, process.env.NODE_ENV)}/dashboard`,
     }),
   },
 };

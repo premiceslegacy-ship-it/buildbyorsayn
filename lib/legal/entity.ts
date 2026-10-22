@@ -1,63 +1,75 @@
 import { z } from "zod";
-import { CONTACT_EMAIL } from "@/lib/legal/links";
+import { DEFAULT_VAT_MENTION, PUBLIC_IDENTITY } from "@/lib/legal/identity";
 
 /**
- * Identité de l'éditeur, lue dans l'environnement.
- * Rien de ce qui est ici n'est écrit en dur dans les pages : ces informations viennent de la société, pas du code.
+ * Identité de l'éditeur (entrepreneur individuel), affichée sur les CGV, les mentions légales et la politique de confidentialité.
+ * Les faits publics connus sont des valeurs par défaut (lib/legal/identity.ts), remplaçables par des variables LEGAL_*.
+ * Seuls les champs réellement inconnus bloquent la production : code postal, ville et médiateur de la consommation.
  */
 
 export const LEGAL_ENV = {
-  companyName: "LEGAL_COMPANY_NAME",
+  fullName: "LEGAL_FULL_NAME",
+  tradeName: "LEGAL_TRADE_NAME",
   legalForm: "LEGAL_LEGAL_FORM",
-  siren: "LEGAL_SIREN",
-  address: "LEGAL_ADDRESS",
-  vatNumber: "LEGAL_VAT_NUMBER",
-  director: "LEGAL_DIRECTOR",
+  siret: "LEGAL_SIRET",
+  street: "LEGAL_STREET",
+  postalCode: "LEGAL_POSTAL_CODE",
+  city: "LEGAL_CITY",
+  phone: "LEGAL_PHONE",
   contactEmail: "LEGAL_CONTACT_EMAIL",
+  director: "LEGAL_DIRECTOR",
+  vatMention: "LEGAL_VAT_MENTION",
   mediatorName: "LEGAL_MEDIATOR_NAME",
   mediatorUrl: "LEGAL_MEDIATOR_URL",
-  phone: "LEGAL_PHONE",
   capital: "LEGAL_CAPITAL",
   registry: "LEGAL_REGISTRY",
 } as const;
 
-/** Variables qui doivent toutes être renseignées en production. */
+/** Variables sans valeur par défaut : toutes doivent être renseignées en production. */
 export const LEGAL_REQUIRED_ENV = [
-  LEGAL_ENV.companyName,
-  LEGAL_ENV.legalForm,
-  LEGAL_ENV.siren,
-  LEGAL_ENV.address,
-  LEGAL_ENV.director,
+  LEGAL_ENV.postalCode,
+  LEGAL_ENV.city,
   LEGAL_ENV.mediatorName,
   LEGAL_ENV.mediatorUrl,
 ] as const;
 
-/** Variables facultatives : la page n'affiche la ligne correspondante que si elles sont renseignées. */
+/** Variables facultatives : valeur par défaut (faits publics) ou ligne absente de la page si elles sont vides. */
 export const LEGAL_OPTIONAL_ENV = [
-  LEGAL_ENV.vatNumber,
-  LEGAL_ENV.contactEmail,
+  LEGAL_ENV.fullName,
+  LEGAL_ENV.tradeName,
+  LEGAL_ENV.legalForm,
+  LEGAL_ENV.siret,
+  LEGAL_ENV.street,
   LEGAL_ENV.phone,
+  LEGAL_ENV.contactEmail,
+  LEGAL_ENV.director,
+  LEGAL_ENV.vatMention,
   LEGAL_ENV.capital,
   LEGAL_ENV.registry,
 ] as const;
-
-/** Adresse de contact réelle de BUILD (valeur par défaut de LEGAL_CONTACT_EMAIL). */
-export const DEFAULT_CONTACT_EMAIL: string = CONTACT_EMAIL;
 
 /** Autorise les valeurs d'exemple même sur un serveur de production (essais de bout en bout). Un bandeau reste affiché. */
 export const LEGAL_SAMPLE_FLAG = "LEGAL_USE_SAMPLE_ENTITY";
 
 export type LegalEntity = {
-  companyName: string;
+  fullName: string;
+  tradeName: string;
   legalForm: string;
+  siret: string;
+  /** Les 9 premiers chiffres du SIRET. */
   siren: string;
+  street: string;
+  postalCode: string;
+  city: string;
+  /** Adresse sur une ligne : rue, code postal, ville. */
   address: string;
-  vatNumber: string | null;
-  director: string;
+  phone: string;
   contactEmail: string;
+  director: string;
+  /** Phrase de TVA, par exemple « TVA non applicable, article 293 B du CGI ». */
+  vatMention: string;
   mediatorName: string;
   mediatorUrl: string;
-  phone: string | null;
   capital: string | null;
   registry: string | null;
 };
@@ -77,18 +89,26 @@ export type ResolvedLegalEntity = { entity: LegalEntity; isSample: boolean };
 
 type Env = Readonly<Record<string, string | undefined>>;
 
+export function formatAddress(parts: Pick<LegalEntity, "street" | "postalCode" | "city">): string {
+  return `${parts.street}, ${parts.postalCode} ${parts.city}`;
+}
+
+/** « Samuel Mbeboura, entrepreneur individuel exerçant sous le nom commercial Orsayn ». */
+export function describeSeller(entity: Pick<LegalEntity, "fullName" | "legalForm" | "tradeName">): string {
+  return `${entity.fullName}, ${entity.legalForm.toLowerCase()} exerçant sous le nom commercial ${entity.tradeName}`;
+}
+
+const SAMPLE_ADDRESS = { postalCode: "00000", city: "Ville d'exemple" };
+
 /** Valeurs visiblement fausses mais valides, pour que les pages s'affichent hors production. */
 export const SAMPLE_LEGAL_ENTITY: LegalEntity = {
-  companyName: "Société d'exemple",
-  legalForm: "SAS d'exemple",
-  siren: "123456782",
-  address: "1 rue de l'Exemple, 75000 Paris",
-  vatNumber: null,
-  director: "Prénom Nom d'exemple",
-  contactEmail: DEFAULT_CONTACT_EMAIL,
+  ...PUBLIC_IDENTITY,
+  siren: PUBLIC_IDENTITY.siret.slice(0, 9),
+  ...SAMPLE_ADDRESS,
+  address: formatAddress({ street: PUBLIC_IDENTITY.street, ...SAMPLE_ADDRESS }),
+  vatMention: DEFAULT_VAT_MENTION,
   mediatorName: "Médiateur d'exemple",
   mediatorUrl: "https://exemple.invalid/mediation",
-  phone: null,
   capital: null,
   registry: null,
 };
@@ -105,12 +125,11 @@ function text(label: string, min = 2, max = 300) {
     .refine((value) => !/[\u2014\u2013\u2022\u00b7]/u.test(value), `${label} contient un tiret long ou un symbole de liste : écris-le avec des mots et des tirets simples.`);
 }
 
-/** Clé de Luhn : tout SIREN valide la vérifie. */
-export function isValidSiren(value: string): boolean {
-  if (!/^\d{9}$/.test(value)) return false;
+/** Clé de Luhn : tout SIREN et presque tout SIRET la vérifient. */
+function luhnValid(digits: string): boolean {
   let sum = 0;
-  for (let i = 0; i < 9; i += 1) {
-    let digit = Number(value[8 - i]);
+  for (let i = 0; i < digits.length; i += 1) {
+    let digit = Number(digits[digits.length - 1 - i]);
     if (i % 2 === 1) {
       digit *= 2;
       if (digit > 9) digit -= 9;
@@ -120,34 +139,28 @@ export function isValidSiren(value: string): boolean {
   return sum % 10 === 0;
 }
 
-/** Numéro de TVA intracommunautaire français : FR + clé (2 caractères) + SIREN. */
-export function isValidFrenchVat(value: string, siren?: string): boolean {
-  const match = /^FR([0-9A-HJ-NP-Z]{2})(\d{9})$/.exec(value);
-  if (!match) return false;
-  const [, key, vatSiren] = match;
-  if (!isValidSiren(vatSiren)) return false;
-  if (siren && vatSiren !== siren) return false;
-  if (/^\d{2}$/.test(key)) {
-    const expected = (12 + 3 * (Number(vatSiren) % 97)) % 97;
-    return Number(key) === expected;
-  }
-  return true;
+export function isValidSiren(value: string): boolean {
+  return /^\d{9}$/.test(value) && luhnValid(value);
 }
 
-const sirenField = z
-  .string({ error: "Le SIREN est obligatoire." })
+export function isValidSiret(value: string): boolean {
+  return /^\d{14}$/.test(value) && luhnValid(value);
+}
+
+const siretField = z
+  .string({ error: "Le SIRET est obligatoire." })
   .transform((value) => value.replace(/[\s.]/g, ""))
   .pipe(
     z
       .string()
-      .regex(/^\d{9}$/, "Le SIREN doit avoir exactement 9 chiffres.")
-      .refine(isValidSiren, "Le SIREN est faux (la clé de contrôle ne correspond pas)."),
+      .regex(/^\d{14}$/, "Le SIRET doit avoir exactement 14 chiffres.")
+      .refine(isValidSiret, "Le SIRET est faux (la clé de contrôle ne correspond pas)."),
   );
 
-const vatField = z
-  .string()
-  .transform((value) => value.replace(/\s/g, "").toUpperCase())
-  .optional();
+const postalCodeField = z
+  .string({ error: "Le code postal est obligatoire." })
+  .trim()
+  .regex(/^\d{5}$/, "Le code postal doit avoir exactement 5 chiffres.");
 
 const emailField = z.string().trim().max(254).pipe(z.email("L'adresse e-mail n'a pas le bon format."));
 
@@ -163,30 +176,23 @@ const urlField = z
     }
   }, "L'adresse web du médiateur doit commencer par https://.");
 
-const entitySchema = z
-  .object({
-    companyName: text("Le nom de la société", 2, 120),
-    legalForm: text("La forme juridique", 2, 80),
-    siren: sirenField,
-    address: text("L'adresse du siège", 8, 300),
-    vatNumber: vatField,
-    director: text("Le nom du directeur de la publication", 3, 120),
-    contactEmail: emailField,
-    mediatorName: text("Le nom du médiateur de la consommation", 3, 160),
-    mediatorUrl: urlField,
-    phone: z.string().trim().regex(/^\+?[0-9 .()-]{8,20}$/, "Le numéro de téléphone n'a pas le bon format.").optional(),
-    capital: text("Le capital social", 2, 60).optional(),
-    registry: text("La mention d'immatriculation", 3, 100).optional(),
-  })
-  .superRefine((value, ctx) => {
-    if (value.vatNumber !== undefined && !isValidFrenchVat(value.vatNumber)) {
-      ctx.addIssue({ code: "custom", path: ["vatNumber"], message: "Le numéro de TVA n'a pas le bon format (FR, 2 caractères de clé, puis le SIREN)." });
-    } else if (value.vatNumber !== undefined && !value.vatNumber.endsWith(value.siren)) {
-      ctx.addIssue({ code: "custom", path: ["vatNumber"], message: "Le numéro de TVA doit se terminer par le SIREN de la société." });
-    }
-  });
-
-const FIELD_TO_ENV = Object.fromEntries(Object.entries(LEGAL_ENV)) as Record<string, string>;
+const entitySchema = z.object({
+  fullName: text("Le nom de l'éditeur", 3, 120),
+  tradeName: text("Le nom commercial", 2, 120),
+  legalForm: text("Le statut juridique", 2, 80),
+  siret: siretField,
+  street: text("La rue", 5, 200),
+  postalCode: postalCodeField,
+  city: text("La ville", 2, 80),
+  phone: z.string({ error: "Le téléphone est obligatoire." }).trim().regex(/^\+?[0-9 .()-]{8,20}$/, "Le numéro de téléphone n'a pas le bon format."),
+  contactEmail: emailField,
+  director: text("Le nom du directeur de la publication", 3, 120),
+  vatMention: text("La mention de TVA", 5, 200),
+  mediatorName: text("Le nom du médiateur de la consommation", 3, 160),
+  mediatorUrl: urlField,
+  capital: text("Le capital social", 2, 60).optional(),
+  registry: text("La mention d'immatriculation", 3, 100).optional(),
+});
 
 function blankToUndefined(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
@@ -195,19 +201,23 @@ function blankToUndefined(value: string | undefined): string | undefined {
 
 /** Valide les variables d'environnement. Fonction pure : n'écrit rien, ne lit pas process.env. */
 export function parseLegalEntity(env: Env): LegalEntityParse {
+  const read = (key: keyof typeof LEGAL_ENV) => blankToUndefined(env[LEGAL_ENV[key]]);
   const raw = {
-    companyName: blankToUndefined(env[LEGAL_ENV.companyName]),
-    legalForm: blankToUndefined(env[LEGAL_ENV.legalForm]),
-    siren: blankToUndefined(env[LEGAL_ENV.siren]),
-    address: blankToUndefined(env[LEGAL_ENV.address]),
-    vatNumber: blankToUndefined(env[LEGAL_ENV.vatNumber]),
-    director: blankToUndefined(env[LEGAL_ENV.director]),
-    contactEmail: blankToUndefined(env[LEGAL_ENV.contactEmail]) ?? DEFAULT_CONTACT_EMAIL,
-    mediatorName: blankToUndefined(env[LEGAL_ENV.mediatorName]),
-    mediatorUrl: blankToUndefined(env[LEGAL_ENV.mediatorUrl]),
-    phone: blankToUndefined(env[LEGAL_ENV.phone]),
-    capital: blankToUndefined(env[LEGAL_ENV.capital]),
-    registry: blankToUndefined(env[LEGAL_ENV.registry]),
+    fullName: read("fullName") ?? PUBLIC_IDENTITY.fullName,
+    tradeName: read("tradeName") ?? PUBLIC_IDENTITY.tradeName,
+    legalForm: read("legalForm") ?? PUBLIC_IDENTITY.legalForm,
+    siret: read("siret") ?? PUBLIC_IDENTITY.siret,
+    street: read("street") ?? PUBLIC_IDENTITY.street,
+    postalCode: read("postalCode"),
+    city: read("city"),
+    phone: read("phone") ?? PUBLIC_IDENTITY.phone,
+    contactEmail: read("contactEmail") ?? PUBLIC_IDENTITY.contactEmail,
+    director: read("director") ?? PUBLIC_IDENTITY.director,
+    vatMention: read("vatMention") ?? DEFAULT_VAT_MENTION,
+    mediatorName: read("mediatorName"),
+    mediatorUrl: read("mediatorUrl"),
+    capital: read("capital"),
+    registry: read("registry"),
   };
 
   const result = entitySchema.safeParse(raw);
@@ -216,16 +226,21 @@ export function parseLegalEntity(env: Env): LegalEntityParse {
     return {
       ok: true,
       entity: {
-        companyName: v.companyName,
+        fullName: v.fullName,
+        tradeName: v.tradeName,
         legalForm: v.legalForm,
-        siren: v.siren,
-        address: v.address,
-        vatNumber: v.vatNumber ?? null,
-        director: v.director,
+        siret: v.siret,
+        siren: v.siret.slice(0, 9),
+        street: v.street,
+        postalCode: v.postalCode,
+        city: v.city,
+        address: formatAddress(v),
+        phone: v.phone,
         contactEmail: v.contactEmail,
+        director: v.director,
+        vatMention: v.vatMention,
         mediatorName: v.mediatorName,
         mediatorUrl: v.mediatorUrl,
-        phone: v.phone ?? null,
         capital: v.capital ?? null,
         registry: v.registry ?? null,
       },
@@ -235,8 +250,8 @@ export function parseLegalEntity(env: Env): LegalEntityParse {
   const issues: LegalEntityIssue[] = [];
   const seen = new Set<string>();
   for (const issue of result.error.issues) {
-    const field = String(issue.path[0] ?? "");
-    const variable = FIELD_TO_ENV[field];
+    const field = String(issue.path[0] ?? "") as keyof typeof LEGAL_ENV;
+    const variable = LEGAL_ENV[field];
     if (!variable || seen.has(variable)) continue;
     seen.add(variable);
     const isMissing = raw[field as keyof typeof raw] === undefined;
@@ -271,11 +286,10 @@ export function resolveLegalEntity(env: Env, nodeEnv: string | undefined): Resol
   const parsed = parseLegalEntity(env);
   if (parsed.ok === true) return { entity: parsed.entity, isSample: false };
 
-  // Le drapeau d'exemple sert aux essais sur un serveur de production local : il est ignoré sur le vrai déploiement Vercel.
-  const sampleAllowed = nodeEnv !== "production" || (env[LEGAL_SAMPLE_FLAG] === "true" && env.VERCEL_ENV !== "production");
+  const sampleAllowed = nodeEnv !== "production" || env[LEGAL_SAMPLE_FLAG] === "true";
   if (sampleAllowed) return { entity: SAMPLE_LEGAL_ENTITY, isSample: true };
 
-  throw new Error(`Identité légale de la société incomplète. ${describeLegalIssues(parsed.issues)}`);
+  throw new Error(`Identité légale de l'éditeur incomplète. ${describeLegalIssues(parsed.issues)}`);
 }
 
 export function getLegalEntity(): ResolvedLegalEntity {

@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 import { legalUpdatedAt } from "@/lib/legal/documents";
 import { LEGAL_LINKS } from "@/lib/legal/links";
+import { getSiteOrigin } from "@/lib/siteOrigin";
 
-// Même hôte que celui des métadonnées du layout racine (Vercel renseigne NEXT_PUBLIC_APP_URL par environnement).
-const SITE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
+// Même hôte que celui des métadonnées du layout racine.
+const SITE_URL = getSiteOrigin();
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

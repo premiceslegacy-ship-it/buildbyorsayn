@@ -58,7 +58,6 @@ export function withClientReferenceId(
 /** Liens Stripe de base, déjà validés (ou null quand le lien est absent ou invalide). */
 export type CheckoutBaseLinks = {
   beginner: string | null;
-  upgrade: string | null;
   full: string | null;
 };
 
@@ -66,8 +65,13 @@ export type CheckoutBaseLinks = {
 export type CheckoutLinks = {
   fondations: string | null;
   coffre: string | null;
-  upgrade: string | null;
 };
+
+/**
+ * Porte serveur du complément Fondations vers LE COFFRE. Le lien Stripe du complément n'apparaît jamais dans une page :
+ * tout le monde passe par cette route, qui n'ouvre le paiement qu'aux comptes Fondations.
+ */
+export const UPGRADE_PATH = "/checkout/upgrade";
 
 /**
  * Point unique de résolution des liens de paiement (accueil, /checkout, tableau de bord).
@@ -80,6 +84,5 @@ export function resolveCheckoutLinks(
   return {
     fondations: withClientReferenceId(base.beginner, userId),
     coffre: withClientReferenceId(base.full, userId),
-    upgrade: withClientReferenceId(base.upgrade, userId),
   };
 }

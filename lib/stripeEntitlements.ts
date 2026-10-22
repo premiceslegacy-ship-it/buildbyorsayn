@@ -52,3 +52,22 @@ export function shouldApplyStripeTier(
   if (currentTier === "full" && incomingTier === "beginner") return false;
   return true;
 }
+
+export type UpgradeDecision = "grant" | "refuse" | "noop";
+
+/**
+ * Dernier rempart côté paiement : le complément (Fondations vers LE COFFRE) n'est jamais accordé à un compte
+ * qui n'a pas déjà Fondations.
+ * - "noop"   : ce paiement n'est pas le complément, le traitement habituel s'applique ;
+ * - "grant"  : complément payé par un compte beginner, full ou admin ;
+ * - "refuse" : complément payé par un compte gratuit, preview, sans niveau ou inconnu : pas d'accès, remboursement.
+ */
+export function decideUpgradeAccess(
+  priceId: string | null | undefined,
+  upgradePriceId: string | undefined,
+  currentTier: string | null | undefined,
+): UpgradeDecision {
+  if (!priceId || !upgradePriceId || priceId !== upgradePriceId) return "noop";
+  if (currentTier === "beginner" || currentTier === "full" || currentTier === "admin") return "grant";
+  return "refuse";
+}

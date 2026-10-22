@@ -9,7 +9,7 @@ import { SectionPager } from "@/components/ui/section-pager";
 import { Section5 } from "../sections/Section5";
 import { ANGLE_MORT, findSectionIndex, SECTIONS } from "../sections.data";
 import { SectionContent } from "../sections.components";
-import { withClientReferenceId } from "@/lib/pricing";
+import { UPGRADE_PATH } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -66,10 +66,8 @@ export default async function BeginnerSectionPage({ params }: Props) {
     : null;
 
   const displayEmail = user.email ?? "";
-  const upgradeUrl = withClientReferenceId(
-    process.env.STRIPE_UPGRADE_CHECKOUT_LINK ?? null,
-    user.id
-  );
+  // Le lien Stripe du complément n'est jamais rendu : la porte serveur le résout selon le niveau du compte.
+  const upgradeUrl = UPGRADE_PATH;
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans">

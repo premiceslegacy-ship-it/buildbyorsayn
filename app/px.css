@@ -36,3 +36,6 @@
 
 /* les ancres de la barre flottante ne passent pas sous la barre */
 .da section[id] { scroll-margin-top: 84px; }
+
+/* phrase courte au-dessus des cartes (par exemple : le complément est réservé aux comptes Fondations) */
+.da .px-avis { max-width: 980px; margin: -24px auto 28px; padding: 14px 22px; border-radius: var(--r-m); background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait-f); font: 500 17px/1.4 var(--font); color: var(--t1); text-align: center; text-wrap: pretty; }

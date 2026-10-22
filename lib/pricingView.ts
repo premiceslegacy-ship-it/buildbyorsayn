@@ -3,21 +3,24 @@ import { SKILLS_CATALOG } from "@/lib/skillsCatalog";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 /** Un bloc d'écran de la zone « Offres ». */
-export type PricingBlock = "fondations" | "coffre" | "upgradeBand" | "upgradeCard" | "owned";
+export type PricingBlock = "fondations" | "coffre" | "upgradeBand" | "upgradeCard" | "owned" | "unverified";
 
 export type PricingView = { blocks: readonly PricingBlock[] };
 
 const BOTH: PricingView = { blocks: ["fondations", "coffre", "upgradeBand"] };
 const UPGRADE_ONLY: PricingView = { blocks: ["upgradeCard"] };
 const OWNED: PricingView = { blocks: ["owned"] };
+const UNVERIFIED: PricingView = { blocks: ["unverified"] };
 
 /**
  * Décide quels blocs d'achat afficher selon l'accès du visiteur.
  * - anonyme, free, preview, inconnu : les deux offres et la montée de Fondations à LE COFFRE ;
  * - beginner (Fondations) : uniquement la carte de montée vers LE COFFRE ;
- * - full ou admin : aucune carte d'achat, seulement la confirmation qu'il a tout.
+ * - full ou admin : aucune carte d'achat, seulement la confirmation qu'il a tout ;
+ * - accès impossible à vérifier (lecture du profil en erreur) : aucune carte d'achat, une phrase neutre.
  */
-export function selectPricingView({ tier }: { tier: string | null | undefined }): PricingView {
+export function selectPricingView({ tier, unverified = false }: { tier: string | null | undefined; unverified?: boolean }): PricingView {
+  if (unverified) return UNVERIFIED;
   const normalized = normalizeProfileTier(tier);
   if (normalized === "full") return OWNED;
   if (normalized === "beginner") return UPGRADE_ONLY;

@@ -3,12 +3,12 @@ import { connection } from "next/server";
 import { ContactLink, IdentityTable, LegalPage, type LegalSection } from "@/components/da/LegalPage";
 import { CHECKOUT_CONSENT_TEXT } from "@/lib/legal/consent";
 import { legalMetadata, PRICES, quote, TIER_NAMES } from "@/lib/legal/documents";
-import { getLegalEntity } from "@/lib/legal/entity";
+import { describeSeller, getLegalEntity } from "@/lib/legal/entity";
 
 export const metadata = legalMetadata("/cgv");
 
 export default async function CgvPage() {
-  // L'identité de la société est lue au moment de la requête : un serveur de production sans elle refuse d'afficher la page.
+  // L'identité de l'éditeur est lue au moment de la requête : un serveur de production sans elle refuse d'afficher la page.
   await connection();
   const { entity, isSample } = getLegalEntity();
   const { fondations, coffre } = TIER_NAMES;
@@ -36,7 +36,7 @@ export default async function CgvPage() {
       title: "Qui te vend BUILD",
       children: (
         <>
-          <p>BUILD est vendu par la société suivante. Dans ce texte, {quote("BUILD")} et {quote("nous")} désignent cette société.</p>
+          <p>BUILD est vendu par {describeSeller(entity)}. Dans ce texte, {quote("BUILD")} et {quote("nous")} désignent cet éditeur.</p>
           <IdentityTable entity={entity} />
         </>
       ),
@@ -63,7 +63,7 @@ export default async function CgvPage() {
               </tr>
             </tbody>
           </table>
-          <p>Les prix sont en euros, toutes taxes comprises. Le prix qui compte est celui affiché au moment de ta commande. Un changement de prix ne touche jamais un achat déjà fait.</p>
+          <p>Les prix sont en euros et sont des prix nets : {entity.vatMention}. Le prix qui compte est celui affiché au moment de ta commande. Un changement de prix ne touche jamais un achat déjà fait.</p>
           <p>
             {quote("Accès à vie")} veut dire : sans limite de durée et sans abonnement, tant que BUILD est exploité. Si BUILD devait s&apos;arrêter, nous te préviendrions par e-mail à l&apos;avance.
           </p>
@@ -134,7 +134,7 @@ export default async function CgvPage() {
             <li>publier, partager ou redistribuer les vidéos, les textes ou les skills, en entier ou en grande partie ;</li>
             <li>enregistrer les vidéos ou contourner leur protection. Ton adresse e-mail apparaît en filigrane sur les vidéos.</li>
           </ul>
-          <p>BUILD, ses vidéos, ses textes, ses skills et ses marques restent la propriété de {entity.companyName} et de ses auteurs.</p>
+          <p>BUILD, ses vidéos, ses textes, ses skills et ses marques restent la propriété de {entity.fullName} et de ses auteurs.</p>
         </>
       ),
     },
@@ -210,7 +210,7 @@ export default async function CgvPage() {
       title: "Droit applicable et tribunaux",
       children: (
         <>
-          <p>Ces conditions sont régies par le droit français. En cas de litige, et si tu es consommateur, tu peux saisir le tribunal du lieu où tu habitais au moment de ton achat ou du fait qui pose problème, ou l&apos;un des tribunaux compétents selon les règles habituelles (article R631-3 du Code de la consommation). Si tu achètes pour ton activité professionnelle, les tribunaux compétents sont ceux du lieu du siège de {entity.companyName}.</p>
+          <p>Ces conditions sont régies par le droit français. En cas de litige, et si tu es consommateur, tu peux saisir le tribunal du lieu où tu habitais au moment de ton achat ou du fait qui pose problème, ou l&apos;un des tribunaux compétents selon les règles habituelles (article R631-3 du Code de la consommation). Si tu achètes pour ton activité professionnelle, les tribunaux compétents sont ceux du lieu où est établi {entity.fullName}.</p>
         </>
       ),
     },

@@ -3,7 +3,7 @@ import { connection } from "next/server";
 import type { ReactNode } from "react";
 import { ContactLink, LegalPage, type LegalSection } from "@/components/da/LegalPage";
 import { legalMetadata, quote, TIER_NAMES } from "@/lib/legal/documents";
-import { getLegalEntity } from "@/lib/legal/entity";
+import { describeSeller, getLegalEntity } from "@/lib/legal/entity";
 import { PROCESSORS } from "@/lib/legal/processors";
 
 export const metadata = legalMetadata("/confidentialite");
@@ -39,7 +39,7 @@ export default async function ConfidentialitePage() {
       title: "Qui est responsable de tes données",
       children: (
         <>
-          <p>Le responsable du traitement est {entity.companyName}, {entity.legalForm}, SIREN {entity.siren}, dont le siège est {entity.address}. Dans ce texte, {quote("nous")} désigne cette société.</p>
+          <p>Le responsable du traitement est {describeSeller(entity)}, SIRET {entity.siret}, établi {entity.address}. Dans ce texte, {quote("nous")} désigne cet éditeur.</p>
           <p>Pour toute question sur tes données, écris à {contact}.</p>
         </>
       ),
@@ -145,7 +145,7 @@ export default async function ConfidentialitePage() {
                 <tr key={processor.id}>
                   <th scope="row">{processor.name}</th>
                   <td>
-                    {processor.role} <strong>Il reçoit :</strong> {processor.data} Société : {processor.company}, {processor.seat}.
+                    {processor.role} <strong>Il reçoit :</strong> {processor.data} Société : {processor.company}, {processor.seat}.{processor.dataLocation ? ` Données stockées en ${processor.dataLocation}.` : ""}
                   </td>
                 </tr>
               ))}

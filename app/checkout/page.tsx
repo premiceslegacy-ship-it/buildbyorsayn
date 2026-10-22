@@ -15,25 +15,34 @@ export const metadata = {
 export default async function CheckoutPage({
     searchParams,
 }: {
-    searchParams: Promise<{ from?: string | string[] }>;
+    searchParams: Promise<{ from?: string | string[]; upgrade?: string | string[] }>;
 }) {
-    const { from } = await searchParams;
+    const { from, upgrade } = await searchParams;
     const fromMcp = from === "mcp";
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     let tier: string | null = null;
+    let accessUnverified = false;
     if (user?.id) {
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
             .from("profiles")
             .select("tier")
             .eq("id", user.id)
-            .single();
+            .maybeSingle();
+        accessUnverified = Boolean(error);
         tier = normalizeProfileTier(profile?.tier ?? null);
     }
 
     const links = getCheckoutLinks(user?.id);
-    const showsBothOffers = selectPricingView({ tier }).blocks.includes("fondations");
+    const blocks = selectPricingView({ tier, unverified: accessUnverified }).blocks;
+    const showsBothOffers = blocks.includes("fondations");
+    const notice =
+        from === "upgrade" && showsBothOffers
+            ? "Le complément est réservé aux comptes Fondations. Choisis Fondations ou LE\u00a0COFFRE."
+            : upgrade === "indisponible" && blocks.includes("upgradeCard")
+              ? "Le paiement du complément n'est pas disponible pour le moment. Écris-nous et on règle ça."
+              : undefined;
 
     return (
         <DaRoot>
@@ -44,6 +53,8 @@ export default async function CheckoutPage({
                     links={links}
                     headingLevel="h1"
                     compact
+                    unverified={accessUnverified}
+                    notice={notice}
                     lede={fromMcp && showsBothOffers ? "Ton compte est prêt. Choisis ton niveau pour connecter ton assistant à BUILD." : undefined}
                 />
                 <div className="wrap">

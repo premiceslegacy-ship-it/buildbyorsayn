@@ -3,6 +3,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { XMLParser } from "fast-xml-parser";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { requireSiteOrigin } from "@/lib/siteOrigin";
 
 export type YoutubeEntry = { videoId: string; title: string; publishedAt: string };
 export type YoutubeFeedResult = { entries: YoutubeEntry[]; deletedIds: string[] };
@@ -91,12 +92,6 @@ export async function storeYoutubeFeed(result: YoutubeFeedResult, fetchImpl: typ
   return entries.length;
 }
 
-function need(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`${name} is not configured.`);
-  return value;
-}
-
 export function requireChannelId(): string {
   const channelId = process.env.YOUTUBE_CHANNEL_ID;
   if (!channelId) throw new Error("YOUTUBE_CHANNEL_ID is not configured.");
@@ -117,7 +112,7 @@ export async function renewYoutubeWebSub(fetchImpl: typeof fetch = fetch): Promi
   const secret = process.env.YOUTUBE_WEBSUB_SECRET;
   if (!secret) throw new Error("YOUTUBE_WEBSUB_SECRET is not configured.");
   // Same variable the Stripe webhook uses; it must be the host that actually serves the app (the hub verifies the callback).
-  const siteUrl = need("NEXT_PUBLIC_APP_URL").replace(/\/+$/, "");
+  const siteUrl = requireSiteOrigin();
   const response = await fetchImpl(HUB_URL, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },

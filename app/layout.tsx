@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import { getSiteOrigin } from "@/lib/siteOrigin";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const SITE_TITLE = "Construire, vendre et livrer avec l'IA | BUILD by Orsayn";
 const SITE_DESCRIPTION = "BUILD t'aide à passer d'idées et d'outils dispersés à une offre claire, un livrable montrable et une méthode réutilisable.";
 // The host that really serves the app (Vercel sets it per environment); localhost when unset in dev.
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const SITE_URL = getSiteOrigin();
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
