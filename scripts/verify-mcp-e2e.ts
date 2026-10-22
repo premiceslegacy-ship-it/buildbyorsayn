@@ -363,7 +363,8 @@ async function main(): Promise<void> {
     })) authorizeUrl.searchParams.set(key, value);
 
     browser = await chromium.launch({ headless: true, channel: "chrome" });
-    const context = await browser.newContext();
+    // Sur Vercel, ce en-tête est posé par la plateforme ; les quotas d'autorisation refusent sans lui.
+    const context = await browser.newContext({ extraHTTPHeaders: TRUSTED_NETWORK_HEADER });
     const page = await context.newPage();
     await page.goto(authorizeUrl.toString());
     await page.getByLabel("Email").fill(email);
