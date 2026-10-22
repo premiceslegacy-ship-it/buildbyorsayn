@@ -81,6 +81,23 @@ export function isRedirectUriRegistrable(candidate: string): boolean {
   if (url.protocol === "http:" && LOOPBACK_HOSTS.has(url.hostname)) return true;
   return false;
 }
+/**
+ * The caller must first validate the redirect URI against the requesting
+ * client's exact registered callback.
+ */
+export function buildValidatedAuthorizationErrorCallback(
+  redirectUri: string,
+  state: string,
+  error: "access_denied" | "temporarily_unavailable",
+  description?: string,
+): URL {
+  const callback = new URL(redirectUri);
+  callback.searchParams.set("error", error);
+  if (description) callback.searchParams.set("error_description", description);
+  callback.searchParams.set("state", state);
+  return callback;
+}
+
 
 const MAX_CLIENT_NAME_LENGTH = 100;
 

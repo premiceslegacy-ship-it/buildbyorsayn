@@ -2,29 +2,31 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { parseYoutubeAtom, verifyWebSubSignature, websubTopic } from "../lib/youtube/feed";
+import { parseYoutubeAtom, renewYoutubeWebSub, verifyWebSubIntent, verifyWebSubSignature, websubTopic } from "../lib/youtube/feed";
 
 const xml = readFileSync(new URL("./fixtures/youtube-feed.xml", import.meta.url), "utf8");
 
 test("parseYoutubeAtom keeps only well-formed entries of the configured channel and reports tombstones", () => {
   const result = parseYoutubeAtom(xml, "UCmine");
   assert.deepEqual(result.entries, [
-    { videoId: "AAAAAAAAAAA", title: "Première & meilleure vidéo", publishedAt: "2026-10-01T09:00:00+00:00" },
-    { videoId: "BBBBBBBBBBB", title: "Deuxième vidéo", publishedAt: "2026-10-10T09:00:00+00:00" },
+    { videoId: "AAAAAAAAAAA", title: "Première & meilleure vidéo", publishedAt: "2026-10-01T09:00:00+00:00", eventAt: "2026-10-20T09:00:00+00:00" },
+    { videoId: "BBBBBBBBBBB", title: "Deuxième vidéo", publishedAt: "2026-10-10T09:00:00+00:00", eventAt: "2026-10-10T09:00:00+00:00" },
   ]);
-  assert.deepEqual(result.deletedIds, ["DELETEDvid1"]);
+  assert.deepEqual(result.tombstones, [{ videoId: "DELETEDvid1", deletedAt: "2026-10-18T10:00:00+00:00" }]);
 });
 
 test("parseYoutubeAtom handles a single entry (not an array) and an empty feed", () => {
   const single = `<feed xmlns:yt="y" xmlns="http://www.w3.org/2005/Atom"><entry><yt:videoId>AAAAAAAAAAA</yt:videoId><yt:channelId>UCmine</yt:channelId><title>Seule</title><published>2026-10-01T09:00:00+00:00</published></entry></feed>`;
-  assert.equal(parseYoutubeAtom(single, "UCmine").entries.length, 1);
-  assert.deepEqual(parseYoutubeAtom(`<feed xmlns="http://www.w3.org/2005/Atom"></feed>`, "UCmine"), { entries: [], deletedIds: [] });
+  assert.deepEqual(parseYoutubeAtom(single, "UCmine").entries, [
+    { videoId: "AAAAAAAAAAA", title: "Seule", publishedAt: "2026-10-01T09:00:00+00:00", eventAt: "2026-10-01T09:00:00+00:00" },
+  ]);
+  assert.deepEqual(parseYoutubeAtom(`<feed xmlns="http://www.w3.org/2005/Atom"></feed>`, "UCmine"), { entries: [], tombstones: [] });
   assert.deepEqual(parseYoutubeAtom(single, "UCother").entries, []);
 });
 
-test("parseYoutubeAtom rejects entries with an unparseable date or a tombstone with a malformed ref", () => {
-  const broken = `<feed xmlns:at="t" xmlns:yt="y" xmlns="http://www.w3.org/2005/Atom"><at:deleted-entry ref="yt:video:short"/><entry><yt:videoId>AAAAAAAAAAA</yt:videoId><yt:channelId>UCmine</yt:channelId><title>Date cassée</title><published>not-a-date</published></entry></feed>`;
-  assert.deepEqual(parseYoutubeAtom(broken, "UCmine"), { entries: [], deletedIds: [] });
+test("parseYoutubeAtom rejects malformed publication and update timestamps or a malformed tombstone ref", () => {
+  const broken = `<feed xmlns:at="t" xmlns:yt="y" xmlns="http://www.w3.org/2005/Atom"><at:deleted-entry ref="yt:video:short"/><entry><yt:videoId>AAAAAAAAAAA</yt:videoId><yt:channelId>UCmine</yt:channelId><title>Publication cassée</title><published>not-a-date</published></entry><entry><yt:videoId>BBBBBBBBBBB</yt:videoId><yt:channelId>UCmine</yt:channelId><title>Mise à jour cassée</title><published>2026-10-01T09:00:00Z</published><updated>not-a-date</updated></entry></feed>`;
+  assert.deepEqual(parseYoutubeAtom(broken, "UCmine"), { entries: [], tombstones: [] });
 });
 
 test("verifyWebSubSignature accepts only the exact HMAC-SHA1 of the body", () => {
@@ -40,25 +42,47 @@ test("verifyWebSubSignature accepts only the exact HMAC-SHA1 of the body", () =>
   assert.equal(verifyWebSubSignature(body, valid, ""), false);
 });
 
-test("websub GET verifies only the expected topic and echoes the challenge", async () => {
+test("verifyWebSubIntent accepts only the exact dedicated token", () => {
+  const token = "v".repeat(32);
+  assert.equal(verifyWebSubIntent(token, token), true);
+  assert.equal(verifyWebSubIntent(`${token}x`, token), false);
+  assert.equal(verifyWebSubIntent(null, token), false);
+  assert.equal(verifyWebSubIntent("short", "short"), false);
+});
+
+test("websub GET accepts only the authenticated subscription intent", async () => {
   const { GET } = await import("../app/api/youtube/websub/route");
-  const previous = process.env.YOUTUBE_CHANNEL_ID;
+  const previous = {
+    channel: process.env.YOUTUBE_CHANNEL_ID,
+    verifyToken: process.env.YOUTUBE_WEBSUB_VERIFY_TOKEN,
+  };
   process.env.YOUTUBE_CHANNEL_ID = "UCmine";
+  process.env.YOUTUBE_WEBSUB_VERIFY_TOKEN = "v".repeat(32);
   try {
     const url = (params: Record<string, string>) => `https://app.example.com/api/youtube/websub?${new URLSearchParams(params)}`;
-    const ok = await GET(new Request(url({ "hub.mode": "subscribe", "hub.topic": websubTopic("UCmine"), "hub.challenge": "abc123" })));
+    const valid = {
+      "hub.mode": "subscribe",
+      "hub.topic": websubTopic("UCmine"),
+      "hub.challenge": "abc123",
+      "hub.verify_token": "v".repeat(32),
+    };
+    const ok = await GET(new Request(url(valid)));
     assert.equal(ok.status, 200);
     assert.equal(await ok.text(), "abc123");
     assert.equal(ok.headers.get("content-type"), "text/plain");
     for (const params of [
-      { "hub.mode": "subscribe", "hub.topic": websubTopic("UCother"), "hub.challenge": "x" },
-      { "hub.mode": "denied", "hub.topic": websubTopic("UCmine"), "hub.challenge": "x" },
-      { "hub.mode": "subscribe", "hub.topic": websubTopic("UCmine") },
+      { ...valid, "hub.topic": websubTopic("UCother") },
+      { ...valid, "hub.mode": "unsubscribe" },
+      { ...valid, "hub.verify_token": "x".repeat(32) },
+      { ...valid, "hub.challenge": "" },
     ]) {
       assert.equal((await GET(new Request(url(params)))).status, 404);
     }
   } finally {
-    if (previous === undefined) delete process.env.YOUTUBE_CHANNEL_ID; else process.env.YOUTUBE_CHANNEL_ID = previous;
+    if (previous.channel === undefined) delete process.env.YOUTUBE_CHANNEL_ID;
+    else process.env.YOUTUBE_CHANNEL_ID = previous.channel;
+    if (previous.verifyToken === undefined) delete process.env.YOUTUBE_WEBSUB_VERIFY_TOKEN;
+    else process.env.YOUTUBE_WEBSUB_VERIFY_TOKEN = previous.verifyToken;
   }
 });
 
@@ -133,7 +157,10 @@ test("a consent-page redirect or a rate limit is NOT read as 'not a Short': it t
 
 test("excludeShorts keeps only long videos in order, across batches, and fails closed on an unknown answer", async () => {
   const ids = ["AAAAAAAAAAA", "BBBBBBBBBBB", "CCCCCCCCCCC", "DDDDDDDDDDD", "EEEEEEEEEEE", "FFFFFFFFFFF", "GGGGGGGGGGG", "HHHHHHHHHHH"];
-  const entries = ids.map((videoId, index) => ({ videoId, title: `t${index}`, publishedAt: `2026-10-0${index + 1}T00:00:00Z` }));
+  const entries = ids.map((videoId, index) => {
+    const publishedAt = `2026-10-0${index + 1}T00:00:00Z`;
+    return { videoId, title: `t${index}`, publishedAt, eventAt: publishedAt };
+  });
   const kept = await excludeShorts(entries, fakeShortsFetch({ shorts: new Set(["AAAAAAAAAAA", "DDDDDDDDDDD", "HHHHHHHHHHH"]) }));
   assert.deepEqual(kept.map((entry) => entry.videoId), ["BBBBBBBBBBB", "CCCCCCCCCCC", "EEEEEEEEEEE", "FFFFFFFFFFF", "GGGGGGGGGGG"]);
   await assert.rejects(excludeShorts(entries, fakeShortsFetch({ consent: new Set(["GGGGGGGGGGG"]) })), /inconclusive/);
@@ -161,7 +188,6 @@ test("websub POST refuses oversized bodies before hashing or storing them", asyn
   assert.equal(actual.status, 413);
 });
 
-import { renewYoutubeWebSub } from "../lib/youtube/feed";
 
 function withEnv(values: Record<string, string | undefined>, run: () => Promise<void>) {
   const previous = Object.fromEntries(Object.keys(values).map((name) => [name, process.env[name]]));
@@ -172,7 +198,12 @@ function withEnv(values: Record<string, string | undefined>, run: () => Promise<
 }
 
 test("WebSub subscribes with a callback on the host that really serves the app, never a hardcoded domain", () => withEnv(
-  { YOUTUBE_CHANNEL_ID: "UCmine", YOUTUBE_WEBSUB_SECRET: "s".repeat(32), NEXT_PUBLIC_APP_URL: "https://build-system-three.vercel.app/" },
+  {
+    YOUTUBE_CHANNEL_ID: "UCmine",
+    YOUTUBE_WEBSUB_SECRET: "s".repeat(32),
+    YOUTUBE_WEBSUB_VERIFY_TOKEN: "v".repeat(32),
+    NEXT_PUBLIC_APP_URL: "https://build-system-three.vercel.app/",
+  },
   async () => {
     let sent: { url: string; body: URLSearchParams } | null = null;
     await renewYoutubeWebSub((async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -184,13 +215,22 @@ test("WebSub subscribes with a callback on the host that really serves the app, 
     assert.equal(sent!.body.get("hub.topic"), websubTopic("UCmine"));
     assert.equal(sent!.body.get("hub.mode"), "subscribe");
     assert.equal(sent!.body.get("hub.secret"), "s".repeat(32));
+    assert.equal(sent!.body.get("hub.verify_token"), "v".repeat(32));
   },
 ));
 
 test("WebSub refuses to subscribe without an app URL, without a secret, or when the hub rejects it", async () => {
   const ok = (async () => new Response(null, { status: 202 })) as typeof fetch;
-  const base = { YOUTUBE_CHANNEL_ID: "UCmine", YOUTUBE_WEBSUB_SECRET: "s".repeat(32), NEXT_PUBLIC_APP_URL: "https://app.example.com" };
+  const base = {
+    YOUTUBE_CHANNEL_ID: "UCmine",
+    YOUTUBE_WEBSUB_SECRET: "s".repeat(32),
+    YOUTUBE_WEBSUB_VERIFY_TOKEN: "v".repeat(32),
+    NEXT_PUBLIC_APP_URL: "https://app.example.com",
+  };
   await withEnv({ ...base, NEXT_PUBLIC_APP_URL: undefined }, async () => { await assert.rejects(renewYoutubeWebSub(ok), /NEXT_PUBLIC_APP_URL/); });
   await withEnv({ ...base, YOUTUBE_WEBSUB_SECRET: undefined }, async () => { await assert.rejects(renewYoutubeWebSub(ok), /YOUTUBE_WEBSUB_SECRET/); });
+  await withEnv({ ...base, YOUTUBE_WEBSUB_VERIFY_TOKEN: undefined }, async () => {
+    await assert.rejects(renewYoutubeWebSub(ok), /YOUTUBE_WEBSUB_VERIFY_TOKEN/);
+  });
   await withEnv(base, async () => { await assert.rejects(renewYoutubeWebSub((async () => new Response(null, { status: 400 })) as typeof fetch), /400/); });
 });

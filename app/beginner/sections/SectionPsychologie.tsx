@@ -4,27 +4,27 @@ import { FoundationChapter } from "../FoundationChapter";
 const LEVERS = [
   {
     t: "Le progrès espéré",
-    d: "Les personnes cherchent souvent une situation meilleure : moins de retard, plus de clarté, moins d'erreurs ou une décision plus simple. Décris ce progrès avec précision, sans promettre un raccourci magique ni un résultat que tu ne peux pas contrôler.",
+    d: "Une personne cherche une situation meilleure : moins de retard, une décision plus simple ou moins d'erreurs à reprendre. Décris ce progrès par un changement visible dans son travail. Garde les conditions et les limites près de la proposition, car tu ne contrôles jamais seul le résultat final.",
   },
   {
     t: "L'identité que l'on veut confirmer",
-    d: "Une offre peut aider quelqu'un à se sentir plus professionnel, plus autonome ou plus organisé. Parle de cette identité sans fabriquer de honte et sans présenter un outil comme le ticket d'entrée obligatoire dans une catégorie.",
+    d: "Un achat peut soutenir l'image que la personne veut avoir d'elle-même : professionnelle, autonome, fiable ou organisée. Montre comment l'offre l'aide à agir ainsi. Évite la honte, le statut inventé et l'idée qu'un outil serait obligatoire pour appartenir au bon groupe.",
   },
   {
     t: "La preuve par l'observation",
-    d: "Voir une méthode utilisée par d'autres peut rassurer, mais une preuve sociale ne remplace pas l'adéquation au contexte. Distingue toujours ce qui est observé, ce qui est mesuré et ce qui reste à vérifier pour la personne en face.",
+    d: "Voir une méthode, un livrable ou un cas comparable réduit une partie de l'incertitude. Précise ce qui a été observé, dans quel contexte et ce qui reste à vérifier. Le comportement d'autres personnes ne suffit jamais à prouver que l'offre convient au cas présent.",
   },
   {
     t: "La crédibilité visible",
-    d: "Une présentation claire, une réponse rapide et un processus lisible peuvent renforcer la confiance. Ne confonds pas apparence premium et preuve de qualité : montre aussi les limites, les conditions et ce qui sera réellement livré.",
+    d: "Une réponse précise, un devis lisible et un processus expliqué donnent des indices sur la manière de travailler. Ces indices ne prouvent pas tout. Ajoute le périmètre, les responsabilités, les limites et un exemple du livrable pour que la confiance repose sur des éléments inspectables.",
   },
   {
     t: "Le coût de l'inaction",
-    d: "Une décision peut être motivée par un coût déjà visible : relances oubliées, informations dispersées, erreurs répétées ou temps perdu. N'utilise ce ressort que si le coût est réel, documentable et présenté sans exagération ni menace.",
+    d: "L'inaction a parfois un coût déjà visible : relances oubliées, temps de ressaisie, erreurs répétées ou demande laissée sans réponse. Fais-le décrire par la personne et distingue le fait du calcul estimé. Une peur amplifiée ou un scénario catastrophe ne produit pas une décision saine.",
   },
   {
     t: "Le besoin de sécurité",
-    d: "Beaucoup d'achats servent à réduire l'incertitude : ne plus rater une facture, perdre une information ou bloquer sur une étape. Explique le périmètre, les accès, les sauvegardes, les contrôles et la marche arrière au lieu de vendre une tranquillité abstraite.",
+    d: "Acheter peut servir à réduire une incertitude : savoir qui répond, retrouver une information ou pouvoir revenir en arrière. Explique les accès, validations, sauvegardes, dépendances et conditions de sortie. Une procédure visible rassure davantage qu'une promesse générale de tranquillité.",
   },
 ];
 
@@ -36,23 +36,32 @@ export function SectionPsychologie() {
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Comprendre ce qui fait agir les gens</h2>
       </div>
       <p className="text-white/60 text-base leading-relaxed mb-10">
-        On répète qu'il faut &quot;résoudre un problème&quot;. C'est vrai, mais c'est incomplet. Une décision mêle faits, émotions, habitudes, identité et perception du risque. Comprendre ces ressorts sert d'abord à mieux qualifier une situation et à écrire un message honnête, pas à exploiter une vulnérabilité ni à promettre un résultat automatique.
+        Une décision mélange faits, émotions, habitudes, identité et perception du risque. La psychologie appliquée consiste à comprendre ces ressorts pour mieux qualifier une situation. Elle ne donne aucune permission d'exploiter une vulnérabilité, de cacher une condition ou de promettre un résultat automatique.
       </p>
 
       <FoundationChapter eyebrow="Chapitre 1" title="Le problème est aussi une situation humaine">
         <p>
-          Un site web premium ne se vend pas seulement parce qu'il règle un souci technique. Il peut aider son propriétaire à paraître plus clair, plus fiable ou plus simple à contacter. Observe donc la situation complète : ce que la personne ressent, ce qu'elle doit prouver, ce qu'elle craint et ce qu'elle peut réellement décider.
+          Une personne ne demande pas toujours un site pour une raison technique. Elle peut vouloir rassurer un prospect après une recommandation, présenter ses réalisations sans fouiller dans son téléphone ou recevoir des demandes plus faciles à traiter. Le livrable prend son sens dans cette situation humaine.
         </p>
         <p>
-          Commence par nommer la situation humaine, puis apporte les faits qui permettent de décider : périmètre, preuve, coût, délai, risques et prochaine étape. L'intuition ouvre l'attention ; la clarté permet un consentement informé.
+          Observe quatre couches. La scène décrit ce qui vient de se passer. L'émotion indique ce qui compte pour la personne. Le risque nomme ce qu'elle veut éviter. Les faits permettent ensuite de juger l'offre : périmètre, preuve, coût, délai, responsabilités et prochaine étape.
         </p>
+        <p>
+          Exemple : une dirigeante dit qu'elle veut « un site premium ». Demande ce qui a déclenché la demande. Elle explique qu'après chaque recommandation, elle renvoie manuellement les mêmes photos et références. Tu peux maintenant discuter d'un parcours précis au lieu d'interpréter le mot « premium » à sa place.
+        </p>
+        <div className="border-y border-white/10 py-5">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/70">Version pour l'IA</p>
+          <p className="text-sm leading-relaxed text-white/60">
+            Fournis une retranscription anonymisée et demande à l'IA de séparer les faits, émotions exprimées, risques nommés, alternatives actuelles et informations manquantes. Exige une citation interne pour chaque observation. Relis ensuite la source : le modèle propose un classement, il ne lit pas l'intention de la personne.
+          </p>
+        </div>
       </FoundationChapter>
 
       {/* Les ressorts */}
       <SectionReveal className="mb-6">
         <h3 className="text-base font-semibold text-[#f0ede8] mb-2">Six ressorts psychologiques</h3>
         <p className="text-sm text-white/45 leading-relaxed mb-5 max-w-2xl">
-          Chacun répond à un besoin différent. Un bon message reste précis, vérifiable et proportionné au contexte au lieu d'activer artificiellement la peur ou l'urgence.
+          Chaque ressort répond à une incertitude différente. Utilise seulement ceux que la situation rend visibles et laisse toujours le refus accessible.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {LEVERS.map(({ t, d }) => (
@@ -69,7 +78,7 @@ export function SectionPsychologie() {
 
       <SectionReveal className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 px-6 py-5">
         <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
-          Comprendre ces ressorts, ce n'est pas manipuler. C'est relier une situation réelle, une preuve utile et une décision libre. La qualité commerciale vient de cette compréhension, de la confiance construite et de la valeur livrée, pas d'une pression mieux cachée.
+          À faire maintenant : reprends une demande réelle et écris la scène, le progrès recherché, le risque perçu et la preuve disponible. Marque chaque interprétation comme une hypothèse. Prépare ensuite une question ouverte pour vérifier ce qui manque, sans suggérer la réponse.
         </p>
       </SectionReveal>
     </div>

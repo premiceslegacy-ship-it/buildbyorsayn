@@ -20,7 +20,14 @@ async function main() {
     if (!response.ok) throw new Error(`YouTube API responded ${response.status}`);
     const page = (await response.json()) as PlaylistPage;
     for (const item of page.items ?? []) {
-      entries.push({ videoId: item.snippet.resourceId.videoId, title: item.snippet.title, publishedAt: item.snippet.publishedAt });
+      entries.push({
+        videoId: item.snippet.resourceId.videoId,
+        title: item.snippet.title,
+        publishedAt: item.snippet.publishedAt,
+        // The Data API has no Atom `updated` value here. Reuse the immutable
+        // publication time rather than making a historical backfill look new.
+        eventAt: item.snippet.publishedAt,
+      });
     }
     pageToken = page.nextPageToken;
   } while (pageToken);
@@ -28,7 +35,7 @@ async function main() {
   // Private/deleted uploads come back with placeholder titles and no usable id.
   const stored = await storeYoutubeFeed({
     entries: entries.filter((entry) => /^[A-Za-z0-9_-]{11}$/.test(entry.videoId) && entry.title !== "Private video" && entry.title !== "Deleted video"),
-    deletedIds: [],
+    tombstones: [],
   });
   console.log(`Backfilled ${stored} videos.`);
 }

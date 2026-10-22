@@ -103,6 +103,9 @@ applyFile("supabase/migrations/20260904233000_mcp_dcr_capacity_recovery.sql");
 applyFile("supabase/migrations/20260905000000_mcp_cleanup_deadline_reserve.sql");
 applyFile("supabase/migrations/20260905001000_mcp_knowledge_entitlement_boundary.sql");
 applyFile("supabase/migrations/20260905002000_mcp_consent_user_binding.sql");
+applyFile("supabase/migrations/20261022133000_oauth_authorization_request_limits.sql");
+applyFile("supabase/migrations/20261022134000_mcp_dcr_short_lease.sql");
+applyFile("supabase/migrations/20261022141000_mcp_rate_limit_cleanup_capacity.sql");
 
 assert.equal(sql("select relrowsecurity::int || ':' || relforcerowsecurity::int from pg_class where oid='public.knowledge_chunks'::regclass"), "1:1");
 assert.equal(sql("select has_table_privilege('anon','public.knowledge_chunks','select')::int || ':' || has_table_privilege('authenticated','public.knowledge_chunks','select')::int"), "0:0");
@@ -183,6 +186,19 @@ assert.deepEqual(rotationResults.sort(), ["issued", "reuse_detected"]);
 assert.equal(sql("select count(*) from public.mcp_refresh_tokens where family_id='22222222-2222-4222-8222-222222222222' and revoked_at is null"), "0");
 assert.equal(sql("select count(*) from public.mcp_access_tokens where family_id='22222222-2222-4222-8222-222222222222' and revoked_at is null"), "0");
 assert.equal(sql(`select status from public.rotate_mcp_refresh_token('${H.refresh1}','${clientId}','${resource}','${sha256("after-replay-access")}','${sha256("after-replay-refresh")}')`), "reuse_detected");
+
+const authorizationCapResults = await Promise.all(
+  Array.from({ length: 6 }, (_, index) => sqlAsync(
+    `select public.create_mcp_authorization_request('${sha256(`cap-request-${index}`)}','${clientId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','state','${userId}')`
+  )),
+);
+assert.equal(authorizationCapResults.filter((status) => status === "created").length, 5);
+assert.equal(authorizationCapResults.filter((status) => status === "rate_limited").length, 1);
+sql(`update public.mcp_authorization_requests set expires_at=now()-interval '1 second' where request_hash='${sha256("cap-request-0")}'`);
+assert.equal(
+  sql(`select public.create_mcp_authorization_request('${sha256("cap-request-after-expiry")}','${clientId}','${redirectUri}','${challenge(verifier)}','S256','mcp','${resource}','state','${userId}')`),
+  "created",
+);
 assert.equal(sql("select count(*) from public.mcp_refresh_tokens where family_expires_at > created_at + interval '30 days'"), "0");
 
 const zeroVector = `[${Array(768).fill(0).join(",")}]`;
@@ -296,6 +312,17 @@ assert.equal(sql(`select count(*) from public.mcp_oauth_clients where client_id=
 const secondCleanup = sql("select * from public.cleanup_mcp_oauth_state(2)");
 assert.equal(secondCleanup, "1|0|0|0|0|0", "second cleanup batch must resume the backlog");
 assert.equal(sql(`select count(*) from public.mcp_authorization_requests where request_hash in ('${cleanupHashes.requestExpired1}','${cleanupHashes.requestExpired2}','${cleanupHashes.requestExpired3}')`), "0");
+
+sql(`insert into public.mcp_rate_limits(subject,window_start,count)
+values ('dedicated-cleanup-expired-1',date_trunc('minute',now()-interval '2 days'),1),
+       ('dedicated-cleanup-expired-2',date_trunc('minute',now()-interval '2 days'),1),
+       ('dedicated-cleanup-expired-3',date_trunc('minute',now()-interval '2 days'),1),
+       ('dedicated-cleanup-fresh',date_trunc('minute',now()),1);`);
+assertSqlFails("select public.cleanup_mcp_rate_limits(0)", "invalid dedicated cleanup batch must fail");
+assertSqlFails("select public.cleanup_mcp_rate_limits(5001)", "oversized dedicated cleanup batch must fail");
+assert.equal(sql("select public.cleanup_mcp_rate_limits(2)"), "2", "dedicated cleanup must respect its batch bound");
+assert.equal(sql("select count(*) from public.mcp_rate_limits where subject like 'dedicated-cleanup-expired-%'"), "1");
+assert.equal(sql("select count(*) from public.mcp_rate_limits where subject='dedicated-cleanup-fresh'"), "1");
 
 const staleUsedClientId = "mcp_cleanup_stale_used_client";
 sql(`insert into public.mcp_oauth_clients(client_id,client_name,redirect_uris,grant_types,token_endpoint_auth_method,created_at,last_used_at)

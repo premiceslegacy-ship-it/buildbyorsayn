@@ -106,7 +106,7 @@ test("the safety rules come first and the text stays within its size budget", ()
 
 test("tool descriptions and tool messages are accented, clean and honest about get_skill", async () => {
   const server = createBuildMcpServer({
-    userId: "user", clientId: "client", tokenHash: "token-hash", tier: "beginner", scope: "mcp",
+    userId: "user", clientId: "client", tokenHash: "token-hash", quotaPrincipal: '["user","client"]', tier: "beginner", scope: "mcp",
   });
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
 

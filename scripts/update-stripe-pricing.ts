@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { CHECKOUT_CONSENT_TEXT } from "../lib/legal/consent";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -13,6 +14,8 @@ const UPGRADE_PAYMENT_LINK_ID = "plink_1TiKL1JwMU6o9YwIGw7ucEAf";
 
 const OLD_FULL_PRICE_ID = "price_1TiKMDJwMU6o9YwIyOe43dkD"; // 497€
 const OLD_UPGRADE_PRICE_ID = "price_1TiKJOJwMU6o9YwIAFHp38MV"; // 400€
+
+const BEGINNER_PAYMENT_LINK_URL = process.env.STRIPE_BEGINNER_CHECKOUT_LINK;
 
 // Stale/orphan payment links found in a read-only audit of the live Stripe
 // account. Each sells one of the two products above at an old, no-longer-valid
@@ -52,18 +55,45 @@ async function createPrice(productId: string, amountEur: number) {
   });
 }
 
-async function repointPaymentLink(paymentLinkId: string, newPriceId: string) {
-  // Stripe's API does not allow swapping the price of an existing line item
-  // on a payment link (PaymentLinkUpdateParams.LineItem only accepts
-  // quantity/adjustable_quantity, never a new price). The only way to change
-  // the price behind a payment link is to create a new one and retire the old.
-  const link = await stripe.paymentLinks.retrieve(paymentLinkId);
+async function findActivePaymentLinkByUrl(url: string) {
+  for await (const link of stripe.paymentLinks.list({ active: true, limit: 100 })) {
+    if (link.url === url) {
+      return stripe.paymentLinks.retrieve(link.id, { expand: ["line_items"] });
+    }
+  }
+  throw new Error(`No active Stripe Payment Link matches STRIPE_BEGINNER_CHECKOUT_LINK.`);
+}
+
+function existingLineItems(link: Stripe.PaymentLink) {
+  const items = link.line_items?.data.map((item) => ({
+    price: typeof item.price === "string" ? item.price : item.price.id,
+    quantity: item.quantity ?? 1,
+  }));
+  if (!items?.length) throw new Error(`Payment Link ${link.id} has no reusable line items.`);
+  return items;
+}
+
+async function replacePaymentLink(
+  link: Stripe.PaymentLink,
+  lineItems: Stripe.PaymentLinkCreateParams.LineItem[],
+) {
+  // Stripe does not allow replacing an existing link's prices or retrofitting
+  // terms acceptance. Create its compliant replacement before retiring it.
   const created = await stripe.paymentLinks.create({
-    line_items: [{ price: newPriceId, quantity: 1 }],
+    line_items: lineItems,
     after_completion: link.after_completion,
+    consent_collection: { terms_of_service: "required" },
+    custom_text: {
+      terms_of_service_acceptance: { message: CHECKOUT_CONSENT_TEXT },
+    },
   });
-  await stripe.paymentLinks.update(paymentLinkId, { active: false });
+  await stripe.paymentLinks.update(link.id, { active: false });
   return { url: created.url, newId: created.id, oldUrl: link.url };
+}
+
+async function repointPaymentLink(paymentLinkId: string, newPriceId: string) {
+  const link = await stripe.paymentLinks.retrieve(paymentLinkId);
+  return replacePaymentLink(link, [{ price: newPriceId, quantity: 1 }]);
 }
 
 async function main() {
@@ -74,9 +104,16 @@ async function main() {
   console.log(`2. New upgrade price: ${eur(NEW_UPGRADE_PRICE_EUR * 100)} on product ${UPGRADE_PRODUCT_ID}`);
   console.log();
 
+  let beginnerLink: Stripe.PaymentLink | null = null;
+  if (APPLY) {
+    if (!BEGINNER_PAYMENT_LINK_URL) {
+      throw new Error("STRIPE_BEGINNER_CHECKOUT_LINK is required in apply mode.");
+    }
+    beginnerLink = await findActivePaymentLinkByUrl(BEGINNER_PAYMENT_LINK_URL);
+  }
+
   let newFullPriceId = "<dry-run: not created>";
   let newUpgradePriceId = "<dry-run: not created>";
-
   if (APPLY) {
     const newFullPrice = await createPrice(FULL_PRODUCT_ID, NEW_FULL_PRICE_EUR);
     newFullPriceId = newFullPrice.id;
@@ -88,22 +125,23 @@ async function main() {
   }
 
   console.log();
-  console.log("3. Payment links: Stripe does not allow changing the price behind an");
-  console.log("   existing payment link, so this creates NEW links and deactivates the old");
-  console.log("   ones. The buy.stripe.com URLs WILL change - update the hardcoded URLs in");
-  console.log("   the codebase and STRIPE_UPGRADE_CHECKOUT_LINK with the new ones printed below.");
+  console.log("3. Payment paths: replace the public Fondations and LE COFFRE links");
+  console.log("   with links requiring the canonical terms, and retire the old public");
+  console.log("   upgrade link. Upgrades now use authenticated server-created Checkout Sessions.");
+  let newBeginnerLinkUrl = "<dry-run: not created>";
   let newFullLinkUrl = "<dry-run: not created>";
-  let newUpgradeLinkUrl = "<dry-run: not created>";
   if (APPLY) {
+    const beginnerResult = await replacePaymentLink(beginnerLink!, existingLineItems(beginnerLink!));
+    newBeginnerLinkUrl = beginnerResult.url;
+    console.log(`  beginner: new link ${beginnerResult.url} (old ${beginnerResult.oldUrl} deactivated)`);
     const fullResult = await repointPaymentLink(FULL_PAYMENT_LINK_ID, newFullPriceId);
     newFullLinkUrl = fullResult.url;
     console.log(`  full: new link ${fullResult.url} (old ${fullResult.oldUrl} deactivated)`);
-
-    const upgradeResult = await repointPaymentLink(UPGRADE_PAYMENT_LINK_ID, newUpgradePriceId);
-    newUpgradeLinkUrl = upgradeResult.url;
-    console.log(`  upgrade: new link ${upgradeResult.url} (old ${upgradeResult.oldUrl} deactivated)`);
+    await stripe.paymentLinks.update(UPGRADE_PAYMENT_LINK_ID, { active: false });
+    console.log(`  upgrade: old public link ${UPGRADE_PAYMENT_LINK_ID} deactivated`);
   } else {
-    console.log(`  would create new links for products behind ${FULL_PAYMENT_LINK_ID} and ${UPGRADE_PAYMENT_LINK_ID}, then deactivate those two.`);
+    console.log("  would replace STRIPE_BEGINNER_CHECKOUT_LINK while preserving its existing price/product.");
+    console.log(`  would create a new full link behind ${FULL_PAYMENT_LINK_ID} and deactivate ${UPGRADE_PAYMENT_LINK_ID}.`);
   }
 
   console.log();
@@ -146,14 +184,13 @@ async function main() {
   console.log();
   if (APPLY) {
     console.log("DONE. Update these in the codebase AND on Vercel env vars, then redeploy:");
+    console.log(`  STRIPE_BEGINNER_CHECKOUT_LINK=${newBeginnerLinkUrl}`);
     console.log(`  STRIPE_FULL_PRICE_ID=${newFullPriceId}`);
     console.log(`  STRIPE_UPGRADE_PRICE_ID=${newUpgradePriceId}`);
-    console.log(`  STRIPE_UPGRADE_CHECKOUT_LINK=${newUpgradeLinkUrl}`);
     console.log(`  lib/pricing.ts STRIPE_FULL_CHECKOUT_LINK=${newFullLinkUrl}`);
     console.log();
-    console.log("Do this BEFORE announcing the new price anywhere - until the env vars are");
-    console.log("updated, the webhook will not recognize the new price IDs and will fail-open");
-    console.log('a paying customer to tier="beginner". The old payment link URLs now 404.');
+    console.log("Do this BEFORE announcing the new price anywhere. Until the price IDs");
+    console.log("are updated, the webhook refuses unknown prices.");
   } else {
     console.log("Dry run complete. Re-run with --apply to execute these changes for real.");
   }

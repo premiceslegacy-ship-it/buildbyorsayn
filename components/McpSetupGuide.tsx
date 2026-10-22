@@ -26,10 +26,18 @@ function Step({
         <span className="flex h-6 w-6 flex-none items-center justify-center rounded-full border border-[#e8d5b0]/45 text-xs font-bold text-[#e8d5b0]">
           {number}
         </span>
-        <span>{children}</span>
+        <div className="min-w-0 flex-1">{children}</div>
       </div>
       {screenSrc && screenAlt ? <Screen src={screenSrc} alt={screenAlt} /> : null}
     </li>
+  );
+}
+
+function ConfigBlock({ children }: { children: string }) {
+  return (
+    <pre className="mt-4 max-w-full overflow-x-auto rounded-md border border-white/[0.12] bg-black/35 px-4 py-3 text-xs leading-5 text-[#e8d5b0]">
+      <code className="select-all">{children}</code>
+    </pre>
   );
 }
 
@@ -76,6 +84,26 @@ function ClientSummary({
 }
 
 export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
+  const hermesConfig = `mcp_servers:
+  build:
+    url: ${JSON.stringify(mcpUrl)}
+    auth: oauth
+    trust: untrusted
+    tools:
+      include: [search_knowledge, get_skill, list_available_content]`;
+  const ompConfig = JSON.stringify(
+    {
+      mcpServers: {
+        build: {
+          type: "http",
+          url: mcpUrl,
+        },
+      },
+    },
+    null,
+    2
+  );
+
   return (
     <section aria-labelledby="mcp-setup-guide-title" className="mt-12 border-t border-white/[0.08] pt-10">
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#c9b48a]">Pas à pas</p>
@@ -83,7 +111,7 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
         Configure ton assistant en quelques minutes
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-[#f0ede8]/60">
-        Ouvre le parcours qui correspond à ton assistant. Claude inclut des captures réelles ; ChatGPT indique les menus et les contrôles à vérifier, car son interface et ses permissions varient selon le forfait et l&apos;espace de travail.
+        Ouvre le parcours qui correspond à ton assistant. Claude inclut des captures réelles. ChatGPT, Hermes et Oh My Pi suivent les réglages publiés par chaque outil.
       </p>
 
       <div className="mt-8 border-y border-white/[0.08]">
@@ -168,6 +196,78 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
               className="mt-3 inline-flex text-xs text-[#e8d5b0] underline underline-offset-4"
             >
               Voir la procédure officielle OpenAI
+            </a>
+          </div>
+        </details>
+
+        <details name="mcp-client-guide" className="group border-t border-white/[0.08] px-0">
+          <ClientSummary
+            logo="/brand-logos/hermes-agent-mark.png"
+            name="Hermes"
+            description="Ajoute BUILD comme serveur distant OAuth dans ton profil Hermes."
+          />
+          <div className="border-t border-white/[0.08] pb-8">
+            <ol className="space-y-8 pt-7">
+              <Step number="1">
+                Ouvre <code className="text-[#e8d5b0]">~/.hermes/config.yaml</code>, puis ajoute ce bloc. Garde <code className="text-[#e8d5b0]">trust: untrusted</code> afin que tout outil non déclaré en lecture seule demande ton accord.
+                <ConfigBlock>{hermesConfig}</ConfigBlock>
+              </Step>
+              <Step number="2">
+                Enregistre le fichier, puis lance <code className="text-[#e8d5b0]">hermes mcp login build</code> dans le terminal qui utilise ce profil. Hermes ouvre l&apos;autorisation OAuth de BUILD.
+              </Step>
+              <Step number="3">
+                Connecte-toi à BUILD, vérifie les permissions affichées, puis autorise la connexion. Sur un serveur distant, colle dans Hermes l&apos;adresse complète obtenue après la redirection si le navigateur ne peut pas joindre le port local.
+              </Step>
+              <Step number="4">
+                Démarre une nouvelle session avec <code className="text-[#e8d5b0]">hermes chat</code>, ou lance <code className="text-[#e8d5b0]">/reload-mcp</code> dans une session ouverte. Demande ensuite la liste de tes contenus BUILD accessibles.
+              </Step>
+              <Step number="5">
+                Si la connexion expire, relance <code className="text-[#e8d5b0]">hermes mcp login build</code>. Pour la couper côté BUILD, utilise le bouton de déconnexion en bas de cette page.
+              </Step>
+            </ol>
+            <a
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-8 inline-flex text-xs text-[#e8d5b0] underline underline-offset-4"
+            >
+              Voir la procédure officielle Hermes
+            </a>
+          </div>
+        </details>
+
+        <details name="mcp-client-guide" className="group border-t border-white/[0.08] px-0">
+          <ClientSummary
+            logo="/brand-logos/omp.svg"
+            name="Oh My Pi"
+            description="Enregistre l'adresse BUILD dans ton profil omp, puis autorise OAuth."
+          />
+          <div className="border-t border-white/[0.08] pb-8">
+            <ol className="space-y-8 pt-7">
+              <Step number="1">
+                Dans omp, lance <code className="text-[#e8d5b0]">/mcp add</code>. Choisis <strong className="font-semibold text-[#f0ede8]">User</strong>, nomme le serveur <strong className="font-semibold text-[#f0ede8]">build</strong>, sélectionne le transport HTTP et colle l&apos;adresse MCP affichée plus bas.
+              </Step>
+              <Step number="2">
+                Si tu préfères le fichier de configuration, ajoute ce bloc dans <code className="text-[#e8d5b0]">~/.omp/agent/mcp.json</code>. Ce fichier contient seulement l&apos;adresse du serveur. Le jeton OAuth reste dans le stockage du profil.
+                <ConfigBlock>{ompConfig}</ConfigBlock>
+              </Step>
+              <Step number="3">
+                Lance <code className="text-[#e8d5b0]">/mcp reload</code>, puis <code className="text-[#e8d5b0]">/mcp reauth build</code>. Connecte-toi à BUILD et autorise la connexion dans le navigateur.
+              </Step>
+              <Step number="4">
+                Lance <code className="text-[#e8d5b0]">/mcp test build</code>. Le contrôle doit afficher le serveur BUILD et ses trois outils de lecture. <code className="text-[#e8d5b0]">/mcp list</code> indique aussi le fichier qui fournit la configuration.
+              </Step>
+              <Step number="5">
+                En cas de réponse 401 ou 403, utilise <code className="text-[#e8d5b0]">/mcp unauth build</code>, puis <code className="text-[#e8d5b0]">/mcp reauth build</code>. Utilise un profil omp séparé pour un projet que tu ne considères pas comme fiable.
+              </Step>
+            </ol>
+            <a
+              href="https://omp.sh/docs/mcp"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-8 inline-flex text-xs text-[#e8d5b0] underline underline-offset-4"
+            >
+              Voir la procédure officielle Oh My Pi
             </a>
           </div>
         </details>

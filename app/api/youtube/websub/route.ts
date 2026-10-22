@@ -1,6 +1,6 @@
 import { revalidateTag } from "next/cache";
 import { YOUTUBE_VIDEOS_CACHE_TAG } from "@/lib/nouveautes/loadVideos";
-import { parseYoutubeAtom, requireChannelId, storeYoutubeFeed, verifyWebSubSignature, websubTopic } from "@/lib/youtube/feed";
+import { parseYoutubeAtom, requireChannelId, storeYoutubeFeed, verifyWebSubIntent, verifyWebSubSignature, websubTopic } from "@/lib/youtube/feed";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +14,14 @@ export async function GET(request: Request): Promise<Response> {
   const mode = params.get("hub.mode");
   const challenge = params.get("hub.challenge");
   const channelId = process.env.YOUTUBE_CHANNEL_ID;
-  if (!channelId || !challenge || params.get("hub.topic") !== websubTopic(channelId) || (mode !== "subscribe" && mode !== "unsubscribe")) {
+  const verifyToken = process.env.YOUTUBE_WEBSUB_VERIFY_TOKEN ?? "";
+  if (
+    !channelId ||
+    !challenge ||
+    params.get("hub.topic") !== websubTopic(channelId) ||
+    mode !== "subscribe" ||
+    !verifyWebSubIntent(params.get("hub.verify_token"), verifyToken)
+  ) {
     return new Response("Not found", { status: 404 });
   }
   return new Response(challenge, { status: 200, headers: { "content-type": "text/plain", "cache-control": "no-store" } });

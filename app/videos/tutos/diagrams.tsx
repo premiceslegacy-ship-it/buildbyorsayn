@@ -56,7 +56,7 @@ export function DecompositionDiagram() {
       <Arrow x1={360} y1={172} x2={360} y2={210} />
       <Arrow x1={442} y1={172} x2={580} y2={210} />
       {["Lot 1", "Lot 2", "Lot 3"].map((label, i) => (
-        <Box key={label} x={40 + i * 220} y={212} w={190} h={90} label={label} sub="entrées reçues · livrable attendu · critère de fin" />
+        <Box key={label} x={40 + i * 220} y={212} w={190} h={90} label={label} sub="entrées reçues, livrable attendu, critère de fin" />
       ))}
     </Frame>
   );

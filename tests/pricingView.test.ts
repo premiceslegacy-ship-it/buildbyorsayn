@@ -8,7 +8,7 @@ import {
   resolveCheckoutLinks,
   type CheckoutBaseLinks,
 } from "../lib/pricing";
-import { getUpgradeCheckoutLink, readCheckoutBaseLinks } from "../lib/checkoutLinks";
+import { readCheckoutBaseLinks } from "../lib/checkoutLinks";
 import { getOfferFacts, selectPricingView } from "../lib/pricingView";
 import { BLOCS_DATA } from "../lib/blocCatalog";
 import { SKILLS_CATALOG } from "../lib/skillsCatalog";
@@ -86,7 +86,6 @@ test("lien absent, invalide ou déjà marqué : null, jamais un lien mort", () =
 test("la lecture de l'environnement refuse tout ce qui n'est pas un lien Stripe https", () => {
   const base = readCheckoutBaseLinks({
     STRIPE_BEGINNER_CHECKOUT_LINK: "https://evil.example/pay",
-    STRIPE_UPGRADE_CHECKOUT_LINK: "https://buy.stripe.com/up",
   });
   assert.equal(base.beginner, null);
   assert.ok(base.full, "le lien LE COFFRE reste disponible");
@@ -99,11 +98,4 @@ test("accès impossible à vérifier : aucune carte d'achat, quel que soit le ni
   for (const tier of [null, "free", "beginner", "full"]) {
     assert.deepEqual(selectPricingView({ tier, unverified: true }).blocks, ["unverified"], String(tier));
   }
-});
-
-test("le lien du complément n'existe que pour un compte identifié et reste validé", () => {
-  const env = { STRIPE_UPGRADE_CHECKOUT_LINK: "https://buy.stripe.com/up" };
-  assert.equal(getUpgradeCheckoutLink("abc", env), "https://buy.stripe.com/up?client_reference_id=abc");
-  assert.equal(getUpgradeCheckoutLink("abc", {}), null);
-  assert.equal(getUpgradeCheckoutLink("abc", { STRIPE_UPGRADE_CHECKOUT_LINK: "https://evil.example/up" }), null);
 });

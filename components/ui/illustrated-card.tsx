@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export type IllustratedCardBadge = { label: string; tone?: "default" | "accent" | "success" };
@@ -77,18 +78,18 @@ function CardShell({
         )}
       >
         {imageSrc ? (
-          <img
+          <Image
             src={imageSrc}
             alt={imageAlt ?? ""}
             aria-hidden={imageAlt ? undefined : true}
             className={cn(
               visualTone === "black-gallery"
-                ? "h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]"
-                : "h-full w-full object-cover",
+                ? "object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]"
+                : "object-cover",
               locked && "opacity-50 grayscale"
             )}
-            loading="lazy"
-            decoding="async"
+            fill
+            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
             draggable={false}
           />
         ) : (

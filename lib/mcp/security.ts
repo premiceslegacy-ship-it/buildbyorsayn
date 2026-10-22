@@ -2,6 +2,19 @@ import { createHmac } from "node:crypto";
 
 export type RateLimitDecision = "allowed" | "denied" | "unavailable";
 
+/**
+ * Canonical quota identity deliberately excludes rotating bearer credentials.
+ */
+export function stableQuotaPrincipal(identity: {
+  userId: string;
+  clientId: string;
+}): string {
+  if (!identity.userId || !identity.clientId) {
+    throw new Error("Invalid stable quota identity");
+  }
+  return JSON.stringify([identity.userId, identity.clientId]);
+}
+
 export function hashRateLimitSubject(prefix: string, value: string, pepper: string): string {
   if (!prefix || !value || pepper.length < 16) throw new Error("Invalid rate-limit subject input");
   return `${prefix}:${createHmac("sha256", pepper).update(value, "utf8").digest("hex")}`;

@@ -31,28 +31,29 @@ export default async function AccompagnementPage({ searchParams }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
   const isAdmin = isAccompanimentAdminUser(user);
-  let hasMemberAccess = false;
 
-  if (user) {
-    const today = new Date().toISOString().slice(0, 10);
-    const { data: assignment, error } = await supabase
-      .from("accompaniment_assignments")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("accompaniment_slug", SITE_WEB_ACCOMPANIMENT_SLUG)
-      .in("status", ACCOMPANIMENT_ACCESS_STATUSES)
-      .lte("starts_on", today)
-      .or(`ends_on.is.null,ends_on.gte.${today}`)
-      .limit(1)
-      .maybeSingle();
-    hasMemberAccess = Boolean(assignment && !error);
-  }
+  // Le profil de la barre et l'accès membre ne dépendent que de `user` : on les lit en parallèle, avec l'utilisateur déjà vérifié.
+  const today = new Date().toISOString().slice(0, 10);
+  const [assignmentResult, identity] = await Promise.all([
+    user
+      ? supabase
+          .from("accompaniment_assignments")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("accompaniment_slug", SITE_WEB_ACCOMPANIMENT_SLUG)
+          .in("status", ACCOMPANIMENT_ACCESS_STATUSES)
+          .lte("starts_on", today)
+          .or(`ends_on.is.null,ends_on.gte.${today}`)
+          .limit(1)
+          .maybeSingle()
+      : null,
+    navIdentity(user),
+  ]);
+  const hasMemberAccess = Boolean(assignmentResult?.data && !assignmentResult.error);
 
   const memberHref = hasMemberAccess
     ? "/accompagnement/espace"
     : `/login?next=${encodeURIComponent("/accompagnement/espace")}`;
-
-  const identity = await navIdentity();
 
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8]">

@@ -6,7 +6,7 @@ export function ProtocolePipelineDiagram() {
   const w = 156, h = 88, gap = 24, y = 70;
   const steps = [
     { label: "01 - Absorption", sub: "greffer des compétences" },
-    { label: "02 - Sprint Cash", sub: "premiers 10k€" },
+    { label: "02 - Sprint Cash", sub: "preuve terrain" },
     { label: "03 - Distillation", sub: "capital organique" },
     { label: "Antifragile", sub: "l'état final" },
   ];

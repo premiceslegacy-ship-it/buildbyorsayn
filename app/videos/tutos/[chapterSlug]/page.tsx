@@ -20,7 +20,7 @@ export default async function HermesChapterPage({
   params: Promise<{ chapterSlug: string }>;
 }) {
   const { chapterSlug: slug } = await params;
-  const gate = await hermesGate();
+  const [gate, identity] = await Promise.all([hermesGate(), navIdentity()]);
   if (gate.files === null) return gate.render;
   const { files } = gate;
 
@@ -34,8 +34,6 @@ export default async function HermesChapterPage({
   const currentIndex = curriculumFiles.findIndex((entry) => entry.path === file.path);
   const prevFile = currentIndex > 0 ? curriculumFiles[currentIndex - 1] : undefined;
   const nextFile = curriculumFiles[currentIndex + 1];
-
-  const identity = await navIdentity();
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0] relative overflow-x-clip">

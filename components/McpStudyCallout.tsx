@@ -13,7 +13,7 @@ export function McpStudyCallout() {
             Connexion bêta
           </p>
           <h2 id="study-with-mcp-title" className="text-lg font-semibold text-[#f0ede8]">
-            Continue ce bloc dans Claude ou ChatGPT
+            Continue ce bloc dans ton assistant
           </h2>
           <p className="mt-1.5 text-sm leading-6 text-white/65">
             Pose tes questions comme d&apos;habitude. Ton assistant voit uniquement les contenus inclus dans ton accès BUILD.

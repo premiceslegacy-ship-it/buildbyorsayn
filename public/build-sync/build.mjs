@@ -22,10 +22,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const CLIENT_ID = "build-sync-cli";
 const SCOPE = "skills:read";
 const DEFAULT_BASE_URL = "https://build-system-three.vercel.app";
-const CLI_VERSION = 2;
+// One-way bridge: v2 clients require this exact declaration before accepting v3.
+const CLI_VERSION = 3;
 const SCHEDULER_VERSION = 2;
 const SCHEDULER_INTERVAL_SECONDS = 60 * 60;
-const MAX_CLI_BYTES = 512 * 1024;
 const MAX_ARTIFACT_BYTES = 50 * 1024 * 1024;
 const MAX_ARCHIVE_ENTRIES = 5_000;
 const CUSTOM_FILE = "CUSTOM.md";
@@ -147,31 +147,6 @@ function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
 
-async function readBoundedBody(response, maximumBytes) {
-  const declared = Number(response.headers.get("content-length") || 0);
-  if (declared > maximumBytes) throw new Error("fichier trop volumineux");
-  if (!response.body) {
-    const bytes = Buffer.from(await response.arrayBuffer());
-    if (bytes.length > maximumBytes) throw new Error("fichier trop volumineux");
-    return bytes;
-  }
-  const reader = response.body.getReader();
-  const chunks = [];
-  let total = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      total += value.byteLength;
-      if (total > maximumBytes) throw new Error("fichier trop volumineux");
-      chunks.push(Buffer.from(value));
-    }
-  } catch (error) {
-    await reader.cancel().catch(() => null);
-    throw error;
-  }
-  return Buffer.concat(chunks, total);
-}
 
 function parseArgs(argv) {
   const args = [...argv];
@@ -448,56 +423,6 @@ async function downloadArtifact(config, paths, artifact, quiet) {
   return bytes;
 }
 
-function managedCliPath() {
-  const actual = path.resolve(fileURLToPath(import.meta.url));
-  const declared = process.env.BUILD_SYNC_CLI_PATH;
-  const defaultInstall = process.platform === "win32"
-    ? process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, "BUILD Sync", "build.mjs")
-    : path.join(process.env.XDG_DATA_HOME || path.join(os.homedir(), ".local", "share"), "build-sync", "build.mjs");
-  const trustedPaths = [declared, defaultInstall].filter(Boolean).map((value) => path.resolve(value));
-  return trustedPaths.includes(actual) ? actual : null;
-}
-
-async function refreshManagedCli(config, quiet) {
-  const script = managedCliPath();
-  if (!script || process.env.BUILD_SYNC_SKIP_SELF_UPDATE === "1") return false;
-  let temporary = null;
-  try {
-    const response = await fetch(new URL("/build-sync/build.mjs", config.baseUrl), {
-      headers: { Accept: "application/javascript" },
-      redirect: "error",
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (!response.ok) throw new Error("téléchargement refusé");
-    const contentType = response.headers.get("content-type")?.split(";", 1)[0];
-    if (!contentType || !["application/javascript", "text/javascript", "text/plain"].includes(contentType)) {
-      throw new Error("format inattendu");
-    }
-    const bytes = await readBoundedBody(response, MAX_CLI_BYTES);
-    if (!bytes.length || bytes.length > MAX_CLI_BYTES) throw new Error("fichier invalide");
-    const source = bytes.toString("utf8");
-    const version = source.match(/\nconst CLI_VERSION = (\d+);/)?.[1];
-    if (!source.startsWith("#!/usr/bin/env node") || !version || Number(version) < CLI_VERSION) {
-      throw new Error("signature BUILD Sync invalide");
-    }
-    const current = await readFile(script);
-    if (sha256(current) === sha256(bytes)) return false;
-    temporary = `${script}.tmp-${process.pid}-${randomBytes(4).toString("hex")}.mjs`;
-    await writeFile(temporary, bytes, { mode: 0o700 });
-    await chmod(temporary, 0o700);
-    const checked = spawnSync(process.execPath, ["--check", temporary], { stdio: "ignore" });
-    if (checked.status !== 0) throw new Error("contrôle JavaScript échoué");
-    await rename(temporary, script);
-    temporary = null;
-    output("✓ BUILD Sync a actualisé son programme local.", quiet);
-    return true;
-  } catch (error) {
-    output(`⚠ Mise à jour du programme BUILD Sync reportée (${terminalText(error?.message || "erreur inconnue")}).`, quiet);
-    return false;
-  } finally {
-    if (temporary) await rm(temporary, { force: true }).catch(() => null);
-  }
-}
 
 function normalizeArchivePath(raw) {
   if (!raw || raw.includes("\0") || raw.includes("\\")) fail("Archive BUILD invalide.");
@@ -632,16 +557,57 @@ async function currentManagedChanges(target, marker) {
   return changed;
 }
 
+async function currentArtifactInstallations(root, artifact) {
+  const directories = await readdir(root, { withFileTypes: true }).catch(() => []);
+  const markers = new Map();
+  for (const entry of directories) {
+    if (!entry.isDirectory() || entry.isSymbolicLink()) continue;
+    const target = path.join(root, entry.name);
+    const marker = await readJson(path.join(target, MARKER_FILE));
+    if (marker?.artifactSlug === artifact.slug) markers.set(entry.name, { marker, target });
+  }
+  if (markers.size === 0) return null;
+
+  const first = markers.values().next().value?.marker;
+  if (!Array.isArray(first?.artifactUnits) || first.artifactUnits.length === 0) return null;
+  const expectedUnits = [...new Set(first.artifactUnits)].sort();
+  if (expectedUnits.length !== markers.size || expectedUnits.some((name) => !markers.has(name))) return null;
+
+  for (const unitName of expectedUnits) {
+    const installed = markers.get(unitName);
+    if (
+      installed.marker.artifactSha256 !== artifact.sha256 ||
+      JSON.stringify([...new Set(installed.marker.artifactUnits)].sort()) !== JSON.stringify(expectedUnits) ||
+      (await currentManagedChanges(installed.target, installed.marker)).length > 0
+    ) {
+      return null;
+    }
+  }
+  return expectedUnits.length;
+}
+
 function timestamp() {
   return new Date().toISOString().replace(/[:.]/g, "-");
 }
 
-export async function installUnit({ agentId, root, unitName, files, artifact, releaseId, paths }) {
+export async function installUnit({ agentId, root, unitName, artifactUnitNames = [unitName], files, artifact, releaseId, paths }) {
   await mkdir(root, { recursive: true, mode: 0o700 });
   const target = path.join(root, unitName);
-  const priorMarker = await readJson(path.join(target, MARKER_FILE));
+  const markerFile = path.join(target, MARKER_FILE);
+  const priorMarker = await readJson(markerFile);
   const changes = await currentManagedChanges(target, priorMarker);
+  const normalizedArtifactUnits = [...new Set(artifactUnitNames)].sort();
   if (priorMarker?.artifactSha256 === artifact.sha256 && changes.length === 0) {
+    const priorArtifactUnits = Array.isArray(priorMarker.artifactUnits)
+      ? [...new Set(priorMarker.artifactUnits)].sort()
+      : [];
+    if (JSON.stringify(priorArtifactUnits) !== JSON.stringify(normalizedArtifactUnits)) {
+      await writeJsonSecure(markerFile, {
+        ...priorMarker,
+        releaseId,
+        artifactUnits: normalizedArtifactUnits,
+      });
+    }
     return { status: "current", unitName };
   }
 
@@ -662,6 +628,7 @@ export async function installUnit({ agentId, root, unitName, files, artifact, re
     releaseId,
     artifactSlug: artifact.slug,
     artifactSha256: artifact.sha256,
+    artifactUnits: normalizedArtifactUnits,
     installedAt: new Date().toISOString(),
     managedFiles: {},
   };
@@ -691,15 +658,31 @@ async function syncSkills(config, paths, quiet = false) {
     output(`→ Vérification de ${catalog.artifacts.length} skill(s) BUILD…`, quiet);
     for (const [artifactIndex, artifact] of catalog.artifacts.entries()) {
       output(`  ${String(artifactIndex + 1).padStart(2, "0")}/${String(catalog.artifacts.length).padStart(2, "0")}  ${terminalText(artifact.title)}`, quiet);
-      let units = null;
+
+      const currentCounts = await Promise.all(
+        config.agents.map((agentId) => currentArtifactInstallations(AGENTS[agentId].root(paths.userHome), artifact))
+      );
+      if (currentCounts.every((count) => count !== null)) {
+        summary.current += currentCounts.reduce((total, count) => total + count, 0);
+        continue;
+      }
+
+      const bytes = await downloadArtifact(config, paths, artifact, quiet);
+      const units = artifactUnits(artifact, bytes);
+      const artifactUnitNames = [...units.keys()];
       for (const agentId of config.agents) {
         const root = AGENTS[agentId].root(paths.userHome);
-        if (!units) {
-          const bytes = await downloadArtifact(config, paths, artifact, quiet);
-          units = artifactUnits(artifact, bytes);
-        }
         for (const [unitName, files] of units) {
-          const result = await installUnit({ agentId, root, unitName, files, artifact, releaseId: catalog.releaseId, paths });
+          const result = await installUnit({
+            agentId,
+            root,
+            unitName,
+            artifactUnitNames,
+            files,
+            artifact,
+            releaseId: catalog.releaseId,
+            paths,
+          });
           summary[result.status] += 1;
           if (result.backupPath) summary.backups.push(result.backupPath);
         }
@@ -757,7 +740,6 @@ async function installScheduler(paths, quiet, deferMacReload = false) {
     if (deferMacReload) {
       const reloader = spawn(process.execPath, [script, "skills", "scheduler-reload"], {
         detached: true,
-        env: { ...process.env, BUILD_SYNC_SKIP_SELF_UPDATE: "1" },
         stdio: "ignore",
       });
       reloader.unref();
@@ -887,7 +869,7 @@ async function logout() {
 }
 
 function help() {
-  output(`BUILD Sync
+  output(`BUILD Sync v${CLI_VERSION}
 
 Usage :
   build-skills setup [--agents=detected|all|codex,claude,hermes]
@@ -895,24 +877,15 @@ Usage :
   build-skills status
   build-skills logout
 
-Les versions officielles sont mises à jour automatiquement. Écris tes adaptations
-dans CUSTOM.md : ce fichier n'est jamais remplacé.`);
+Les skills officiels sont vérifiés toutes les heures. La mise à jour du programme
+BUILD Sync reste une installation explicite. Écris tes adaptations dans CUSTOM.md :
+ce fichier n'est jamais remplacé.`);
 }
 
 async function update(flags) {
   const paths = homePaths();
   const config = await loadConfig(paths);
   const quiet = Boolean(flags.quiet);
-  if (await refreshManagedCli(config, quiet)) {
-    const script = managedCliPath();
-    const args = [script, "skills", "update", ...(quiet ? ["--quiet"] : [])];
-    const resumed = spawnSync(process.execPath, args, {
-      env: { ...process.env, BUILD_SYNC_SKIP_SELF_UPDATE: "1" },
-      stdio: "inherit",
-    });
-    if (resumed.status !== 0) fail("La synchronisation n'a pas pu reprendre après la mise à jour de BUILD Sync.");
-    return;
-  }
   const summary = await syncSkills(config, paths, quiet);
   await reconcileScheduler(config, paths, quiet);
   return summary;

@@ -10,6 +10,9 @@ import { doctrineInventory } from "./inventory";
 // verified file contents are.
 const DOCTRINE_CACHE_TTL_MS = 90_000;
 let cachedFiles: { files: readonly DoctrineFile[]; expiresAt: number } | null = null;
+// Lecture déjà en cours : les visites simultanées qui arrivent à l'expiration du cache la partagent
+// au lieu de relancer chacune les ~23 téléchargements Storage.
+let inFlight: Promise<readonly DoctrineFile[]> | null = null;
 
 async function readPublishedDoctrineUncached(): Promise<readonly DoctrineFile[]> {
   if (typeof window !== "undefined") throw new Error("Server runtime required");
@@ -55,12 +58,19 @@ async function readPublishedDoctrineUncached(): Promise<readonly DoctrineFile[]>
 
 export async function readPublishedDoctrine(): Promise<readonly DoctrineFile[]> {
   if (cachedFiles && cachedFiles.expiresAt > Date.now()) return cachedFiles.files;
-  const files = await readPublishedDoctrineUncached();
-  cachedFiles = { files, expiresAt: Date.now() + DOCTRINE_CACHE_TTL_MS };
-  return files;
+  if (inFlight) return inFlight;
+  const read = readPublishedDoctrineUncached().then((files) => {
+    cachedFiles = { files, expiresAt: Date.now() + DOCTRINE_CACHE_TTL_MS };
+    return files;
+  }).finally(() => {
+    if (inFlight === read) inFlight = null;
+  });
+  inFlight = read;
+  return read;
 }
 
 /** Test-only: each test simulates a distinct remote state and must not see a previous test's cached result. */
 export function __resetDoctrineCacheForTests(): void {
   cachedFiles = null;
+  inFlight = null;
 }

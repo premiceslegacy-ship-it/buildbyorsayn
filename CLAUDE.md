@@ -1,5 +1,14 @@
 # Claude Project Instructions
 
+## Relais Claude et Codex pour la refonte BUILD
+
+Pour tout travail lié à la refonte en cours, lire avant d'écrire :
+
+1. `/Users/useersm/Desktop/Business Orsyan/ORSAYN AI/Identité Visuelle/Identité BUILD/plan-implementation/23-boucle-claude-codex.md`
+2. `/Users/useersm/Desktop/Business Orsyan/ORSAYN AI/Identité Visuelle/Identité BUILD/plan-implementation/24-etat-relais.md`
+
+`24-etat-relais.md` est la source unique de l'exécuteur actif, du SHA de base, des chemins possédés, des preuves et de la prochaine action. Quand Claude revient après un relais Codex, il commence par relire le diff Codex et consigne son verdict avant toute nouvelle implémentation. Ne jamais inclure dans un commit une modification hors de la portée attribuée.
+
 ## BUILD Skills Sync
 
 Canonical private source: `$ORSAYN_AI_ROOT/skills/`. The ignored `docs/` tree is only the publishing mirror; never author a skill there first.

@@ -3,7 +3,7 @@ import test from "node:test";
 import { resolveUpgradeRedirect } from "../lib/checkoutUpgrade";
 import { buildUpgradeRefusalEmail, refuseUpgradePurchase, type RefundRequest } from "../lib/stripeUpgradeRefusal";
 
-const STRIPE = "https://buy.stripe.com/up?client_reference_id=abc";
+const STRIPE = "https://checkout.stripe.com/c/pay/cs_test_123";
 
 test("non connecté : connexion puis retour à la porte du complément", () => {
   assert.equal(
@@ -44,7 +44,12 @@ test("erreur de lecture du profil : jamais le lien du complément", () => {
   }
 });
 
-function fakeDeps(options: { refundFails?: boolean; emailFails?: boolean } = {}) {
+function fakeDeps(options: {
+  refundFails?: boolean;
+  emailFails?: boolean;
+  refundStatus?: "pending" | "requires_action" | "succeeded" | "failed" | "canceled" | null;
+  refreshedRefundStatus?: "pending" | "requires_action" | "succeeded" | "failed" | "canceled" | null;
+} = {}) {
   const refunds: { params: RefundRequest; idempotencyKey: string }[] = [];
   const emails: string[] = [];
   const logs: string[] = [];
@@ -56,8 +61,17 @@ function fakeDeps(options: { refundFails?: boolean; emailFails?: boolean } = {})
       createRefund: async (params: RefundRequest, opts: { idempotencyKey: string }) => {
         if (options.refundFails) throw new Error("stripe down");
         refunds.push({ params, idempotencyKey: opts.idempotencyKey });
-        return {};
+        return {
+          id: "re_1",
+          status: options.refundStatus === undefined ? "succeeded" : options.refundStatus,
+        };
       },
+      retrieveRefund: async (refundId: string) => ({
+        id: refundId,
+        status: options.refreshedRefundStatus === undefined
+          ? (options.refundStatus === undefined ? "succeeded" : options.refundStatus)
+          : options.refreshedRefundStatus,
+      }),
       notifyCustomer: async (email: string) => {
         if (options.emailFails) throw new Error("resend down");
         emails.push(email);
@@ -103,11 +117,35 @@ test("remboursement en échec : résultat refund_failed (le webhook répond 500 
   assert.equal(f.emails.length, 0);
 });
 
+test("un remboursement non final n'est pas annoncé comme réussi et conserve le retry du webhook", async () => {
+  for (const refundStatus of ["pending", "requires_action", null] as const) {
+    const f = fakeDeps({ refundStatus });
+    const result = await refuseUpgradePurchase(f.deps, {
+      sessionId: "cs_pending",
+      paymentIntent: "pi_pending",
+      customerEmail: "a@b.fr",
+    });
+    assert.deepEqual(result, { outcome: "refund_pending" });
+    assert.equal(f.emails.length, 0);
+  }
+});
+
 test("e-mail en échec : le remboursement reste acquis", async () => {
   const f = fakeDeps({ emailFails: true });
   const result = await refuseUpgradePurchase(f.deps, { sessionId: "cs_5", paymentIntent: "pi_5", customerEmail: "a@b.fr" });
   assert.deepEqual(result, { outcome: "refunded" });
   assert.equal(f.refunds.length, 1);
+});
+
+test("un retry rafraîchit le remboursement idempotent avant d'envoyer la confirmation", async () => {
+  const f = fakeDeps({ refundStatus: "pending", refreshedRefundStatus: "succeeded" });
+  const result = await refuseUpgradePurchase(f.deps, {
+    sessionId: "cs_settled",
+    paymentIntent: "pi_settled",
+    customerEmail: "a@b.fr",
+  });
+  assert.deepEqual(result, { outcome: "refunded" });
+  assert.deepEqual(f.emails, ["a@b.fr"]);
 });
 
 test("l'e-mail de refus tutoie, donne le lien /checkout et n'a aucun tiret long", () => {

@@ -3,8 +3,8 @@ import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 /**
  * Où envoyer une personne qui arrive sur /checkout/upgrade.
- * Seul un compte Fondations obtient le lien du complément ; tous les autres sont renvoyés vers un parcours honnête.
- * `upgradeUrl` est le lien Stripe déjà prêt (avec l'identifiant du compte), ou null s'il est absent ou invalide.
+ * Seul un compte Fondations obtient une Checkout Session créée côté serveur ;
+ * les autres sont renvoyés vers Fondations ou LE COFFRE.
  */
 export function resolveUpgradeRedirect(input: {
   authenticated: boolean;

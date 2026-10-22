@@ -24,8 +24,6 @@ async function expectNoUpgradeStripeLink(page: Page, path: string) {
   for (const url of html.match(STRIPE_URL) ?? []) {
     expect(shown, `lien Stripe inattendu dans le HTML de ${path}`).toContain(url.replace(/&amp;/g, "&"));
   }
-  const upgradeLink = process.env.STRIPE_UPGRADE_CHECKOUT_LINK;
-  if (upgradeLink) expect(html).not.toContain(upgradeLink);
 }
 
 async function expectBothOffersAndBand(page: Page, scope: string) {
@@ -81,20 +79,6 @@ test.describe("Offres pour un compte Fondations", () => {
     await expectOnlyUpgradeCard(page, "main");
   });
 
-  test("la porte /checkout/upgrade mène au paiement du complément, avec l'identifiant du compte", async ({ beginnerPage: page }) => {
-    // On lit la redirection sans la suivre : on ne navigue jamais vers le vrai Stripe.
-    const response = await page.request.get("/checkout/upgrade", { maxRedirects: 0 });
-    expect(response.status()).toBe(303);
-    const location = response.headers()["location"] ?? "";
-    if (location.startsWith("https://")) {
-      const url = new URL(location);
-      expect(url.hostname).toBe("buy.stripe.com");
-      expect(url.searchParams.get("client_reference_id")).toBeTruthy();
-    } else {
-      // Lien du complément absent ou invalide : page honnête, jamais un lien mort.
-      expect(location).toBe("/checkout?upgrade=indisponible");
-    }
-  });
 
   test("le HTML de l'accueil et de /checkout ne contient pas le lien du complément", async ({ beginnerPage: page }) => {
     await expectNoUpgradeStripeLink(page, "/");

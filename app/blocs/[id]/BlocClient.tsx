@@ -129,11 +129,45 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
         const code = firstNewline === -1 ? inner.trim() : inner.slice(firstNewline + 1);
         return <CodeBlock key={segIdx} code={code} />;
       }
-      return segment.trim().split("\n\n").filter(Boolean).map((para, paraIdx) => (
-        <p key={`${segIdx}-${paraIdx}`}>
-          <LinkifiedText text={para} />
-        </p>
-      ));
+      return segment.trim().split("\n\n").filter(Boolean).map((paragraph, paraIdx) => {
+        const key = `${segIdx}-${paraIdx}`;
+        if (paragraph.startsWith("## ")) {
+          return (
+            <h3 key={key} className="pt-2 text-lg font-semibold tracking-tight text-[#f0ede8]">
+              <LinkifiedText text={paragraph.slice(3)} />
+            </h3>
+          );
+        }
+
+        const lines = paragraph.split("\n").map((line) => line.trim()).filter(Boolean);
+        if (lines.length > 0 && lines.every((line) => line.startsWith("- "))) {
+          return (
+            <ul key={key} className="space-y-2 pl-5">
+              {lines.map((line, lineIdx) => (
+                <li key={`${key}-${lineIdx}`} className="list-disc pl-1">
+                  <LinkifiedText text={line.slice(2)} />
+                </li>
+              ))}
+            </ul>
+          );
+        }
+        if (lines.length > 0 && lines.every((line) => /^\d+\)\s/.test(line))) {
+          return (
+            <ol key={key} className="space-y-2 pl-5">
+              {lines.map((line, lineIdx) => (
+                <li key={`${key}-${lineIdx}`} className="list-decimal pl-1">
+                  <LinkifiedText text={line.replace(/^\d+\)\s/, "")} />
+                </li>
+              ))}
+            </ol>
+          );
+        }
+        return (
+          <p key={key} className="whitespace-pre-line">
+            <LinkifiedText text={paragraph} />
+          </p>
+        );
+      });
     });
   };
 
@@ -218,7 +252,7 @@ export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: Deliv
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                     </a>
                     <p className="text-center text-xs text-white/25 mt-4">
-                      Paiement sécurisé via Stripe · paiement unique · accès à vie
+                      Paiement sécurisé via Stripe, paiement unique, accès à vie
                     </p>
                   </div>
                 </div>

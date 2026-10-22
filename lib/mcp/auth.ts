@@ -1,13 +1,14 @@
 import { createMcpSupabaseAdmin } from "@/lib/mcp/supabaseAdmin";
 import { getMcpResourceUrl } from "@/lib/mcp/config";
 import { hashToken } from "@/lib/mcp/oauth";
-import { isExactMcpResource } from "@/lib/mcp/security";
+import { isExactMcpResource, stableQuotaPrincipal } from "@/lib/mcp/security";
 import { resolveMcpProfileTier, type McpTier } from "@/lib/mcpAccess";
 
 export type McpAuthContext = {
   userId: string;
   clientId: string;
   tokenHash: string;
+  quotaPrincipal: string;
   tier: McpTier;
   scope: "mcp";
 };
@@ -57,6 +58,10 @@ export async function resolveMcpAuth(request: Request): Promise<McpAuthContext |
     userId: tokenRow.user_id,
     clientId: tokenRow.client_id,
     tokenHash,
+    quotaPrincipal: stableQuotaPrincipal({
+      userId: tokenRow.user_id,
+      clientId: tokenRow.client_id,
+    }),
     tier,
     scope: "mcp",
   };

@@ -4,16 +4,20 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 
+const REFRESH_INTERVAL_SECONDS = 60;
+
 export function AdminAutoRefresh() {
   const router = useRouter();
-  const [seconds, setSeconds] = useState(15);
+  const [seconds, setSeconds] = useState(REFRESH_INTERVAL_SECONDS);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+
       setSeconds((current) => {
         if (current <= 1) {
           router.refresh();
-          return 15;
+          return REFRESH_INTERVAL_SECONDS;
         }
         return current - 1;
       });
@@ -26,7 +30,7 @@ export function AdminAutoRefresh() {
     <button
       type="button"
       onClick={() => {
-        setSeconds(15);
+        setSeconds(REFRESH_INTERVAL_SECONDS);
         router.refresh();
       }}
       className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-white/45 transition-colors hover:bg-white/[0.06] hover:text-white/70"

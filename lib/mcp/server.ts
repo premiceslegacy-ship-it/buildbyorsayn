@@ -13,6 +13,7 @@ import {
   embeddingFingerprint,
 } from "@/lib/knowledge/embeddings";
 import type { McpAuthContext } from "@/lib/mcp/auth";
+import { hashRateLimitSubject, resolveRateLimitDecision } from "@/lib/mcp/security";
 
 export const KNOWLEDGE_SOURCES = [
   "blocs",
@@ -33,6 +34,12 @@ const SEARCH_KNOWLEDGE_INPUT_SHAPE = {
 const GET_SKILL_INPUT_SHAPE = {
   slug: z.string().trim().min(1).max(100).regex(/^[a-z0-9][a-z0-9-]*$/),
 };
+const READ_ONLY_TOOL_ANNOTATIONS = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
 
 export const SEARCH_KNOWLEDGE_INPUT_SCHEMA = z.object(SEARCH_KNOWLEDGE_INPUT_SHAPE).strict();
 export const GET_SKILL_INPUT_SCHEMA = z.object(GET_SKILL_INPUT_SHAPE).strict();
@@ -142,17 +149,37 @@ export function createBuildMcpServer(
       description:
         "Recherche dans les contenus BUILD accessibles au palier de la personne et dans la matière dont ils sont tirés : blocs, protocole, accompagnement, catalogue des skills, texte des skills publiés en markdown, notes de travail et doctrine. Donne une question située, un objectif et, si possible, le secteur ou le projet. La réponse doit servir à comparer, décider ou exécuter, pas seulement à retrouver un mot-clé.",
       inputSchema: SEARCH_KNOWLEDGE_INPUT_SHAPE,
+      annotations: READ_ONLY_TOOL_ANNOTATIONS,
     },
     async ({ query, source, limit }) => {
-      const queryEmbedding = await embedQuery(query, runtime);
-      if (!queryEmbedding) return toolError("La recherche est temporairement indisponible.");
-
       const admin = createMcpSupabaseAdmin({
         signal: runtime.signal,
         timeoutMs: runtime.deadlineAt
           ? Math.max(1, Math.min(15_000, runtime.deadlineAt - Date.now()))
           : 15_000,
       });
+      const pepper = process.env.MCP_PRINCIPAL_RATE_LIMIT_PEPPER ?? "";
+      if (pepper.length < 16) return toolError("La recherche est temporairement indisponible.");
+      for (const budget of [
+        { key: "minute", maximum: 10, seconds: 60 },
+        { key: "hour", maximum: 100, seconds: 3_600 },
+      ]) {
+        const { data, error } = await admin.rpc("check_mcp_rate_limit", {
+          p_subject: hashRateLimitSubject(
+            "mcp-search",
+            `${budget.key}:${auth.quotaPrincipal}`,
+            pepper,
+          ),
+          p_max_per_window: budget.maximum,
+          p_window_seconds: budget.seconds,
+        });
+        if (resolveRateLimitDecision(data, error) !== "allowed") {
+          return toolError("La recherche est temporairement indisponible.");
+        }
+      }
+
+      const queryEmbedding = await embedQuery(query, runtime);
+      if (!queryEmbedding) return toolError("La recherche est temporairement indisponible.");
       const { data: rawMatches, error } = await admin.rpc("match_mcp_knowledge_chunks", {
         query_embedding: queryEmbedding.embedding,
         p_token_hash: auth.tokenHash,
@@ -207,6 +234,7 @@ export function createBuildMcpServer(
       description:
         "Récupère le texte complet d'un skill BUILD accessible, mais seulement pour les skills publiés en markdown. Les autres skills sont livrés en archive : cet outil ne les sert pas, ils s'installent avec BUILD Sync. Utilise cet outil quand la tâche demande une procédure réutilisable, des contrôles de qualité ou une méthode versionnée, puis adapte le skill au projet au lieu de le recopier aveuglément.",
       inputSchema: GET_SKILL_INPUT_SHAPE,
+      annotations: READ_ONLY_TOOL_ANNOTATIONS,
     },
     async ({ slug }) => {
       const skill = getSkillBySlug(slug);
@@ -259,6 +287,7 @@ export function createBuildMcpServer(
       description:
         "Liste le palier de la personne, les skills accessibles et le nombre de skills verrouillés. Utilise cette vue pour choisir une capacité disponible avant de demander une action, sans tenter de contourner les permissions.",
       inputSchema: {},
+      annotations: READ_ONLY_TOOL_ANNOTATIONS,
     },
     async () => {
       const availableSkills = SKILLS_CATALOG.filter((skill) =>

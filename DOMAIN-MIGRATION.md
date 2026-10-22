@@ -151,7 +151,7 @@ Chemins qui ne doivent jamais être redirigés sur l'ancien domaine, parce que d
 - `/api/youtube/websub` : rappels de YouTube ;
 - `/api/webhooks/stripe` : tant que Stripe n'a pas été basculé.
 
-La raison tient en une ligne de code : le programme BUILD Sync télécharge sa mise à jour avec `redirect: "error"` (`public/build-sync/build.mjs`, fonction `refreshManagedCli`). Une redirection de `build.mjs` fait échouer la mise à jour de l'ordinateur, sans bruit.
+BUILD Sync ne remplace plus automatiquement son propre programme. La mise à jour du CLI reste une installation explicite : garde malgré tout ces URLs stables pendant la double période, car les commandes d'installation et les tâches déjà configurées conservent l'origine enregistrée.
 
 ### 4.1) Connecteurs MCP déjà enregistrés
 
@@ -173,19 +173,20 @@ Avec l'option A, il n'y a aucun message à envoyer. Le guide d'installation (`co
 
 Faits vérifiés dans `public/build-sync/build.mjs` :
 - chaque ordinateur garde son domaine dans `~/.build-sync/config.json` (`baseUrl`) et le recopie dans ses identifiants. Si les deux ne correspondent pas, le programme relance une connexion interactive (fonction `getAccessToken`) ;
-- la mise à jour automatique toutes les heures lance `skills update --quiet`, qui commence par télécharger `{baseUrl}/build-sync/build.mjs` sans suivre de redirection, puis le catalogue et les skills depuis le même domaine ;
-- un fichier téléchargé n'est accepté que si sa constante `CLI_VERSION` est supérieure ou égale à celle du programme en place.
+- la tâche automatique lance le programme déjà installé avec `skills update --quiet`. La version 3 télécharge le catalogue et les skills depuis `baseUrl`, mais ne télécharge ni ne remplace son propre programme ;
+- la constante `CLI_VERSION = 3` existe seulement comme pont à sens unique : un client v2 peut accepter cette dernière mise à niveau automatique. Une fois en v3, toute nouvelle version du programme demande une réinstallation explicite.
 
 Conséquences :
 - avec l'option A, l'ancien domaine reste l'issuer, rien ne change pour les ordinateurs ;
-- avec l'option B, dès que l'issuer change, les jetons existants sont refusés. En mode silencieux (la tâche horaire), le programme échoue sans rien afficher : les skills cessent simplement de se mettre à jour.
+- avec l'option B, les installations v3 restent configurées sur l'ancien domaine. Dès que ses jetons ou ses routes cessent d'être valides, la tâche silencieuse échoue et les skills cessent de se mettre à jour ;
+- aucun futur `build.mjs` ne peut migrer automatiquement une installation v3 vers le nouveau domaine. La personne doit relancer l'installateur depuis le nouveau domaine.
 
 Plan pour l'option B, en trois temps :
-1) **Au moins quatorze jours avant** : publier sur l'ancien domaine une version intermédiaire de `build.mjs` (`CLI_VERSION` augmentée). Elle doit connaître le nouveau domaine, et, au premier `update` ou `status`, afficher un message clair et écrire un fichier d'état dans `~/.build-sync` pour ne pas le répéter. Elle ne doit pas ouvrir de navigateur en mode silencieux. **Cette version n'est pas écrite aujourd'hui** : c'est un travail à faire, avec ses tests, avant le jour J.
-2) **Le jour J** : changer `BUILD_SYNC_OAUTH_ISSUER`, `BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN`, `install.sh`, `install.ps1`, `DEFAULT_BASE_URL`, dans un seul commit. Le test de `tests/buildSync.test.ts` vérifie qu'ils restent alignés.
-3) **Pendant la double période** : les membres relancent la commande d'installation depuis le nouveau domaine (`curl -fsSL https://NOUVEAU/build-sync/install.sh | sh` sur macOS, Linux et WSL, `irm https://NOUVEAU/build-sync/install.ps1 | iex` sous Windows). Cette commande refait tout : programme, configuration, connexion, tâche horaire. C'est le chemin de secours qui marche toujours, y compris pour un ordinateur qui n'aurait pas reçu la version intermédiaire.
+1) **Au moins quatorze jours avant** : annoncer la date, la nouvelle commande d'installation et l'obligation de la relancer. Garder l'ancien domaine fonctionnel pendant toute la période ;
+2) **Le jour J** : changer `BUILD_SYNC_OAUTH_ISSUER`, `BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN`, `install.sh`, `install.ps1` et `DEFAULT_BASE_URL` dans un seul commit. Le test de `tests/buildSync.test.ts` vérifie qu'ils restent alignés ;
+3) **Pendant la double période** : les membres relancent la commande d'installation depuis le nouveau domaine (`curl -fsSL https://NOUVEAU/build-sync/install.sh | sh` sur macOS, Linux et WSL, `irm https://NOUVEAU/build-sync/install.ps1 | iex` sous Windows). Cette commande remplace le programme, réécrit la configuration, reconnecte le compte et recrée la tâche horaire.
 
-L'ancien domaine doit continuer à servir `build.mjs` en réponse directe (code 200, type `application/javascript`) tant qu'il reste des ordinateurs sur l'ancienne installation. Le suivi se fait dans les journaux Vercel : cherche les appels à `/build-sync/build.mjs` et `/api/build-sync/catalog` sur l'ancien hôte, et ne retire l'ancien domaine que lorsque ces appels ont disparu depuis un mois.
+L'ancien domaine doit continuer à servir `build.mjs` en réponse directe pour permettre aux derniers clients v2 de recevoir le pont v3, et ses routes catalogue et artefacts doivent rester actives tant que des installations v3 l'utilisent. Le suivi se fait dans les journaux Vercel : cherche les appels à `/build-sync/build.mjs`, `/api/build-sync/catalog` et `/api/build-sync/artifacts/*` sur l'ancien hôte. Ne retire l'ancien domaine que lorsque ces appels ont disparu depuis un mois.
 
 ## 5) Vérifications après bascule
 
@@ -228,7 +229,7 @@ npm run domain:check                                                    # OK : .
 2) un achat en mode test Stripe : le webhook répond 200 (Stripe, Développeurs, Webhooks, voir la dernière livraison), l'e-mail de bienvenue arrive et son lien pointe vers `NOUVEAU` ;
 3) la lecture d'une leçon vidéo sous `NOUVEAU` (Mux accepte les deux domaines) ;
 4) l'ajout du connecteur MCP dans Claude avec l'adresse choisie, puis une question qui interroge BUILD ;
-5) `build-skills status` sur un ordinateur déjà installé, puis `build-skills update` ;
+5) `build-skills status` sur une installation restée sur l'ancien domaine, puis relance de l'installateur depuis `NOUVEAU`, nouveau `status` et `update` réussis ;
 6) un e-mail de test d'administration : expéditeur, SPF et DKIM passent (affichage de l'en-tête « Authentication-Results » dans le client mail).
 
 ## 6) Retour arrière

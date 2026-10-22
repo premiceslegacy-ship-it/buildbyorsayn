@@ -25,14 +25,6 @@
 
 /* page /checkout */
 .da .px-page { padding-top: clamp(96px, 11vw, 132px); }
-.da .px-beta { max-width: 560px; margin: 40px auto 0; padding-bottom: clamp(48px, 7vw, 96px); }
-.da .px-beta__form { display: grid; gap: 12px; }
-.da .px-beta__form label { font: 500 15px/1.3 var(--font); color: var(--t2); text-align: center; }
-.da .px-beta__ligne { display: flex; gap: 10px; }
-.da .px-beta__ligne input { flex: 1; min-width: 0; height: 48px; padding: 0 20px; border-radius: 999px; border: 0; background: var(--carte); color: var(--encre); font: 500 16px/1 var(--font); box-shadow: inset 0 0 0 1px var(--trait-f); }
-.da .px-beta__ligne input::placeholder { color: var(--t3); }
-.da .px-beta__ligne .btn:disabled { opacity: .5; cursor: wait; }
-.da .px-erreur { font: 500 15px/1.4 var(--font); color: #ffa3a3; text-align: center; }
 
 /* les ancres de la barre flottante ne passent pas sous la barre */
 .da section[id] { scroll-margin-top: 84px; }

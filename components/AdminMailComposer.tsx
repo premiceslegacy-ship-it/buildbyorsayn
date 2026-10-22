@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Mail, Send, Users, Video, RefreshCw, FileText } from "lucide-react";
 import { resolveSiteOrigin } from "@/lib/siteOrigin";
+import { MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS } from "@/lib/resendTransport";
 
 type MailUser = {
   id: string;
@@ -14,8 +15,8 @@ type Audience = "selected" | "all" | "free" | "beginner" | "full";
 
 type SendResult = {
   ok: boolean;
-  sent?: number;
-  batches?: number;
+  accepted?: number;
+  total?: number;
   error?: string;
 };
 
@@ -63,7 +64,6 @@ const TEMPLATES: Record<TemplateKey, { label: string; icon: React.ReactNode; fil
 export function AdminMailComposer({ users }: { users: MailUser[] }) {
   const [audience, setAudience] = useState<Audience>("selected");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [batchSize, setBatchSize] = useState(10);
   const [subject, setSubject] = useState("");
   const [preheader, setPreheader] = useState("");
   const [body, setBody] = useState("");
@@ -71,6 +71,7 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
   const [ctaUrl, setCtaUrl] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [result, setResult] = useState<SendResult | null>(null);
+  const campaignRef = useRef<{ id: string; fingerprint: string } | null>(null);
 
   // Template state
   const [activeTemplate, setActiveTemplate] = useState<TemplateKey>("blank");
@@ -91,9 +92,11 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
   }, [audience, selectedUsers.length, users]);
 
   const toggleUser = (id: string) => {
-    setSelectedIds((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
-    );
+    setSelectedIds((current) => {
+      if (current.includes(id)) return current.filter((item) => item !== id);
+      if (current.length >= MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS) return current;
+      return [...current, id];
+    });
   };
 
   const applyTemplate = (key: TemplateKey) => {
@@ -121,24 +124,42 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
     setIsSending(true);
     setResult(null);
 
-    const response = await fetch("/api/admin/send-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        audience,
-        selectedUserIds: selectedIds,
-        batchSize,
-        subject,
-        preheader,
-        body,
-        ctaLabel,
-        ctaUrl,
-      }),
-    });
+    const requestPayload = {
+      audience,
+      selectedUserIds: selectedIds,
+      subject,
+      preheader,
+      body,
+      ctaLabel,
+      ctaUrl,
+    };
+    const fingerprint = JSON.stringify(requestPayload);
+    if (!campaignRef.current || campaignRef.current.fingerprint !== fingerprint) {
+      campaignRef.current = { id: crypto.randomUUID(), fingerprint };
+    }
 
-    const payload = (await response.json().catch(() => ({}))) as SendResult;
-    setResult({ ok: response.ok && payload.ok, ...payload });
-    setIsSending(false);
+    try {
+      const response = await fetch("/api/admin/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaignId: campaignRef.current.id,
+          ...requestPayload,
+        }),
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as SendResult;
+      const succeeded = response.ok && payload.ok;
+      setResult({ ok: succeeded, ...payload });
+      if (succeeded) campaignRef.current = null;
+    } catch {
+      setResult({
+        ok: false,
+        error: "La réponse de l'envoi est indisponible. Relance la même campagne pour conserver l'idempotence.",
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -295,23 +316,9 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
-            {[1, 10, 30].map((size) => (
-              <button
-                key={size}
-                type="button"
-                onClick={() => setBatchSize(size)}
-                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                  batchSize === size
-                    ? "border-[#e8d5b0]/40 bg-[#e8d5b0]/12 text-[#e8d5b0]"
-                    : "border-white/10 bg-white/[0.03] text-white/35 hover:bg-white/[0.06]"
-                }`}
-              >
-                {size} par {size}
-              </button>
-            ))}
-          </div>
-
+          <p className="text-[11px] text-white/30">
+            Sélection individuelle : {MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS} destinataires maximum.
+          </p>
           <div className="max-h-72 overflow-y-auto rounded-xl border border-white/8 bg-black/15">
             {users.map((user) => (
               <label
@@ -322,6 +329,10 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
                   type="checkbox"
                   checked={selectedIds.includes(user.id)}
                   onChange={() => toggleUser(user.id)}
+                  disabled={
+                    !selectedIds.includes(user.id)
+                    && selectedIds.length >= MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS
+                  }
                   className="h-4 w-4 accent-[#e8d5b0]"
                 />
                 <span className="min-w-0 flex-1 truncate font-mono text-xs text-white/55">{user.email}</span>
@@ -329,11 +340,23 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
               </label>
             ))}
           </div>
+          {expectedRecipients > MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS && (
+            <p className="rounded-lg border border-amber-400/20 bg-amber-400/8 px-3 py-2 text-xs text-amber-100/70">
+              La voie synchrone est limitée à {MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS} destinataires.
+              Aucune outbox n&apos;est configurée : cet envoi sera refusé sans livraison partielle.
+            </p>
+          )}
 
           <button
             type="button"
             onClick={sendEmail}
-            disabled={isSending || expectedRecipients === 0 || !subject.trim() || !body.trim()}
+            disabled={
+              isSending
+              || expectedRecipients === 0
+              || expectedRecipients > MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS
+              || !subject.trim()
+              || !body.trim()
+            }
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#c9b48a] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-colors hover:bg-[#e8d5b0] disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Send className="h-4 w-4" />
@@ -343,7 +366,7 @@ export function AdminMailComposer({ users }: { users: MailUser[] }) {
           {result && (
             <p className={`text-xs ${result.ok ? "text-emerald-300/80" : "text-red-300/80"}`}>
               {result.ok
-                ? `${result.sent ?? 0} email(s) envoyés en ${result.batches ?? 0} lot(s).`
+                ? `${result.accepted ?? 0} email(s) accepté(s) par Resend.`
                 : result.error ?? "L'envoi a échoué."}
             </p>
           )}

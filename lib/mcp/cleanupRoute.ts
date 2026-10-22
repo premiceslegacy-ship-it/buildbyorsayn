@@ -4,6 +4,9 @@ import { verifyMcpCleanupAuthorization } from "@/lib/mcp/cronAuth";
 import { logMcpEvent, resolveMcpRequestId } from "@/lib/mcp/observability";
 
 export const MCP_CLEANUP_SUPABASE_TIMEOUT_MS = 6_000;
+export const MCP_OAUTH_CLEANUP_BATCH_SIZE = 1_000;
+export const MCP_RATE_LIMIT_CLEANUP_BATCH_SIZE = 5_000;
+
 
 const CLEANUP_RESULT_SCHEMA = z.array(z.object({
   authorization_requests_deleted: z.number().int().nonnegative(),
@@ -20,6 +23,10 @@ const BUILD_SYNC_CLEANUP_RESULT_SCHEMA = z.array(z.object({
   access_tokens_deleted: z.number().int().nonnegative(),
   refresh_tokens_deleted: z.number().int().nonnegative(),
 }).strict()).length(1);
+
+const ACTIVITY_CLEANUP_RESULT_SCHEMA = z.number().int().nonnegative();
+const RATE_LIMIT_CLEANUP_RESULT_SCHEMA = z.number().int().nonnegative();
+
 
 type CleanupRpcResult = {
   data: unknown;
@@ -83,23 +90,29 @@ export function createMcpCleanupHandler(
 
     try {
       const admin = createAdmin();
-      const [mcpResult, buildSyncResult] = await Promise.all([
-        admin.rpc("cleanup_mcp_oauth_state", { p_batch_size: 500 }),
-        admin.rpc("cleanup_build_sync_oauth_state", { p_batch_size: 500 }),
+      const [mcpResult, rateLimitResult, buildSyncResult, activityResult] = await Promise.all([
+        admin.rpc("cleanup_mcp_oauth_state", { p_batch_size: MCP_OAUTH_CLEANUP_BATCH_SIZE }),
+        admin.rpc("cleanup_mcp_rate_limits", { p_batch_size: MCP_RATE_LIMIT_CLEANUP_BATCH_SIZE }),
+        admin.rpc("cleanup_build_sync_oauth_state", { p_batch_size: MCP_OAUTH_CLEANUP_BATCH_SIZE }),
+        admin.rpc("cleanup_member_activity_events", { p_batch_size: 1000, p_retention_days: 90 }),
       ]);
-      if (mcpResult.error || buildSyncResult.error) {
+      if (mcpResult.error || rateLimitResult.error || buildSyncResult.error || activityResult.error) {
         return respond({ error: "cleanup_failed" }, 500, "failed");
       }
 
       const parsed = CLEANUP_RESULT_SCHEMA.safeParse(mcpResult.data);
       const buildSyncParsed = BUILD_SYNC_CLEANUP_RESULT_SCHEMA.safeParse(buildSyncResult.data);
-      if (!parsed.success || !buildSyncParsed.success) {
+      const rateLimitParsed = RATE_LIMIT_CLEANUP_RESULT_SCHEMA.safeParse(rateLimitResult.data);
+      const activityParsed = ACTIVITY_CLEANUP_RESULT_SCHEMA.safeParse(activityResult.data);
+      if (!parsed.success || !rateLimitParsed.success || !buildSyncParsed.success || !activityParsed.success) {
         return respond({ error: "cleanup_failed" }, 500, "failed");
       }
 
       return respond({
         cleaned: parsed.data[0],
+        rateLimitsDeleted: rateLimitParsed.data,
         buildSyncCleaned: buildSyncParsed.data[0],
+        activityEventsDeleted: activityParsed.data,
       }, 200, "allowed");
     } catch {
       return respond({ error: "cleanup_failed" }, 500, "failed");

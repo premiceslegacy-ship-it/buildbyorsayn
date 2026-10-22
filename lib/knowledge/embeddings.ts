@@ -1,5 +1,4 @@
 import { createHash } from "node:crypto";
-import { GoogleGenAI } from "@google/genai";
 
 export const EMBEDDING_DIMENSIONS = 768;
 export const DEFAULT_EMBEDDING_TOTAL_TIMEOUT_MS = 14_000;
@@ -26,7 +25,7 @@ type ResolvedEmbeddingRequestOptions = {
 
 export type EmbeddingTask = "RETRIEVAL_DOCUMENT" | "RETRIEVAL_QUERY";
 export type EmbeddingConfig = {
-  provider: "gemini" | "openrouter";
+  provider: "openrouter";
   model: string;
   dimensions: 768;
   normalization: "l2-v1";
@@ -66,26 +65,14 @@ export function normalizeAndValidateEmbedding(values: unknown): number[] {
 }
 
 export function resolveEmbeddingConfig(env: EmbeddingEnvironment): EmbeddingConfig {
-  const provider = env.KNOWLEDGE_EMBEDDING_PROVIDER;
-  if (provider !== "gemini" && provider !== "openrouter") {
-    throw new Error("KNOWLEDGE_EMBEDDING_PROVIDER must be explicitly set to gemini or openrouter.");
+  if (env.KNOWLEDGE_EMBEDDING_PROVIDER !== "openrouter") {
+    throw new Error("KNOWLEDGE_EMBEDDING_PROVIDER must be explicitly set to openrouter.");
   }
-
-  if (provider === "gemini") {
-    if (!env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is required for Gemini embeddings.");
-    return {
-      provider,
-      model: env.KNOWLEDGE_EMBEDDING_MODEL || "gemini-embedding-001",
-      dimensions: EMBEDDING_DIMENSIONS,
-      normalization: "l2-v1",
-    };
-  }
-
   if (!env.OPENROUTER_API_KEY) {
     throw new Error("OPENROUTER_API_KEY is required for OpenRouter embeddings.");
   }
   return {
-    provider,
+    provider: "openrouter",
     model: env.KNOWLEDGE_EMBEDDING_MODEL || "openai/text-embedding-3-small",
     dimensions: EMBEDDING_DIMENSIONS,
     normalization: "l2-v1",
@@ -216,84 +203,6 @@ async function withRetries<T>(
   throw lastError;
 }
 
-export class GeminiEmbeddingProvider implements EmbeddingProvider {
-  private client: GoogleGenAI;
-  readonly config: EmbeddingConfig;
-
-  constructor(
-    apiKey: string,
-    model = "gemini-embedding-001",
-    dependencies: { client?: GoogleGenAI } = {}
-  ) {
-    this.client = dependencies.client ?? new GoogleGenAI({ apiKey });
-    this.config = {
-      provider: "gemini",
-      model,
-      dimensions: EMBEDDING_DIMENSIONS,
-      normalization: "l2-v1",
-    };
-  }
-
-  async embedBatch(
-    texts: string[],
-    taskType: EmbeddingTask,
-    requestOptions?: EmbeddingRequestOptions
-  ): Promise<number[][]> {
-    const options = resolveRequestOptions(requestOptions);
-    const totalDeadline = deadlineSignal(options.totalTimeoutMs);
-    const totalSignal = options.signal
-      ? AbortSignal.any([options.signal, totalDeadline.signal])
-      : totalDeadline.signal;
-    const deadlineAt = Date.now() + options.totalTimeoutMs;
-    const results: number[][] = [];
-    try {
-      for (let index = 0; index < texts.length; index += BATCH_SIZE) {
-        const batch = texts.slice(index, index + BATCH_SIZE);
-        results.push(...(await withRetries(
-          (signal, attemptTimeoutMs) => this.embedOnce(batch, taskType, signal, attemptTimeoutMs),
-          options,
-          totalSignal,
-          deadlineAt
-        )));
-      }
-      return results;
-    } finally {
-      totalDeadline.dispose();
-    }
-  }
-
-  private async embedOnce(
-    batch: string[],
-    taskType: EmbeddingTask,
-    signal: AbortSignal,
-    attemptTimeoutMs: number
-  ): Promise<number[][]> {
-    const response = await this.client.models.embedContent({
-      model: this.config.model,
-      contents: batch,
-      config: {
-        taskType,
-        outputDimensionality: EMBEDDING_DIMENSIONS,
-        abortSignal: signal,
-        httpOptions: {
-          timeout: attemptTimeoutMs,
-          retryOptions: { attempts: 1 },
-        },
-      },
-    });
-    const embeddings = response.embeddings ?? [];
-    if (embeddings.length !== batch.length) {
-      throw new EmbeddingResponseError("Embedding provider returned an unexpected result count.");
-    }
-    try {
-      return embeddings.map((embedding) => normalizeAndValidateEmbedding(embedding.values));
-    } catch (error) {
-      throw new EmbeddingResponseError("Embedding provider returned an invalid embedding.", {
-        cause: error,
-      });
-    }
-  }
-}
 
 export class OpenRouterEmbeddingProvider implements EmbeddingProvider {
   readonly config: EmbeddingConfig;
@@ -405,8 +314,5 @@ export function createEmbeddingProvider(env: EmbeddingEnvironment = process.env)
     return null;
   }
 
-  if (config.provider === "gemini") {
-    return new GeminiEmbeddingProvider(env.GEMINI_API_KEY!, config.model);
-  }
   return new OpenRouterEmbeddingProvider(env.OPENROUTER_API_KEY!, config.model);
 }

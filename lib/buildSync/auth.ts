@@ -6,11 +6,12 @@ import {
   BUILD_SYNC_SCOPE,
 } from "@/lib/buildSync/config";
 import { resolveMcpProfileTier, type McpTier } from "@/lib/mcpAccess";
+import { stableQuotaPrincipal } from "@/lib/mcp/security";
 
 export type BuildSyncAuthContext = {
   userId: string;
   tier: McpTier;
-  tokenHash: string;
+  quotaPrincipal: string;
 };
 
 export async function resolveBuildSyncAuth(
@@ -25,7 +26,7 @@ export async function resolveBuildSyncAuth(
   const admin = createAdminSupabase({ signal: request.signal });
   const { data: stored, error } = await admin
     .from("build_sync_access_tokens")
-    .select("user_id, scope, resource, expires_at, revoked_at")
+    .select("user_id, client_id, scope, resource, expires_at, revoked_at")
     .eq("token_hash", tokenHash)
     .maybeSingle();
 
@@ -41,7 +42,14 @@ export async function resolveBuildSyncAuth(
   const tier = resolveMcpProfileTier(profile, profileError);
   if (!canUseBuildSync(tier)) return null;
 
-  return { userId: stored.user_id, tier, tokenHash };
+  return {
+    userId: stored.user_id,
+    tier,
+    quotaPrincipal: stableQuotaPrincipal({
+      userId: stored.user_id,
+      clientId: stored.client_id,
+    }),
+  };
 }
 
 export function buildSyncChallengeHeader(): string {

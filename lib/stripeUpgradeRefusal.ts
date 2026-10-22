@@ -10,11 +10,20 @@ export type RefundRequest = {
   metadata: Record<string, string>;
 };
 
-export type UpgradeRefusalDeps = {
-  createRefund: (params: RefundRequest, options: { idempotencyKey: string }) => Promise<unknown>;
+export type RefundResponse = {
+  id: string;
+  status: string | null;
+};
+
+export type RefundExecutionDeps = {
+  createRefund: (params: RefundRequest, options: { idempotencyKey: string }) => Promise<RefundResponse>;
+  retrieveRefund: (refundId: string) => Promise<RefundResponse>;
+  log: (message: string) => void;
+};
+
+export type UpgradeRefusalDeps = RefundExecutionDeps & {
   /** Renvoie false si l'e-mail n'a pas pu partir (ou si l'envoi n'est pas configuré). Ne bloque jamais le refus. */
   notifyCustomer: (email: string) => Promise<boolean>;
-  log: (message: string) => void;
 };
 
 export type UpgradeRefusalResult =
@@ -22,12 +31,42 @@ export type UpgradeRefusalResult =
   | { outcome: "refunded" }
   /** Aucun paiement à rembourser : journalisé, répondre 200. */
   | { outcome: "no_payment_intent" }
-  /** Le remboursement a échoué : répondre 500 pour que Stripe réessaie. */
-  | { outcome: "refund_failed" };
+  /** Le remboursement n'est pas acquis : répondre 500 pour conserver les retries Stripe. */
+  | { outcome: "refund_pending" | "refund_failed" };
 
 export function paymentIntentId(value: string | { id: string } | null | undefined): string | null {
   if (!value) return null;
   return typeof value === "string" ? value : value.id || null;
+}
+
+export async function createConfirmedRefund(
+  deps: RefundExecutionDeps,
+  input: { request: RefundRequest; idempotencyKey: string; logLabel: string },
+): Promise<{ outcome: "refunded" | "refund_pending" | "refund_failed" }> {
+  let refund: RefundResponse;
+  try {
+    refund = await deps.createRefund(input.request, { idempotencyKey: input.idempotencyKey });
+  } catch {
+    deps.log(`[Webhook] ${input.logLabel} refund request failed`);
+    return { outcome: "refund_failed" };
+  }
+  if (refund.status !== "succeeded") {
+    try {
+      refund = await deps.retrieveRefund(refund.id);
+    } catch {
+      deps.log(`[Webhook] ${input.logLabel} refund ${refund.id} status could not be refreshed`);
+      return { outcome: "refund_pending" };
+    }
+  }
+  if (refund.status === "failed" || refund.status === "canceled") {
+    deps.log(`[Webhook] ${input.logLabel} refund ${refund.id} ended with status ${refund.status}`);
+    return { outcome: "refund_failed" };
+  }
+  if (refund.status !== "succeeded") {
+    deps.log(`[Webhook] ${input.logLabel} refund ${refund.id} is not complete`);
+    return { outcome: "refund_pending" };
+  }
+  return { outcome: "refunded" };
 }
 
 export async function refuseUpgradePurchase(
@@ -40,9 +79,10 @@ export async function refuseUpgradePurchase(
     return { outcome: "no_payment_intent" };
   }
 
-  try {
-    await deps.createRefund(
-      {
+  const refundResult = await createConfirmedRefund(
+    deps,
+    {
+      request: {
         payment_intent: intent,
         reason: "requested_by_customer",
         metadata: {
@@ -51,12 +91,11 @@ export async function refuseUpgradePurchase(
           note: "Le complement est reserve aux comptes Fondations. Acces non accorde, paiement rembourse automatiquement.",
         },
       },
-      { idempotencyKey: `upgrade-refused-${input.sessionId}` },
-    );
-  } catch {
-    deps.log("[Webhook] Automatic refund of a refused upgrade failed");
-    return { outcome: "refund_failed" };
-  }
+      idempotencyKey: `upgrade-refused-${input.sessionId}`,
+      logLabel: "Refused upgrade",
+    },
+  );
+  if (refundResult.outcome !== "refunded") return refundResult;
 
   if (input.customerEmail) {
     try {

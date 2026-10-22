@@ -6,7 +6,6 @@ import { PricingSection } from "@/components/da/PricingSection";
 import { getCheckoutLinks } from "@/lib/checkoutLinks";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { selectPricingView } from "@/lib/pricingView";
-import { BetaCodeForm } from "./BetaCodeForm";
 
 export const metadata = {
     title: "Choisir mon niveau | BUILD by Orsayn",
@@ -57,9 +56,6 @@ export default async function CheckoutPage({
                     notice={notice}
                     lede={fromMcp && showsBothOffers ? "Ton compte est prêt. Choisis ton niveau pour connecter ton assistant à BUILD." : undefined}
                 />
-                <div className="wrap">
-                    <div className="px-beta"><BetaCodeForm /></div>
-                </div>
             </main>
             <DaFooter homeBase="/" />
         </DaRoot>

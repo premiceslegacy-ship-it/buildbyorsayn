@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSkillBySlug } from "@/lib/skillsCatalog";
 import { getStoredSkillContent } from "@/lib/skills/storage";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
+import { reservePrivateDownload } from "@/lib/privateDownloadRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -59,7 +60,7 @@ async function listFiles(rootDir: string, currentDir = "") {
     if (entry.name === ".DS_Store") continue;
 
     const relativePath = path.join(currentDir, entry.name);
-    const absolutePath = path.join(rootDir, relativePath);
+    const absolutePath = path.join(/* turbopackIgnore: true */ rootDir, relativePath);
 
     if (entry.isDirectory()) {
       files.push(...(await listFiles(rootDir, relativePath)));
@@ -172,7 +173,7 @@ async function createZipFromDirectory(rootDir: string, packageName: string) {
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
@@ -217,7 +218,18 @@ export async function GET(
     }
   }
 
-  const storedSkill = await getStoredSkillContent(skill);
+  const downloadDecision = await reservePrivateDownload(user.id, request.signal);
+  if (downloadDecision !== "allowed") {
+    return NextResponse.json(
+      { error: downloadDecision === "denied" ? "Trop de téléchargements." : "Téléchargement temporairement indisponible." },
+      {
+        status: downloadDecision === "denied" ? 429 : 503,
+        headers: { "Cache-Control": "no-store", "Retry-After": downloadDecision === "denied" ? "3600" : "5" },
+      }
+    );
+  }
+
+  const storedSkill = await getStoredSkillContent(skill, { signal: request.signal });
 
   if (storedSkill) {
     return new NextResponse(storedSkill.body, {

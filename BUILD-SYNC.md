@@ -12,9 +12,11 @@ Claude Code et Hermes Agent. Le site ne reçoit aucun accès aux projets locaux.
    skill de manière atomique.
 5. Une tâche locale vérifie les versions toutes les heures.
 
-Le programme BUILD Sync se met également à jour depuis l'origine BUILD avant
-chaque contrôle. Les changements futurs de fréquence sont ainsi appliqués à la
-planification locale sans demander une nouvelle installation.
+Les skills sont contrôlés et synchronisés chaque heure. La version 3 du
+programme ne télécharge ni ne remplace son propre code. Une installation v2
+peut accepter une dernière mise à niveau vers la v3 grâce au pont
+`CLI_VERSION = 3`; toute version ultérieure du programme ou du planificateur
+demande de relancer explicitement l'installateur.
 
 Les adaptations doivent vivre dans `CUSTOM.md`. Ce fichier est injecté dans le
 contrat du skill et n'est jamais remplacé. Si un autre fichier géré a été modifié,

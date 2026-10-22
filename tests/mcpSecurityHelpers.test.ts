@@ -6,8 +6,10 @@ import {
   hashRateLimitSubject,
   isExactMcpResource,
   resolveRateLimitDecision,
+  stableQuotaPrincipal,
   trustedClientAddress,
 } from "../lib/mcp/security";
+import { buildValidatedAuthorizationErrorCallback } from "../lib/mcp/oauth";
 
 test("rate limiting distinguishes denial from infrastructure failure", () => {
   assert.equal(resolveRateLimitDecision(true, null), "allowed");
@@ -47,6 +49,42 @@ test("rate-limit subjects never persist a raw network address", () => {
   assert.equal(first, again);
   assert.equal(first.includes("203.0.113.7"), false);
   assert.match(first, /^mcp-dcr:[a-f0-9]{64}$/);
+});
+
+test("bearer rotation preserves stable user/client quota subjects", () => {
+  const beforeRotation = {
+    userId: "8a4e06ba-47a4-4a28-8de7-774843687d3c",
+    clientId: "public-client",
+    tokenHash: "old-access-token-hash",
+  };
+  const afterRotation = {
+    ...beforeRotation,
+    tokenHash: "new-access-token-hash",
+  };
+  const pepper = "dedicated-test-pepper";
+  assert.equal(
+    hashRateLimitSubject("mcp-search", stableQuotaPrincipal(beforeRotation), pepper),
+    hashRateLimitSubject("mcp-search", stableQuotaPrincipal(afterRotation), pepper),
+  );
+  assert.notEqual(
+    stableQuotaPrincipal(beforeRotation),
+    stableQuotaPrincipal({ ...beforeRotation, clientId: "other-client" }),
+  );
+});
+
+test("validated OAuth errors return to the exact callback with original state", () => {
+  const callback = buildValidatedAuthorizationErrorCallback(
+    "https://client.example/oauth/callback?tenant=build",
+    "opaque-state",
+    "temporarily_unavailable",
+    "Too many authorization requests.",
+  );
+  assert.equal(callback.origin, "https://client.example");
+  assert.equal(callback.pathname, "/oauth/callback");
+  assert.equal(callback.searchParams.get("tenant"), "build");
+  assert.equal(callback.searchParams.get("error"), "temporarily_unavailable");
+  assert.equal(callback.searchParams.get("error_description"), "Too many authorization requests.");
+  assert.equal(callback.searchParams.get("state"), "opaque-state");
 });
 
 test("network rate limits trust only the platform-owned forwarding header", () => {

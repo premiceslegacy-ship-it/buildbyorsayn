@@ -3,7 +3,6 @@ import Stripe from "stripe";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import {
-    decideUpgradeAccess,
     determineStripeTier,
     escapeIlikePattern,
     emailsMatch,
@@ -12,13 +11,22 @@ import {
     referenceMatchesProfile,
     type PaidTier,
 } from "@/lib/stripeEntitlements";
-import { buildUpgradeRefusalEmail, refuseUpgradePurchase } from "@/lib/stripeUpgradeRefusal";
+import {
+    hasAcceptedStripeTerms,
+    isPaidCheckoutSession,
+    secureUpgradeUserId,
+} from "@/lib/stripeCheckout";
+import { buildUpgradeRefusalEmail, createConfirmedRefund, paymentIntentId, refuseUpgradePurchase } from "@/lib/stripeUpgradeRefusal";
+import { processPaidUpgrade, type UpgradeClaimResult } from "@/lib/stripeUpgradeProcessing";
+import { sendResendMessage, stripeEmailIdempotencyKey } from "@/lib/resendTransport";
 import { optionalSiteOrigin, requireSiteOrigin } from "@/lib/siteOrigin";
 import { getLegalEntity } from "@/lib/legal/entity";
 import { buildPurchaseConfirmation } from "@/lib/legal/consent";
 import { COFFRE_LABEL, FONDATIONS_LABEL } from "@/lib/pricing";
+import { readBoundedBody } from "@/lib/mcp/http";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const MAX_STRIPE_WEBHOOK_BODY_BYTES = 512 * 1024;
 
 function escapeHtml(value: string) {
     return value
@@ -133,55 +141,29 @@ function buildWelcomeEmailHtml(actionLink: string) {
 </html>`;
 }
 
-async function sendWelcomeEmail(email: string, actionLink: string) {
-    const resendApiKey = process.env.RESEND_API_KEY;
-    const from = process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM;
-
-    if (!resendApiKey || !from) return false;
-
-    try {
-        const response = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${resendApiKey}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                from,
-                to: [email],
-                subject: "Bienvenue dans BUILD - active ton compte",
-                html: buildWelcomeEmailHtml(actionLink),
-                text: `Bienvenue dans BUILD.\n\nTon paiement est confirmé. Active ton compte et choisis ton mot de passe ici : ${actionLink}`,
-            }),
-        });
-
-        if (!response.ok) {
-            console.error("[Webhook] Resend welcome email failed");
-            return false;
-        }
-
-        return true;
-    } catch {
-        console.error("[Webhook] Resend welcome email request failed");
-        return false;
-    }
+async function sendWelcomeEmail(email: string, actionLink: string, checkoutSessionId: string) {
+    return sendResendMessage({
+        apiKey: process.env.RESEND_API_KEY,
+        from: process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM,
+        to: email,
+        subject: "Bienvenue dans BUILD - active ton compte",
+        html: buildWelcomeEmailHtml(actionLink),
+        text: `Bienvenue dans BUILD.\n\nTon paiement est confirmé. Active ton compte et choisis ton mot de passe ici : ${actionLink}`,
+        idempotencyKey: stripeEmailIdempotencyKey("welcome", checkoutSessionId),
+    });
 }
 
-async function sendUpgradeRefusalEmail(email: string) {
-    const resendApiKey = process.env.RESEND_API_KEY;
-    const from = process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM;
-    if (!resendApiKey || !from) return false;
-
+async function sendUpgradeRefusalEmail(email: string, checkoutSessionId: string) {
     const { subject, text, html } = buildUpgradeRefusalEmail(optionalSiteOrigin());
-    const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ from, to: [email], subject, html, text }),
+    return sendResendMessage({
+        apiKey: process.env.RESEND_API_KEY,
+        from: process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM,
+        to: email,
+        subject,
+        html,
+        text,
+        idempotencyKey: stripeEmailIdempotencyKey("upgrade-refused", checkoutSessionId),
     });
-    return response.ok;
 }
 
 /**
@@ -193,12 +175,11 @@ async function sendPurchaseConfirmationEmail(
     offerName: string,
     amountCents: number | null,
     createdSeconds: number,
+    checkoutSessionId: string,
 ) {
     try {
-        const resendApiKey = process.env.RESEND_API_KEY;
-        const from = process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM;
         const baseUrl = optionalSiteOrigin();
-        if (!resendApiKey || !from || !baseUrl || !amountCents || amountCents <= 0) {
+        if (!baseUrl || !amountCents || amountCents <= 0) {
             console.error("[Webhook] Purchase confirmation skipped (missing configuration or amount)");
             return false;
         }
@@ -217,13 +198,15 @@ async function sendPurchaseConfirmationEmail(
                 vatMention: entity.vatMention,
             },
         });
-        const response = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ from, to: [email], subject, html, text }),
+        return sendResendMessage({
+            apiKey: process.env.RESEND_API_KEY,
+            from: process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM,
+            to: email,
+            subject,
+            html,
+            text,
+            idempotencyKey: stripeEmailIdempotencyKey("purchase-confirmation", checkoutSessionId),
         });
-        if (!response.ok) console.error("[Webhook] Resend purchase confirmation failed");
-        return response.ok;
     } catch {
         console.error("[Webhook] Purchase confirmation failed");
         return false;
@@ -232,6 +215,38 @@ async function sendPurchaseConfirmationEmail(
 
 function canSendWelcomeEmail() {
     return Boolean(process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM));
+}
+
+async function refundRejectedCheckout(
+    session: Stripe.Checkout.Session,
+    reason: "missing_terms_consent" | "unknown_price",
+    metadata: Record<string, string> = {},
+) {
+    const intent = paymentIntentId(session.payment_intent);
+    if (!intent) {
+        console.error(`[Webhook] ${reason} checkout has no refundable payment intent`);
+        return { outcome: "refund_failed" as const };
+    }
+    return createConfirmedRefund(
+        {
+            createRefund: (params, options) => stripe.refunds.create(params, options),
+            retrieveRefund: (refundId) => stripe.refunds.retrieve(refundId),
+            log: (message) => console.error(message),
+        },
+        {
+            request: {
+                payment_intent: intent,
+                reason: "requested_by_customer",
+                metadata: {
+                    refused_reason: reason,
+                    checkout_session_id: session.id,
+                    ...metadata,
+                },
+            },
+            idempotencyKey: `${reason}-${session.id}`,
+            logLabel: `${reason} checkout`,
+        },
+    );
 }
 
 async function persistProfileTier(
@@ -286,12 +301,18 @@ async function persistProfileTier(
 }
 
 export async function POST(req: NextRequest) {
-    const body = await req.text();
     const signature = req.headers.get("stripe-signature");
 
     if (!signature) {
         return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 });
     }
+
+    const boundedBody = await readBoundedBody(req, MAX_STRIPE_WEBHOOK_BODY_BYTES);
+    if (boundedBody.ok === false) {
+        const status = boundedBody.reason === "too_large" ? 413 : boundedBody.reason === "timeout" ? 408 : 400;
+        return NextResponse.json({ error: "Invalid webhook body" }, { status });
+    }
+    const body = boundedBody.text;
 
     let event: Stripe.Event;
     try {
@@ -305,19 +326,135 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Verification failed" }, { status: 400 });
     }
 
-    if (event.type === "checkout.session.completed") {
+    if (
+        event.type === "checkout.session.completed" ||
+        event.type === "checkout.session.async_payment_succeeded"
+    ) {
         const session = event.data.object as Stripe.Checkout.Session;
+        if (!isPaidCheckoutSession(session)) {
+            return NextResponse.json({ received: true }, { status: 200 });
+        }
         const referenceId = session.client_reference_id?.trim() || null;
         const customerEmail = normalizeCustomerEmail(session.customer_details?.email);
-        let userId: string | null = null;
-
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        // A client-controlled reference is only a hint. Bind it to the
-        // customer email already stored on that profile before granting access.
+        // Le produit est identifié avant toute résolution ou création de compte.
+        let priceId: string | null = null;
+        try {
+            const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 });
+            priceId = lineItems.data[0]?.price?.id ?? null;
+        } catch {
+            console.error("[Webhook] Stripe line-item lookup failed");
+            return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+        }
+
+        const tier = determineStripeTier(
+            priceId,
+            process.env.STRIPE_BEGINNER_PRICE_ID,
+            process.env.STRIPE_FULL_PRICE_ID,
+            process.env.STRIPE_UPGRADE_PRICE_ID,
+        );
+        if (!tier) {
+            console.error("[Webhook] Paid checkout uses an unknown Stripe price; refunding");
+            const refund = await refundRejectedCheckout(session, "unknown_price", {
+                observed_price_id: priceId ?? "missing",
+            });
+            if (refund.outcome !== "refunded") {
+                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+            }
+            return NextResponse.json({ received: true }, { status: 200 });
+        }
+
+        if (!hasAcceptedStripeTerms(session)) {
+            console.error("[Webhook] Paid checkout is missing required terms consent; refunding");
+            const refund = await refundRejectedCheckout(session, "missing_terms_consent");
+            if (refund.outcome !== "refunded") {
+                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+            }
+            return NextResponse.json({ received: true }, { status: 200 });
+        }
+
+        const isUpgrade = priceId === process.env.STRIPE_UPGRADE_PRICE_ID;
+        if (isUpgrade) {
+            const upgradeUserId = secureUpgradeUserId(session);
+            if (!upgradeUserId) {
+                console.error("[Webhook] Upgrade checkout is not bound to an authenticated account");
+                const refused = await refuseUpgradePurchase(
+                    {
+                        createRefund: (params, options) => stripe.refunds.create(params, options),
+                        retrieveRefund: (refundId) => stripe.refunds.retrieve(refundId),
+                        notifyCustomer: (email) => sendUpgradeRefusalEmail(email, session.id),
+                        log: (message) => console.error(message),
+                    },
+                    { sessionId: session.id, paymentIntent: session.payment_intent, customerEmail },
+                );
+                if (refused.outcome === "refund_failed" || refused.outcome === "refund_pending") {
+                    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                }
+                return NextResponse.json({ received: true }, { status: 200 });
+            }
+
+            const result = await processPaidUpgrade(
+                {
+                    claimUpgrade: async (userId, checkoutSessionId) => {
+                        const { data, error } = await supabase.rpc("apply_stripe_upgrade", {
+                            p_user_id: userId,
+                            p_checkout_session_id: checkoutSessionId,
+                        });
+                        if (error) throw new Error("Atomic upgrade RPC failed");
+                        if (
+                            data === "granted" ||
+                            data === "duplicate" ||
+                            data === "refuse" ||
+                            data === "conflict"
+                        ) {
+                            return data as UpgradeClaimResult;
+                        }
+                        throw new Error("Atomic upgrade RPC returned an invalid result");
+                    },
+                    createRefund: (params, options) => stripe.refunds.create(params, options),
+                    retrieveRefund: (refundId) => stripe.refunds.retrieve(refundId),
+                    notifyCustomer: (email) => sendUpgradeRefusalEmail(email, session.id),
+                    log: (message) => console.error(message),
+                },
+                {
+                    userId: upgradeUserId,
+                    sessionId: session.id,
+                    paymentIntent: session.payment_intent,
+                    customerEmail,
+                },
+            );
+
+            if (
+                result.outcome === "claim_failed" ||
+                result.outcome === "refund_failed" ||
+                result.outcome === "refund_pending"
+            ) {
+                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+            }
+            if (result.outcome === "refunded" || result.outcome === "no_payment_intent") {
+                return NextResponse.json({ received: true }, { status: 200 });
+            }
+
+            revalidatePath("/", "layout");
+            if (customerEmail) {
+                await sendPurchaseConfirmationEmail(
+                    customerEmail,
+                    `Passage de ${FONDATIONS_LABEL} à ${COFFRE_LABEL}`,
+                    session.amount_total ?? null,
+                    event.created,
+                    session.id,
+                );
+            }
+            return NextResponse.json({ received: true }, { status: 200 });
+        }
+
+        let userId: string | null = null;
+
+        // Pour les achats initiaux, la référence reste un indice lié à l'e-mail du profil.
         if (referenceId) {
             if (!isUuid(referenceId) || !customerEmail) {
                 console.warn("[Webhook] Ignoring an unbound client reference");
@@ -342,8 +479,6 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // If the reference is absent or cannot be bound, resolve the account
-        // by the normalized Stripe customer email instead.
         if (!userId && customerEmail) {
             const { data: profile, error: profileLookupError } = await supabase
                 .from("profiles")
@@ -361,7 +496,6 @@ export async function POST(req: NextRequest) {
                 try {
                     appUrl = requireSiteOrigin();
                 } catch {
-                    // Never invent a host: an invitation pointing at a dead domain strands a paying customer. Stripe retries on 500.
                     console.error("[Webhook] NEXT_PUBLIC_APP_URL is not configured or invalid");
                     return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                 }
@@ -375,11 +509,8 @@ export async function POST(req: NextRequest) {
                             data: { invited_from: "stripe_checkout" },
                         }
                     );
-                    if (inviteError) {
+                    if (inviteError || !invited?.user?.id) {
                         console.error("[Webhook] Supabase invitation failed");
-                        return NextResponse.json({ error: "Processing failed" }, { status: 500 });
-                    } else if (!invited?.user?.id) {
-                        console.error("[Webhook] Supabase invitation returned no user");
                         return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                     }
                     userId = invited.user.id;
@@ -397,22 +528,20 @@ export async function POST(req: NextRequest) {
                     if (linkError || !inviteLink?.user?.id || !actionLink) {
                         console.error("[Webhook] Supabase invitation link generation failed");
                         return NextResponse.json({ error: "Processing failed" }, { status: 500 });
-                    } else {
-                        userId = inviteLink.user.id;
-                        const sent = await sendWelcomeEmail(customerEmail, actionLink);
-
-                        if (!sent) {
-                            const { data: fallbackInvited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
-                                customerEmail,
-                                {
-                                    redirectTo,
-                                    data: { invited_from: "stripe_checkout_fallback" },
-                                }
-                            );
-                            if (inviteError || !fallbackInvited?.user?.id) {
-                                console.error("[Webhook] Fallback Supabase invitation failed");
-                                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                    }
+                    userId = inviteLink.user.id;
+                    const sent = await sendWelcomeEmail(customerEmail, actionLink, session.id);
+                    if (!sent) {
+                        const { data: fallbackInvited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
+                            customerEmail,
+                            {
+                                redirectTo,
+                                data: { invited_from: "stripe_checkout_fallback" },
                             }
+                        );
+                        if (inviteError || !fallbackInvited?.user?.id) {
+                            console.error("[Webhook] Fallback Supabase invitation failed");
+                            return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                         }
                     }
                 }
@@ -420,57 +549,6 @@ export async function POST(req: NextRequest) {
         }
 
         if (userId) {
-            // Retrieve line items to identify which price was purchased.
-            let priceId: string | null = null;
-            try {
-                const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 });
-                priceId = lineItems.data[0]?.price?.id ?? null;
-            } catch {
-                console.error("[Webhook] Stripe line-item lookup failed");
-                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
-            }
-
-            const tier = determineStripeTier(
-                priceId,
-                process.env.STRIPE_BEGINNER_PRICE_ID,
-                process.env.STRIPE_FULL_PRICE_ID,
-                process.env.STRIPE_UPGRADE_PRICE_ID,
-            );
-
-            if (!tier) {
-                console.error("[Webhook] Stripe price ID is not allowlisted");
-                return NextResponse.json({ received: true }, { status: 200 });
-            }
-
-            // Dernier rempart : le complément n'ouvre jamais LE COFFRE à un compte sans Fondations.
-            if (priceId && priceId === process.env.STRIPE_UPGRADE_PRICE_ID) {
-                const { data: currentProfile, error: currentTierError } = await supabase
-                    .from("profiles")
-                    .select("tier")
-                    .eq("id", userId)
-                    .maybeSingle();
-                if (currentTierError) {
-                    console.error("[Webhook] Current tier lookup failed");
-                    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
-                }
-
-                const decision = decideUpgradeAccess(priceId, process.env.STRIPE_UPGRADE_PRICE_ID, currentProfile?.tier ?? null);
-                if (decision === "refuse") {
-                    const result = await refuseUpgradePurchase(
-                        {
-                            createRefund: (params, options) => stripe.refunds.create(params, options),
-                            notifyCustomer: sendUpgradeRefusalEmail,
-                            log: (message) => console.error(message),
-                        },
-                        { sessionId: session.id, paymentIntent: session.payment_intent, customerEmail },
-                    );
-                    if (result.outcome === "refund_failed") {
-                        return NextResponse.json({ error: "Processing failed" }, { status: 500 });
-                    }
-                    return NextResponse.json({ received: true }, { status: 200 });
-                }
-            }
-
             const persistenceError = await persistProfileTier(supabase, userId, tier, customerEmail);
             if (persistenceError) {
                 console.error("[Webhook] Profile entitlement update failed");
@@ -478,13 +556,15 @@ export async function POST(req: NextRequest) {
             }
 
             revalidatePath("/", "layout");
-
             if (customerEmail) {
-                const isUpgrade = Boolean(priceId && priceId === process.env.STRIPE_UPGRADE_PRICE_ID);
-                const offerName = isUpgrade
-                    ? `Passage de ${FONDATIONS_LABEL} à ${COFFRE_LABEL}`
-                    : tier === "beginner" ? FONDATIONS_LABEL : COFFRE_LABEL;
-                await sendPurchaseConfirmationEmail(customerEmail, offerName, session.amount_total ?? null, event.created);
+                const offerName = tier === "beginner" ? FONDATIONS_LABEL : COFFRE_LABEL;
+                await sendPurchaseConfirmationEmail(
+                    customerEmail,
+                    offerName,
+                    session.amount_total ?? null,
+                    event.created,
+                    session.id,
+                );
             }
         }
     }

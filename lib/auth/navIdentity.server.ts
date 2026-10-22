@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
+import type { User } from "@supabase/supabase-js";
 
 export type NavIdentity = {
   tier: string | null;
@@ -13,12 +14,13 @@ export type NavIdentity = {
 /**
  * Reads the current user's tier and display identity for the NavBar,
  * from within a Server Component. Returns null when there is no session.
+ * `knownUser` : the page already called `auth.getUser()`; passing its result skips a second round trip to the Auth server.
  */
-export async function navIdentity(): Promise<NavIdentity | null> {
+export async function navIdentity(knownUser?: User | null): Promise<NavIdentity | null> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = knownUser !== undefined
+    ? knownUser
+    : (await supabase.auth.getUser()).data.user;
 
   if (!user) return null;
 

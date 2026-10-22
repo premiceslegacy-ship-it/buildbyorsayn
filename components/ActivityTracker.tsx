@@ -41,13 +41,14 @@ export function ActivityTracker({ userEmail }: ActivityTrackerProps) {
   useEffect(() => {
     if (!userEmail || !pathname) return;
 
-    const heartbeat = () => postActivity("heartbeat", pathname);
+    const heartbeat = () => {
+      if (document.visibilityState === "visible") postActivity("heartbeat", pathname);
+    };
     const onVisibilityChange = () => {
       postActivity(document.visibilityState === "visible" ? "tab_visible" : "tab_hidden", pathname);
     };
 
-    heartbeat();
-    const interval = window.setInterval(heartbeat, 30000);
+    const interval = window.setInterval(heartbeat, 60_000);
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {

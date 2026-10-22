@@ -4,12 +4,13 @@ const nextConfig = {
   poweredByHeader: false,
 
   // Keep the revocable MCP asset out of /_next/image so its launch gate and
-  // no-store response cannot be bypassed. Editorial reference covers are
-  // ordinary public assets and may use the optimized local image pipeline.
+  // no-store response cannot be bypassed. Editorial reference covers, card
+  // illustrations and client logos may use the optimized local image pipeline.
   images: {
     localPatterns: [
       { pathname: "/_next-image-not-used/**" },
       { pathname: "/assets/protocole-references/**" },
+      { pathname: "/assets/illustrations/**" },
       { pathname: "/brand-logos/**" },
       { pathname: "/da/**" },
     ],
@@ -45,7 +46,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: blob: https:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://generativelanguage.googleapis.com https://*.mux.com https://*.litix.io",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.mux.com https://*.litix.io",
               // Mux HLS playback: segments over https, MSE blob URLs and a blob worker.
               "media-src 'self' blob: https://*.mux.com",
               "worker-src 'self' blob:",

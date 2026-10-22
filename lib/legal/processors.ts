@@ -97,8 +97,9 @@ export const PROCESSORS: readonly Processor[] = [
     data: "Ton adresse e-mail et le contenu du message envoyé.",
     hosts: ["resend.com", "api.resend.com"],
     evidence: [
-      { file: "app/api/webhooks/stripe/route.ts", needle: "api.resend.com" },
-      { file: "app/api/admin/send-email/route.ts", needle: "api.resend.com" },
+      { file: "lib/resendTransport.ts", needle: "https://api.resend.com/emails" },
+      { file: "app/api/webhooks/stripe/route.ts", needle: "sendResendMessage" },
+      { file: "app/api/admin/send-email/route.ts", needle: "sendAdminBroadcast" },
     ],
   },
   {
@@ -134,8 +135,6 @@ export const PROCESSORS: readonly Processor[] = [
  * Un nouvel hôte qui n'est ni ici ni dans PROCESSORS fait échouer le test.
  */
 export const NON_PERSONAL_HOSTS: Readonly<Record<string, string>> = {
-  "generativelanguage.googleapis.com":
-    "Autre fournisseur d'embeddings que le code sait appeler (KNOWLEDGE_EMBEDDING_PROVIDER=gemini). Le fournisseur retenu par la configuration est OpenRouter.",
   "fonts.googleapis.com": "Autorisation de feuille de style dans la politique de sécurité. Les polices du site sont servies par le site lui-même.",
   "fonts.gstatic.com": "Autorisation de polices dans la politique de sécurité. Les polices du site sont servies par le site lui-même.",
   "cal.com": "Lien vers le service de réservation des accompagnements. BUILD ne lui envoie aucune donnée : la personne quitte le site.",

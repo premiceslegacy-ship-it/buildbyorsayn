@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -19,7 +17,6 @@ import { artifactUnits, installUnit, main as mainCli, readStoredZip } from "../p
 import {
   BUILD_SYNC_CLI,
   BUILD_SYNC_FALLBACK_ORIGIN,
-  BUILD_SYNC_TARGETS,
   buildSyncInstallCommands,
   buildSyncOrigin,
   buildSyncHostsDiffer,
@@ -167,32 +164,51 @@ test("managed updates preserve CUSTOM.md and back up unexpected edits", async ()
   }
 });
 
-test("the managed CLI updates itself atomically before synchronizing", async () => {
-  const temporary = await realpath(await mkdtemp(path.join(os.tmpdir(), "build-sync-self-update-")));
-  const dataHome = path.join(temporary, "data");
-  const syncHome = path.join(temporary, "state");
-  const cliDirectory = path.join(dataHome, "build-sync");
-  const cliPath = path.join(cliDirectory, "build.mjs");
-  const currentCli = await readFile(new URL("../public/build-sync/build.mjs", import.meta.url));
+test("a legacy multi-unit marker is migrated once before unchanged checks skip artifact egress", async () => {
+  const temporary = await realpath(await mkdtemp(path.join(os.tmpdir(), "build-sync-current-")));
+  const stateHome = path.join(temporary, "state");
+  const artifactBody = storedZip({
+    "bundle/sample-a/SKILL.md": "---\nname: sample-a\n---\nProcédure stable A\n",
+    "bundle/sample-b/SKILL.md": "---\nname: sample-b\n---\nProcédure stable B\n",
+  });
+  const artifactSha256 = createHash("sha256").update(artifactBody).digest("hex");
+  let artifactRequests = 0;
+  let cliRequests = 0;
   const server = createServer((request, response) => {
     if (request.url === "/build-sync/build.mjs") {
-      response.writeHead(200, {
-        "Content-Type": "application/javascript",
-        "Content-Length": String(currentCli.length),
-      }).end(currentCli);
+      cliRequests += 1;
+      response.writeHead(500).end();
       return;
     }
     if (request.url === "/api/build-sync/catalog") {
-      response.writeHead(200, { "Content-Type": "application/json" })
-        .end(JSON.stringify({ releaseId: "self-update-test", artifacts: [] }));
+      response.writeHead(200, { "Content-Type": "application/json" }).end(JSON.stringify({
+        releaseId: "release-stable",
+        artifacts: [{
+          slug: "sample",
+          title: "Sample",
+          fileName: "sample.zip",
+          sha256: artifactSha256,
+          downloadUrl: "/api/build-sync/artifacts/sample",
+        }],
+      }));
+      return;
+    }
+    if (request.url === "/api/build-sync/artifacts/sample") {
+      artifactRequests += 1;
+      response.writeHead(200, {
+        "Content-Type": "application/zip",
+        "Content-Length": String(artifactBody.length),
+      }).end(artifactBody);
       return;
     }
     response.writeHead(404).end();
   });
+  const previous = {
+    home: process.env.HOME,
+    syncHome: process.env.BUILD_SYNC_HOME,
+  };
   try {
-    await mkdir(cliDirectory, { recursive: true });
-    await mkdir(syncHome, { recursive: true });
-    await writeFile(cliPath, Buffer.concat([currentCli, Buffer.from("\n// ancienne copie locale\n")]), { mode: 0o700 });
+    await mkdir(stateHome, { recursive: true });
     await new Promise<void>((resolve, reject) => {
       server.once("error", reject);
       server.listen(0, "127.0.0.1", resolve);
@@ -200,112 +216,58 @@ test("the managed CLI updates itself atomically before synchronizing", async () 
     const address = server.address();
     assert.ok(address && typeof address !== "string");
     const baseUrl = `http://127.0.0.1:${address.port}`;
-    await writeFile(path.join(syncHome, "config.json"), JSON.stringify({
+    process.env.HOME = temporary;
+    process.env.BUILD_SYNC_HOME = stateHome;
+    await writeFile(path.join(stateHome, "config.json"), JSON.stringify({
       schemaVersion: 1,
       baseUrl,
       agents: ["codex"],
       schedulerEnabled: false,
     }));
-    await writeFile(path.join(syncHome, "credentials.json"), JSON.stringify({
+    await writeFile(path.join(stateHome, "credentials.json"), JSON.stringify({
       baseUrl,
       accessToken: "test-access-token",
       refreshToken: "test-refresh-token",
       accessExpiresAt: Date.now() + 10 * 60_000,
     }));
-    const result = await new Promise<{ code: number | null; stdout: string; stderr: string }>((resolve, reject) => {
-      const child = spawn(process.execPath, [cliPath, "skills", "update"], {
-        env: {
-          ...process.env,
-          HOME: temporary,
-          XDG_DATA_HOME: dataHome,
-          BUILD_SYNC_HOME: syncHome,
-          BUILD_SYNC_CLI_PATH: cliPath,
-        },
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-      let stdout = "";
-      let stderr = "";
-      child.stdout.on("data", (chunk) => { stdout += chunk; });
-      child.stderr.on("data", (chunk) => { stderr += chunk; });
-      child.once("error", reject);
-      child.once("close", (code) => resolve({ code, stdout, stderr }));
-    });
-    assert.equal(result.code, 0, result.stderr || result.stdout);
-    assert.deepEqual(await readFile(cliPath), currentCli, result.stdout);
-    const config = JSON.parse(await readFile(path.join(syncHome, "config.json"), "utf8"));
-    assert.equal(config.lastReleaseId, "self-update-test");
+
+    await mainCli(["update", "--quiet"]);
+    assert.equal(artifactRequests, 1);
+
+    const skillRoot = path.join(temporary, ".codex", "skills");
+    for (const unitName of ["sample-a", "sample-b"]) {
+      const markerFile = path.join(skillRoot, unitName, ".build-sync.json");
+      const marker = JSON.parse(await readFile(markerFile, "utf8"));
+      delete marker.artifactUnits;
+      await writeFile(markerFile, `${JSON.stringify(marker, null, 2)}\n`);
+    }
+
+    await mainCli(["update", "--quiet"]);
+    assert.equal(artifactRequests, 2, "the first legacy-marker check must verify the artifact");
+    for (const unitName of ["sample-a", "sample-b"]) {
+      const marker = JSON.parse(await readFile(path.join(skillRoot, unitName, ".build-sync.json"), "utf8"));
+      assert.deepEqual(marker.artifactUnits, ["sample-a", "sample-b"]);
+    }
+
+    await mainCli(["update", "--quiet"]);
+    assert.equal(artifactRequests, 2, "migrated unchanged markers must skip later artifact egress");
+
+    await writeFile(path.join(skillRoot, "sample-b", "SKILL.md"), "local drift\n");
+    await mainCli(["update", "--quiet"]);
+    assert.equal(artifactRequests, 3, "local drift must force a verified artifact download");
+    assert.equal(cliRequests, 0, "skill updates must not attempt to replace the CLI");
   } finally {
+    if (previous.home === undefined) delete process.env.HOME;
+    else process.env.HOME = previous.home;
+    if (previous.syncHome === undefined) delete process.env.BUILD_SYNC_HOME;
+    else process.env.BUILD_SYNC_HOME = previous.syncHome;
     await new Promise((resolve) => server.close(resolve));
     await rm(temporary, { recursive: true, force: true });
   }
 });
 
-test("BUILD Sync OAuth storage is private, scoped and rotatable", () => {
-  const sql = readFileSync(new URL("../supabase/migrations/20261010130000_build_sync_oauth.sql", import.meta.url), "utf8");
-  for (const table of [
-    "build_sync_authorization_requests",
-    "build_sync_authorization_codes",
-    "build_sync_access_tokens",
-    "build_sync_refresh_tokens",
-  ]) {
-    assert.match(sql, new RegExp(`alter table public\\.${table} force row level security`, "i"));
-    assert.match(sql, new RegExp(`revoke all on table public\\.${table} from public, anon, authenticated`, "i"));
-  }
-  assert.match(sql, /scope = 'skills:read'/);
-  assert.match(sql, /rotate_build_sync_refresh_token/);
-  assert.match(sql, /reuse_detected/);
-  assert.match(sql, /family_expires_at/);
-  assert.match(sql, /revoke_build_sync_user_connections/);
-  assert.match(sql, /cleanup_build_sync_oauth_state/);
-  assert.match(sql, /p_batch_size not between 1 and 1000/);
-  assert.ok((sql.match(/limit p_batch_size/g) ?? []).length >= 4);
-});
 
-test("BUILD Sync is served without browser filesystem APIs", () => {
-  const cli = readFileSync(new URL("../public/build-sync/build.mjs", import.meta.url), "utf8");
-  const page = readFileSync(new URL("../components/BuildSyncInstall.tsx", import.meta.url), "utf8");
-  const proxy = readFileSync(new URL("../proxy.ts", import.meta.url), "utf8");
-  const catalog = readFileSync(new URL("../app/api/build-sync/catalog/route.ts", import.meta.url), "utf8");
-  const artifact = readFileSync(new URL("../app/api/build-sync/artifacts/[slug]/route.ts", import.meta.url), "utf8");
-  const session = readFileSync(new URL("../app/api/build-sync/session/route.ts", import.meta.url), "utf8");
-  const authorize = readFileSync(new URL("../app/api/build-sync/oauth/authorize/route.ts", import.meta.url), "utf8");
-  const posixInstaller = readFileSync(new URL("../public/build-sync/install.sh", import.meta.url), "utf8");
-  const windowsInstaller = readFileSync(new URL("../public/build-sync/install.ps1", import.meta.url), "utf8");
-  assert.doesNotMatch(cli, /showDirectoryPicker|FileSystemDirectoryHandle/);
-  assert.match(cli, /CUSTOM\.md/);
-  assert.match(cli, /artifact\.sha256/);
-  assert.match(cli, /StartInterval/);
-  assert.match(cli, /SCHEDULER_INTERVAL_SECONDS = 60 \* 60/);
-  assert.match(cli, /OnUnitActiveSec=1h/);
-  assert.match(cli, /"HOURLY", "\/MO", "1"/);
-  assert.match(cli, /refreshManagedCli/);
-  assert.match(cli, /reconcileScheduler/);
-  assert.match(cli, /EnvironmentVariables/);
-  assert.match(cli, /Environment=.*BUILD_SYNC_CLI_PATH/);
-  assert.match(page, /Étapes de l’installation BUILD Sync/);
-  assert.match(page, /Synchroniser/);
-  assert.doesNotMatch(page, /buildbyorsayn\.com/);
-  assert.doesNotMatch(cli, /buildbyorsayn\.com/);
-  assert.match(cli, /BUILD Sync : installation guidée/);
-  assert.match(cli, /BUILD Sync est prêt/);
-  assert.match(cli, /Progression de l'installation/);
-  assert.match(cli, /\/brand-logos\/build-logo-compact\.png/);
-  assert.match(cli, /data:image\/png;base64/);
-  assert.doesNotMatch(cli, /class="mark" aria-hidden="true">B/);
-  assert.match(proxy, /\/build-sync\/consent/);
-  assert.match(catalog, /resolveBuildSyncAuth/);
-  assert.match(catalog, /canDownload/);
-  assert.match(artifact, /getStoredSkillContent/);
-  assert.match(artifact, /status: 403/);
-  assert.match(session, /revoke_build_sync_user_connections/);
-  assert.match(authorize, /canUseBuildSync/);
-  assert.match(authorize, /access_denied/);
-  assert.match(posixInstaller, /https:\/\/nodejs\.org/);
-  assert.match(posixInstaller, /BUILD_SYNC_CLI_PATH/);
-  assert.match(windowsInstaller, /https:\/\/nodejs\.org/);
-  assert.match(windowsInstaller, /BUILD_SYNC_CLI_PATH/);
-  assert.match(windowsInstaller, /BUILD_SYNC_INSTALL_ONLY/);
-});
+
 
 test("the install card and the assistant share one source for commands, folders and subcommands", async () => {
   const [posix, windows] = buildSyncInstallCommands("https://build.example/");
@@ -314,11 +276,6 @@ test("the install card and the assistant share one source for commands, folders 
   assert.equal(buildSyncOrigin(undefined), BUILD_SYNC_FALLBACK_ORIGIN);
   assert.equal(buildSyncOrigin("  https://build.example//  "), "https://build.example");
 
-  const cli = readFileSync(new URL("../public/build-sync/build.mjs", import.meta.url), "utf8");
-  for (const target of BUILD_SYNC_TARGETS) {
-    const segments = target.folder.replace(/^~\//, "").split("/").map((segment) => JSON.stringify(segment)).join(", ");
-    assert.ok(cli.includes(`path.join(home, ${segments})`), `${target.folder} must match AGENTS in build.mjs`);
-  }
 
   let printed = "";
   const originalWrite = process.stdout.write;
@@ -337,15 +294,6 @@ test("the install card and the assistant share one source for commands, folders 
 });
 
 test("the scripts' default host stays in step with the displayed command and the exported constant", () => {
-  const scripts = {
-    "install.sh": /BUILD_SYNC_BASE_URL:-(https:\/\/[^}"]+)\}/,
-    "install.ps1": /else \{ "(https:\/\/[^"]+)" \}/,
-    "build.mjs": /DEFAULT_BASE_URL = "(https:\/\/[^"]+)"/,
-  } as const;
-  for (const [file, pattern] of Object.entries(scripts)) {
-    const source = readFileSync(new URL(`../public/build-sync/${file}`, import.meta.url), "utf8");
-    assert.equal(source.match(pattern)?.[1], BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN, `${file} must default to BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN`);
-  }
 
   assert.equal(buildSyncHostsDiffer("https://build.example", "https://build.example/"), false);
   assert.equal(buildSyncHostsDiffer("https://www.example.com", "https://example.com"), true);

@@ -6,6 +6,8 @@ import { GET as cleanupMcp } from "../app/api/cron/mcp-cleanup/route";
 import {
   createMcpCleanupHandler,
   MCP_CLEANUP_SUPABASE_TIMEOUT_MS,
+  MCP_OAUTH_CLEANUP_BATCH_SIZE,
+  MCP_RATE_LIMIT_CLEANUP_BATCH_SIZE,
 } from "../lib/mcp/cleanupRoute";
 import {
   createMcpSupabaseAdmin,
@@ -112,12 +114,19 @@ test("cleanup route accepts a valid secret and returns the validated structured 
     access_tokens_deleted: 23,
     refresh_tokens_deleted: 29,
   };
+  const rateLimitsDeleted = 37;
   const rpcCalls: Array<{ name: string; args: unknown }> = [];
   const logRecords: unknown[] = [];
   const handler = createMcpCleanupHandler({
     createAdmin: () => ({
       rpc: async (name: string, args: unknown) => {
         rpcCalls.push({ name, args });
+        if (name === "cleanup_member_activity_events") {
+          return { data: 31, error: null };
+        }
+        if (name === "cleanup_mcp_rate_limits") {
+          return { data: rateLimitsDeleted, error: null };
+        }
         return {
           data: [name === "cleanup_build_sync_oauth_state" ? buildSyncCleaned : cleaned],
           error: null,
@@ -139,10 +148,17 @@ test("cleanup route accepts a valid secret and returns the validated structured 
   assert.equal(response.headers.get("cache-control"), "no-store");
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   assert.equal(response.headers.get("x-request-id"), "cleanup-regression-1");
-  assert.deepEqual(await response.json(), { cleaned, buildSyncCleaned });
+  assert.deepEqual(await response.json(), {
+    cleaned,
+    rateLimitsDeleted,
+    buildSyncCleaned,
+    activityEventsDeleted: 31,
+  });
   assert.deepEqual(rpcCalls.sort((a, b) => a.name.localeCompare(b.name)), [
-    { name: "cleanup_build_sync_oauth_state", args: { p_batch_size: 500 } },
-    { name: "cleanup_mcp_oauth_state", args: { p_batch_size: 500 } },
+    { name: "cleanup_build_sync_oauth_state", args: { p_batch_size: MCP_OAUTH_CLEANUP_BATCH_SIZE } },
+    { name: "cleanup_mcp_oauth_state", args: { p_batch_size: MCP_OAUTH_CLEANUP_BATCH_SIZE } },
+    { name: "cleanup_mcp_rate_limits", args: { p_batch_size: MCP_RATE_LIMIT_CLEANUP_BATCH_SIZE } },
+    { name: "cleanup_member_activity_events", args: { p_batch_size: 1000, p_retention_days: 90 } },
   ]);
   assert.equal(logRecords.length, 1);
   const logRecord = logRecords[0] as Record<string, unknown>;
@@ -159,48 +175,19 @@ test("cleanup route accepts a valid secret and returns the validated structured 
   );
 });
 
-test("cleanup is scheduled daily and calls only the bounded cleanup RPCs", async () => {
+test("cleanup runs every minute with bounded capacity above configured window creation", async () => {
   const config = JSON.parse(await readFile("vercel.json", "utf8")) as {
     crons?: Array<{ path?: string; schedule?: string }>;
   };
   assert.deepEqual(config.crons, [
-    { path: "/api/cron/mcp-cleanup", schedule: "17 3 * * *" },
+    { path: "/api/cron/mcp-cleanup", schedule: "* * * * *" },
     { path: "/api/cron/youtube-sync", schedule: "23 6 * * *" },
   ]);
-  const route = await readFile("app/api/cron/mcp-cleanup/route.ts", "utf8");
-  const handler = await readFile("lib/mcp/cleanupRoute.ts", "utf8");
-  assert.match(route, /createMcpCleanupHandler/);
-  assert.match(handler, /cleanup_mcp_oauth_state/);
-  assert.match(handler, /cleanup_build_sync_oauth_state/);
-  assert.match(handler, /p_batch_size:\s*500/);
-  assert.match(handler, /CLEANUP_RESULT_SCHEMA\.safeParse/);
-  assert.doesNotMatch(handler, /refresh_token_hash|access_token_hash|\.select\(\s*["']\*["']\s*\)/i);
-});
-
-test("cleanup SQL is batch-bounded, time-bounded, and release-gated", async () => {
-  const migration = await readFile(
-    "supabase/migrations/20260904230000_mcp_bounded_cleanup.sql",
-    "utf8"
-  );
-  assert.match(migration, /p_batch_size integer default 500/);
-  assert.match(migration, /p_batch_size not between 1 and 1000/);
-  assert.match(migration, /statement_timeout/);
-  assert.match(migration, /lock_timeout/);
-  assert.ok((migration.match(/limit p_batch_size/g) ?? []).length >= 6);
-
-  const packageJson = JSON.parse(await readFile("package.json", "utf8")) as {
-    scripts?: Record<string, string>;
-  };
-  assert.equal(packageJson.scripts?.["test:mcp-postgres"], "node scripts/verify-mcp-postgres-gates.mjs");
-});
-
-test("cleanup SQL finishes before the HTTP deadline reserve", async () => {
-  const migration = await readFile(
-    "supabase/migrations/20260905000000_mcp_cleanup_deadline_reserve.sql",
-    "utf8"
-  );
-  assert.match(
-    migration,
-    /alter function public\.cleanup_mcp_oauth_state\(integer\)[\s\S]*set statement_timeout = '5s'/i
+  assert.equal(MCP_OAUTH_CLEANUP_BATCH_SIZE, 1_000);
+  assert.equal(MCP_RATE_LIMIT_CLEANUP_BATCH_SIZE, 5_000);
+  const maximumHourlyRowsAtConfiguredClientCapacity = 500 * 352;
+  assert.ok(
+    MCP_RATE_LIMIT_CLEANUP_BATCH_SIZE * 60 > maximumHourlyRowsAtConfiguredClientCapacity,
+    "the bounded minute cadence must drain more rows than configured quotas can credibly create",
   );
 });

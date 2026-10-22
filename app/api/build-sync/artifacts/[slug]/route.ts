@@ -5,6 +5,7 @@ import {
 } from "@/lib/buildSync/auth";
 import { getSkillBySlug } from "@/lib/skillsCatalog";
 import { getStoredSkillContent } from "@/lib/skills/storage";
+import { reservePrivateDownload } from "@/lib/privateDownloadRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,17 @@ export async function GET(
   if (!skill) return NextResponse.json({ error: "not_found" }, { status: 404 });
   if (!isAllowed(auth.tier, skill.access)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403, headers: { "Cache-Control": "no-store" } });
+  }
+
+  const downloadDecision = await reservePrivateDownload(auth.quotaPrincipal, request.signal);
+  if (downloadDecision !== "allowed") {
+    return NextResponse.json(
+      { error: downloadDecision === "denied" ? "rate_limited" : "temporarily_unavailable" },
+      {
+        status: downloadDecision === "denied" ? 429 : 503,
+        headers: { "Cache-Control": "no-store", "Retry-After": downloadDecision === "denied" ? "3600" : "5" },
+      }
+    );
   }
 
   const stored = await getStoredSkillContent(skill, { signal: request.signal });

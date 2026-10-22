@@ -40,7 +40,6 @@ type Presence = {
 
 type ActivityEvent = {
   user_id: string;
-  email: string | null;
   event_type: string;
   path: string | null;
   created_at: string;
@@ -78,7 +77,7 @@ export default async function AdminPage() {
       .limit(1000),
     supabaseAdmin
       .from("member_activity_events")
-      .select("user_id, email, event_type, path, created_at")
+      .select("user_id, event_type, path, created_at")
       .order("created_at", { ascending: false })
       .limit(1000),
   ]);

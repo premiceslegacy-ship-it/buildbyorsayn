@@ -3,8 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { canUseBuildSync, getBuildSyncResourceUrl } from "@/lib/buildSync/config";
 import { createBuildSyncAuthorizationSchema } from "@/lib/buildSync/oauth";
-import { generateOpaqueToken, hashToken } from "@/lib/mcp/oauth";
+import { buildValidatedAuthorizationErrorCallback, generateOpaqueToken, hashToken } from "@/lib/mcp/oauth";
 import { resolveMcpProfileTier } from "@/lib/mcpAccess";
+import { reserveAuthorizationRequest } from "@/lib/mcp/authorizationRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -49,10 +50,30 @@ export async function GET(request: Request) {
   const tier = resolveMcpProfileTier(profile, profileError);
   const input = parsed.data;
   if (!canUseBuildSync(tier)) {
-    const callback = new URL(input.redirect_uri);
-    callback.searchParams.set("error", "access_denied");
-    callback.searchParams.set("state", input.state);
-    return NextResponse.redirect(callback, { headers: NO_STORE });
+    return NextResponse.redirect(
+      buildValidatedAuthorizationErrorCallback(input.redirect_uri, input.state, "access_denied"),
+      { headers: NO_STORE },
+    );
+  }
+
+  const rateDecision = await reserveAuthorizationRequest(admin, {
+    headers: request.headers,
+    userId: user.id,
+    clientId: input.client_id,
+    product: "build-sync",
+  });
+  if (rateDecision !== "allowed") {
+    return NextResponse.redirect(
+      buildValidatedAuthorizationErrorCallback(
+        input.redirect_uri,
+        input.state,
+        "temporarily_unavailable",
+        "Too many authorization requests.",
+      ),
+      {
+        headers: { ...NO_STORE, "Retry-After": rateDecision === "denied" ? "300" : "5" },
+      },
+    );
   }
 
   const requestHandle = generateOpaqueToken();
@@ -68,6 +89,17 @@ export async function GET(request: Request) {
   });
 
   if (error || status !== "created") {
+    if (!error && status === "rate_limited") {
+      return NextResponse.redirect(
+        buildValidatedAuthorizationErrorCallback(
+          input.redirect_uri,
+          input.state,
+          "temporarily_unavailable",
+          "Too many active authorization requests.",
+        ),
+        { headers: { ...NO_STORE, "Retry-After": "300" } },
+      );
+    }
     return oauthError("Authorization is temporarily unavailable.", 503);
   }
 

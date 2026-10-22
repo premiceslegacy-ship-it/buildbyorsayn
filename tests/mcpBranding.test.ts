@@ -61,6 +61,7 @@ test("the MCP initialize response exposes the official BUILD icon", async () => 
     userId: "user",
     clientId: "client",
     tokenHash: "token-hash",
+    quotaPrincipal: '["user","client"]',
     tier: "beginner",
     scope: "mcp",
   });

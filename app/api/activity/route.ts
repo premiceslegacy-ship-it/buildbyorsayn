@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { parseActivityPayload } from "@/lib/activity";
+import { isJsonMediaType, readBoundedBody } from "@/lib/mcp/http";
+import {
+  hashRateLimitSubject,
+  resolveRateLimitDecision,
+  trustedClientAddress,
+} from "@/lib/mcp/security";
 
-const TRACKED_EVENTS = new Set(["page_view", "heartbeat", "tab_visible", "tab_hidden"]);
-const LOGGED_EVENTS = new Set(["page_view", "tab_visible", "tab_hidden"]);
+const MAX_ACTIVITY_BODY_BYTES = 2_048;
+const LOGGED_EVENTS: Record<string, true> = {
+  page_view: true,
+  tab_visible: true,
+  tab_hidden: true,
+};
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -15,19 +26,56 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ tracked: false }, { status: 401 });
   }
 
-  const body = await req.json().catch(() => null);
-  const eventType = typeof body?.eventType === "string" ? body.eventType : "heartbeat";
-  const path = typeof body?.path === "string" && body.path.startsWith("/") ? body.path.slice(0, 250) : "/";
-  const metadata = typeof body?.metadata === "object" && body.metadata !== null ? body.metadata : {};
-
-  if (!TRACKED_EVENTS.has(eventType)) {
+  if (!isJsonMediaType(req.headers.get("content-type"))) {
+    return NextResponse.json({ tracked: false }, { status: 415 });
+  }
+  const boundedBody = await readBoundedBody(req, MAX_ACTIVITY_BODY_BYTES);
+  if (boundedBody.ok === false) {
+    return NextResponse.json(
+      { tracked: false },
+      { status: boundedBody.reason === "too_large" ? 413 : 400 }
+    );
+  }
+  let rawBody: unknown;
+  try {
+    rawBody = JSON.parse(boundedBody.text);
+  } catch {
     return NextResponse.json({ tracked: false }, { status: 400 });
   }
+  const body = parseActivityPayload(rawBody);
+  if (!body) {
+    return NextResponse.json({ tracked: false }, { status: 400 });
+  }
+  const { eventType, path, metadata } = body;
 
   const supabaseAdmin = createSupabaseAdmin(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
+
+  const address = trustedClientAddress(req.headers);
+  const pepper = process.env.ACTIVITY_RATE_LIMIT_PEPPER ?? "";
+  if (!address || pepper.length < 16) {
+    return NextResponse.json({ tracked: false }, { status: 503, headers: { "Retry-After": "5" } });
+  }
+  const { data: allowed, error: rateLimitError } = await supabaseAdmin.rpc(
+    "check_mcp_rate_limit",
+    {
+      p_subject: hashRateLimitSubject("activity", `${user.id}:${address}`, pepper),
+      p_max_per_window: 60,
+      p_window_seconds: 60,
+    }
+  );
+  const rateDecision = resolveRateLimitDecision(allowed, rateLimitError);
+  if (rateDecision !== "allowed") {
+    return NextResponse.json(
+      { tracked: false },
+      {
+        status: rateDecision === "denied" ? 429 : 503,
+        headers: { "Retry-After": rateDecision === "denied" ? "60" : "5" },
+      }
+    );
+  }
 
   const now = new Date().toISOString();
   const email = user.email ?? null;
@@ -49,10 +97,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ tracked: false, setupRequired: true }, { status: 200 });
   }
 
-  if (LOGGED_EVENTS.has(eventType)) {
+  if (LOGGED_EVENTS[eventType]) {
     const { error: eventError } = await supabaseAdmin.from("member_activity_events").insert({
       user_id: user.id,
-      email,
       event_type: eventType,
       path,
       metadata,

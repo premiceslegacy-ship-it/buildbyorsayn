@@ -2,24 +2,24 @@ import { FoundationChapter } from "../FoundationChapter";
 import { FoundationEditorialNote } from "../FoundationEditorialNote";
 
 const DISCOVERY_QUESTIONS = [
-  ["La dernière fois", "Quand ce problème s’est-il présenté pour la dernière fois ?"],
-  ["L’alternative actuelle", "Comment l’as-tu résolu, ou qu’as-tu essayé à la place ?"],
-  ["Le coût concret", "Qu’est-ce que cela t’a coûté en temps, en argent, en marge ou en énergie ?"],
-  ["La décision", "Qu’est-ce qui devrait être vrai pour que tu changes maintenant ?"],
+  ["La dernière fois", "Quand ce problème s'est-il présenté pour la dernière fois ? Que s'est-il passé, dans l'ordre ?"],
+  ["L'alternative actuelle", "Comment l'as-tu traité ? Qu'as-tu essayé, payé ou décidé à la place ?"],
+  ["Le coût concret", "Qu'est-ce que cet épisode a demandé en temps, en argent, en marge, en énergie ou en risque ?"],
+  ["La décision", "Qu'est-ce qui devrait être vrai pour que tu changes, et qui doit participer à la décision ?"],
 ] as const;
 
 const OFFER_ELEMENTS = [
-  ["Le progrès", "Ce que la personne pourra faire ou livrer de mieux, sans promettre un revenu automatique."],
-  ["Le chemin", "Les étapes prises en charge, le format de livraison et les décisions qui restent à prendre."],
-  ["L’effort", "Le temps, les informations, les validations et les actions que le client doit réellement fournir."],
-  ["La limite", "Les cas où l’offre ne convient pas, les dépendances et le risque qui reste après l’achat."],
+  ["Le progrès", "Ce que la personne pourra faire, voir ou livrer de mieux. Formule un changement observable sans promettre un résultat hors de ton contrôle."],
+  ["Le chemin", "Les étapes prises en charge, le format de livraison, les validations et le moment où le travail est considéré comme terminé."],
+  ["L'effort", "Le temps, les informations, les accès, les décisions et les actions que le client doit réellement fournir."],
+  ["La limite", "Les situations non couvertes, les dépendances, les conditions de sortie et le risque qui reste après l'achat."],
 ] as const;
 
 const OBJECTIONS = [
-  ["Je peux le faire avec une IA", "Oui. La valeur est dans le cadrage, le contexte, les arbitrages, la vérification et le résultat livré, pas dans l’accès à un outil."],
-  ["Je dois réfléchir", "Demande ce qui doit être clarifié : le prix, le risque, le calendrier, la priorité ou l’adéquation. Ne crée pas une urgence artificielle."],
-  ["C’est trop cher", "Reviens au coût actuel, au périmètre et au résultat attendu. Si la valeur n’est pas compréhensible, améliore l’offre avant de proposer une remise."],
-  ["J’ai déjà un prestataire", "Cherche ce qui fonctionne, ce qui reste lent ou fragile et ce qui ne mérite pas d’être remplacé. Une bonne qualification peut conclure à ne rien changer."],
+  ["Je peux le faire avec une IA", "C'est possible. Vérifie ce que la personne veut prendre en charge. Ta valeur doit apparaître dans le cadrage, le contexte, les arbitrages, la vérification et le livrable, jamais dans le simple accès à un outil."],
+  ["Je dois réfléchir", "Demande quelle information manque et quand la décision sera revue. La réponse peut concerner le prix, le calendrier, le risque, une autre personne ou une priorité différente. Laisse du temps sans fabriquer de date limite."],
+  ["C'est trop cher", "Clarifie le périmètre, l'effort et le coût actuel avec des éléments fournis par la personne. Si la valeur reste incompréhensible, réduis ou recompose l'offre avant d'envisager une remise."],
+  ["J'ai déjà un prestataire", "Comprends ce qui fonctionne, ce qui reste fragile et ce que la personne veut préserver. Une recommandation sérieuse peut compléter l'existant ou conclure qu'aucun changement n'est utile."],
 ] as const;
 
 export function SectionVente() {
@@ -27,15 +27,18 @@ export function SectionVente() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
       <div className="mb-8 flex items-center gap-3">
         <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">04</span>
-        <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Vendre, c’est de la psychologie appliquée</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Vendre, c'est de la psychologie appliquée</h2>
       </div>
       <p className="mb-10 max-w-3xl text-base leading-relaxed text-white/60">
-        La vente fait peur parce qu’on l’imagine comme du baratin de marchand de tapis. C’est l’inverse. Bien vendre, c’est comprendre quelqu’un sans parler à sa place, puis lui montrer un chemin proportionné à sa situation. C’est une compétence qui peut soutenir une activité quand l’offre répond à un besoin réel et que la livraison tient ses promesses.
+        Vendre consiste à comprendre une situation, vérifier qu'un problème mérite une action, puis proposer un chemin que tu sais livrer. La personne garde sa décision. Ton rôle est de poser les bonnes questions, rendre le choix lisible et arrêter quand l'offre ne correspond pas.
       </p>
 
       <FoundationChapter eyebrow="Chapitre 1" title="Diagnostiquer avant de proposer">
         <p>
-          Un bon médecin ne prescrit pas dès que tu entres. Il pose des questions, écoute, vérifie, puis recommande uniquement ce qui correspond au cas. Fais pareil : le premier objectif n’est pas de placer ton offre, mais de savoir si le problème est réel, récent, coûteux et accessible.
+          Adopte la posture d'un médecin : écouter, examiner, formuler une hypothèse, puis prescrire seulement quand les faits suffisent. Au début de l'échange, cherche un épisode récent. Les comportements passés donnent une matière plus solide qu'une opinion sur une solution imaginaire.
+        </p>
+        <p>
+          Demande la permission de prendre des notes. Laisse la personne raconter avant de reformuler. Sépare ses mots, tes interprétations et les informations manquantes. Cette discipline évite de transformer chaque difficulté en argument pour ton offre.
         </p>
         <div className="divide-y divide-white/10 border-y border-white/10">
           {DISCOVERY_QUESTIONS.map(([label, question], index) => (
@@ -47,21 +50,21 @@ export function SectionVente() {
           ))}
         </div>
         <FoundationEditorialNote label="Ce que tu cherches">
-          Une question sur un comportement passé vaut mieux qu’une question qui demande si quelqu’un aimerait une solution imaginaire. Une intention déclarée n’est pas une vente. Cherche un document, un paiement, un temps déjà consacré ou une décision réellement prise.
+          Cherche une trace du comportement : document, outil, paiement, délai, relance ou décision. Une intention déclarée reste une information utile, mais elle ne prouve ni l'achat futur ni la valeur de ta solution.
         </FoundationEditorialNote>
       </FoundationChapter>
 
-      <FoundationChapter eyebrow="Chapitre 2" title="Le déroulé d’une vente, dans l’ordre">
+      <FoundationChapter eyebrow="Chapitre 2" title="Le déroulé d'une vente, dans l'ordre">
         <p>
-          Ce n’est pas une liste de techniques à empiler. Chaque étape prépare la suivante et peut s’arrêter si l’offre n’est pas adaptée.
+          Chaque étape prépare la suivante et possède une condition d'arrêt. Si tu ne comprends pas le problème, tu continues le diagnostic. Si l'offre ne correspond pas, tu le dis. Si une condition importante manque, tu ne forces pas la proposition.
         </p>
         <div className="divide-y divide-white/10 border-y border-white/10">
           {[
-            ["Comprendre", "Faire raconter la situation, l’alternative actuelle, le coût et le résultat recherché."],
-            ["Reformuler", "Vérifier que tu as compris sans amplifier la douleur ni inventer une urgence."],
-            ["Relier", "Montrer le lien entre le problème décrit, le résultat possible et ton mode de livraison."],
+            ["Comprendre", "Faire raconter la situation, le déclencheur, l'alternative actuelle, le coût et le progrès recherché."],
+            ["Reformuler", "Résumer les faits avec les mots de la personne, puis lui demander ce que tu as mal compris ou oublié."],
+            ["Relier", "Expliquer comment ton mode de livraison traite la friction, quelles étapes restent humaines et quelles limites demeurent."],
             ["Proposer", "Présenter une prochaine étape proportionnée : exemple, diagnostic, devis, démonstration ou achat."],
-            ["Vérifier", "Demander ce qui bloque, confirmer les conditions et laisser une sortie claire si ce n’est pas le bon moment."],
+            ["Vérifier", "Demander ce qui bloque encore, confirmer les responsabilités et laisser une sortie claire."],
           ].map(([title, description], index) => (
             <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start">
               <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
@@ -70,11 +73,14 @@ export function SectionVente() {
             </div>
           ))}
         </div>
+        <p>
+          Exemple : un artisan décrit des demandes dispersées entre appels et messages. Tu reformules le chemin actuel, vérifies qui doit répondre, puis montres un exemple de file à valider. Le devis vient après l'accord sur le problème, le périmètre et les responsabilités.
+        </p>
       </FoundationChapter>
 
-      <FoundationChapter eyebrow="Chapitre 3" title="Rendre l’offre facile à choisir">
+      <FoundationChapter eyebrow="Chapitre 3" title="Rendre l'offre facile à choisir">
         <p>
-          Une offre n’est pas une longue liste de bonus. Elle devient lisible quand la personne comprend le progrès recherché, le chemin proposé, le travail qui reste à sa charge et le risque qui n’est pas supprimé.
+          Une offre est un contrat de progrès. Elle indique ce qui change, comment le travail sera mené, ce que chacun fournit et où s'arrête la responsabilité. Une longue liste de fonctions ne remplace aucune de ces réponses.
         </p>
         <div className="divide-y divide-white/10 border-y border-white/10">
           {OFFER_ELEMENTS.map(([label, description], index) => (
@@ -85,11 +91,14 @@ export function SectionVente() {
             </div>
           ))}
         </div>
+        <p>
+          Écris aussi les cas de non-pertinence. Une offre peut être mauvaise pour une équipe sans responsable disponible, pour un volume trop faible ou pour un besoin déjà bien couvert. Dire cela avant l'achat améliore la décision et protège la livraison.
+        </p>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 4" title="Répondre aux objections sans forcer">
         <p>
-          Une objection est souvent une information manquante, pas une invitation à parler plus fort. Réponds à la question réelle, puis vérifie si elle est résolue. Si elle ne l’est pas, réduis le périmètre ou arrête la conversation.
+          Une objection signale une information, une confiance ou une priorité manquante. Commence par la reformuler, demande si tu as visé juste, puis réponds avec le fait ou la preuve adaptés. Vérifie ensuite si la question est résolue. Accepte qu'une réponse puisse rester négative.
         </p>
         <div className="divide-y divide-white/10 border-y border-white/10">
           {OBJECTIONS.map(([objection, response]) => (
@@ -99,17 +108,20 @@ export function SectionVente() {
             </div>
           ))}
         </div>
+        <FoundationEditorialNote label="Une réponse proportionnée">
+          Prépare les objections réellement entendues et la preuve qui répond à chacune. Supprime les réponses qui reposent sur une peur, un faux délai, une comparaison invérifiable ou un résultat que tu ne peux pas documenter.
+        </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 5" title="Passer du problème à une offre proposable">
-        <p>La méthode ne s’arrête pas au bon diagnostic. Elle doit produire une prochaine étape concrète, tout en laissant la personne libre de ne pas acheter.</p>
+        <p>Le diagnostic devient utile quand il produit un livrable clair, un prix explicable et une prochaine étape volontaire. Construis cette offre à partir du terrain, puis ajuste-la après des conversations et des livraisons documentées.</p>
         <div className="divide-y divide-white/10 border-y border-white/10">
           {[
-            ["Choisir un terrain", "Pars d’un segment que tu peux atteindre, dont tu comprends les contraintes et où tu peux observer le travail réel. Une niche n’est pas une prison : c’est un premier terrain d’apprentissage."],
-            ["Formuler le livrable", "Décris ce qui sera remis, dans quel format, avec quelles limites et quelles informations le client devra fournir. Vends un résultat vérifiable, pas une promesse vague d’IA."],
-            ["Organiser un appel", "Sur 20 à 30 minutes : 5 minutes pour la situation, 10 pour le coût et les alternatives, 5 pour le résultat et les contraintes, puis 5 pour décider de la prochaine étape ou de l’arrêt."],
-            ["Proposer un prix", "Relie le prix au périmètre, au temps de préparation, aux validations, aux outils et au risque restant. Commence avec une offre simple et ajuste après des retours réels, pas après une intuition."],
-            ["Suivre sans harceler", "Garde dans un CRM minimal le problème, le dernier échange, la prochaine date, le statut et la raison d’un refus. Un rappel peut vérifier la décision ; il ne doit pas créer une fausse urgence."],
+            ["Choisir un terrain", "Pars d'un segment que tu peux atteindre, dont tu comprends les contraintes et où tu peux observer le travail réel. La niche sert de premier terrain d'apprentissage."],
+            ["Formuler le livrable", "Décris ce qui sera remis, dans quel format, avec quels critères d'acceptation, quelles limites et quelles informations le client fournit."],
+            ["Organiser un appel", "Prépare les thèmes plutôt qu'un monologue : situation récente, alternative, coût, progrès, contraintes, décision et suite. Garde du temps pour reformuler."],
+            ["Proposer un prix", "Relie le prix au périmètre, à la préparation, aux validations, aux outils, au support et au risque pris. Change-le après des données de terrain, jamais pour répondre à une gêne passagère."],
+            ["Suivre sans harceler", "Conserve dans un CRM minimal le problème, la dernière interaction, la prochaine date consentie, le statut et la raison d'un refus. Arrête quand il n'y a plus de suite convenue."],
           ].map(([title, description], index) => (
             <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_11rem_1fr] sm:items-start">
               <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
@@ -118,11 +130,17 @@ export function SectionVente() {
             </div>
           ))}
         </div>
-        <FoundationEditorialNote label="Une relance suffit">Une séquence simple peut suffire : premier message ancré dans une scène métier, réponse ou silence, relance courte quelques jours plus tard, puis arrêt documenté. Mesure les réponses et les objections pour améliorer l’offre, sans transformer une observation interne en preuve commerciale.</FoundationEditorialNote>
+        <div className="border-b border-white/10 py-5">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/70">Version pour l'IA</p>
+          <p className="text-sm leading-relaxed text-white/60">
+            Donne à l'IA des notes anonymisées, le livrable réel, les limites et ta grille de qualification. Demande-lui de séparer faits, hypothèses, objections et questions manquantes, puis de préparer une reformulation et un brouillon de suivi. Relis chaque ligne avec la source avant tout envoi.
+          </p>
+        </div>
+        <FoundationEditorialNote label="Une relance convenue">Le premier message nomme une scène et pose une question. La relance rappelle le contexte et permet une réponse courte. Sans accord, sans réponse ou après un refus, documente l'arrêt. Les objections recueillies servent à améliorer l'offre, jamais à fabriquer une preuve commerciale.</FoundationEditorialNote>
       </FoundationChapter>
 
-      <FoundationEditorialNote label="À retenir" className="mt-14 mb-4">
-        Vendre, c’est écouter, diagnostiquer, puis prescrire. Pose plus de questions que tu ne fais de promesses. Le calme et la compréhension vendent mieux que la pression.
+      <FoundationEditorialNote label="À faire maintenant" className="mt-14 mb-4">
+        Choisis une personne que tu peux interroger avec son accord. Prépare les quatre questions de découverte et écoute un épisode récent. Écris ensuite une offre d'une page avec progrès, chemin, effort et limite. Termine par une prochaine étape que la personne peut accepter ou refuser clairement.
       </FoundationEditorialNote>
     </div>
   );

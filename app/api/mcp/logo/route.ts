@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 /**
  * L'icône du serveur MCP est servie sous /api/mcp/ et non comme fichier statique :
  * les en-têtes de sécurité du site (Cross-Origin-Resource-Policy: same-origin) excluent
- * justement ce préfixe pour que Claude et ChatGPT puissent lire le connecteur.
+ * ce préfixe pour que les clients MCP distants puissent lire le connecteur.
  * Le fichier vit dans public/mcp pour rester versionné avec les autres marques, et
  * next.config.mjs (outputFileTracingIncludes) l'embarque dans la fonction déployée.
  */

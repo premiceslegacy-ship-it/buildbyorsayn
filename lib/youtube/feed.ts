@@ -5,8 +5,9 @@ import { XMLParser } from "fast-xml-parser";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { requireSiteOrigin } from "@/lib/siteOrigin";
 
-export type YoutubeEntry = { videoId: string; title: string; publishedAt: string };
-export type YoutubeFeedResult = { entries: YoutubeEntry[]; deletedIds: string[] };
+export type YoutubeEntry = { videoId: string; title: string; publishedAt: string; eventAt: string };
+export type YoutubeTombstone = { videoId: string; deletedAt: string };
+export type YoutubeFeedResult = { entries: YoutubeEntry[]; tombstones: YoutubeTombstone[] };
 
 const VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
 const HUB_URL = "https://pubsubhubbub.appspot.com/subscribe";
@@ -26,16 +27,27 @@ export function parseYoutubeAtom(xml: string, channelId: string): YoutubeFeedRes
     if (text(entry["yt:channelId"]) !== channelId || !VIDEO_ID.test(videoId)) continue;
     const title = text(entry.title);
     const publishedAt = text(entry.published);
-    if (!title || Number.isNaN(Date.parse(publishedAt))) continue;
-    entries.push({ videoId, title, publishedAt });
+    const updatedAt = text(entry.updated);
+    if (
+      !title
+      || Number.isNaN(Date.parse(publishedAt))
+      || (updatedAt !== "" && Number.isNaN(Date.parse(updatedAt)))
+    ) continue;
+    // Some historical/API-derived entries have no Atom `updated`. Publication
+    // time is a deterministic, conservative fallback; ingestion time would let
+    // a stale replay overtake a newer tombstone.
+    entries.push({ videoId, title, publishedAt, eventAt: updatedAt || publishedAt });
   }
 
-  const deletedIds: string[] = [];
+  const tombstones: YoutubeTombstone[] = [];
   for (const deleted of asArray(feed["at:deleted-entry"] as Record<string, unknown> | Record<string, unknown>[] | undefined)) {
     const match = /^yt:video:([A-Za-z0-9_-]{11})$/.exec(String(deleted["@_ref"] ?? ""));
-    if (match) deletedIds.push(match[1]);
+    const deletedAt = String(deleted["@_when"] ?? "").trim();
+    if (match && !Number.isNaN(Date.parse(deletedAt))) {
+      tombstones.push({ videoId: match[1], deletedAt });
+    }
   }
-  return { entries, deletedIds };
+  return { entries, tombstones };
 }
 
 const SHORTS_CHECK_CONCURRENCY = 6;
@@ -77,19 +89,24 @@ export async function excludeShorts(entries: YoutubeEntry[], fetchImpl: typeof f
 export async function storeYoutubeFeed(result: YoutubeFeedResult, fetchImpl: typeof fetch = fetch): Promise<number> {
   const supabase = createAdminSupabase();
   const entries = await excludeShorts(result.entries, fetchImpl);
-  if (entries.length > 0) {
-    const now = new Date().toISOString();
-    const { error } = await supabase.from("youtube_videos").upsert(
-      entries.map((entry) => ({ video_id: entry.videoId, title: entry.title, published_at: entry.publishedAt, updated_at: now })),
-      { onConflict: "video_id" }
-    );
-    if (error) throw new Error(`youtube_videos upsert failed: ${error.message}`);
+  if (entries.length === 0 && result.tombstones.length === 0) return 0;
+
+  const { data, error } = await supabase.rpc("apply_youtube_feed_events", {
+    p_entries: entries.map((entry) => ({
+      video_id: entry.videoId,
+      title: entry.title,
+      published_at: entry.publishedAt,
+      event_at: entry.eventAt,
+    })),
+    p_tombstones: result.tombstones.map((tombstone) => ({
+      video_id: tombstone.videoId,
+      deleted_at: tombstone.deletedAt,
+    })),
+  });
+  if (error || typeof data !== "number") {
+    throw new Error(`youtube feed event apply failed: ${error?.message ?? "invalid response"}`);
   }
-  if (result.deletedIds.length > 0) {
-    const { error } = await supabase.from("youtube_videos").delete().in("video_id", result.deletedIds);
-    if (error) throw new Error(`youtube_videos delete failed: ${error.message}`);
-  }
-  return entries.length;
+  return data;
 }
 
 export function requireChannelId(): string {
@@ -110,8 +127,10 @@ export async function syncYoutubeChannel(fetchImpl: typeof fetch = fetch): Promi
 export async function renewYoutubeWebSub(fetchImpl: typeof fetch = fetch): Promise<void> {
   const channelId = requireChannelId();
   const secret = process.env.YOUTUBE_WEBSUB_SECRET;
+  const verifyToken = process.env.YOUTUBE_WEBSUB_VERIFY_TOKEN;
   if (!secret) throw new Error("YOUTUBE_WEBSUB_SECRET is not configured.");
-  // Same variable the Stripe webhook uses; it must be the host that actually serves the app (the hub verifies the callback).
+  if (!verifyToken) throw new Error("YOUTUBE_WEBSUB_VERIFY_TOKEN is not configured.");
+  // The hub verifies this public callback before it starts sending signed notifications.
   const siteUrl = requireSiteOrigin();
   const response = await fetchImpl(HUB_URL, {
     method: "POST",
@@ -122,12 +141,20 @@ export async function renewYoutubeWebSub(fetchImpl: typeof fetch = fetch): Promi
       "hub.callback": `${siteUrl}/api/youtube/websub`,
       "hub.verify": "async",
       "hub.secret": secret,
+      "hub.verify_token": verifyToken,
       "hub.lease_seconds": String(WEBSUB_LEASE_SECONDS),
     }),
   });
   if (response.status !== 202 && response.status !== 204) throw new Error(`WebSub subscribe responded ${response.status}`);
 }
 
+
+export function verifyWebSubIntent(received: string | null, expected: string): boolean {
+  if (!received || expected.length < 16) return false;
+  const left = Buffer.from(received);
+  const right = Buffer.from(expected);
+  return left.length === right.length && timingSafeEqual(left, right);
+}
 export function verifyWebSubSignature(body: string, header: string | null, secret: string): boolean {
   if (!header || !secret) return false;
   const expected = `sha1=${createHmac("sha1", secret).update(body).digest("hex")}`;

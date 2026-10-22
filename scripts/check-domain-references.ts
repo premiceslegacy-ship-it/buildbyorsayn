@@ -52,6 +52,7 @@ export const HOST_ALLOWLIST: readonly AllowedHost[] = [
   { host: "platform.openai.com", kind: "third-party", why: "Documentation de la connexion ChatGPT." },
   { host: "*.openai.com", kind: "third-party", why: "Documentation et marque OpenAI." },
   { host: "nodejs.org", kind: "third-party", why: "Lien d'installation de Node.js dans les scripts BUILD Sync." },
+  { host: "omp.sh", kind: "third-party", why: "Lien d'installation officiel du client Oh My Pi dans le guide de connexion MCP." },
   { host: "*.w3.org", kind: "third-party", why: "Espace de noms XML des fichiers SVG." },
   { host: "nextjs.org", kind: "third-party", why: "Documentation Next.js citée dans la configuration." },
   { host: "ui.shadcn.com", kind: "third-party", why: "Schéma de components.json." },

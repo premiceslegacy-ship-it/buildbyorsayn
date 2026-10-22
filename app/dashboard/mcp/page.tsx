@@ -18,21 +18,34 @@ export const metadata = {
 
 function ClientLogos() {
   return (
-    <div className="flex items-center gap-4" aria-label="Claude et ChatGPT">
+    <div className="flex items-center gap-3" aria-label="Claude, ChatGPT, Hermes et Oh My Pi">
       <Image
         src="/brand-logos/claude.svg"
         alt="Claude"
         width={28}
         height={28}
-        className="h-7 w-7"
+        className="h-7 w-7 object-contain"
       />
-      <span className="h-4 w-px bg-white/15" aria-hidden="true" />
       <Image
         src="/brand-logos/chatgpt.svg"
         alt="ChatGPT"
         width={28}
         height={28}
-        className="h-7 w-7"
+        className="h-7 w-7 object-contain"
+      />
+      <Image
+        src="/brand-logos/hermes-agent-mark.png"
+        alt="Hermes"
+        width={28}
+        height={28}
+        className="h-7 w-7 object-contain"
+      />
+      <Image
+        src="/brand-logos/omp.svg"
+        alt="Oh My Pi"
+        width={28}
+        height={28}
+        className="h-7 w-7 object-contain"
       />
     </div>
   );
@@ -105,7 +118,7 @@ export default async function McpDashboardPage({
   if (!connectorVisible) {
     return (
       <PageShell>
-        <h1 className="text-3xl font-semibold tracking-tight">La connexion à Claude et ChatGPT n&apos;est pas encore ouverte</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">La connexion aux assistants n&apos;est pas encore ouverte</h1>
         <p className="mt-3 text-sm text-[#f0ede8]/60">
           Les essais réels sont encore en cours. Aucun réglage n&apos;est nécessaire.
         </p>
@@ -178,7 +191,7 @@ export default async function McpDashboardPage({
         <section className="py-10">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#c9b48a]">Une seule adresse</p>
           <p className="mt-3 max-w-xl text-sm leading-6 text-[#f0ede8]/60">
-            Utilise cette même adresse dans Claude ou ChatGPT. Le guide ci-dessous te montre exactement où cliquer.
+            Utilise cette même adresse dans l&apos;assistant de ton choix. Le guide ci-dessous te donne le parcours pour chacun.
           </p>
           <McpSetupGuide mcpUrl={mcpUrl} />
         </section>

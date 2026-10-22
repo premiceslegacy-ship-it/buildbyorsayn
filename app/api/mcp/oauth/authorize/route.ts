@@ -3,12 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 import { createMcpSupabaseAdmin } from "@/lib/mcp/supabaseAdmin";
 import { getMcpResourceUrl } from "@/lib/mcp/config";
 import {
+  buildValidatedAuthorizationErrorCallback,
   generateOpaqueToken,
   hashToken,
   isRedirectUriAllowed,
 } from "@/lib/mcp/oauth";
 import { createAuthorizationRequestSchema } from "@/lib/mcp/oauthSchemas";
 import { observeMcpRoute } from "@/lib/mcp/observability";
+import { reserveAuthorizationRequest } from "@/lib/mcp/authorizationRateLimit";
 
 export const dynamic = "force-dynamic";
 const NO_STORE = { "Cache-Control": "no-store", Pragma: "no-cache" };
@@ -56,6 +58,26 @@ async function handleGet(request: Request) {
     return NextResponse.redirect(loginUrl, { headers: NO_STORE });
   }
 
+  const rateDecision = await reserveAuthorizationRequest(admin, {
+    headers: request.headers,
+    userId: user.id,
+    clientId: input.client_id,
+    product: "mcp",
+  });
+  if (rateDecision !== "allowed") {
+    return NextResponse.redirect(
+      buildValidatedAuthorizationErrorCallback(
+        input.redirect_uri,
+        input.state,
+        "temporarily_unavailable",
+        "Too many authorization requests.",
+      ),
+      {
+        headers: { ...NO_STORE, "Retry-After": rateDecision === "denied" ? "300" : "5" },
+      },
+    );
+  }
+
   const requestHandle = generateOpaqueToken();
   const { data: requestStatus, error: insertError } = await admin.rpc("create_mcp_authorization_request", {
     p_request_hash: hashToken(requestHandle),
@@ -69,6 +91,17 @@ async function handleGet(request: Request) {
     p_user_id: user.id,
   });
   if (insertError || requestStatus !== "created") {
+    if (!insertError && requestStatus === "rate_limited") {
+      return NextResponse.redirect(
+        buildValidatedAuthorizationErrorCallback(
+          input.redirect_uri,
+          input.state,
+          "temporarily_unavailable",
+          "Too many active authorization requests.",
+        ),
+        { headers: { ...NO_STORE, "Retry-After": "300" } },
+      );
+    }
     return oauthError("Authorization is temporarily unavailable.", 503);
   }
 
