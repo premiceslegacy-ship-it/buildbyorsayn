@@ -55,7 +55,8 @@ const nextConfig = {
               "base-uri 'self'",
               "form-action 'self'",
               "object-src 'none'",
-              "upgrade-insecure-requests",
+              // Safari applique cette directive aussi sur http://127.0.0.1 : les CSS et scripts seraient demandés en https et la page s'afficherait sans style. On ne la pose que sur le vrai déploiement.
+              ...(process.env.VERCEL ? ["upgrade-insecure-requests"] : []),
             ].join("; "),
           },
           {
