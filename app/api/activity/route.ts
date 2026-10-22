@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { parseActivityPayload } from "@/lib/activity";
+import { activityRateLimitChecks, parseActivityPayload } from "@/lib/activity";
 import { isJsonMediaType, readBoundedBody } from "@/lib/mcp/http";
-import {
-  hashRateLimitSubject,
-  resolveRateLimitDecision,
-  trustedClientAddress,
-} from "@/lib/mcp/security";
+import { resolveRateLimitDecision, trustedClientAddress } from "@/lib/mcp/security";
 
 const MAX_ACTIVITY_BODY_BYTES = 2_048;
 const LOGGED_EVENTS: Record<string, true> = {
@@ -58,23 +54,18 @@ export async function POST(req: NextRequest) {
   if (!address || pepper.length < 16) {
     return NextResponse.json({ tracked: false }, { status: 503, headers: { "Retry-After": "5" } });
   }
-  const { data: allowed, error: rateLimitError } = await supabaseAdmin.rpc(
-    "check_mcp_rate_limit",
-    {
-      p_subject: hashRateLimitSubject("activity", `${user.id}:${address}`, pepper),
-      p_max_per_window: 60,
-      p_window_seconds: 60,
+  for (const check of activityRateLimitChecks(user.id, address, pepper)) {
+    const { data: allowed, error: rateLimitError } = await supabaseAdmin.rpc("check_mcp_rate_limit", check);
+    const rateDecision = resolveRateLimitDecision(allowed, rateLimitError);
+    if (rateDecision !== "allowed") {
+      return NextResponse.json(
+        { tracked: false },
+        {
+          status: rateDecision === "denied" ? 429 : 503,
+          headers: { "Retry-After": rateDecision === "denied" ? "60" : "5" },
+        }
+      );
     }
-  );
-  const rateDecision = resolveRateLimitDecision(allowed, rateLimitError);
-  if (rateDecision !== "allowed") {
-    return NextResponse.json(
-      { tracked: false },
-      {
-        status: rateDecision === "denied" ? 429 : 503,
-        headers: { "Retry-After": rateDecision === "denied" ? "60" : "5" },
-      }
-    );
   }
 
   const now = new Date().toISOString();

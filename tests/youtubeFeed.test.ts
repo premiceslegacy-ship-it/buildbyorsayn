@@ -188,6 +188,24 @@ test("websub POST refuses oversized bodies before hashing or storing them", asyn
   assert.equal(actual.status, 413);
 });
 
+test("websub POST stops reading a chunked body without Content-Length once it exceeds the cap", async () => {
+  const { POST } = await import("../app/api/youtube/websub/route");
+  let pulled = 0;
+  const endless = new ReadableStream<Uint8Array>({
+    pull(controller) {
+      pulled += 1;
+      controller.enqueue(new Uint8Array(64 * 1024).fill(120));
+    },
+  });
+  const response = await POST(new Request("https://app.example.com/api/youtube/websub", {
+    method: "POST",
+    body: endless,
+    duplex: "half",
+  } as RequestInit & { duplex: "half" }));
+  assert.equal(response.status, 413);
+  assert.ok(pulled < 20, `the endless stream must be cancelled after the cap (pulled ${pulled} chunks)`);
+});
+
 
 function withEnv(values: Record<string, string | undefined>, run: () => Promise<void>) {
   const previous = Object.fromEntries(Object.keys(values).map((name) => [name, process.env[name]]));

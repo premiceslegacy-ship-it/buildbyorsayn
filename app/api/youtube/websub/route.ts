@@ -1,4 +1,5 @@
 import { revalidateTag } from "next/cache";
+import { readBoundedBody } from "@/lib/mcp/http";
 import { YOUTUBE_VIDEOS_CACHE_TAG } from "@/lib/nouveautes/loadVideos";
 import { parseYoutubeAtom, requireChannelId, storeYoutubeFeed, verifyWebSubIntent, verifyWebSubSignature, websubTopic } from "@/lib/youtube/feed";
 
@@ -30,10 +31,10 @@ export async function GET(request: Request): Promise<Response> {
 // Content distribution. A bad signature is acknowledged (202) and dropped, per spec.
 export async function POST(request: Request): Promise<Response> {
   try {
-    const declared = Number(request.headers.get("content-length") ?? 0);
-    if (Number.isFinite(declared) && declared > MAX_WEBSUB_BODY_BYTES) return new Response(null, { status: 413 });
-    const body = await request.text();
-    if (body.length > MAX_WEBSUB_BODY_BYTES) return new Response(null, { status: 413 });
+    // Lecture bornée au flux : un corps sans Content-Length (chunked) ou envoyé au compte-gouttes ne reste pas en mémoire.
+    const bounded = await readBoundedBody(request, MAX_WEBSUB_BODY_BYTES);
+    if (bounded.ok === false) return new Response(null, { status: bounded.reason === "too_large" ? 413 : 400 });
+    const body = bounded.text;
     const secret = process.env.YOUTUBE_WEBSUB_SECRET ?? "";
     if (!verifyWebSubSignature(body, request.headers.get("x-hub-signature"), secret)) {
       return new Response(null, { status: 202 });

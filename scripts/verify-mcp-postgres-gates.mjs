@@ -246,7 +246,7 @@ assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zero
 sql(`update public.profiles set tier='beginner' where id='${userId}'`);
 assert.equal(sql(`select count(*) from public.match_mcp_knowledge_chunks('${zeroVector}'::extensions.vector,'${issuedAccess2}','${resource}',20,'blocs','${fpA}')`), "0");
 sql(`update public.profiles set tier='preview' where id='${userId}'`);
-assert.equal(sql("select metadata->>'sectionId' || ':' || metadata->>'startSeconds' || ':' || tier_required from public.knowledge_chunks where source_id='video:b2-s1:chapter:1'"), "b2-s1:0:full");
+assert.equal(sql("select (metadata->>'sectionId') || ':' || (metadata->>'startSeconds') || ':' || tier_required from public.knowledge_chunks where source_id='video:b2-s1:chapter:1'"), "b2-s1:0:full");
 const unknownAccessHash = sha256("unknown-knowledge-access-token");
 const expiredAccessHash = sha256("expired-knowledge-access-token");
 const revokedAccessHash = sha256("revoked-knowledge-access-token");

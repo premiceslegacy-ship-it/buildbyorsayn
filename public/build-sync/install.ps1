@@ -1,6 +1,10 @@
 $ErrorActionPreference = "Stop"
 
 $BuildSyncOrigin = if ($env:BUILD_SYNC_BASE_URL) { $env:BUILD_SYNC_BASE_URL } else { "https://build-system-three.vercel.app" }
+# Même règle que build.mjs : HTTPS, ou http local pour le développement. Rien d'autre n'est téléchargé ni exécuté.
+if ($BuildSyncOrigin -notmatch '^(https://[A-Za-z0-9._~:/-]+|http://(127\.0\.0\.1|localhost)(:[0-9]{1,5})?)$') {
+  throw "BUILD_SYNC_BASE_URL doit commencer par https:// (ou http://127.0.0.1 en développement local), sans caractère spécial."
+}
 Write-Host ""
 Write-Host "BUILD Sync - préparation de l'installation"
 Write-Host ""
@@ -27,7 +31,10 @@ Invoke-WebRequest -UseBasicParsing "$BuildSyncOrigin/build-sync/build.mjs" -OutF
 Move-Item -Force $TempPath $CliPath
 
 $Wrapper = Join-Path $BinRoot "build-skills.cmd"
-Set-Content -Encoding Ascii -Path $Wrapper -Value "@echo off`r`nset `"BUILD_SYNC_CLI_PATH=$CliPath`"`r`n`"$($Node.Source)`" `"$CliPath`" %*`r`n"
+# Dans un .cmd, un pourcent serait réinterprété : on le double.
+$CliPathCmd = $CliPath.Replace("%", "%%")
+$NodePathCmd = $Node.Source.Replace("%", "%%")
+Set-Content -Encoding Ascii -Path $Wrapper -Value "@echo off`r`nset `"BUILD_SYNC_CLI_PATH=$CliPathCmd`"`r`n`"$NodePathCmd`" `"$CliPathCmd`" %*`r`n"
 
 if ($env:BUILD_SYNC_INSTALL_ONLY -ne "1") {
   & $Node.Source $CliPath skills setup "--base-url=$BuildSyncOrigin"

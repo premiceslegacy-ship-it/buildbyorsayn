@@ -5,7 +5,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { config as loadEnv } from "dotenv";
 import { ASSISTANT_BENCH_CASES, BENCH_TIERS, validateBenchCases, type BenchCase, type BenchTier } from "./cases";
 import { connectTier, createOfflineTier, credentialsForTier, type ConnectedTier, type ToolObservation } from "./mcpClient";
-import { answerBatch, judgeBatch, SCORE_KEYS, type PreparedCase } from "./models";
+import { answerBatch, judgeBatch, SCORE_KEYS, type AnswerRecord, type JudgeRecord, type PreparedCase } from "./models";
 import { buildAssistantInstructions } from "../../lib/mcp/assistantInstructions";
 
 loadEnv({ path: ".env.local", quiet: true });
@@ -21,7 +21,7 @@ type CaseResult = {
   expected: BenchCase["expected"];
   observations: ToolObservation[];
   answer: string;
-  judgement: Awaited<ReturnType<typeof judgeBatch>>[number];
+  judgement: JudgeRecord;
   retrieval: {
     evaluated: boolean;
     expectedInTop3: boolean | null;
@@ -34,6 +34,7 @@ type Options = {
   label: string;
   split: Split;
   batchSize: number;
+  concurrency: number;
   startServer: boolean;
   serverCwd: string;
   caseIds: Set<string> | null;
@@ -42,6 +43,12 @@ type Options = {
   offlineBaseline: boolean;
   instructionsFile: string | null;
 };
+
+/** Le serveur limite search_knowledge à 10 appels par minute et par client OAuth : on espace donc les recherches d'un même palier. */
+const SEARCH_SPACING_MS = 6_500;
+const TRANSIENT_RETRIES = 3;
+const TRANSIENT_RETRY_DELAY_MS = 20_000;
+const MAX_CODEX_CONCURRENCY = 4;
 
 function argument(name: string): string | undefined {
   return process.argv.find((value) => value.startsWith(`--${name}=`))?.slice(name.length + 3);
@@ -53,6 +60,10 @@ function parseOptions(): Options {
     throw new Error("--split must be iteration, holdout or all.");
   }
   const batchSize = Number(argument("batch-size") ?? "5");
+  const concurrency = Number(argument("concurrency") ?? String(MAX_CODEX_CONCURRENCY));
+  if (!Number.isSafeInteger(concurrency) || concurrency < 1 || concurrency > MAX_CODEX_CONCURRENCY) {
+    throw new Error(`--concurrency must be an integer between 1 and ${MAX_CODEX_CONCURRENCY}.`);
+  }
   if (!Number.isSafeInteger(batchSize) || batchSize < 1 || batchSize > 10) {
     throw new Error("--batch-size must be an integer between 1 and 10.");
   }
@@ -67,6 +78,7 @@ function parseOptions(): Options {
     label: argument("label") ?? `run-${Date.now()}`,
     split,
     batchSize,
+    concurrency,
     startServer: process.argv.includes("--start-server"),
     serverCwd: resolve(argument("server-cwd") ?? process.cwd()),
     caseIds: casesRaw ? new Set(casesRaw.split(",").filter(Boolean)) : null,
@@ -252,21 +264,64 @@ async function main(): Promise<void> {
     }
     const firstConnection = connections.get("free")!;
     const instructions = firstConnection.instructions;
-    for (const [batchIndex, definitions] of batches(selected, options.batchSize).entries()) {
-      const prepared: PreparedCase[] = [];
-      for (const definition of definitions) {
-        const connection = connections.get(definition.tier)!;
+
+    // Phase 1 : appels d'outils réels. Les trois paliers avancent en parallèle, chacun à son rythme.
+    const observationsById = new Map<string, ToolObservation[]>();
+    let transientFailures = 0;
+    await Promise.all(BENCH_TIERS.map(async (tier) => {
+      const connection = connections.get(tier)!;
+      let lastSearchAt = 0;
+      for (const definition of selected.filter((item) => item.tier === tier)) {
         const observations: ToolObservation[] = [];
-        for (const call of definition.tools) observations.push(await connection.callTool(call));
-        prepared.push({ definition, observations });
+        for (const call of definition.tools) {
+          for (let attempt = 0; ; attempt += 1) {
+            if (call.name === "search_knowledge") {
+              const wait = lastSearchAt + SEARCH_SPACING_MS - Date.now();
+              if (wait > 0) await delay(wait);
+            }
+            const observation = await connection.callTool(call);
+            if (call.name === "search_knowledge") lastSearchAt = Date.now();
+            const transient = observation.isError && /temporairement indisponible|a échoué/.test(observation.text);
+            if (!transient || attempt >= TRANSIENT_RETRIES) {
+              observations.push(observation);
+              break;
+            }
+            transientFailures += 1;
+            await delay(TRANSIENT_RETRY_DELAY_MS);
+          }
+        }
+        observationsById.set(definition.id, observations);
       }
-      const runId = `${options.label}-${String(batchIndex + 1).padStart(2, "0")}`;
-      const answers = await answerBatch({ instructions, batch: prepared, runId });
-      const judgements = await judgeBatch({ batch: prepared, answers, runId });
-      const answerById = new Map(answers.map((answer) => [answer.id, answer.answer]));
-      const judgementById = new Map(judgements.map((judgement) => [judgement.id, judgement]));
-      for (const item of prepared) {
-        results.push({
+      process.stderr.write(`Tools done for ${tier}.\n`);
+    }));
+
+    // Phase 2 : réponse puis jugement par Codex, au plus options.concurrency lots à la fois.
+    const allBatches = batches(selected, options.batchSize);
+    const batchResults: CaseResult[][] = allBatches.map(() => []);
+    let nextBatch = 0;
+    await Promise.all(Array.from({ length: Math.min(options.concurrency, allBatches.length) }, async () => {
+      while (nextBatch < allBatches.length) {
+        const batchIndex = nextBatch;
+        nextBatch += 1;
+        const prepared: PreparedCase[] = allBatches[batchIndex].map((definition) => ({
+          definition,
+          observations: observationsById.get(definition.id)!,
+        }));
+        const runId = `${options.label}-${String(batchIndex + 1).padStart(2, "0")}`;
+        let answers: AnswerRecord[] | null = null;
+        let judgements: JudgeRecord[] | null = null;
+        for (let attempt = 1; judgements === null; attempt += 1) {
+          try {
+            answers = await answerBatch({ instructions, batch: prepared, runId });
+            judgements = await judgeBatch({ batch: prepared, answers, runId });
+          } catch (error) {
+            if (attempt >= 2) throw error;
+            process.stderr.write(`Batch ${batchIndex + 1} failed once, retrying: ${error instanceof Error ? error.message.slice(0, 200) : "unknown"}\n`);
+          }
+        }
+        const answerById = new Map(answers!.map((answer) => [answer.id, answer.answer]));
+        const judgementById = new Map(judgements.map((judgement) => [judgement.id, judgement]));
+        batchResults[batchIndex] = prepared.map((item) => ({
           id: item.definition.id,
           split: item.definition.split,
           tier: item.definition.tier,
@@ -277,10 +332,11 @@ async function main(): Promise<void> {
           answer: answerById.get(item.definition.id)!,
           judgement: judgementById.get(item.definition.id)!,
           retrieval: retrievalResult(item.definition, item.observations),
-        });
+        }));
+        process.stderr.write(`Completed batch ${batchIndex + 1}/${allBatches.length}.\n`);
       }
-      process.stderr.write(`Completed batch ${batchIndex + 1}/${Math.ceil(selected.length / options.batchSize)}.\n`);
-    }
+    }));
+    results.push(...batchResults.flat());
 
     const toolNames = Object.fromEntries([...connections].map(([tier, connection]) => [tier, connection.toolNames]));
     const report = {
@@ -295,6 +351,7 @@ async function main(): Promise<void> {
       responder: { model: "gpt-5.6-sol", reasoningEffort: "high", sandbox: "read-only" },
       judge: { model: "gpt-5.6-sol", reasoningEffort: "xhigh", sandbox: "read-only", blind: true },
       summary: buildSummary(results, toolNames, instructions.length),
+      toolRetries: transientFailures,
       results,
     };
     const outputPath = `/tmp/cx/assistant-bench-${options.label}.json`;

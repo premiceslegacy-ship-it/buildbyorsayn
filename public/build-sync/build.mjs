@@ -395,12 +395,34 @@ async function getAccessToken(config, paths, quiet) {
   }
 }
 
+/** Résout un chemin du serveur BUILD et refuse toute adresse qui sortirait de l'origine configurée : le jeton ne part jamais ailleurs. */
+export function sameOriginUrl(input, baseUrl) {
+  const target = new URL(input, baseUrl);
+  if (target.origin !== new URL(baseUrl).origin || target.username || target.password) {
+    fail("Adresse BUILD hors de l'origine configurée.");
+  }
+  return target;
+}
+
 async function authorizedFetch(config, paths, input, init = {}, quiet = false) {
+  const target = sameOriginUrl(input, config.baseUrl);
   const accessToken = await getAccessToken(config, paths, quiet);
-  return fetch(new URL(input, config.baseUrl), {
+  return fetch(target, {
     ...init,
     headers: { ...init.headers, Authorization: `Bearer ${accessToken}` },
   });
+}
+
+/** Le catalogue vient du réseau : chaque champ réutilisé dans un chemin, une empreinte ou une adresse est borné avant tout usage. */
+export function validateCatalogArtifact(artifact) {
+  const valid = artifact && typeof artifact === "object" &&
+    typeof artifact.slug === "string" && /^[a-z0-9][a-z0-9-]{0,80}$/.test(artifact.slug) &&
+    typeof artifact.fileName === "string" && /^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.(md|zip)$/.test(artifact.fileName) &&
+    typeof artifact.sha256 === "string" && /^[0-9a-f]{64}$/.test(artifact.sha256) &&
+    artifact.downloadUrl === `/api/build-sync/artifacts/${artifact.slug}` &&
+    typeof artifact.title === "string";
+  if (!valid) fail("Catalogue BUILD invalide.");
+  return artifact;
 }
 
 async function fetchCatalog(config, paths, quiet) {
@@ -409,6 +431,7 @@ async function fetchCatalog(config, paths, quiet) {
   if (!response.ok || !body || !Array.isArray(body.artifacts)) {
     fail(body?.error === "unauthorized" ? "Connexion BUILD Sync refusée." : "Catalogue BUILD indisponible.");
   }
+  body.artifacts.forEach(validateCatalogArtifact);
   return body;
 }
 
@@ -590,7 +613,15 @@ function timestamp() {
   return new Date().toISOString().replace(/[:.]/g, "-");
 }
 
+/** Un nom d'unité est un seul segment de chemin : il ne remonte jamais hors de la racine des skills. */
+function assertUnitName(unitName) {
+  if (typeof unitName !== "string" || !unitName || unitName === "." || unitName === ".." || /[\\/\0]/.test(unitName)) {
+    fail("Nom de skill invalide.");
+  }
+}
+
 export async function installUnit({ agentId, root, unitName, artifactUnitNames = [unitName], files, artifact, releaseId, paths }) {
+  assertUnitName(unitName);
   await mkdir(root, { recursive: true, mode: 0o700 });
   const target = path.join(root, unitName);
   const markerFile = path.join(target, MARKER_FILE);
@@ -704,8 +735,42 @@ function xmlEscape(value) {
   return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[char]);
 }
 
-function systemdQuote(value) {
-  return `"${String(value).replace(/([\\"])/g, "\\$1")}"`;
+/** Un chemin avec retour à la ligne ou caractère de contrôle ne peut pas entrer dans un fichier de planification : on refuse plutôt que d'échapper. */
+function assertPlainPath(value) {
+  if (/[\u0000-\u001f\u007f]/.test(String(value))) fail("Chemin d'installation BUILD Sync invalide pour la planification.");
+  return String(value);
+}
+
+// systemd relit les guillemets, les antislashs, les spécificateurs % et les variables $ d'une ligne Exec.
+export function systemdQuote(value) {
+  return `"${assertPlainPath(value).replace(/([\\"])/g, "\\$1").replace(/%/g, "%%").replace(/\$/g, "$$$$")}"`;
+}
+
+export function launchdPlist({ execPath, script, logDir }) {
+  const text = (value) => xmlEscape(assertPlainPath(value));
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>Label</key><string>com.buildbyorsayn.skills-sync</string>
+<key>ProgramArguments</key><array><string>${text(execPath)}</string><string>${text(script)}</string><string>skills</string><string>update</string><string>--quiet</string></array>
+<key>EnvironmentVariables</key><dict><key>BUILD_SYNC_CLI_PATH</key><string>${text(script)}</string></dict>
+<key>RunAtLoad</key><true/><key>StartInterval</key><integer>${SCHEDULER_INTERVAL_SECONDS}</integer>
+<key>StandardOutPath</key><string>${text(path.join(logDir, "sync.log"))}</string>
+<key>StandardErrorPath</key><string>${text(path.join(logDir, "sync-error.log"))}</string>
+</dict></plist>\n`;
+}
+
+export function systemdServiceUnit({ execPath, script }) {
+  return `[Unit]\nDescription=Synchronise les skills BUILD\n\n[Service]\nType=oneshot\nEnvironment=${systemdQuote(`BUILD_SYNC_CLI_PATH=${script}`)}\nExecStart=${systemdQuote(execPath)} ${systemdQuote(script)} skills update --quiet\n`;
+}
+
+// Un chemin Windows ne contient jamais de guillemet : s'il en contient un, quelqu'un tente de sortir de la chaîne /TR.
+export function schtasksCommand({ execPath, script }) {
+  for (const value of [execPath, script]) {
+    assertPlainPath(value);
+    if (String(value).includes('"')) fail("Chemin d'installation BUILD Sync invalide pour la planification.");
+  }
+  return `"${execPath}" "${script}" skills update --quiet`;
 }
 
 async function reloadMacScheduler() {
@@ -726,16 +791,7 @@ async function installScheduler(paths, quiet, deferMacReload = false) {
     const logDir = path.join(paths.root, "logs");
     await mkdir(launchAgents, { recursive: true });
     await mkdir(logDir, { recursive: true, mode: 0o700 });
-    const body = `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-<key>Label</key><string>com.buildbyorsayn.skills-sync</string>
-<key>ProgramArguments</key><array><string>${xmlEscape(process.execPath)}</string><string>${xmlEscape(script)}</string><string>skills</string><string>update</string><string>--quiet</string></array>
-<key>EnvironmentVariables</key><dict><key>BUILD_SYNC_CLI_PATH</key><string>${xmlEscape(script)}</string></dict>
-<key>RunAtLoad</key><true/><key>StartInterval</key><integer>${SCHEDULER_INTERVAL_SECONDS}</integer>
-<key>StandardOutPath</key><string>${xmlEscape(path.join(logDir, "sync.log"))}</string>
-<key>StandardErrorPath</key><string>${xmlEscape(path.join(logDir, "sync-error.log"))}</string>
-</dict></plist>\n`;
+    const body = launchdPlist({ execPath: process.execPath, script, logDir });
     await writeFile(plist, body, { mode: 0o600 });
     if (deferMacReload) {
       const reloader = spawn(process.execPath, [script, "skills", "scheduler-reload"], {
@@ -753,14 +809,14 @@ async function installScheduler(paths, quiet, deferMacReload = false) {
   if (process.platform === "linux" && commandExists("systemctl")) {
     const unitDir = path.join(paths.userHome, ".config", "systemd", "user");
     await mkdir(unitDir, { recursive: true, mode: 0o700 });
-    await writeFile(path.join(unitDir, "build-skills-sync.service"), `[Unit]\nDescription=Synchronise les skills BUILD\n\n[Service]\nType=oneshot\nEnvironment=${systemdQuote(`BUILD_SYNC_CLI_PATH=${script}`)}\nExecStart=${systemdQuote(process.execPath)} ${systemdQuote(script)} skills update --quiet\n`, { mode: 0o600 });
+    await writeFile(path.join(unitDir, "build-skills-sync.service"), systemdServiceUnit({ execPath: process.execPath, script }), { mode: 0o600 });
     await writeFile(path.join(unitDir, "build-skills-sync.timer"), `[Unit]\nDescription=Vérifie les skills BUILD\n\n[Timer]\nOnBootSec=2min\nOnUnitActiveSec=1h\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n`, { mode: 0o600 });
     spawnSync("systemctl", ["--user", "daemon-reload"], { stdio: "ignore" });
     const enabled = spawnSync("systemctl", ["--user", "enable", "--now", "build-skills-sync.timer"], { stdio: "ignore" });
     return enabled.status === 0;
   }
   if (process.platform === "win32") {
-    const command = `"${process.execPath}" "${script}" skills update --quiet`;
+    const command = schtasksCommand({ execPath: process.execPath, script });
     const created = spawnSync("schtasks.exe", ["/Create", "/F", "/SC", "HOURLY", "/MO", "1", "/TN", "BUILD Skills Sync", "/TR", command], { stdio: "ignore" });
     return created.status === 0;
   }

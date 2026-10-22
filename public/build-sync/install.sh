@@ -2,6 +2,27 @@
 set -eu
 
 BUILD_SYNC_ORIGIN="${BUILD_SYNC_BASE_URL:-https://build-system-three.vercel.app}"
+
+# Même règle que build.mjs : HTTPS, ou http local pour le développement. Rien d'autre n'est téléchargé ni exécuté.
+case "$BUILD_SYNC_ORIGIN" in
+  https://*|http://127.0.0.1|http://127.0.0.1:*|http://localhost|http://localhost:*) ;;
+  *)
+    echo "✗ BUILD_SYNC_BASE_URL doit commencer par https:// (ou http://127.0.0.1 en développement local)." >&2
+    exit 1
+    ;;
+esac
+case "$BUILD_SYNC_ORIGIN" in
+  *[!A-Za-z0-9._~:/-]*)
+    echo "✗ BUILD_SYNC_BASE_URL contient des caractères non autorisés." >&2
+    exit 1
+    ;;
+esac
+
+# Entoure une valeur de guillemets simples pour qu'un shell la relise telle quelle (une apostrophe devient '\'').
+build_sync_quote() {
+  printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
+}
+
 BUILD_SYNC_DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/build-sync"
 BUILD_SYNC_BIN_DIR="$HOME/.local/bin"
 
@@ -26,13 +47,16 @@ echo "✓ Node.js $(node -v)"
 echo "→ Téléchargement sécurisé de BUILD Sync…"
 
 mkdir -p "$BUILD_SYNC_DATA_DIR" "$BUILD_SYNC_BIN_DIR"
-curl -fsSL "$BUILD_SYNC_ORIGIN/build-sync/build.mjs" -o "$BUILD_SYNC_DATA_DIR/build.mjs.tmp"
+curl -fsSL --proto-redir "=https" "$BUILD_SYNC_ORIGIN/build-sync/build.mjs" -o "$BUILD_SYNC_DATA_DIR/build.mjs.tmp"
 chmod 700 "$BUILD_SYNC_DATA_DIR/build.mjs.tmp"
 mv "$BUILD_SYNC_DATA_DIR/build.mjs.tmp" "$BUILD_SYNC_DATA_DIR/build.mjs"
 
 {
   echo '#!/bin/sh'
-  printf 'BUILD_SYNC_CLI_PATH="%s" exec "%s" "%s" "$@"\n' "$BUILD_SYNC_DATA_DIR/build.mjs" "$(command -v node)" "$BUILD_SYNC_DATA_DIR/build.mjs"
+  printf 'BUILD_SYNC_CLI_PATH=%s exec %s %s "$@"\n' \
+    "$(build_sync_quote "$BUILD_SYNC_DATA_DIR/build.mjs")" \
+    "$(build_sync_quote "$(command -v node)")" \
+    "$(build_sync_quote "$BUILD_SYNC_DATA_DIR/build.mjs")"
 } > "$BUILD_SYNC_BIN_DIR/build-skills"
 chmod 700 "$BUILD_SYNC_BIN_DIR/build-skills"
 
