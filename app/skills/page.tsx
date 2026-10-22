@@ -1,22 +1,16 @@
-"use client";
-
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Download } from "lucide-react";
-import { motion } from "motion/react";
-import { createClient } from "@/lib/supabase/client";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { getCheckoutUrls } from "@/app/actions/getCheckoutUrls";
-import { SKILLS_CATALOG, SKILL_CATEGORY_LABELS, type SkillCategory } from "@/lib/skillsCatalog";
+import { SKILLS_CATALOG, SKILL_CATEGORY_LABELS } from "@/lib/skillsCatalog";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { IllustratedCard } from "@/components/ui/illustrated-card";
 import { SkillsFreshness } from "@/components/SkillsFreshness";
 import { BuildSyncInstall } from "@/components/BuildSyncInstall";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
-import { illustrationSrc } from "@/lib/illustrations";
 import { COFFRE_LABEL, COFFRE_PRICE, FONDATIONS_PRICE, UPGRADE_PATH, withClientReferenceId } from "@/lib/pricing";
-import { normalizeProfileTier } from "@/lib/mcpAccess";
+import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
+import { SkillsCatalogClient } from "./SkillsCatalogClient";
 
 const SKILL_USAGE_STEPS = [
   {
@@ -197,139 +191,15 @@ const SKILL_GLOSSARY = [
   ["Lighthouse 100", "Un score de contrôle sur certaines dimensions web. Ce n’est ni une garantie de conversion, ni une preuve que le produit est bon pour son marché."],
 ] as const;
 
-type SkillsPublicationMetadata = {
-  publishedAt: string;
-  releaseId: string;
-  artifacts: Array<{ fileName: string; sha256: string }>;
-};
+export const dynamic = "force-dynamic";
 
-type SkillDownloadRecord = {
-  sha256: string;
-  downloadedAt: string;
-  publishedAt: string;
-};
-
-type SkillDownloadRecords = Record<string, SkillDownloadRecord>;
-
-const SKILL_DOWNLOADS_STORAGE_KEY = "build-skill-downloads";
-
-function isSkillsPublicationMetadata(value: unknown): value is SkillsPublicationMetadata {
-  if (!value || typeof value !== "object") return false;
-  const candidate = value as Record<string, unknown>;
-  return (
-    typeof candidate.publishedAt === "string" &&
-    !Number.isNaN(Date.parse(candidate.publishedAt)) &&
-    typeof candidate.releaseId === "string" &&
-    Array.isArray(candidate.artifacts) &&
-    candidate.artifacts.every(
-      (artifact) =>
-        artifact &&
-        typeof artifact === "object" &&
-        typeof (artifact as Record<string, unknown>).fileName === "string" &&
-        typeof (artifact as Record<string, unknown>).sha256 === "string"
-    )
-  );
-}
-
-function readSkillDownloadRecords(): SkillDownloadRecords {
-  try {
-    const value = JSON.parse(window.localStorage.getItem(SKILL_DOWNLOADS_STORAGE_KEY) ?? "{}");
-    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-
-    return Object.fromEntries(
-      Object.entries(value).flatMap(([slug, record]) => {
-        if (!record || typeof record !== "object") return [];
-        const candidate = record as Record<string, unknown>;
-        if (
-          typeof candidate.sha256 !== "string" ||
-          typeof candidate.downloadedAt !== "string" ||
-          typeof candidate.publishedAt !== "string"
-        ) {
-          return [];
-        }
-        return [[slug, candidate as SkillDownloadRecord]];
-      })
-    );
-  } catch {
-    return {};
-  }
-}
-
-export default function SkillsPage() {
-  const [tier, setTier] = useState<string | null | "loading">("loading");
-  const [checkoutHref, setCheckoutHref] = useState<string | null>(null);
-  const [beginnerHref, setBeginnerHref] = useState<string | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<SkillCategory | "all">("all");
-  const [publication, setPublication] = useState<SkillsPublicationMetadata | null>(null);
-  const [downloadRecords, setDownloadRecords] = useState<SkillDownloadRecords>(() =>
-    typeof window === "undefined" ? {} : readSkillDownloadRecords()
-  );
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        setTier(null);
-        return;
-      }
-
-      const [{ data: profile }, urls] = await Promise.all([
-        supabase.from("profiles").select("tier").eq("id", user.id).single(),
-        getCheckoutUrls(),
-      ]);
-
-      const userTier = normalizeProfileTier(profile?.tier ?? null);
-
-      setTier(userTier);
-      // Le complément passe par la porte serveur : son lien Stripe n'arrive jamais dans le navigateur.
-      setCheckoutHref(userTier === "beginner" ? UPGRADE_PATH : withClientReferenceId(urls.full, user.id));
-      setBeginnerHref(withClientReferenceId(urls.beginner, user.id));
-    };
-
-    fetchProfile();
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadPublication() {
-      try {
-        const response = await fetch("/api/skills/metadata", {
-          signal: controller.signal,
-        });
-        if (!response.ok) return;
-        const payload: unknown = await response.json();
-        if (isSkillsPublicationMetadata(payload)) setPublication(payload);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") return;
-      }
-    }
-
-    void loadPublication();
-    return () => controller.abort();
-  }, []);
-
-  function rememberDownload(slug: string, fileName: string) {
-    const artifact = publication?.artifacts.find((item) => item.fileName === fileName);
-    if (!publication || !artifact) return;
-
-    const nextRecords = {
-      ...downloadRecords,
-      [slug]: {
-        sha256: artifact.sha256,
-        downloadedAt: new Date().toISOString(),
-        publishedAt: publication.publishedAt,
-      },
-    };
-    window.localStorage.setItem(SKILL_DOWNLOADS_STORAGE_KEY, JSON.stringify(nextRecords));
-    setDownloadRecords(nextRecords);
-  }
-
-  const isLoading = tier === "loading";
+export default async function SkillsPage() {
+  const identity = await requirePageAccess("authenticated", "/skills");
+  const urls = await getCheckoutUrls();
+  const checkoutHref = identity.tier === "beginner"
+    ? UPGRADE_PATH
+    : withClientReferenceId(urls.full, identity.user.id);
+  const beginnerHref = withClientReferenceId(urls.beginner, identity.user.id);
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
@@ -373,7 +243,7 @@ export default function SkillsPage() {
           </div>
         </header>
 
-        {!isLoading && (tier === "beginner" || tier === "full") ? <BuildSyncInstall /> : null}
+        {identity.tier === "beginner" || identity.tier === "full" ? <BuildSyncInstall /> : null}
 
         <section id="methode" className="mb-10 scroll-mt-24 hidden md:block">
           <LiquidCard className="p-5 sm:p-6">
@@ -553,119 +423,16 @@ export default function SkillsPage() {
           </LiquidCard>
         </section>
 
-        <div id="catalogue" className="mb-6 flex flex-wrap gap-2 scroll-mt-24">
-          {(["all", ...Object.keys(SKILL_CATEGORY_LABELS)] as (SkillCategory | "all")[]).map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategoryFilter(cat)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-medium border transition-colors cursor-pointer ${
-                categoryFilter === cat
-                  ? "bg-[#e8d5b0] text-[#0e0e0f] border-[#e8d5b0]"
-                  : "bg-white/[0.03] text-white/50 border-white/[0.08] hover:text-white/80 hover:border-white/20"
-              }`}
-            >
-              {cat === "all" ? "Tous" : SKILL_CATEGORY_LABELS[cat]}
-            </button>
-          ))}
-        </div>
-
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="h-[240px] rounded-2xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {SKILLS_CATALOG.filter((skill) => categoryFilter === "all" || skill.category === categoryFilter).map((skill, index) => {
-              const isFree = skill.access === "free";
-              const isBeginner = skill.access === "beginner";
-              const canDownload =
-                isFree ||
-                tier === "full" ||
-                (isBeginner && tier === "beginner");
-              const badgeClasses = isFree
-                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                : isBeginner
-                  ? "bg-[#e8d5b0]/10 border-[#e8d5b0]/20 text-[#e8d5b0]"
-                  : "bg-white/5 border-white/10 text-white/35";
-              const badgeLabel = isFree
-                ? "Gratuit"
-                : isBeginner
-                  ? "Fondations"
-                  : COFFRE_LABEL;
-              const lockedHref = isBeginner ? beginnerHref : checkoutHref;
-              const lockedLabel = isBeginner
-                ? `Débloquer les fondations - ${FONDATIONS_PRICE}€`
-                : `Prendre ${COFFRE_LABEL} - ${COFFRE_PRICE}€`;
-              const currentArtifact = publication?.artifacts.find((artifact) => artifact.fileName === skill.fileName);
-              const downloadedRecord = downloadRecords[skill.slug];
-              const hasUpdate = Boolean(
-                currentArtifact &&
-                downloadedRecord &&
-                currentArtifact.sha256 !== downloadedRecord.sha256
-              );
-
-              return (
-                <motion.div
-                  id={`skill-${skill.slug}`}
-                  key={skill.slug}
-                  whileHover="hover"
-                  className="animate-reveal flex h-full scroll-mt-24 flex-col"
-                  style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
-                >
-                  <IllustratedCard
-                    title={skill.title}
-                    description={skill.description}
-                    imageSrc={illustrationSrc(`skills-${skill.slug}`)}
-                    visualTone="black-gallery"
-                    locked={!canDownload}
-                  />
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <span className="text-[11px] uppercase tracking-[0.1em] text-white/35">
-                      {SKILL_CATEGORY_LABELS[skill.category]}
-                    </span>
-                    <span
-                      className={`border px-2.5 py-1 text-[11px] font-medium ${badgeClasses}`}
-                    >
-                      {badgeLabel}
-                    </span>
-                  </div>
-                  <div className="mt-3">
-                    {canDownload ? (
-                      <a
-                        href={`/api/skills/${skill.slug}`}
-                        onClick={() => rememberDownload(skill.slug, skill.fileName)}
-                        className="inline-flex items-center justify-center gap-2 w-full bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-all duration-200 hover:bg-[#f0dfc0] shadow-[0_0_24px_rgba(232,213,176,0.18)]"
-                      >
-                        <Download className="w-4 h-4" />
-                        {hasUpdate ? "Mettre à jour" : "Télécharger"}
-                      </a>
-                    ) : lockedHref ? (
-                      <a
-                        href={lockedHref}
-                        className="inline-flex items-center justify-center gap-2 w-full bg-white/[0.06] border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition-all duration-200 hover:bg-white/[0.1] hover:text-white"
-                      >
-                        {lockedLabel}
-                        <ArrowRight className="w-4 h-4" />
-                      </a>
-                    ) : (
-                      <p
-                        role="status"
-                        className="w-full border border-white/10 bg-white/[0.03] px-5 py-3 text-center text-sm text-white/45"
-                      >
-                        Paiement momentanément indisponible.
-                      </p>
-                    )}
-                    {canDownload && hasUpdate ? (
-                      <p role="status" className="mt-2 text-xs leading-relaxed text-[#e8d5b0]/85">Une nouvelle version est disponible. Télécharge-la, puis compare-la à ta copie locale avant de remplacer tes propres adaptations.</p>
-                    ) : null}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
+        <SkillsCatalogClient
+          skills={SKILLS_CATALOG}
+          categoryLabels={SKILL_CATEGORY_LABELS}
+          tier={identity.tier}
+          beginnerHref={beginnerHref}
+          fullHref={checkoutHref}
+          beginnerLockedLabel={`Débloquer les fondations à ${FONDATIONS_PRICE} €`}
+          fullLockedLabel={`Prendre ${COFFRE_LABEL} à ${COFFRE_PRICE} €`}
+          fullBadgeLabel={COFFRE_LABEL}
+        />
 
         <section className="mt-10 md:hidden">
           <details className="group border border-white/[0.1] bg-white/[0.025] px-4 py-3">

@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, ExternalLink, Search, Terminal, Database, BookOpen,
@@ -10,8 +7,8 @@ import {
   BookMarked, Globe, Monitor, Plug,
 } from "lucide-react";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { motion } from "motion/react";
+import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
+import { SourceCategoryFilter } from "./SourceCategoryFilter";
 
 const CATEGORIES = ["Tous", "IA & Automatisation", "Design & UI", "Outils & Infra", "Vente & Business"];
 
@@ -297,12 +294,10 @@ const SOURCES = [
   },
 ];
 
-export default function SourcesPage() {
-  const [activeCategory, setActiveCategory] = useState("Tous");
+export const dynamic = "force-dynamic";
 
-  const filteredSources = SOURCES.filter((source) =>
-    activeCategory === "Tous" ? true : source.type === activeCategory
-  );
+export default async function SourcesPage() {
+  await requirePageAccess("beginner", "/sources");
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
@@ -326,57 +321,13 @@ export default function SourcesPage() {
           Les outils et les cerveaux qui font tourner le système.
         </p>
 
-        {/* Filters */}
-        <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
-          {CATEGORIES.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeCategory === category
-                  ? "bg-[#e8d5b0] text-[#0e0e0f] shadow-[0_0_15px_rgba(232,213,176,0.4)]"
-                  : "bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 hover:text-white/90"
-                }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
       </div>
 
-      {/* Bento Grid */}
-      <div className="max-w-7xl mx-auto px-8 pb-24">
-        {filteredSources.length === 0 ? (
-          <div className="text-center text-white/40 py-12">
-            Aucune ressource trouvée pour cette catégorie.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredSources.map((source, index) => {
-              const Icon = source.icon;
-              const CardWrapper = source.url
-                ? ({ children }: { children: React.ReactNode }) => (
-                    <a
-                      href={source.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group cursor-pointer animate-reveal h-full block"
-                      style={{ animationDelay: `${index * 100}ms`, animationFillMode: "both" }}
-                    >
-                      {children}
-                    </a>
-                  )
-                : ({ children }: { children: React.ReactNode }) => (
-                    <div
-                      className="group animate-reveal h-full"
-                      style={{ animationDelay: `${index * 100}ms`, animationFillMode: "both" }}
-                    >
-                      {children}
-                    </div>
-                  );
-
-              return (
-                <CardWrapper key={source.id}>
-                  <motion.div whileHover="hover" className="h-full">
+      <SourceCategoryFilter
+        categories={CATEGORIES}
+        entries={SOURCES.map((source, index) => {
+          const Icon = source.icon;
+          const card = (
                     <LiquidCard className="p-6 transition-all duration-500 flex flex-col justify-between h-full min-h-[200px]">
                       {/* Glow background on hover */}
                       <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
@@ -384,7 +335,7 @@ export default function SourcesPage() {
                       {/* Top Section */}
                       <div className="flex justify-between items-start relative z-10">
                         <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#e8d5b0] shadow-[0_4px_16px_rgba(0,0,0,0.2)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_16px_rgba(232,213,176,0.15)] transition-all duration-500">
-                          <AnimatedIcon icon={Icon} className="w-6 h-6 drop-shadow-[0_0_8px_rgba(232,213,176,0.5)]" strokeWidth={1.5} />
+                          <Icon className="w-6 h-6 drop-shadow-[0_0_8px_rgba(232,213,176,0.5)]" strokeWidth={1.5} />
                         </div>
                         {source.url && (
                           <ExternalLink className="w-5 h-5 text-white/20 group-hover:text-white/70 transition-colors duration-300" />
@@ -401,13 +352,22 @@ export default function SourcesPage() {
                         </p>
                       </div>
                     </LiquidCard>
-                  </motion.div>
-                </CardWrapper>
-              );
-            })}
-          </div>
-        )}
-      </div>
+          );
+          const className = "group animate-reveal h-full block";
+          const style = { animationDelay: `${index * 100}ms`, animationFillMode: "both" as const };
+          return {
+            id: source.id,
+            category: source.type,
+            content: source.url ? (
+              <a href={source.url} target="_blank" rel="noopener noreferrer" className={`${className} cursor-pointer`} style={style}>
+                {card}
+              </a>
+            ) : (
+              <div className={className} style={style}>{card}</div>
+            ),
+          };
+        })}
+      />
     </main>
   );
 }

@@ -1,10 +1,12 @@
-"use client";
-
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
+import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
 
-export default function FinPage() {
+export const dynamic = "force-dynamic";
+
+export default async function FinPage() {
+  await requirePageAccess("full", "/fin");
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans relative overflow-hidden flex flex-col items-center justify-center p-6 selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
       

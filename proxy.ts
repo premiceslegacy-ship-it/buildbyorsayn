@@ -22,22 +22,19 @@ const SECURITY_HEADERS: Record<string, string> = {
  * pour nettoyer les tokens. Si on retourne un redirect sans ces cookies, le navigateur
  * garde les vieux tokens indéfiniment → l'utilisateur est bloqué définitivement.
  */
-function createRedirectWithCookies(
+export function createRedirectWithCookies(
     url: URL,
     supabaseResponse: NextResponse,
     headers: Record<string, string>
 ): NextResponse {
     const response = NextResponse.redirect(url);
     supabaseResponse.cookies.getAll().forEach((cookie) => {
-        response.cookies.set(cookie.name, cookie.value, {
-            secure: true,
-            sameSite: "lax",
-            path: "/",
-        });
+        response.cookies.set(cookie);
     });
     Object.entries(headers).forEach(([key, value]) => {
         response.headers.set(key, value);
     });
+    response.headers.set("Cache-Control", "no-store");
     return response;
 }
 

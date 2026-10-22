@@ -1,18 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { BLOCS_DATA } from "@/lib/mockData";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
+
+const VALID_BLOC_IDS = new Set(BLOCS_DATA.map((bloc) => Number(bloc.id)));
 
 export async function toggleBlocCompletion(
   blocId: number
 ): Promise<{ success: boolean; completedBlocks: number[] }> {
-  // Input validation: blocId must be a positive integer within expected range
   if (
     typeof blocId !== "number" ||
     !Number.isInteger(blocId) ||
-    blocId < 1 ||
-    blocId > 1000
+    !VALID_BLOC_IDS.has(blocId)
   ) {
     return { success: false, completedBlocks: [] };
   }
@@ -23,29 +24,23 @@ export async function toggleBlocCompletion(
   } = await supabase.auth.getUser();
   if (!user) return { success: false, completedBlocks: [] };
 
-  const supabaseAdmin = createSupabaseAdmin(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  const { data: profile } = await supabaseAdmin
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("completed_blocks")
+    .select("tier")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
+  const tier = profileError ? null : normalizeProfileTier(profile?.tier);
+  const canComplete = tier === "full" || (tier === "beginner" && blocId === 1);
+  if (!canComplete) return { success: false, completedBlocks: [] };
 
-  const current: number[] = profile?.completed_blocks ?? [];
-  const isCompleted = current.includes(blocId);
-  const updated = isCompleted
-    ? current.filter((id) => id !== blocId)
-    : [...current, blocId];
+  const { data, error } = await supabase.rpc("toggle_block_progress", {
+    p_bloc_id: blocId,
+  });
+  const updated = Array.isArray(data)
+    ? data.filter((value): value is number => typeof value === "number" && VALID_BLOC_IDS.has(value))
+    : [];
 
-  const { error } = await supabaseAdmin
-    .from("profiles")
-    .update({ completed_blocks: updated })
-    .eq("id", user.id);
-
-  if (error) return { success: false, completedBlocks: current };
+  if (error || !Array.isArray(data)) return { success: false, completedBlocks: [] };
 
   revalidatePath("/", "layout");
 

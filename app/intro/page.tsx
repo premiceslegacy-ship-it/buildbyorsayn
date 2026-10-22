@@ -1,12 +1,9 @@
-"use client";
-
-import { ArrowRight, Zap, Shield, Target, Brain, TrendingUp } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Zap, Shield, Target, Brain, TrendingUp } from "lucide-react";
+import Link from "next/link";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { motion } from "motion/react";
 import { Logo } from "@/components/Logo";
+import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
 
 const MANIFESTO_POINTS = [
   {
@@ -46,8 +43,10 @@ const CORE_SKILLS = [
   }
 ];
 
-export default function IntroPage() {
-  const router = useRouter();
+export const dynamic = "force-dynamic";
+
+export default async function IntroPage() {
+  await requirePageAccess("full", "/intro");
 
   return (
     <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] font-sans relative selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0] overflow-hidden">
@@ -66,12 +65,7 @@ export default function IntroPage() {
 
         {/* Protocole Zéro, carte d'orientation */}
         <section className="mb-24 pt-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col gap-6"
-          >
+          <div className="flex flex-col gap-6 animate-reveal">
             <div>
               <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-2">Le Protocole Zéro</p>
               <h2 className="text-2xl font-medium tracking-tight text-[#f0ede8]">Tu es sur quelle phase ?</h2>
@@ -116,16 +110,12 @@ export default function IntroPage() {
                 </LiquidCard>
               ))}
             </div>
-          </motion.div>
+          </div>
         </section>
 
         {/* Hero Section */}
         <section className="min-h-[60vh] flex flex-col justify-center mb-24">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          >
+          <div className="animate-reveal">
             <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-[#f0ede8] to-white/40 leading-[1.05]">
               Avant de commencer.
             </h1>
@@ -133,42 +123,33 @@ export default function IntroPage() {
             <p className="text-xl md:text-2xl text-white/50 max-w-3xl leading-relaxed font-light">
               Ce système a été construit à partir d&apos;une pratique réelle, des projets livrés, des erreurs corrigées. Tout ce qui est ici est actionnable.
             </p>
-          </motion.div>
+          </div>
         </section>
 
         {/* Manifesto Section */}
         <section className="py-24 border-t border-white/10">
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:w-1/3"
-            >
+            <div className="lg:w-1/3 animate-reveal">
               <h2 className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-4 sticky top-32">
                 Les règles du jeu
               </h2>
               <p className="text-3xl font-medium tracking-tight leading-snug sticky top-44">
                 Construire pour durer, déployer pour itérer.
               </p>
-            </motion.div>
+            </div>
             
             <div className="lg:w-2/3 space-y-16">
               {MANIFESTO_POINTS.map((point, index) => (
-                <motion.div 
+                <div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="space-y-4"
+                  className="space-y-4 animate-reveal"
+                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: "both" }}
                 >
                   <h3 className="text-2xl md:text-3xl font-medium tracking-tight text-[#f0ede8]">{point.title}</h3>
                   <p className="text-lg text-white/50 leading-relaxed">
                     {point.description}
                   </p>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -176,62 +157,45 @@ export default function IntroPage() {
 
         {/* Core Principles Grid */}
         <section className="py-24">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-16"
-          >
+          <div className="mb-16 animate-reveal">
             <h2 className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-4">
               Mindset
             </h2>
             <p className="text-3xl font-medium tracking-tight leading-snug">
               L'état d'esprit pour réussir.
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {CORE_SKILLS.map((skill, index) => (
-              <motion.div
+            {CORE_SKILLS.map(({ icon: Icon, title, description }, index) => (
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                whileHover="hover"
+                className="animate-reveal"
+                style={{ animationDelay: `${index * 100}ms`, animationFillMode: "both" }}
               >
                 <LiquidCard className="p-8 group hover:bg-white/[0.04] transition-colors duration-500 h-full">
                   <div className="w-12 h-12 mb-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.1)] transition-all duration-500">
-                    <AnimatedIcon icon={skill.icon} className="w-5 h-5 text-[#e8d5b0]" />
+                    <Icon className="w-5 h-5 text-[#e8d5b0]" />
                   </div>
-                  <h4 className="text-xl font-medium mb-3 text-[#f0ede8]">{skill.title}</h4>
+                  <h4 className="text-xl font-medium mb-3 text-[#f0ede8]">{title}</h4>
                   <p className="text-white/50 leading-relaxed text-sm">
-                    {skill.description}
+                    {description}
                   </p>
                 </LiquidCard>
-              </motion.div>
+              </div>
             ))}
           </div>
         </section>
 
         {/* Call to Action */}
         <section className="py-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            whileHover="hover"
-          >
-            <LiquidCard 
-              className="p-8 sm:p-12 md:p-20 flex flex-col items-center text-center relative overflow-hidden group cursor-pointer"
-              onClick={() => router.push('/dashboard')}
-            >
+          <div className="animate-reveal">
+            <Link href="/dashboard" className="block group">
+            <LiquidCard className="p-8 sm:p-12 md:p-20 flex flex-col items-center text-center relative overflow-hidden cursor-pointer">
               
               <div className="relative z-10 max-w-2xl mx-auto">
                 <div className="w-16 h-16 mx-auto mb-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  <AnimatedIcon icon={TrendingUp} className="w-8 h-8 text-[#e8d5b0]" />
+                  <TrendingUp className="w-8 h-8 text-[#e8d5b0]" />
                 </div>
                 
                 <h2 className="text-3xl md:text-5xl font-semibold tracking-tight mb-6 text-[#f0ede8]">
@@ -246,7 +210,8 @@ export default function IntroPage() {
                 </LiquidButton>
               </div>
             </LiquidCard>
-          </motion.div>
+            </Link>
+          </div>
         </section>
 
       </div>

@@ -1,13 +1,11 @@
-"use client";
-
-import { Check, Copy, Download, ExternalLink, FolderOpen, RefreshCw, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { Copy, Download, ExternalLink, FolderOpen, RefreshCw, ShieldCheck } from "lucide-react";
 import {
   BUILD_SYNC_INTERVAL_LABEL,
   BUILD_SYNC_TARGETS,
   buildSyncInstallCommands,
   buildSyncOrigin,
 } from "@/lib/buildSync/installCommands";
+import { CopyBuildSyncCommand } from "@/components/CopyBuildSyncCommand";
 
 const COMMANDS = buildSyncInstallCommands(buildSyncOrigin(process.env.NEXT_PUBLIC_APP_URL));
 
@@ -19,8 +17,6 @@ const EXPERIENCE_STEPS = [
 ] as const;
 
 export function BuildSyncInstall() {
-  const [copied, setCopied] = useState<string | null>(null);
-
   return (
     <section aria-labelledby="build-sync-title" className="mb-10 overflow-hidden border border-[#e8d5b0]/20 bg-[#e8d5b0]/[0.045] p-4 sm:p-6">
       <div className="grid min-w-0 gap-7 lg:grid-cols-[1fr_1.1fr] lg:items-center">
@@ -58,19 +54,7 @@ export function BuildSyncInstall() {
               <p className="mb-1.5 text-xs uppercase tracking-[0.14em] text-white/60">{label}</p>
               <div className="flex min-w-0 items-stretch border border-white/10 bg-black/35">
                 <pre className="min-w-0 flex-1 overflow-x-auto p-3 text-xs leading-5 text-[#e8d5b0]/85 sm:text-xs"><code>{command}</code></pre>
-                <button
-                  type="button"
-                  aria-label={copied === label ? `Commande ${label} copiée` : `Copier la commande ${label}`}
-                  title={copied === label ? "Commande copiée" : "Copier la commande"}
-                  onClick={() => {
-                    void navigator.clipboard.writeText(command);
-                    setCopied(label);
-                    window.setTimeout(() => setCopied(null), 2_000);
-                  }}
-                  className="flex size-11 shrink-0 items-center justify-center border-l border-white/10 bg-white/[0.06] text-white/55 transition hover:text-[#e8d5b0]"
-                >
-                  {copied === label ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                </button>
+                <CopyBuildSyncCommand label={`la commande ${label}`} command={command} />
               </div>
             </div>
           ))}

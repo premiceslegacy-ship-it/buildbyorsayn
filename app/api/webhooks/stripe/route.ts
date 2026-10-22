@@ -219,7 +219,7 @@ function canSendWelcomeEmail() {
 
 async function refundRejectedCheckout(
     session: Stripe.Checkout.Session,
-    reason: "missing_terms_consent" | "unknown_price",
+    reason: "missing_customer_identity" | "missing_terms_consent" | "unknown_price",
     metadata: Record<string, string> = {},
 ) {
     const intent = paymentIntentId(session.payment_intent);
@@ -453,6 +453,17 @@ export async function POST(req: NextRequest) {
         }
 
         let userId: string | null = null;
+
+        if (!customerEmail) {
+            console.error("[Webhook] Initial checkout has no resolvable customer identity; refunding");
+            const refund = await refundRejectedCheckout(session, "missing_customer_identity", {
+                observed_client_reference: isUuid(referenceId) ? "valid_uuid_without_email" : "missing_or_invalid",
+            });
+            if (refund.outcome !== "refunded") {
+                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+            }
+            return NextResponse.json({ received: true }, { status: 200 });
+        }
 
         // Pour les achats initiaux, la référence reste un indice lié à l'e-mail du profil.
         if (referenceId) {

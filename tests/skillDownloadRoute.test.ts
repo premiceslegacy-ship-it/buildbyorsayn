@@ -13,9 +13,10 @@ test('download maps the current product film and Apple ZIPs with production deni
  });
 
  test('skills page remembers a downloaded snapshot and offers an explicit update without overwriting local work', () => {
- const source=readFileSync(new URL('../app/skills/page.tsx',import.meta.url),'utf8');
- assert.match(source,/build-skill-downloads/);
- assert.match(source,/Mettre à jour/);
- assert.match(source,/copie locale/);
- assert.match(source,/n'écrase jamais tes adaptations/);
+ const page=readFileSync(new URL('../app/skills/page.tsx',import.meta.url),'utf8');
+ const client=readFileSync(new URL('../app/skills/SkillsCatalogClient.tsx',import.meta.url),'utf8');
+ assert.match(client,/build-skill-downloads/);
+ assert.match(client,/Mettre à jour/);
+ assert.match(client,/copie locale/);
+ assert.match(page,/n'écrase jamais tes adaptations/);
  });

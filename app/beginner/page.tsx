@@ -1,15 +1,16 @@
-"use client";
-
+import Image from "next/image";
 import { NavBar } from "@/components/NavBar";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { IllustratedCard } from "@/components/ui/illustrated-card";
 import { IllustratedCardGrid } from "@/components/ui/illustrated-card-grid";
 import { illustrationSrc } from "@/lib/illustrations";
-import { useBeginnerAuth } from "./useBeginnerAuth";
+import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
 import { SECTIONS, ANGLE_MORT } from "./sections.data";
 
-export default function BeginnerPage() {
-  const { tier, displayEmail, isAdmin } = useBeginnerAuth();
+export const dynamic = "force-dynamic";
+
+export default async function BeginnerPage() {
+  const identity = await requirePageAccess("beginner", "/beginner");
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans">
@@ -18,21 +19,23 @@ export default function BeginnerPage() {
       {/* Nav */}
       <NavBar
         activeLink="beginner"
-        tier={tier}
-        isAdmin={isAdmin}
-        displayEmail={displayEmail}
-        initials={displayEmail ? displayEmail.substring(0, 2).toUpperCase() : "?"}
+        tier={identity.tier}
+        isAdmin={identity.isAdmin}
+        displayName={identity.displayName}
+        displayEmail={identity.displayEmail}
+        initials={identity.initials}
       />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pb-32 relative z-10">
         <div className="pt-6 mb-10 flex flex-col items-center text-center">
-          <img
+          <Image
             src="/brand-logos/fondations-tree-mark.png"
             alt=""
             aria-hidden="true"
+            width={1036}
+            height={1154}
             className="h-40 w-auto sm:h-56 object-contain mb-6"
-            loading="eager"
-            decoding="async"
+            priority
             draggable={false}
           />
           <p className="text-xs uppercase tracking-[0.15em] text-[#e8d5b0]/60 font-semibold">Fondations</p>
