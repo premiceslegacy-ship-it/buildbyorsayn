@@ -85,7 +85,7 @@ export const PROCESSORS: readonly Processor[] = [
     hosts: ["mux.com", "litix.io"],
     evidence: [
       { file: "components/lessons/LessonPlayer.tsx", needle: "MuxPlayer" },
-      { file: "next.config.mjs", needle: "litix.io" },
+      { file: "lib/csp.ts", needle: "litix.io" },
     ],
   },
   {

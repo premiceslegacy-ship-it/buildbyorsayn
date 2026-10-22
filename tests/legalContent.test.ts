@@ -111,7 +111,9 @@ test("tout service externe appelé par le code ou autorisé par la politique de 
     for (const match of source.matchAll(/fetch\(\s*["'`]https?:\/\/([a-z0-9.-]+)/gi)) add(match[1], file);
     for (const match of source.matchAll(/\b(?:URL|ENDPOINT|BASE|HOST)[A-Za-z_]*\s*(?::\s*string\s*)?=\s*["'`]https?:\/\/([a-z0-9.-]+)/g)) add(match[1], file);
   }
-  for (const match of read("next.config.mjs").matchAll(/(?:https?|wss):\/\/(?:\*\.)?([a-z0-9.-]+\.[a-z]{2,})/gi)) add(match[1], "next.config.mjs");
+  for (const configFile of ["next.config.mjs", "lib/csp.ts"]) {
+    for (const match of read(configFile).matchAll(/(?:https?|wss):\/\/(?:\*\.)?([a-z0-9.-]+\.[a-z]{2,})/gi)) add(match[1], configFile);
+  }
 
   assert.ok(hosts.size >= 8, "le balayage doit trouver les intégrations connues");
   const unknown = [...hosts].filter(([host]) => !processorHostCovered(host));

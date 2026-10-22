@@ -2,49 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-// Allowed redirect paths after auth callback (prevents open redirect)
-const ALLOWED_REDIRECT_PREFIXES = [
-  "/dashboard",
-  "/update-password",
-  "/blocs",
-  "/sources",
-  "/fin",
-  "/intro",
-  "/admin",
-  "/checkout",
-];
-
-function sanitizeRedirectPath(rawPath: string): string {
-  // Default fallback
-  const fallback = "/dashboard";
-
-  // Block protocol-relative URLs (//evil.com), absolute URLs (http://), and empty strings
-  if (
-    !rawPath ||
-    !rawPath.startsWith("/") ||
-    rawPath.startsWith("//") ||
-    rawPath.includes("://") ||
-    rawPath.includes("\\")
-  ) {
-    return fallback;
-  }
-
-  // Only allow paths that match our known route prefixes
-  const isAllowed = ALLOWED_REDIRECT_PREFIXES.some((prefix) =>
-    rawPath.startsWith(prefix)
-  );
-
-  return isAllowed ? rawPath : fallback;
-}
+import { resolveCallbackRedirect } from "@/lib/auth/callbackRedirect";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const rawNext = searchParams.get("next") ?? "/dashboard";
 
-  // Sanitize the redirect target to prevent open redirect attacks
-  const next = sanitizeRedirectPath(rawNext);
+  // Chemin interne uniquement : empêche la redirection ouverte après l'authentification.
+  const next = resolveCallbackRedirect(searchParams.get("next"));
 
   if (code) {
     const cookieStore = await cookies();
