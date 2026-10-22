@@ -27,6 +27,9 @@ export function Section2() {
         <p>
           Un LLM (<em>Large Language Model</em>, ou grand modèle de langage) produit une suite de texte probable à partir de ce qu'il reçoit. Il peut expliquer, rédiger ou proposer du code. Il ne devient ni une base de données fiable ni le responsable du résultat. Une réponse convaincante reste à vérifier.
         </p>
+        <p>
+          Demande les horaires d'une boulangerie sans lui donner de fichier : le modèle invente des horaires plausibles. Donne-lui la fiche de la boutique : il cite les bons horaires et tu peux vérifier d'où ils viennent.
+        </p>
         <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-white/10 py-5">
           <ToolMark name="Claude" src="/brand-logos/claude.svg" />
           <ToolMark name="ChatGPT" src="/brand-logos/chatgpt.svg" />
@@ -38,13 +41,16 @@ export function Section2() {
           <div className="grid gap-3 py-4 md:grid-cols-[9rem_1fr]"><strong className="text-sm text-[#e8d5b0]">Le projet</strong><p className="text-sm leading-relaxed text-white/60">Un dossier de connaissances rassemble les règles et les décisions stables. Il évite de tout répéter, à condition de dater les informations et de retirer les versions devenues fausses.</p></div>
         </div>
         <FoundationEditorialNote label="À faire maintenant">
-          Ouvre une nouvelle conversation avec un seul fichier utile, la tâche, le format de sortie et un critère d'acceptation. Compare le résultat à une demande sans contexte. Si le modèle invente, ajoute la source manquante au lieu d'allonger le rôle.
+          Ouvre une nouvelle conversation avec un seul fichier utile, la tâche, le format de sortie et un critère d'acceptation. Compare le résultat à une demande sans contexte. Si le modèle invente, ajoute la source manquante au lieu d'allonger le rôle. Compte 15 minutes. Tu repars avec deux réponses comparées.
         </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 2" title="L'analogie de l'API">
         <p>
           Une API, ou interface de programmation, ressemble au comptoir d'un restaurant. Ton application envoie une demande structurée vers une adresse prévue. Le service vérifie l'accès, exécute l'opération et renvoie une réponse avec un statut. Tu dois connaître le format attendu, les délais, les erreurs, le coût éventuel et les données qui quittent ton système.
+        </p>
+        <p>
+          Côté business, prends le formulaire de réservation d'un gîte. Quand le client valide ses dates, le site appelle le service de paiement par son API. Le service répond « accepté » ou « refusé », et le site affiche la bonne suite.
         </p>
         <ApiFlowDiagram />
         <p>
@@ -61,13 +67,16 @@ export function Section2() {
           <div className="border-t border-emerald-500/25 pt-4"><p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300/80">Rôle et méthode</p><p className="font-mono text-[11px] leading-relaxed text-white/50">Lis le brief et les références. Propose l'en-tête. Garde les textes fournis. Vérifie le mobile et les liens.</p><p className="mt-3 text-xs leading-relaxed text-white/35">Le travail et son contrôle sont explicites.</p></div>
         </div>
         <FoundationEditorialNote label="À faire maintenant">
-          Réécris un prompt que tu utilises souvent avec six éléments : entrée, objectif, source, périmètre, sortie et contrôle. Conserve ce contrat dans le projet si tu comptes le réutiliser.
+          Réécris un prompt que tu utilises souvent avec six éléments : entrée, objectif, source, périmètre, sortie et contrôle. Conserve ce contrat dans le projet si tu comptes le réutiliser. Compte 20 minutes. Tu repars avec un prompt réutilisable.
         </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 4" title="De l'assistant à l'agent">
         <p>
           Un assistant répond dans une conversation. Un agent peut aussi lire un dossier, appeler un outil, modifier un objet et contrôler une sortie. Cette capacité augmente le risque avec le périmètre. Un agent qui prépare un email peut rester sans droit d'envoi. Un agent qui lit un CRM ne reçoit pas le droit de supprimer des contacts.
+        </p>
+        <p>
+          Exemple : un agent lit les nouveaux avis d'un restaurant et prépare une réponse pour chacun. Il n'a pas le droit de publier. Le gérant relit, ajuste le ton et publie lui-même.
         </p>
         <div className="divide-y divide-white/10 border-y border-white/10">
           {[
@@ -111,7 +120,7 @@ export function Section2() {
           ))}
         </div>
         <FoundationEditorialNote label="Comparer avant de choisir">
-          Prends une tâche courte et cinq entrées fixes. Fais-les passer par les options envisagées, puis compare exactitude, format, utilité et dérive. Le meilleur choix est celui qui tient ton cas avec le moins de correction, pas celui dont le nom circule le plus.
+          Prends une tâche courte et cinq entrées fixes. Fais-les passer par les options envisagées, puis compare exactitude, format, utilité et dérive. Le meilleur choix est celui qui tient ton cas avec le moins de correction, pas celui dont le nom circule le plus. Par exemple, passe cinq demandes de devis fictives d'un électricien dans deux modèles et compte les erreurs de chacun.
         </FoundationEditorialNote>
         <FoundationEditorialNote label="Les responsabilités restent séparées">
           La compétence décrit le travail. La connexion détient l'accès. Le journal conserve les appels et les résultats utiles. La personne autorise l'action externe. Dessine ces quatre cases pour un seul flux avant d'ajouter un outil ou un profil.

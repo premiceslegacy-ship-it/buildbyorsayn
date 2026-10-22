@@ -66,6 +66,9 @@ export function SectionMindset() {
         <p>
           Commence par un groupe cohérent qui partage une situation observable. Utilise le même message assez longtemps pour comprendre les réactions, puis change une seule variable. Si tu modifies en même temps la cible, l'offre et le canal, tu obtiens du mouvement sans savoir ce qui a produit le résultat.
         </p>
+        <p>
+          Exemple fictif : tu envoies le même message à 30 salons de coiffure de ta ville sur deux semaines. Tu obtiens 3 réponses et 1 appel. Pour le test suivant, tu changes une seule chose, par exemple la première phrase, et tu gardes la cible et le canal.
+        </p>
         <div className="border-y border-white/10 py-4">
           <p className="text-[#e8d5b0]/90">
             Quelques silences ne prouvent pas l'absence de marché. Ils demandent un diagnostic : la bonne personne a-t-elle reçu le message, au bon moment, avec une situation et une prochaine étape compréhensibles ? Note les réponses, les objections et les absences de réponse avant d'élargir.
@@ -98,7 +101,7 @@ export function SectionMindset() {
       {/* Synthèse */}
       <SectionReveal className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 px-6 py-5">
         <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
-          À faire maintenant : écris une croyance qui bloque ton projet. Reformule-la en une phrase vérifiable. Choisis un test que tu peux arrêter facilement, un signal observable et une date de décision. Après le test, conserve la conclusion, les faits et la prochaine action dans ton dossier de projet.
+          À faire maintenant : écris une croyance qui bloque ton projet. Reformule-la en une phrase vérifiable. Choisis un test que tu peux arrêter facilement, un signal observable et une date de décision. Après le test, conserve la conclusion, les faits et la prochaine action dans ton dossier de projet. Compte 20 minutes ce soir. Tu repars avec une hypothèse, un test et une date.
         </p>
       </SectionReveal>
     </div>

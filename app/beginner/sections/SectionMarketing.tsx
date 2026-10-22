@@ -62,11 +62,17 @@ export function SectionMarketing() {
         <p>
           Fais correspondre l'engagement demandé à l'étape. Un post de découverte peut proposer de regarder un exemple. Une démonstration peut proposer un diagnostic. Une page d'offre peut présenter l'achat quand le prix, les conditions et le livrable sont déjà clairs.
         </p>
+        <p>
+          Exemple pour un magasin de vélos. Le post raconte la crevaison du lundi matin sur le trajet du travail. La vidéo montre ce que contient une révision complète. La page de l'offre révision donne le délai, ce qui est inclus et comment réserver.
+        </p>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 3" title="Observer avant d'imiter">
         <p>
-          Une bibliothèque publicitaire montre des annonces diffusées. Un centre créatif, un post public, une discussion communautaire ou une vidéo longue montre aussi des choix de message. Aucun de ces supports ne révèle à lui seul la rentabilité, la qualité des demandes ou les conditions de production.
+          Une bibliothèque publicitaire montre des annonces diffusées. C'est un outil public qui liste les annonces actives d'une page, par exemple celle de Meta. Un centre créatif, un post public, une discussion communautaire ou une vidéo longue montre aussi des choix de message. Aucun de ces supports ne révèle à lui seul la rentabilité, la qualité des demandes ou les conditions de production.
+        </p>
+        <p>
+          Exemple : ouvre la bibliothèque publicitaire de Meta et relève 5 annonces de salles de sport de ta ville. Note pour chacune la scène montrée, l'offre et l'action demandée. Compte 30 minutes. Tu repars avec un tableau de cinq lignes à comparer.
         </p>
         <p>
           Étudie donc la mécanique au lieu de recopier la surface. Capture le lien, la date, le public apparent et les six champs ci-dessous. Reformule ensuite le principe sur une page blanche avec les faits de ton offre. Une phrase, une promesse ou un exemple reconnaissable reste chez sa source.
@@ -94,6 +100,9 @@ export function SectionMarketing() {
         </div>
         <p>
           Avant de publier, choisis un signal lié à ton objectif : réponse qualifiée, demande d'exemple, conversation engagée, devis demandé ou objection nouvelle. Ajoute un signal négatif comme une mauvaise qualification ou une confusion répétée. Si les réactions ne progressent pas, reviens à la scène, à l'offre ou à la preuve avant d'augmenter le volume.
+        </p>
+        <p>
+          Exemple fictif : un serrurier publie 10 posts en 3 semaines sur deux angles, la porte claquée et la serrure changée après un déménagement. Le premier angle produit 4 réponses qualifiées, le second aucune. Il garde le premier et teste une nouvelle preuve.
         </p>
       </FoundationChapter>
 
@@ -142,7 +151,7 @@ N'invente aucun fait, chiffre, témoignage, urgence ou résultat. Termine par la
       </FoundationChapter>
 
       <FoundationEditorialNote label="À faire maintenant" className="mt-14 mb-4">
-        Choisis une conversation ou une démonstration que tu peux utiliser. Remplis les six champs d'observation, écris une idée directrice et décline-la dans un format. Chaque scène, preuve, structure et contrôle validés rejoignent un capital réutilisable que tu peux adapter au prochain contenu au lieu de repartir de zéro. Avant de publier, note le signal attendu, le signal négatif et la condition qui te fera arrêter ou réviser.
+        Choisis une conversation ou une démonstration que tu peux utiliser. Remplis les six champs d'observation, écris une idée directrice et décline-la dans un format. Chaque scène, preuve, structure et contrôle validés rejoignent un capital réutilisable que tu peux adapter au prochain contenu au lieu de repartir de zéro. Avant de publier, note le signal attendu, le signal négatif et la condition qui te fera arrêter ou réviser. Compte 45 minutes. Tu repars avec un contenu prêt à publier et ses deux signaux écrits.
       </FoundationEditorialNote>
     </div>
   );

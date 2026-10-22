@@ -118,11 +118,11 @@ function MakeHermesUseful() {
       <header className="max-w-3xl">
         <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">BLOC 01 : INSTALLER ET CADRER</p>
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Prépare un premier workflow que tu peux arrêter.</h1>
-        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">L'installation fournit un moteur. Ta mission, tes sources, tes droits et ta preuve de fin transforment ce moteur en aide de travail.</p>
+        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">L'installation fournit un moteur. Ta mission, tes sources, tes droits et ta preuve de fin transforment ce moteur en aide de travail. Compte 25 minutes ce soir : tu repars avec trois fiches vérifiées et un contrat de mission que tu peux réutiliser.</p>
       </header>
 
       <section className="mt-14">
-        <SectionTitle eyebrow="VÉRIFIER L'ENVIRONNEMENT" title="Commence par savoir ce qui tourne réellement." intro="Utilise le paquet Desktop officiel sur macOS ou Windows, ou l'installation en ligne de commande documentée pour ton système. Recharge le terminal, puis contrôle la version, les dépendances et le profil actif avant d'ajouter un outil." />
+        <SectionTitle eyebrow="VÉRIFIER L'ENVIRONNEMENT" title="Commence par savoir ce qui tourne réellement." intro="Utilise le paquet Desktop officiel sur macOS ou Windows, ou l'installation en ligne de commande documentée pour ton système. Recharge le terminal, puis contrôle la version, les dépendances et le profil actif avant d'ajouter un outil. Un profil est une configuration nommée qui regroupe le modèle, les outils, la mémoire et les réglages d'un usage." />
         <pre className="mt-7 overflow-x-auto border border-white/[0.1] bg-black/25 p-4 text-xs leading-relaxed text-white/70"><code>{`hermes --version
 hermes doctor
 hermes status --all`}</code></pre>
@@ -135,12 +135,12 @@ hermes status --all`}</code></pre>
           <Step number="01" title="Configurer le modèle"><code className="text-white/75">hermes model</code> ajoute le fournisseur, l'authentification et le modèle. Le sélecteur lancé dans une conversation sert seulement aux fournisseurs déjà configurés.</Step>
           <Step number="02" title="Réduire les outils"><code className="text-white/75">hermes tools</code> permet d'activer les catégories utiles. Un workflow de synthèse n'a besoin ni d'une publication, ni d'un accès d'administration.</Step>
           <Step number="03" title="Définir la sortie">Écris le fichier, la fiche ou la décision attendue. Ajoute les sources à citer, les inconnues à garder et les erreurs qui doivent arrêter le travail.</Step>
-          <Step number="04" title="Préparer la reprise">Indique l'état durable, les objets touchés, la dernière vérification et la prochaine action. Une nouvelle session doit pouvoir reprendre sans répéter un effet.</Step>
+          <Step number="04" title="Préparer la reprise">Indique l'état durable, c'est-à-dire la note qui survit à la fin de la session, les objets touchés, la dernière vérification et la prochaine action. Une nouvelle session doit pouvoir reprendre sans répéter un effet.</Step>
         </div>
       </section>
 
       <section className="mt-16">
-        <SectionTitle eyebrow="PREMIER WORKFLOW" title="Traite trois dossiers fictifs en lecture seule." intro="Crée un petit dossier avec deux cas complets et un cas qui contient une pièce manquante. N'utilise aucun secret, aucune donnée client et aucune destination externe." />
+        <SectionTitle eyebrow="PREMIER WORKFLOW" title="Traite trois dossiers fictifs en lecture seule." intro="Crée un petit dossier avec deux cas complets et un cas qui contient une pièce manquante. Par exemple, trois demandes de devis d'un paysagiste : deux avec la surface et les photos du jardin, une sans surface. Une boutique peut prendre trois demandes de retour, un cabinet trois demandes de rendez-vous. N'utilise aucun secret, aucune donnée client et aucune destination externe." />
         <div className="mt-8 border-y border-white/[0.1] divide-y divide-white/[0.1]">
           {[
             ["Mission", "Préparer une fiche par dossier et signaler ce qui manque avant toute décision."],
@@ -191,12 +191,12 @@ function ThreeReusableProjects() {
       <header className="max-w-3xl">
         <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">BLOC 02 : PRATIQUER SUR TROIS CAS</p>
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Construis trois workflows que tu peux refaire.</h1>
-        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">Chaque cas possède une entrée, une sortie, une limite, une preuve et une reprise. Tu gardes la méthode seulement après avoir contrôlé le résultat.</p>
+        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">Chaque cas possède une entrée, une sortie, une limite, une preuve et une reprise. Tu gardes la méthode seulement après avoir contrôlé le résultat. Ce soir, choisis un seul des trois cas et compte 35 minutes : tu repars avec une recette écrite que tu pourras relancer la semaine prochaine.</p>
       </header>
 
       <section className="mt-14">
         <Case number="01" title="Préparer un carrousel fidèle à une idée">
-          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Une scène réelle, une idée principale, une preuve autorisée, une limite et la destination du contenu. Le brief sépare les faits, les hypothèses et les chiffres qui demandent une source.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Une scène réelle, une idée principale, une preuve autorisée, une limite et la destination du contenu. Exemple : un carrousel de six écrans pour un cabinet de kinésithérapie sur les douleurs de dos au bureau, qui renvoie vers la page de prise de rendez-vous. Le brief sépare les faits, les hypothèses et les chiffres qui demandent une source.</p>
           <p><strong className="font-semibold text-[#f0ede8]">Exécution.</strong> L'agent propose une route écran par écran. Chaque écran porte une idée utile à la compréhension. Le texte reste lisible sur téléphone et le geste final correspond à ce que la destination délivre.</p>
           <p><strong className="font-semibold text-[#f0ede8]">Limite et preuve.</strong> Il ne publie rien. Tu relis le rendu dans son format final, les chiffres, les sources, la promesse et le lien. Après diffusion autorisée, tu compares des signaux de qualité à des contenus comparables.</p>
           <p><strong className="font-semibold text-[#f0ede8]">Reprise.</strong> La passation garde l'idée, le dernier écran validé, les points refusés et la prochaine correction. Une interruption ne force pas à reconstruire la route.</p>
@@ -204,9 +204,9 @@ function ThreeReusableProjects() {
         </Case>
 
         <Case number="02" title="Préparer l'amélioration d'une page">
-          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Une URL, une période, les requêtes et pages autorisées, ainsi que la décision visée. La Search Console indique des impressions et des clics. Elle ne révèle pas seule l'intention exacte de chaque personne.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Exécution.</strong> L'agent compare les questions visibles, le contenu présent et les passages manquants. Il propose une structure, des exemples ou une FAQ dans un brouillon séparé.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Limite et preuve.</strong> Il ne change ni la page publiée, ni la mesure. Tu contrôles les sources, le diff et la lisibilité. La preuve porte d'abord sur la qualité du brouillon, puis sur l'effet observé après une publication décidée par le propriétaire.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Une URL, une période, les requêtes et pages autorisées, ainsi que la décision visée. Exemple : la page « tarifs » d&apos;un garage sur les 28 derniers jours. La Search Console, l&apos;outil gratuit de Google qui montre les recherches menant au site, indique des impressions et des clics. Elle ne révèle pas seule l&apos;intention exacte de chaque personne.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Exécution.</strong> L'agent compare les questions visibles, le contenu présent et les passages manquants. Il propose une structure, des exemples ou une FAQ dans un brouillon séparé. Pour le garage, cela peut être une réponse claire à « combien coûte une vidange » si le prix réel est fourni par le propriétaire.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Limite et preuve.</strong> Il ne change ni la page publiée, ni la mesure. Tu contrôles les sources, le diff, c&apos;est-à-dire la liste exacte des lignes modifiées, et la lisibilité. La preuve porte d'abord sur la qualité du brouillon, puis sur l'effet observé après une publication décidée par le propriétaire.</p>
           <p><strong className="font-semibold text-[#f0ede8]">Reprise.</strong> Le dossier garde l'URL, la version, les données lues, la proposition, l'approbation et la date de prochaine lecture.</p>
           <Capitalise><p>Conserve les intentions, structures, preuves et règles de qualité qui ont survécu à la revue. Retire les conclusions fondées sur une seule variation.</p></Capitalise>
         </Case>
@@ -271,11 +271,11 @@ function TregInHermes() {
           <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold">BLOC 03 : CONNECTER SANS TOUT OUVRIR</p>
         </div>
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Ajoute un outil externe par MCP.</h1>
-        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">MCP expose des outils à l'agent. Tu contrôles encore le serveur, l'authentification, les outils visibles, le coût, les actions sensibles et la preuve de l'effet.</p>
+        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">MCP (Model Context Protocol) est le protocole qui branche un service externe sur l'agent et lui expose des outils. Tu contrôles encore le serveur, l'authentification, les outils visibles, le coût, les actions sensibles et la preuve de l'effet.</p>
       </header>
 
       <section className="mt-14">
-        <SectionTitle eyebrow="AVANT LA CONNEXION" title="Écris le travail, puis ouvre une seule capacité." intro="Choisis une question métier, une source, une sortie, un plafond et un propriétaire. Une connexion réussie prouve seulement que le serveur répond." />
+        <SectionTitle eyebrow="AVANT LA CONNEXION" title="Écris le travail, puis ouvre une seule capacité." intro="Choisis une question métier, une source, une sortie, un plafond et un propriétaire. Exemple : un cabinet comptable veut une fiche publique sur dix entreprises de sa zone avant de les contacter. La sortie est un tableau, le plafond de dépense est fixé à l'avance et l'associé décide de chaque contact. Une connexion réussie prouve seulement que le serveur répond." />
         <div className="mt-8 grid gap-x-6 gap-y-8 md:grid-cols-2">
           <Step number="01" title="Nommer l'opération">Écris l'action exacte, les paramètres et le résultat attendu. « Utiliser le marketing » reste trop vague.</Step>
           <Step number="02" title="Inspecter le serveur">Lis l'URL ou la commande locale, la source du paquet, le mode d'authentification et les outils exposés.</Step>
@@ -291,6 +291,7 @@ hermes mcp login service
 hermes mcp test service
 hermes mcp configure service`}</code></pre>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/50">Après le filtre, ouvre une nouvelle session ou recharge MCP. Contrôle la liste réelle des outils. Un nom rassurant ou une description fournie par le serveur ne remplace pas ce contrôle.</p>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/50">À faire ce soir, en 30 minutes : écris l&apos;opération exacte que tu veux confier, ajoute un serveur MCP en lecture seule, filtre ses outils et recopie la liste réellement visible. Tu repars avec un reçu de connexion daté, sans aucun appel payant.</p>
       </section>
 
       <section className="mt-16">
@@ -298,7 +299,7 @@ hermes mcp configure service`}</code></pre>
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <article className="border border-white/[0.1] p-5 sm:p-6">
             <h3 className="text-lg font-semibold tracking-tight">Connexion documentée</h3>
-            <p className="mt-3 text-sm leading-relaxed text-white/55">Le serveur distant utilise OAuth ou un jeton d'organisation. Préfère OAuth pour une connexion interactive et ne colle jamais un secret dans une conversation.</p>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">Le serveur distant utilise OAuth ou un jeton d'organisation. OAuth est une connexion par autorisation : tu valides l&apos;accès dans ton navigateur sans copier de mot de passe. Préfère OAuth pour une connexion interactive et ne colle jamais un secret dans une conversation.</p>
             <pre className="mt-5 overflow-x-auto border border-white/[0.1] bg-black/25 p-4 text-xs leading-relaxed text-white/70"><code>{`hermes mcp add treg --url https://treg.to/mcp/ --auth oauth
 hermes mcp login treg
 hermes mcp test treg

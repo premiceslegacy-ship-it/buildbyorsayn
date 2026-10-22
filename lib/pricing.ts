@@ -11,7 +11,7 @@ export function formatEuro(amount: number): string {
 }
 export const FONDATIONS_LABEL = "Fondations";
 
-export const STRIPE_FULL_CHECKOUT_LINK = "https://buy.stripe.com/bJeaEYe46bxT00I0PC5AQ0c";
+export const STRIPE_FULL_CHECKOUT_LINK = "https://buy.stripe.com/aFa00k6BE31n00IfKw5AQ0g";
 
 export function sanitizeStripeCheckoutUrl(value: string | null | undefined): string | null {
   if (!value) return null;

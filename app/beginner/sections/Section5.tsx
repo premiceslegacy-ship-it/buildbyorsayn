@@ -10,10 +10,10 @@ export function Section5({ upgradeUrl, isFullUser }: { upgradeUrl: string; isFul
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Le seuil</h2>
       </div>
       <p className="text-white/60 text-base leading-relaxed mb-6">
-        Tu peux maintenant cadrer un problème, préparer le contexte, choisir un outil et mettre un premier site en ligne. Cette base sert à tester une offre, un message et un premier flux réel. Elle ne crée pas de clients par simple application. Le marché, la preuve et la qualité de livraison restent déterminants.
+        Tu peux maintenant cadrer un problème, préparer le contexte, choisir un outil et mettre un premier site en ligne. Cette base sert à tester une offre, un message et un premier flux réel. Elle ne crée pas de clients par simple application. Le marché, la preuve et la qualité de livraison restent déterminants. Elle s’applique à des sites pour restaurants, à des automatisations pour cabinets de kiné ou de comptabilité, ou à ton propre commerce.
       </p>
       <p className="text-white/60 text-base leading-relaxed mb-10">
-        Prends le dernier projet que tu as touché. Si ses briefs, décisions, fichiers sources, accès et procédures vivent seulement dans une conversation, tu dépends encore de l’outil et de ta mémoire. Les Fondations t’aident à lancer une preuve. {COFFRE_LABEL} sert à transformer les apprentissages validés en méthode portable.
+        Prends le dernier projet que tu as touché. Si ses briefs, décisions, fichiers sources, accès et procédures vivent seulement dans une conversation, tu dépends encore de l’outil et de ta mémoire. Les Fondations t’aident à lancer une preuve. {COFFRE_LABEL} sert à transformer les apprentissages validés en méthode portable. À faire ce soir : sors ce projet de la conversation et range son brief, ses décisions et ses accès dans un dossier. Compte 30 minutes. Tu repars avec un dossier projet que n’importe quel outil peut relire.
       </p>
 
       {/* Les piliers */}

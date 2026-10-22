@@ -12,7 +12,7 @@ const LEVERS = [
   },
   {
     t: "La preuve par l'observation",
-    d: "Voir une méthode, un livrable ou un cas comparable réduit une partie de l'incertitude. Précise ce qui a été observé, dans quel contexte et ce qui reste à vérifier. Le comportement d'autres personnes ne suffit jamais à prouver que l'offre convient au cas présent.",
+    d: "Voir une méthode, un livrable ou un cas comparable réduit une partie de l'incertitude. Précise ce qui a été observé, dans quel contexte et ce qui reste à vérifier. Par exemple, un artisan montre le devis anonymisé d'un chantier comparable, avec ses postes et ses délais. Le comportement d'autres personnes ne suffit jamais à prouver que l'offre convient au cas présent.",
   },
   {
     t: "La crédibilité visible",
@@ -20,7 +20,7 @@ const LEVERS = [
   },
   {
     t: "Le coût de l'inaction",
-    d: "L'inaction a parfois un coût déjà visible : relances oubliées, temps de ressaisie, erreurs répétées ou demande laissée sans réponse. Fais-le décrire par la personne et distingue le fait du calcul estimé. Une peur amplifiée ou un scénario catastrophe ne produit pas une décision saine.",
+    d: "L'inaction a parfois un coût déjà visible : relances oubliées, temps de ressaisie, erreurs répétées ou demande laissée sans réponse. Exemple fictif : un plombier compte 6 demandes rappelées trop tard sur un mois, dont 4 parties chez un concurrent. Fais-le décrire par la personne et distingue le fait du calcul estimé. Une peur amplifiée ou un scénario catastrophe ne produit pas une décision saine.",
   },
   {
     t: "Le besoin de sécurité",
@@ -78,7 +78,7 @@ export function SectionPsychologie() {
 
       <SectionReveal className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 px-6 py-5">
         <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
-          À faire maintenant : reprends une demande réelle et écris la scène, le progrès recherché, le risque perçu et la preuve disponible. Marque chaque interprétation comme une hypothèse. Prépare ensuite une question ouverte pour vérifier ce qui manque, sans suggérer la réponse.
+          À faire maintenant : reprends une demande réelle et écris la scène, le progrès recherché, le risque perçu et la preuve disponible. Marque chaque interprétation comme une hypothèse. Prépare ensuite une question ouverte pour vérifier ce qui manque, sans suggérer la réponse. Compte 25 minutes. Tu repars avec une fiche de quatre lignes et une question prête à poser.
         </p>
       </SectionReveal>
     </div>

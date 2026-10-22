@@ -207,7 +207,7 @@ export const CHAPTER_META: Record<string, ChapterMeta> = {
     group: "entreprise",
     section: "team",
     order: 7,
-    summary: "Mesure une baseline, teste un périmètre réversible et n'élargis qu'après avoir prouvé qualité, coût et récupération.",
+    summary: "Mesure la situation de départ, teste un périmètre réversible et n'élargis qu'après avoir prouvé qualité, coût et récupération.",
   },
   "entreprise-08-templates-et-exercices.md": {
     path: "entreprise-08-templates-et-exercices.md",

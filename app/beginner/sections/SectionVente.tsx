@@ -40,6 +40,9 @@ export function SectionVente() {
         <p>
           Demande la permission de prendre des notes. Laisse la personne raconter avant de reformuler. Sépare ses mots, tes interprétations et les informations manquantes. Cette discipline évite de transformer chaque difficulté en argument pour ton offre.
         </p>
+        <p>
+          Exemple fictif : tu demandes à la gérante d'une auto-école de raconter la dernière annulation. Un élève a prévenu par SMS à 7 h, le moniteur l'a appris à 9 h, et le créneau est resté vide. Elle estime à 5 le nombre de créneaux perdus ainsi chaque mois.
+        </p>
         <div className="divide-y divide-white/10 border-y border-white/10">
           {DISCOVERY_QUESTIONS.map(([label, question], index) => (
             <div key={label} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start">
@@ -94,6 +97,9 @@ export function SectionVente() {
         <p>
           Écris aussi les cas de non-pertinence. Une offre peut être mauvaise pour une équipe sans responsable disponible, pour un volume trop faible ou pour un besoin déjà bien couvert. Dire cela avant l'achat améliore la décision et protège la livraison.
         </p>
+        <p>
+          Exemple pour un cabinet de kiné. Le progrès : les rendez-vous annulés sont reproposés le jour même. Le chemin : une liste d'attente et un message validé par l'accueil. L'effort : une heure d'échange et l'accès à l'agenda. La limite : les urgences restent gérées au téléphone.
+        </p>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 4" title="Répondre aux objections sans forcer">
@@ -115,13 +121,14 @@ export function SectionVente() {
 
       <FoundationChapter eyebrow="Chapitre 5" title="Passer du problème à une offre proposable">
         <p>Le diagnostic devient utile quand il produit un livrable clair, un prix explicable et une prochaine étape volontaire. Construis cette offre à partir du terrain, puis ajuste-la après des conversations et des livraisons documentées.</p>
+        <p>Exemple fictif : tu choisis les salons de coiffure de ta ville, tu en appelles 10, et tu notes chaque échange dans un CRM minimal, c'est-à-dire un tableau de suivi des prospects avec une ligne par salon.</p>
         <div className="divide-y divide-white/10 border-y border-white/10">
           {[
             ["Choisir un terrain", "Pars d'un segment que tu peux atteindre, dont tu comprends les contraintes et où tu peux observer le travail réel. La niche sert de premier terrain d'apprentissage."],
             ["Formuler le livrable", "Décris ce qui sera remis, dans quel format, avec quels critères d'acceptation, quelles limites et quelles informations le client fournit."],
             ["Organiser un appel", "Prépare les thèmes plutôt qu'un monologue : situation récente, alternative, coût, progrès, contraintes, décision et suite. Garde du temps pour reformuler."],
             ["Proposer un prix", "Relie le prix au périmètre, à la préparation, aux validations, aux outils, au support et au risque pris. Change-le après des données de terrain, jamais pour répondre à une gêne passagère."],
-            ["Suivre sans harceler", "Conserve dans un CRM minimal le problème, la dernière interaction, la prochaine date consentie, le statut et la raison d'un refus. Arrête quand il n'y a plus de suite convenue."],
+            ["Suivre sans harceler", "Conserve dans ton tableau de suivi le problème, la dernière interaction, la prochaine date consentie, le statut et la raison d'un refus. Arrête quand il n'y a plus de suite convenue."],
           ].map(([title, description], index) => (
             <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_11rem_1fr] sm:items-start">
               <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
@@ -140,7 +147,7 @@ export function SectionVente() {
       </FoundationChapter>
 
       <FoundationEditorialNote label="À faire maintenant" className="mt-14 mb-4">
-        Choisis une personne que tu peux interroger avec son accord. Prépare les quatre questions de découverte et écoute un épisode récent. Écris ensuite une offre d'une page avec progrès, chemin, effort et limite. Termine par une prochaine étape que la personne peut accepter ou refuser clairement.
+        Choisis une personne que tu peux interroger avec son accord. Prépare les quatre questions de découverte et écoute un épisode récent. Écris ensuite une offre d'une page avec progrès, chemin, effort et limite. Termine par une prochaine étape que la personne peut accepter ou refuser clairement. Compte une heure, appel compris. Tu repars avec tes notes d'appel et une offre d'une page.
       </FoundationEditorialNote>
     </div>
   );

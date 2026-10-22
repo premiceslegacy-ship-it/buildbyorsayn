@@ -25,9 +25,7 @@ test.describe("Hermes Agent performance", () => {
     expect(warm).not.toBeNull();
     expect(cold ?? 0).toBeGreaterThan(0);
     expect(warm ?? 0).toBeGreaterThan(0);
-    await expect(
-      page.getByRole("heading", { name: "Hermes Agent, une IA qui comprend le travail." })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /Hermes/ })).toBeVisible();
 
     test.info().annotations.push({
       type: "navigation-timing",

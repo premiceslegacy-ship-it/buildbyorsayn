@@ -101,6 +101,12 @@ export function SectionCopywriting() {
         <p>
           Un post vu au hasard demande plus de contexte qu'une page ouverte après une recherche précise. Une personne qui revient sur le devis cherche surtout les conditions et la suite. Garde le même contrat de fond, puis adapte la quantité d'explication.
         </p>
+        <p>
+          Exemple chez une fleuriste. Pour une personne qui ne pense pas encore au problème, le post nomme la scène : le bouquet commandé la veille d'un anniversaire, introuvable le samedi matin. Pour une personne qui compare déjà, la page donne les conditions, l'acompte et le délai de commande.
+        </p>
+        <FoundationEditorialNote label="À faire maintenant">
+          Prends une offre et écris deux versions du même message : un post pour quelqu'un qui découvre le problème, une page pour quelqu'un qui compare. Compte 20 minutes. Tu repars avec deux textes de cinq lignes.
+        </FoundationEditorialNote>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 4" title="Explique ce qui change dans le travail">
@@ -118,7 +124,7 @@ export function SectionCopywriting() {
           </div>
         </div>
         <FoundationEditorialNote label="Montre le chemin">
-          Donne un nom à ta méthode seulement quand tu peux montrer les entrées, les étapes, les contrôles, la sortie et les cas qu'elle ne couvre pas.
+          Donne un nom à ta méthode seulement quand tu peux montrer les entrées, les étapes, les contrôles, la sortie et les cas qu'elle ne couvre pas. Chez un traiteur, par exemple : la demande arrive, le nombre de couverts et la date sont vérifiés, puis une personne confirme le menu avant l'acompte.
         </FoundationEditorialNote>
       </FoundationChapter>
 
@@ -137,6 +143,9 @@ export function SectionCopywriting() {
         </div>
         <p className="text-sm leading-relaxed text-white/45">
           Place la preuve près de l'affirmation qu'elle soutient. Si tu cites un résultat, conserve la source, la date, le contexte, la méthode, l'autorisation et la limite. Un cas ne devient jamais une promesse universelle.
+        </p>
+        <p>
+          Exemple : un paysagiste qui annonce « chantier tenu dans les délais » montre le planning prévu et les photos datées d'un jardin comparable. Ce soir, en 15 minutes, associe chacune de tes trois affirmations principales à une preuve disponible, ou retire-la.
         </p>
       </FoundationChapter>
 
@@ -172,7 +181,7 @@ Après chaque version, liste les affirmations qui demandent une vérification.`}
       </FoundationChapter>
 
       <FoundationEditorialNote label="À faire maintenant" className="mt-14 mb-4">
-        Choisis une offre réelle et remplis les cinq parties du message. Écris une phrase floue que tu utilises aujourd'hui, puis remplace-la par une scène, un mécanisme et une limite. Lis le résultat à voix haute et demande à une personne extérieure ce qu'elle comprend et pourquoi elle pourrait refuser.
+        Choisis une offre réelle et remplis les cinq parties du message. Écris une phrase floue que tu utilises aujourd'hui, puis remplace-la par une scène, un mécanisme et une limite. Lis le résultat à voix haute et demande à une personne extérieure ce qu'elle comprend et pourquoi elle pourrait refuser. Compte 45 minutes. Tu repars avec une carte de message remplie et une phrase réécrite.
       </FoundationEditorialNote>
     </div>
   );
