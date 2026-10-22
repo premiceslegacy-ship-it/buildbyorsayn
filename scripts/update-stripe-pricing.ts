@@ -30,9 +30,19 @@ async function activeLinks(): Promise<Stripe.PaymentLink[]> {
 }
 
 async function lineItems(linkId: string): Promise<Stripe.PaymentLinkCreateParams.LineItem[]> {
-  const items = await stripe.paymentLinks.listLineItems(linkId, { limit: 10 });
-  if (!items.data.length) throw new Error(`Payment Link ${linkId} has no line items.`);
-  return items.data.map((item) => ({ price: item.price!.id, quantity: item.quantity ?? 1 }));
+  const items: Stripe.PaymentLinkCreateParams.LineItem[] = [];
+  for await (const item of stripe.paymentLinks.listLineItems(linkId, { limit: 100 })) {
+    items.push({ price: item.price!.id, quantity: item.quantity ?? 1 });
+  }
+  if (!items.length) throw new Error(`Payment Link ${linkId} has no line items.`);
+  return items;
+}
+
+/** Même prix et mêmes quantités, dans n'importe quel ordre. */
+async function sameLineItems(a: string, b: string): Promise<boolean> {
+  const key = (items: Stripe.PaymentLinkCreateParams.LineItem[]) =>
+    items.map((item) => `${item.price}x${item.quantity}`).sort().join(",");
+  return key(await lineItems(a)) === key(await lineItems(b));
 }
 
 const isCompliant = (link: Stripe.PaymentLink) => link.consent_collection?.terms_of_service === "required";
@@ -66,11 +76,19 @@ async function main() {
 
   if (RETIRE) {
     for (const link of links) {
-      const replaced = links.some((candidate) => candidate.metadata?.replaces === link.id && isCompliant(candidate));
-      if (replaced || (PUBLIC_UPGRADE_LINK_URL && link.url === PUBLIC_UPGRADE_LINK_URL)) {
-        await stripe.paymentLinks.update(link.id, { active: false });
-        console.log(`désactivé ${link.id} ${link.url}`);
+      const isPublicUpgrade = Boolean(PUBLIC_UPGRADE_LINK_URL) && link.url === PUBLIC_UPGRADE_LINK_URL;
+      if (!isPublicUpgrade) {
+        // Un lien conforme ne se retire jamais ; un ancien lien seulement si son remplaçant conforme vend la même chose.
+        if (isCompliant(link)) continue;
+        const replacement = links.find((candidate) => candidate.metadata?.replaces === link.id && isCompliant(candidate));
+        if (!replacement) continue;
+        if (!(await sameLineItems(link.id, replacement.id))) {
+          console.log(`gardé ${link.id} : son remplaçant ${replacement.id} ne vend pas les mêmes lignes`);
+          continue;
+        }
       }
+      await stripe.paymentLinks.update(link.id, { active: false });
+      console.log(`désactivé ${link.id} ${link.url}`);
     }
   }
 

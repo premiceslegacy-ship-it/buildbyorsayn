@@ -96,7 +96,7 @@ export function Section1() {
 
       <FoundationChapter eyebrow="Chapitre 3" title="Les automatisations suivent une logique simple">
         <p>
-          Une automatisation relie un déclencheur, des données, une condition, une action et une preuve de résultat. Dans le cas d'un formulaire, le déclencheur est l'envoi. Les données sont les champs autorisés. La condition vérifie le consentement. Les actions créent le contact dans le CRM et préparent la confirmation. Un CRM est le fichier de suivi de tes contacts, par exemple HubSpot.
+          Une automatisation relie un déclencheur, des données, une condition, une action et une preuve de résultat. Dans le cas d'un formulaire, le déclencheur est l'envoi. Les données sont les champs autorisés. La condition vérifie le consentement. Les actions créent le contact dans le CRM et préparent la confirmation. Un CRM est l’outil où tu suis tes contacts et tes ventes, par exemple HubSpot ; au début, un simple tableau suffit.
         </p>
         <p>
           Prends une salle d'escalade. Une personne remplit le formulaire de séance d'essai. Le flux vérifie le consentement, crée sa fiche une seule fois, prépare le message avec le créneau choisi et prévient l'accueil si le téléphone manque.
