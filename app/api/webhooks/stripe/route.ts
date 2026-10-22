@@ -202,7 +202,7 @@ async function sendPurchaseConfirmationEmail(
             console.error("[Webhook] Purchase confirmation skipped (missing configuration or amount)");
             return false;
         }
-        const { entity } = getLegalEntity();
+        const entity = getLegalEntity();
         const { subject, text, html } = buildPurchaseConfirmation({
             offerName,
             amountCents,

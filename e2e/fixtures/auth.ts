@@ -18,9 +18,14 @@ export const BEGINNER_E2E_EMAIL = process.env.E2E_BEGINNER_TEST_EMAIL;
 export const BEGINNER_E2E_PASSWORD = process.env.E2E_BEGINNER_TEST_PASSWORD;
 export const hasBeginnerE2eAccount = Boolean(BEGINNER_E2E_EMAIL && BEGINNER_E2E_PASSWORD);
 
+export const FREE_E2E_EMAIL = process.env.E2E_FREE_TEST_EMAIL;
+export const FREE_E2E_PASSWORD = process.env.E2E_FREE_TEST_PASSWORD;
+export const hasE2eFreeAccount = Boolean(FREE_E2E_EMAIL && FREE_E2E_PASSWORD);
+
 const STORAGE_STATE_PATH = path.join(process.cwd(), "e2e", ".auth", "user.json");
 const BEGINNER_STORAGE_STATE_PATH = path.join(process.cwd(), "e2e", ".auth", "beginner.json");
-type AuthStateKey = "full" | "beginner";
+const FREE_STORAGE_STATE_PATH = path.join(process.cwd(), "e2e", ".auth", "free.json");
+type AuthStateKey = "full" | "beginner" | "free";
 
 type AuthStateMetadata = {
   accountKey: AuthStateKey;
@@ -96,7 +101,7 @@ export async function ensureAuthState(page: Page): Promise<void> {
   await saveBoundAuthState(page, STORAGE_STATE_PATH, "full", E2E_EMAIL!);
 }
 
-export const test = base.extend<{ authedPage: Page; beginnerPage: Page }>({
+export const test = base.extend<{ authedPage: Page; beginnerPage: Page; freePage: Page }>({
   authedPage: async ({ browser }, use) => {
     fs.mkdirSync(path.dirname(STORAGE_STATE_PATH), { recursive: true });
     const session = await openAuthenticatedPage(browser, STORAGE_STATE_PATH, "full", E2E_EMAIL, E2E_PASSWORD);
@@ -111,6 +116,18 @@ export const test = base.extend<{ authedPage: Page; beginnerPage: Page }>({
       "beginner",
       BEGINNER_E2E_EMAIL,
       BEGINNER_E2E_PASSWORD
+    );
+    await use(session.page);
+    await session.close();
+  },
+  freePage: async ({ browser }, use) => {
+    fs.mkdirSync(path.dirname(FREE_STORAGE_STATE_PATH), { recursive: true });
+    const session = await openAuthenticatedPage(
+      browser,
+      FREE_STORAGE_STATE_PATH,
+      "free",
+      FREE_E2E_EMAIL,
+      FREE_E2E_PASSWORD
     );
     await use(session.page);
     await session.close();

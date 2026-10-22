@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { connection } from "next/server";
 import { ContactLink, IdentityTable, LegalPage, type LegalSection } from "@/components/da/LegalPage";
 import { CHECKOUT_CONSENT_TEXT } from "@/lib/legal/consent";
 import { legalMetadata, PRICES, quote, TIER_NAMES } from "@/lib/legal/documents";
@@ -7,10 +6,9 @@ import { describeSeller, getLegalEntity } from "@/lib/legal/entity";
 
 export const metadata = legalMetadata("/cgv");
 
-export default async function CgvPage() {
+export default function CgvPage() {
   // L'identité de l'éditeur est lue au moment de la requête : un serveur de production sans elle refuse d'afficher la page.
-  await connection();
-  const { entity, isSample } = getLegalEntity();
+  const entity = getLegalEntity();
   const { fondations, coffre } = TIER_NAMES;
 
   const sections: LegalSection[] = [
@@ -25,9 +23,7 @@ export default async function CgvPage() {
           <p>
             Créer un compte gratuit n&apos;est pas un achat : il te donne accès au premier bloc, sans paiement. Les présentes conditions s&apos;appliquent dès que tu paies une offre.
           </p>
-          <p>
-            Elles s&apos;adressent aux personnes qui achètent pour elles-mêmes. Si tu achètes pour ton activité professionnelle, les protections réservées aux consommateurs, dont le droit de rétractation, ne te sont reconnues que dans les cas où la loi les étend à toi.
-          </p>
+          <p>BUILD est une formation conçue pour des professionnels.</p>
         </>
       ),
     },
@@ -189,19 +185,23 @@ export default async function CgvPage() {
       ),
     },
     {
-      id: "mediation",
-      title: "Réclamations et médiation",
+      id: "reclamations",
+      title: entity.mediator ? "Réclamations et médiation" : "Réclamations",
       children: (
         <>
           <p>Si quelque chose ne va pas, écris-nous d&apos;abord à <ContactLink entity={entity} />. Nous répondons et cherchons une solution avec toi.</p>
-          <p>Si nous n&apos;arrivons pas à nous entendre, tu peux saisir gratuitement le médiateur de la consommation (articles L611-1 et suivants du Code de la consommation) :</p>
-          <table>
-            <tbody>
-              <tr><th scope="row">Médiateur</th><td>{entity.mediatorName}</td></tr>
-              <tr><th scope="row">Site</th><td><a href={entity.mediatorUrl} rel="noopener noreferrer">{entity.mediatorUrl}</a></td></tr>
-            </tbody>
-          </table>
-          <p>Le médiateur peut être saisi une fois que tu as fait une réclamation écrite auprès de nous.</p>
+          {entity.mediator ? (
+            <>
+              <p>Si nous n&apos;arrivons pas à nous entendre, tu peux saisir gratuitement le médiateur de la consommation (articles L611-1 et suivants du Code de la consommation) :</p>
+              <table>
+                <tbody>
+                  <tr><th scope="row">Médiateur</th><td>{entity.mediator.name}</td></tr>
+                  <tr><th scope="row">Site</th><td><a href={entity.mediator.url} rel="noopener noreferrer">{entity.mediator.url}</a></td></tr>
+                </tbody>
+              </table>
+              <p>Le médiateur peut être saisi une fois que tu as fait une réclamation écrite auprès de nous.</p>
+            </>
+          ) : null}
         </>
       ),
     },
@@ -228,7 +228,6 @@ export default async function CgvPage() {
   return (
     <LegalPage
       href="/cgv"
-      isSample={isSample}
       intro={`Voici les règles qui s'appliquent quand tu achètes ${fondations} ou ${coffre}, écrites pour être lues.`}
       sections={sections}
     />

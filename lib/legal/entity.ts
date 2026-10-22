@@ -3,8 +3,8 @@ import { DEFAULT_VAT_MENTION, PUBLIC_IDENTITY } from "@/lib/legal/identity";
 
 /**
  * Identité de l'éditeur (entrepreneur individuel), affichée sur les CGV, les mentions légales et la politique de confidentialité.
- * Les faits publics connus sont des valeurs par défaut (lib/legal/identity.ts), remplaçables par des variables LEGAL_*.
- * Seuls les champs réellement inconnus bloquent la production : code postal, ville et médiateur de la consommation.
+ * Tout a une valeur par défaut (lib/legal/identity.ts), remplaçable par une variable LEGAL_*. Aucune variable n'est obligatoire.
+ * Une variable renseignée mais mal formée est une erreur de configuration : elle fait échouer le build et la vérification.
  */
 
 export const LEGAL_ENV = {
@@ -25,32 +25,6 @@ export const LEGAL_ENV = {
   registry: "LEGAL_REGISTRY",
 } as const;
 
-/** Variables sans valeur par défaut : toutes doivent être renseignées en production. */
-export const LEGAL_REQUIRED_ENV = [
-  LEGAL_ENV.postalCode,
-  LEGAL_ENV.city,
-  LEGAL_ENV.mediatorName,
-  LEGAL_ENV.mediatorUrl,
-] as const;
-
-/** Variables facultatives : valeur par défaut (faits publics) ou ligne absente de la page si elles sont vides. */
-export const LEGAL_OPTIONAL_ENV = [
-  LEGAL_ENV.fullName,
-  LEGAL_ENV.tradeName,
-  LEGAL_ENV.legalForm,
-  LEGAL_ENV.siret,
-  LEGAL_ENV.street,
-  LEGAL_ENV.phone,
-  LEGAL_ENV.contactEmail,
-  LEGAL_ENV.director,
-  LEGAL_ENV.vatMention,
-  LEGAL_ENV.capital,
-  LEGAL_ENV.registry,
-] as const;
-
-/** Autorise les valeurs d'exemple même sur un serveur de production (essais de bout en bout). Un bandeau reste affiché. */
-export const LEGAL_SAMPLE_FLAG = "LEGAL_USE_SAMPLE_ENTITY";
-
 export type LegalEntity = {
   fullName: string;
   tradeName: string;
@@ -68,8 +42,8 @@ export type LegalEntity = {
   director: string;
   /** Phrase de TVA, par exemple « TVA non applicable, article 293 B du CGI ». */
   vatMention: string;
-  mediatorName: string;
-  mediatorUrl: string;
+  /** Médiateur de la consommation, seulement si LEGAL_MEDIATOR_NAME et LEGAL_MEDIATOR_URL sont renseignées. */
+  mediator: { name: string; url: string } | null;
   capital: string | null;
   registry: string | null;
 };
@@ -85,8 +59,6 @@ export type LegalEntityParse =
   | { ok: true; entity: LegalEntity }
   | { ok: false; issues: LegalEntityIssue[] };
 
-export type ResolvedLegalEntity = { entity: LegalEntity; isSample: boolean };
-
 type Env = Readonly<Record<string, string | undefined>>;
 
 export function formatAddress(parts: Pick<LegalEntity, "street" | "postalCode" | "city">): string {
@@ -97,21 +69,6 @@ export function formatAddress(parts: Pick<LegalEntity, "street" | "postalCode" |
 export function describeSeller(entity: Pick<LegalEntity, "fullName" | "legalForm" | "tradeName">): string {
   return `${entity.fullName}, ${entity.legalForm.toLowerCase()} exerçant sous le nom commercial ${entity.tradeName}`;
 }
-
-const SAMPLE_ADDRESS = { postalCode: "00000", city: "Ville d'exemple" };
-
-/** Valeurs visiblement fausses mais valides, pour que les pages s'affichent hors production. */
-export const SAMPLE_LEGAL_ENTITY: LegalEntity = {
-  ...PUBLIC_IDENTITY,
-  siren: PUBLIC_IDENTITY.siret.slice(0, 9),
-  ...SAMPLE_ADDRESS,
-  address: formatAddress({ street: PUBLIC_IDENTITY.street, ...SAMPLE_ADDRESS }),
-  vatMention: DEFAULT_VAT_MENTION,
-  mediatorName: "Médiateur d'exemple",
-  mediatorUrl: "https://exemple.invalid/mediation",
-  capital: null,
-  registry: null,
-};
 
 const PLACEHOLDER = /^(?:todo|tbd|tba|n\/?a|xx+|\.{2,}|\?+|-+|changeme|change-me|a completer|à compléter|a remplir|à remplir|exemple|example|lorem)(?![a-z0-9])|d'exemple|[\[\]<>{}]|^\s*$/i;
 
@@ -165,7 +122,7 @@ const postalCodeField = z
 const emailField = z.string().trim().max(254).pipe(z.email("L'adresse e-mail n'a pas le bon format."));
 
 const urlField = z
-  .string({ error: "L'adresse web du médiateur est obligatoire." })
+  .string()
   .trim()
   .refine((value) => {
     try {
@@ -188,10 +145,15 @@ const entitySchema = z.object({
   contactEmail: emailField,
   director: text("Le nom du directeur de la publication", 3, 120),
   vatMention: text("La mention de TVA", 5, 200),
-  mediatorName: text("Le nom du médiateur de la consommation", 3, 160),
-  mediatorUrl: urlField,
+  mediatorName: text("Le nom du médiateur de la consommation", 3, 160).optional(),
+  mediatorUrl: urlField.optional(),
   capital: text("Le capital social", 2, 60).optional(),
   registry: text("La mention d'immatriculation", 3, 100).optional(),
+}).superRefine((value, ctx) => {
+  if ((value.mediatorName === undefined) !== (value.mediatorUrl === undefined)) {
+    const missing = value.mediatorName === undefined ? "mediatorName" : "mediatorUrl";
+    ctx.addIssue({ code: "custom", path: [missing], message: "Le nom et l'adresse web du médiateur vont ensemble : renseigne les deux ou aucun." });
+  }
 });
 
 function blankToUndefined(value: string | undefined): string | undefined {
@@ -208,8 +170,8 @@ export function parseLegalEntity(env: Env): LegalEntityParse {
     legalForm: read("legalForm") ?? PUBLIC_IDENTITY.legalForm,
     siret: read("siret") ?? PUBLIC_IDENTITY.siret,
     street: read("street") ?? PUBLIC_IDENTITY.street,
-    postalCode: read("postalCode"),
-    city: read("city"),
+    postalCode: read("postalCode") ?? PUBLIC_IDENTITY.postalCode,
+    city: read("city") ?? PUBLIC_IDENTITY.city,
     phone: read("phone") ?? PUBLIC_IDENTITY.phone,
     contactEmail: read("contactEmail") ?? PUBLIC_IDENTITY.contactEmail,
     director: read("director") ?? PUBLIC_IDENTITY.director,
@@ -239,8 +201,7 @@ export function parseLegalEntity(env: Env): LegalEntityParse {
         contactEmail: v.contactEmail,
         director: v.director,
         vatMention: v.vatMention,
-        mediatorName: v.mediatorName,
-        mediatorUrl: v.mediatorUrl,
+        mediator: v.mediatorName !== undefined && v.mediatorUrl !== undefined ? { name: v.mediatorName, url: v.mediatorUrl } : null,
         capital: v.capital ?? null,
         registry: v.registry ?? null,
       },
@@ -254,7 +215,7 @@ export function parseLegalEntity(env: Env): LegalEntityParse {
     const variable = LEGAL_ENV[field];
     if (!variable || seen.has(variable)) continue;
     seen.add(variable);
-    const isMissing = raw[field as keyof typeof raw] === undefined;
+    const isMissing = raw[field as keyof typeof raw] === undefined && issue.code !== "custom";
     issues.push({
       variable,
       kind: isMissing ? "missing" : "invalid",
@@ -278,20 +239,13 @@ export function describeLegalIssues(issues: readonly LegalEntityIssue[]): string
   return lines.join("\n");
 }
 
-/**
- * Production : l'identité réelle est obligatoire, sinon on s'arrête (jamais de blanc ni de texte provisoire en public).
- * Hors production : valeurs d'exemple signalées par `isSample`, pour que les pages restent testables.
- */
-export function resolveLegalEntity(env: Env, nodeEnv: string | undefined): ResolvedLegalEntity {
+/** Retourne l'identité de l'éditeur, ou lève une erreur en français qui nomme les variables à corriger. */
+export function resolveLegalEntity(env: Env): LegalEntity {
   const parsed = parseLegalEntity(env);
-  if (parsed.ok === true) return { entity: parsed.entity, isSample: false };
-
-  const sampleAllowed = nodeEnv !== "production" || env[LEGAL_SAMPLE_FLAG] === "true";
-  if (sampleAllowed) return { entity: SAMPLE_LEGAL_ENTITY, isSample: true };
-
-  throw new Error(`Identité légale de l'éditeur incomplète. ${describeLegalIssues(parsed.issues)}`);
+  if (parsed.ok === true) return parsed.entity;
+  throw new Error(`Identité légale de l'éditeur invalide. ${describeLegalIssues(parsed.issues)}`);
 }
 
-export function getLegalEntity(): ResolvedLegalEntity {
-  return resolveLegalEntity(process.env, process.env.NODE_ENV);
+export function getLegalEntity(): LegalEntity {
+  return resolveLegalEntity(process.env);
 }

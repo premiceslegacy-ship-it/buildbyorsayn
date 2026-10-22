@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { connection } from "next/server";
 import type { ReactNode } from "react";
 import { ContactLink, LegalPage, type LegalSection } from "@/components/da/LegalPage";
 import { legalMetadata, quote, TIER_NAMES } from "@/lib/legal/documents";
@@ -27,9 +26,8 @@ function Traitement({ titre, donnees, pourquoi, base, duree }: { titre: string; 
   );
 }
 
-export default async function ConfidentialitePage() {
-  await connection();
-  const { entity, isSample } = getLegalEntity();
+export default function ConfidentialitePage() {
+  const entity = getLegalEntity();
   const { fondations, coffre } = TIER_NAMES;
   const contact = <ContactLink entity={entity} />;
 
@@ -244,7 +242,6 @@ export default async function ConfidentialitePage() {
   return (
     <LegalPage
       href="/confidentialite"
-      isSample={isSample}
       intro="Quelles données BUILD collecte, pourquoi, pendant combien de temps, qui les traite pour nous et comment faire valoir tes droits."
       sections={sections}
     />

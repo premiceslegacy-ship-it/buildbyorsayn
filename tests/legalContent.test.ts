@@ -200,3 +200,10 @@ test("les mentions légales indiquent un hébergeur applicatif prouvé par le d�
   const mentions = read(pageFileFor("/mentions-legales")!);
   assert.ok(!/cloudflare/i.test(mentions) && !PROCESSORS.some((p) => /cloudflare/i.test(p.name)));
 });
+
+test("la médiation n'apparaît dans les CGV que si un médiateur est déclaré, et jamais dans les mentions légales", () => {
+  const cgv = read(pageFileFor("/cgv")!);
+  assert.ok(cgv.includes("entity.mediator ? ("), "le bloc médiateur doit dépendre de entity.mediator");
+  assert.ok(cgv.includes("entity.mediator ? \"Réclamations et médiation\" : \"Réclamations\""), "le titre de la section doit s'adapter");
+  assert.ok(!/médiat/i.test(read(pageFileFor("/mentions-legales")!)));
+});

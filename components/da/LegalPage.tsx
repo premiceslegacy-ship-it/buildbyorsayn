@@ -21,11 +21,9 @@ type Props = {
   href: LegalHref;
   intro?: string;
   sections: readonly LegalSection[];
-  /** Vrai quand l'identité de l'éditeur vient des valeurs d'exemple : un bandeau le dit clairement. */
-  isSample: boolean;
 };
 
-export function LegalPage({ href, intro, sections, isSample }: Props) {
+export function LegalPage({ href, intro, sections }: Props) {
   const title = legalTitle(href);
   const updatedAt = legalUpdatedAt(href);
   const showToc = sections.length >= TOC_FROM;
@@ -42,12 +40,6 @@ export function LegalPage({ href, intro, sections, isSample }: Props) {
 
       <main className="lg-main" id="contenu">
         <div className="wrap">
-          {isSample ? (
-            <p className="lg-alerte" role="note" data-testid="legal-sample-banner">
-              <strong>Valeurs d&apos;exemple.</strong> L&apos;identité de l&apos;éditeur (code postal, ville, médiateur de la consommation) n&apos;est pas encore renseignée sur ce serveur. Cette page ne doit pas être publiée en l&apos;état.
-            </p>
-          ) : null}
-
           <div className="lg-tete">
             <p className="t-meta">Dernière mise à jour le {formatLegalDate(updatedAt)}</p>
             <h1 className="t-1">{title}</h1>

@@ -8,9 +8,6 @@
 .da .lg-tete { max-width: 760px; margin: 0 auto clamp(28px, 4vw, 44px); display: grid; gap: 16px; }
 .da .lg-tete .t-lede { max-width: 34em; }
 
-.da .lg-alerte { max-width: 760px; margin: 0 auto 28px; padding: 16px 20px; border-radius: var(--r-m); background: var(--carte); border: 1px solid rgba(255, 204, 102, .55); color: var(--t1); font: 500 16px/1.5 var(--font); }
-.da .lg-alerte strong { color: var(--encre); font-weight: 650; }
-
 .da .lg-sommaire { max-width: 760px; margin: 0 auto clamp(32px, 4vw, 48px); padding: 22px 24px; border-radius: var(--r-m); background: var(--carte); border: 1px solid var(--trait); }
 .da .lg-sommaire h2 { font: 600 14px/1.3 var(--font); color: var(--t3); margin-bottom: 12px; }
 .da .lg-sommaire ol { counter-reset: s; display: grid; gap: 2px 32px; }

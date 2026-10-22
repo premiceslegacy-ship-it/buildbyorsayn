@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { connection } from "next/server";
 import { ContactLink, IdentityTable, LegalPage, type LegalSection } from "@/components/da/LegalPage";
 import { legalMetadata } from "@/lib/legal/documents";
 import { getLegalEntity } from "@/lib/legal/entity";
@@ -7,9 +6,8 @@ import { getProcessor } from "@/lib/legal/processors";
 
 export const metadata = legalMetadata("/mentions-legales");
 
-export default async function MentionsLegalesPage() {
-  await connection();
-  const { entity, isSample } = getLegalEntity();
+export default function MentionsLegalesPage() {
+  const entity = getLegalEntity();
   const vercel = getProcessor("vercel");
   const supabase = getProcessor("supabase");
   const mux = getProcessor("mux");
@@ -75,7 +73,7 @@ export default async function MentionsLegalesPage() {
       id: "donnees",
       title: "Données personnelles et cookies",
       children: (
-        <p>Les données que BUILD collecte et les droits que tu as dessus sont décrits dans la <Link href="/confidentialite">politique de confidentialité</Link>. Ce que BUILD enregistre dans ton navigateur est décrit sur la page <Link href="/cookies">Cookies</Link>. Pour les litiges liés à un achat, la <Link href="/cgv">page des conditions générales de vente</Link> indique le médiateur de la consommation.</p>
+        <p>Les données que BUILD collecte et les droits que tu as dessus sont décrits dans la <Link href="/confidentialite">politique de confidentialité</Link>. Ce que BUILD enregistre dans ton navigateur est décrit sur la page <Link href="/cookies">Cookies</Link>.</p>
       ),
     },
   ];
@@ -83,7 +81,6 @@ export default async function MentionsLegalesPage() {
   return (
     <LegalPage
       href="/mentions-legales"
-      isSample={isSample}
       intro="Les informations que la loi demande d'afficher sur un site : qui édite BUILD, qui l'héberge, comment nous joindre."
       sections={sections}
     />

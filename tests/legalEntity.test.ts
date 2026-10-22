@@ -6,62 +6,60 @@ import {
   isValidSiren,
   isValidSiret,
   LEGAL_ENV,
-  LEGAL_REQUIRED_ENV,
-  LEGAL_SAMPLE_FLAG,
   parseLegalEntity,
   resolveLegalEntity,
-  SAMPLE_LEGAL_ENTITY,
 } from "../lib/legal/entity";
 import { DEFAULT_VAT_MENTION, PUBLIC_IDENTITY } from "../lib/legal/identity";
 
-function validEnv(extra: Record<string, string> = {}): Record<string, string> {
-  return {
+test("sans aucune variable, l'identité publique par défaut est complète et valide", () => {
+  const parsed = parseLegalEntity({});
+  assert.equal(parsed.ok, true);
+  if (!parsed.ok) return;
+  const { entity } = parsed;
+  assert.equal(entity.fullName, "Samuel Mbeboura");
+  assert.equal(entity.tradeName, "Orsayn");
+  assert.equal(entity.siret, PUBLIC_IDENTITY.siret);
+  assert.equal(entity.siren, "989208152");
+  assert.equal(entity.address, "1 rue des héraults, 37550 Saint-Avertin");
+  assert.equal(entity.contactEmail, "contact@orsayn.fr");
+  assert.equal(entity.vatMention, DEFAULT_VAT_MENTION);
+  assert.equal(entity.mediator, null);
+  assert.equal(entity.capital, null);
+  assert.equal(entity.registry, null);
+  assert.equal(describeSeller(entity), "Samuel Mbeboura, entrepreneur individuel exerçant sous le nom commercial Orsayn");
+  assert.equal(resolveLegalEntity({}).siret, PUBLIC_IDENTITY.siret);
+});
+
+test("une variable remplace la valeur par défaut, la ville et le code postal compris", () => {
+  const parsed = parseLegalEntity({
     [LEGAL_ENV.postalCode]: "75010",
     [LEGAL_ENV.city]: "Paris",
-    [LEGAL_ENV.mediatorName]: "Médiateur de la consommation Test",
-    [LEGAL_ENV.mediatorUrl]: "https://mediation.test-reel.fr/saisir",
-    ...extra,
-  };
-}
-
-test("les faits publics sont des valeurs par défaut : seuls code postal, ville et médiateur sont à fournir", () => {
-  const parsed = parseLegalEntity(validEnv());
+    [LEGAL_ENV.street]: "8 avenue du Test",
+    [LEGAL_ENV.vatMention]: "TVA intracommunautaire FR12345678901",
+    [LEGAL_ENV.capital]: "1 000 euros",
+  });
   assert.equal(parsed.ok, true);
   if (!parsed.ok) return;
-  assert.equal(parsed.entity.fullName, PUBLIC_IDENTITY.fullName);
-  assert.equal(parsed.entity.tradeName, "Orsayn");
-  assert.equal(parsed.entity.siret, PUBLIC_IDENTITY.siret);
-  assert.equal(parsed.entity.siren, "989208152");
-  assert.equal(parsed.entity.vatMention, DEFAULT_VAT_MENTION);
-  assert.equal(parsed.entity.address, "1 rue des héraults, 75010 Paris");
-  assert.equal(parsed.entity.contactEmail, "contact@orsayn.fr");
-  assert.equal(parsed.entity.capital, null);
-  assert.equal(parsed.entity.registry, null);
-  assert.equal(describeSeller(parsed.entity), "Samuel Mbeboura, entrepreneur individuel exerçant sous le nom commercial Orsayn");
-});
-
-test("les variables de production sont exactement les champs réellement inconnus", () => {
-  assert.deepEqual([...LEGAL_REQUIRED_ENV].sort(), ["LEGAL_CITY", "LEGAL_MEDIATOR_NAME", "LEGAL_MEDIATOR_URL", "LEGAL_POSTAL_CODE"]);
-  const parsed = parseLegalEntity({});
-  assert.equal(parsed.ok, false);
-  if (parsed.ok) return;
-  assert.deepEqual(parsed.issues.map((issue) => issue.variable).sort(), [...LEGAL_REQUIRED_ENV].sort());
-  assert.ok(parsed.issues.every((issue) => issue.kind === "missing"));
-  const message = describeLegalIssues(parsed.issues);
-  for (const name of LEGAL_REQUIRED_ENV) assert.ok(message.includes(name));
-});
-
-test("une variable peut remplacer une valeur par défaut, y compris la mention de TVA", () => {
-  const parsed = parseLegalEntity(validEnv({ [LEGAL_ENV.vatMention]: "TVA intracommunautaire FR12345678901", [LEGAL_ENV.street]: "8 avenue du Test", [LEGAL_ENV.capital]: "1 000 euros" }));
-  assert.equal(parsed.ok, true);
-  if (!parsed.ok) return;
-  assert.equal(parsed.entity.vatMention, "TVA intracommunautaire FR12345678901");
   assert.equal(parsed.entity.address, "8 avenue du Test, 75010 Paris");
+  assert.equal(parsed.entity.vatMention, "TVA intracommunautaire FR12345678901");
   assert.equal(parsed.entity.capital, "1 000 euros");
 });
 
+test("le médiateur est facultatif, et ne s'active que si le nom et l'adresse web sont donnés ensemble", () => {
+  const both = parseLegalEntity({ [LEGAL_ENV.mediatorName]: "Médiateur Test Réel", [LEGAL_ENV.mediatorUrl]: "https://mediation.test-reel.fr/saisir" });
+  assert.equal(both.ok && both.entity.mediator?.name, "Médiateur Test Réel");
+  assert.equal(both.ok && both.entity.mediator?.url, "https://mediation.test-reel.fr/saisir");
+
+  for (const only of [{ [LEGAL_ENV.mediatorName]: "Médiateur Test Réel" }, { [LEGAL_ENV.mediatorUrl]: "https://mediation.test-reel.fr" }]) {
+    const parsed = parseLegalEntity(only);
+    assert.equal(parsed.ok, false);
+    if (!parsed.ok) assert.equal(parsed.issues.length, 1);
+  }
+  assert.equal(parseLegalEntity({ [LEGAL_ENV.mediatorName]: "Médiateur Test Réel", [LEGAL_ENV.mediatorUrl]: "http://pas-securise.fr" }).ok, false);
+});
+
 test("le SIRET est normalisé, sa clé de contrôle est vérifiée et le SIREN en est dérivé", () => {
-  const parsed = parseLegalEntity(validEnv({ [LEGAL_ENV.siret]: "552 100 554 00055" }));
+  const parsed = parseLegalEntity({ [LEGAL_ENV.siret]: "552 100 554 00055" });
   if (parsed.ok) assert.equal(parsed.entity.siren, "552100554");
   assert.equal(isValidSiret(PUBLIC_IDENTITY.siret), true);
   assert.equal(isValidSiren("989208152"), true);
@@ -69,71 +67,41 @@ test("le SIRET est normalisé, sa clé de contrôle est vérifiée et le SIREN e
   assert.equal(isValidSiret("9892081520001"), false);
 });
 
-test("un SIRET mal formé est refusé et le message ne répète pas la valeur reçue", () => {
+test("une variable mal formée est une erreur claire en français qui ne répète jamais la valeur", () => {
   for (const bad of ["9892081520001", "98920815200012", "9892081520001A"]) {
-    const parsed = parseLegalEntity(validEnv({ [LEGAL_ENV.siret]: bad }));
+    const parsed = parseLegalEntity({ [LEGAL_ENV.siret]: bad });
     assert.equal(parsed.ok, false, `${bad} doit être refusé`);
     if (parsed.ok) continue;
     assert.equal(parsed.issues[0].variable, LEGAL_ENV.siret);
     assert.equal(parsed.issues[0].kind, "invalid");
     assert.ok(!describeLegalIssues(parsed.issues).includes(bad));
   }
+  assert.throws(
+    () => resolveLegalEntity({ [LEGAL_ENV.siret]: "123" }),
+    (error: unknown) => error instanceof Error && error.message.startsWith("Identité légale") && error.message.includes(LEGAL_ENV.siret) && !error.message.includes("123"),
+  );
 });
 
-test("code postal, téléphone, e-mail, lien du médiateur, textes provisoires et tirets longs sont contrôlés", () => {
+test("code postal, téléphone, e-mail, textes provisoires et tirets longs sont refusés", () => {
   const cases: Array<[string, string]> = [
-    [LEGAL_ENV.postalCode, "7501"],
-    [LEGAL_ENV.postalCode, "75O10"],
+    [LEGAL_ENV.postalCode, "3755"],
+    [LEGAL_ENV.postalCode, "37 550"],
     [LEGAL_ENV.city, "[Ville]"],
     [LEGAL_ENV.city, "à compléter"],
     [LEGAL_ENV.phone, "pas de téléphone"],
     [LEGAL_ENV.contactEmail, "pas-un-email"],
     [LEGAL_ENV.director, "Samuel \u2014 Mbeboura"],
-    [LEGAL_ENV.mediatorName, "Médiateur d'exemple"],
-    [LEGAL_ENV.mediatorUrl, "http://mediation.test-reel.fr"],
-    [LEGAL_ENV.mediatorUrl, "https://exemple.invalid/mediation"],
+    [LEGAL_ENV.vatMention, "xxx"],
   ];
   for (const [variable, value] of cases) {
-    const parsed = parseLegalEntity(validEnv({ [variable]: value }));
+    const parsed = parseLegalEntity({ [variable]: value });
     assert.equal(parsed.ok, false, `${variable}=${value} doit être refusé`);
     if (!parsed.ok) assert.equal(parsed.issues[0].variable, variable);
   }
 });
 
-test("en production, les champs inconnus sont obligatoires : pas de valeur d'exemple, message français sans valeur", () => {
-  assert.throws(
-    () => resolveLegalEntity({}, "production"),
-    (error: unknown) => error instanceof Error && error.message.startsWith("Identité légale") && error.message.includes(LEGAL_ENV.postalCode),
-  );
-  const resolved = resolveLegalEntity(validEnv(), "production");
-  assert.equal(resolved.isSample, false);
-  assert.equal(resolved.entity.city, "Paris");
-});
-
-test("hors production, les valeurs d'exemple sont rendues et signalées, jamais mêlées à des valeurs partielles", () => {
-  for (const nodeEnv of ["development", "test", undefined]) {
-    const resolved = resolveLegalEntity({}, nodeEnv);
-    assert.equal(resolved.isSample, true);
-    assert.equal(resolved.entity, SAMPLE_LEGAL_ENTITY);
-  }
-  const partial = resolveLegalEntity({ [LEGAL_ENV.city]: "Paris" }, "development");
-  assert.equal(partial.isSample, true);
-  assert.notEqual(partial.entity.city, "Paris");
-});
-
-test("l'indicateur d'essai autorise les valeurs d'exemple en production, et seulement s'il vaut true", () => {
-  assert.equal(resolveLegalEntity({ [LEGAL_SAMPLE_FLAG]: "true" }, "production").isSample, true);
-  assert.throws(() => resolveLegalEntity({ [LEGAL_SAMPLE_FLAG]: "1" }, "production"));
-});
-
-test("les valeurs d'exemple (ville, médiateur) ne passent pas la validation de production", () => {
-  const asEnv: Record<string, string> = {
-    [LEGAL_ENV.postalCode]: SAMPLE_LEGAL_ENTITY.postalCode,
-    [LEGAL_ENV.city]: SAMPLE_LEGAL_ENTITY.city,
-    [LEGAL_ENV.mediatorName]: SAMPLE_LEGAL_ENTITY.mediatorName,
-    [LEGAL_ENV.mediatorUrl]: SAMPLE_LEGAL_ENTITY.mediatorUrl,
-  };
-  const parsed = parseLegalEntity(asEnv);
-  assert.equal(parsed.ok, false);
-  if (!parsed.ok) assert.deepEqual(parsed.issues.map((issue) => issue.variable).sort(), [LEGAL_ENV.city, LEGAL_ENV.mediatorName, LEGAL_ENV.mediatorUrl]);
+test("une valeur vide ou faite d'espaces retombe sur la valeur par défaut", () => {
+  const parsed = parseLegalEntity({ [LEGAL_ENV.city]: "   ", [LEGAL_ENV.director]: "" });
+  assert.equal(parsed.ok && parsed.entity.city, "Saint-Avertin");
+  assert.equal(parsed.ok && parsed.entity.director, "Samuel Mbeboura");
 });

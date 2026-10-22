@@ -1,8 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { LEGAL_LINKS } from "../lib/legal/links";
 
-// Le serveur d'essai tourne en production : il lui faut soit les variables LEGAL_* réelles,
-// soit LEGAL_USE_SAMPLE_ENTITY=true (valeurs d'exemple et bandeau d'avertissement).
 const VIEWPORTS = [390, 834, 1440, 1920] as const;
 
 for (const link of LEGAL_LINKS) {

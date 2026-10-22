@@ -3,6 +3,7 @@ import {
   expect,
   hasBeginnerE2eAccount,
   hasE2eAccount,
+  hasE2eFreeAccount,
 } from "./fixtures/auth";
 
 test.describe("Skills catalog cards", () => {
@@ -28,5 +29,17 @@ test.describe("Skills access states", () => {
     const lockedCta = page.getByRole("link", { name: /Débloquer|Prendre/i }).first();
     await expect(lockedCta).toBeVisible({ timeout: 10_000 });
     await expect(lockedCta).not.toHaveAttribute("href", /\/api\/skills\//);
+  });
+});
+
+test.describe("Skills access for a free account", () => {
+  test.skip(!hasE2eFreeAccount, "E2E_FREE_TEST_EMAIL/E2E_FREE_TEST_PASSWORD not configured");
+
+  test("every skill is locked: no download link, only unlock calls to action", async ({ freePage: page }) => {
+    await page.goto("/skills");
+    const lockedCta = page.getByRole("link", { name: /Débloquer|Prendre/i }).first();
+    await expect(lockedCta).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('a[href^="/api/skills/"]')).toHaveCount(0);
+    await expect(page.locator('a[href*="/checkout/upgrade"]')).toHaveCount(0);
   });
 });

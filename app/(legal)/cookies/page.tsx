@@ -1,14 +1,12 @@
 import Link from "next/link";
-import { connection } from "next/server";
 import { ContactLink, LegalPage, type LegalSection } from "@/components/da/LegalPage";
 import { legalMetadata } from "@/lib/legal/documents";
 import { getLegalEntity } from "@/lib/legal/entity";
 
 export const metadata = legalMetadata("/cookies");
 
-export default async function CookiesPage() {
-  await connection();
-  const { entity, isSample } = getLegalEntity();
+export default function CookiesPage() {
+  const entity = getLegalEntity();
 
   const sections: LegalSection[] = [
     {
@@ -89,7 +87,6 @@ export default async function CookiesPage() {
   return (
     <LegalPage
       href="/cookies"
-      isSample={isSample}
       intro="Ce que BUILD enregistre dans ton navigateur, à quoi cela sert et comment l'effacer."
       sections={sections}
     />

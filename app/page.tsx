@@ -1,5 +1,4 @@
 import "@/app/landing.css";
-import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,7 +6,7 @@ import { DaRoot } from "@/components/da/DaRoot";
 import { DaNav } from "@/components/da/DaNav";
 import { DaFooter } from "@/components/da/DaFooter";
 import { DaIcon } from "@/components/da/DaIcon";
-import { Tile, type TileLogo } from "@/components/da/Tile";
+import { HeroScene } from "@/components/da/HeroScene";
 import { LandingBento } from "@/components/da/LandingBento";
 import { PricingSection } from "@/components/da/PricingSection";
 import { Faq } from "@/components/da/Faq";
@@ -44,27 +43,6 @@ export const metadata: Metadata = {
 };
 
 const FACES = ["femme", "homme", "mamie", "souriant"] as const;
-
-type SceneTile = { logo: TileLogo; size: "xl" | "l" | "m" | "s"; x: string; y: string; dur: string; del?: string; ent: string };
-const SCENE_TILES: SceneTile[] = [
-  { logo: "build", size: "xl", x: "50%", y: "50%", dur: "8s", ent: ".1s" },
-  { logo: "claude", size: "l", x: "21%", y: "26%", dur: "7s", del: "-1s", ent: ".25s" },
-  { logo: "openai", size: "l", x: "80%", y: "24%", dur: "9s", del: "-3s", ent: ".35s" },
-  { logo: "hermes", size: "l", x: "13%", y: "72%", dur: "8s", del: "-2s", ent: ".45s" },
-  { logo: "stripe", size: "m", x: "85%", y: "70%", dur: "7.5s", del: "-4s", ent: ".55s" },
-  { logo: "cursor", size: "s", x: "34%", y: "88%", dur: "6.5s", del: "-2.5s", ent: ".65s" },
-  { logo: "supabase", size: "s", x: "66%", y: "90%", dur: "7s", del: "-5s", ent: ".75s" },
-];
-
-const SCENE_CHIPS = [
-  { label: "Offre trouvée", x: "36%", y: "11%", dur: "8s", del: "-2s", ent: ".9s" },
-  { label: "Site livré", x: "67%", y: "9%", dur: "9s", del: "-4s", ent: "1s" },
-  { label: "Premier client", x: "50%", y: "80%", dur: "8.5s", del: "-1s", ent: "1.1s" },
-];
-
-function motion(t: { x: string; y: string; dur: string; del?: string; ent: string }): CSSProperties {
-  return { "--x": t.x, "--y": t.y, "--dur": t.dur, "--del": t.del, "--ent": t.ent } as CSSProperties;
-}
 
 const BEFORE = [
   "Tu testes des outils d'IA sans savoir quoi en vendre.",
@@ -126,17 +104,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="scene" aria-hidden="true">
-            <span className="halo" /><span className="anneau" /><span className="anneau anneau--2" />
-            {SCENE_TILES.map((t) => (
-              <Tile key={t.logo} logo={t.logo} className={`tuile--${t.size}`} style={motion(t)} />
-            ))}
-            {SCENE_CHIPS.map((c) => (
-              <span className="puce verre" style={motion(c)} key={c.label}>
-                <i><DaIcon name="check" /></i>{c.label}
-              </span>
-            ))}
-          </div>
+          <HeroScene />
         </section>
 
         <section className="sec" id="pourquoi" aria-labelledby="pourquoi-titre">
