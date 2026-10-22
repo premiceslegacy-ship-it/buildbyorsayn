@@ -12,7 +12,8 @@ test.describe("Skills catalog cards", () => {
   test("cards render uniformly with an illustration and access badge", async ({ authedPage: page }) => {
     await page.goto("/skills");
     await page.locator("#catalogue").scrollIntoViewIfNeeded();
-    const cards = page.locator('img[src^="/assets/illustrations/skills-"]');
+    // next/image sert l'illustration via /_next/image?url=%2Fassets%2Fillustrations%2Fskills-…
+    const cards = page.locator('img[src*="illustrations%2Fskills-"], img[src^="/assets/illustrations/skills-"]');
     await expect(cards.first()).toBeVisible({ timeout: 10_000 });
     expect(await cards.count()).toBeGreaterThan(0);
   });

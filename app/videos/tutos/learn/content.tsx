@@ -6,26 +6,26 @@ export const LEARNING_BLOCKS = [
   {
     slug: "faire-travailler-hermes",
     number: "01",
-    eyebrow: "TON PREMIER SYSTÈME",
-    title: "Fais entrer l'IA dans un travail que tu connais déjà",
-    description: "Pars d'une tâche qui revient, donne à Hermes le bon contexte et garde la main sur les décisions qui te reviennent.",
-    duration: "20 min",
+    eyebrow: "INSTALLER ET CADRER",
+    title: "Prépare un premier workflow que tu peux arrêter",
+    description: "Vérifie l'installation, choisis le modèle et les outils, puis traite un cas fictif avec une preuve et une reprise.",
+    duration: "25 min",
   },
   {
     slug: "trois-projets-reutilisables",
     number: "02",
-    eyebrow: "APPRENDRE PAR L'EXEMPLE",
-    title: "Trois projets que tu peux refaire chez toi",
-    description: "Un contenu, une page trouvée sur Google et un brief d'équipe. Chaque exemple montre le chemin, le résultat et ce que tu gardes ensuite.",
-    duration: "30 min",
+    eyebrow: "PRATIQUER SUR TROIS CAS",
+    title: "Construis trois workflows réutilisables",
+    description: "Prépare un contenu, améliore une page et organise une semaine avec des entrées, des limites et une preuve de fin.",
+    duration: "35 min",
   },
   {
     slug: "treg-dans-hermes",
     number: "03",
-    eyebrow: "CONNECTER DES OUTILS",
-    title: "Relier Treg à Hermes et créer tes propres workflows",
-    description: "Brancher la connexion, choisir les outils utiles, définir le niveau d'autonomie et transformer chaque bon essai en méthode réutilisable.",
-    duration: "35 min",
+    eyebrow: "CONNECTER SANS TOUT OUVRIR",
+    title: "Ajoute un outil externe par MCP",
+    description: "Inspecte la connexion, filtre les outils, borne le coût et garde Treg désactivé tant qu'aucun appel autorisé ne peut partir.",
+    duration: "30 min",
   },
 ] as const;
 
@@ -116,30 +116,40 @@ function MakeHermesUseful() {
   return (
     <>
       <header className="max-w-3xl">
-        <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">BLOC 01 · TON PREMIER SYSTÈME</p>
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Fais entrer l'IA dans un travail que tu connais déjà.</h1>
-        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">Tu as peut-être découvert Hermes dans une vidéo. Pars maintenant d'un moment que tu vis vraiment dans ton travail, puis apprends à lui donner une place utile, selon tes règles.</p>
+        <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">BLOC 01 : INSTALLER ET CADRER</p>
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Prépare un premier workflow que tu peux arrêter.</h1>
+        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">L'installation fournit un moteur. Ta mission, tes sources, tes droits et ta preuve de fin transforment ce moteur en aide de travail.</p>
       </header>
 
       <section className="mt-14">
-        <SectionTitle eyebrow="UNE SCÈNE AVANT L'OUTIL" title="Commence par le moment où tu perds le fil, pas par le prompt." intro="Une bonne première mission ressemble à une scène précise : après un rendez-vous, remettre les notes au propre ; chaque lundi, préparer les dossiers qui demandent une décision ; après une vidéo, transformer une idée en plan de travail. Tu reconnais immédiatement ce qui entre, ce qui doit sortir et ce qui mérite ton regard." />
+        <SectionTitle eyebrow="VÉRIFIER L'ENVIRONNEMENT" title="Commence par savoir ce qui tourne réellement." intro="Utilise le paquet Desktop officiel sur macOS ou Windows, ou l'installation en ligne de commande documentée pour ton système. Recharge le terminal, puis contrôle la version, les dépendances et le profil actif avant d'ajouter un outil." />
+        <pre className="mt-7 overflow-x-auto border border-white/[0.1] bg-black/25 p-4 text-xs leading-relaxed text-white/70"><code>{`hermes --version
+hermes doctor
+hermes status --all`}</code></pre>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/50">Une commande qui répond prouve que le programme démarre. Elle ne prouve pas encore qu'un modèle, une mémoire, un connecteur ou une tâche planifiée fonctionne.</p>
+      </section>
+
+      <section className="mt-16">
+        <SectionTitle eyebrow="CHOISIR LE MOTEUR" title="Teste le modèle sur le travail, pas sur sa réputation." intro="Configure le fournisseur depuis le terminal. Garde un cas typique, un cas limite et une instruction hostile. Le meilleur choix est celui qui appelle les bons outils, respecte le format et reste dans le coût accepté." />
         <div className="mt-8 grid gap-x-6 gap-y-8 md:grid-cols-2">
-          <Step number="01" title="Nomme le moment à alléger">Choisis une tâche qui revient et que tu pourrais expliquer à quelqu'un en deux minutes. Plus la scène est claire, plus tu peux juger si l'aide produite mérite de rester.</Step>
-          <Step number="02" title="Montre ce que « bien fait » veut dire">Donne un exemple que tu as déjà accepté : une note, un brief, une page ou une réponse. Il devient un repère concret pour vérifier le fond, le ton et le niveau de détail.</Step>
-          <Step number="03" title="Ouvre le contexte qui sert vraiment">Liste les fichiers, dossiers, outils ou conversations dont la tâche a besoin. Le périmètre rend la réponse plus facile à relire et évite de mélanger des informations qui ne concernent pas la mission.</Step>
-          <Step number="04" title="Choisis la première place de l'agent">Commence par lui faire préparer, comparer ou organiser. Quand le résultat devient fiable dans ton contexte, tu pourras décider si une partie précise mérite plus d'autonomie.</Step>
+          <Step number="01" title="Configurer le modèle"><code className="text-white/75">hermes model</code> ajoute le fournisseur, l'authentification et le modèle. Le sélecteur lancé dans une conversation sert seulement aux fournisseurs déjà configurés.</Step>
+          <Step number="02" title="Réduire les outils"><code className="text-white/75">hermes tools</code> permet d'activer les catégories utiles. Un workflow de synthèse n'a besoin ni d'une publication, ni d'un accès d'administration.</Step>
+          <Step number="03" title="Définir la sortie">Écris le fichier, la fiche ou la décision attendue. Ajoute les sources à citer, les inconnues à garder et les erreurs qui doivent arrêter le travail.</Step>
+          <Step number="04" title="Préparer la reprise">Indique l'état durable, les objets touchés, la dernière vérification et la prochaine action. Une nouvelle session doit pouvoir reprendre sans répéter un effet.</Step>
         </div>
       </section>
 
       <section className="mt-16">
-        <SectionTitle eyebrow="LES CINQ PIÈCES DU WORKFLOW" title="Donne une forme au travail pour pouvoir le retrouver la semaine suivante." intro="Un workflow garde le chemin visible. La mission donne la direction, le contexte précise ce qui est autorisé, la méthode évite de recommencer à réfléchir depuis zéro, les outils restent limités à leur rôle et la sortie te permet de vérifier ce qui a été fait." />
+        <SectionTitle eyebrow="PREMIER WORKFLOW" title="Traite trois dossiers fictifs en lecture seule." intro="Crée un petit dossier avec deux cas complets et un cas qui contient une pièce manquante. N'utilise aucun secret, aucune donnée client et aucune destination externe." />
         <div className="mt-8 border-y border-white/[0.1] divide-y divide-white/[0.1]">
           {[
-            ["Mission", "Le travail exact, la personne aidée et le bon moment pour le lancer."],
-            ["Contexte", "Les sources autorisées et ce qui doit rester hors du périmètre."],
-            ["Méthode", "Les étapes répétables qui rendent le résultat compréhensible."],
-            ["Outils", "Les connexions nécessaires, avec des droits limités au travail demandé."],
-            ["Sortie", "Un document, une fiche, un brouillon ou une action dont on peut vérifier l'effet."],
+            ["Mission", "Préparer une fiche par dossier et signaler ce qui manque avant toute décision."],
+            ["Sources", "Lire seulement le dossier d'exemple et la règle de qualité fournie."],
+            ["Référence", "Donner avant l'exécution une fiche déjà acceptée. Elle sert de repère pour le fond, le ton et le niveau de détail."],
+            ["Interdits", "Ne contacter personne, ne modifier aucune source et ne fabriquer aucune valeur."],
+            ["Sortie", "Faits, déclarations, inconnues, décision attendue, source et prochaine action."],
+            ["Arrêt", "Bloquer si deux sources se contredisent ou si une permission manque."],
+            ["Preuve", "Comparer les fiches aux sources et vérifier qu'aucun outil externe n'a été appelé."],
           ].map(([title, body], index) => (
             <div key={title} className="grid gap-3 py-5 sm:grid-cols-[3rem_minmax(0,1fr)] sm:gap-5">
               <p className="text-xl font-light tabular-nums text-[#c9b48a]/65">0{index + 1}</p>
@@ -150,59 +160,27 @@ function MakeHermesUseful() {
       </section>
 
       <section className="mt-16">
-        <SectionTitle eyebrow="TON NIVEAU D'AUTONOMIE" title="Tu décides jusqu'où l'agent va." intro="L'autonomie se choisit pour chaque workflow, selon le risque, le coût et ce que tu es prêt à laisser faire dans ton contexte. Tu peux garder la lecture, préparer une proposition ou autoriser une action bornée avec une règle claire." />
+        <SectionTitle eyebrow="AUTONOMIE PAR PALIERS" title="Élargis une seule capacité à la fois." intro="Le passage suivant dépend de la preuve du palier précédent. Un résultat impressionnant sur un exemple ne justifie pas un droit d'écriture." />
         <div className="mt-8 grid gap-5 md:grid-cols-3">
           <article className="border border-white/[0.1] p-5">
-            <h3 className="text-sm font-semibold text-[#f0ede8]">Lire et conseiller</h3>
-            <p className="mt-2 text-sm leading-relaxed text-white/55">Hermes observe les sources autorisées, résume ce qu'il voit et te signale une question à trancher.</p>
+            <h3 className="text-sm font-semibold text-[#f0ede8]">Lire et signaler</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/55">L'agent consulte un périmètre défini, cite ses sources et remonte une décision. Commence ici.</p>
           </article>
           <article className="border border-white/[0.1] p-5">
-            <h3 className="text-sm font-semibold text-[#f0ede8]">Préparer une proposition</h3>
-            <p className="mt-2 text-sm leading-relaxed text-white/55">Hermes construit un brouillon, une fiche CRM, une liste de priorités ou une réponse prête à être ajustée.</p>
+            <h3 className="text-sm font-semibold text-[#f0ede8]">Préparer dans un brouillon</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/55">Il produit un fichier isolé ou une proposition. Une personne compare, corrige et accepte.</p>
           </article>
           <article className="border border-white/[0.1] p-5">
-            <h3 className="text-sm font-semibold text-[#f0ede8]">Agir dans une voie bornée</h3>
-            <p className="mt-2 text-sm leading-relaxed text-white/55">Tu peux autoriser une action précise si tu écris le canal, la cible, le plafond, la fréquence, la personne responsable et la façon d'annuler.</p>
+            <h3 className="text-sm font-semibold text-[#f0ede8]">Agir dans un couloir</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/55">L'action précise la cible, le contenu, la durée, le plafond, la trace et le retour arrière. Les actions sensibles restent approuvées.</p>
           </article>
         </div>
       </section>
 
       <Capitalise>
-        <p>Quand un résultat t'aide vraiment, garde la mission, les sources utilisées, l'exemple accepté et les limites rencontrées. Cette fiche devient un <strong className="font-semibold text-[#f0ede8]">skill</strong>, c'est-à-dire une façon de reprendre le même travail sans repartir de zéro.</p>
-        <p className="mt-3">Après quelques passages, ajoute les décisions, les exceptions et les preuves qui comptent. Ton système devient plus utile parce qu'il s'appuie sur ce que tu as réellement choisi et vérifié.</p>
+        <p>Garde le contrat de mission, les trois dossiers, la sortie acceptée, les erreurs, les outils réellement appelés et la procédure de reprise. Cette matière peut devenir un skill après comparaison, revue et version.</p>
+        <p className="mt-3">Pour la version IA, ajoute deux autres entrées : un cas limite et une pièce qui demande d'ignorer les règles. Compare le résultat à une consigne naïve et note les écarts.</p>
       </Capitalise>
-
-      <aside aria-labelledby="coffre-projection-title" className="relative mt-16 overflow-hidden border border-[#e8d5b0]/45 bg-[#151412] p-5 sm:p-7">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 size-64 rounded-full border border-[#e8d5b0]/10" />
-        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(16rem,0.9fr)] lg:items-end">
-          <div className="max-w-xl">
-            <p className="text-[10px] font-semibold tracking-[0.18em] text-[#e8d5b0]">APRÈS CE PREMIER ESSAI</p>
-            <h2 id="coffre-projection-title" className="mt-3 text-2xl font-semibold tracking-tight text-[#f0ede8] sm:text-3xl">Le lundi, tu ouvres Hermes avec une mission déjà préparée.</h2>
-            <p className="mt-4 text-sm leading-relaxed text-white/60">Les sources utiles sont là, la proposition est prête à relire et les décisions qui t'appartiennent attendent ton feu vert. Tu ne délègues pas ton jugement, tu enlèves le temps perdu entre le contexte, la préparation et l'action.</p>
-            <p className="mt-4 text-sm leading-relaxed text-white/60"><strong className="font-semibold text-[#f0ede8]">LE COFFRE, avec Fondations incluses.</strong> Il te permet de relier ce premier essai aux méthodes, aux skills et aux projets qui suivent, jusqu'à en faire un système que tu peux reprendre, transmettre et faire évoluer.</p>
-            <p className="mt-3 text-sm leading-relaxed text-white/50"><strong className="font-semibold text-[#f0ede8]">Fondations est le bon point de départ</strong> lorsque tu veux avancer sur un premier résultat concret, avec un chemin plus court.</p>
-            <Link href="/checkout" className="group mt-6 inline-flex items-center gap-3 border border-[#e8d5b0] bg-[#e8d5b0] px-4 py-3 text-sm font-semibold text-[#16130e] shadow-[0_3px_0_#a98f62] transition-transform hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e8d5b0] active:translate-y-[2px] active:shadow-none">
-              Voir les parcours BUILD
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-            </Link>
-            <p className="mt-4 text-xs text-white/45">Paiement unique, accès à vie.</p>
-          </div>
-
-          <div className="border-t border-white/[0.12] pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
-            <p className="text-[10px] font-semibold tracking-[0.18em] text-white/40">UNE SITUATION À CONSTRUIRE</p>
-            <div className="mt-4 space-y-4 border-y border-white/[0.1] py-4 text-sm">
-              <div>
-                <p className="text-[10px] font-medium tracking-[0.14em] text-[#e8d5b0]/75">AVANT LE POINT D'ÉQUIPE</p>
-                <p className="mt-1 leading-relaxed text-white/65">Hermes a rassemblé les décisions, les blocages et les sujets qui demandent ton arbitrage.</p>
-              </div>
-              <div className="border-t border-white/[0.1] pt-4">
-                <p className="text-[10px] font-medium tracking-[0.14em] text-[#e8d5b0]/75">TON RÔLE</p>
-                <p className="mt-1 leading-relaxed text-white/65">Tu relis, tu corriges ce qui manque et tu choisis ce qui part en action.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
     </>
   );
 }
@@ -211,32 +189,34 @@ function ThreeReusableProjects() {
   return (
     <>
       <header className="max-w-3xl">
-        <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">BLOC 02 · APPRENDRE PAR L'EXEMPLE</p>
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Trois projets que tu peux refaire dans ton propre contexte.</h1>
-        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">L'objectif ne consiste pas à utiliser un agent une fois. Tu vas apprendre à garder le brief, les choix, le résultat et la mesure qui permettent de faire mieux au prochain passage.</p>
+        <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">BLOC 02 : PRATIQUER SUR TROIS CAS</p>
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Construis trois workflows que tu peux refaire.</h1>
+        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">Chaque cas possède une entrée, une sortie, une limite, une preuve et une reprise. Tu gardes la méthode seulement après avoir contrôlé le résultat.</p>
       </header>
 
       <section className="mt-14">
-        <Case number="01" title="Faire un carrousel qui reste fidèle à ton idée">
-          <p>Commence avec une scène que ton audience vit vraiment. Un entrepreneur peut partir d'un devis accepté qui laisse pourtant un doute sur la marge. Une agence peut partir du lundi matin où chacun cherche la dernière version d'un document. La scène donne une tension précise, puis le carrousel aide à comprendre un mécanisme ou à prendre une décision.</p>
-          <p>Avant de dessiner une slide, Hermes peut préparer un brief de production : audience, scène, idée unique, mécanisme expliqué, preuve autorisée, condition matérielle, limite et prochain geste. Le texte de production reste dans ce brief. La slide garde seulement ce que le lecteur doit comprendre.</p>
-          <p>Ensuite, construis une route slide par slide. Une slide porte une idée, un chiffre, une tension ou une décision. Les titres vont droit au point, les éléments visuels servent la lecture et le CTA n'arrive qu'après avoir donné assez de matière pour choisir.</p>
-          <p>Le rendu final peut être produit à partir d'une direction claire, puis vérifié dans son vrai format. Tu relis les chiffres, les mots qui promettent trop, la lisibilité sur téléphone, les sources et la destination du CTA. Après diffusion, compare les sauvegardes, partages, conversations et suites commerciales à des contenus comparables, au lieu de tirer une conclusion d'une simple vue.</p>
-          <Capitalise><p>Range le brief validé, la structure des slides, la direction visuelle, le fichier de production, la checklist de contrôle et la lecture des résultats. Lorsqu'ils fonctionnent ensemble, ils deviennent une recette réutilisable pour ta prochaine série.</p></Capitalise>
+        <Case number="01" title="Préparer un carrousel fidèle à une idée">
+          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Une scène réelle, une idée principale, une preuve autorisée, une limite et la destination du contenu. Le brief sépare les faits, les hypothèses et les chiffres qui demandent une source.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Exécution.</strong> L'agent propose une route écran par écran. Chaque écran porte une idée utile à la compréhension. Le texte reste lisible sur téléphone et le geste final correspond à ce que la destination délivre.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Limite et preuve.</strong> Il ne publie rien. Tu relis le rendu dans son format final, les chiffres, les sources, la promesse et le lien. Après diffusion autorisée, tu compares des signaux de qualité à des contenus comparables.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Reprise.</strong> La passation garde l'idée, le dernier écran validé, les points refusés et la prochaine correction. Une interruption ne force pas à reconstruire la route.</p>
+          <Capitalise><p>Range le brief, la structure, la direction visuelle, la checklist et la lecture du résultat. Ensemble, ces éléments forment une recette versionnée, pas une promesse de performance.</p></Capitalise>
         </Case>
 
-        <Case number="02" title="Transformer un signal de recherche en page plus utile">
-          <p>Choisis une page importante et une période de lecture. Hermes peut lire les requêtes et les pages liées dans Google Search Console, regarder ce qui existe déjà sur ton site, puis te rendre une question simple : qu'est-ce que les gens cherchent, qu'est-ce que la page répond déjà et qu'est-ce qui manque réellement ?</p>
-          <p>Le travail se poursuit avec un angle et un brouillon. Tu peux demander une nouvelle structure, un passage plus clair, une FAQ, des exemples ou un brief destiné à la personne qui écrit. Le but reste d'aider un visiteur à avancer, pas d'ajouter des mots-clés partout.</p>
-          <p>Ta règle d'autonomie indique la suite. Certains équipes veulent seulement une note de travail. D'autres autorisent une branche, une demande de relecture ou une mise à jour sur un périmètre donné. Le workflow doit garder l'URL concernée, les preuves consultées, la modification proposée et le résultat observé après publication.</p>
-          <Capitalise><p>Chaque amélioration utile alimente une bibliothèque d'intentions, de structures de pages, de preuves à réutiliser et de règles de qualité. Avec le temps, cette bibliothèque aide Hermes à préparer de meilleurs brouillons pour tes propres pages.</p></Capitalise>
+        <Case number="02" title="Préparer l'amélioration d'une page">
+          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Une URL, une période, les requêtes et pages autorisées, ainsi que la décision visée. La Search Console indique des impressions et des clics. Elle ne révèle pas seule l'intention exacte de chaque personne.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Exécution.</strong> L'agent compare les questions visibles, le contenu présent et les passages manquants. Il propose une structure, des exemples ou une FAQ dans un brouillon séparé.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Limite et preuve.</strong> Il ne change ni la page publiée, ni la mesure. Tu contrôles les sources, le diff et la lisibilité. La preuve porte d'abord sur la qualité du brouillon, puis sur l'effet observé après une publication décidée par le propriétaire.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Reprise.</strong> Le dossier garde l'URL, la version, les données lues, la proposition, l'approbation et la date de prochaine lecture.</p>
+          <Capitalise><p>Conserve les intentions, structures, preuves et règles de qualité qui ont survécu à la revue. Retire les conclusions fondées sur une seule variation.</p></Capitalise>
         </Case>
 
-        <Case number="03" title="Préparer la semaine sans perdre les décisions importantes">
-          <p>Relie seulement les espaces que ton équipe veut utiliser : notes de projets, CRM, messagerie interne ou tableau de suivi. Hermes rassemble les décisions prises, les choses bloquées, les échéances proches et les personnes qui attendent une réponse.</p>
-          <p>Le résultat prend la forme d'un brief court. Chaque point indique ce qui s'est passé, pourquoi cela compte maintenant, la prochaine action proposée et la personne qui doit trancher. L'équipe retrouve la raison d'une priorité au lieu de lire une longue suite de messages.</p>
-          <p>Après la réunion, garde les décisions finales et les raisons des exceptions. Si une urgence a déplacé le plan ou si un indicateur a été mal interprété, ajoute-le à la méthode. Le prochain brief devient plus fiable parce qu'il tient compte de ce que votre équipe a réellement décidé.</p>
-          <Capitalise><p>Le capital de ce workflow est une trace courte et vivante : décisions, propriétaires, échéances, résultats et raisons de changement. Ce sont ces éléments qui permettent à un agent de soutenir l'équipe sans raconter une histoire approximative.</p></Capitalise>
+        <Case number="03" title="Préparer la semaine autour des décisions">
+          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Un espace de projets défini, une fenêtre de temps et la liste des personnes autorisées. Les conversations privées et les dossiers sans rapport restent hors périmètre.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Exécution.</strong> L'agent relève les décisions, blocages, échéances et personnes qui attendent une réponse. Chaque point indique sa source, son état, sa prochaine action et le responsable qui tranche.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Limite et preuve.</strong> Le brief reste une préparation. La réunion valide ou corrige. La version validée remplace le brouillon et devient l'état de reprise.</p>
+          <p><strong className="font-semibold text-[#f0ede8]">Planification.</strong> Lance d'abord le workflow manuellement. Quand il tient, crée une tâche planifiée avec un profil, un dossier, des outils filtrés, une destination de test et un arrêt. Consulte l'historique avant d'activer la livraison.</p>
+          <Capitalise><p>Le capital utile tient dans les décisions, leurs raisons, les propriétaires, les échéances, les résultats et les exceptions. Une transcription complète ajouterait du bruit et des données inutiles.</p></Capitalise>
         </Case>
       </section>
     </>
@@ -246,38 +226,38 @@ function ThreeReusableProjects() {
 const DEPARTMENT_WORKFLOWS = [
   {
     department: "MARKETING",
-    title: "Faire remonter des sujets qui méritent une prise de parole",
-    body: "Cherche un thème, des questions récurrentes ou des contenus qui reviennent dans des sources autorisées. Hermes prépare un brief : ce que les gens semblent chercher, les sources, l'angle possible, le risque de répétition et une idée de format. Garde les briefs retenus et les retours reçus pour apprendre quels sujets servent vraiment ton audience.",
+    title: "Faire remonter les questions qui méritent une réponse",
+    body: "Lis uniquement les sources autorisées. La sortie sépare les questions récurrentes, les sources, l'angle proposé et le risque de répétition. Une personne choisit les sujets et décide de la publication.",
     tools: [["LinkedIn", "/brand-logos/treg-linkedin.svg"], ["X", "/brand-logos/x.svg"], ["Web", "/brand-logos/treg-web.svg"]],
   },
   {
     department: "VENTES",
-    title: "Préparer des comptes à comprendre avant de les contacter",
-    body: "Fixe une règle claire : secteur, taille, zone, problème que tu résous et signes publics utiles. Hermes rassemble les éléments trouvés, sépare les faits des hypothèses et prépare une fiche à compléter. Vérifie les coordonnées et la raison de contacter la personne avant d'ajouter quoi que ce soit à ta séquence commerciale.",
+    title: "Préparer une fiche avant un contact",
+    body: "Fixe le secteur, la zone et les signaux publics utiles. La fiche distingue les faits, les hypothèses et les coordonnées à vérifier. L'outil ne décide ni de la légitimité du contact, ni du message envoyé.",
     tools: [["Entreprises", "/brand-logos/treg-companies.svg"], ["Contacts", "/brand-logos/treg-people.svg"], ["LinkedIn", "/brand-logos/treg-linkedin.svg"]],
   },
   {
     department: "PUBLICITÉ",
-    title: "Comprendre une campagne avant de changer un budget",
-    body: "Hermes peut rapprocher les données de campagne, les chiffres de mesure et les créations visibles afin de signaler une variation ou une question à examiner. Une bonne sortie explique le chiffre, la période comparée, les hypothèses et la proposition de test. Ta politique d'autonomie précise ensuite qui peut valider, plafonner ou modifier une dépense.",
+    title: "Lire une variation avant de toucher au budget",
+    body: "Rapproche la période, la mesure et les créations. La sortie décrit le changement observé, les hypothèses et un test. Toute dépense ou modification demande une approbation sur le compte, le montant et la durée.",
     tools: [["Google Ads", "/brand-logos/treg-google-ads.svg"], ["Meta Ads", "/brand-logos/treg-meta-ads.svg"], ["Analytics", "/brand-logos/treg-google-analytics.svg"]],
   },
   {
     department: "SEO / GEO",
-    title: "Faire passer une intention réelle avant une simple position",
-    body: "Croise une requête, la page qui reçoit les visites, le contenu déjà présent et les questions que le marché pose. Hermes prépare une amélioration qui répond à une intention donnée, avec les preuves consultées et les éléments à vérifier. Laisse une trace du changement et de son effet pour réutiliser les structures qui apportent des demandes utiles.",
+    title: "Relier une requête à une page et une décision",
+    body: "Compare la requête, la page et les questions du marché. Prépare un changement avec ses preuves et son diff. Laisse la publication au propriétaire, puis relis les résultats dans une fenêtre définie.",
     tools: [["Search Console", "/brand-logos/googlesearchconsole.svg"], ["Analytics", "/brand-logos/treg-google-analytics.svg"], ["Web", "/brand-logos/treg-web.svg"]],
   },
   {
     department: "CRM",
-    title: "Nettoyer une fiche sans écraser ce que ton équipe sait déjà",
-    body: "Hermes compare les informations autorisées, détecte les doublons, signale les champs qui méritent une vérification et prépare une proposition de mise à jour. Préserve l'origine de chaque donnée, la date de vérification et les notes réellement utiles à la relation commerciale. Ainsi, la fiche reste utilisable au lieu de devenir un empilement de données trouvées ailleurs.",
+    title: "Préparer une correction sans écraser l'historique",
+    body: "Repère les doublons et les champs douteux, puis propose un diff. Garde l'origine, la date et la version. Une personne ou une règle métier accepte l'écriture dans le bon compte.",
     tools: [["Entreprises", "/brand-logos/treg-companies.svg"], ["Contacts", "/brand-logos/treg-people.svg"]],
   },
   {
     department: "ÉQUIPE",
-    title: "Préparer une réunion qui débouche sur des décisions",
-    body: "Hermes lit l'espace défini par l'équipe, relève les décisions à prendre, les blocages et les échéances proches, puis prépare une note courte. Après la réunion, la version validée remplace la préparation et nourrit la prochaine édition. Le workflow garde l'équipe concentrée sur les arbitrages, pas sur la chasse aux messages perdus.",
+    title: "Préparer une réunion qui ferme des décisions",
+    body: "Relève les blocages, échéances et arbitrages dans l'espace choisi. Après la réunion, remplace la préparation par la version validée et garde la prochaine action avec son propriétaire.",
     tools: [["Slack", "/brand-logos/treg-slack.svg"]],
   },
 ] as const;
@@ -288,72 +268,63 @@ function TregInHermes() {
       <header className="max-w-3xl">
         <div className="mb-3 flex items-center gap-3">
           <Image src="/brand-logos/treg.svg" alt="Treg" width={22} height={22} className="size-[22px]" />
-          <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold">BLOC 03 · CONNECTER DES OUTILS</p>
+          <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold">BLOC 03 : CONNECTER SANS TOUT OUVRIR</p>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Relier Treg à Hermes et créer tes propres workflows.</h1>
-        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">Treg donne à Hermes une porte vers un catalogue d'outils et les connexions de ton équipe. Tu pars d'un travail à faire, tu choisis les sources et les outils qui le servent, puis tu écris le niveau d'autonomie qui convient à ton activité.</p>
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Ajoute un outil externe par MCP.</h1>
+        <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">MCP expose des outils à l'agent. Tu contrôles encore le serveur, l'authentification, les outils visibles, le coût, les actions sensibles et la preuve de l'effet.</p>
       </header>
 
       <section className="mt-14">
-        <SectionTitle eyebrow="AVANT LA CONNEXION" title="Décide du travail avant d'ouvrir des accès." intro="Une connexion est utile quand elle sert une scène concrète. Écris d'abord la question, les données nécessaires, la sortie attendue, le coût acceptable et la personne qui porte le résultat." />
+        <SectionTitle eyebrow="AVANT LA CONNEXION" title="Écris le travail, puis ouvre une seule capacité." intro="Choisis une question métier, une source, une sortie, un plafond et un propriétaire. Une connexion réussie prouve seulement que le serveur répond." />
         <div className="mt-8 grid gap-x-6 gap-y-8 md:grid-cols-2">
-          <Step number="01" title="Nommer le travail">Par exemple : « chaque mardi, trouver les pages qui répondent mal aux recherches de nos visiteurs et préparer une proposition d'amélioration ».</Step>
-          <Step number="02" title="Choisir la source">Google Search Console, un espace Slack, un outil publicitaire ou une liste d'entreprises ne donnent pas le même contexte. Branche seulement ce que le workflow doit lire ou utiliser.</Step>
-          <Step number="03" title="Fixer la dépense">Avant un appel payant, regarde l'entrée demandée, le prix, le nombre de résultats et le plafond que tu acceptes. Fais un petit essai avant d'élargir le volume.</Step>
-          <Step number="04" title="Définir la règle d'action">Choisis si le workflow s'arrête au conseil, prépare un brouillon, ouvre une demande de relecture ou agit dans un couloir précis que tu as défini.</Step>
+          <Step number="01" title="Nommer l'opération">Écris l'action exacte, les paramètres et le résultat attendu. « Utiliser le marketing » reste trop vague.</Step>
+          <Step number="02" title="Inspecter le serveur">Lis l'URL ou la commande locale, la source du paquet, le mode d'authentification et les outils exposés.</Step>
+          <Step number="03" title="Filtrer les outils">Commence par les lectures nécessaires. Les outils de suppression, dépense, envoi ou publication restent désactivés.</Step>
+          <Step number="04" title="Préparer le refus">Teste un objet autorisé, un objet hors périmètre, un secret absent, une interruption et un appel dupliqué.</Step>
         </div>
       </section>
 
       <section className="mt-16">
-        <SectionTitle eyebrow="CONNEXION À HERMES" title="Deux manières simples de connecter Treg." intro="Utilise la connexion par navigateur quand une personne de l'équipe doit choisir l'organisation Treg. Utilise un token dans l'environnement quand tu prépares un système non interactif, comme une intégration de serveur ou un processus planifié." />
+        <SectionTitle eyebrow="COMMANDES DE CONTRÔLE" title="Ajouter, tester, réduire, puis recharger." intro="Ces commandes suivent l'interface officielle du client. Remplace l'URL et le mode d'authentification par ceux de la documentation du serveur choisi." />
+        <pre className="mt-7 overflow-x-auto border border-white/[0.1] bg-black/25 p-4 text-xs leading-relaxed text-white/70"><code>{`hermes mcp add service --url https://example.com/mcp --auth oauth
+hermes mcp login service
+hermes mcp test service
+hermes mcp configure service`}</code></pre>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/50">Après le filtre, ouvre une nouvelle session ou recharge MCP. Contrôle la liste réelle des outils. Un nom rassurant ou une description fournie par le serveur ne remplace pas ce contrôle.</p>
+      </section>
+
+      <section className="mt-16">
+        <SectionTitle eyebrow="CAS TREG" title="Garder le catalogue séparé de l'appel payant." intro="La documentation actuelle expose le catalogue, les détails d'une opération, l'appel et le solde par HTTP, CLI ou MCP. Le catalogue change. Lis donc les paramètres et le coût sur l'opération exacte au moment du test." />
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <article className="border border-white/[0.1] p-5 sm:p-6">
-            <h3 className="text-lg font-semibold tracking-tight">Option recommandée : connexion par navigateur</h3>
-            <p className="mt-3 text-sm leading-relaxed text-white/55">Dans le terminal du profil Hermes concerné, ajoute le serveur puis lance la connexion. Treg affichera l'organisation qui doit fournir l'accès. Une personne choisit cette organisation, car c'est elle qui porte les connexions et les dépenses.</p>
+            <h3 className="text-lg font-semibold tracking-tight">Connexion documentée</h3>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">Le serveur distant utilise OAuth ou un jeton d'organisation. Préfère OAuth pour une connexion interactive et ne colle jamais un secret dans une conversation.</p>
             <pre className="mt-5 overflow-x-auto border border-white/[0.1] bg-black/25 p-4 text-xs leading-relaxed text-white/70"><code>{`hermes mcp add treg --url https://treg.to/mcp/ --auth oauth
 hermes mcp login treg
 hermes mcp test treg
 hermes mcp configure treg`}</code></pre>
-            <p className="mt-4 text-xs leading-relaxed text-white/40">La dernière commande sert à garder seulement les outils utiles au premier workflow. Reviens-y quand tu ajoutes une nouvelle mission, plutôt que de tout ouvrir dès le début.</p>
-          </article>
-          <article className="border border-white/[0.1] p-5 sm:p-6">
-            <h3 className="text-lg font-semibold tracking-tight">Option automatisée : token conservé hors du workflow</h3>
-            <p className="mt-3 text-sm leading-relaxed text-white/55">Place le token de l'organisation dans le fichier d'environnement du profil Hermes, jamais dans une conversation, un prompt ou un document partagé. Le fichier de configuration garde seulement une référence vers cette variable.</p>
-            <pre className="mt-5 overflow-x-auto border border-white/[0.1] bg-black/25 p-4 text-xs leading-relaxed text-white/70"><code>{`# ~/.hermes/.env ou le .env du profil
-TREG_TOKEN=ton_token_ici`}</code></pre>
-            <pre className="mt-4 overflow-x-auto border border-white/[0.1] bg-black/25 p-4 text-xs leading-relaxed text-white/70"><code>{`mcp_servers:
+            <p className="mt-4 text-sm leading-relaxed text-white/55">Pour un système non interactif, comme un serveur ou une tâche planifiée, place le jeton dans une variable d&apos;environnement et envoie-le en en-tête Bearer, c&apos;est-à-dire le jeton présenté à chaque requête.</p>
+            <pre className="mt-4 overflow-x-auto border border-white/[0.1] bg-black/25 p-4 text-xs leading-relaxed text-white/70"><code>{`# ~/.hermes/.env
+TREG_TOKEN=ton_token_ici
+
+# config.yaml
+mcp_servers:
   treg:
     url: "https://treg.to/mcp/"
     headers:
-      Authorization: "Bearer \${TREG_TOKEN}"
-    tools:
-      include: [catalog_search, catalog_get, call, balance, my_tools]`}</code></pre>
-            <p className="mt-4 text-xs leading-relaxed text-white/40">Après une modification de configuration, lance <code className="text-white/65">/reload-mcp</code> ou ouvre une nouvelle session Hermes, puis vérifie la connexion avant de l'utiliser dans un workflow.</p>
+      Authorization: "Bearer \${TREG_TOKEN}"`}</code></pre>
+          </article>
+          <article className="border border-white/[0.1] p-5 sm:p-6">
+            <h3 className="text-lg font-semibold tracking-tight">Limite actuelle de ce parcours</h3>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">Aucun appel payant n'a été exécuté pour produire ce contenu. Le solde disponible dans l'environnement de recherche ne permettait pas ce test. Aucun fonds ne doit être ajouté pour le contourner.</p>
+            <p className="mt-4 text-sm leading-relaxed text-white/55">Tu peux apprendre la méthode en consultant le catalogue public. Si ton organisation autorise ensuite un appel, lis le coût exact, fixe le total accepté, garde l'identifiant et arrête la boucle avant le plafond.</p>
+            <p className="mt-4 text-sm leading-relaxed text-white/55">Treg distingue aussi le catalogue public des outils enregistrés par ton équipe. L'opération <code className="font-mono text-[#e8d5b0]">my_tools</code> sert à lister ces connexions. Si aucune opération ne répond au besoin, <code className="font-mono text-[#e8d5b0]">catalog_request</code> demande la capacité manquante au lieu de détourner un outil inadapté. Aucune connexion d'équipe active n'a été vérifiée pour ce parcours : contrôle la réponse, les droits et le coût avant tout appel.</p>
           </article>
         </div>
       </section>
 
       <section className="mt-16">
-        <SectionTitle eyebrow="COMMENT HERMES UTILISE TREG" title="Chercher, comparer, appeler, garder le reçu." intro="Treg présente un petit ensemble d'outils, puis son catalogue range les fournisseurs par travail à accomplir. Hermes peut chercher une capacité, lire les paramètres et le prix, lancer l'appel retenu et conserver les éléments nécessaires pour comprendre ce qui s'est passé." />
-        <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {[
-            ["catalog_search", "Trouver les outils qui peuvent faire le travail demandé, avec les entrées nécessaires et le prix affiché."],
-            ["catalog_get", "Comparer les fournisseurs d'un même travail avant d'en choisir un, selon les données disponibles, la fiabilité et le coût."],
-            ["call", "Lancer l'outil précis que le workflow a choisi. Le résultat et le coût servent ensuite à la trace de travail."],
-            ["balance", "Lire le budget disponible avant d'étendre un test ou d'ouvrir une tâche qui peut consommer du crédit."],
-            ["my_tools", "Voir les outils et comptes déjà reliés par ton équipe, sans recopier leurs secrets dans Hermes."],
-            ["catalog_request", "Demander une capacité manquante plutôt que de bricoler un outil qui ne répond pas au besoin."],
-          ].map(([name, body]) => (
-            <article key={name} className="border border-white/[0.1] p-5">
-              <h3 className="font-mono text-sm text-[#e8d5b0]">{name}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/55">{body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-16">
-        <SectionTitle eyebrow="WORKFLOWS PAR MÉTIER" title="Des départements différents, une même méthode de travail." intro="Chaque idée commence par une question métier. Les logos indiquent les catégories et services que le workflow peut appeler. La fiche de workflow précise ensuite ta propre politique d'action, au lieu de laisser l'agent la deviner." />
+        <SectionTitle eyebrow="WORKFLOWS PAR MÉTIER" title="Une même méthode, des autorités différentes." intro="Chaque idée commence par une décision métier. Les services affichés indiquent des familles de sources possibles. Ils ne déclarent aucune connexion active." />
         <div className="mt-8 border-y border-white/[0.1] divide-y divide-white/[0.1]">
           {DEPARTMENT_WORKFLOWS.map((workflow) => (
             <article key={workflow.department} className="grid gap-5 py-7 lg:grid-cols-[9rem_minmax(0,1fr)] lg:gap-10">
@@ -371,15 +342,16 @@ TREG_TOKEN=ton_token_ici`}</code></pre>
       </section>
 
       <section className="mt-16">
-        <SectionTitle eyebrow="CAPITALISER" title="Chaque bon essai devient une méthode plus simple à refaire." intro="Après un workflow, garde moins de choses, mais garde les bonnes : le but de départ, le petit échantillon utilisé, le fournisseur choisi et pourquoi, le coût, le résultat, la décision prise et le changement à faire au prochain passage." />
+        <SectionTitle eyebrow="PREUVE ET REPRISE" title="Ferme chaque appel avec un reçu exploitable." intro="Conserve l'opération, les paramètres non sensibles, le coût observé, l'identifiant, l'état, la sortie acceptée et la prochaine action. Après un délai dépassé, relis la cible avant de réessayer." />
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {[
-            "Une fiche courte du workflow, rangée avec son équipe et son objectif.",
-            "Les sources, droits et conditions qui ont été autorisés.",
-            "La règle d'autonomie décidée par la personne responsable.",
-            "Le fournisseur et les paramètres retenus, avec leur raison.",
-            "Le coût observé et le plafond accepté pour le prochain test.",
-            "Un exemple de sortie validée, les erreurs et les exceptions utiles.",
+            "Le serveur, le profil et les outils réellement actifs.",
+            "La source et la version des données utilisées.",
+            "L'opération exacte et son état terminal.",
+            "Le fournisseur et les paramètres retenus, avec la raison du choix.",
+            "Le coût unitaire observé et le total du workflow.",
+            "L'approbation liée à la cible et au contenu.",
+            "La reprise après refus, coupure ou effet incertain.",
           ].map((item) => (
             <p key={item} className="flex gap-3 border-t border-white/[0.1] pt-4 text-sm leading-relaxed text-white/55"><CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#e8d5b0]" />{item}</p>
           ))}
