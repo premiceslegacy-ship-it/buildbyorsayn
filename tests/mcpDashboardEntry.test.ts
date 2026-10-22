@@ -43,6 +43,12 @@ test("the MCP setup page gates instructions by paid access and uses a focused la
 
   assert.match(page, /\/brand-logos\/claude\.svg/);
   assert.match(page, /\/brand-logos\/chatgpt\.svg/);
+  assert.match(page, /\/brand-logos\/hermes-agent-mark\.png/);
+  assert.match(page, /\/brand-logos\/omp\.svg/);
+  assert.match(page, /\/brand-logos\/cursor\.svg/);
+  // 390 px : la rangée de cinq logos passe sous le titre au lieu de déborder de la page.
+  assert.match(page, /flex flex-wrap items-center gap-3/);
+  assert.match(page, /flex flex-col items-start gap-6 sm:flex-row sm:justify-between/);
   assert.match(page, /Connecte BUILD à ton assistant/);
   assert.match(page, /Impossible de vérifier ton accès BUILD/);
   assert.match(page, /Choisir mon accès/);

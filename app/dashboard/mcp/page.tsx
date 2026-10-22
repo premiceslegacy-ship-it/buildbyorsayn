@@ -18,7 +18,7 @@ export const metadata = {
 
 function ClientLogos() {
   return (
-    <div className="flex items-center gap-3" aria-label="Claude, ChatGPT, Hermes et Oh My Pi">
+    <div className="flex flex-wrap items-center gap-3" aria-label="Claude, ChatGPT, Hermes, Oh My Pi et Cursor">
       <Image
         src="/brand-logos/claude.svg"
         alt="Claude"
@@ -43,6 +43,13 @@ function ClientLogos() {
       <Image
         src="/brand-logos/omp.svg"
         alt="Oh My Pi"
+        width={28}
+        height={28}
+        className="h-7 w-7 object-contain"
+      />
+      <Image
+        src="/brand-logos/cursor.svg"
+        alt="Cursor"
         width={28}
         height={28}
         className="h-7 w-7 object-contain"
@@ -150,7 +157,7 @@ export default async function McpDashboardPage({
 
   return (
     <PageShell>
-      <div className="flex items-start justify-between gap-6">
+      <div className="flex flex-col items-start gap-6 sm:flex-row sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#c9b48a]">
             {connectorLaunched ? "Connexion disponible" : "Connexion bêta"}
