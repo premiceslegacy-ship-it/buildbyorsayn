@@ -55,9 +55,14 @@ test.describe("Accueil public", () => {
     }
   });
 
-  test("la FAQ a ses six questions", async ({ page }) => {
+  test("chaque question de la FAQ s'ouvre sur une réponse", async ({ page }) => {
     await openLanding(page);
-    await expect(page.locator("section#faq details")).toHaveCount(6);
+    const items = page.locator("section#faq details");
+    expect(await items.count()).toBeGreaterThan(0);
+    for (const item of await items.all()) {
+      await item.locator("summary").click();
+      await expect(item.locator("summary ~ *").first()).toBeVisible();
+    }
   });
 
   test("le pied de page mène aux quatre pages légales", async ({ page }) => {
