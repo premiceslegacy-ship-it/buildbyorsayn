@@ -122,6 +122,32 @@ export function readingProgress(
   return Math.min(1, Math.max(0, scrollTop / available));
 }
 
+export function readerWordCount(content: string): number {
+  const readable = content
+    .replace(/^---[\s\S]*?^---\s*$/m, " ")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/\[\[(?:schema|maquette):[^\]]+\]\]/gi, " ")
+    .replace(/:::[^\n]*/g, " ")
+    .replace(/[#>*_=`~|]/g, " ");
+  return readable.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)?/gu)?.length ?? 0;
+}
+
+export function estimateReadingMinutes(content: string, wordsPerMinute = 220): number {
+  const words = readerWordCount(content);
+  if (words === 0) return 0;
+  return Math.max(1, Math.ceil(words / Math.max(1, wordsPerMinute)));
+}
+
+export function remainingReadingLabel(totalMinutes: number, progress: number): string {
+  if (totalMinutes <= 0) return "Moins d’une minute";
+  const boundedProgress = Math.min(1, Math.max(0, progress));
+  if (boundedProgress >= 1) return "Lecture terminée";
+  const remaining = Math.max(1, Math.ceil(totalMinutes * (1 - boundedProgress)));
+  return `${remaining} min restante${remaining > 1 ? "s" : ""}`;
+}
+
 export function chapterProgressLabel(done: number, total: number): string {
   if (total <= 0) return "Aucun chapitre disponible";
   const bounded = Math.min(total, Math.max(0, done));

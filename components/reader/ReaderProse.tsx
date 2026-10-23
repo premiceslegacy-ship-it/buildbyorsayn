@@ -2,9 +2,16 @@
 
 import { createElement, useRef, useState, type ReactNode } from "react";
 import { Check, Copy, Download, FileText } from "lucide-react";
+import { readerVisualElement, type ReaderVisualKind } from "@/components/schemas/registry";
 import { animateAppElement } from "@/lib/ui/motion";
 import { playAppSound } from "@/lib/ui/sound";
 import { readerImageSource, readerMarkdownHref } from "./readerModel";
+import {
+  parseBeforeAfterPairs,
+  parseDirectiveOpening,
+  parseReaderDirective,
+  splitExampleContent,
+} from "./readerRichMarkdown";
 import styles from "./reader.module.css";
 
 type ReaderSkillFile = { slug: string; title: string; description: string };
@@ -46,7 +53,7 @@ function CodeBlock({ code }: { code: string }) {
 
 function inline(text: string, options: MarkdownOptions): ReactNode[] {
   const nodes: ReactNode[] = [];
-  const tokens = /(!\[[^\]\n]*\]\([^\s)]+(?:\s+"[^"]*")?\)|\[[^\]\n]+\]\([^\s)]+\)|`[^`\n]+`|\*\*[^*\n]+\*\*|__[^_\n]+__|\*[^*\n]+\*|_[^_\n]+_)/g;
+  const tokens = /(!\[[^\]\n]*\]\([^\s)]+(?:\s+"[^"]*")?\)|\[[^\]\n]+\]\([^\s)]+\)|`[^`\n]+`|==[^=\n]+==|\*\*[^*\n]+\*\*|__[^_\n]+__|\*[^*\n]+\*|_[^_\n]+_)/g;
   let offset = 0;
   for (const match of text.matchAll(tokens)) {
     nodes.push(text.slice(offset, match.index));
@@ -64,6 +71,8 @@ function inline(text: string, options: MarkdownOptions): ReactNode[] {
       nodes.push(href ? <a key={match.index} href={href} rel={href.startsWith("http") ? "noreferrer noopener" : undefined}>{inline(link[1], options)}</a> : link[1]);
     } else if (token.startsWith("`")) {
       nodes.push(<code key={match.index}>{token.slice(1, -1)}</code>);
+    } else if (token.startsWith("==")) {
+      nodes.push(<mark className={styles.highlight} data-reader-highlight="true" key={match.index}>{inline(token.slice(2, -2), options)}</mark>);
     } else {
       const strong = token.startsWith("**") || token.startsWith("__");
       nodes.push(createElement(strong ? "strong" : "em", { key: match.index }, token.slice(strong ? 2 : 1, strong ? -2 : -1)));
@@ -74,11 +83,59 @@ function inline(text: string, options: MarkdownOptions): ReactNode[] {
   return nodes;
 }
 
+function ReaderVisual({ kind, name }: { kind: ReaderVisualKind; name: string }) {
+  const visual = readerVisualElement(kind, name);
+  if (!visual) return null;
+  return <div className={styles.richVisual} data-reader-visual={kind} data-reader-visual-name={name}>{visual}</div>;
+}
+
+function BeforeAfterGallery({ content, options }: { content: string; options: MarkdownOptions }) {
+  const pairs = parseBeforeAfterPairs(content);
+  if (pairs.length === 0) return <aside className={styles.richCard} data-reader-card="avant-apres"><Markdown content={content} options={options} /></aside>;
+  return <section className={styles.beforeAfterGallery} data-reader-before-after="true" aria-label="Comparaison avant et après">
+    {pairs.map((pair, index) => <article className={styles.beforeAfterPair} key={`${pair.before}-${index}`}>
+      <div className={styles.beforeColumn}><span>Avant</span><p><del>{inline(pair.before, options)}</del></p></div>
+      <div className={styles.afterColumn}><span><Check aria-hidden="true" />Après</span><p>{inline(pair.after, options)}</p></div>
+      {pair.why ? <p className={styles.whyLine}><strong>Pourquoi</strong>{inline(pair.why, options)}</p> : null}
+    </article>)}
+  </section>;
+}
+
+function RichDirective({ kind, title, content, options }: {
+  kind: "avant-apres" | "exemple" | "retiens";
+  title?: string;
+  content: string;
+  options: MarkdownOptions;
+}) {
+  if (kind === "avant-apres") return <BeforeAfterGallery content={content} options={options} />;
+  if (kind === "exemple") {
+    const example = splitExampleContent(content);
+    return <aside className={`${styles.richCard} ${styles.exampleCard}`} data-reader-card="exemple">
+      <header><span>Exemple</span><h3>{title ?? "Un cas concret"}</h3>{example.profession ? <p>{example.profession}</p> : null}</header>
+      <div className={styles.richCardBody}><Markdown content={example.body} options={options} /></div>
+    </aside>;
+  }
+  return <aside className={`${styles.richCard} ${styles.takeawayCard}`} data-reader-card="retiens">
+    <h3>À retenir</h3>
+    <div className={styles.richCardBody}><Markdown content={content} options={options} /></div>
+  </aside>;
+}
+
 function stripFrontmatter(content: string): string {
   const normalized = content.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
   if (!normalized.startsWith("---\n")) return normalized;
   const end = normalized.slice(4).search(/^(?:---|\.\.\.)\s*$/m);
   return end < 0 ? "" : normalized.slice(4 + end).replace(/^[^\n]*(?:\n|$)/, "");
+}
+
+function startsMarkdownBlock(lines: readonly string[], index: number): boolean {
+  const line = lines[index] ?? "";
+  if (!line.trim()) return true;
+  if (parseDirectiveOpening(line) || line.trim() === ":::") return true;
+  if (/^\s*\[\[(?:schema|maquette):[^\]\n]+\]\]\s*$/i.test(line)) return true;
+  if (/^(?:#{1,6}\s|\s*>\s?|\s*(?:[-+*]|\d+[.)])\s|\s*(?:`{3,}|~{3,}))/.test(line)) return true;
+  if (/^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line)) return true;
+  return /^\s*\|/.test(line) && /^\s*\|(?:\s*:?-{3,}:?\s*\|)+\s*$/.test(lines[index + 1] || "");
 }
 
 function Markdown({ content, options }: { content: string; options: MarkdownOptions }) {
@@ -87,6 +144,31 @@ function Markdown({ content, options }: { content: string; options: MarkdownOpti
   for (let index = 0; index < lines.length;) {
     const line = lines[index];
     if (!line.trim()) { index += 1; continue; }
+
+    const directiveOpening = parseDirectiveOpening(line);
+    if (directiveOpening) {
+      const key = index;
+      const directive = parseReaderDirective(lines, index);
+      if (!directive) {
+        index += 1;
+        continue;
+      }
+      blocks.push(<RichDirective key={key} kind={directive.kind} title={directive.title} content={directive.content} options={options} />);
+      index = directive.endIndex + 1;
+      continue;
+    }
+
+    if (line.trim() === ":::") {
+      index += 1;
+      continue;
+    }
+
+    const visual = line.match(/^\s*\[\[(schema|maquette):([^\]\n]+)\]\]\s*$/i);
+    if (visual) {
+      blocks.push(<ReaderVisual kind={visual[1].toLowerCase() as ReaderVisualKind} name={visual[2].trim()} key={index} />);
+      index += 1;
+      continue;
+    }
 
     const fence = line.match(/^\s*(`{3,}|~{3,})[^`]*$/);
     if (fence) {
@@ -150,8 +232,13 @@ function Markdown({ content, options }: { content: string; options: MarkdownOpti
 
     const paragraph = [line];
     const key = index++;
-    while (index < lines.length && lines[index].trim() && !/^(?:#{1,6}\s|\s*>\s?|\s*(?:[-+*]|\d+[.)])\s|\s*(?:`{3,}|~{3,}))/.test(lines[index])) paragraph.push(lines[index++]);
-    blocks.push(<p key={key}>{inline(paragraph.join(" "), options)}</p>);
+    while (index < lines.length && !startsMarkdownBlock(lines, index)) paragraph.push(lines[index++]);
+    const paragraphText = paragraph.join(" ");
+    if (/^Version pour (?:ton|l['’])IA\s*:/i.test(paragraphText)) {
+      blocks.push(<aside className={styles.aiVersion} key={key}><p>{inline(paragraphText, options)}</p></aside>);
+    } else {
+      blocks.push(<p key={key}>{inline(paragraphText, options)}</p>);
+    }
   }
   return <>{blocks}</>;
 }
