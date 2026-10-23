@@ -82,10 +82,10 @@ export function ObjectionQuestionDiagram() {
     platform="WhatsApp"
     contact="Gérant de restaurant"
     messages={[
-      { from: "person", text: "C'est trop cher pour nous.", time: "10:02" },
-      { from: "agent", text: "Qu'est-ce qui te semble trop grand : le montant, le travail inclus ou le risque ?", time: "10:04" },
-      { from: "person", text: "Le risque. Que ça réponde seul aux clients.", time: "10:09" },
-      { from: "agent", text: "L'outil prépare. Ton équipe garde l'envoi et le prix. Je te montre sur un exemple ?", time: "10:11" },
+      { from: "agent", text: "C'est trop cher pour nous.", time: "10:02" },
+      { from: "person", text: "Qu'est-ce qui te semble trop grand : le montant, le travail inclus ou le risque ?", time: "10:04" },
+      { from: "agent", text: "Le risque. Que ça réponde seul aux clients.", time: "10:09" },
+      { from: "person", text: "L'outil prépare. Ton équipe garde l'envoi et le prix. Je te montre sur un exemple ?", time: "10:11" },
     ]}
     backstageTitle="Ce que tu fais"
     actions={[

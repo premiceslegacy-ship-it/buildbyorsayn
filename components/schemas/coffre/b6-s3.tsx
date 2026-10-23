@@ -24,7 +24,7 @@ export function QuiFaitQuoiProduitDiagram() {
 export function FormulaireDeuxMetiersDiagram() {
   return <WebPage
     title="Un formulaire, deux métiers"
-    description="Exemple : la demande de rendez-vous du cabinet de Julie, kiné, vue par le visuel et par le backend."
+    description="Exemple : la demande de rendez‑vous du cabinet de Julie, kiné, vue par le visuel et par le backend."
     legend="Les deux métiers lisent le même contrat des rôles avant de travailler."
     ariaLabel="Une page de création de compte pour un cabinet de kiné. Le titre et l'ordre des champs relèvent du visuel. Les messages d'erreur aussi. Le choix du rôle suit le contrat commun : patient, accueil, praticien. Le bouton Créer mon compte déclenche le backend, qui vérifie les données et les droits."
     accent={EM}
@@ -32,7 +32,7 @@ export function FormulaireDeuxMetiersDiagram() {
       url: "cabinet-kine.fr/compte",
       nav: "Cabinet",
       eyebrow: "Créer un compte",
-      heading: "Demande ton rendez-vous en ligne",
+      heading: "Crée ton compte pour demander un rendez‑vous",
       subtitle: "Ton nom, ton e-mail, puis le rôle demandé.",
       button: "Créer mon compte",
       fields: [{ label: "Nom", value: "Camille Roche" }, { label: "E-mail", value: "Ton adresse e-mail" }, { label: "Rôle", value: "Patient", kind: "select" }],
@@ -87,13 +87,13 @@ export function RevueDesRolesDiagram() {
     title="Chaque rôle testé sur l'écran"
     description="Exemple : la revue des trois rôles du cabinet de Julie, avec ce que chacun voit et ce qu'il ne voit pas."
     legend="Un refus se teste aussi sérieusement qu'une autorisation."
-    ariaLabel="Un fichier de revue des rôles. Le patient voit ses rendez-vous mais pas les notes médicales. L'accueil voit les horaires mais pas les notes médicales. Le praticien voit ses rendez-vous mais pas les agendas des autres. Les annotations soulignent les trois refus testés."
+    ariaLabel="Un fichier de revue des rôles. Le patient voit ses rendez‑vous mais pas les notes médicales. L'accueil voit les horaires mais pas les notes médicales. Le praticien voit ses rendez‑vous mais pas les agendas des autres. Les annotations soulignent les trois refus testés."
     accent={EM}
     filename="revue-des-roles.md"
     tool="Supabase"
     lines={[
       { text: "# Revue des rôles, cabinet", tone: "heading" },
-      { text: "Patient : ses rendez-vous, autorisé" },
+      { text: "Patient : ses rendez‑vous, autorisé" },
       { text: "Patient : notes médicales, refusé" },
       { text: "Accueil : horaires, autorisé" },
       { text: "Accueil : notes médicales, refusé" },

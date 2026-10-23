@@ -11,7 +11,7 @@ type AccentStyle = CSSProperties & { "--kit-em": string };
 export type KitKey = { swatch: "accent" | "muted" | "human" | "arrow" | "loop"; label: string };
 
 /** Mention des maquettes de sites : le style visuel est une illustration, pas une référence de design. */
-export const SITE_DESIGN_DISCLAIMER = "Maquette d'illustration : regarde la structure et les mots. Le style visuel n'est pas un modèle de design à copier.";
+export const SITE_DESIGN_DISCLAIMER = "Maquette d'illustration : regarde la structure et les mots. Le style visuel n'est pas un modèle de design à copier.";
 
 export function KitFrame({ title, description, ariaLabel, accent = "#22d96e", kind, legend, keys, disclaimer, children }: {
   title: string;

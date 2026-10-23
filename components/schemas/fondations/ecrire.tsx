@@ -72,7 +72,7 @@ export function PreuveAuBonEndroitDiagram() {
       photo: "velo",
     }}
     annotations={[
-      { number: 1, target: "image", label: "Ton travail ? Une vraie fiche remise", why: "Une photo de l'atelier répond à « est-ce du vrai travail ? » avant toute phrase.", alt: "Une photo de la fiche de diagnostic remise au client." },
+      { number: 1, target: "image", label: "Ton travail ? Une vraie fiche remise", why: "Une photo de l'atelier répond à « est‑ce du vrai travail ? » avant toute phrase.", alt: "Une photo de la fiche de diagnostic remise au client." },
       { number: 2, target: "heading", label: "Mon cas ? Sa scène exacte", why: "Le bruit que le client a déjà entendu : il se reconnaît en une ligne.", alt: "Le nom du vélo ou du modèle." },
       { number: 3, target: "subtitle", label: "Pour moi ? Ce qui se passe ensuite", why: "Déposer, vérifier, valider le devis, réparer : les quatre gestes dans l'ordre.", alt: "Un délai : réponse sous 48 h." },
     ]}

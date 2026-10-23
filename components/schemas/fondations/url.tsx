@@ -43,7 +43,7 @@ export function BouclePetiteTacheDiagram() {
     ariaLabel="La boucle lit le résumé de mission, modifie l'en-tête avec Claude Code, ouvre la page en local, teste les liens, le bouton et le mobile, puis corrige avec un retour précis avant de recommencer."
     accent={EM}
     entryIndex={0}
-    centerLabel="Partie suivante"
+    centerLabel="Nouveau tour"
     steps={[
       { label: "Lire", detail: "Mission et fichiers touchés" },
       { label: "Modifier", detail: "L'en-tête seulement", tool: "Claude Code" },

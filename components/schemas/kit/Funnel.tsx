@@ -30,7 +30,7 @@ export function Funnel({ stages, leakIndex, leakLabel, tool, ...frame }: FunnelP
   >
     <div className={styles.funnel}>
       {stages.map((stage, index) => {
-        const width = Math.max(46, (stage.value / maximum) * 100);
+        const width = 46 + (stage.value / maximum) * 54;
         const rowStyle = {
           "--kit-funnel-width": `${width}%`,
           "--kit-funnel-compact-width": `${72 + width * .28}%`,

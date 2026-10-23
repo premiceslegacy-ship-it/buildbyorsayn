@@ -28,7 +28,7 @@ export function Chat({ platform, contact, messages, backstageTitle = "En couliss
   return <KitFrame {...frame} kind="chat" keys={actions.some((action) => action.humanValidation) ? [{ swatch: "human", label: "Un humain valide avant l'envoi" }] : undefined}>
     <div className={styles.chatLayout}>
       <section className={styles.phone}>
-        <header>{platform !== "Neutre" ? <ToolMark name={platform} size={36} /> : <span className={styles.neutralAvatar}>{contact.charAt(0)}</span>}<div><strong>{contact}</strong><span>{platform}</span></div></header>
+        <header>{platform !== "Neutre" ? <ToolMark name={platform} size={36} /> : <span className={styles.neutralAvatar}>{contact.charAt(0)}</span>}<div><strong>{contact}</strong>{platform !== "Neutre" ? <span>{platform}</span> : null}</div></header>
         <div className={styles.messages}>{messages.map((message, index) => <div className={message.from === "agent" ? styles.agentBubble : styles.personBubble} key={`${message.time}-${index}`}>
           <p>{message.text}</p><time>{message.time}</time>
         </div>)}</div>
@@ -36,8 +36,8 @@ export function Chat({ platform, contact, messages, backstageTitle = "En couliss
       <section className={styles.backstage}>
         <h4>{backstageTitle}</h4>
         <ol>{actions.map((action, index) => <li className={action.humanValidation ? styles.isAccent : undefined} key={`${action.label}-${index}`}>
-          <span className={styles.actionIcon}>{action.tool ? <ToolMark name={action.tool} size={32} /> : action.humanValidation ? <><Hand /><Check /></> : index + 1}</span>
-          <p>{action.label}</p>
+          <span className={styles.actionIcon}>{action.humanValidation ? <><Hand /><Check /></> : index + 1}</span>
+          <p>{action.label}{action.tool ? <span className={styles.actionTool}><ToolMark name={action.tool} size={28} /></span> : null}</p>
         </li>)}</ol>
       </section>
     </div>

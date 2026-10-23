@@ -18,6 +18,8 @@ export type WebPageData = {
   offer?: string;
   faq?: string;
   /** Photo de métier à montrer à côté du titre. */
+  /** Lien secondaire, en texte simple avec un chevron. */
+  link?: string;
   photo?: keyof typeof PHOTOS;
   /** Écran de produit à la place d'une photo. */
   screen?: SiteScreen;
@@ -110,7 +112,7 @@ function buildSite(page: WebPageData, quality: Quality, pinOf: (slot: SiteSlot) 
     }
     : {
       kind: "hero", variant: screen && !photo ? "product" : "centered",
-      title: page.heading, text: page.subtitle, cta: page.button, note: page.offer,
+      title: page.heading, text: page.subtitle, cta: page.button, cta2: page.link ?? "Voir un exemple", note: page.offer,
       ...visual, ...(!photo && screen ? { screen } : {}),
       pins: pin("eyebrow", "title", "text", "cta", "note", "image", "screen"),
     };
@@ -176,20 +178,22 @@ function buildNotes(page: WebPageData, quality: Quality, annotations?: readonly 
   };
 
   if (annotations) {
-    const slotOf: Record<WebAnnotation["target"], SiteSlot> = { heading: "title", subtitle: "text", button: "cta", image: "image", proofs: "logos", offer: "note", faq: "faq" };
-    const bySlot = new Map<SiteSlot, WebAnnotation>();
-    for (const annotation of annotations) {
-      const isForm = Boolean(page.fields?.length);
-      const slot: SiteSlot = isForm
-        ? ({ heading: "title", subtitle: "text", button: "cta", image: "fields", proofs: "note", offer: "note", faq: "faq" } as const)[annotation.target]
-        : annotation.target === "image" && !photoOf(page) && screenOf(page) ? "screen" : slotOf[annotation.target];
-      bySlot.set(slot, annotation);
-    }
+    const isForm = Boolean(page.fields?.length);
+    const slotOf = (annotation: WebAnnotation): SiteSlot => {
+      const map: Record<WebAnnotation["target"], SiteSlot> = isForm
+        ? { heading: "title", subtitle: "text", button: "cta", image: "fields", proofs: "note", offer: "note", faq: "faq" }
+        : { heading: "title", subtitle: "text", button: "cta", image: !photoOf(page) && screenOf(page) ? "screen" : "image", proofs: "logos", offer: "note", faq: "faq" };
+      return map[annotation.target];
+    };
+    // Les pastilles se numérotent dans l'ordre où elles apparaissent à l'écran.
+    const reading: SiteSlot[] = isForm
+      ? ["title", "text", "fields", "cta", "note", "faq"]
+      : ["eyebrow", "title", "text", "cta", "note", "image", "screen", "logos", "faq"];
+    const sorted = [...annotations].sort((x, y) => reading.indexOf(slotOf(x)) - reading.indexOf(slotOf(y)));
+    const numbers = new Map<SiteSlot, number>(sorted.map((annotation, index) => [slotOf(annotation), index + 1]));
     return {
-      pinOf: (slot) => bySlot.get(slot)?.number,
-      notes: [...annotations].sort((a, b) => a.number - b.number).map((annotation) => {
-        return { pin: annotation.number, role: annotation.label, why: annotation.why, alt: annotation.alt };
-      }),
+      pinOf: (slot) => numbers.get(slot),
+      notes: sorted.map((annotation, index) => ({ pin: index + 1, role: annotation.label, why: annotation.why, alt: annotation.alt })),
     };
   }
 

@@ -1,22 +1,20 @@
-Tu peux apprendre une méthode brillante et l'oublier dans deux semaines. Tu peux aussi la transformer en geste simple qui revient dans chaque projet.
-
-Ce dernier bloc sert à faire ce passage.
+Ton premier projet est livré. Tu as appris une méthode : dans deux semaines, tu l'auras oubliée si elle reste dans ta tête. Elle survit si elle devient un geste simple, écrit, qui revient dans chaque projet.
 
 [[schema:DuGesteAuSystemeVivant]]
 
 ## Tu vas fermer la boucle
 
-Tu vas partir d'un travail répété. Tu vas l'écrire, l'auditer, choisir son mode d'exécution et corriger ce qui casse.
+Tu pars d'un travail que tu refais déjà souvent, par exemple envoyer un devis ou remettre un site. Tu regardes ce que tu fais vraiment, tu l'écris en SOP (une procédure courte, étape par étape), tu choisis qui l'exécute (toi, un agent, ou les deux), puis tu corriges ce qui casse.
 
-Le but n'est pas de produire plus de documents. Le but est de rendre le prochain projet plus clair que le précédent.
+À la fin, tu auras :
 
-À la fin, tu auras :
-
-- une première SOP testable ;
-- une carte du travail actuel ;
-- un choix entre plusieurs modes d'exécution ;
+- une première SOP que tu peux tester sur un vrai cas ;
+- une carte de ton travail actuel, avec ses temps morts ;
+- un choix argumenté entre plusieurs façons de l'exécuter ;
 - une correction vérifiée et rangée au bon endroit.
+
+Au prochain projet, tu ouvres ta SOP au lieu de tout réexpliquer.
 
 ==Un système devient utile quand il aide le prochain passage, pas quand il remplit un dossier.==
 
-On commence par le geste le plus simple : écrire ce que tu fais déjà plusieurs fois.
+On commence par le geste le plus simple : écrire ce que tu fais déjà plusieurs fois.

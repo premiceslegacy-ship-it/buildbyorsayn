@@ -1,23 +1,23 @@
-Une idée peut tenir dans une phrase. Un produit réel doit tenir quand quelqu'un se connecte, se trompe, revient demain et demande de l'aide.
+Ton offre est écrite (Bloc 5) et ton chantier préparé (Bloc 3). Pour construire un produit complet, une phrase ne suffit plus.
 
-C'est là que la construction commence vraiment.
+Une idée tient en une phrase : « une application pour suivre mes chantiers ». Un produit doit tenir quand une personne se connecte, se trompe de mot de passe, revient le lendemain matin et demande de l'aide.
 
 [[schema:DeLIdeeAuProduitVisible]]
 
-## Tu vas passer du rêve au travail vérifiable
+## Tu vas passer de l'idée au travail vérifiable
 
-Ce bloc te montre comment ORACLE by Orsayn conduit un projet complet. Tu vas voir le cadrage, l'ordre des documents, la répartition du travail et les tests.
+Ce bloc montre comment ORACLE by Orsayn, la méthode de construction de BUILD, conduit un projet complet : le cadrage par une interview, l'ordre des documents, le travail réparti en lots, puis les tests.
 
-Tu ne vas pas regarder une liste abstraite. Chaque chapitre montre l'écran, le document ou la décision à produire.
+Chaque chapitre te met devant un écran, un document ou une décision que tu peux produire toi-même.
 
-À la fin, tu auras :
+À la fin, tu auras :
 
-- une scène de projet prête pour l'interview ;
-- un lot de travail que quelqu'un peut recevoir ;
-- deux décisions spécialisées reliées entre elles ;
-- un premier dossier projet relu ;
-- une promesse de page alignée sur le produit.
+- une scène de projet prête pour l'interview ;
+- un lot de travail qu'une personne peut recevoir sans te poser dix questions ;
+- deux décisions de spécialistes reliées entre elles ;
+- un premier dossier projet relu ;
+- une page de présentation qui ne promet que ce que le produit fait.
 
 ==Construire pour de vrai, c'est rendre chaque décision visible avant qu'elle coûte cher.==
 
-On commence par comprendre ce que le système fait réellement. Pas par son nom. Pas par une démonstration.
+On commence par ce que la personne fera à l'écran, mardi à 9 h.

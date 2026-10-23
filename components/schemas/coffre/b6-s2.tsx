@@ -44,7 +44,7 @@ export function DocumentsQuiSeNourrissentDiagram() {
 export function ContratDeLotAnnoteDiagram() {
   return <FileCard
     title="Un lot qui voyage seul"
-    description="Exemple : le contrat du premier lot de Mehdi, coach sportif, pour construire sa réservation."
+    description="Exemple : le contrat du premier lot de Samir, coach sportif, pour construire sa réservation."
     legend="Si quelqu'un doit t'appeler pour comprendre le lot, il manque une ligne."
     ariaLabel="Un fichier de contrat de lot pour une réservation. Il donne l'objectif, les sources, les fichiers autorisés, ce qui est interdit, le résultat attendu, le test final et la passation. Les annotations soulignent l'objectif, l'interdit, le test final et la passation."
     accent={EM}
@@ -96,7 +96,7 @@ export function CockpitIntegrationDiagram() {
 export function ParcoursE2EVisibleDiagram() {
   return <Steps
     title="Le test joue la personne"
-    description="Exemple : le test de bout en bout de la réservation de Mehdi, écran par écran."
+    description="Exemple : le test de bout en bout de la réservation de Samir, écran par écran."
     legend="Un test ne passe au vert que s'il voit ce que la personne verrait."
     ariaLabel="Un parcours de test en quatre étapes. Choisir un créneau libre dans l'agenda. Réserver avec son nom et son e-mail. Voir la confirmation s'afficher à l'écran, mise en avant. Puis vérifier qu'un autre compte est bien refusé."
     accent={EM}

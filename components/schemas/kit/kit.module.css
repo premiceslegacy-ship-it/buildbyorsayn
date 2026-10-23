@@ -64,8 +64,9 @@
 
 .legend p {
   flex-basis: 100%;
-  max-width: 40rem;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
+  padding-inline: max(0px, calc((100% - 40rem) / 2));
   color: var(--kit-copy);
   font: 450 14px/1.45 var(--font, sans-serif);
   text-align: center;
@@ -916,7 +917,7 @@
 /* Rings */
 .ringsWide { width: 100%; max-width: 380px; aspect-ratio: 1; justify-self: center; position: relative; display: grid; place-items: center; }
 .ring { width: var(--kit-ring-size); height: var(--kit-ring-size); position: absolute; display: flex; align-items: flex-start; justify-content: center; padding-top: 11px; border: 1px solid rgba(241,245,242,.19); border-radius: 50%; background: color-mix(in srgb, #252a27 calc(13% + var(--kit-ring-depth) * 5%), transparent); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
-.ring > span { max-width: 92%; padding: 3px 9px; color: var(--kit-copy); font: 600 12.5px/1.2 var(--font, sans-serif); text-align: center; white-space: nowrap; }
+.ring > span { position: relative; z-index: 2; max-width: 92%; padding: 3px 9px; border-radius: 7px; background: #1e2220; color: var(--kit-copy); font: 600 12.5px/1.2 var(--font, sans-serif); text-align: center; white-space: nowrap; }
 .ring.isAccent { border-color: var(--kit-em); box-shadow: 0 0 30px color-mix(in srgb, var(--kit-em) 8%, transparent), inset 0 1px 0 color-mix(in srgb, var(--kit-em) 38%, transparent); }
 .ring.isAccent > span { color: var(--kit-em); }
 .ringCore { z-index: 4; width: 84px; height: 84px; display: grid; place-items: center; padding: 10px; border-radius: 50%; background: linear-gradient(150deg, #303632, #1b1f1d); color: var(--kit-ink); font: 650 14px/1.2 var(--font-t, sans-serif); text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
@@ -949,6 +950,9 @@
 
 /* Cinq étapes ont besoin d'au moins 640 px, un relais de quatre aussi : sinon le rail devient vertical. */
 @container kit (max-width: 699px) {
+  .ringsLayout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .ringsWide { display: none; }
+  .ringsList > strong { min-height: 68px; display: grid; place-items: center; padding: 14px; border-radius: 18px; background: linear-gradient(150deg, #303632, #1b1f1d); color: var(--kit-ink); font: 650 16px/1.2 var(--font-t, sans-serif); text-align: center; }
   .track:is([data-count="5"]),
   .track[data-variant="relay"]:is([data-count="4"]) { grid-template-columns: minmax(0, 1fr); gap: 10px 0; }
   .track:is([data-count="5"]) > li,
@@ -1042,9 +1046,6 @@
   .forkBranches::before { display: none; }
   .forkBranches article { min-height: 102px; }
 
-  .ringsLayout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  .ringsWide { display: none; }
-  .ringsList > strong { min-height: 68px; display: grid; place-items: center; padding: 14px; border-radius: 18px; background: linear-gradient(150deg, #303632, #1b1f1d); color: var(--kit-ink); font: 650 16px/1.2 var(--font-t, sans-serif); text-align: center; }
 
   .bigNumber { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .bigNumber > section { min-height: 150px; }
@@ -1064,3 +1065,7 @@
     scroll-behavior: auto !important;
   }
 }
+
+.actionTool { display: inline-flex; margin-left: 8px; vertical-align: middle; }
+.forkBranches article { justify-items: center; text-align: center; }
+.forkBranches article > span { display: inline-flex; justify-content: center; }

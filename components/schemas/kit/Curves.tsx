@@ -66,7 +66,7 @@ export function Curves({ labels, series, annotations = [], ...frame }: CurvesPro
           return <span
             className={styles.curveAnnotation}
             data-below={point.y < 34 ? "true" : undefined}
-            data-edge={point.x > 420 ? "true" : undefined}
+            data-edge={point.x > 300 ? "true" : undefined}
             style={{ left: `${((point.x + 10) / 560) * 100}%`, top: `${((point.y + 8) / 236) * 100}%` }}
             key={`${annotation.label}-${annotation.series}-${annotation.point}`}
           ><i /><b>{annotation.label}</b></span>;

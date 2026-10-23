@@ -102,10 +102,9 @@ export function ParcoursDuTerrainDiagram() {
     title="Le parcours reste visible"
     description="Exemple : vingt contacts notés dans un simple tableau, du premier message à la livraison."
     legend="Le but n'est pas d'envoyer plus de messages : c'est de voir où ça bloque."
-    ariaLabel="Exemple de parcours suivi dans un tableau : 20 contacts, 8 réponses, 4 appels, 2 offres, 1 livraison acceptée. La plus grosse perte arrive entre les réponses et les appels."
+    ariaLabel="Exemple de parcours suivi dans un tableau : 20 contacts, 8 réponses, 4 appels, 2 offres, 1 livraison acceptée. La plus grosse perte arrive entre les contacts et les réponses."
     accent={EM}
-    tool="Notion"
-    leakIndex={1}
+    leakIndex={0}
     leakLabel="Ici, le parcours bloque"
     stages={[
       { label: "Contacts", value: 20, detail: "Le canal, la date" },
@@ -234,7 +233,7 @@ export function ChangerDOutilSansRetomberDiagram() {
     title="Les outils passent, la méthode reste"
     description="Tu loues les modèles. Tes fiches, tes règles et tes tests passent de l'un à l'autre."
     legend="Si un modèle change, tu adaptes la méthode. Tu ne retombes pas à zéro."
-    ariaLabel="À gauche, les modèles loués : Claude, ChatGPT et Gemini, remplaçables. À droite, mis en avant, ce que tu gardes : tes fiches et tes règles dans Notion, ton agent qui les relit avec Hermes Agent."
+    ariaLabel="À gauche, les modèles loués : Claude, ChatGPT et Gemini, remplaçables. À droite, mis en avant, ce que tu gardes : tes fiches, tes règles et tes tests."
     accent={EM}
     accentGroup={1}
     groups={[
@@ -244,8 +243,9 @@ export function ChangerDOutilSansRetomberDiagram() {
         { name: "Gemini", description: "Remplaçable" },
       ] },
       { role: "Ce que tu gardes", tools: [
-        { name: "Notion", description: "Fiches et règles" },
-        { name: "Hermes Agent", description: "Relit ta méthode" },
+        { name: "Tes fiches", description: "Ta méthode écrite" },
+        { name: "Tes règles", description: "Ce qui reste vrai" },
+        { name: "Tes tests", description: "Pour vérifier le nouvel outil" },
       ] },
     ]}
   />;
