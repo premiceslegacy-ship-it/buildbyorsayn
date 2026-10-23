@@ -34,9 +34,9 @@ async function expectNoUpgradeStripeLink(page: Page, path: string) {
   }
 }
 
-/** `main` désigne la page rendue : on ignore le gabarit de chargement (`aria-busy`) encore présent pendant le streaming. */
+/** `main` désigne la page rendue : pendant le streaming deux `main` peuvent coexister (gabarit de chargement puis page), la page vient en dernier. */
 function zoneOf(page: Page, scope: string) {
-  return page.locator(scope === "main" ? "main:not([aria-busy])" : scope);
+  return scope === "main" ? page.locator("main:not([aria-busy])").last() : page.locator(scope);
 }
 
 async function expectBothOffersAndBand(page: Page, scope: string) {
@@ -69,7 +69,8 @@ async function expectOnlyUpgradeCard(page: Page, scope: string) {
 
 async function expectNoPurchaseCard(page: Page, scope: string) {
   const zone = zoneOf(page, scope);
-  await expect(zone.getByRole("heading", { name: "Tu as tout BUILD." }).last()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Chargement des niveaux…" })).toHaveCount(0, { timeout: 15_000 });
+  await expect(zone.getByRole("heading", { name: "Tu as tout BUILD." }).last()).toBeVisible({ timeout: 15_000 });
   await expect(zone.getByRole("link", { name: /^(Prendre|Passer à)/ })).toHaveCount(0);
   await expect(zone.locator('a[href^="https://buy.stripe.com/"]')).toHaveCount(0);
   await expect(zone.getByRole("link", { name: "Ouvrir mon espace" })).toHaveAttribute("href", "/dashboard");
