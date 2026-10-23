@@ -491,25 +491,28 @@
   position: relative;
   width: 100%;
   display: grid;
-  grid-template-columns: clamp(38px, 4vw, 56px) minmax(0, 1fr) auto 24px;
+  grid-template-columns: clamp(40px, 4vw, 56px) minmax(0, 1fr) auto 28px;
   align-items: center;
-  gap: clamp(12px, 2vw, 28px);
-  min-height: 74px;
-  padding: 14px clamp(10px, 2vw, 22px);
+  gap: clamp(12px, 1.8vw, 28px);
+  padding: clamp(14px, 1.4vw, 20px) clamp(10px, 1.4vw, 22px);
   border-radius: var(--r-m);
   color: inherit;
   text-align: left;
   transition: background .32s var(--ease-c), transform .1s linear;
 }
 
-.chapterList li + li .chapterRow {
+.chapterList li + li {
   box-shadow: 0 -.5px 0 var(--trait);
+}
+
+.chapterList li:has(.chapterRow:hover),
+.chapterList li:has(.chapterRow[aria-current]) {
+  box-shadow: none;
 }
 
 .chapterRow:hover,
 .chapterRow[aria-current] {
   background: var(--carte);
-  box-shadow: none;
 }
 
 .chapterRow:active {
@@ -518,7 +521,7 @@
 
 .chapterNumber {
   color: var(--t3);
-  font: 700 clamp(22px, 2.4vw, 32px)/1 var(--font-t);
+  font: 700 clamp(24px, 2.4vw, 32px)/1 var(--font-t);
   letter-spacing: -.04em;
   text-align: center;
 }
@@ -535,6 +538,7 @@
   display: block;
   color: var(--encre);
   font: 600 17px/1.28 var(--font-t);
+  letter-spacing: -.01em;
   text-wrap: pretty;
 }
 
@@ -653,9 +657,9 @@
 .article {
   --reader-scale: 1;
   min-width: 0;
-  width: min(100%, calc(680px * var(--reader-scale)));
+  width: min(100%, calc(640px * var(--reader-scale)));
+  justify-self: center;
   padding: clamp(34px, 6vw, 76px) 0 48px;
-  outline: 0;
 }
 
 .article[data-size="small"] {
@@ -916,7 +920,7 @@
 
 .overviewChapters {
   width: min(100% - 2 * var(--gutter), 62rem);
-  margin: clamp(60px, 7vw, 76px) auto 0;
+  margin: clamp(60px, 7vw, 72px) auto 0;
 }
 
 .overviewChapters .chapterHeading {

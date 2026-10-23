@@ -5,6 +5,7 @@ import { canReadBlocSection, projectBlocForTier } from "../lib/blocAccess";
 import { BLOCS_DATA as privateCorpus } from "../lib/mockData";
 import {
   READER_MODE_STORAGE_KEY,
+  chapterIndexForKey,
   chapterProgressLabel,
   chapterSummary,
   parseReaderMode,
@@ -35,6 +36,19 @@ test("le chapitre demandé est borné et accepte les liens historiques par ancre
   assert.equal(resolveChapterIndex(ids, "2"), 1);
   assert.equal(resolveChapterIndex(ids, "../../../secret"), 0);
   assert.equal(resolveChapterIndex([], "1"), -1);
+});
+
+test("Origine et Fin ciblent les bornes des blocs de trois et six chapitres", () => {
+  const three = privateCorpus.find((bloc) => bloc.id === "2")!.sections.map((section) => section.id);
+  const six = privateCorpus.find((bloc) => bloc.id === "1")!.sections.map((section) => section.id);
+  assert.equal(three.length, 3);
+  assert.equal(six.length, 6);
+  assert.equal(three[chapterIndexForKey("Home", 1, three.length)!], three[0]);
+  assert.equal(three[chapterIndexForKey("End", 1, three.length)!], three.at(-1));
+  assert.equal(six[chapterIndexForKey("Home", 3, six.length)!], six[0]);
+  assert.equal(six[chapterIndexForKey("End", 3, six.length)!], six.at(-1));
+  assert.equal(chapterIndexForKey("ArrowLeft", 0, six.length), null);
+  assert.equal(chapterIndexForKey("ArrowUp", 0, three.length, true), 2);
 });
 
 test("la copie Markdown conserve tout le texte et ajoute la structure des chapitres", () => {
@@ -80,7 +94,7 @@ test("le lecteur expose les états chargement, erreur, vide et les interactions 
   const foundation = read("components/reader/FoundationReader.tsx");
   const player = read("components/lessons/LessonPlayer.tsx");
   const state = read("components/reader/ReaderState.tsx");
-  for (const marker of ["Escape", "ArrowLeft", "ArrowRight", 'event.key === "Home"', 'event.key === "End"', 'role="radiogroup"', "aria-current", "Envoyer à mon IA", "Marquer comme lu"]) {
+  for (const marker of ["Escape", "ArrowLeft", "ArrowRight", "chapterIndexForKey", 'role="radiogroup"', "aria-current", "Envoyer à mon IA", "Marquer comme lu"]) {
     assert.ok(`${view}\n${foundation}\n${read("components/reader/ModeSwitch.tsx")}`.includes(marker), marker);
   }
   assert.doesNotMatch(blocPage, /ReaderView/);
@@ -97,6 +111,8 @@ test("le lecteur expose les états chargement, erreur, vide et les interactions 
   assert.match(player, /Réessayer/);
   assert.match(state, /Aucun chapitre disponible/);
   assert.match(state, /aria-busy="true"/);
+  assert.match(read("components/reader/ModeSwitch.tsx"), /tabIndex=\{mode === "video" \? 0 : -1\}/);
+  assert.match(read("components/reader/ModeSwitch.tsx"), /requestAnimationFrame[\s\S]{0,180}\.focus\(\)/);
 });
 
 test("les sons du lecteur partent dans les mêmes gestionnaires que leurs animations", () => {
@@ -111,5 +127,21 @@ test("le style du lecteur garde les marges mobiles et n'ajoute aucune bande lat�
   assert.match(css, /@media \(max-width: 734px\)/);
   assert.match(css, /margin-inline: 20px/);
   assert.match(css, /min-width: 44px/);
+  assert.match(css, /width: min\(100%, calc\(640px \* var\(--reader-scale\)\)\)/);
   assert.doesNotMatch(css, /border-left\s*:/);
+});
+
+test("le focus DA est émeraude au clavier et reste invisible sur les cibles programmatiques", () => {
+  const sharedCss = read("app/da.css");
+  const accountCss = read("app/ui3.css");
+  const adminCss = read("app/admin/admin.css");
+  const reader = `${read("components/reader/ReaderView.tsx")}\n${read("components/reader/FoundationReader.tsx")}`;
+  const search = read("components/da/SearchDialog.tsx");
+  assert.match(sharedCss, /\.da :focus-visible \{ outline: 2px solid var\(--em\) !important; outline-offset: 3px !important; border-radius: 8px; \}/);
+  assert.match(sharedCss, /\[data-focus-ring="none"\]:focus-visible \{ outline: none !important; \}/);
+  assert.doesNotMatch(accountCss, /input:focus-visible/);
+  assert.doesNotMatch(adminCss, /focus-within[^\{]*\{[^}]*outline/);
+  assert.match(reader, /data-focus-ring="none"[^>]*tabIndex=\{-1\}/);
+  assert.match(search, /origin === document\.body \|\| origin\?\.matches\(":focus-visible"\)/);
+  assert.match(search, /event\.key === "Tab"[^\n]*delete searchInput\?\.dataset\.focusRing/);
 });

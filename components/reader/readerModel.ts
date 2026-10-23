@@ -1,6 +1,7 @@
 export const READER_MODE_STORAGE_KEY = "btv-mode";
 
 export type ReaderMode = "video" | "texte";
+export type ReaderNavigationKey = "ArrowDown" | "ArrowLeft" | "ArrowRight" | "ArrowUp" | "End" | "Home";
 
 export type ReaderMarkdownSection = {
   title: string;
@@ -37,6 +38,21 @@ export function resolveChapterIndex(
   return Number.isInteger(numeric) && numeric >= 1 && numeric <= sectionIds.length
     ? numeric - 1
     : 0;
+}
+
+export function chapterIndexForKey(
+  key: ReaderNavigationKey,
+  currentIndex: number,
+  total: number,
+  wrap = false,
+): number | null {
+  if (total <= 0) return null;
+  if (key === "Home") return 0;
+  if (key === "End") return total - 1;
+  const delta = key === "ArrowDown" || key === "ArrowRight" ? 1 : -1;
+  const next = currentIndex + delta;
+  if (wrap) return (next + total) % total;
+  return next >= 0 && next < total ? next : null;
 }
 
 export function serializeReaderMarkdown(

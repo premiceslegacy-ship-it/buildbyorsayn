@@ -15,7 +15,6 @@
 .da .ui3-field input, .da .ui3-form input { width: 100%; height: 52px; padding: 0 16px; border: 0; border-radius: var(--r-s); background: var(--carte-2); color: var(--encre); font: 400 17px/1.25 var(--font); box-shadow: inset 0 0 0 1px rgba(241,245,242,.22); transition: box-shadow .32s var(--ease-c), background .32s var(--ease-c); }
 .da .ui3-field input::placeholder, .da .ui3-form input::placeholder { color: var(--t3); }
 .da .ui3-field input:hover, .da .ui3-form input:hover { box-shadow: inset 0 0 0 1px rgba(241,245,242,.4); }
-.da .ui3-field input:focus-visible, .da .ui3-form input:focus-visible { outline: 2px solid var(--em); outline-offset: 2px; }
 .da .ui3-field[data-invalid="true"] input { box-shadow: inset 0 0 0 1.5px #ff6b63; }
 .da .ui3-field-error { display: flex; gap: 8px; align-items: flex-start; font: 500 14px/1.4 var(--font); color: #ff817a; }
 .da .ui3-field-error .ui3-icon { margin-top: 1px; width: 18px; height: 18px; }

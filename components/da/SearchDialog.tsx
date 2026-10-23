@@ -29,7 +29,12 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
   useEffect(() => {
     if (!open) return;
     const origin = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    input.current?.focus();
+    const searchInput = input.current;
+    if (searchInput) {
+      if (origin === document.body || origin?.matches(":focus-visible")) delete searchInput.dataset.focusRing;
+      else searchInput.dataset.focusRing = "none";
+      searchInput.focus({ preventScroll: true });
+    }
     document.documentElement.style.overflow = "hidden";
     scrim.current?.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
     if (panel.current) {
@@ -39,6 +44,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
         : [{ opacity: 0, transform: "translateX(-50%) translateY(-10px) scale(.98)" }, { opacity: 1, transform: "translateX(-50%)" }], "doux");
     }
     const key = (event: KeyboardEvent) => {
+      if (event.key === "Tab") delete searchInput?.dataset.focusRing;
       if (event.key === "Escape") onClose();
       if ((event.key === "ArrowDown" || event.key === "ArrowUp") && resultsRef.current.length) {
         event.preventDefault();
@@ -63,7 +69,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
       }
     };
     document.addEventListener("keydown", key);
-    return () => { document.removeEventListener("keydown", key); document.documentElement.style.overflow = ""; origin?.focus(); };
+    return () => { document.removeEventListener("keydown", key); document.documentElement.style.overflow = ""; delete searchInput?.dataset.focusRing; origin?.focus(); };
   }, [open, onClose]);
 
   useEffect(() => {

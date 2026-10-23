@@ -28,7 +28,9 @@
 .da button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
 .da img, .da svg { display: block; max-width: 100%; }
 .da img { height: auto; }
-.da :focus-visible { outline: 2px solid var(--em); outline-offset: 3px; border-radius: 8px; }
+.da :focus-visible { outline: 2px solid var(--em) !important; outline-offset: 3px !important; border-radius: 8px; }
+.da :where(article, main, [role="dialog"], h1, h2)[tabindex="-1"]:focus-visible,
+.da [data-focus-ring="none"]:focus-visible { outline: none !important; }
 .da .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .da .wrap { width: min(var(--wrap), 100% - 2 * var(--gutter)); margin-inline: auto; }
 .da .ic { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }

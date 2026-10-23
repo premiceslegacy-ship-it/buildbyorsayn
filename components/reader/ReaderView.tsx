@@ -15,6 +15,7 @@ import { ReaderEmpty } from "./ReaderState";
 import { ReaderProse } from "./ReaderProse";
 import {
   READER_MODE_STORAGE_KEY,
+  chapterIndexForKey,
   chapterSummary,
   readerModeQuery,
   readingProgress,
@@ -84,8 +85,8 @@ function ChapterRows({
             if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
             event.preventDefault();
             const buttons = [...(list.current?.querySelectorAll<HTMLButtonElement>("button") ?? [])];
-            const target = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1 : event.key === "ArrowDown" ? (index + 1) % buttons.length : (index + buttons.length - 1) % buttons.length;
-            buttons[target]?.focus();
+            const target = chapterIndexForKey(event.key as "ArrowDown" | "ArrowUp" | "Home" | "End", index, buttons.length, true);
+            if (target !== null) buttons[target]?.focus();
           }}
         >
           <span className={styles.chapterNumber}>{String(index + 1).padStart(2, "0")}</span>
@@ -180,8 +181,9 @@ export function ReaderView({
         router.push(backHref);
         return;
       }
-      const nextIndex = event.key === "ArrowLeft" ? selected - 1 : event.key === "ArrowRight" ? selected + 1 : event.key === "Home" ? 0 : event.key === "End" ? sections.length - 1 : null;
-      if (nextIndex === null || nextIndex < 0 || nextIndex >= sections.length) return;
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      const nextIndex = chapterIndexForKey(event.key as "ArrowLeft" | "ArrowRight" | "Home" | "End", selected, sections.length);
+      if (nextIndex === null) return;
       event.preventDefault();
       chooseChapter(nextIndex);
     };
@@ -255,7 +257,7 @@ export function ReaderView({
         </div>
       </div> : <div className={styles.textLayout}>
         <ChapterRows sections={sections} selected={selected} completedIds={completedIds} onSelect={chooseChapter} compact />
-        <article ref={article} className={styles.article} data-size={size} tabIndex={-1} aria-label={`Lecture du chapitre ${selected + 1}`}>
+        <article ref={article} className={styles.article} data-size={size} data-focus-ring="none" tabIndex={-1} aria-label={`Lecture du chapitre ${selected + 1}`}>
           <header className={styles.articleHeader}><span>Chapitre {selected + 1}</span><h2>{current.title}</h2></header>
           <div className={styles.prose}><ReaderProse section={current} /></div>
           <footer className={styles.articleEnd}>

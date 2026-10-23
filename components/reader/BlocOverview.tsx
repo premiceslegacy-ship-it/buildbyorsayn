@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Check, LockKeyhole, Play } from "lucide-react";
@@ -39,7 +39,6 @@ export function BlocOverview({ blocId, title, displayNumber, sections, totalSect
   const current = sections[resumeIndex];
   const started = completedCount > 0;
   const hasLockedChapters = sections.length < totalSections;
-  const summary = useMemo(() => chapterSummary(sections[0]?.content ?? ""), [sections]);
 
   useEffect(() => {
     installAppMotionTokens();
@@ -57,7 +56,6 @@ export function BlocOverview({ blocId, title, displayNumber, sections, totalSect
       <div className={styles.heroInner}>
         <span className={styles.eyebrow}>Bloc {displayNumber}{hasLockedChapters ? ", accès limité" : ""}</span>
         <h1>{leading ? `${leading} ` : ""}<span className="mot">{highlighted}</span></h1>
-        {summary ? <p className={styles.heroSummary}>{summary}</p> : null}
         <div className={styles.segments} role="img" aria-label={chapterProgressLabel(completedCount, totalSections)}>
           <div className={styles.segmentTrack} style={{ "--reader-total": Math.max(1, totalSections) } as CSSProperties}>
             {Array.from({ length: totalSections }, (_, index) => <span key={index} data-state={index < completedCount ? "done" : index === completedCount ? "current" : "todo"} />)}

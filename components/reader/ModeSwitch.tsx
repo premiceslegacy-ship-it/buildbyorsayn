@@ -32,12 +32,14 @@ export function ModeSwitch({ mode, onChange }: { mode: ReaderMode; onChange: (mo
         if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
         event.preventDefault();
         event.stopPropagation();
-        select(mode === "video" ? "texte" : "video");
+        const next = mode === "video" ? "texte" : "video";
+        select(next);
+        window.requestAnimationFrame(() => root.current?.querySelector<HTMLButtonElement>(`[data-mode-value="${next}"]`)?.focus());
       }}
     >
       <span className={styles.modePill} aria-hidden="true" />
-      <button type="button" role="radio" aria-checked={mode === "video"} data-sfx="none" onClick={() => select("video")}>Vidéo</button>
-      <button type="button" role="radio" aria-checked={mode === "texte"} data-sfx="none" onClick={() => select("texte")}>Texte</button>
+      <button type="button" role="radio" aria-checked={mode === "video"} tabIndex={mode === "video" ? 0 : -1} data-mode-value="video" data-sfx="none" onClick={() => select("video")}>Vidéo</button>
+      <button type="button" role="radio" aria-checked={mode === "texte"} tabIndex={mode === "texte" ? 0 : -1} data-mode-value="texte" data-sfx="none" onClick={() => select("texte")}>Texte</button>
     </div>
   );
 }
