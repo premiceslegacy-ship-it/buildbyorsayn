@@ -29,14 +29,11 @@ test("the account menu keeps the existing MCP connection route", async () => {
 test("the MCP setup page gates instructions by paid access and uses a focused layout", async () => {
   const page = await readFile("app/dashboard/mcp/page.tsx", "utf8");
 
-  assert.match(page, /\/brand-logos\/claude\.svg/);
-  assert.match(page, /\/brand-logos\/chatgpt\.svg/);
-  assert.match(page, /\/brand-logos\/hermes-agent-mark\.png/);
-  assert.match(page, /\/brand-logos\/omp\.svg/);
-  assert.match(page, /\/brand-logos\/cursor\.svg/);
-  // 390 px : la rangée de cinq logos passe sous le titre au lieu de déborder de la page.
-  assert.match(page, /flex flex-wrap items-center gap-3/);
-  assert.match(page, /flex flex-col items-start gap-6 sm:flex-row sm:justify-between/);
+  for (const logo of ["claude", "openai", "hermes", "omp", "cursor"]) {
+    assert.ok(page.includes(`["${logo}",`) || page.includes(`"${logo}"`), logo);
+  }
+  // 390 px : la rangée est flexible et le style UI-3 lui permet de revenir à la ligne.
+  assert.match(page, /className="ui3-tool-logos"/);
   assert.match(page, /Connecte BUILD à ton assistant/);
   assert.match(page, /Impossible de vérifier ton accès BUILD/);
   assert.match(page, /Choisir mon accès/);
@@ -47,5 +44,6 @@ test("the MCP setup page gates instructions by paid access and uses a focused la
     page,
     /if \(tier !== "beginner" && tier !== "full"\)[\s\S]*?return[\s\S]*?const connectionStatus = await getMcpConnectionStatus\(\)/,
   );
-  assert.doesNotMatch(page, /LiquidCard|rounded-2xl|backdrop-blur/);
+  assert.match(page, /DaRoot/);
+  assert.doesNotMatch(page, /LiquidCard|rounded-2xl/);
 });

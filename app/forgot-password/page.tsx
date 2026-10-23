@@ -1,175 +1,75 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, AlertCircle } from "lucide-react";
-import { Logo } from "@/components/Logo";
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
+import { DaRoot } from "@/components/da/DaRoot";
 import { createClient } from "@/lib/supabase/client";
+import { playAppSound } from "@/lib/ui/sound";
+import "@/app/ui3.css";
 
 type Step = "email" | "otp";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<Step>("email");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) {
-      setError("Renseigne ton adresse email.");
-      return;
-    }
+  const fail = (message: string) => { setError(message); setIsLoading(false); void playAppSound("error"); };
+
+  async function sendCode(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) return fail("Cette adresse e-mail n’a pas l’air correcte.");
     setError("");
     setIsLoading(true);
-
-    const supabase = createClient();
-    await supabase.auth.resetPasswordForEmail(email);
-
-    // Ne jamais confirmer si le compte existe (sécurité)
+    await createClient().auth.resetPasswordForEmail(email.trim());
     setIsLoading(false);
     setStep("otp");
-  };
+    void playAppSound("confirm");
+  }
 
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otp) {
-      setError("Saisis le code reçu par email.");
-      return;
-    }
+  async function verifyCode(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (otp.length !== 6) return fail("Saisis le code reçu par e-mail : 6 chiffres.");
     setError("");
     setIsLoading(true);
-
-    const supabase = createClient();
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      email,
-      token: otp,
-      type: "recovery",
-    });
-
-    if (verifyError) {
-      setError("Code invalide ou expiré. Vérifie ton email et réessaie.");
-      setIsLoading(false);
-      return;
-    }
-
-    window.location.href = "/update-password";
-  };
+    const { error: verifyError } = await createClient().auth.verifyOtp({ email: email.trim(), token: otp, type: "recovery" });
+    if (verifyError) return fail("Code invalide ou expiré. Vérifie ton e-mail et réessaie.");
+    void playAppSound("confirm");
+    router.push("/update-password");
+  }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 relative overflow-hidden bg-[#0e0e0f]">
-      <div className="absolute top-8 left-8 z-20">
-        <Logo layout="horizontal" />
-      </div>
-
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(232,213,176,0.08),transparent_70%)] blur-[40px] pointer-events-none opacity-50" />
-
-      <div className="relative z-10 w-full max-w-[400px]">
-        <LiquidCard className="w-full p-8">
-          <div className="flex flex-col space-y-8 relative z-10">
-            <div className="flex flex-col space-y-2 text-center">
-              <h1 className="text-2xl font-medium tracking-tight text-[#f0ede8]">
-                Mot de passe oublié
-              </h1>
-              <p className="text-[13px] text-white/40 leading-relaxed">
-                {step === "email"
-                  ? "Saisis ton email pour recevoir un code de vérification."
-                  : `Un code de vérification a été envoyé à ${email}.`}
-              </p>
-            </div>
-
-            {step === "email" ? (
-              <form className="flex flex-col space-y-6" onSubmit={handleEmailSubmit} noValidate>
-                <div className="flex flex-col space-y-2">
-                  <label
-                    htmlFor="email"
-                    className="text-[13px] text-[#f0ede8]/60 uppercase tracking-[0.06em] font-medium"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="builder@exemple.com"
-                    className={`w-full bg-transparent border rounded-[10px] px-4 py-3 text-[15px] text-[#f0ede8] placeholder:text-[#f0ede8]/20 focus:outline-none transition-colors duration-200 ${
-                      error
-                        ? "border-red-500/50 focus:border-red-500/80"
-                        : "border-white/10 focus:border-[#e8d5b0]/40"
-                    }`}
-                  />
-                  {error && (
-                    <div className="flex items-center gap-2 text-red-400 text-xs mt-1">
-                      <AlertCircle className="w-3 h-3" />
-                      <span>{error}</span>
-                    </div>
-                  )}
-                </div>
-
-                <LiquidButton type="submit" className="w-full" size="xl" disabled={isLoading}>
-                  {isLoading ? "Envoi en cours…" : "Envoyer le code"}
-                </LiquidButton>
-              </form>
-            ) : (
-              <form className="flex flex-col space-y-6" onSubmit={handleOtpSubmit} noValidate>
-                <div className="flex flex-col space-y-2">
-                  <label
-                    htmlFor="otp"
-                    className="text-[13px] text-[#f0ede8]/60 uppercase tracking-[0.06em] font-medium"
-                  >
-                    Code de vérification
-                  </label>
-                  <input
-                    id="otp"
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    autoComplete="one-time-code"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                    placeholder="123456"
-                    className={`w-full bg-transparent border rounded-[10px] px-4 py-3 text-[20px] text-[#f0ede8] placeholder:text-[#f0ede8]/20 focus:outline-none transition-colors duration-200 tracking-[0.4em] text-center font-mono ${
-                      error
-                        ? "border-red-500/50 focus:border-red-500/80"
-                        : "border-white/10 focus:border-[#e8d5b0]/40"
-                    }`}
-                  />
-                  {error && (
-                    <div className="flex items-center gap-2 text-red-400 text-xs mt-1">
-                      <AlertCircle className="w-3 h-3" />
-                      <span>{error}</span>
-                    </div>
-                  )}
-                </div>
-
-                <LiquidButton type="submit" className="w-full" size="xl" disabled={isLoading}>
-                  {isLoading ? "Vérification…" : "Vérifier le code"}
-                </LiquidButton>
-
-                <button
-                  type="button"
-                  onClick={() => { setStep("email"); setError(""); setOtp(""); }}
-                  className="text-center text-[13px] text-white/30 hover:text-white/60 transition-colors duration-200"
-                >
-                  Renvoyer le code
-                </button>
-              </form>
-            )}
-
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center gap-2 text-[13px] text-white/30 hover:text-white/60 transition-colors duration-200"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Retour à la connexion
-            </Link>
-          </div>
-        </LiquidCard>
-      </div>
-    </main>
+    <DaRoot>
+      <main className="ui3-auth">
+        <Link className="ui3-auth-logo" href="/" aria-label="BUILD, accueil"><Image src="/da/logo-sombre.svg" alt="BUILD" width={104} height={30} priority /></Link>
+        <section className="ui3-auth-card" aria-labelledby="recovery-title">
+          <div className="ui3-auth-progress" role="img" aria-label={step === "email" ? "Étape 1 sur 3" : "Étape 2 sur 3"}><i className="is-done" /><i className={step === "otp" ? "is-current" : ""} /><i /></div>
+          {step === "email" ? <>
+            <Link className="ui3-text-link" href="/login">Retour à la connexion</Link>
+            <h1 id="recovery-title">Mot de passe oublié.</h1>
+            <p className="ui3-auth-copy">Écris ton e-mail. On t’envoie un code à 6 chiffres.</p>
+            {error ? <p className="ui3-auth-alert ui3-auth-alert-error" role="alert">{error}</p> : null}
+            <form className="ui3-auth-form" onSubmit={sendCode} noValidate>
+              <label className="ui3-field" data-invalid={Boolean(error)}><span>E-mail</span><input type="email" value={email} onChange={(event) => { setEmail(event.target.value); setError(""); }} autoComplete="username" inputMode="email" placeholder="toi@exemple.com" aria-invalid={Boolean(error)} /></label>
+              <div className="ui3-auth-actions"><button className="btn btn--p" disabled={isLoading}>{isLoading ? "Envoi" : "Envoyer le code"}</button></div>
+            </form>
+          </> : <>
+            <h1 id="recovery-title">Regarde ta boîte mail.</h1>
+            <p className="ui3-auth-copy">Si un compte existe pour <strong>{email}</strong>, un code à 6 chiffres vient de partir.</p>
+            {error ? <p className="ui3-auth-alert ui3-auth-alert-error" role="alert">{error}</p> : null}
+            <form className="ui3-auth-form" onSubmit={verifyCode} noValidate>
+              <label className="ui3-field ui3-code" data-invalid={Boolean(error)}><span>Code de vérification</span><input type="text" inputMode="numeric" pattern="[0-9]*" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(event) => { setOtp(event.target.value.replace(/\D/g, "")); setError(""); }} placeholder="000000" aria-invalid={Boolean(error)} /></label>
+              <p className="ui3-hint">Regarde aussi dans tes courriers indésirables.</p>
+              <div className="ui3-auth-actions"><button className="btn btn--p" disabled={isLoading}>{isLoading ? "Vérification" : "Vérifier le code"}</button><button className="ui3-text-link" type="button" onClick={() => { setStep("email"); setOtp(""); setError(""); void playAppSound("select"); }}>Changer l’adresse</button></div>
+            </form>
+          </>}
+        </section>
+      </main>
+    </DaRoot>
   );
 }

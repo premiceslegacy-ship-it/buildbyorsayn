@@ -1,68 +1,50 @@
 "use client";
 
-import { useState } from "react";
-import { AlertCircle, MailCheck } from "lucide-react";
 import Link from "next/link";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
+import { FormEvent, useState } from "react";
+import { AccountIcon } from "@/components/account/AccountIcon";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeInternalRedirect } from "@/lib/safeRedirect";
+import { playAppSound } from "@/lib/ui/sound";
 
 type Mode = "login" | "signup";
+type Errors = { email: string; password: string; auth: string };
+const EMPTY_ERRORS: Errors = { email: "", password: "", auth: "" };
 
-export function LoginForm({
-  initialMode = "login",
-  redirectTo = "/dashboard",
-}: {
-  initialMode?: Mode;
-  redirectTo?: string;
-}) {
+function signupPasswordError(password: string) {
+  if (password.length < 8) return "Utilise au moins 8 caractères.";
+  if (!/[A-Z]/.test(password)) return "Ajoute au moins une majuscule.";
+  if (!/[a-z]/.test(password)) return "Ajoute au moins une minuscule.";
+  if (!/[0-9]/.test(password)) return "Ajoute au moins un chiffre.";
+  return "";
+}
+
+export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: { initialMode?: Mode; redirectTo?: string }) {
   const [mode, setMode] = useState<Mode>(initialMode);
-  const [errors, setErrors] = useState({ email: "", password: "", auth: "" });
+  const [errors, setErrors] = useState<Errors>(EMPTY_ERRORS);
   const [info, setInfo] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const isSignup = mode === "signup";
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+  const reportError = (next: Errors) => {
+    setErrors(next);
+    void playAppSound("error");
+  };
 
-    const newErrors = { email: "", password: "", auth: "" };
-    let hasError = false;
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+    const next = { ...EMPTY_ERRORS };
+    if (!email) next.email = "Écris ton adresse e-mail.";
+    else if (!/^\S+@\S+\.\S+$/.test(email)) next.email = "Cette adresse e-mail n’a pas l’air correcte.";
+    if (!password) next.password = "Écris ton mot de passe.";
+    else if (isSignup) next.password = signupPasswordError(password);
+    if (next.email || next.password) return reportError(next);
 
-    if (!email) {
-      newErrors.email = "L'identifiant est requis pour accéder au système.";
-      hasError = true;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Le format de l'identifiant est invalide.";
-      hasError = true;
-    }
-
-    if (!password) {
-      newErrors.password = "Le code d'accès est manquant.";
-      hasError = true;
-    } else if (isSignup) {
-      if (password.length < 8) {
-        newErrors.password = "Le mot de passe doit contenir au moins 8 caractères.";
-        hasError = true;
-      } else if (!/[A-Z]/.test(password)) {
-        newErrors.password = "Le mot de passe doit contenir au moins une majuscule.";
-        hasError = true;
-      } else if (!/[a-z]/.test(password)) {
-        newErrors.password = "Le mot de passe doit contenir au moins une minuscule.";
-        hasError = true;
-      } else if (!/[0-9]/.test(password)) {
-        newErrors.password = "Le mot de passe doit contenir au moins un chiffre.";
-        hasError = true;
-      }
-    }
-
-    setErrors(newErrors);
+    setErrors(EMPTY_ERRORS);
     setInfo("");
-    if (hasError) return;
-
     setIsLoading(true);
     const supabase = createClient();
 
@@ -70,168 +52,70 @@ export function LoginForm({
       if (isSignup) {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) {
-          console.error("[signUp] Supabase error:", error.message);
-          const msg =
-            error.message.includes("already registered") || error.message.includes("user_already_exists")
-              ? "Un compte existe déjà avec cet email. Connecte-toi."
-              : error.message.includes("disabled") || error.message.includes("not allowed")
-              ? "Les inscriptions sont désactivées. Contacte l'administrateur."
+          const auth = error.message.includes("already registered") || error.message.includes("user_already_exists")
+            ? "Un compte existe déjà avec cet e-mail. Connecte-toi."
+            : error.message.includes("disabled") || error.message.includes("not allowed")
+              ? "Les inscriptions sont désactivées. Contacte l’administrateur."
               : error.message.includes("rate limit") || error.message.includes("too many")
-              ? "Trop de tentatives. Réessaie dans quelques minutes."
-              : error.message.includes("weak") || error.message.includes("characters")
-              ? "Mot de passe trop faible. Utilise au moins 8 caractères."
-              : `Erreur : ${error.message}`;
-          setErrors((prev) => ({ ...prev, auth: msg }));
+                ? "Trop de tentatives. Réessaie dans quelques minutes."
+                : "La création du compte a échoué. Réessaie.";
           setIsLoading(false);
-          return;
+          return reportError({ ...EMPTY_ERRORS, auth });
         }
-        // Email confirmation required: session is null but no error
         if (!data.session) {
           setIsLoading(false);
-          setInfo("Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse avant de te connecter.");
+          setInfo("Compte créé. Regarde ta boîte mail pour confirmer ton adresse avant de te connecter.");
+          void playAppSound("confirm");
           return;
         }
       } else {
-        // Nettoyer toute session stale avant de tenter la connexion
         await supabase.auth.signOut({ scope: "local" });
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
-          const msg =
-            error.message.includes("Email not confirmed")
-              ? "Ton adresse email n'est pas encore confirmée. Vérifie ta boîte mail."
-              : error.message.includes("rate limit") || error.message.includes("too many")
+          const auth = error.message.includes("Email not confirmed")
+            ? "Ton adresse e-mail n’est pas encore confirmée. Regarde ta boîte mail."
+            : error.message.includes("rate limit") || error.message.includes("too many")
               ? "Trop de tentatives. Réessaie dans quelques minutes."
-              : "Identifiants incorrects. Vérifie ton email et ton mot de passe.";
-          setErrors((prev) => ({ ...prev, auth: msg }));
+              : "E-mail ou mot de passe incorrect.";
           setIsLoading(false);
-          return;
+          return reportError({ ...EMPTY_ERRORS, auth });
         }
       }
-
-      // Navigation complète pour garantir que les cookies sont envoyés au serveur
+      void playAppSound("confirm");
       window.location.href = sanitizeInternalRedirect(redirectTo);
-      return;
     } catch {
-      setErrors((prev) => ({
-        ...prev,
-        auth: "Erreur réseau. Vérifie ta connexion et réessaie.",
-      }));
       setIsLoading(false);
+      reportError({ ...EMPTY_ERRORS, auth: "Erreur réseau. Vérifie ta connexion et réessaie." });
     }
-  };
+  }
 
-  const switchMode = () => {
+  function switchMode() {
     setMode(isSignup ? "login" : "signup");
-    setErrors({ email: "", password: "", auth: "" });
-  };
+    setErrors(EMPTY_ERRORS);
+    setInfo("");
+    void playAppSound("select");
+  }
 
   return (
     <>
-      <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-medium tracking-tightest text-[#f0ede8]">
-          {isSignup ? "Créer ton compte" : "Accéder au système BUILD"}
-        </h1>
-      </div>
-
-      <form className="flex flex-col space-y-6" onSubmit={handleSubmit} noValidate>
-        <div className="flex flex-col space-y-4">
-          <div className="flex flex-col space-y-2">
-            <label
-              htmlFor="email"
-              className="text-[13px] text-[#f0ede8]/60 uppercase tracking-[0.06em] font-medium"
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="builder@exemple.com"
-              className={`w-full bg-transparent border rounded-[10px] px-4 py-3 text-[15px] text-[#f0ede8] placeholder:text-[#f0ede8]/20 focus:outline-none transition-colors duration-200 ${errors.email
-                ? "border-red-500/50 focus:border-red-500/80"
-                : "border-white/10 focus:border-[#e8d5b0]/40"
-                }`}
-            />
-            {errors.email && (
-              <div className="flex items-center gap-2 text-red-400 text-xs mt-1 animate-fade-in">
-                <AlertCircle className="w-3 h-3" />
-                <span>{errors.email}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <label
-              htmlFor="password"
-              className="text-[13px] text-[#f0ede8]/60 uppercase tracking-[0.06em] font-medium"
-            >
-              Mot de passe
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              className={`w-full bg-transparent border rounded-[10px] px-4 py-3 text-[15px] text-[#f0ede8] placeholder:text-[#f0ede8]/20 focus:outline-none transition-colors duration-200 ${errors.password
-                ? "border-red-500/50 focus:border-red-500/80"
-                : "border-white/10 focus:border-[#e8d5b0]/40"
-                }`}
-            />
-            {errors.password && (
-              <div className="flex items-center gap-2 text-red-400 text-xs mt-1 animate-fade-in">
-                <AlertCircle className="w-3 h-3" />
-                <span>{errors.password}</span>
-              </div>
-            )}
-            {!isSignup && (
-              <div className="flex justify-end">
-                <Link
-                  href="/forgot-password"
-                  className="text-[12px] text-white/30 hover:text-[#e8d5b0]/70 transition-colors duration-200"
-                >
-                  Mot de passe oublié ?
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {errors.auth && (
-          <div className="flex items-start gap-2 text-red-400 text-[13px] animate-fade-in bg-red-500/8 border border-red-500/20 rounded-lg px-3 py-2.5">
-            <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-            <span>{errors.auth}</span>
-          </div>
-        )}
-
-        {info && (
-          <div className="flex items-start gap-2 text-[#e8d5b0]/80 text-xs animate-fade-in bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 rounded-lg px-3 py-2.5">
-            <MailCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-            <span>{info}</span>
-          </div>
-        )}
-
-        <LiquidButton
-          type="submit"
-          className="w-full"
-          size="xl"
-          disabled={isLoading}
-        >
-          {isLoading
-            ? isSignup ? "Création en cours…" : "Connexion en cours…"
-            : isSignup ? "Créer mon compte" : "Continuer"}
-        </LiquidButton>
-
-        <p className="text-center text-[13px] text-[#f0ede8]/40">
-          {isSignup ? "Déjà un compte ?" : "Pas encore membre ?"}{" "}
-          <button
-            type="button"
-            onClick={switchMode}
-            className="text-[#e8d5b0]/70 hover:text-[#e8d5b0] transition-colors duration-200 underline underline-offset-2 cursor-pointer"
-          >
-            {isSignup ? "Se connecter" : "Créer un compte"}
-          </button>
-        </p>
+      <h1>{isSignup ? "Crée ton compte." : "Connecte-toi à BUILD."}</h1>
+      {errors.auth ? <p className="ui3-auth-alert ui3-auth-alert-error" role="alert">{errors.auth}</p> : null}
+      {info ? <p className="ui3-auth-alert ui3-auth-alert-success" role="status">{info}</p> : null}
+      <form className="ui3-auth-form" onSubmit={handleSubmit} noValidate>
+        <label className="ui3-field" data-invalid={Boolean(errors.email)}>
+          <span>E-mail</span>
+          <input name="email" type="email" autoComplete="username" inputMode="email" placeholder="toi@exemple.com" aria-invalid={Boolean(errors.email)} />
+          {errors.email ? <span className="ui3-field-error"><AccountIcon name="mail" />{errors.email}</span> : null}
+        </label>
+        <label className="ui3-field" data-invalid={Boolean(errors.password)}>
+          <span className="ui3-field-head"><span>Mot de passe</span>{!isSignup ? <Link href="/forgot-password">Mot de passe oublié ?</Link> : null}</span>
+          <input name="password" type="password" autoComplete={isSignup ? "new-password" : "current-password"} aria-invalid={Boolean(errors.password)} />
+          {isSignup ? <span className="ui3-password-rules">8 caractères, une majuscule, une minuscule et un chiffre.</span> : null}
+          {errors.password ? <span className="ui3-field-error"><AccountIcon name="key" />{errors.password}</span> : null}
+        </label>
+        <div className="ui3-auth-actions"><button className="btn btn--p" type="submit" disabled={isLoading}>{isLoading ? (isSignup ? "Création" : "Connexion") : (isSignup ? "Créer mon compte" : "Se connecter")}</button></div>
       </form>
+      <p className="ui3-auth-switch">{isSignup ? "Tu as déjà un compte ?" : "Tu n’as pas encore de compte ?"}<button type="button" onClick={switchMode}>{isSignup ? "Se connecter" : "Créer un compte"}</button></p>
     </>
   );
 }

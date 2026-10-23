@@ -6,36 +6,29 @@ import { doctrineAccessStatus } from "@/lib/doctrine/access.server";
 import { readPublishedDoctrine } from "@/lib/doctrine/storage";
 import type { DoctrineFile } from "../../doctrine/markdown";
 import { COFFRE_LABEL, COFFRE_PRICE } from "@/lib/pricing";
+import { DaRoot } from "@/components/da/DaRoot";
+import "@/app/ui3.css";
 
 export function GateShell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans">
-      <div className="max-w-3xl mx-auto px-6 py-16">
-        <Link href="/skills" className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white/90 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Retour aux skills
-        </Link>
-        {children}
-      </div>
-    </main>
+    <DaRoot><main className="ui3-state"><div className="ui3-access-card"><Link href="/skills" className="ui3-text-link"><ArrowLeft aria-hidden="true" /> Retour aux skills</Link>{children}</div></main></DaRoot>
   );
 }
 
 function LockedGate() {
   return (
     <GateShell>
-      <div className="mt-10 rounded-2xl border border-[#e8d5b0]/15 bg-[#e8d5b0]/[0.04] p-8">
-        <div className="w-12 h-12 rounded-full bg-[#e8d5b0]/10 flex items-center justify-center mb-6">
-          <Lock className="w-5 h-5 text-[#e8d5b0]" />
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Hermes Agent : organiser le travail avec l&apos;IA</h1>
-        <p className="mt-4 text-white/60 leading-relaxed">
+      <div>
+        <Lock aria-hidden="true" />
+        <h1 className="t-2">Hermes Agent : organiser le travail avec l&apos;IA</h1>
+        <p>
           Comment partir d&apos;un vrai problème, répartir les rôles, ranger les bonnes informations et donner à chaque outil seulement les accès dont il a besoin. Ce contenu est réservé à {COFFRE_LABEL}.
         </p>
         <Link
           href="/checkout"
-          className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] hover:bg-[#f0dfc0] transition-colors"
+          className="btn btn--p"
         >
-          Prendre {COFFRE_LABEL} - {COFFRE_PRICE}€
+          Prendre {COFFRE_LABEL} à {COFFRE_PRICE}&nbsp;€
         </Link>
       </div>
     </GateShell>
@@ -45,8 +38,8 @@ function LockedGate() {
 function UnavailableGate() {
   return (
     <GateShell>
-      <h1 className="mt-10 text-2xl sm:text-3xl font-semibold">Doctrine momentanément indisponible</h1>
-      <p className="mt-4 text-white/60">Réessaie plus tard. Aucun contenu non vérifié ne sera affiché.</p>
+      <h1 className="t-2">Parcours momentanément indisponible</h1>
+      <p>Réessaie plus tard. Aucun contenu non vérifié n’est affiché.</p>
     </GateShell>
   );
 }

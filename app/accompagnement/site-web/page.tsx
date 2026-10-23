@@ -1,134 +1,61 @@
+import Image from "next/image";
 import Link from "next/link";
-import { MethodToolsAsset, StartingPointAsset, ThemeAtlas } from "@/components/AccompanimentAssets";
-import { createClient } from "@/lib/supabase/server";
+import { DaRoot } from "@/components/da/DaRoot";
+import { NavBar } from "@/components/NavBar";
+import { AccompanimentCta } from "@/components/account/AccompanimentCta";
 import {
   ACCOMPANIMENT_ACCESS_STATUSES,
   isAccompanimentAdminUser,
   SITE_WEB_ACCOMPANIMENT_SLUG,
 } from "@/lib/accompanimentAccess";
-import { THEMES } from "@/lib/siteWebAccompagnement";
 import { ACCOMPANIMENT_CAL_URL } from "@/lib/accompagnements";
-import { NavBar } from "@/components/NavBar";
 import { navIdentity } from "@/lib/auth/navIdentity.server";
-
-const CAL_URL = ACCOMPANIMENT_CAL_URL;
+import { THEMES } from "@/lib/siteWebAccompagnement";
+import { createClient } from "@/lib/supabase/server";
+import "@/app/ui3.css";
 
 export const metadata = {
-  title: "Vendre des sites web avec l&apos;IA | BUILD",
-  description: "Vendre des sites web créés avec l&apos;IA et structurer une activité qui peut grandir.",
+  title: "Vendre des sites web avec l’IA | BUILD",
+  description: "Un accompagnement individuel pour cadrer, produire et livrer des sites web avec l’IA.",
 };
 
 export default async function SiteWebAccompagnementPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const isAdmin = isAccompanimentAdminUser(user);
-
-  // Le profil de la barre et l'accès membre ne dépendent que de `user` : on les lit en parallèle, avec l'utilisateur déjà vérifié.
+  const { data: { user } } = await supabase.auth.getUser();
   const today = new Date().toISOString().slice(0, 10);
-  const [assignmentResult, identity] = await Promise.all([
+  const [assignment, identity] = await Promise.all([
     user
-      ? supabase
-          .from("accompaniment_assignments")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("accompaniment_slug", SITE_WEB_ACCOMPANIMENT_SLUG)
-          .in("status", ACCOMPANIMENT_ACCESS_STATUSES)
-          .lte("starts_on", today)
-          .or(`ends_on.is.null,ends_on.gte.${today}`)
-          .limit(1)
-          .maybeSingle()
+      ? supabase.from("accompaniment_assignments").select("id").eq("user_id", user.id).eq("accompaniment_slug", SITE_WEB_ACCOMPANIMENT_SLUG).in("status", ACCOMPANIMENT_ACCESS_STATUSES).lte("starts_on", today).or(`ends_on.is.null,ends_on.gte.${today}`).limit(1).maybeSingle()
       : null,
     navIdentity(user),
   ]);
-  const hasMemberAccess = Boolean(assignmentResult?.data && !assignmentResult.error);
+  const hasMemberAccess = Boolean(assignment?.data && !assignment.error);
+  const isAdmin = isAccompanimentAdminUser(user);
 
   return (
-    <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8]">
-      <NavBar
-        activeLink="accompagnement"
-        tier={identity?.tier ?? null}
-        isAdmin={identity?.isAdmin}
-        displayName={identity?.displayName}
-        displayEmail={identity?.displayEmail}
-        initials={identity?.initials}
-      />
+    <DaRoot className="da-app">
+      <NavBar activeLink="accompagnement" tier={identity?.tier} isAdmin={identity?.isAdmin} displayName={identity?.displayName} displayEmail={identity?.displayEmail} initials={identity?.initials} />
+      <main className="ui3-accompaniment-detail">
+        <section className="ui3-accompaniment-intro">
+          <div className="ui3-accompaniment-art" aria-hidden="true"><Image src="/da/objets/vente.png" alt="" width={480} height={480} priority /></div>
+          <p className="eyebrow">Accompagnement individuel</p>
+          <h1 className="t-aff">Produis et vends des sites web avec une méthode claire.</h1>
+          <p className="t-lede">On part de ton niveau, de ton offre et de ton projet. Tu travailles les compétences qui te manquent, dans le bon ordre.</p>
+          <AccompanimentCta href={ACCOMPANIMENT_CAL_URL} />
+          <p className="ui3-rdv-note">Le premier échange est gratuit. Tu choisis ton créneau.</p>
+          {(hasMemberAccess || isAdmin) ? <div className="ui3-auth-switch">{hasMemberAccess ? <Link href="/accompagnement/espace">Ouvrir mon espace</Link> : null}{isAdmin ? <Link href="/accompagnement/formateur">Espace formateur</Link> : null}</div> : null}
+        </section>
 
-      {(isAdmin || hasMemberAccess) && (
-        <div className="border-b border-white/[0.08] px-5 py-2.5 sm:px-8">
-          <div className="mx-auto flex max-w-7xl items-center justify-end gap-4 text-sm">
-            {isAdmin ? <Link className="text-[#c9b48a] hover:text-[#f0ede8]" href="/accompagnement/formateur">Formateur</Link> : null}
-            {hasMemberAccess ? <Link className="text-[#d8d3c8] hover:text-[#c9b48a]" href="/accompagnement/espace">Espace membre</Link> : null}
+        <section className="ui3-accompaniment-themes" aria-labelledby="themes-title">
+          <div className="ui3-section-head">
+            <div><p className="eyebrow">Ton parcours</p><h2 id="themes-title">Les compétences travaillées</h2></div>
+            <p>Chaque thème vient du parcours réel utilisé dans ton espace membre.</p>
           </div>
-        </div>
-      )}
-
-      <section className="border-b border-white/[0.08] px-5 py-16 sm:px-8 sm:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="mx-auto max-w-4xl text-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#c9b48a]">BUILD · accompagnement sites web</p>
-            <h1 className="mt-5 text-4xl font-medium tracking-[-0.04em] sm:text-6xl lg:text-7xl">Produis et vends plus de sites web avec l&apos;IA.</h1>
-            <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[#bdb9b0]">L&apos;accompagnement t&apos;apprend à utiliser l&apos;IA comme une équipe de développeurs à portée de main : cadrer une offre, produire avec la bonne méthode, livrer plus vite et structurer une activité web qui peut grandir.</p>
-            <div className="mt-9 flex flex-wrap justify-center gap-3">
-              <a className="build-cta build-cta-primary" href={CAL_URL} target="_blank" rel="noreferrer">Faire le point gratuitement</a>
-              <a className="build-cta build-cta-secondary" href="#themes">Voir les thèmes</a>
-            </div>
-            <p className="mt-3 text-sm text-[#8f8b84]">Un premier échange pour trouver le prochain levier : offre, production ou vente.</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-white/[0.08] bg-[#161618] px-5 py-16 sm:px-8 sm:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="max-w-2xl">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#c9b48a]">Un accompagnement vraiment 1:1</p>
-            <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] sm:text-5xl">Je pars de ton niveau, pas d&apos;un programme figé.</h2>
-            <p className="mt-5 text-base leading-7 text-[#bdb9b0]">Que tu partes d&apos;une idée, que tu produises déjà des assets ou que tu veuilles professionnaliser ta façon de vendre et de livrer, l&apos;accompagnement s&apos;adapte à ce que tu sais déjà.</p>
-            <p className="mt-4 text-base leading-7 text-[#bdb9b0]">On travaille sur ce qu&apos;il te manque pour passer de ton niveau actuel à une offre claire, un livrable utile et une activité capable de progresser.</p>
-          </div>
-          <div className="mt-10 max-w-6xl"><StartingPointAsset /></div>
-        </div>
-      </section>
-
-      <section className="border-b border-white/[0.08] px-5 py-16 sm:px-8 sm:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#c9b48a]">Une méthode, plusieurs outils</p>
-            <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] sm:text-5xl">Les outils changent. La méthode reste.</h2>
-            <p className="mt-5 text-base leading-7 text-[#bdb9b0]">Les outils sont des briques. BUILD t&apos;apprend à les orchestrer pour vendre des sites web, produire plus vite, livrer proprement et faire grandir l&apos;activité sans dépendre d&apos;un seul outil.</p>
-          </div>
-          <div className="mt-10 max-w-6xl"><MethodToolsAsset /></div>
-          <div className="mt-10 flex flex-wrap items-center gap-5 border-t border-white/[0.08] pt-8">
-            <p className="max-w-xl text-base leading-7 text-[#d8d3c8]">Tu veux savoir quel levier débloquer en premier ?</p>
-            <a className="build-cta build-cta-secondary" href={CAL_URL} target="_blank" rel="noreferrer">Trouver le bon point de départ</a>
-          </div>
-        </div>
-      </section>
-
-      <section id="themes" className="bg-[#eee8dc] px-5 py-16 text-[#171719] sm:px-8 sm:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div className="max-w-2xl">
-              <p className="text-xs uppercase tracking-[0.18em] text-[#80652f]">Ce que tu apprends</p>
-              <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] sm:text-5xl">Les thèmes qui font la différence.</h2>
-            </div>
-            <p className="max-w-sm text-sm leading-6 text-[#5f594e]">Pas une liste de tâches. Les compétences qui te permettent de continuer seul.</p>
-          </div>
-          <div className="mt-10"><ThemeAtlas themes={THEMES} user={Boolean(user)} memberAccess={hasMemberAccess} /></div>
-        </div>
-      </section>
-
-      <section className="px-5 py-16 sm:px-8 sm:py-24">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-end justify-between gap-8 border-t border-white/[0.08] pt-8">
-          <div className="max-w-2xl">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#c9b48a]">Passer à l'action</p>
-            <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] sm:text-5xl">Ne reste pas seul devant le prochain cap de ton activité.</h2>
-            <p className="mt-5 text-base leading-7 text-[#bdb9b0]">On regarde ton niveau, les sites web que tu veux vendre, ton système actuel et le prochain levier utile pour progresser.</p>
-          </div>
-          <a className="build-cta build-cta-primary" href={CAL_URL} target="_blank" rel="noreferrer">Faire le point gratuitement</a>
-        </div>
-      </section>
-    </main>
+          <ol className="ui3-theme-grid">
+            {THEMES.map((theme) => <li key={theme.id}><span>{theme.marker}</span><div><h3>{theme.title}</h3><p>{theme.promise}</p></div></li>)}
+          </ol>
+        </section>
+      </main>
+    </DaRoot>
   );
 }

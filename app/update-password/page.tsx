@@ -1,117 +1,66 @@
 "use client";
 
-import { useState } from "react";
-import { AlertCircle } from "lucide-react";
-import { Logo } from "@/components/Logo";
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
+import Image from "next/image";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
+import { AccountIcon } from "@/components/account/AccountIcon";
+import { DaRoot } from "@/components/da/DaRoot";
 import { createClient } from "@/lib/supabase/client";
+import { playAppSound } from "@/lib/ui/sound";
+import "@/app/ui3.css";
+
+const rules = [
+  { label: "8 caractères", valid: (value: string) => value.length >= 8 },
+  { label: "Une majuscule", valid: (value: string) => /[A-Z]/.test(value) },
+  { label: "Une minuscule", valid: (value: string) => /[a-z]/.test(value) },
+  { label: "Un chiffre", valid: (value: string) => /[0-9]/.test(value) },
+];
 
 export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!password) {
-      setError("Renseigne ton nouveau mot de passe.");
-      return;
-    }
-    if (password.length < 8) {
-      setError("Le mot de passe doit contenir au moins 8 caractères.");
-      return;
-    }
-    if (!/[A-Z]/.test(password)) {
-      setError("Le mot de passe doit contenir au moins une majuscule.");
-      return;
-    }
-    if (!/[a-z]/.test(password)) {
-      setError("Le mot de passe doit contenir au moins une minuscule.");
-      return;
-    }
-    if (!/[0-9]/.test(password)) {
-      setError("Le mot de passe doit contenir au moins un chiffre.");
-      return;
-    }
+  const fail = (message: string) => { setError(message); setIsLoading(false); void playAppSound("error"); };
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const missing = rules.find((rule) => !rule.valid(password));
+    if (missing) return fail("Ton mot de passe doit respecter toutes les règles.");
+    if (password !== confirmation) return fail("Les deux mots de passe ne correspondent pas.");
     setError("");
     setIsLoading(true);
-
-    const supabase = createClient();
-    const { error: updateError } = await supabase.auth.updateUser({ password });
-
+    const { error: updateError } = await createClient().auth.updateUser({ password });
     if (updateError) {
-      const isSamePassword =
-        updateError.message.includes("same_password") ||
-        updateError.message.includes("different from the old password");
-      setError(
-        isSamePassword
-          ? "Ce mot de passe est identique à l'ancien. Choisis un mot de passe différent."
-          : "Une erreur est survenue. Le code est peut-être expiré, recommence depuis le début."
-      );
-      setIsLoading(false);
-      return;
+      const same = updateError.message.includes("same_password") || updateError.message.includes("different from the old password");
+      return fail(same ? "Ce mot de passe est identique à l’ancien. Choisis-en un autre." : "Le code est peut-être expiré. Recommence depuis le début.");
     }
-
-    // Refresh pour que le middleware voit la nouvelle session avant la redirection
-    window.location.href = "/dashboard";
-  };
+    setIsLoading(false);
+    setDone(true);
+    void playAppSound("confirm");
+  }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 relative overflow-hidden bg-[#0e0e0f]">
-      <div className="absolute top-8 left-8 z-20">
-        <Logo layout="horizontal" />
-      </div>
-
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(232,213,176,0.08),transparent_70%)] blur-[40px] pointer-events-none opacity-50" />
-
-      <div className="relative z-10 w-full max-w-[400px]">
-        <LiquidCard className="w-full p-8">
-          <div className="flex flex-col space-y-8 relative z-10">
-            <div className="flex flex-col space-y-2 text-center">
-              <h1 className="text-2xl font-medium tracking-tight text-[#f0ede8]">
-                Nouveau mot de passe
-              </h1>
-              <p className="text-[13px] text-white/40 leading-relaxed">
-                Choisis un mot de passe sécurisé (8 caractères minimum).
-              </p>
-            </div>
-
-            <form className="flex flex-col space-y-6" onSubmit={handleSubmit} noValidate>
-              <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="password"
-                  className="text-[13px] text-[#f0ede8]/60 uppercase tracking-[0.06em] font-medium"
-                >
-                  Nouveau mot de passe
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className={`w-full bg-transparent border rounded-[10px] px-4 py-3 text-[15px] text-[#f0ede8] placeholder:text-[#f0ede8]/20 focus:outline-none transition-colors duration-200 ${
-                    error
-                      ? "border-red-500/50 focus:border-red-500/80"
-                      : "border-white/10 focus:border-[#e8d5b0]/40"
-                  }`}
-                />
-                {error && (
-                  <div className="flex items-center gap-2 text-red-400 text-xs mt-1">
-                    <AlertCircle className="w-3 h-3" />
-                    <span>{error}</span>
-                  </div>
-                )}
-              </div>
-
-              <LiquidButton type="submit" className="w-full" size="xl" disabled={isLoading}>
-                {isLoading ? "Enregistrement…" : "Enregistrer le nouveau mot de passe"}
-              </LiquidButton>
+    <DaRoot>
+      <main className="ui3-auth">
+        <Link className="ui3-auth-logo" href="/" aria-label="BUILD, accueil"><Image src="/da/logo-sombre.svg" alt="BUILD" width={104} height={30} priority /></Link>
+        <section className="ui3-auth-card" aria-labelledby="password-title">
+          <div className="ui3-auth-progress" role="img" aria-label={done ? "Terminé" : "Étape 3 sur 3"}><i className="is-done" /><i className="is-done" /><i className="is-current" /></div>
+          {done ? <div className="ui3-auth-success" role="status"><span className="ui3-auth-success-mark"><AccountIcon name="check" /></span><h1 id="password-title">Mot de passe changé.</h1><p className="ui3-auth-copy">Tu peux te connecter avec ton nouveau mot de passe.</p><Link className="btn btn--p" href="/login">Me connecter</Link></div> : <>
+            <h1 id="password-title">Nouveau mot de passe.</h1>
+            <p className="ui3-auth-copy">Choisis-en un que tu n’as jamais utilisé ailleurs.</p>
+            {error ? <p className="ui3-auth-alert ui3-auth-alert-error" role="alert">{error}</p> : null}
+            <form className="ui3-auth-form" onSubmit={handleSubmit} noValidate>
+              <label className="ui3-field" data-invalid={Boolean(error)}><span>Nouveau mot de passe</span><input type="password" value={password} onChange={(event) => { setPassword(event.target.value); setError(""); }} autoComplete="new-password" aria-invalid={Boolean(error)} /></label>
+              <div className="ui3-password-rules" aria-label="Règles du mot de passe">{rules.map((rule) => <span key={rule.label} className={rule.valid(password) ? "is-valid" : ""}><AccountIcon name="check" />{rule.label}</span>)}</div>
+              <label className="ui3-field" data-invalid={Boolean(error)}><span>Écris-le encore une fois</span><input type="password" value={confirmation} onChange={(event) => { setConfirmation(event.target.value); setError(""); }} autoComplete="new-password" aria-invalid={Boolean(error)} /></label>
+              <div className="ui3-auth-actions"><button className="btn btn--p" disabled={isLoading}>{isLoading ? "Enregistrement" : "Enregistrer le mot de passe"}</button></div>
             </form>
-          </div>
-        </LiquidCard>
-      </div>
-    </main>
+          </>}
+        </section>
+      </main>
+    </DaRoot>
   );
 }

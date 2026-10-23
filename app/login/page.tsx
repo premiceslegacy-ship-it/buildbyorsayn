@@ -1,47 +1,27 @@
-import { Metadata } from "next";
-import { Logo } from "@/components/Logo";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { DaRoot } from "@/components/da/DaRoot";
 import { LoginForm } from "@/components/LoginForm";
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
 import { PHASES } from "@/lib/siteWebAccompagnement";
 import { sanitizeInternalRedirect } from "@/lib/safeRedirect";
+import "@/app/ui3.css";
 
-export const metadata: Metadata = {
-  title: "Connexion | BUILD",
-};
+export const metadata: Metadata = { title: "Connexion | BUILD" };
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    mode?: string | string[];
-    next?: string | string[];
-    phase?: string | string[];
-  }>;
-}) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ mode?: string | string[]; next?: string | string[]; phase?: string | string[] }> }) {
   const { mode, next, phase } = await searchParams;
   const safeBase = sanitizeInternalRedirect(next);
   const phaseValue = typeof phase === "string" ? phase : null;
   const safePhase = PHASES.some((item) => item.id === phaseValue) ? phaseValue : null;
-  const redirectTo = safePhase && safeBase.startsWith("/accompagnement/espace")
-    ? `${safeBase.split("#")[0]}#${safePhase}`
-    : safeBase;
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-[#0e0e0f]">
-      {/* Logo en haut à gauche */}
-      <div className="absolute top-4 left-4 sm:top-8 sm:left-8 z-20">
-        <Logo layout="horizontal" />
-      </div>
+  const redirectTo = safePhase && safeBase.startsWith("/accompagnement/espace") ? `${safeBase.split("#")[0]}#${safePhase}` : safeBase;
 
-      {/* Halos ambiants de fond */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(232,213,176,0.08),transparent_70%)] blur-[40px] pointer-events-none opacity-50 max-w-[100vw]" />
-      
-      <div className="flex flex-col items-center space-y-8 sm:space-y-12 relative z-10 w-full max-w-[400px]">
-        <LiquidCard className="w-full p-6 sm:p-8">
-          <div className="flex flex-col space-y-8 relative z-10">
-            <LoginForm initialMode={mode === "signup" ? "signup" : "login"} redirectTo={redirectTo} />
-          </div>
-        </LiquidCard>
-      </div>
-    </main>
+  return (
+    <DaRoot>
+      <main className="ui3-auth">
+        <Link className="ui3-auth-logo" href="/" aria-label="BUILD, accueil"><Image src="/da/logo-sombre.svg" alt="BUILD" width={104} height={30} priority /></Link>
+        <section className="ui3-auth-card" aria-label={mode === "signup" ? "Créer un compte" : "Se connecter"}><LoginForm initialMode={mode === "signup" ? "signup" : "login"} redirectTo={redirectTo} /></section>
+      </main>
+    </DaRoot>
   );
 }

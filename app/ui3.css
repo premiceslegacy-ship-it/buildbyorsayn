@@ -1,0 +1,216 @@
+/* UI-3, surfaces d'accès et de compte. Tous les sélecteurs sont bornés à .da. */
+.da .ui3-icon { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* Authentification */
+.da .ui3-auth { min-height: 100svh; padding: calc(72px + clamp(16px, 5vh, 64px)) var(--gutter) clamp(48px, 8vh, 96px); display: grid; place-items: start center; background: radial-gradient(52% 40% at 50% 0%, rgba(34,217,110,.12), transparent 70%), var(--nuit); }
+.da .ui3-auth-logo { position: absolute; top: clamp(20px, 3vw, 32px); left: var(--gutter); z-index: 2; }
+.da .ui3-auth-logo img { width: 104px; height: auto; }
+.da .ui3-auth-card { width: min(100%, 520px); display: grid; gap: 22px; padding: clamp(24px, 4vw, 40px); border-radius: var(--r-l); background: var(--carte); margin-top: clamp(0px, 4vh, 48px); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .ui3-auth-card h1 { font: 700 clamp(32px, 4vw, 48px)/1.1 var(--font-t); letter-spacing: -.032em; color: var(--encre); text-wrap: balance; }
+.da .ui3-auth-copy { margin-top: -10px; font: 400 17px/1.47 var(--font); color: var(--t2); text-wrap: pretty; overflow-wrap: anywhere; }
+.da .ui3-auth-form, .da .ui3-form { display: grid; gap: 20px; }
+.da .ui3-field, .da .ui3-form label { display: grid; gap: 8px; min-width: 0; font: 600 17px/1.3 var(--font-t); color: var(--encre); }
+.da .ui3-field-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.da .ui3-field-head a { font: 500 14px/1.3 var(--font); color: var(--menthe); }
+.da .ui3-field input, .da .ui3-form input { width: 100%; height: 52px; padding: 0 16px; border: 0; border-radius: var(--r-s); background: var(--carte-2); color: var(--encre); font: 400 17px/1.25 var(--font); box-shadow: inset 0 0 0 1px rgba(241,245,242,.22); transition: box-shadow .32s var(--ease-c), background .32s var(--ease-c); }
+.da .ui3-field input::placeholder, .da .ui3-form input::placeholder { color: var(--t3); }
+.da .ui3-field input:hover, .da .ui3-form input:hover { box-shadow: inset 0 0 0 1px rgba(241,245,242,.4); }
+.da .ui3-field input:focus-visible, .da .ui3-form input:focus-visible { outline: 2px solid var(--em); outline-offset: 2px; }
+.da .ui3-field[data-invalid="true"] input { box-shadow: inset 0 0 0 1.5px #ff6b63; }
+.da .ui3-field-error { display: flex; gap: 8px; align-items: flex-start; font: 500 14px/1.4 var(--font); color: #ff817a; }
+.da .ui3-field-error .ui3-icon { margin-top: 1px; width: 18px; height: 18px; }
+.da .ui3-auth-alert { padding: 12px 14px; border-radius: var(--r-s); font: 500 14px/1.4 var(--font); }
+.da .ui3-auth-alert-error { color: #ff9a95; background: rgba(255,69,58,.12); box-shadow: inset 0 0 0 1px rgba(255,69,58,.4); }
+.da .ui3-auth-alert-success { color: var(--menthe); background: rgba(34,217,110,.1); }
+.da .ui3-auth-actions { display: grid; gap: 8px; justify-items: center; }
+.da .ui3-auth-actions .btn--p { width: 100%; height: 52px; font-size: 17px; }
+.da .ui3-auth-switch { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; text-align: center; font: 400 17px/1.4 var(--font); color: var(--t2); }
+.da .ui3-auth-switch button, .da .ui3-auth-switch a, .da .ui3-text-link { color: var(--menthe); font-weight: 500; }
+.da .ui3-auth-progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.da .ui3-auth-progress i { height: 4px; border-radius: 2px; background: rgba(241,245,242,.18); overflow: hidden; }
+.da .ui3-auth-progress i::after { content: ""; display: block; width: 100%; height: 100%; transform: scaleX(0); transform-origin: left; background: var(--em); transition: transform var(--sp-doux-d, .6s) var(--sp-doux, var(--ease)); }
+.da .ui3-auth-progress i.is-done::after, .da .ui3-auth-progress i.is-current::after { transform: scaleX(1); }
+.da .ui3-code input { height: 64px; text-align: center; font: 700 32px/1 var(--font-t); letter-spacing: .42em; padding-left: calc(16px + .42em); font-variant-numeric: tabular-nums; }
+.da .ui3-password-rules { display: grid; gap: 6px; font: 500 14px/1.35 var(--font); color: var(--t2); }
+.da .ui3-password-rules span { display: flex; align-items: center; gap: 8px; }
+.da .ui3-password-rules .is-valid { color: var(--encre); }
+.da .ui3-password-rules .ui3-icon { width: 16px; height: 16px; color: var(--em); }
+.da .ui3-auth-success { display: grid; justify-items: center; text-align: center; gap: 16px; }
+.da .ui3-auth-success-mark { width: 88px; height: 88px; display: grid; place-items: center; border-radius: 50%; color: var(--em); box-shadow: inset 0 0 0 2px rgba(34,217,110,.55); animation: ui3-pop var(--sp-rebond-d, .65s) var(--sp-rebond, var(--ease)) both; }
+.da .ui3-auth-success-mark .ui3-icon { width: 44px; height: 44px; stroke-width: 2.4; }
+@keyframes ui3-pop { from { opacity: 0; transform: scale(.72); } }
+
+/* Compte */
+.da .ui3-account { max-width: 1280px; min-height: 100svh; margin-inline: auto; padding: calc(68px + clamp(24px, 4vw, 52px)) var(--gutter) 120px; }
+.da .ui3-account-head { display: grid; gap: 4px; margin-bottom: clamp(20px, 3vw, 40px); }
+.da .ui3-account-grid { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: clamp(40px, 6vw, 96px); align-items: start; }
+.da .ui3-settings { display: grid; gap: 28px; align-content: start; position: sticky; top: 92px; }
+.da .ui3-settings-group { display: grid; border-radius: var(--r-m); background: var(--carte); overflow: hidden; }
+.da .ui3-setting { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr) auto 18px; align-items: center; gap: 14px; width: 100%; min-height: 60px; padding: 8px 16px 8px 14px; text-align: left; font: 500 17px/1.3 var(--font); color: var(--t1); transition: background .32s var(--ease-c), transform .1s linear; }
+.da .ui3-setting + .ui3-setting::before, .da .ui3-settings-group form + form::before { content: ""; position: absolute; left: 64px; right: 0; top: 0; height: 1px; background: var(--trait); }
+.da .ui3-setting:hover, .da .ui3-setting.is-active { background: var(--carte-2); }
+.da .ui3-setting:active { transform: scale(.985); }
+.da .ui3-setting-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--carte-2); color: var(--em); }
+.da .ui3-setting.is-active .ui3-setting-icon { background: var(--em); color: var(--sur-em); }
+.da .ui3-setting small { max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 14px/1.3 var(--font); color: var(--t3); }
+.da .ui3-setting > .ui3-icon { width: 18px; height: 18px; color: var(--t3); }
+.da .ui3-setting-danger { grid-template-columns: 36px minmax(0, 1fr); color: #ff8b85; }
+.da .ui3-setting-danger .ui3-setting-icon { color: #ff817a; background: rgba(255,69,58,.16); }
+.da .ui3-account-pane { min-width: 0; max-width: 42rem; display: grid; gap: 18px; }
+.da .ui3-pane-section { display: grid; gap: 20px; align-content: start; }
+.da .ui3-pane-section h2 { font: 700 40px/1.08 var(--font-t); letter-spacing: -.035em; color: var(--encre); text-wrap: balance; }
+.da .ui3-pane-section > p { font: 400 17px/1.47 var(--font); color: var(--t2); text-wrap: pretty; }
+.da .ui3-pane-section > p strong { color: var(--encre); font-weight: 600; }
+.da .ui3-form .btn--p { justify-self: start; min-width: 200px; }
+.da .ui3-hint { font: 400 14px/1.4 var(--font); color: var(--t3); }
+.da .ui3-notice { padding: 12px 14px; border-radius: var(--r-s); font: 500 14px/1.4 var(--font); animation: ui3-enter var(--sp-doux-d, .6s) var(--sp-doux, var(--ease)) both; }
+.da .ui3-notice-success { color: var(--menthe); background: rgba(34,217,110,.1); }
+.da .ui3-notice-error { color: #ff9a95; background: rgba(255,69,58,.12); box-shadow: inset 0 0 0 1px rgba(255,69,58,.35); }
+@keyframes ui3-enter { from { opacity: 0; transform: translateY(8px); } }
+.da .ui3-subscription { display: grid; gap: 18px; padding: clamp(20px, 2.4vw, 28px); border-radius: var(--r-l); background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .ui3-subscription h3 { font: 600 24px/1.15 var(--font-t); color: var(--encre); letter-spacing: -.02em; }
+.da .ui3-subscription ul { display: grid; gap: 12px; padding-top: 18px; box-shadow: 0 -1px 0 var(--trait); }
+.da .ui3-subscription li { display: grid; grid-template-columns: 20px 1fr; gap: 12px; font: 400 17px/1.4 var(--font); color: var(--t1); }
+.da .ui3-subscription li .ui3-icon { color: var(--em); }
+.da .ui3-upgrade { overflow: hidden; border-radius: var(--r-l); background: linear-gradient(180deg, #0f2a1b 0%, #0a1710 55%, #0a0f0c 100%); box-shadow: inset 0 0 0 1px rgba(34,217,110,.35); }
+.da .ui3-upgrade-art { position: relative; display: grid; place-items: center; height: 230px; overflow: hidden; }
+.da .ui3-upgrade-art::before { content: ""; position: absolute; width: 280px; height: 180px; border-radius: 50%; background: rgba(34,217,110,.16); filter: blur(45px); }
+.da .ui3-upgrade-art img { position: relative; width: min(72%, 300px); transform: translateY(12px); }
+.da .ui3-upgrade-lock { position: absolute; left: 50%; bottom: 28px; width: 54px; height: 54px; display: grid; place-items: center; transform: translateX(-50%); border-radius: 50%; color: var(--encre); background: rgba(5,8,6,.58); backdrop-filter: blur(18px); box-shadow: inset 0 0 0 1px rgba(241,245,242,.3); }
+.da .ui3-upgrade-body { display: grid; gap: 14px; padding: 0 clamp(24px, 4vw, 36px) clamp(28px, 4vw, 40px); }
+.da .ui3-upgrade-body h3 { font: 700 28px/1.12 var(--font-t); letter-spacing: -.03em; color: var(--encre); }
+.da .ui3-upgrade-body > p { color: var(--t2); }
+.da .ui3-upgrade-price { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.da .ui3-upgrade-price strong { font: 700 44px/1 var(--font-t); color: var(--encre); }
+.da .ui3-upgrade-price span { font: 500 14px/1.3 var(--font); color: var(--t3); }
+.da .ui3-upgrade-body .btn { width: 100%; }
+.da .ui3-connection, .da .ui3-device { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px; border-radius: var(--r-m); background: var(--carte); }
+.da .ui3-logo-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.da .ui3-logo-row > span { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; background: var(--ivoire); }
+.da .ui3-logo-row img { width: 25px; height: 25px; object-fit: contain; }
+.da .ui3-device { justify-content: flex-start; }
+.da .ui3-device > span:last-child { display: grid; gap: 2px; }
+.da .ui3-device small { color: var(--t3); }
+.da .ui3-danger-button { color: #ff9a95; background: rgba(255,69,58,.16); box-shadow: inset 0 0 0 1px rgba(255,69,58,.5); }
+.da .ui3-back { display: none; justify-self: start; min-height: 44px; color: var(--menthe); font-weight: 500; }
+.da .ui3-back::before { content: "‹"; margin-right: 6px; font-size: 25px; line-height: 0; }
+
+/* Pages de catalogue et d'accès */
+.da .ui3-page { min-height: 100svh; padding-bottom: clamp(88px, 10vw, 140px); }
+.da .ui3-page-head { text-align: center; padding: calc(68px + clamp(40px, 6vw, 92px)) var(--gutter) clamp(20px, 3vw, 40px); background: radial-gradient(46% 60% at 50% 0%, rgba(34,217,110,.10), transparent 70%), var(--nuit); }
+.da .ui3-page-head > div { display: grid; justify-items: center; gap: 18px; max-width: 54rem; margin-inline: auto; }
+.da .ui3-page-body { max-width: 1500px; margin-inline: auto; padding-inline: var(--gutter); }
+.da .ui3-section { margin-top: clamp(48px, 6vw, 88px); }
+.da .ui3-section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin-bottom: 22px; }
+.da .ui3-section-head h2 { font: 650 clamp(24px, 3vw, 36px)/1.14 var(--font-t); letter-spacing: -.03em; color: var(--encre); }
+.da .ui3-steps { display: grid; gap: 20px; }
+@media (min-width: 735px) { .da .ui3-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.da .ui3-step { display: grid; grid-template-columns: 34px 1fr; gap: 4px 14px; align-items: start; padding: 24px; border-radius: var(--r-m); background: var(--carte); }
+.da .ui3-step::before { content: attr(data-step); grid-row: span 2; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; font: 700 17px/1 var(--font-t); color: var(--sur-em); background: var(--em); }
+.da .ui3-step b { font: 600 19px/1.25 var(--font-t); color: var(--encre); }
+.da .ui3-step span { font: 400 17px/1.4 var(--font); color: var(--t2); }
+.da .ui3-skill-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+@media (min-width: 735px) { .da .ui3-skill-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1360px) { .da .ui3-skill-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.da .ui3-skill-card { display: grid; grid-template-rows: auto 1fr; min-width: 0; overflow: hidden; border-radius: var(--r-m); background: var(--carte); }
+.da .ui3-skill-card[data-locked="true"] .ui3-skill-image img { filter: saturate(.55) brightness(.62); }
+.da .ui3-skill-image { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--noir); }
+.da .ui3-skill-image img { width: 100%; height: 100%; object-fit: cover; }
+.da .ui3-skill-badge { position: absolute; top: 12px; right: 12px; min-height: 28px; display: inline-flex; align-items: center; padding: 4px 11px; border-radius: 999px; background: rgba(5,8,6,.78); color: var(--t1); font: 600 12px/1.2 var(--font); box-shadow: inset 0 0 0 1px rgba(241,245,242,.24); }
+.da .ui3-skill-body { display: grid; grid-template-rows: auto auto auto auto 1fr auto; gap: 12px; padding: 20px; }
+.da .ui3-skill-body h3 { font: 600 21px/1.2 var(--font-t); letter-spacing: -.02em; color: var(--encre); }
+.da .ui3-skill-body > p { font: 400 17px/1.4 var(--font); color: var(--t2); }
+.da .ui3-skill-label { font: 600 14px/1.2 var(--font); color: var(--menthe); }
+.da .ui3-prompt { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 12px 12px 12px 14px; border-radius: var(--r-s); background: var(--nuit); }
+.da .ui3-prompt p { font: 400 14px/1.45 var(--font); color: var(--t1); overflow-wrap: anywhere; }
+.da .ui3-prompt button { min-height: 36px; padding: 0 14px; border-radius: 999px; background: rgba(241,245,242,.12); font: 600 14px/1 var(--font); }
+.da .ui3-skill-adapt { font-size: 14px !important; }
+.da .ui3-skill-adapt strong { color: var(--t1); }
+.da .ui3-skill-action { align-self: end; display: grid; gap: 8px; }
+.da .ui3-skill-action .btn { width: 100%; }
+.da .ui3-skill-status { font: 500 14px/1.4 var(--font); color: var(--menthe); }
+.da .ui3-skill-status[data-error="true"] { color: #ff9a95; }
+.da .ui3-filter { display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: var(--carte); width: max-content; max-width: 100%; overflow-x: auto; }
+.da .ui3-filter button { flex: none; min-height: 36px; padding: 0 14px; border-radius: 999px; font: 600 14px/1 var(--font); color: var(--t2); }
+.da .ui3-filter button[aria-pressed="true"] { color: var(--encre); background: var(--carte-2); }
+.da .ui3-state { min-height: 70svh; display: grid; place-items: center; padding: calc(68px + 56px) var(--gutter) 110px; text-align: center; }
+.da .ui3-state > div { display: grid; justify-items: center; gap: 16px; max-width: 38rem; }
+.da .ui3-state p { color: var(--t2); }
+.da .ui3-tool-logos { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.da .ui3-tool-logos span { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; background: var(--ivoire); }
+.da .ui3-tool-logos img { width: 28px; height: 28px; object-fit: contain; }
+.da .ui3-access-card { width: min(100%, 760px); display: grid; gap: 24px; padding: clamp(24px, 4vw, 40px); border-radius: var(--r-l); background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .ui3-access-row { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; padding-block: 18px; box-shadow: 0 1px 0 var(--trait), 0 -1px 0 var(--trait); }
+.da .ui3-access-row dt { font: 600 14px/1.3 var(--font); color: var(--t3); }
+.da .ui3-access-row dd { font: 600 17px/1.3 var(--font); color: var(--encre); }
+.da .ui3-status-ok { color: var(--menthe) !important; }
+
+/* Accompagnement */
+.da .ui3-rdv { min-height: 100svh; display: grid; align-content: center; justify-items: center; gap: clamp(40px, 7vw, 88px); padding: calc(68px + clamp(24px, 5vw, 64px)) var(--gutter) clamp(48px, 8vw, 96px); background: radial-gradient(48% 38% at 50% 30%, rgba(34,217,110,.14), transparent 72%), var(--nuit); }
+.da .ui3-rdv-hero { display: grid; justify-items: center; text-align: center; width: min(100%, 52rem); }
+.da .ui3-rdv-art { width: clamp(200px, 34vw, 380px); aspect-ratio: 1; margin-bottom: clamp(-24px, -2vw, -8px); filter: drop-shadow(0 32px 48px rgba(0,0,0,.5)); }
+.da .ui3-rdv-art img { width: 100%; height: 100%; object-fit: contain; }
+.da .ui3-rdv-hero h1 { max-width: 14em; font-size: clamp(40px, 6vw, 64px); }
+.da .ui3-rdv-hero .t-lede { margin-top: 20px; max-width: 28em; }
+.da .ui3-rdv-hero .btn { margin-top: 36px; min-width: 220px; height: 52px; }
+.da .ui3-rdv-note { margin-top: 14px; font: 400 14px/1.4 var(--font); color: var(--t3); }
+.da .ui3-rdv-soon { display: flex; gap: 16px; align-items: baseline; padding: 18px 22px; border-radius: var(--r-m); background: var(--carte); text-align: left; }
+.da .ui3-rdv-soon strong { color: var(--t2); }
+.da .ui3-rdv-soon span { color: var(--t3); font-size: 14px; }
+.da .ui3-accompaniment-detail { min-height: 100svh; padding-bottom: clamp(80px, 10vw, 140px); }
+.da .ui3-accompaniment-intro { display: grid; justify-items: center; width: min(100%, 58rem); margin-inline: auto; padding: calc(68px + 40px) var(--gutter) clamp(64px, 8vw, 104px); text-align: center; }
+.da .ui3-accompaniment-art { width: clamp(180px, 28vw, 320px); aspect-ratio: 1; margin-bottom: -24px; filter: drop-shadow(0 28px 44px rgba(0,0,0,.48)); }
+.da .ui3-accompaniment-art img { width: 100%; height: 100%; object-fit: contain; }
+.da .ui3-accompaniment-intro h1 { max-width: 14em; }
+.da .ui3-accompaniment-intro .t-lede { max-width: 32em; margin-top: 20px; }
+.da .ui3-accompaniment-intro .btn { min-width: 220px; height: 52px; margin-top: 32px; }
+.da .ui3-accompaniment-themes { width: min(calc(100% - 2 * var(--gutter)), 1120px); margin-inline: auto; }
+.da .ui3-accompaniment-themes .ui3-section-head > p { max-width: 28rem; color: var(--t2); }
+.da .ui3-theme-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.da .ui3-theme-grid li { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 16px; padding: 22px; border-radius: var(--r-m); background: var(--carte); }
+.da .ui3-theme-grid li > span { color: var(--menthe); font: 600 14px/1.3 var(--font-t); }
+.da .ui3-theme-grid h3 { color: var(--encre); font: 600 19px/1.25 var(--font-t); }
+.da .ui3-theme-grid p { margin-top: 7px; color: var(--t2); font: 400 14px/1.45 var(--font); }
+.da.ui3-accompaniment-workspace > main { min-height: 100svh; background: var(--nuit) !important; color: var(--encre) !important; font-family: var(--font); }
+.da.ui3-accompaniment-workspace [class*="border-l-"] { border-left-width: 0 !important; padding-left: 0 !important; }
+
+/* Hermes */
+.da .ui3-hermes-face { width: clamp(200px, 24vw, 320px); aspect-ratio: 1; object-fit: contain; margin-block: -18px -34px; }
+.da .ui3-hermes-groups { display: grid; gap: clamp(64px, 7vw, 88px); width: min(100%, 62rem); margin-inline: auto; }
+.da .ui3-hermes-group { display: grid; gap: 10px; }
+.da .ui3-hermes-group > p { max-width: 36em; color: var(--t2); }
+.da .ui3-hermes-list { margin-inline: -18px; }
+.da .ui3-hermes-row { position: relative; display: grid; grid-template-columns: 44px minmax(0,1fr) auto; gap: 18px; align-items: start; padding: 18px; border-radius: var(--r-m); transition: background .32s var(--ease-c), transform .1s linear; }
+.da .ui3-hermes-row:hover { background: var(--carte); }
+.da .ui3-hermes-row:active { transform: scale(.99); }
+.da .ui3-hermes-row + .ui3-hermes-row::before { content: ""; position: absolute; left: 18px; right: 18px; top: 0; height: 1px; background: var(--trait); }
+.da .ui3-hermes-number { color: var(--t3); font: 600 14px/1 var(--font-t); }
+.da .ui3-hermes-copy { display: grid; gap: 5px; }
+.da .ui3-hermes-copy strong { color: var(--encre); font: 600 17px/1.28 var(--font-t); }
+.da .ui3-hermes-copy span { color: var(--t2); font: 400 14px/1.45 var(--font); }
+.da .ui3-hermes-open { color: var(--menthe); font: 600 14px/1 var(--font); white-space: nowrap; }
+
+@media (max-width: 899px) {
+  .da .ui3-account-grid { display: block; }
+  .da .ui3-settings { position: static; }
+  .da .ui3-account-grid[data-section=""] .ui3-account-pane { display: none; }
+  .da .ui3-account-grid:not([data-section=""]) .ui3-settings { display: none; }
+  .da .ui3-account-grid:not([data-section=""]) .ui3-account-pane { display: block; }
+  .da .ui3-back { display: inline-flex; align-items: center; }
+  .da .ui3-account-head { display: none; }
+  .da .ui3-account { padding-top: calc(68px + 20px); }
+}
+@media (max-width: 734px) {
+  .da .ui3-auth { padding-inline: 20px; }
+  .da .ui3-auth-logo { left: 20px; }
+  .da .ui3-auth-card { padding: 24px 20px; }
+  .da .ui3-prompt { grid-template-columns: 1fr; }
+  .da .ui3-prompt button { justify-self: start; }
+  .da .ui3-rdv-soon { display: grid; gap: 2px; text-align: center; }
+  .da .ui3-hermes-row { grid-template-columns: 32px minmax(0,1fr); padding-inline: 10px; }
+  .da .ui3-hermes-open { grid-column: 2; }
+  .da .ui3-theme-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .da .ui3-auth-progress i::after, .da .ui3-notice, .da .ui3-auth-success-mark { animation: none; transition-duration: .12s; }
+}

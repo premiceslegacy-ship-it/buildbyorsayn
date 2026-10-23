@@ -5,6 +5,7 @@ import "@/app/da-mcp.css";
 import { createClient } from "@/lib/supabase/server";
 import { resolveMcpStartDecision } from "@/lib/mcp/startDestination";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
+import "@/app/ui3.css";
 
 export default async function McpStartPage() {
   const connectorVisible =
@@ -38,13 +39,13 @@ export default async function McpStartPage() {
 
   return (
     <DaRoot>
-      <main className="mx-page">
-        <section className="mx-card mx-center" aria-labelledby="mx-title">
+      <main className="ui3-state">
+        <section className="ui3-access-card" aria-labelledby="mx-title">
           <Link href="/" aria-label="Retour à l'accueil BUILD">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/da/logo-sombre.svg" alt="BUILD" width={104} height={30} />
           </Link>
-          <div className="mx-head">
+          <div>
             <p className="mx-step">Connexion de ton assistant</p>
             <h1 id="mx-title" className="t-2">Impossible de vérifier ton accès</h1>
             <p>Ton accès BUILD n&apos;a pas pu être confirmé. Réessaie dans un instant avant de choisir une offre.</p>

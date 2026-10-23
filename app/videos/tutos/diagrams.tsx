@@ -25,7 +25,7 @@ export function DiagnosticDiagram() {
     <Frame
       title="Du symptôme à la réponse minimale"
       explainer="Un problème mal diagnostiqué produit une automatisation mal ciblée. Chaque étape doit être vérifiée avant de passer à la suivante."
-      caption="Lecture : on avance uniquement de gauche à droite - impossible de sauter une étape pour aller plus vite."
+      caption="Lecture : on avance uniquement de gauche à droite. Impossible de sauter une étape pour aller plus vite."
       viewBox="0 0 720 180"
     >
       {steps.map((s, i) => (
@@ -76,7 +76,7 @@ export function KnowledgeLayersDiagram() {
     <Frame
       title="Six couches, six responsabilités distinctes"
       explainer="Chaque couche a un rôle précis. Mélanger « source brute » et « connaissance qualifiée », par exemple, fait remonter une information non vérifiée comme si elle l'était."
-      caption="Lecture : de haut en bas, chaque couche s'appuie sur celle du dessus - une information ne descend jamais deux couches à la fois."
+      caption="Lecture : de haut en bas, chaque couche s'appuie sur celle du dessus. Une information ne descend jamais deux couches à la fois."
       viewBox={`0 0 720 ${rows.length * (h + gap) + 20}`}
     >
       {rows.map((r, i) => (
@@ -103,7 +103,7 @@ export function ExecutionLoopDiagram() {
   return (
     <Frame
       title="La boucle ne s'arrête pas à une réponse produite"
-      explainer="Un agent qui répond puis oublie n'apprend jamais. La boucle ne se referme qu'une fois la trace écrite - c'est elle qui nourrit la mesure et l'amélioration du cycle suivant."
+      explainer="Un agent qui répond puis oublie n'apprend jamais. La boucle ne se referme qu'une fois la trace écrite. C'est elle qui nourrit la mesure et l'amélioration du cycle suivant."
       caption="Lecture : suivre les flèches dans le sens horaire, en partant de « Percevoir » en haut. Le centre rappelle que chaque tour de boucle doit être mesuré."
       viewBox="0 0 720 400"
     >
@@ -252,7 +252,7 @@ export function WorkshopDiagram() {
     <Frame
       title="Cinq fiches, un seul dossier de pilote"
       explainer="Chaque fiche couvre un moment différent d'un essai en conditions réelles. Toutes se rassemblent dans le même dossier, qui devient la preuve qu'on peut montrer à quelqu'un d'autre."
-      caption="Lecture : les cinq fiches sont indépendantes et peuvent être remplies dans n'importe quel ordre - seul le dossier final les régroupe."
+      caption="Lecture : les cinq fiches sont indépendantes et peuvent être remplies dans n'importe quel ordre. Seul le dossier final les régroupe."
       viewBox="0 0 720 340"
     >
       <Box x={hubX - hubW / 2} y={hubY} w={hubW} h={hubH} label="Dossier de pilote" accent />
@@ -281,8 +281,8 @@ export function FederatedBrainDiagram() {
   return (
     <Frame
       title="Quatre responsabilités, pas un super-agent"
-      explainer="Une entreprise AI-first n'est pas un agent unique qui fait tout : elle sépare qui oriente, qui sait, qui opère et qui exécute - comme quatre rôles distincts dans une équipe humaine."
-      caption="Lecture : les quatre responsabilités coexistent en continu, aucune ne remplace les autres - un agent d'exécution ne doit jamais fixer seul l'orientation."
+      explainer="Une entreprise AI-first n'est pas un agent unique qui fait tout : elle sépare qui oriente, qui sait, qui opère et qui exécute, comme quatre rôles distincts dans une équipe humaine."
+      caption="Lecture : les quatre responsabilités coexistent en continu, aucune ne remplace les autres. Un agent d'exécution ne doit jamais fixer seul l'orientation."
       viewBox="0 0 720 320"
     >
       <text x={360} y={30} textAnchor="middle" fontSize="11" fontWeight={600} letterSpacing="0.08em" fill="#c4bfb799">
@@ -324,8 +324,8 @@ export function PoleMapDiagram() {
   return (
     <Frame
       title="Cartographier les pôles réellement présents"
-      explainer="Avant de décider où poser un agent, on liste tous les pôles qui existent vraiment dans l'entreprise - pas un agent par métier théorique, mais une carte fidèle du terrain."
-      caption="Lecture : cette carte est un inventaire, pas une hiérarchie - aucun pôle n'est « au-dessus » d'un autre ici."
+      explainer="Avant de décider où poser un agent, on liste tous les pôles qui existent vraiment dans l'entreprise. Pas un agent par métier théorique, mais une carte fidèle du terrain."
+      caption="Lecture : cette carte est un inventaire, pas une hiérarchie. Aucun pôle n'est « au-dessus » d'un autre ici."
       viewBox={`0 0 720 ${Math.ceil(poles.length / cols) * (h + gapY) + y0 + 10}`}
     >
       <text x={20} y={26} fontSize="11" fontWeight={600} letterSpacing="0.08em" fill="#c4bfb799">
@@ -344,14 +344,14 @@ export function DataFormatsDiagram() {
     { label: "Doctrine & méthode", sub: "Markdown versionné, relu par des humains" },
     { label: "Objets métier vivants", sub: "dans l'application ou la base adaptée" },
     { label: "Contrat d'échange", sub: "JSON ou schéma structuré entre systèmes" },
-    { label: "Index de recherche", sub: "une projection dérivée - jamais la source d'autorité" },
+    { label: "Index de recherche", sub: "une projection dérivée, jamais la source d'autorité" },
   ];
   const h = 62, gap = 16, x = 60, w = 600;
   return (
     <Frame
       title="Un format par responsabilité, pas par habitude"
       explainer="Utiliser le même format partout par confort crée des ambiguïtés : un index de recherche n'a pas la même autorité qu'une doctrine versionnée, même s'il est plus rapide à consulter."
-      caption="Lecture : plus on descend, plus le format sert à la vitesse d'accès - mais seul le haut du tableau fait autorité en cas de désaccord."
+      caption="Lecture : plus on descend, plus le format sert à la vitesse d'accès. Mais seul le haut du tableau fait autorité en cas de désaccord."
       viewBox={`0 0 720 ${rows.length * (h + gap) + 16}`}
     >
       {rows.map((r, i) => (
@@ -372,8 +372,8 @@ export function SkillsSopDiagram() {
   return (
     <Frame
       title="Métier, compétence, procédure, exécutant"
-      explainer="Un métier contient plusieurs compétences. Chaque compétence bien maîtrisée peut être formalisée en procédure stable, que n'importe quel exécutant - humain ou agent - peut ensuite suivre."
-      caption="Lecture : c'est la procédure (SOP) qui rend une compétence transmissible, pas l'inverse - sans elle, le savoir reste dans la tête d'une seule personne."
+      explainer="Un métier contient plusieurs compétences. Chaque compétence bien maîtrisée peut être formalisée en procédure stable, que n'importe quel exécutant, humain ou agent, peut ensuite suivre."
+      caption="Lecture : c'est la procédure (SOP) qui rend une compétence transmissible, pas l'inverse. Sans elle, le savoir reste dans la tête d'une seule personne."
       viewBox="0 0 720 170"
     >
       {steps.map((s, i) => (
@@ -393,7 +393,7 @@ export function ToolAccessDiagram() {
     <Frame
       title="Une connexion réussie ne prouve pas l'opération"
       explainer="Avoir accès à une API, une CLI ou un serveur MCP n'est qu'une porte. Ce qui compte, c'est le contrôle technique interposé devant l'action, et la preuve que l'action interdite a bien été refusée."
-      caption="Lecture : une interdiction vérifiée sur une porte (API) ne garantit rien sur une autre porte (CLI) - chaque accès doit être testé séparément."
+      caption="Lecture : une interdiction vérifiée sur une porte (API) ne garantit rien sur une autre porte (CLI). Chaque accès doit être testé séparément."
       viewBox="0 0 720 240"
     >
       <Box x={20} y={24} w={200} h={90} label="API / CLI / MCP" sub="une porte d'accès parmi d'autres" />
@@ -402,7 +402,7 @@ export function ToolAccessDiagram() {
       <Arrow x1={468} y1={69} x2={500} y2={69} />
       <Box x={500} y={24} w={200} h={90} label="Action réelle" sub="testée, le refus est vérifié en pratique" />
       <text x={360} y={155} textAnchor="middle" fontSize="12.5" fontWeight={600} fill={SUBTEXT}>Une interdiction vérifiée sur une porte</text>
-      <text x={360} y={177} textAnchor="middle" fontSize="12.5" fill="#c4bfb7cc">ne dit rien sur les autres portes - chacune se teste pour elle-même.</text>
+      <text x={360} y={177} textAnchor="middle" fontSize="12.5" fill="#c4bfb7cc">ne dit rien sur les autres portes. Chacune se teste pour elle-même.</text>
     </Frame>
   );
 }
@@ -425,7 +425,7 @@ export function WorkflowCrossPoleDiagram() {
     <Frame
       title="Un résultat qui traverse plusieurs pôles"
       explainer="Une vente ne reste jamais dans un seul pôle : elle part du marketing ou de la vente, passe par les opérations, la finance, puis revient nourrir l'apprentissage collectif."
-      caption="Lecture : suivre la numérotation en continu - la fin de la première ligne (Proposition) rejoint le début de la seconde (Acceptation)."
+      caption="Lecture : suivre la numérotation en continu. La fin de la première ligne (Proposition) rejoint le début de la seconde (Acceptation)."
       viewBox={`0 0 720 ${rows * (h + gapY) + 20}`}
     >
       {steps.map((label, i) => {
@@ -484,7 +484,7 @@ export function AdoptionLaddersDiagram() {
     <Frame
       title="Avancer par paliers réversibles"
       explainer="Chaque palier engage un peu plus, mais reste réversible : on peut revenir en arrière sans dégât jusqu'au pilote supervisé. Ce n'est qu'à partir de l'extension limitée que l'engagement devient plus difficile à annuler."
-      caption="Lecture : la hauteur des barres représente le niveau d'engagement, pas la durée - un palier peut être court et déjà très engageant."
+      caption="Lecture : la hauteur des barres représente le niveau d'engagement, pas la durée. Un palier peut être court et déjà très engageant."
       viewBox={`0 0 ${totalW + 24} 360`}
     >
       <Bracket x={12 + 3 * (w + gap) - gap / 2} y1={16} y2={baseY - maxBarH * (3 / 6)} label="rien n'est encore engagé" reach={10} />
@@ -534,7 +534,7 @@ export function TemplateTreeDiagram() {
     <Frame
       title="Un dossier de départ, pas une configuration"
       explainer="C'est une arborescence de dossiers, pas un flux : « entreprise-exemple/ » contient les quatre dossiers ci-dessous, ils ne « pointent » pas vers lui."
-      caption="Lecture : les traits sont des branches d'arborescence (contenant → contenu), sans flèche - rien ne « circule », un dossier en contient simplement d'autres."
+      caption="Lecture : les traits sont des branches d'arborescence (contenant → contenu), sans flèche. Rien ne « circule », un dossier en contient simplement d'autres."
       viewBox="0 0 720 250"
     >
       <Box x={rootX} y={rootY} w={rootW} h={rootH} label="entreprise-exemple/" accent />

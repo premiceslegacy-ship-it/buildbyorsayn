@@ -1,0 +1,133 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+import { SKILLS_CATALOG } from "../lib/skillsCatalog";
+import { accessibleSkillCount, canDownloadSkill, lockedSkillCta } from "../app/skills/access";
+import { accountIncludedItems, accountTierLabel, accountUpgradeTarget } from "../components/account/accountPresentation";
+
+test("Compte présente chaque palier sans offrir une montée inutile", () => {
+  assert.equal(accountTierLabel("free"), "Gratuit");
+  assert.deepEqual(accountIncludedItems("free"), ["Le contenu gratuit", "Ton compte BUILD"]);
+  assert.equal(accountUpgradeTarget("free"), "full");
+  assert.equal(accountTierLabel("beginner"), "Fondations");
+  assert.match(accountIncludedItems("beginner").join(" "), /skills Fondations/);
+  assert.equal(accountUpgradeTarget("beginner"), "complement");
+  assert.equal(accountTierLabel("full"), "LE\u00a0COFFRE");
+  assert.match(accountIncludedItems("full").join(" "), /Tous les skills/);
+  assert.equal(accountUpgradeTarget("full"), null);
+});
+
+test("les trois paliers ne voient que leurs skills", () => {
+  assert.equal(accessibleSkillCount(SKILLS_CATALOG, "free"), 0);
+  assert.equal(accessibleSkillCount(SKILLS_CATALOG, "preview"), 0);
+  assert.equal(accessibleSkillCount(SKILLS_CATALOG, "beginner"), SKILLS_CATALOG.filter((skill) => skill.access === "beginner").length);
+  assert.equal(accessibleSkillCount(SKILLS_CATALOG, "full"), SKILLS_CATALOG.length);
+  assert.equal(canDownloadSkill("beginner", "full"), false);
+  assert.equal(canDownloadSkill("full", "beginner"), true);
+  assert.equal(lockedSkillCta("free", "beginner"), "Prendre Fondations");
+  assert.equal(lockedSkillCta("beginner", "full"), "Passer à LE\u00a0COFFRE");
+});
+
+test("Skills couvre téléchargement, mise à jour, échec, vide et BUILD Sync", async () => {
+  const [page, client, loading, error] = await Promise.all([
+    readFile("app/skills/page.tsx", "utf8"),
+    readFile("app/skills/SkillsCatalogClient.tsx", "utf8"),
+    readFile("app/skills/loading.tsx", "utf8"),
+    readFile("app/skills/error.tsx", "utf8"),
+  ]);
+  assert.match(page, /SKILLS_CATALOG/);
+  assert.match(page, /SkillsSyncCard/);
+  assert.match(client, /fetch\(`\/api\/skills\/\$\{skill\.slug\}`\)/);
+  assert.match(client, /Mettre à jour/);
+  assert.match(client, /Aucun skill n’est disponible/);
+  assert.match(client, /Le téléchargement a échoué/);
+  assert.match(loading, /aria-busy="true"/);
+  assert.match(error, /reset/);
+});
+
+test("Compte garde les contrôles de session et les confirmations", async () => {
+  const [page, client, loading, error] = await Promise.all([
+    readFile("app/compte/page.tsx", "utf8"),
+    readFile("components/account/AccountClient.tsx", "utf8"),
+    readFile("app/compte/loading.tsx", "utf8"),
+    readFile("app/compte/error.tsx", "utf8"),
+  ]);
+  assert.match(page, /if \(!user\) redirect/);
+  assert.match(client, /auth\.updateUser\(\{ data: \{ first_name: trimmed \} \}\)/);
+  assert.match(client, /auth\.updateUser\(\{ email: nextEmail \}\)/);
+  assert.match(client, /auth\.updateUser\(\{ password \}\)/);
+  assert.match(client, /signOut\(\{ scope: "others" \}\)/);
+  assert.match(client, /confirmEverywhere/);
+  assert.doesNotMatch(client, /deleteUser|Supprimer mon compte/);
+  assert.match(loading, /aria-busy="true"/);
+  assert.match(error, /reset/);
+});
+
+test("connexion et récupération exposent chargement, réussite et erreur", async () => {
+  const [login, forgot, update, loginLoading, forgotError, updateError] = await Promise.all([
+    readFile("components/LoginForm.tsx", "utf8"),
+    readFile("app/forgot-password/page.tsx", "utf8"),
+    readFile("app/update-password/page.tsx", "utf8"),
+    readFile("app/login/loading.tsx", "utf8"),
+    readFile("app/forgot-password/error.tsx", "utf8"),
+    readFile("app/update-password/error.tsx", "utf8"),
+  ]);
+  assert.match(login, /signInWithPassword/);
+  assert.match(login, /signUp/);
+  assert.match(login, /Erreur réseau/);
+  assert.match(forgot, /resetPasswordForEmail/);
+  assert.match(forgot, /verifyOtp/);
+  assert.match(forgot, /Code invalide ou expiré/);
+  assert.match(update, /Les deux mots de passe ne correspondent pas/);
+  assert.match(update, /Mot de passe changé/);
+  for (const source of [login, forgot, update]) assert.match(source, /playAppSound\("(confirm|error)/);
+  assert.match(loginLoading, /AuthRouteLoading/);
+  assert.match(forgotError, /AuthRouteError/);
+  assert.match(updateError, /AuthRouteError/);
+});
+
+test("les écrans d’accès MCP ferment la porte avant de charger les instructions", async () => {
+  const page = await readFile("app/dashboard/mcp/page.tsx", "utf8");
+  assert.match(page, /if \(profileError \|\| tier === null\)/);
+  assert.match(page, /if \(tier !== "beginner" && tier !== "full"\)/);
+  assert.ok(page.indexOf('if (tier !== "beginner" && tier !== "full")') < page.indexOf("getMcpConnectionStatus()"));
+  assert.match(page, /Vérification indisponible/);
+  assert.match(page, /revocation === "error"/);
+});
+
+test("Accompagnement et Hermes ont leurs états de chargement et d’erreur", async () => {
+  for (const route of ["accompagnement", "videos/tutos"]) {
+    const [loading, error] = await Promise.all([readFile(`app/${route}/loading.tsx`, "utf8"), readFile(`app/${route}/error.tsx`, "utf8")]);
+    assert.match(loading, /aria-busy="true"/, route);
+    assert.match(error, /reset/, route);
+  }
+  const hermes = await readFile("app/videos/tutos/page.tsx", "utf8");
+  assert.match(hermes, /files\.length === 0/);
+  assert.match(hermes, /CHAPTER_META/);
+});
+
+test("Accompagnement garde ses données et ses portes d’accès réelles", async () => {
+  const [landing, detail, member, trainer] = await Promise.all([
+    readFile("app/accompagnement/page.tsx", "utf8"),
+    readFile("app/accompagnement/site-web/page.tsx", "utf8"),
+    readFile("app/accompagnement/espace/page.tsx", "utf8"),
+    readFile("app/accompagnement/formateur/page.tsx", "utf8"),
+  ]);
+  assert.match(landing, /ACCOMPANIMENT_CAL_URL/);
+  assert.match(landing, /ACCOMPANIMENT_ACCESS_STATUSES/);
+  assert.match(detail, /THEMES\.map/);
+  assert.match(detail, /accompaniment_assignments/);
+  assert.match(member, /if \(!user\) redirect/);
+  assert.match(member, /if \(error \|\| !data\) redirect/);
+  assert.match(trainer, /if \(!user \|\| !isAccompanimentAdminUser\(user\)\) redirect/);
+  assert.match(trainer, /ui3-accompaniment-workspace/);
+});
+
+test("les styles UI-3 respectent les largeurs et les garde-fous visuels", async () => {
+  const css = await readFile("app/ui3.css", "utf8");
+  assert.match(css, /--gutter/);
+  assert.match(css, /@media \(max-width: 899px\)/);
+  assert.match(css, /@media \(max-width: 734px\)/);
+  assert.match(css, /prefers-reduced-motion/);
+  assert.doesNotMatch(css, /border-left\s*:/);
+});

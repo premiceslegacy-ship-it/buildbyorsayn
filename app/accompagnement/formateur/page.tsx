@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
+import { DaRoot } from "@/components/da/DaRoot";
 import { TrainerWorkspace, type TrainerClient } from "@/components/accompagnement/TrainerWorkspace";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -17,6 +18,7 @@ import type {
   AccompanimentWorkspaceContextRow,
 } from "@/lib/accompanimentTypes";
 import { isThemeUnderstood, THEMES } from "@/lib/siteWebAccompagnement";
+import "@/app/ui3.css";
 
 const RELANCE_AFTER_DAYS = 14;
 
@@ -237,5 +239,5 @@ export default async function TrainerPage() {
     ? "Une partie des données n'est pas disponible. Vérifie la migration d'accès et les tables de suivi avant d'inscrire une personne."
     : null;
 
-  return <TrainerWorkspace clients={clients} people={people} dataWarning={dataWarning} />;
+  return <DaRoot className="ui3-accompaniment-workspace"><TrainerWorkspace clients={clients} people={people} dataWarning={dataWarning} /></DaRoot>;
 }

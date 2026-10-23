@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
+import { DaRoot } from "@/components/da/DaRoot";
 import { SiteWebWorkspace } from "@/components/accompagnement/SiteWebWorkspace";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -15,6 +16,7 @@ import type {
   AccompanimentWorkspaceContextRow,
 } from "@/lib/accompanimentTypes";
 import { SITE_WEB_THEME_IDS } from "@/lib/siteWebAccompagnement";
+import "@/app/ui3.css";
 
 export const metadata = {
   title: "Espace membre | BUILD",
@@ -59,11 +61,9 @@ export default async function SiteWebAccompanimentWorkspacePage() {
     ? mapWorkspaceContextRow(contextData as AccompanimentWorkspaceContextRow)
     : null;
 
-  return (
-    <SiteWebWorkspace
-      memberName={getUserDisplayName(user)}
-      assignment={{ ...assignment, themeIds: validThemeIds }}
-      workspaceContext={workspaceContext}
-    />
-  );
+  return <DaRoot className="ui3-accompaniment-workspace"><SiteWebWorkspace
+    memberName={getUserDisplayName(user)}
+    assignment={{ ...assignment, themeIds: validThemeIds }}
+    workspaceContext={workspaceContext}
+  /></DaRoot>;
 }

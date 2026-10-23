@@ -1,199 +1,133 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { ArrowRight, Download } from "lucide-react";
-import { IllustratedCard } from "@/components/ui/illustrated-card";
-import { illustrationSrc } from "@/lib/illustrations";
 import type { SkillCatalogItem, SkillCategory } from "@/lib/skillsCatalog";
+import { playAppSound } from "@/lib/ui/sound";
+import { accessibleSkillCount, canDownloadSkill, lockedSkillCta } from "./access";
 
-type SkillsPublicationMetadata = {
-  publishedAt: string;
-  releaseId: string;
-  artifacts: Array<{ fileName: string; sha256: string }>;
+type Publication = { publishedAt: string; releaseId: string; artifacts: Array<{ fileName: string; sha256: string }> };
+type RecordEntry = { sha256: string; downloadedAt: string; publishedAt: string };
+type Records = Record<string, RecordEntry>;
+type DownloadState = { slug: string; status: "loading" | "error" | "done" } | null;
+
+const STORAGE_KEY = "build-skill-downloads";
+
+const PRESENTATION: Record<string, { prompt: string; adapt: string }> = {
+  "product-film-factory": { prompt: "Utilise le skill Product Film Factory. Fais un film produit de 30 secondes pour mon produit. Montre-moi le plan avant de coder.", adapt: "Donne-lui ton logo, tes couleurs et une phrase sur ton produit." },
+  "oracle-by-orsayn": { prompt: "Utilise le skill ORACLE by Orsayn. Je veux construire mon produit. Pose-moi tes questions une par une avant d’écrire du code.", adapt: "Donne-lui ta stack et les personnes qui utiliseront le produit." },
+  "oracle-site-web": { prompt: "Utilise le skill ORACLE Site Web. Cadre ma page de vente à partir de mon offre, de mon audience et de mes preuves.", adapt: "Ajoute ton prix, tes vraies preuves et les éléments de ta marque." },
+  "apple-design-skills": { prompt: "Utilise les Apple Design Skills. Audite cet écran et corrige les espaces, le texte, les composants et leurs états.", adapt: "Donne tes couleurs et tes polices, ou demande de garder ton style." },
+  "ux-ui-design": { prompt: "Utilise le skill UX/UI Design Premium. Analyse mes références, puis propose une direction adaptée à mon projet.", adapt: "Précise ton audience et les choix visuels que tu refuses." },
+  "backend-orsayn": { prompt: "Utilise le skill Backend Orsayn. Audite la connexion, les droits d’accès et les clés secrètes de mon backend.", adapt: "Précise ta base de données et ton hébergeur." },
+  "deep-research-vertical": { prompt: "Utilise le skill Deep Research Verticale. Analyse ma niche, ses problèmes, ses concurrents et une première offre à tester.", adapt: "Donne ta niche, ton pays et ce que tu sais déjà faire." },
 };
 
-type SkillDownloadRecord = {
-  sha256: string;
-  downloadedAt: string;
-  publishedAt: string;
-};
-
-type SkillDownloadRecords = Record<string, SkillDownloadRecord>;
-
-const SKILL_DOWNLOADS_STORAGE_KEY = "build-skill-downloads";
-
-function isSkillsPublicationMetadata(value: unknown): value is SkillsPublicationMetadata {
+function validPublication(value: unknown): value is Publication {
   if (!value || typeof value !== "object") return false;
-  const candidate = value as Record<string, unknown>;
-  return (
-    typeof candidate.publishedAt === "string" &&
-    !Number.isNaN(Date.parse(candidate.publishedAt)) &&
-    typeof candidate.releaseId === "string" &&
-    Array.isArray(candidate.artifacts) &&
-    candidate.artifacts.every(
-      (artifact) =>
-        artifact &&
-        typeof artifact === "object" &&
-        typeof (artifact as Record<string, unknown>).fileName === "string" &&
-        typeof (artifact as Record<string, unknown>).sha256 === "string"
-    )
-  );
+  const candidate = value as Publication;
+  return typeof candidate.publishedAt === "string" && typeof candidate.releaseId === "string" && Array.isArray(candidate.artifacts) && candidate.artifacts.every((item) => typeof item?.fileName === "string" && typeof item?.sha256 === "string");
 }
 
-function readSkillDownloadRecords(): SkillDownloadRecords {
+function readRecords(): Records {
   try {
-    const value = JSON.parse(window.localStorage.getItem(SKILL_DOWNLOADS_STORAGE_KEY) ?? "{}");
-    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-    return Object.fromEntries(
-      Object.entries(value).flatMap(([slug, record]) => {
-        if (!record || typeof record !== "object") return [];
-        const candidate = record as Record<string, unknown>;
-        if (
-          typeof candidate.sha256 !== "string" ||
-          typeof candidate.downloadedAt !== "string" ||
-          typeof candidate.publishedAt !== "string"
-        ) return [];
-        return [[slug, candidate as SkillDownloadRecord]];
-      })
-    );
-  } catch {
-    return {};
-  }
+    const value = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "{}");
+    return value && typeof value === "object" && !Array.isArray(value) ? value as Records : {};
+  } catch { return {}; }
 }
 
-export function SkillsCatalogClient({
-  skills,
-  categoryLabels,
-  tier,
-  beginnerHref,
-  fullHref,
-  beginnerLockedLabel,
-  fullLockedLabel,
-  fullBadgeLabel,
-}: {
-  skills: SkillCatalogItem[];
-  categoryLabels: Record<SkillCategory, string>;
-  tier: string | null;
-  beginnerHref: string | null;
-  fullHref: string | null;
-  beginnerLockedLabel: string;
-  fullLockedLabel: string;
-  fullBadgeLabel: string;
-}) {
-  const [categoryFilter, setCategoryFilter] = useState<SkillCategory | "all">("all");
-  const [publication, setPublication] = useState<SkillsPublicationMetadata | null>(null);
-  const [downloadRecords, setDownloadRecords] = useState<SkillDownloadRecords>(() =>
-    typeof window === "undefined" ? {} : readSkillDownloadRecords()
-  );
+function saveBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 2_000);
+}
+
+export function SkillsCatalogClient({ skills, categoryLabels, tier, beginnerHref, fullHref }: { skills: SkillCatalogItem[]; categoryLabels: Record<SkillCategory, string>; tier: string | null; beginnerHref: string | null; fullHref: string | null }) {
+  const [publication, setPublication] = useState<Publication | null>(null);
+  const [metadataState, setMetadataState] = useState<"loading" | "ready" | "error">("loading");
+  const [records, setRecords] = useState<Records>(() => typeof window === "undefined" ? {} : readRecords());
+  const [download, setDownload] = useState<DownloadState>(null);
+  const count = accessibleSkillCount(skills, tier);
 
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/skills/metadata", { signal: controller.signal })
-      .then((response) => response.ok ? response.json() : null)
-      .then((payload: unknown) => {
-        if (isSkillsPublicationMetadata(payload)) setPublication(payload);
-      })
-      .catch((error: unknown) => {
-        if (!(error instanceof DOMException && error.name === "AbortError")) return;
-      });
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("metadata")))
+      .then((payload: unknown) => { if (!validPublication(payload)) throw new Error("metadata"); setPublication(payload); setMetadataState("ready"); })
+      .catch((error: unknown) => { if (!(error instanceof DOMException && error.name === "AbortError")) setMetadataState("error"); });
     return () => controller.abort();
   }, []);
 
-  function rememberDownload(slug: string, fileName: string) {
-    const artifact = publication?.artifacts.find((item) => item.fileName === fileName);
-    if (!publication || !artifact) return;
-    const nextRecords = {
-      ...downloadRecords,
-      [slug]: {
-        sha256: artifact.sha256,
-        downloadedAt: new Date().toISOString(),
-        publishedAt: publication.publishedAt,
-      },
-    };
-    window.localStorage.setItem(SKILL_DOWNLOADS_STORAGE_KEY, JSON.stringify(nextRecords));
-    setDownloadRecords(nextRecords);
+  async function copyPrompt(prompt: string, button: HTMLButtonElement) {
+    try {
+      await navigator.clipboard.writeText(prompt);
+      button.textContent = "Copié";
+      void playAppSound("confirm");
+      window.setTimeout(() => { button.textContent = "Copier"; }, 1_400);
+    } catch {
+      button.textContent = "Réessayer";
+      void playAppSound("error");
+    }
   }
+
+  async function downloadSkill(skill: SkillCatalogItem) {
+    setDownload({ slug: skill.slug, status: "loading" });
+    try {
+      const response = await fetch(`/api/skills/${skill.slug}`);
+      if (!response.ok) throw new Error("download");
+      saveBlob(await response.blob(), skill.fileName);
+      const artifact = publication?.artifacts.find((item) => item.fileName === skill.fileName);
+      if (publication && artifact) {
+        const next = { ...records, [skill.slug]: { sha256: artifact.sha256, downloadedAt: new Date().toISOString(), publishedAt: publication.publishedAt } };
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        setRecords(next);
+      }
+      setDownload({ slug: skill.slug, status: "done" });
+      void playAppSound("confirm");
+    } catch {
+      setDownload({ slug: skill.slug, status: "error" });
+      void playAppSound("error");
+    }
+  }
+
+  if (skills.length === 0) return <p className="ui3-skill-status" role="status">Aucun skill n’est disponible pour le moment.</p>;
 
   return (
     <>
-      <div id="catalogue" className="mb-6 flex flex-wrap gap-2 scroll-mt-24">
-        {(["all", ...Object.keys(categoryLabels)] as (SkillCategory | "all")[]).map((category) => (
-          <button
-            type="button"
-            key={category}
-            onClick={() => setCategoryFilter(category)}
-            className={`rounded-full px-3.5 py-1.5 text-xs font-medium border transition-colors cursor-pointer ${
-              categoryFilter === category
-                ? "bg-[#e8d5b0] text-[#0e0e0f] border-[#e8d5b0]"
-                : "bg-white/[0.03] text-white/50 border-white/[0.08] hover:text-white/80 hover:border-white/20"
-            }`}
-          >
-            {category === "all" ? "Tous" : categoryLabels[category]}
-          </button>
-        ))}
+      <div className="ui3-section-head">
+        <div><h2>Les skills de BUILD</h2><p className="t-meta">{metadataState === "loading" ? "Vérification des versions" : metadataState === "error" ? "Versions momentanément indisponibles" : "Versions vérifiées"}</p></div>
+        {count > 0 ? <a className="btn btn--p" href="#build-sync">Installer mes {count} skills</a> : <a className="btn btn--p" href="/checkout">Voir les niveaux</a>}
       </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {skills.filter((skill) => categoryFilter === "all" || skill.category === categoryFilter).map((skill, index) => {
-          const isFree = skill.access === "free";
-          const isBeginner = skill.access === "beginner";
-          const canDownload = isFree || tier === "full" || (isBeginner && tier === "beginner");
-          const badgeClasses = isFree
-            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-            : isBeginner
-              ? "bg-[#e8d5b0]/10 border-[#e8d5b0]/20 text-[#e8d5b0]"
-              : "bg-white/5 border-white/10 text-white/35";
-          const badgeLabel = isFree ? "Gratuit" : isBeginner ? "Fondations" : fullBadgeLabel;
-          const lockedHref = isBeginner ? beginnerHref : fullHref;
-          const lockedLabel = isBeginner ? beginnerLockedLabel : fullLockedLabel;
-          const currentArtifact = publication?.artifacts.find((artifact) => artifact.fileName === skill.fileName);
-          const downloadedRecord = downloadRecords[skill.slug];
-          const hasUpdate = Boolean(currentArtifact && downloadedRecord && currentArtifact.sha256 !== downloadedRecord.sha256);
-
-          return (
-            <div
-              id={`skill-${skill.slug}`}
-              key={skill.slug}
-              className="animate-reveal flex h-full scroll-mt-24 flex-col"
-              style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
-            >
-              <IllustratedCard
-                title={skill.title}
-                description={skill.description}
-                imageSrc={illustrationSrc(`skills-${skill.slug}`)}
-                visualTone="black-gallery"
-                locked={!canDownload}
-              />
-              <div className="mt-3 flex items-center justify-between gap-2">
-                <span className="text-[11px] uppercase tracking-[0.1em] text-white/35">{categoryLabels[skill.category]}</span>
-                <span className={`border px-2.5 py-1 text-[11px] font-medium ${badgeClasses}`}>{badgeLabel}</span>
-              </div>
-              <div className="mt-3">
-                {canDownload ? (
-                  <a
-                    href={`/api/skills/${skill.slug}`}
-                    onClick={() => rememberDownload(skill.slug, skill.fileName)}
-                    className="inline-flex items-center justify-center gap-2 w-full bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-all duration-200 hover:bg-[#f0dfc0] shadow-[0_0_24px_rgba(232,213,176,0.18)]"
-                  >
-                    <Download className="w-4 h-4" />
-                    {hasUpdate ? "Mettre à jour" : "Télécharger"}
-                  </a>
-                ) : lockedHref ? (
-                  <a href={lockedHref} className="inline-flex items-center justify-center gap-2 w-full bg-white/[0.06] border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition-all duration-200 hover:bg-white/[0.1] hover:text-white">
-                    {lockedLabel}
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                ) : (
-                  <p role="status" className="w-full border border-white/10 bg-white/[0.03] px-5 py-3 text-center text-sm text-white/45">Paiement momentanément indisponible.</p>
-                )}
-                {canDownload && hasUpdate ? (
-                  <p role="status" className="mt-2 text-xs leading-relaxed text-[#e8d5b0]/85">Une nouvelle version est disponible. Télécharge-la, puis compare-la à ta copie locale avant de remplacer tes propres adaptations.</p>
-                ) : null}
+      <ul className="ui3-skill-grid">
+        {skills.map((skill, index) => {
+          const presentation = PRESENTATION[skill.slug];
+          const canDownload = canDownloadSkill(tier, skill.access);
+          const artifact = publication?.artifacts.find((item) => item.fileName === skill.fileName);
+          const hasUpdate = Boolean(artifact && records[skill.slug] && artifact.sha256 !== records[skill.slug].sha256);
+          const state = download?.slug === skill.slug ? download.status : null;
+          const lockedHref = skill.access === "beginner" ? beginnerHref : fullHref;
+          return <li className="ui3-skill-card" data-locked={!canDownload} key={skill.slug} style={{ animationDelay: `${index * 60}ms` }} aria-label={`${skill.title}, ${categoryLabels[skill.category]}`}>
+            <div className="ui3-skill-image"><Image src={`/da/skills/${skill.slug}.jpg`} alt="" width={640} height={360} /><span className="ui3-skill-badge">{skill.access === "beginner" ? "Fondations" : skill.access === "full" ? "LE\u00a0COFFRE" : "Gratuit"}</span></div>
+            <div className="ui3-skill-body">
+              <h3>{skill.title}</h3>
+              <p>{skill.description}</p>
+              <span className="ui3-skill-label">Dis à ton IA</span>
+              <div className="ui3-prompt"><p>{presentation?.prompt ?? `Utilise le skill ${skill.title} pour m’aider sur mon projet.`}</p><button type="button" onClick={(event) => void copyPrompt(presentation?.prompt ?? `Utilise le skill ${skill.title}.`, event.currentTarget)}>Copier</button></div>
+              <p className="ui3-skill-adapt"><strong>Adapte-le à toi.</strong> {presentation?.adapt ?? "Ajoute ton contexte, tes contraintes et tes références."}</p>
+              <div className="ui3-skill-action">
+                {canDownload ? <button className="btn btn--p" type="button" disabled={state === "loading"} onClick={() => void downloadSkill(skill)}>{state === "loading" ? "Téléchargement" : state === "done" ? "Téléchargé" : hasUpdate ? "Mettre à jour" : "Télécharger"}</button> : lockedHref ? <a className="btn btn--g" href={lockedHref}>{lockedSkillCta(tier, skill.access)}</a> : <p className="ui3-skill-status" data-error="true">Paiement momentanément indisponible.</p>}
+                {hasUpdate ? <p className="ui3-skill-status">Une nouvelle version est prête. Compare-la à ta copie locale avant de remplacer tes adaptations.</p> : null}
+                {state === "error" ? <p className="ui3-skill-status" data-error="true" role="alert">Le téléchargement a échoué. Réessaie.</p> : null}
               </div>
             </div>
-          );
+          </li>;
         })}
-      </div>
+      </ul>
     </>
   );
 }
