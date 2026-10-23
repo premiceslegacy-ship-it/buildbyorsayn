@@ -114,7 +114,6 @@ function ChapterRows({
   sections,
   selected,
   completedIds,
-  mode,
   showUpcomingVideo,
   onSelect,
   compact = false,
@@ -122,12 +121,12 @@ function ChapterRows({
   sections: ReaderChapter[];
   selected: number;
   completedIds: readonly string[];
-  mode: ReaderMode;
   showUpcomingVideo: boolean;
   onSelect: (index: number) => void;
   compact?: boolean;
 }) {
   const list = useRef<HTMLOListElement>(null);
+  const seriesHasVideo = sections.some((section) => Boolean(section.lesson || section.video));
   return <ol ref={list} className={compact ? styles.rail : styles.chapterList} aria-label="Chapitres">
     {compact ? <li className={styles.railLabel} aria-hidden="true">Chapitres</li> : null}
     {sections.map((section, index) => {
@@ -136,7 +135,7 @@ function ChapterRows({
       const contents = <>
         <span className={styles.chapterNumber}>{index + 1}</span>
         <span className={styles.chapterCopy}><b>{section.title}</b>{summary ? <span>{summary}</span> : null}</span>
-        <span className={styles.chapterMeta}>{section.durationLabel ?? (section.lesson ? formatLessonDuration(section.lesson.durationSeconds) : showUpcomingVideo ? "Vidéo à venir" : null)}</span>
+        <span className={styles.chapterMeta}>{section.durationLabel ?? (section.lesson ? formatLessonDuration(section.lesson.durationSeconds) : showUpcomingVideo ? seriesHasVideo ? "Vidéo à venir" : chapterReadingTime(section) : null)}</span>
         <span className={styles.chapterMark} aria-label={done ? "Lu" : undefined}>{done ? <Check aria-hidden="true" /> : null}</span>
       </>;
       const keyHandler = (event: React.KeyboardEvent<HTMLElement>) => {
@@ -148,9 +147,7 @@ function ChapterRows({
         if (target !== null) controls[target]?.focus();
       };
       return <li key={section.id}>
-        {section.href && index !== selected
-          ? <Link className={styles.chapterRow} href={withMode(section.href, mode)} data-sfx="none" onClick={() => void playAppSound("open")} onKeyDown={keyHandler}>{contents}</Link>
-          : <button className={styles.chapterRow} type="button" data-sfx="none" data-section-id={section.id} aria-current={selected === index ? "true" : undefined} onClick={() => onSelect(index)} onKeyDown={keyHandler}>{contents}</button>}
+        <button className={styles.chapterRow} type="button" data-sfx="none" data-section-id={section.id} aria-current={selected === index ? "true" : undefined} onClick={() => onSelect(index)} onKeyDown={keyHandler}>{contents}</button>
       </li>;
     })}
   </ol>;
@@ -379,7 +376,7 @@ export function ReaderView({
       {mode === "video" ? <div className={styles.videoLayout}>
         <div className={styles.stageWrap}>
           <div className={styles.stage}>
-            {current.video ? <div className={styles.customVideo}>{current.video}</div> : current.lesson ? <LessonPlayer key={current.id} sectionId={current.id} title={current.title} onCompleted={() => { if (!completedIds.includes(current.id)) complete(current.id); }} onEnded={() => setEnded(true)} /> : <div className={styles.coming}>{thumbnailSrc ? <Image className={styles.comingBackground} src={thumbnailSrc} alt="" fill sizes="(min-width: 1024px) 1024px, 100vw" /> : null}<div className={styles.comingInner}><h2>La vidéo arrive bientôt.</h2><p>Le texte est déjà là.</p><button className="btn btn--p" type="button" data-sfx="none" onClick={() => { void playAppSound("open"); setReaderMode("texte"); }}>Lire le texte</button></div></div>}
+            {current.video ? <div className={styles.customVideo}>{current.video}</div> : current.lesson ? <LessonPlayer key={current.id} sectionId={current.id} title={current.title} onCompleted={() => { if (!completedIds.includes(current.id)) complete(current.id); }} onEnded={() => setEnded(true)} /> : <div className={styles.coming}>{thumbnailSrc ? <Image className={styles.comingBackground} src={thumbnailSrc} alt="" fill sizes="(min-width: 1024px) 1024px, 100vw" /> : null}<div className={styles.comingInner}><h2>La vidéo arrive bientôt. Le texte est déjà là.</h2><button className="btn btn--p" type="button" data-sfx="none" onClick={() => { void playAppSound("open"); setReaderMode("texte"); }}>Lire le texte</button></div></div>}
           </div>
           {sections.length > 1 ? <div className={styles.timelineChapters} aria-hidden="true">{sections.map((section, index) => <span key={section.id} data-active={index === selected ? "true" : undefined} style={{ flexGrow: Math.max(1, section.lesson?.durationSeconds ?? 1) }} />)}</div> : null}
           {ended ? <div className={styles.endOverlay}><div className={styles.endCard}>
@@ -397,7 +394,7 @@ export function ReaderView({
         </header>
         {current.lesson ? <div className={styles.lessonMeta}><LessonMeta lesson={current.lesson} /></div> : null}
         <div className={styles.chapterHeading}><h2>Chapitres</h2><span>{sections.length} chapitre{sections.length > 1 ? "s" : ""}</span></div>
-        <ChapterRows sections={sections} selected={selected} completedIds={completedIds} mode={mode} showUpcomingVideo={showUpcomingVideo} onSelect={chooseChapter} />
+        <ChapterRows sections={sections} selected={selected} completedIds={completedIds} showUpcomingVideo={showUpcomingVideo} onSelect={chooseChapter} />
         {showChapterNavigation ? <div className={styles.neighbors}>
           {selected > 0 ? <button className={styles.neighborCard} type="button" data-sfx="none" onClick={() => chooseChapter(selected - 1)}><small>Chapitre précédent</small><strong>{sections[selected - 1].title}</strong></button> : null}
           {selected < sections.length - 1 ? <button className={styles.neighborCard} type="button" data-sfx="none" onClick={() => chooseChapter(selected + 1)}><small>Chapitre suivant</small><strong>{sections[selected + 1].title}</strong></button> : null}
@@ -409,7 +406,7 @@ export function ReaderView({
             <motion.button className={styles.outlineBackdrop} type="button" aria-label="Fermer le sommaire" onClick={toggleOutline} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : .2 }} />
             <motion.aside id="reader-outline" className={styles.outline} aria-label="Sommaire" initial={reduceMotion ? false : { opacity: 0, scale: .98 }} animate={{ opacity: 1, scale: 1 }} exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: .98 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 30 }}>
               <div className={styles.outlineHeader}><strong>Chapitres</strong><button className={styles.iconButton} type="button" aria-label="Fermer le sommaire" data-sfx="none" onClick={toggleOutline}><X aria-hidden="true" /></button></div>
-              <ChapterRows sections={sections} selected={selected} completedIds={completedIds} mode={mode} showUpcomingVideo={showUpcomingVideo} onSelect={chooseChapter} compact />
+              <ChapterRows sections={sections} selected={selected} completedIds={completedIds} showUpcomingVideo={showUpcomingVideo} onSelect={chooseChapter} compact />
             </motion.aside>
           </> : null}
         </AnimatePresence>

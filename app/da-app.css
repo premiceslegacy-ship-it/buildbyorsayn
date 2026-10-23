@@ -89,7 +89,7 @@ html.r2-reader-open .da.da-app.has-tabbar {
 .da.da-app .nav-unseen { min-width: 18px; height: 18px; padding-inline: 5px; display: inline-grid; place-items: center; border-radius: 999px; background: var(--em); color: var(--sur-em); font: 700 10px/1 var(--font); }
 .da.da-app .nav-unseen--mobile { position: absolute; top: 5px; right: 10px; }
 @media (min-width: 735px) { .da.da-app .tabbar { display: none; } }
-@media (max-width: 734px) { .da.da-app.has-tabbar { padding-bottom: calc(96px + env(safe-area-inset-bottom)); } }
+@media (max-width: 734px) { .da.da-app.has-tabbar { padding-bottom: calc(88px + max(12px, env(safe-area-inset-bottom))); } }
 
 /* Menu des initiales. */
 .da.da-app .amenu { position: fixed; z-index: 95; top: calc(var(--bar) + 6px); right: var(--gutter); width: min(320px, calc(100vw - 32px)); padding: 8px; border-radius: var(--r-m); background: var(--carte-2); box-shadow: 0 0 0 1px var(--trait), 0 28px 80px rgba(0, 0, 0, .6); transform-origin: calc(100% - 20px) 0; display: grid; gap: 6px; }

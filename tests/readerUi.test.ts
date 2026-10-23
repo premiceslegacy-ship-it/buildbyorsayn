@@ -164,6 +164,7 @@ test("le style du lecteur garde les marges mobiles et n'ajoute aucune bande lat�
 });
 
 test("la ligne active garde exactement la grille et les métriques des autres chapitres", () => {
+  const view = read("components/reader/ReaderView.tsx");
   const css = read("components/reader/reader.module.css");
   const rowRule = css.match(/\.chapterRow\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
   const activeRule = css.match(/\.chapterRow\[aria-current\]\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
@@ -171,8 +172,28 @@ test("la ligne active garde exactement la grille et les métriques des autres ch
     assert.match(rowRule, new RegExp(declaration.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), declaration);
   }
   assert.doesNotMatch(activeRule, /(?:width|height|margin|padding|gap|grid|transform|font|letter-spacing)\s*:/);
+  assert.match(view, /const seriesHasVideo = sections\.some/);
+  assert.match(view, /showUpcomingVideo \? seriesHasVideo \? "Vidéo à venir" : chapterReadingTime\(section\)/);
+  assert.doesNotMatch(view, /<Link className=\{styles\.chapterRow\}/);
   assert.match(css, /\.diagramSlot\s*\{[\s\S]*?width: 100%;[\s\S]*?max-width: 100%;[\s\S]*?min-width: 0;/);
   assert.doesNotMatch(css, /\.diagramSlot\s*\{[^}]*100vw/s);
+});
+
+test("la barre mobile garde le segment centré sans titre dans la rangée", () => {
+  const css = read("components/reader/reader.module.css");
+  assert.match(css, /grid-template-columns: minmax\(96px, 1fr\) auto minmax\(96px, 1fr\)/);
+  assert.match(css, /\.modeSwitch button \{[\s\S]*?min-width: 46px/);
+  assert.match(css, /\.toolbarTitle,[\s\S]{0,80}\.toolButton span[\s\S]{0,80}display: none/);
+  assert.doesNotMatch(css, /\.toolbarSide:last-child > \.iconButton:not\(\.mobileOutlineButton\)/);
+});
+
+test("la miniature vidéo reste nette avec son état en bas à gauche", () => {
+  const view = `${read("components/reader/ReaderView.tsx")}\n${read("components/reader/BlocOverview.tsx")}`;
+  const css = read("components/reader/reader.module.css");
+  assert.match(view, /La vidéo arrive bientôt\. Le texte est déjà là\./);
+  assert.match(view, /styles\.overviewLocked/);
+  assert.match(css, /\.coming\s*\{[\s\S]*?place-items: end start/);
+  assert.match(css, /\.overviewUpcoming,[\s\S]*?bottom: clamp\(24px, 3vw, 38px\)/);
 });
 
 test("Protocole et Hermes utilisent le lecteur commun avec leurs libellés", () => {

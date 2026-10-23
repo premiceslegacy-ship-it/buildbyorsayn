@@ -78,7 +78,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
         {current?.lesson ? <LessonPlayer sectionId={current.id} title={current.title} onCompleted={() => undefined} /> : <>
           <Image src={thumbnail} alt="" fill priority sizes="(min-width: 1200px) 1184px, 100vw" />
           <div className={styles.overviewStageShade} />
-          {unlocked ? <div className={styles.overviewUpcoming}><h2>La vidéo arrive bientôt.</h2><p>Le texte est déjà là.</p><Link className="btn btn--p" href={`/blocs/${blocId}/lire?chapter=${encodeURIComponent(current.id)}&mode=text`} data-sfx="none" onClick={(event) => animateAction(event.currentTarget, "open")}>Lire le texte</Link></div> : null}
+          {unlocked ? <div className={styles.overviewUpcoming}><h2>La vidéo arrive bientôt. Le texte est déjà là.</h2><Link className="btn btn--p" href={`/blocs/${blocId}/lire?chapter=${encodeURIComponent(current.id)}&mode=text`} data-sfx="none" onClick={(event) => animateAction(event.currentTarget, "open")}>Lire le texte</Link></div> : <div className={styles.overviewLocked}><p>Cette vidéo est dans LE COFFRE.</p></div>}
         </>}
         {visibleSections.length > 1 ? <div className={styles.timelineChapters} aria-hidden="true">{visibleSections.map((section, index) => <span key={section.id} data-active={unlocked && index === resumeIndex ? "true" : undefined} style={{ flexGrow: Math.max(1, sections[index]?.lesson?.durationSeconds ?? 1) }} />)}</div> : null}
       </div>

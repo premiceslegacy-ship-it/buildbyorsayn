@@ -20,7 +20,7 @@ test.describe("Bloc lessons (member)", () => {
     await expect(page.getByRole("radiogroup", { name: "Mode de lecture" })).toBeVisible({ timeout: 10_000 });
     const hasLesson = await page.getByTestId("lesson-player").or(page.getByTestId("lesson-unavailable")).or(page.getByTestId("lesson-loading")).count();
     if (hasLesson === 0) {
-      await expect(page.getByRole("heading", { name: "La vidéo arrive bientôt.", exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "La vidéo arrive bientôt. Le texte est déjà là.", exact: true })).toBeVisible();
       await page.getByRole("radio", { name: "Texte" }).click();
       await expect(page.getByRole("button", { name: "Marquer comme lu" })).toBeVisible();
     }

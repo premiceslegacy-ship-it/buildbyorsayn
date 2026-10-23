@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -8,6 +10,25 @@ const schemaSources = [
   "components/schemas/primitives.tsx",
   "components/schemas/layouts.tsx",
   "components/schemas/foundations.tsx",
+  "components/schemas/fondations/shared.tsx",
+  "components/schemas/fondations/intro.tsx",
+  "components/schemas/fondations/etat-esprit.tsx",
+  "components/schemas/fondations/comprendre.tsx",
+  "components/schemas/fondations/vendre.tsx",
+  "components/schemas/fondations/ecrire.tsx",
+  "components/schemas/fondations/attention.tsx",
+  "components/schemas/hermes/shared.tsx",
+  "components/schemas/hermes/01-intro.tsx",
+  "components/schemas/hermes/02-installer-et-essayer.tsx",
+  "components/schemas/hermes/03-choisir-le-travail.tsx",
+  "components/schemas/hermes/04-regarder-le-vrai-travail.tsx",
+  "components/schemas/hermes/05-decouper-le-travail.tsx",
+  "components/schemas/hermes/06-identite-memoire-contexte.tsx",
+  "components/schemas/hermes/07-du-message-au-dossier.tsx",
+  "components/schemas/hermes/08-droits-outils-couts.tsx",
+  "components/schemas/hermes/09-preparer-un-pilote.tsx",
+  "components/schemas/hermes/10-tester-avant-de-garder.tsx",
+  "components/schemas/hermes/11-garder-le-savoir-faire.tsx",
   "components/schemas/protocole.tsx",
   "components/schemas/hermes.tsx",
   "components/schemas/blocks.server.tsx",
@@ -139,6 +160,89 @@ test("les schémas Fondations et Protocole restent aux points d'insertion réels
   for (const component of ["ContextFilesDiagram", "FounderDossierDiagram"]) assert.match(penser, new RegExp(`<${component} \\/>`));
   for (const component of ["PromptContextDiagram", "ApiFlowDiagram"]) assert.match(environnement, new RegExp(`<${component} \\/>`));
   for (const component of ["LocataireVsCapitalDiagram", "ProtocolePipelineDiagram"]) assert.match(protocole, new RegExp(`<${component} \\/>`));
+});
+
+test("chaque marqueur de la vidéo Ce qui ne change pas est enregistré", (context) => {
+  const fallbackRoot = fileURLToPath(new URL("../../../Business%20Orsyan/ORSAYN%20AI/", import.meta.url));
+  const orsaynRoot = process.env.ORSAYN_AI_ROOT || fallbackRoot;
+  const contentRoot = resolve(
+    orsaynRoot,
+    "Identité Visuelle/Identité BUILD/plan-implementation/fiches-internes/redaction/fondations",
+  );
+  const files = [
+    "01-intro-ce-qui-ne-change-pas.md",
+    "02-chapitre-01-etat-d-esprit.md",
+    "03-chapitre-02-comprendre-les-gens.md",
+    "04-chapitre-03-vendre.md",
+    "05-chapitre-04-ecrire-pour-vendre.md",
+    "06-chapitre-05-capter-l-attention.md",
+  ];
+  if (!files.every((file) => existsSync(resolve(contentRoot, file)))) {
+    context.skip("les fiches internes ne sont pas présentes dans cet environnement");
+    return;
+  }
+
+  const markers = files.flatMap((file) => [...readFileSync(resolve(contentRoot, file), "utf8")
+    .matchAll(/\[\[(?:schema|maquette):([^\]\n]+)\]\]/g)]
+    .map((match) => match[1].trim()));
+  const registry = read("components/schemas/registry.ts");
+  const registered = [...registry.matchAll(/\{ name: "([^"]+)", kind: "(?:schema|maquette)", course: "fondations"/g)]
+    .map((match) => match[1]);
+
+  assert.equal(markers.length, 25, "les six fiches contiennent 25 marqueurs");
+  assert.equal(new Set(markers).size, markers.length, "les marqueurs sont uniques");
+  assert.deepEqual([...registered].sort(), [...markers].sort());
+});
+
+test("chaque marqueur des onze premiers chapitres Hermes est enregistré", (context) => {
+  const fallbackRoot = fileURLToPath(new URL("../../../Business%20Orsyan/ORSAYN%20AI/", import.meta.url));
+  const orsaynRoot = process.env.ORSAYN_AI_ROOT || fallbackRoot;
+  const contentRoot = resolve(
+    orsaynRoot,
+    "Identité Visuelle/Identité BUILD/plan-implementation/fiches-internes/redaction/hermes",
+  );
+  const files = [
+    "01-intro.md",
+    "02-installer-et-essayer.md",
+    "03-choisir-le-travail.md",
+    "04-regarder-le-vrai-travail.md",
+    "05-decouper-le-travail.md",
+    "06-identite-memoire-contexte.md",
+    "07-du-message-au-dossier.md",
+    "08-droits-outils-couts.md",
+    "09-preparer-un-pilote.md",
+    "10-tester-avant-de-garder.md",
+    "11-garder-le-savoir-faire.md",
+  ];
+  if (!files.every((file) => existsSync(resolve(contentRoot, file)))) {
+    context.skip("les fiches internes Hermes ne sont pas présentes dans cet environnement");
+    return;
+  }
+
+  const markers = files.flatMap((file) => [...readFileSync(resolve(contentRoot, file), "utf8")
+    .matchAll(/\[\[(?:schema|maquette):([^\]\n]+)\]\]/g)]
+    .map((match) => match[1].trim()));
+  const registry = read("components/schemas/registry.ts");
+  const registered = [...registry.matchAll(/\{ name: "([^"]+)", kind: "(?:schema|maquette)", course: "hermes"/g)]
+    .map((match) => match[1]);
+
+  assert.equal(markers.length, 39, "les onze fiches contiennent 39 marqueurs");
+  assert.equal(new Set(markers).size, markers.length, "les marqueurs Hermes sont uniques");
+  assert.deepEqual([...registered].sort(), [...markers].sort());
+});
+
+test("la planche admin rend le catalogue en large et compact et filtre par cours", () => {
+  const page = read("app/admin/schemas/page.tsx");
+  const board = read("app/admin/schemas/SchemaBoard.tsx");
+  assert.match(page, /user\?\.app_metadata\?\.role !== "admin"/);
+  assert.match(page, /<SchemaBoard searchParams=\{searchParams\}/);
+  assert.match(board, /await searchParams/);
+  assert.match(board, /query\.cours/);
+  assert.match(board, /READER_VISUAL_CATALOG\.filter/);
+  assert.match(board, /data-control-layout="wide"/);
+  assert.match(board, /data-control-layout="compact"/);
+  assert.match(read("app/admin/schemas/schemas.module.css"), /width: 720px/);
+  assert.match(read("app/admin/schemas/schemas.module.css"), /width: 350px/);
 });
 
 test("les seize schémas Hermes gardent leur chapitre réel", () => {

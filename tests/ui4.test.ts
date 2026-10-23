@@ -21,6 +21,26 @@ test("la liste des sources annonce aussi son état vide", async () => {
   assert.match(source, /role="status"/);
 });
 
+test("les cartes Sources gardent de vraies tuiles et des segments défilants", async () => {
+  const css = await readFile("app/sources/sources.module.css", "utf8");
+  assert.match(css, /width: 64px !important/);
+  assert.match(css, /height: 36px/);
+  assert.match(css, /padding: 0 16px/);
+  assert.match(css, /overflow-x: auto/);
+  assert.match(css, /\.card \{[^}]*gap: 16px/s);
+});
+
+test("Aujourd’hui nomme le premier contenu sans doubler la rangée", async () => {
+  const [page, css] = await Promise.all([
+    readFile("app/dashboard/page.tsx", "utf8"),
+    readFile("app/da-app.css", "utf8"),
+  ]);
+  assert.match(page, /<h2 className="cont__t">\{firstAccessible\.title\}<\/h2>/);
+  assert.match(page, /Ton premier contenu, \{firstAccessible\.meta\}/);
+  assert.doesNotMatch(page, /<h2 className="cont__t">Commence ici<\/h2>/);
+  assert.match(css, /padding-bottom: calc\(88px \+ max\(12px, env\(safe-area-inset-bottom\)\)\)/);
+});
+
 test("les pages de lecture restantes exposent un chargement et une reprise après erreur", async () => {
   const routes = [
     "app/protocole",
