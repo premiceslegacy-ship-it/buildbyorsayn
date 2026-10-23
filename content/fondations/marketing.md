@@ -92,6 +92,34 @@ Après : « Tu tiens ton programme trois jours, puis le travail reprend le des
 Pourquoi : le script nomme la rupture réelle et annonce un travail concret. Il ne promet aucun résultat physique.
 :::
 
+## La meilleure publicité ne ressemble pas à une publicité
+
+Dans un fil, on fait défiler vite. Une annonce qui ressemble à une annonce (un logo, une promesse, un bouton « Découvrir ») est sautée en une seconde. Une annonce qui ressemble à ce qu'on lisait déjà (un article, une note de téléphone, la réponse à une question, un message d'un client) reste à l'écran assez longtemps pour être lue.
+
+C'est ce qu'on appelle une publicité native : elle prend la forme du contenu autour d'elle. Elle ne cache pas qu'elle est une publicité. La mention « Sponsorisé » reste visible, c'est la règle de la plateforme et de la loi, et un texte déguisé qui trompe la personne ferait perdre sa confiance en trois secondes.
+
+[[schema:PubsQuiNeFontPasPub]]
+
+Prends ces six formats comme six façons d'ouvrir la même offre. Regarde ce qu'ils ont en commun : ils partent d'un fait que la personne reconnaît (un grincement en côte, trois semaines d'attente) et laissent l'offre arriver à la fin. Aucun ne commence par le nom de l'entreprise.
+
+Pour choisir, pose-toi une question : qu'est-ce que ton client lit ou ouvre déjà tous les jours ?
+
+1. Il lit la presse locale : fais un article, avec un fait vérifiable en titre.
+2. Il tient des notes ou des listes : fais une note, avec ce qu'il quitte barré.
+3. Il pose des questions en message : réponds à une vraie question, en story.
+4. Il fait confiance à d'autres clients : montre un vrai message, avec son accord.
+5. Il compare deux options dans sa tête : fais un tableau blanc ou deux colonnes.
+
+La vidéo suit la même règle. Une mini-vidéo dessinée de vingt secondes, où le héros est le client et l'atelier n'arrive qu'au dernier plan, passe mieux qu'une vidéo où le dirigeant vante son entreprise.
+
+[[schema:MiniVideoDessinee]]
+
+Une offre vraiment unique fait exception : quand tu proposes quelque chose qu'aucun concurrent ne fait, une annonce très simple qui l'annonce en une phrase peut suffire. Teste les deux sur le même budget et garde ce qui répond.
+
+:::exemple Ne copie pas le costume
+Le format de l'article marche parce qu'on s'attend à y lire un fait. Si tes faits ne sont pas vérifiables (un délai que tu ne tiens pas, un avis inventé), le format se retourne contre toi : retire-le et garde la version simple.
+:::
+
 ## Produis assez pour apprendre, puis resserre
 
 Au début, tu as besoin de comparer plusieurs angles. Choisis une scène, publie quelques variations et note les réponses qui montrent une vraie compréhension.

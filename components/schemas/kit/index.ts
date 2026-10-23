@@ -7,6 +7,7 @@ export * from "./Cycle";
 export * from "./FileCard";
 export * from "./Fork";
 export * from "./Funnel";
+export * from "./NativeAds";
 export * from "./Ladder";
 export * from "./Rings";
 export * from "./SiteMockup";

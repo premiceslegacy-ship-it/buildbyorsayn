@@ -26,6 +26,8 @@ import {
 import { LeCheminDuMessageDiagram } from "./fondations/intro";
 import {
   ObserverSansCopierDiagram,
+  PubsQuiNeFontPasPubDiagram,
+  MiniVideoDessineeDiagram,
   SourceVersBibliothequeDiagram,
   TroisTempsAttentionDiagram,
   UneIdeeUnePersonneDiagram,
@@ -191,6 +193,8 @@ export const READER_VISUAL_CATALOG: readonly ReaderVisualCatalogEntry[] = [
   { name: "UneIdeeUnePersonne", kind: "schema", course: "fondations", component: UneIdeeUnePersonneDiagram },
   { name: "TroisTempsAttention", kind: "schema", course: "fondations", component: TroisTempsAttentionDiagram },
   { name: "ObserverSansCopier", kind: "schema", course: "fondations", component: ObserverSansCopierDiagram },
+  { name: "PubsQuiNeFontPasPub", kind: "schema", course: "fondations", component: PubsQuiNeFontPasPubDiagram },
+  { name: "MiniVideoDessinee", kind: "schema", course: "fondations", component: MiniVideoDessineeDiagram },
   { name: "VolumePuisQualite", kind: "schema", course: "fondations", component: VolumePuisQualiteDiagram },
   { name: "SourceVersBibliotheque", kind: "schema", course: "fondations", component: SourceVersBibliothequeDiagram },
   { name: "DeLideeALURL", kind: "schema", course: "fondations", component: DeLideeALURLDiagram },

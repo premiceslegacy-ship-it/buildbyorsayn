@@ -1,4 +1,4 @@
-import { AdCard, Compare, Curves, Fork, Ladder } from "../kit";
+import { AdCard, Compare, Curves, Fork, Ladder, NativeAds, Steps } from "../kit";
 
 const EM = "#22d96e";
 
@@ -111,6 +111,42 @@ export function SourceVersBibliothequeDiagram() {
       { label: "Vidéo", condition: "Elle vérifie la feuille de route" },
       { label: "E-mail", condition: "Les infos demandées aux prestataires" },
       { label: "Page", condition: "Ce que la coordination inclut" },
+    ]}
+  />;
+}
+
+export function PubsQuiNeFontPasPubDiagram() {
+  const photo = "/schemas/sites/atelier-velo-reparation.jpg";
+  return <NativeAds
+    title="Six façons de ne pas ressembler à une publicité"
+    description="Le même atelier de vélos, présenté dans six formats que la personne lit déjà tous les jours."
+    legend="Le format imite un contenu, jamais le fait que c'est une publicité : la mention « Sponsorisé » reste visible."
+    ariaLabel="Six publicités d'un atelier de vélos : un faux article de presse, une note de téléphone avec une liste cochée et barrée, une réponse à une question de story, un message reçu, un tableau blanc avec deux cercles, et une comparaison entre tes problèmes et ma solution. Chacune porte la mention Sponsorisé."
+    accent={EM}
+    formats={[
+      { kind: "press", name: "L'article", sponsor: "Sponsorisé", source: "Le Journal du vélo", headline: "À Lyon, cet atelier trouve le grincement de ton vélo en 48 h", image: photo, caption: "Le mécanicien montre la pièce, puis le devis, avant de toucher à quoi que ce soit.", why: "On lit un titre de presse, pas une promesse de vendeur : le fait passe avant l'offre.", when: "Quand ton offre a un fait vérifiable à raconter (un délai, une méthode, un cas)." },
+      { kind: "notes", name: "La note de téléphone", sponsor: "Sponsorisé", date: "17 janvier 2026 à 10 h 44", title: "Pourquoi je change d'atelier", items: [{ text: "Diagnostic sous 48 h", struck: "Trois semaines d'attente" }, { text: "Devis validé avant la réparation", struck: "Une facture surprise" }, { text: "Fiche de diagnostic remise", struck: "« C'est réglé » sans preuve" }], image: photo, why: "Une liste personnelle, avec ce qu'on quitte barré : le lecteur compare tout seul.", when: "Quand ton offre remplace une habitude que la personne connaît déjà." },
+      { kind: "story", name: "La réponse à une question", sponsor: "Sponsorisé", account: "Atelier de Mehdi", image: photo, question: "Tu répares aussi les vélos électriques ?", answer: ["Oui, batterie comprise.", "Dépose-le le matin, diagnostic le lendemain."], why: "Une vraie question de client, une réponse courte : on dirait une conversation.", when: "Quand tu réponds déjà aux mêmes questions chaque semaine." },
+      { kind: "dm", name: "Le message reçu", sponsor: "Sponsorisé", image: photo, from: "Exemple, à remplacer par un vrai message de client, avec son accord", messages: ["Mon vélo ne grince plus du tout !", "Merci pour la fiche de diagnostic, je sais enfin ce qui a été changé."], why: "Un message de client, présenté comme on le reçoit : la preuve parle à ta place.", when: "Quand tu as de vrais messages de clients et leur accord pour les montrer." },
+      { kind: "whiteboard", name: "Le tableau blanc", sponsor: "Sponsorisé", left: "Mon vélo grince", right: "Pas trois semaines sans vélo", middle: "48 h", caption: "Atelier de Mehdi, Lyon", why: "Un schéma fait à la main ressemble à une explication, pas à une annonce.", when: "Quand ton offre se comprend par la rencontre de deux besoins." },
+      { kind: "versus", name: "Tes problèmes, ma solution", sponsor: "Sponsorisé", leftTitle: "tes problèmes", rightTitle: "ma solution", bubbles: ["Ça grince en côte", "Pas de devis avant", "Trois semaines d'attente", "Aucune preuve"], image: photo, caption: "Diagnostic sous 48 h, devis avant la réparation", why: "Les bulles reprennent les phrases que le client se dit déjà : il se reconnaît avant de lire l'offre.", when: "Quand ton offre répond à des frustrations que tu entends souvent." },
+    ]}
+  />;
+}
+
+export function MiniVideoDessineeDiagram() {
+  return <Steps
+    title="Une mini-vidéo dessinée en quatre plans"
+    description="Le même atelier de vélos, raconté en vingt secondes par un dessin animé, sans voix de vendeur."
+    legend="Le héros du dessin est ton client : l'atelier arrive à la fin, une fois le problème reconnu."
+    ariaLabel="Quatre plans d'une mini-vidéo dessinée : un cycliste entend un grincement en côte, il dépose son vélo à l'atelier, il reçoit une fiche avec la pièce montrée, il remonte la côte en silence."
+    accent={EM}
+    accentIndex={2}
+    items={[
+      { label: "Plan 1, le grincement", detail: "Un cycliste dessiné monte une côte, un bruit sort de la pédale. Voix off : « Ça grince seulement quand tu forces. »" },
+      { label: "Plan 2, le dépôt", detail: "Il pose son vélo à l'atelier, le mécanicien note le bruit. Voix off : « Tu le déposes le matin. »" },
+      { label: "Plan 3, la preuve", detail: "Le mécanicien montre la pièce usée et le devis. Voix off : « Tu vois la pièce avant de payer. »" },
+      { label: "Plan 4, le silence", detail: "Le cycliste remonte la même côte sans bruit. Texte : « Diagnostic sous 48 h. Décris le bruit. »" },
     ]}
   />;
 }

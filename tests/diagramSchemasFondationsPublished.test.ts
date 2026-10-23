@@ -20,7 +20,7 @@ const publishedFiles = [
   "angle-mort.md",
 ] as const;
 
-test("les 54 marqueurs Fondations publiés ont un composant enregistré", () => {
+test("les 56 marqueurs Fondations publiés ont un composant enregistré", () => {
   const markers = publishedFiles.flatMap((file) => [...read(`content/fondations/${file}`)
     .matchAll(/\[\[(schema|maquette):([^\]\n]+)\]\]/g)]
     .map((match) => `${match[1]}:${match[2].trim()}`));
@@ -28,7 +28,7 @@ test("les 54 marqueurs Fondations publiés ont un composant enregistré", () => 
   const registered = [...registry.matchAll(/\{ name: "([^"]+)", kind: "(schema|maquette)", course: "fondations"/g)]
     .map((match) => `${match[2]}:${match[1]}`);
 
-  assert.equal(markers.length, 54);
+  assert.equal(markers.length, 56);
   assert.equal(new Set(markers).size, markers.length);
   assert.deepEqual([...registered].sort(), [...markers].sort());
 });

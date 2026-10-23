@@ -1,0 +1,121 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@container kit (max-width: 899px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container kit (max-width: 559px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.grid > li { min-width: 0; display: grid; align-content: start; gap: 12px; }
+
+.stage {
+  container-type: inline-size;
+  position: relative;
+  margin: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #fff;
+  color: #1c1e21;
+  font-family: -apple-system, "SF Pro Text", "Inter", system-ui, sans-serif;
+  box-shadow: 0 14px 34px -16px rgba(0, 0, 0, .55);
+}
+.stage h5, .stage p, .stage ul, .stage small { margin: 0; padding: 0; }
+.stage ul { list-style: none; }
+.stage img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.sponsor {
+  display: inline-flex;
+  align-items: center;
+  padding: .3em .7em;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .55);
+  color: #fff;
+  font: 600 3cqi/1 -apple-system, system-ui, sans-serif;
+  letter-spacing: .01em;
+}
+
+/* 1. Faux article */
+.press { height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 3cqi; padding: 5cqi; background: #f6f4ef; }
+.press header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 2.5cqi; border-bottom: 1px solid rgba(0, 0, 0, .25); }
+.press header strong { font: 700 5.2cqi/1 Georgia, "Times New Roman", serif; letter-spacing: -.01em; }
+.press .sponsor { background: rgba(0, 0, 0, .08); color: #4b4f56; }
+.press h5 { font: 700 7.4cqi/1.08 Georgia, "Times New Roman", serif; letter-spacing: -.015em; text-wrap: balance; }
+.press img { border-radius: 2px; min-height: 0; }
+.press p { color: #4b4f56; font: 400 3.6cqi/1.35 -apple-system, system-ui, sans-serif; }
+
+/* 2. Note de téléphone */
+.notes { position: relative; height: 100%; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); align-content: start; gap: 2cqi; padding: 4.5cqi 5cqi; background: #fafaf7; }
+.notesBar { display: flex; align-items: center; justify-content: space-between; color: #d9a400; font: 500 4cqi/1 -apple-system, system-ui, sans-serif; }
+.notesBar span { display: inline-flex; align-items: center; gap: 1cqi; }
+.notesBar svg { width: 5cqi; height: 5cqi; }
+.notes > small { text-align: center; color: #8a8a8e; font: 400 3.2cqi/1.2 sans-serif; }
+.notes h5 { font: 800 7cqi/1.05 -apple-system, system-ui, sans-serif; letter-spacing: -.02em; text-wrap: balance; }
+.notes ul { display: grid; gap: 2.6cqi; }
+.notes li { display: grid; grid-template-columns: 6.4cqi minmax(0, 1fr); gap: 2.6cqi; align-items: start; }
+.tick { width: 6.4cqi; height: 6.4cqi; display: grid; place-items: center; border-radius: 50%; background: #e0b400; color: #fff; }
+.tick svg { width: 4cqi; height: 4cqi; }
+.notes li div { display: grid; gap: .4cqi; min-width: 0; }
+.notes li b { font: 500 3.9cqi/1.2 sans-serif; }
+.notes li s { color: #6e6e73; font: 400 3.7cqi/1.2 sans-serif; }
+.notes img { align-self: end; justify-self: end; width: 46%; height: 100%; max-height: 26cqi; border-radius: 2.4cqi; }
+.notes .sponsor { position: absolute; left: 5cqi; bottom: 4cqi; }
+
+/* 3. Réponse de story avec question */
+.story { position: relative; height: 100%; color: #fff; }
+.story > img { position: absolute; inset: 0; }
+.story::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(0, 0, 0, .5), rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, .6)); }
+.storyTop { position: absolute; z-index: 2; top: 4cqi; left: 4cqi; right: 4cqi; display: flex; align-items: center; gap: 2.4cqi; }
+.storyTop span:first-child { width: 8cqi; height: 8cqi; flex: none; display: grid; place-items: center; border-radius: 50%; background: #fff; color: #1c1e21; font: 700 3.8cqi/1 sans-serif; }
+.storyTop strong { min-width: 0; font: 600 3.8cqi/1.1 sans-serif; }
+.storyTop .sponsor { margin-left: auto; flex: none; }
+.storyQuestion { position: absolute; z-index: 2; left: 8cqi; right: 8cqi; top: 20%; overflow: hidden; border-radius: 3cqi; background: #fff; color: #1c1e21; text-align: center; }
+.storyQuestion small { display: block; padding: 2.2cqi; background: #eceef1; color: #4b4f56; font: 600 3.4cqi/1 sans-serif; }
+.storyQuestion p { padding: 3.4cqi 4cqi; font: 600 4.6cqi/1.2 sans-serif; text-wrap: balance; }
+.storyAnswer { position: absolute; z-index: 2; left: 6cqi; right: 6cqi; bottom: 6cqi; display: grid; gap: 2cqi; }
+.storyAnswer p { justify-self: start; padding: 2.2cqi 3cqi; border-radius: 2cqi; background: rgba(255, 255, 255, .95); color: #1c1e21; font: 600 4cqi/1.2 sans-serif; }
+
+/* 4. Message reçu */
+.dm { height: 100%; display: grid; grid-template-rows: auto auto auto 1fr auto; align-content: start; justify-items: start; gap: 2.6cqi; padding: 5cqi; background: #fff; }
+.dmHead { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.dmHead small { color: #8a8a8e; font: 500 3.2cqi/1 sans-serif; }
+.dm .sponsor { background: rgba(0, 0, 0, .08); color: #4b4f56; }
+.dm img { width: 46%; height: auto; aspect-ratio: 4 / 5; border-radius: 3cqi; justify-self: start; }
+.dm ul { display: grid; gap: 1.6cqi; justify-items: start; width: 100%; }
+.dm li { max-width: 88%; padding: 2.6cqi 3.6cqi; border-radius: 4.4cqi; background: #eceef1; font: 400 4.3cqi/1.25 sans-serif; }
+.dmFrom { align-self: end; color: #8a8a8e; font: 400 3.2cqi/1.2 sans-serif; }
+
+/* 5. Tableau blanc */
+.board { height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto auto; gap: 2cqi; padding: 6cqi 5cqi 4cqi; background: #cfd8de; }
+.boardSurface { position: relative; border: 1.4cqi solid #b5bdc4; border-radius: 1.6cqi; background: #f9fbfc; }
+.boardSurface svg { position: absolute; inset: 6% 3% 6%; width: 94%; height: 88%; fill: none; stroke: #1c1e21; stroke-width: 1.4; stroke-linecap: round; }
+.boardSurface p { position: absolute; width: 30%; color: #1b2b6b; font: 500 4.4cqi/1.12 "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive; text-align: center; }
+.boardSurface p[data-pos="l"] { left: 9%; top: 40%; }
+.boardSurface p[data-pos="r"] { right: 9%; top: 36%; }
+.boardSurface p[data-pos="m"] { left: 41%; width: 18%; top: 41%; padding: 0; background: none; color: #0d6b3b; font-weight: 800; font-size: 5.4cqi; }
+.boardTray { height: 2.6cqi; display: flex; gap: 2cqi; align-items: center; padding-left: 4cqi; background: #aab3ba; border-radius: 1cqi; }
+.boardTray span { width: 10cqi; height: 1.6cqi; border-radius: 1cqi; background: #1b2b6b; }
+.boardTray span + span { background: #1c1e21; }
+.board footer { display: flex; align-items: center; gap: 2cqi; }
+.board footer small { color: #3a444b; font: 500 3.2cqi/1.2 sans-serif; }
+
+/* 6. Tes problèmes, ma solution */
+.versus { position: relative; height: 100%; display: grid; grid-template-columns: 1fr 1fr; background: #f1f1f4; }
+.versus > div { min-width: 0; display: grid; align-content: start; gap: 3cqi; padding: 6cqi 3.4cqi; }
+.versus > div:first-child { border-right: 1px solid rgba(0, 0, 0, .35); }
+.versus h5 { font: 800 6.6cqi/.95 -apple-system, system-ui, sans-serif; letter-spacing: -.03em; }
+.versus h5[data-side="l"] { color: #d62020; }
+.versus h5[data-side="r"] { color: #1c1e21; }
+.versus ul { display: grid; gap: 2.2cqi; }
+.versus li { justify-self: start; padding: 2.2cqi 3cqi; border-radius: 3.4cqi; background: #dcdde1; font: 400 3.6cqi/1.2 sans-serif; }
+.versus li:nth-child(even) { justify-self: end; }
+.versus img { aspect-ratio: 1; border-radius: 3cqi; }
+.versus p { font: 600 3.8cqi/1.25 sans-serif; text-wrap: balance; }
+.versus .sponsor { position: absolute; left: 50%; bottom: 3cqi; transform: translateX(-50%); }
+
+.caption { display: grid; gap: 6px; }
+.caption h5 { margin: 0; color: var(--kit-ink); font: 650 15px/1.3 var(--font, sans-serif); }
+.caption p { margin: 0; color: var(--kit-copy); font: 450 14px/1.45 var(--font, sans-serif); }
+.caption p b { display: block; margin-bottom: 1px; color: var(--kit-em); font: 650 12.5px/1.3 var(--font, sans-serif); }

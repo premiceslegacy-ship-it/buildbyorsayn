@@ -157,7 +157,7 @@ test("chaque marqueur publié de la première vidéo Fondations est enregistré"
   const registered = [...registry.matchAll(/\{ name: "([^"]+)", kind: "(?:schema|maquette)", course: "fondations"/g)]
     .map((match) => match[1]);
 
-  assert.equal(markers.length, 25, "les six fiches contiennent 25 marqueurs");
+  assert.equal(markers.length, 27, "les six fiches contiennent 27 marqueurs");
   assert.equal(new Set(markers).size, markers.length, "les marqueurs sont uniques");
   assert.deepEqual([...registered].filter((name) => markers.includes(name)).sort(), [...markers].sort());
 });
