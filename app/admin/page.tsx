@@ -1,18 +1,24 @@
 export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { Activity, ArrowLeft, Eye, MousePointerClick, Users } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
-import { BLOCS_DATA } from "@/lib/mockData";
-import { AdminAutoRefresh } from "@/components/AdminAutoRefresh";
 import { AdminMailComposer } from "@/components/AdminMailComposer";
-import { AdminUsersTable } from "@/components/AdminUsersTable";
-import { AdminVideoManager } from "./AdminVideoManager";
+import { AdminUsersTable, type AdminUserRow } from "@/components/AdminUsersTable";
+import AgentView from "@/components/admin/AgentView";
+import { AccompanimentView } from "@/components/admin/AccompanimentView";
+import { AdminShell } from "@/components/admin/AdminShell";
+import NewsView from "@/components/admin/NewsView";
+import { OverviewView } from "@/components/admin/OverviewView";
+import { YoutubeNewsPanel } from "@/components/admin/YoutubeNewsPanel";
+import { DaRoot } from "@/components/da/DaRoot";
+import { BLOCS_DATA } from "@/lib/mockData";
 import type { AdminVideoLessonRow } from "@/lib/mux/adminServer";
+import { createClient } from "@/lib/supabase/server";
+import { AdminVideoManager } from "./AdminVideoManager";
+import "./admin.css";
 
 const TOTAL_BLOCS = BLOCS_DATA.length;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 type Profile = {
   id: string;
@@ -20,22 +26,8 @@ type Profile = {
   completed_blocks: number[] | null;
 };
 
-type EnrichedUser = Profile & {
-  email: string;
-  lastSignIn: string | null;
-  createdAt: string;
-  currentPath: string | null;
-  lastActivity: string | null;
-  lastEvent: string | null;
-  events24h: number;
-  pageViews24h: number;
-  pageViews7d: number;
-  pageViews30d: number;
-};
-
 type Presence = {
   user_id: string;
-  email: string | null;
   current_path: string | null;
   last_event: string | null;
   last_seen_at: string;
@@ -48,32 +40,48 @@ type ActivityEvent = {
   created_at: string;
 };
 
+type AccompanimentRow = {
+  id: string;
+  status: string;
+  starts_on: string;
+  ends_on: string | null;
+  user_id: string;
+};
+
+function isInactiveForEmail(account: AdminUserRow, now: number) {
+  return (account.tier === null || account.tier === "free")
+    && now - new Date(account.createdAt).getTime() >= 14 * DAY_MS
+    && (!account.lastSignIn || now - new Date(account.lastSignIn).getTime() >= 90 * DAY_MS);
+}
+
 export default async function AdminPage() {
-  // ── 1. Vérification identité ──────────────────────────────────────────────
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user?.app_metadata?.role !== "admin") {
-    redirect("/dashboard");
-  }
+  if (user?.app_metadata?.role !== "admin") redirect("/dashboard");
 
-  // ── 2. Récupération des données via le client admin ───────────────────────
   const supabaseAdmin = createSupabaseAdmin(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } },
   );
 
+  // Une page dynamique doit figer le même instant pour tous ses calculs de présence.
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now();
+  const since30Days = new Date(now - 30 * DAY_MS).toISOString();
   const [
-    { data: profiles },
-    { data: authData },
+    { data: profiles, error: profilesError },
+    { data: authData, error: authError },
     { data: presenceData, error: presenceError },
     { data: eventData, error: eventError },
     { data: videoData, error: videoError },
+    { data: accompanimentData, error: accompanimentError },
   ] = await Promise.all([
-    supabaseAdmin.from("profiles").select("id, tier, completed_blocks").order("id"),
-    supabaseAdmin.auth.admin.listUsers({ perPage: 1000 }),
+    supabaseAdmin.from("profiles").select("id, tier, completed_blocks").order("id").limit(1000),
+    supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
     supabaseAdmin
       .from("member_presence")
       .select("user_id, email, current_path, last_event, last_seen_at")
@@ -82,211 +90,178 @@ export default async function AdminPage() {
     supabaseAdmin
       .from("member_activity_events")
       .select("user_id, event_type, path, created_at")
+      .gte("created_at", since30Days)
       .order("created_at", { ascending: false })
-      .limit(1000),
+      .limit(10000),
     supabaseAdmin
       .from("video_lessons")
-      .select("id,section_id,title,summary,transcript,deliverables,chapters,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,approved_at,created_at")
+      .select("id,section_id,title,summary,transcript,deliverables,chapters,thumbnail,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,approved_at,created_at")
       .order("created_at", { ascending: false })
       .limit(100),
+    supabaseAdmin
+      .from("accompaniment_assignments")
+      .select("id,status,starts_on,ends_on,user_id")
+      .order("starts_on", { ascending: false })
+      .limit(1000),
   ]);
 
-  const emailMap = new Map<string, string>(
-    (authData?.users ?? []).map((u) => [u.id, u.email ?? "-"])
+  const authUsers = authData?.users ?? [];
+  const emailMap = new Map(authUsers.map((account) => [account.id, account.email ?? account.id]));
+  const lastSignInMap = new Map(authUsers.map((account) => [account.id, account.last_sign_in_at ?? null]));
+  const createdAtMap = new Map(authUsers.map((account) => [account.id, account.created_at]));
+  const presenceMap = new Map(
+    (((presenceData as Presence[] | null) ?? [])).map((presence) => [presence.user_id, presence]),
   );
-  const lastSignInMap = new Map<string, string | null>(
-    (authData?.users ?? []).map((u) => [u.id, u.last_sign_in_at ?? null])
-  );
-  const createdAtMap = new Map<string, string>(
-    (authData?.users ?? []).map((u) => [u.id, u.created_at])
-  );
-  const presenceMap = new Map<string, Presence>(
-    ((presenceData as Presence[] | null) ?? []).map((p) => [p.user_id, p])
-  );
-
-  const now = Date.now();
-  const last24h = now - 24 * 60 * 60 * 1000;
-  const last7d = now - 7 * 24 * 60 * 60 * 1000;
-  const last30d = now - 30 * 24 * 60 * 60 * 1000;
   const allEvents = (eventData as ActivityEvent[] | null) ?? [];
-  const recentEvents = allEvents.filter(
-    (event) => new Date(event.created_at).getTime() >= last24h
-  );
+  const recent24Hours = now - DAY_MS;
+  const recent7Days = now - 7 * DAY_MS;
   const eventCountByUser = new Map<string, number>();
-  const pageViewCountByUser = new Map<string, number>();
+  const pageViews24hByUser = new Map<string, number>();
   const pageViews7dByUser = new Map<string, number>();
   const pageViews30dByUser = new Map<string, number>();
-
-  for (const event of recentEvents) {
-    eventCountByUser.set(event.user_id, (eventCountByUser.get(event.user_id) ?? 0) + 1);
-    if (event.event_type === "page_view") {
-      pageViewCountByUser.set(event.user_id, (pageViewCountByUser.get(event.user_id) ?? 0) + 1);
-    }
-  }
+  const dailyPageViews = Array.from({ length: 7 }, (_, index) => ({
+    date: new Date(now - (6 - index) * DAY_MS),
+    value: 0,
+  }));
 
   for (const event of allEvents) {
+    const eventTime = new Date(event.created_at).getTime();
+    if (!Number.isFinite(eventTime)) continue;
+    if (eventTime >= recent24Hours) {
+      eventCountByUser.set(event.user_id, (eventCountByUser.get(event.user_id) ?? 0) + 1);
+    }
     if (event.event_type !== "page_view") continue;
-    const t = new Date(event.created_at).getTime();
-    if (t >= last7d) {
+    if (eventTime >= recent24Hours) {
+      pageViews24hByUser.set(event.user_id, (pageViews24hByUser.get(event.user_id) ?? 0) + 1);
+    }
+    if (eventTime >= recent7Days) {
       pageViews7dByUser.set(event.user_id, (pageViews7dByUser.get(event.user_id) ?? 0) + 1);
+      const ageInDays = Math.floor((now - eventTime) / DAY_MS);
+      const bucket = dailyPageViews[6 - Math.min(6, Math.max(0, ageInDays))];
+      if (bucket) bucket.value += 1;
     }
-    if (t >= last30d) {
-      pageViews30dByUser.set(event.user_id, (pageViews30dByUser.get(event.user_id) ?? 0) + 1);
-    }
+    pageViews30dByUser.set(event.user_id, (pageViews30dByUser.get(event.user_id) ?? 0) + 1);
   }
 
-  const users: EnrichedUser[] = (profiles ?? []).map((p: Profile) => ({
-    ...p,
-    email: emailMap.get(p.id) ?? p.id,
-    lastSignIn: lastSignInMap.get(p.id) ?? null,
-    createdAt: createdAtMap.get(p.id) ?? new Date(0).toISOString(),
-    currentPath: presenceMap.get(p.id)?.current_path ?? null,
-    lastActivity: presenceMap.get(p.id)?.last_seen_at ?? null,
-    lastEvent: presenceMap.get(p.id)?.last_event ?? null,
-    events24h: eventCountByUser.get(p.id) ?? 0,
-    pageViews24h: pageViewCountByUser.get(p.id) ?? 0,
-    pageViews7d: pageViews7dByUser.get(p.id) ?? 0,
-    pageViews30d: pageViews30dByUser.get(p.id) ?? 0,
-  })).sort((a, b) => {
-    const aTime = a.lastActivity ?? a.lastSignIn;
-    const bTime = b.lastActivity ?? b.lastSignIn;
-    if (!aTime && !bTime) return 0;
-    if (!aTime) return 1;
-    if (!bTime) return -1;
-    return new Date(bTime).getTime() - new Date(aTime).getTime();
+  const users: AdminUserRow[] = ((profiles as Profile[] | null) ?? []).map((profile) => ({
+    ...profile,
+    email: emailMap.get(profile.id) ?? profile.id,
+    lastSignIn: lastSignInMap.get(profile.id) ?? null,
+    createdAt: createdAtMap.get(profile.id) ?? new Date(0).toISOString(),
+    currentPath: presenceMap.get(profile.id)?.current_path ?? null,
+    lastActivity: presenceMap.get(profile.id)?.last_seen_at ?? null,
+    lastEvent: presenceMap.get(profile.id)?.last_event ?? null,
+    events24h: eventCountByUser.get(profile.id) ?? 0,
+    pageViews24h: pageViews24hByUser.get(profile.id) ?? 0,
+    pageViews7d: pageViews7dByUser.get(profile.id) ?? 0,
+    pageViews30d: pageViews30dByUser.get(profile.id) ?? 0,
+  })).sort((left, right) => {
+    const leftDate = left.lastActivity ?? left.lastSignIn;
+    const rightDate = right.lastActivity ?? right.lastSignIn;
+    if (!leftDate && !rightDate) return left.email.localeCompare(right.email, "fr");
+    if (!leftDate) return 1;
+    if (!rightDate) return -1;
+    return new Date(rightDate).getTime() - new Date(leftDate).getTime();
   });
 
-  const fullCount = users.filter((u) => u.tier === "full").length;
-  const beginnerCount = users.filter((u) => u.tier === "beginner").length;
-  const paidCount = fullCount + beginnerCount;
-  const onlineCount = users.filter((u) => {
-    if (!u.lastActivity) return false;
-    return now - new Date(u.lastActivity).getTime() < 2 * 60 * 1000;
-  }).length;
-  const active24hCount = users.filter((u) => u.events24h > 0).length;
-  const active7dCount = users.filter((u) => u.pageViews7d > 0).length;
-  const inactive30dCount = users.filter((u) => {
-    const t = u.lastActivity ?? u.lastSignIn;
-    if (!t) return true;
-    return new Date(t).getTime() < last30d;
-  }).length;
-  const pageViews24h = recentEvents.filter((event) => event.event_type === "page_view").length;
-  const trackingSetupMissing = Boolean(presenceError || eventError);
+  const fullCount = users.filter((account) => account.tier === "full").length;
+  const beginnerCount = users.filter((account) => account.tier === "beginner").length;
+  const onlineUsers = users.filter((account) => (
+    account.lastActivity && now - new Date(account.lastActivity).getTime() < 2 * 60 * 1000
+  ));
+  const inactiveCandidateCount = users.filter((account) => isInactiveForEmail(account, now)).length;
+  const interactiveUsers = authError ? [] : users;
+  const averageBlocs = users.length
+    ? users.reduce((total, account) => total + (account.completed_blocks?.length ?? 0), 0) / users.length
+    : 0;
+  const trackingSetupMissing = Boolean(profilesError || authError || presenceError || eventError);
+  const accompanimentRows = (accompanimentData as AccompanimentRow[] | null) ?? [];
+  const today = new Date().toISOString().slice(0, 10);
 
-  const avgBlocs =
-    users.length === 0
-      ? 0
-      : (
-          users.reduce(
-            (acc, u) => acc + (u.completed_blocks?.length ?? 0),
-            0
-          ) / users.length
-        ).toFixed(1);
-
-  // ── 3. Render ─────────────────────────────────────────────────────────────
   return (
-    <main className="min-h-screen bg-[#0a0a0b] text-[#f0ede8] font-sans">
-      {/* Halos */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-4 blur-[160px] w-[700px] h-[250px] rounded-full pointer-events-none" />
-
-      <div className="max-w-full mx-auto px-4 sm:px-6 md:px-10 py-8 md:py-12">
-        {/* Header */}
-        <div className="mb-10 flex flex-col gap-1">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-white/30 hover:text-white/60 transition-colors mb-4 w-fit"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Retour au Dashboard
-          </Link>
-          <p className="text-xs uppercase tracking-[0.15em] text-white/30 font-semibold">
-            Admin · Accès restreint
-          </p>
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-[#f0ede8]">
-                Tableau de bord utilisateurs
-              </h1>
-              <p className="mt-2 text-sm text-white/35">
-                Présence réelle, progression, activité et pilotage des accès.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/accompagnement/formateur"
-                className="border border-[#c9b48a]/50 px-4 py-2.5 text-sm text-[#e8d5b0] transition-colors hover:border-[#c9b48a] hover:bg-[#e8d5b0]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
-              >
-                Gérer les accompagnements
-              </Link>
-              <AdminAutoRefresh />
-            </div>
-          </div>
-        </div>
-
-        {/* KPI cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-6">
-          {[
-            { label: "Utilisateurs", value: users.length, icon: Users },
-            { label: "En ligne", value: onlineCount, icon: Activity },
-            { label: "Actifs 24h", value: active24hCount, icon: MousePointerClick },
-            { label: "Actifs 7j", value: active7dCount, icon: MousePointerClick },
-            { label: "Inactifs 30j+", value: inactive30dCount, icon: Eye },
-            { label: "Pages vues 24h", value: pageViews24h, icon: Eye },
-            { label: "Gratuits", value: users.length - paidCount, icon: Users },
-            { label: "Fondations", value: beginnerCount, icon: Users },
-            { label: "Complet", value: fullCount, icon: Users },
-            { label: "Blocs moy.", value: `${avgBlocs} / ${TOTAL_BLOCS}`, icon: Activity },
-          ].map((kpi) => (
-            <div
-              key={kpi.label}
-              className="bg-white/[0.03] border border-white/8 rounded-2xl p-4"
-            >
-              <kpi.icon className="mb-3 h-4 w-4 text-[#e8d5b0]/60" />
-              <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">{kpi.label}</p>
-              <p className="text-2xl font-bold text-[#e8d5b0]">{kpi.value}</p>
-            </div>
-          ))}
-        </div>
-
-        {trackingSetupMissing && (
-          <div className="mb-6 rounded-xl border border-amber-400/20 bg-amber-400/8 px-4 py-3 text-sm text-amber-100/70">
-            Tracking prêt côté app, mais les tables Supabase ne répondent pas encore. Applique la migration
-            {" "}
-            <span className="font-mono text-amber-100">supabase/migrations/20260627190000_member_activity_tracking.sql</span>
-            {" "}
-            pour activer présence et événements.
-          </div>
-        )}
-
-        <AdminVideoManager
-          sections={BLOCS_DATA.flatMap((bloc) => bloc.sections.map((section) => ({
-            id: section.id,
-            title: section.title,
-            blocTitle: bloc.titre,
-          })))}
-          initialVideos={(videoData ?? []) as AdminVideoLessonRow[]}
-          setupMissing={Boolean(videoError)}
-        />
-
-        <div className="mb-10">
-          <AdminMailComposer
-            users={users.map((u) => ({
-              id: u.id,
-              email: u.email,
-              tier: u.tier,
-              inactiveForEmail: (u.tier === null || u.tier === "free")
-                && now - new Date(u.createdAt).getTime() >= 14 * 24 * 60 * 60 * 1000
-                && (!u.lastSignIn || now - new Date(u.lastSignIn).getTime() >= 90 * 24 * 60 * 60 * 1000),
-            }))}
-          />
-        </div>
-
-        <AdminUsersTable users={users} totalBlocs={TOTAL_BLOCS} />
-
-        <p className="mt-6 text-center text-xs text-white/20">
-          {users.length} utilisateur{users.length !== 1 ? "s" : ""} · triés par dernière activité · données en temps réel
-        </p>
-      </div>
-    </main>
+    <DaRoot className="adm-root">
+      <AdminShell
+        userLabel="Samuel"
+        counts={{ users: users.length, accompaniment: accompanimentRows.length }}
+        views={{
+          overview: (
+            <OverviewView
+              stats={{
+                users: users.length,
+                free: users.length - beginnerCount - fullCount,
+                beginner: beginnerCount,
+                full: fullCount,
+                averageBlocs,
+                totalBlocs: TOTAL_BLOCS,
+                online: onlineUsers.length,
+                active24h: users.filter((account) => account.events24h > 0).length,
+                active7d: users.filter((account) => account.pageViews7d > 0).length,
+                inactive30d: users.filter((account) => {
+                  const lastSeen = account.lastActivity ?? account.lastSignIn;
+                  return !lastSeen || new Date(lastSeen).getTime() < now - 30 * DAY_MS;
+                }).length,
+                pageViews24h: allEvents.filter((event) => (
+                  event.event_type === "page_view" && new Date(event.created_at).getTime() >= recent24Hours
+                )).length,
+              }}
+              dailyPageViews={dailyPageViews.map((item) => ({
+                label: new Intl.DateTimeFormat("fr-FR", { weekday: "short", day: "numeric" }).format(item.date),
+                value: item.value,
+              }))}
+              onlineUsers={onlineUsers.slice(0, 8).map((account) => ({
+                id: account.id,
+                email: account.email,
+                path: account.currentPath,
+                tier: account.tier,
+              }))}
+              dataWarning={trackingSetupMissing ? "Une partie des chiffres d'activité est indisponible. Les comptes et les accès restent inchangés." : null}
+            />
+          ),
+          users: (
+            <AdminUsersTable
+              users={interactiveUsers}
+              totalBlocs={TOTAL_BLOCS}
+              inactiveCandidateCount={authError ? 0 : inactiveCandidateCount}
+              dataWarning={authError || profilesError ? "La liste complète des utilisateurs est momentanément indisponible. Aucune action n'est proposée." : null}
+            />
+          ),
+          videos: (
+            <AdminVideoManager
+              sections={BLOCS_DATA.flatMap((bloc) => bloc.sections.map((section) => ({
+                id: section.id,
+                title: section.title,
+                blocTitle: bloc.titre,
+              })))}
+              initialVideos={(videoData ?? []) as AdminVideoLessonRow[]}
+              setupMissing={Boolean(videoError)}
+            />
+          ),
+          agent: <AgentView />,
+          news: <NewsView youtubePanel={<YoutubeNewsPanel />} />,
+          emails: (
+            <AdminMailComposer
+              dataWarning={authError || profilesError ? "Les destinataires sont momentanément indisponibles. Aucun envoi n'est proposé." : null}
+              users={interactiveUsers.map((account) => ({
+                id: account.id,
+                email: account.email,
+                tier: account.tier,
+                inactiveForEmail: isInactiveForEmail(account, now),
+              }))}
+            />
+          ),
+          accompaniment: (
+            <AccompanimentView
+              summary={{
+                total: accompanimentRows.length,
+                active: accompanimentRows.filter((row) => row.status === "active" && row.starts_on <= today && (!row.ends_on || row.ends_on >= today)).length,
+                planned: accompanimentRows.filter((row) => row.status === "planned").length,
+                completed: accompanimentRows.filter((row) => row.status === "completed").length,
+              }}
+              dataWarning={accompanimentError ? "Le suivi des accompagnements est momentanément indisponible." : null}
+            />
+          ),
+        }}
+      />
+    </DaRoot>
   );
 }

@@ -1,27 +1,16 @@
 "use client";
 
+import { AlertCircle, FileText, Mail, RefreshCw, Send, Users, Video } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
-import { Mail, Send, Users, Video, RefreshCw, FileText } from "lucide-react";
-import { resolveSiteOrigin } from "@/lib/siteOrigin";
+import { COFFRE_LABEL } from "@/lib/pricing";
 import { MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS } from "@/lib/resendTransport";
+import { resolveSiteOrigin } from "@/lib/siteOrigin";
+import { playAppSound } from "@/lib/ui/sound";
 
-type MailUser = {
-  id: string;
-  email: string;
-  tier: string | null;
-  inactiveForEmail: boolean;
-};
-
+type MailUser = { id: string; email: string; tier: string | null; inactiveForEmail: boolean };
 type Audience = "selected" | "all" | "free" | "beginner" | "full";
-
-type SendResult = {
-  ok: boolean;
-  accepted?: number;
-  total?: number;
-  error?: string;
-};
-
 type TemplateKey = "blank" | "video" | "update";
+type SendResult = { ok: boolean; accepted?: number; total?: number; error?: string };
 
 const AUDIENCE_LABELS: Record<Audience, string> = {
   selected: "Sélection",
@@ -31,370 +20,173 @@ const AUDIENCE_LABELS: Record<Audience, string> = {
   full: "Complet",
 };
 
-const TEMPLATES: Record<TemplateKey, { label: string; icon: React.ReactNode; fill: (vals: { videoTitle?: string; videoUrl?: string; updateTitle?: string; updateDesc?: string }) => { subject: string; preheader: string; body: string; ctaLabel: string; ctaUrl: string } }> = {
-  blank: {
-    label: "Vide",
-    icon: <FileText className="h-3.5 w-3.5" />,
-    fill: () => ({ subject: "", preheader: "", body: "", ctaLabel: "", ctaUrl: "" }),
-  },
-  video: {
-    label: "Nouvelle vidéo",
-    icon: <Video className="h-3.5 w-3.5" />,
-    fill: ({ videoTitle = "[Titre de la vidéo]", videoUrl = "" }) => ({
-      subject: `Nouvelle vidéo : ${videoTitle}`,
-      preheader: "Disponible maintenant dans ta bibliothèque BUILD.",
-      body: `Une nouvelle vidéo vient d'être ajoutée à BUILD.\n\n${videoTitle}\n\nElle illustre concrètement ce que tu apprends dans les modules - pas de théorie, que de l'actionnable.\n\nClique ci-dessous pour la regarder directement.`,
-      ctaLabel: "Regarder la vidéo →",
-      ctaUrl: videoUrl,
-    }),
-  },
-  update: {
-    label: "Mise à jour BUILD",
-    icon: <RefreshCw className="h-3.5 w-3.5" />,
-    fill: ({ updateTitle = "[Titre de la mise à jour]", updateDesc = "[Décris ce qui a changé]" }) => ({
-      subject: `Mise à jour BUILD : ${updateTitle}`,
-      preheader: "Le contenu vient d'être mis à jour.",
-      body: `BUILD vient d'être mis à jour.\n\n${updateTitle}\n\n${updateDesc}\n\nConnecte-toi pour voir les changements.`,
-      ctaLabel: "Voir la mise à jour →",
-      // Lecture littérale de NEXT_PUBLIC_APP_URL : seule forme que Next remplace dans le code envoyé au navigateur.
-      ctaUrl: `${resolveSiteOrigin(process.env.NEXT_PUBLIC_APP_URL, process.env.NODE_ENV)}/dashboard`,
-    }),
-  },
+const TEMPLATE_LABELS: Record<TemplateKey, { label: string; icon: typeof Mail }> = {
+  blank: { label: "Vide", icon: FileText },
+  video: { label: "Nouvelle vidéo", icon: Video },
+  update: { label: "Mise à jour BUILD", icon: RefreshCw },
 };
 
-export function AdminMailComposer({ users }: { users: MailUser[] }) {
+function templateContent(key: TemplateKey, values: { videoTitle: string; videoUrl: string; updateTitle: string; updateDesc: string }) {
+  if (key === "video") return {
+    subject: `Nouvelle vidéo : ${values.videoTitle || "Titre de la vidéo"}`,
+    preheader: "Disponible maintenant dans ta bibliothèque BUILD.",
+    body: `Une nouvelle vidéo vient d'être ajoutée à BUILD.\n\n${values.videoTitle || "Titre de la vidéo"}\n\nTu peux la regarder dès maintenant depuis ton espace.`,
+    ctaLabel: "Regarder la vidéo",
+    ctaUrl: values.videoUrl,
+  };
+  if (key === "update") return {
+    subject: `Mise à jour BUILD : ${values.updateTitle || "Titre de la mise à jour"}`,
+    preheader: "Le contenu vient d'être mis à jour.",
+    body: `BUILD vient d'être mis à jour.\n\n${values.updateTitle || "Titre de la mise à jour"}\n\n${values.updateDesc || "Décris ici ce qui a changé."}\n\nConnecte-toi pour voir les changements.`,
+    ctaLabel: "Voir la mise à jour",
+    ctaUrl: `${resolveSiteOrigin(process.env.NEXT_PUBLIC_APP_URL, process.env.NODE_ENV)}/dashboard`,
+  };
+  return { subject: "", preheader: "", body: "", ctaLabel: "", ctaUrl: "" };
+}
+
+export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; dataWarning: string | null }) {
   const [audience, setAudience] = useState<Audience>("selected");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [subject, setSubject] = useState("");
-  const [preheader, setPreheader] = useState("");
-  const [body, setBody] = useState("");
-  const [ctaLabel, setCtaLabel] = useState("");
-  const [ctaUrl, setCtaUrl] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const [approved, setApproved] = useState(false);
-  const [result, setResult] = useState<SendResult | null>(null);
-  const campaignRef = useRef<{ id: string; fingerprint: string } | null>(null);
-
-  // Template state
   const [activeTemplate, setActiveTemplate] = useState<TemplateKey>("blank");
   const [videoTitle, setVideoTitle] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [updateTitle, setUpdateTitle] = useState("");
   const [updateDesc, setUpdateDesc] = useState("");
+  const [subject, setSubject] = useState("");
+  const [preheader, setPreheader] = useState("");
+  const [body, setBody] = useState("");
+  const [ctaLabel, setCtaLabel] = useState("");
+  const [ctaUrl, setCtaUrl] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [result, setResult] = useState<SendResult | null>(null);
+  const campaignRef = useRef<{ id: string; fingerprint: string } | null>(null);
 
-  const selectedUsers = useMemo(
-    () => users.filter((user) => selectedIds.includes(user.id)),
-    [selectedIds, users]
-  );
-
+  const selectedUsers = useMemo(() => users.filter((account) => selectedIds.includes(account.id)), [selectedIds, users]);
   const expectedRecipients = useMemo(() => {
-    const eligibleUsers = users.filter((user) => !user.inactiveForEmail);
-    if (audience === "selected") return selectedUsers.filter((user) => !user.inactiveForEmail).length;
-    if (audience === "free") return eligibleUsers.filter((user) => !user.tier || user.tier === "free").length;
-    return eligibleUsers.filter((user) => audience === "all" || user.tier === audience).length;
+    const eligible = users.filter((account) => !account.inactiveForEmail);
+    if (audience === "selected") return selectedUsers.filter((account) => !account.inactiveForEmail).length;
+    if (audience === "free") return eligible.filter((account) => !account.tier || account.tier === "free").length;
+    return eligible.filter((account) => audience === "all" || account.tier === audience).length;
   }, [audience, selectedUsers, users]);
-  const excludedInactiveCount = users.filter((user) => user.inactiveForEmail).length;
+  const excludedInactiveCount = users.filter((account) => account.inactiveForEmail).length;
+
+  const values = { videoTitle, videoUrl, updateTitle, updateDesc };
+  const applyTemplate = (key: TemplateKey) => {
+    const next = templateContent(key, values);
+    setActiveTemplate(key);
+    setSubject(next.subject);
+    setPreheader(next.preheader);
+    setBody(next.body);
+    setCtaLabel(next.ctaLabel);
+    setCtaUrl(next.ctaUrl);
+    setConfirmation("");
+    setResult(null);
+    void playAppSound("select");
+  };
+  const refreshTemplate = () => applyTemplate(activeTemplate);
 
   const toggleUser = (id: string) => {
-    setSelectedIds((current) => {
-      if (current.includes(id)) return current.filter((item) => item !== id);
-      if (current.length >= MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS) return current;
-      return [...current, id];
-    });
-  };
-
-  const applyTemplate = (key: TemplateKey) => {
-    setActiveTemplate(key);
-    setResult(null);
-    const filled = TEMPLATES[key].fill({ videoTitle, videoUrl, updateTitle, updateDesc });
-    setSubject(filled.subject);
-    setPreheader(filled.preheader);
-    setBody(filled.body);
-    setCtaLabel(filled.ctaLabel);
-    setCtaUrl(filled.ctaUrl);
-  };
-
-  const refreshTemplate = () => {
-    if (activeTemplate === "blank") return;
-    const filled = TEMPLATES[activeTemplate].fill({ videoTitle, videoUrl, updateTitle, updateDesc });
-    setSubject(filled.subject);
-    setPreheader(filled.preheader);
-    setBody(filled.body);
-    setCtaLabel(filled.ctaLabel);
-    setCtaUrl(filled.ctaUrl);
+    setSelectedIds((current) => current.includes(id)
+      ? current.filter((item) => item !== id)
+      : current.length < MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS ? [...current, id] : current);
+    void playAppSound("select");
   };
 
   const sendEmail = async () => {
-    if (!approved) {
-      setResult({ ok: false, error: "Confirme l'audience et le contenu avant l'envoi." });
+    if (confirmation !== "ENVOYER") {
+      setResult({ ok: false, error: "Écris ENVOYER pour confirmer cet envoi réel." });
+      void playAppSound("error");
       return;
     }
     setIsSending(true);
     setResult(null);
-
-    const requestPayload = {
-      audience,
-      selectedUserIds: selectedIds,
-      subject,
-      preheader,
-      body,
-      ctaLabel,
-      ctaUrl,
-    };
+    const requestPayload = { audience, selectedUserIds: selectedIds, subject, preheader, body, ctaLabel, ctaUrl };
     const fingerprint = JSON.stringify(requestPayload);
     if (!campaignRef.current || campaignRef.current.fingerprint !== fingerprint) {
       campaignRef.current = { id: crypto.randomUUID(), fingerprint };
     }
-
     try {
       const response = await fetch("/api/admin/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          campaignId: campaignRef.current.id,
-          approved: true,
-          confirmation: "ENVOYER",
-          ...requestPayload,
-        }),
+        body: JSON.stringify({ campaignId: campaignRef.current.id, approved: true, confirmation: "ENVOYER", ...requestPayload }),
       });
-
-      const payload = (await response.json().catch(() => ({}))) as SendResult;
+      const payload = await response.json().catch(() => ({})) as SendResult;
       const succeeded = response.ok && payload.ok;
       setResult({ ok: succeeded, ...payload });
       if (succeeded) {
         campaignRef.current = null;
-        setApproved(false);
+        setConfirmation("");
       }
+      void playAppSound(succeeded ? "confirm" : "error");
     } catch {
-      setResult({
-        ok: false,
-        error: "La réponse de l'envoi est indisponible. Relance la même campagne pour conserver l'idempotence.",
-      });
+      setResult({ ok: false, error: "La réponse de l'envoi est indisponible. Relance la même campagne pour conserver l'idempotence." });
+      void playAppSound("error");
     } finally {
       setIsSending(false);
     }
   };
 
   return (
-    <section className="rounded-2xl border border-white/8 bg-white/[0.02] p-5 md:p-6">
-      <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-[#e8d5b0]">
-            <Mail className="h-4 w-4" />
-            <p className="text-xs font-semibold uppercase tracking-[0.15em]">Broadcast membres</p>
-          </div>
-          <h2 className="text-xl font-semibold text-[#f0ede8]">Envoyer un email ciblé</h2>
-          <p className="mt-1 text-sm text-white/35">
-            Vidéo YouTube, update blocks, annonce produit ou message individuel.
-          </p>
-        </div>
-        <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/45">
-          <Users className="h-3.5 w-3.5" />
-          {expectedRecipients} destinataire{expectedRecipients > 1 ? "s" : ""}
-        </div>
+    <section className="adm-section" aria-labelledby="admin-mail-title">
+      {dataWarning ? <div className="adm-notice adm-notice-error" role="alert"><AlertCircle aria-hidden="true" /><p>{dataWarning}</p></div> : null}
+      <div className="adm-section-heading">
+        <div><h2 id="admin-mail-title">Composer un e-mail</h2><p>Prépare ton message, vérifie les destinataires, puis confirme l'envoi réel.</p></div>
+        <span className="adm-recipient-count"><Users aria-hidden="true" />{expectedRecipients} destinataire{expectedRecipients > 1 ? "s" : ""}</span>
       </div>
 
-      {/* Template selector */}
-      <div className="mb-4">
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-white/30">Template</p>
-        <div className="flex flex-wrap gap-2">
-          {(Object.keys(TEMPLATES) as TemplateKey[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => applyTemplate(key)}
-              className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                activeTemplate === key
-                  ? "border-[#e8d5b0]/40 bg-[#e8d5b0]/12 text-[#e8d5b0]"
-                  : "border-white/10 bg-white/[0.03] text-white/35 hover:bg-white/[0.06]"
-              }`}
-            >
-              {TEMPLATES[key].icon}
-              {TEMPLATES[key].label}
-            </button>
-          ))}
-        </div>
-
-        {/* Template fields */}
-        {activeTemplate === "video" && (
-          <div className="mt-3 flex flex-col gap-2 rounded-xl border border-[#e8d5b0]/15 bg-[#e8d5b0]/5 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#e8d5b0]/60">Infos vidéo</p>
-            <input
-              value={videoTitle}
-              onChange={(e) => setVideoTitle(e.target.value)}
-              onBlur={refreshTemplate}
-              placeholder="Titre de la vidéo"
-              className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80 outline-none placeholder:text-white/20 focus:border-[#e8d5b0]/40"
-            />
-            <input
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              onBlur={refreshTemplate}
-              placeholder="URL YouTube (https://youtu.be/...)"
-              className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80 outline-none placeholder:text-white/20 focus:border-[#e8d5b0]/40"
-            />
-            <button
-              type="button"
-              onClick={refreshTemplate}
-              className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-[#e8d5b0]/20 bg-[#e8d5b0]/10 px-3 py-1.5 text-xs text-[#e8d5b0]/80 transition-colors hover:bg-[#e8d5b0]/20"
-            >
-              <RefreshCw className="h-3 w-3" />
-              Appliquer
-            </button>
-          </div>
-        )}
-
-        {activeTemplate === "update" && (
-          <div className="mt-3 flex flex-col gap-2 rounded-xl border border-[#e8d5b0]/15 bg-[#e8d5b0]/5 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#e8d5b0]/60">Infos mise à jour</p>
-            <input
-              value={updateTitle}
-              onChange={(e) => setUpdateTitle(e.target.value)}
-              onBlur={refreshTemplate}
-              placeholder="Titre de la mise à jour"
-              className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80 outline-none placeholder:text-white/20 focus:border-[#e8d5b0]/40"
-            />
-            <textarea
-              value={updateDesc}
-              onChange={(e) => setUpdateDesc(e.target.value)}
-              onBlur={refreshTemplate}
-              placeholder="Ce qui a changé, ce qui a été ajouté..."
-              rows={3}
-              className="resize-none rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80 outline-none placeholder:text-white/20 focus:border-[#e8d5b0]/40"
-            />
-            <button
-              type="button"
-              onClick={refreshTemplate}
-              className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-[#e8d5b0]/20 bg-[#e8d5b0]/10 px-3 py-1.5 text-xs text-[#e8d5b0]/80 transition-colors hover:bg-[#e8d5b0]/20"
-            >
-              <RefreshCw className="h-3 w-3" />
-              Appliquer
-            </button>
-          </div>
-        )}
+      <div className="adm-template-tabs" role="group" aria-label="Choisir un gabarit">
+        {(Object.keys(TEMPLATE_LABELS) as TemplateKey[]).map((key) => {
+          const Icon = TEMPLATE_LABELS[key].icon;
+          return <button type="button" key={key} aria-pressed={activeTemplate === key} onClick={() => applyTemplate(key)}><Icon aria-hidden="true" />{TEMPLATE_LABELS[key].label}</button>;
+        })}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="flex flex-col gap-3">
-          <input
-            value={subject}
-            onChange={(event) => setSubject(event.target.value)}
-            placeholder="Objet de l'email"
-            className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none transition-colors placeholder:text-white/20 focus:border-[#e8d5b0]/40"
-          />
-          <input
-            value={preheader}
-            onChange={(event) => setPreheader(event.target.value)}
-            placeholder="Préheader optionnel"
-            className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none transition-colors placeholder:text-white/20 focus:border-[#e8d5b0]/40"
-          />
-          <textarea
-            value={body}
-            onChange={(event) => setBody(event.target.value)}
-            placeholder="Message. Tu peux coller l'annonce, le lien YouTube ou la note de mise à jour."
-            rows={7}
-            className="resize-none rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-relaxed text-white/80 outline-none transition-colors placeholder:text-white/20 focus:border-[#e8d5b0]/40"
-          />
-          <div className="grid gap-3 md:grid-cols-[1fr_180px]">
-            <input
-              value={ctaUrl}
-              onChange={(event) => setCtaUrl(event.target.value)}
-              placeholder="URL du bouton"
-              className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none transition-colors placeholder:text-white/20 focus:border-[#e8d5b0]/40"
-            />
-            <input
-              value={ctaLabel}
-              onChange={(event) => setCtaLabel(event.target.value)}
-              placeholder="Texte bouton"
-              className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none transition-colors placeholder:text-white/20 focus:border-[#e8d5b0]/40"
-            />
+      {activeTemplate === "video" ? (
+        <div className="adm-template-fields">
+          <label>Titre de la vidéo<input value={videoTitle} onChange={(event) => setVideoTitle(event.target.value)} /></label>
+          <label>Lien de la vidéo<input value={videoUrl} onChange={(event) => setVideoUrl(event.target.value)} placeholder="https://..." /></label>
+          <button type="button" className="adm-ghost-button" onClick={refreshTemplate}><RefreshCw aria-hidden="true" />Appliquer</button>
+        </div>
+      ) : null}
+      {activeTemplate === "update" ? (
+        <div className="adm-template-fields">
+          <label>Titre de la mise à jour<input value={updateTitle} onChange={(event) => setUpdateTitle(event.target.value)} /></label>
+          <label>Description<input value={updateDesc} onChange={(event) => setUpdateDesc(event.target.value)} /></label>
+          <button type="button" className="adm-ghost-button" onClick={refreshTemplate}><RefreshCw aria-hidden="true" />Appliquer</button>
+        </div>
+      ) : null}
+
+      <div className="adm-mail-layout">
+        <div className="adm-mail-form">
+          <label>Objet<input value={subject} maxLength={160} onChange={(event) => setSubject(event.target.value)} /></label>
+          <label>Préheader<input value={preheader} maxLength={200} onChange={(event) => setPreheader(event.target.value)} /></label>
+          <label>Message<textarea value={body} maxLength={20000} rows={9} onChange={(event) => setBody(event.target.value)} /></label>
+          <div className="adm-form-grid-two"><label>Lien du bouton<input value={ctaUrl} maxLength={2048} onChange={(event) => setCtaUrl(event.target.value)} /></label><label>Texte du bouton<input value={ctaLabel} maxLength={80} onChange={(event) => setCtaLabel(event.target.value)} /></label></div>
+          <div className="adm-mail-preview" aria-label="Aperçu de l'e-mail">
+            <span>BUILD</span>
+            <small>{preheader || "Préheader"}</small>
+            <h3>{subject || "Objet de ton e-mail"}</h3>
+            {body ? body.split(/\n{2,}/).map((paragraph, index) => <p key={index}>{paragraph}</p>) : <p>Ton message apparaîtra ici.</p>}
+            {ctaLabel ? <b>{ctaLabel}</b> : null}
           </div>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-2 gap-2">
-            {(Object.keys(AUDIENCE_LABELS) as Audience[]).map((item) => (
-              <button
-                key={item}
-                type="button"
-                onClick={() => setAudience(item)}
-                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                  audience === item
-                    ? "border-[#e8d5b0]/40 bg-[#e8d5b0]/12 text-[#e8d5b0]"
-                    : "border-white/10 bg-white/[0.03] text-white/35 hover:bg-white/[0.06]"
-                }`}
-              >
-                {AUDIENCE_LABELS[item]}
-              </button>
-            ))}
+        <aside className="adm-mail-audience" aria-labelledby="mail-audience-title">
+          <h3 id="mail-audience-title">Destinataires</h3>
+          <div className="adm-audience-tabs" role="group" aria-label="Choisir l'audience">
+            {(Object.keys(AUDIENCE_LABELS) as Audience[]).map((item) => <button type="button" key={item} aria-pressed={audience === item} onClick={() => { setAudience(item); setConfirmation(""); void playAppSound("select"); }}>{AUDIENCE_LABELS[item]}</button>)}
           </div>
-
-          <p className="text-[11px] text-white/30">
-            Sélection individuelle : {MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS} destinataires maximum.
-          </p>
-          <p className="text-[11px] text-white/30">
-            {excludedInactiveCount} compte{excludedInactiveCount > 1 ? "s" : ""} gratuit{excludedInactiveCount > 1 ? "s" : ""} inactif{excludedInactiveCount > 1 ? "s" : ""} depuis trois mois ne reçoivent jamais de mail.
-          </p>
-          <div className="max-h-72 overflow-y-auto rounded-xl border border-white/8 bg-black/15">
-            {users.map((user) => (
-              <label
-                key={user.id}
-                className="flex cursor-pointer items-center gap-3 border-b border-white/5 px-3 py-2.5 last:border-b-0 hover:bg-white/[0.03]"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedIds.includes(user.id)}
-                  onChange={() => toggleUser(user.id)}
-                  disabled={
-                    user.inactiveForEmail
-                    ||
-                    !selectedIds.includes(user.id)
-                    && selectedIds.length >= MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS
-                  }
-                  className="h-4 w-4 accent-[#e8d5b0]"
-                />
-                <span className="min-w-0 flex-1 truncate font-mono text-xs text-white/55">{user.email}</span>
-                <span className="text-[11px] text-white/25">{user.tier ?? "free"}</span>
-              </label>
-            ))}
+          <p>{excludedInactiveCount} compte{excludedInactiveCount > 1 ? "s" : ""} gratuit{excludedInactiveCount > 1 ? "s" : ""} inactif{excludedInactiveCount > 1 ? "s" : ""} depuis plus de trois mois ne reçoivent jamais d'e-mail.</p>
+          <div className="adm-recipient-list">
+            {users.map((account) => <label key={account.id} data-disabled={account.inactiveForEmail || undefined}><input type="checkbox" checked={selectedIds.includes(account.id)} onChange={() => toggleUser(account.id)} disabled={account.inactiveForEmail || (!selectedIds.includes(account.id) && selectedIds.length >= MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS)} /><span>{account.email}</span><small>{account.tier === "full" ? COFFRE_LABEL : account.tier === "beginner" ? "Fondations" : "Gratuit"}</small></label>)}
           </div>
-          {expectedRecipients > MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS && (
-            <p className="rounded-lg border border-amber-400/20 bg-amber-400/8 px-3 py-2 text-xs text-amber-100/70">
-              La voie synchrone est limitée à {MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS} destinataires.
-              Aucune outbox n&apos;est configurée : cet envoi sera refusé sans livraison partielle.
-            </p>
-          )}
-
-          <label className="flex items-start gap-3 rounded-lg border border-white/8 bg-black/15 px-3 py-3 text-xs leading-relaxed text-white/50">
-            <input type="checkbox" checked={approved} onChange={(event) => setApproved(event.target.checked)} className="mt-0.5 h-4 w-4 accent-[#e8d5b0]" />
-            J'ai relu l'audience, l'objet, le message et le lien. Je confirme cet envoi réel.
-          </label>
-
-          <button
-            type="button"
-            onClick={sendEmail}
-            disabled={
-              isSending
-              || expectedRecipients === 0
-              || expectedRecipients > MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS
-              || !subject.trim()
-              || !body.trim()
-              || !approved
-            }
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#c9b48a] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-colors hover:bg-[#e8d5b0] disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <Send className="h-4 w-4" />
-            {isSending ? "Envoi..." : "Envoyer"}
-          </button>
-
-          {result && (
-            <p className={`text-xs ${result.ok ? "text-emerald-300/80" : "text-red-300/80"}`}>
-              {result.ok
-                ? `${result.accepted ?? 0} email(s) accepté(s) par Resend.`
-                : result.error ?? "L'envoi a échoué."}
-            </p>
-          )}
-        </div>
+          {expectedRecipients > MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS ? <p className="adm-inline-error">La voie synchrone est limitée à {MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS} destinataires. Aucun e-mail ne sera envoyé.</p> : null}
+          <label className="adm-confirm-field">Je confirme cet envoi réel. Écris <b>ENVOYER</b><input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} autoComplete="off" /></label>
+          <button type="button" className="adm-primary-button" onClick={() => { void sendEmail(); }} disabled={isSending || expectedRecipients === 0 || expectedRecipients > MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS || !subject.trim() || !body.trim() || confirmation !== "ENVOYER"}><Send aria-hidden="true" />{isSending ? "Envoi en cours" : "Envoyer"}</button>
+          {result ? <p className={result.ok ? "adm-success" : "adm-inline-error"} role={result.ok ? "status" : "alert"}>{result.ok ? `${result.accepted ?? 0} e-mail${(result.accepted ?? 0) > 1 ? "s" : ""} accepté${(result.accepted ?? 0) > 1 ? "s" : ""} par Resend.` : result.error ?? "L'envoi a échoué."}</p> : null}
+        </aside>
       </div>
     </section>
   );

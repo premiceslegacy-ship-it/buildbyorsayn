@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, FileVideo, Image as ImageIcon, RefreshCw, Upload, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { setAdminVideoThumbnailAction } from "./actions";
 import {
   ADMIN_VIDEO_CONFIRMATION,
   MAX_ADMIN_VIDEO_BYTES,
@@ -8,12 +10,22 @@ import {
   type VideoChapter,
 } from "@/lib/mux/adminLessons";
 import type { AdminVideoLessonRow } from "@/lib/mux/adminServer";
+import { playAppSound } from "@/lib/ui/sound";
 
 type SectionOption = { id: string; title: string; blocTitle: string };
+type AdminVideoRow = AdminVideoLessonRow & { thumbnail?: string | null };
 type ApiResult = { ok: boolean; error?: string; videoId?: string; uploadUrl?: string; previousAssetId?: string | null };
 
+const STATUS_LABELS: Record<AdminVideoLessonRow["status"], string> = {
+  waiting: "Envoi en attente",
+  preparing: "Traitement Mux",
+  ready: "Prête à relire",
+  errored: "Erreur de traitement",
+  cancelled: "Envoi annulé",
+};
+
 function parseChapterLines(value: string): VideoChapter[] | null {
-  const chapters: VideoChapter[] = [];
+  const result: VideoChapter[] = [];
   for (const rawLine of value.split("\n")) {
     const line = rawLine.trim();
     if (!line) continue;
@@ -24,35 +36,39 @@ function parseChapterLines(value: string): VideoChapter[] | null {
       ? parts[0] * 60 + parts[1]
       : parts[0] * 3600 + parts[1] * 60 + parts[2];
     if (!Number.isSafeInteger(seconds) || parts.at(-1)! >= 60 || (parts.length === 3 && parts[1] >= 60)) return null;
-    chapters.push({ index: chapters.length + 1, title: match[2].trim(), startSeconds: seconds });
+    result.push({ index: result.length + 1, title: match[2].trim(), startSeconds: seconds });
   }
-  return chapters.length > 0 ? chapters : null;
+  return result.length ? result : null;
 }
 
-function uploadToMux(url: string, file: File, onProgress: (percentage: number) => void) {
+function uploadToMux(url: string, file: File, onProgress: (percentage: number) => void, signal: AbortSignal) {
   return new Promise<void>((resolve, reject) => {
     const request = new XMLHttpRequest();
     request.open("PUT", url);
     request.setRequestHeader("Content-Type", file.type);
     request.upload.addEventListener("progress", (event) => {
-      if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
+      if (event.lengthComputable) onProgress(Math.round(event.loaded / event.total * 100));
     });
     request.addEventListener("load", () => {
       if (request.status >= 200 && request.status < 300) resolve();
       else reject(new Error("upload_failed"));
     });
     request.addEventListener("error", () => reject(new Error("upload_failed")));
+    request.addEventListener("abort", () => reject(new DOMException("Envoi annulé", "AbortError")));
+    signal.addEventListener("abort", () => request.abort(), { once: true });
     request.send(file);
   });
 }
 
-const STATUS_LABELS: Record<AdminVideoLessonRow["status"], string> = {
-  waiting: "Envoi en attente",
-  preparing: "Traitement Mux",
-  ready: "Prête à relire",
-  errored: "Erreur de traitement",
-  cancelled: "Envoi annulé",
-};
+function formatDuration(seconds: number | null) {
+  if (!seconds) return "Durée inconnue";
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function hasChapters(value: unknown) {
+  return Array.isArray(value) && value.length > 0;
+}
 
 export function AdminVideoManager({
   sections,
@@ -60,43 +76,65 @@ export function AdminVideoManager({
   setupMissing,
 }: {
   sections: SectionOption[];
-  initialVideos: AdminVideoLessonRow[];
+  initialVideos: AdminVideoRow[];
   setupMissing: boolean;
 }) {
-  const [videos, setVideos] = useState(initialVideos);
+  const [videos, setVideos] = useState<AdminVideoRow[]>(initialVideos);
   const [sectionId, setSectionId] = useState(sections[0]?.id ?? "");
-  const selected = sections.find((section) => section.id === sectionId);
   const [title, setTitle] = useState(sections[0]?.title ?? "");
   const [summary, setSummary] = useState("");
   const [transcript, setTranscript] = useState("");
   const [deliverables, setDeliverables] = useState("");
   const [chapters, setChapters] = useState(`0:00 ${sections[0]?.title ?? "Introduction"}`);
   const [file, setFile] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [messageError, setMessageError] = useState(false);
   const [busy, setBusy] = useState(false);
   const [publishId, setPublishId] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState("");
-  const pollRef = useRef<number | null>(null);
-
+  const uploadAbort = useRef<AbortController | null>(null);
+  const previousStatuses = useRef(new Map(initialVideos.map((video) => [video.id, video.status])));
+  const fileInput = useRef<HTMLInputElement>(null);
+  const selected = sections.find((section) => section.id === sectionId);
   const hasProcessingVideo = useMemo(
     () => videos.some((video) => video.status === "waiting" || video.status === "preparing"),
-    [videos]
+    [videos],
   );
 
-  const refreshVideos = async () => {
-    const response = await fetch("/api/admin/videos", { cache: "no-store" });
-    const payload = await response.json().catch(() => null) as { ok?: boolean; videos?: AdminVideoLessonRow[] } | null;
-    if (response.ok && payload?.ok && Array.isArray(payload.videos)) setVideos(payload.videos);
-  };
+  const announce = useCallback((nextMessage: string, error = false) => {
+    setMessage(nextMessage);
+    setMessageError(error);
+    void playAppSound(error ? "error" : "confirm");
+  }, []);
+
+  const refreshVideos = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/videos", { cache: "no-store" });
+      const payload = await response.json().catch(() => null) as { ok?: boolean; videos?: AdminVideoRow[] } | null;
+      if (!response.ok || !payload?.ok || !Array.isArray(payload.videos)) throw new Error("refresh_failed");
+      const becameReady = payload.videos.some((video) => previousStatuses.current.get(video.id) !== "ready" && video.status === "ready");
+      setVideos((current) => payload.videos!.map((video) => ({
+        ...video,
+        thumbnail: video.thumbnail ?? current.find((item) => item.id === video.id)?.thumbnail ?? null,
+      })));
+      previousStatuses.current = new Map(payload.videos.map((video) => [video.id, video.status]));
+      if (becameReady) {
+        setMessage("Mux a terminé le traitement. La vidéo est prête à relire.");
+        setMessageError(false);
+        void playAppSound("confirm");
+      }
+    } catch {
+      announce("Les statuts Mux ne se sont pas actualisés. Réessaie.", true);
+    }
+  }, [announce]);
 
   useEffect(() => {
     if (!hasProcessingVideo) return;
-    pollRef.current = window.setInterval(() => { void refreshVideos(); }, 3_000);
-    return () => {
-      if (pollRef.current !== null) window.clearInterval(pollRef.current);
-    };
-  }, [hasProcessingVideo]);
+    const poll = window.setInterval(() => { void refreshVideos(); }, 3_000);
+    return () => window.clearInterval(poll);
+  }, [hasProcessingVideo, refreshVideos]);
 
   const changeSection = (nextId: string) => {
     setSectionId(nextId);
@@ -105,25 +143,40 @@ export function AdminVideoManager({
       setTitle(next.title);
       setChapters(`0:00 ${next.title}`);
     }
+    void playAppSound("select");
+  };
+
+  const chooseFile = (nextFile: File | null) => {
+    setFile(nextFile);
+    setMessage(null);
+    if (nextFile) void playAppSound("select");
   };
 
   const startUpload = async () => {
     setMessage(null);
+    setMessageError(false);
     if (!file || !VIDEO_MIME_TYPES.includes(file.type as (typeof VIDEO_MIME_TYPES)[number])) {
-      setMessage("Choisis une vidéo MP4, MOV, WebM ou M4V.");
+      announce("Choisis une vidéo MP4, MOV, WebM ou M4V.", true);
       return;
     }
     if (file.size > MAX_ADMIN_VIDEO_BYTES) {
-      setMessage("Le fichier dépasse la limite définie pour l'admin.");
+      announce("Le fichier dépasse la limite définie pour l'administration.", true);
       return;
     }
     const parsedChapters = parseChapterLines(chapters);
     if (!parsedChapters) {
-      setMessage("Écris un chapitre par ligne sous la forme 0:00 Titre.");
+      announce("Écris un chapitre par ligne sous la forme 0:00 Titre.", true);
+      return;
+    }
+    if (transcript.trim().length < 20 || !summary.trim()) {
+      announce("Ajoute le résumé et une transcription relue avant l'envoi.", true);
       return;
     }
 
     setBusy(true);
+    const controller = new AbortController();
+    uploadAbort.current = controller;
+    let videoId: string | null = null;
     try {
       const response = await fetch("/api/admin/videos", {
         method: "POST",
@@ -137,29 +190,69 @@ export function AdminVideoManager({
           chapters: parsedChapters,
           file: { name: file.name, size: file.size, type: file.type },
         }),
+        signal: controller.signal,
       });
       const payload = await response.json().catch(() => ({})) as ApiResult;
-      if (!response.ok || !payload.ok || !payload.uploadUrl) throw new Error(payload.error ?? "create_failed");
+      if (!response.ok || !payload.ok || !payload.uploadUrl || !payload.videoId) throw new Error(payload.error ?? "create_failed");
+      videoId = payload.videoId;
       setProgress(0);
-      await uploadToMux(payload.uploadUrl, file, setProgress);
+      await uploadToMux(payload.uploadUrl, file, setProgress, controller.signal);
       setProgress(100);
-      setMessage("Envoi terminé. Mux traite la vidéo et ses sous-titres français.");
+      setMessage("Envoi terminé. Mux traite la vidéo et les sous-titres français.");
+      setMessageError(false);
+      void playAppSound("select");
       await refreshVideos();
     } catch (error) {
-      setMessage(error instanceof Error && error.message !== "create_failed"
-        ? error.message
-        : "L'envoi a échoué. Tu peux réessayer sans publier.");
+      if (videoId && error instanceof DOMException && error.name === "AbortError") {
+        await fetch(`/api/admin/videos/${videoId}`, { method: "DELETE" }).catch(() => undefined);
+        announce("Envoi annulé.", false);
+      } else {
+        announce(error instanceof Error && !["create_failed", "upload_failed"].includes(error.message)
+          ? error.message
+          : "L'envoi a échoué. Tu peux réessayer sans publier.", true);
+      }
+    } finally {
+      uploadAbort.current = null;
+      setBusy(false);
+    }
+  };
+
+  const cancelWaitingUpload = async (videoId: string) => {
+    setBusy(true);
+    try {
+      const response = await fetch(`/api/admin/videos/${videoId}`, { method: "DELETE" });
+      const payload = await response.json().catch(() => ({})) as ApiResult;
+      if (!response.ok || !payload.ok) throw new Error(payload.error ?? "L'annulation a échoué.");
+      announce("Envoi annulé.");
+      await refreshVideos();
+    } catch (error) {
+      announce(error instanceof Error ? error.message : "L'annulation a échoué.", true);
     } finally {
       setBusy(false);
     }
   };
 
-  const publish = async (videoId: string) => {
-    if (confirmation !== ADMIN_VIDEO_CONFIRMATION) return;
+  const chooseThumbnail = (video: AdminVideoRow, ratio: number) => {
+    if (!video.duration_seconds) return;
+    const timeSeconds = Math.min(video.duration_seconds - 1, Math.max(0, Math.round(video.duration_seconds * ratio)));
+    setBusy(true);
+    setMessage(null);
+    void setAdminVideoThumbnailAction({ videoId: video.id, timeSeconds }).then((result) => {
+      if (!result.ok || !result.thumbnail) {
+        announce(result.message, true);
+        return;
+      }
+      setVideos((current) => current.map((item) => item.id === video.id ? { ...item, thumbnail: result.thumbnail } : item));
+      announce(result.message);
+    }).finally(() => setBusy(false));
+  };
+
+  const publish = async (video: AdminVideoRow) => {
+    if (confirmation !== ADMIN_VIDEO_CONFIRMATION || !video.thumbnail) return;
     setBusy(true);
     setMessage(null);
     try {
-      const response = await fetch(`/api/admin/videos/${videoId}/publish`, {
+      const response = await fetch(`/api/admin/videos/${video.id}/publish`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ approved: true, confirmation }),
@@ -168,102 +261,136 @@ export function AdminVideoManager({
       if (!response.ok || !payload.ok) throw new Error(payload.error ?? "La publication a échoué.");
       setPublishId(null);
       setConfirmation("");
-      setMessage(payload.previousAssetId
+      announce(payload.previousAssetId
         ? `Vidéo publiée. Supprime manuellement l'ancien asset Mux ${payload.previousAssetId}.`
-        : "Vidéo publiée. Elle est maintenant disponible dans son chapitre.");
+        : "Vidéo publiée. Elle est disponible dans son chapitre.");
       await refreshVideos();
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "La publication a échoué.");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const cancel = async (videoId: string) => {
-    setBusy(true);
-    try {
-      const response = await fetch(`/api/admin/videos/${videoId}`, { method: "DELETE" });
-      const payload = await response.json().catch(() => ({})) as ApiResult;
-      if (!response.ok || !payload.ok) throw new Error(payload.error ?? "L'annulation a échoué.");
-      setMessage("Envoi annulé.");
-      await refreshVideos();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "L'annulation a échoué.");
+      announce(error instanceof Error ? error.message : "La publication a échoué.", true);
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <section className="mb-10 rounded-2xl border border-white/8 bg-white/[0.02] p-5 md:p-6" aria-labelledby="admin-video-title">
-      <div className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#e8d5b0]">Vidéos</p>
-        <h2 id="admin-video-title" className="mt-2 text-xl font-semibold text-[#f0ede8]">Envoyer et publier un chapitre</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/45">
-          Le fichier va directement vers Mux. La transcription relue entre dans le corpus du compagnon seulement après ta publication.
-        </p>
-      </div>
-
-      {setupMissing ? (
-        <p role="status" className="rounded-xl border border-amber-400/20 bg-amber-400/8 px-4 py-3 text-sm text-amber-100/75">
-          La table vidéo n'est pas encore disponible. Applique la migration locale prévue avant d'utiliser cette vue.
-        </p>
-      ) : (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
-          <div className="space-y-4">
-            <label className="block text-sm text-white/65">
-              Chapitre BUILD
-              <select value={sectionId} onChange={(event) => changeSection(event.target.value)} className="mt-2 w-full rounded-lg border border-white/10 bg-[#111113] px-3 py-3 text-white">
-                {sections.map((section) => <option key={section.id} value={section.id}>{section.blocTitle} : {section.title}</option>)}
-              </select>
-            </label>
-            <label className="block text-sm text-white/65">Titre<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={200} className="mt-2 w-full rounded-lg border border-white/10 bg-[#111113] px-3 py-3 text-white" /></label>
-            <label className="block text-sm text-white/65">Résumé<textarea value={summary} onChange={(event) => setSummary(event.target.value)} maxLength={2000} rows={3} className="mt-2 w-full rounded-lg border border-white/10 bg-[#111113] px-3 py-3 text-white" /></label>
-            <label className="block text-sm text-white/65">
-              Transcription relue
-              <textarea value={transcript} onChange={(event) => setTranscript(event.target.value)} maxLength={250000} rows={9} placeholder="[0:00] Ce que tu dis dans la vidéo..." className="mt-2 w-full rounded-lg border border-white/10 bg-[#111113] px-3 py-3 text-white" />
-              <span className="mt-1 block text-xs text-white/30">Ajoute [2:10] au début d'une ligne quand tu as un repère exact.</span>
-            </label>
-            <label className="block text-sm text-white/65">Chapitres et repères<textarea value={chapters} onChange={(event) => setChapters(event.target.value)} rows={4} className="mt-2 w-full rounded-lg border border-white/10 bg-[#111113] px-3 py-3 font-mono text-sm text-white" /></label>
-            <label className="block text-sm text-white/65">Livrables, trois lignes maximum<textarea value={deliverables} onChange={(event) => setDeliverables(event.target.value)} rows={3} className="mt-2 w-full rounded-lg border border-white/10 bg-[#111113] px-3 py-3 text-white" /></label>
-            <label className="block text-sm text-white/65">Fichier vidéo<input type="file" accept={VIDEO_MIME_TYPES.join(",")} onChange={(event) => setFile(event.target.files?.[0] ?? null)} className="mt-2 block w-full text-sm text-white/55 file:mr-4 file:rounded-lg file:border-0 file:bg-white/10 file:px-4 file:py-3 file:text-white" /></label>
-            {progress !== null && <p role="status" className="text-sm text-white/55">Envoi : {progress} %</p>}
-            <button type="button" disabled={busy || !selected} onClick={() => { void startUpload(); }} className="min-h-11 rounded-lg bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] disabled:cursor-not-allowed disabled:opacity-50">{busy ? "Traitement..." : "Envoyer à Mux"}</button>
-          </div>
-
+    <div className="adm-view-stack">
+      <section className="adm-section" aria-labelledby="admin-video-title">
+        <div className="adm-section-heading">
           <div>
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-white/75">Envois récents</h3>
-              <button type="button" onClick={() => { void refreshVideos(); }} className="min-h-11 px-3 text-xs text-white/45 hover:text-white">Actualiser</button>
-            </div>
-            <div className="space-y-3">
-              {videos.length === 0 && <p className="rounded-xl border border-white/8 px-4 py-5 text-sm text-white/35">Aucune vidéo envoyée.</p>}
-              {videos.map((video) => (
-                <article key={video.id} className="rounded-xl border border-white/8 bg-black/15 p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div><p className="text-sm font-medium text-white/80">{video.title}</p><p className="mt-1 text-xs text-white/35">{video.section_id} : {STATUS_LABELS[video.status]}</p></div>
-                    {video.published_at && <span className="rounded-full border border-emerald-400/20 px-2 py-1 text-xs text-emerald-300">Publiée</span>}
-                  </div>
-                  <p className="mt-3 text-xs text-white/35">Transcription : {video.transcript.length} caractères. Palier : {video.tier_required}.</p>
-                  {video.status === "waiting" && !video.published_at && <button type="button" disabled={busy} onClick={() => { void cancel(video.id); }} className="mt-3 min-h-11 px-3 text-xs text-red-200/70 hover:text-red-100">Annuler l'envoi</button>}
-                  {video.status === "ready" && !video.published_at && publishId !== video.id && <button type="button" disabled={busy} onClick={() => { setPublishId(video.id); setConfirmation(""); }} className="mt-3 min-h-11 rounded-lg border border-[#e8d5b0]/40 px-3 text-xs text-[#e8d5b0]">Relire puis publier</button>}
-                  {publishId === video.id && (
-                    <div className="mt-4 rounded-lg border border-[#e8d5b0]/20 bg-[#e8d5b0]/5 p-3">
-                      <p className="text-xs leading-relaxed text-white/55">Confirme que la transcription, les repères et le palier sont justes. Écris {ADMIN_VIDEO_CONFIRMATION} pour publier.</p>
-                      <input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className="mt-3 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white" />
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <button type="button" disabled={busy || confirmation !== ADMIN_VIDEO_CONFIRMATION} onClick={() => { void publish(video.id); }} className="min-h-11 rounded-lg bg-[#e8d5b0] px-4 text-xs font-semibold text-[#0e0e0f] disabled:opacity-40">Publier maintenant</button>
-                        <button type="button" onClick={() => { setPublishId(null); setConfirmation(""); }} className="min-h-11 px-3 text-xs text-white/45">Revenir</button>
-                      </div>
-                    </div>
-                  )}
-                </article>
-              ))}
-            </div>
+            <h2 id="admin-video-title">Envoyer une vidéo</h2>
+            <p>Le fichier part directement vers Mux. Tu relis le résumé, la transcription et les chapitres avant de publier.</p>
           </div>
         </div>
-      )}
-      {message && <p role="status" className="mt-4 text-sm text-white/60">{message}</p>}
-    </section>
+
+        {setupMissing ? (
+          <div className="adm-notice adm-notice-error" role="alert"><FileVideo aria-hidden="true" /><p>La table vidéo n'est pas disponible. Aucun envoi ne peut démarrer.</p></div>
+        ) : (
+          <div className="adm-video-layout">
+            <div className="adm-video-form">
+              <div className="adm-form-grid-two">
+                <label>Bloc et chapitre<select value={sectionId} onChange={(event) => changeSection(event.target.value)}>{sections.map((section) => <option key={section.id} value={section.id}>{section.blocTitle} : {section.title}</option>)}</select></label>
+                <label>Titre<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={200} /></label>
+              </div>
+              <label>Résumé<textarea value={summary} onChange={(event) => setSummary(event.target.value)} maxLength={2000} rows={3} /></label>
+              <label>Transcription relue<textarea value={transcript} onChange={(event) => setTranscript(event.target.value)} maxLength={250000} rows={8} placeholder="[0:00] Ce que tu dis dans la vidéo..." /><small>Ajoute [2:10] au début d'une ligne quand tu as un repère exact.</small></label>
+              <div className="adm-form-grid-two">
+                <label>Chapitres et repères<textarea value={chapters} onChange={(event) => setChapters(event.target.value)} rows={4} /></label>
+                <label>Livrables, trois lignes maximum<textarea value={deliverables} onChange={(event) => setDeliverables(event.target.value)} rows={4} /></label>
+              </div>
+            </div>
+
+            <div
+              className="adm-dropzone"
+              data-dragging={dragging || undefined}
+              onDragEnter={(event) => { event.preventDefault(); setDragging(true); }}
+              onDragOver={(event) => event.preventDefault()}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(event) => { event.preventDefault(); setDragging(false); chooseFile(event.dataTransfer.files[0] ?? null); }}
+            >
+              <span><Upload aria-hidden="true" /></span>
+              <h3>{file ? file.name : "Dépose la vidéo ici"}</h3>
+              <p>{file ? `${(file.size / 1024 / 1024).toFixed(1).replace(".", ",")} Mo` : "MP4, MOV, WebM ou M4V. Le fichier ne passe pas par Vercel."}</p>
+              <input ref={fileInput} type="file" accept={VIDEO_MIME_TYPES.join(",")} onChange={(event) => chooseFile(event.target.files?.[0] ?? null)} hidden />
+              <button className="adm-ghost-button" type="button" onClick={() => fileInput.current?.click()}>Choisir un fichier</button>
+              {progress !== null ? <div className="adm-upload-progress" role="status"><i style={{ width: `${progress}%` }} /><span>{progress} %</span></div> : null}
+              <div className="adm-upload-actions">
+                <button className="adm-primary-button" type="button" disabled={busy || !selected} onClick={() => { void startUpload(); }}>{busy ? "Envoi en cours" : "Envoyer à Mux"}</button>
+                {busy && progress !== null ? <button className="adm-link-button" type="button" onClick={() => uploadAbort.current?.abort()}><X aria-hidden="true" />Annuler</button> : null}
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="adm-section" aria-labelledby="admin-recent-videos">
+        <div className="adm-section-heading">
+          <div><h2 id="admin-recent-videos">Ce qui suit</h2><p>Chaque étape reste visible jusqu'à la publication.</p></div>
+          <button className="adm-ghost-button" type="button" onClick={() => { void refreshVideos(); }}><RefreshCw aria-hidden="true" />Actualiser</button>
+        </div>
+
+        <div className="adm-video-list" aria-live="polite">
+          {videos.length === 0 ? <div className="adm-empty-card"><FileVideo aria-hidden="true" /><h3>Aucune vidéo envoyée</h3><p>Le premier envoi apparaîtra ici avec son traitement et ses contrôles.</p></div> : null}
+          {videos.map((video) => {
+            const complete = {
+              transcript: video.transcript.trim().length >= 20,
+              chapters: hasChapters(video.chapters),
+              summary: Boolean(video.summary.trim()),
+              thumbnail: Boolean(video.thumbnail),
+              playback: Boolean(video.playback_id && video.duration_seconds),
+            };
+            const publishable = video.status === "ready" && Object.values(complete).every(Boolean);
+            return (
+              <article className="adm-video-card" key={video.id}>
+                <div className="adm-video-card-head">
+                  <span className="adm-video-thumb"><ImageIcon aria-hidden="true" /></span>
+                  <div><h3>{video.title}</h3><p>{video.section_id}, {formatDuration(video.duration_seconds)}</p></div>
+                  <span className="adm-status" data-status={video.status}><i aria-hidden="true" />{STATUS_LABELS[video.status]}</span>
+                </div>
+
+                <ol className="adm-video-steps">
+                  {([
+                    ["Transcription", complete.transcript],
+                    ["Chapitres", complete.chapters],
+                    ["Résumé", complete.summary],
+                    ["Miniature", complete.thumbnail],
+                    ["Lecture signée", complete.playback],
+                  ] as const).map(([label, done], index) => <li key={label} data-done={done || undefined}><span>{done ? <Check aria-hidden="true" /> : index + 1}</span>{label}</li>)}
+                </ol>
+
+                {video.status === "ready" && !video.thumbnail && video.duration_seconds ? (
+                  <div className="adm-thumbnail-choice">
+                    <p>Choisis le moment utilisé par Mux pour la miniature.</p>
+                    <div>{[0.25, 0.5, 0.75].map((ratio) => {
+                      const seconds = Math.round(video.duration_seconds! * ratio);
+                      return <button type="button" key={ratio} disabled={busy} onClick={() => chooseThumbnail(video, ratio)}><ImageIcon aria-hidden="true" /><span>{Math.round(ratio * 100)} %</span><small>{formatDuration(seconds)}</small></button>;
+                    })}</div>
+                  </div>
+                ) : null}
+
+                <div className="adm-video-card-actions">
+                  {video.status === "waiting" && !video.published_at ? <button type="button" className="adm-danger-button" disabled={busy} onClick={() => { void cancelWaitingUpload(video.id); }}>Annuler l'envoi</button> : null}
+                  {video.published_at ? <span className="adm-status" data-status="published"><i aria-hidden="true" />Publiée</span> : null}
+                  {video.status === "ready" && !video.published_at && publishId !== video.id ? (
+                    <button type="button" className="adm-ghost-button" disabled={!publishable || busy} onClick={() => { setPublishId(video.id); setConfirmation(""); void playAppSound("open"); }}>
+                      {publishable ? "Relire puis publier" : "Complète les étapes"}
+                    </button>
+                  ) : null}
+                </div>
+
+                {publishId === video.id ? (
+                  <div className="adm-publish-confirm">
+                    <p>Relis le palier, le résumé, la transcription, les chapitres et la miniature. Écris <b>{ADMIN_VIDEO_CONFIRMATION}</b> pour publier.</p>
+                    <input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} autoComplete="off" />
+                    <div><button type="button" className="adm-ghost-button" onClick={() => { setPublishId(null); setConfirmation(""); }}>Revenir</button><button type="button" className="adm-danger-button" disabled={busy || confirmation !== ADMIN_VIDEO_CONFIRMATION} onClick={() => { void publish(video); }}>Publier maintenant</button></div>
+                  </div>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      {message ? <p className={messageError ? "adm-inline-error" : "adm-success"} role={messageError ? "alert" : "status"}>{message}</p> : null}
+    </div>
   );
 }

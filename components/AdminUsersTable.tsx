@@ -1,15 +1,19 @@
 "use client";
 
+import { AlertCircle, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { setUserTier } from "@/app/actions/setUserTier";
+import { InactiveAccountsCard } from "@/components/admin/InactiveAccountsCard";
 import { COFFRE_LABEL } from "@/lib/pricing";
+import { playAppSound } from "@/lib/ui/sound";
 
-type EnrichedUser = {
+export type AdminUserRow = {
   id: string;
   tier: string | null;
   completed_blocks: number[] | null;
   email: string;
   lastSignIn: string | null;
+  createdAt: string;
   currentPath: string | null;
   lastActivity: string | null;
   lastEvent: string | null;
@@ -19,337 +23,182 @@ type EnrichedUser = {
   pageViews30d: number;
 };
 
-type FilterKey = "all" | "free" | "beginner" | "full" | "paid";
+type FilterKey = "all" | "free" | "beginner" | "full" | "paid" | "inactive";
+type SortKey = "activity" | "email" | "tier" | "views" | "progress";
 
 const PAGE_SIZE = 30;
-
-const FILTERS: { key: FilterKey; label: string }[] = [
-  { key: "all", label: "Tous les membres" },
+const DAY_MS = 24 * 60 * 60 * 1000;
+const FILTERS: Array<{ key: FilterKey; label: string }> = [
+  { key: "all", label: "Tous" },
   { key: "free", label: "Gratuit" },
   { key: "beginner", label: "Fondations" },
   { key: "full", label: COFFRE_LABEL },
-  { key: "paid", label: `Fondations + ${COFFRE_LABEL}` },
+  { key: "paid", label: "Payants" },
+  { key: "inactive", label: "Inactifs depuis 3 mois" },
 ];
 
-function matchesFilter(tier: string | null, filter: FilterKey): boolean {
-  switch (filter) {
-    case "free":
-      return tier === null;
-    case "beginner":
-      return tier === "beginner";
-    case "full":
-      return tier === "full";
-    case "paid":
-      return tier === "beginner" || tier === "full";
-    default:
-      return true;
-  }
+function isInactiveCandidate(account: AdminUserRow, now = Date.now()) {
+  return (account.tier === null || account.tier === "free")
+    && now - new Date(account.createdAt).getTime() >= 14 * DAY_MS
+    && (!account.lastSignIn || now - new Date(account.lastSignIn).getTime() >= 90 * DAY_MS);
 }
 
-function formatLastSeen(dateStr: string | null): { label: string; style: "online" | "never" | "default" } {
-  if (!dateStr) return { label: "Jamais connecté", style: "never" };
-
-  const diffMs = Date.now() - new Date(dateStr).getTime();
-  const s = Math.floor(diffMs / 1000);
-  const m = Math.floor(s / 60);
-  const h = Math.floor(m / 60);
-  const d = Math.floor(h / 24);
-  const w = Math.floor(d / 7);
-  const mo = Math.floor(d / 30);
-
-  if (s < 120) return { label: "En ligne",           style: "online" };
-  if (m < 60)  return { label: `Il y a ${m} min`,    style: "default" };
-  if (h < 24)  return { label: `Il y a ${h}h`,       style: "default" };
-  if (d === 1) return { label: "Hier",                style: "default" };
-  if (d < 7)   return { label: `Il y a ${d} jours`,  style: "default" };
-  if (w === 1) return { label: "Il y a 1 semaine",   style: "default" };
-  if (w < 4)   return { label: `Il y a ${w} sem.`,   style: "default" };
-  if (mo === 1)return { label: "Il y a 1 mois",      style: "default" };
-  return         { label: `Il y a ${mo} mois`,       style: "default" };
+function matchesFilter(account: AdminUserRow, filter: FilterKey) {
+  if (filter === "free") return account.tier === null || account.tier === "free";
+  if (filter === "beginner") return account.tier === "beginner";
+  if (filter === "full") return account.tier === "full";
+  if (filter === "paid") return account.tier === "beginner" || account.tier === "full";
+  if (filter === "inactive") return isInactiveCandidate(account);
+  return true;
 }
 
-function TierBadge({ tier }: { tier: string | null }) {
-  if (tier === "full") {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        {COFFRE_LABEL}
-      </span>
-    );
-  }
-  if (tier === "beginner") {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-[#e8d5b0]/15 text-[#e8d5b0] border border-[#e8d5b0]/20">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#e8d5b0]" />
-        Fondations
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-red-500/10 text-red-400 border border-red-500/15">
-      <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-      Gratuit
-    </span>
-  );
+function formatLastSeen(value: string | null) {
+  if (!value) return { label: "Jamais connecté", online: false };
+  const minutes = Math.floor((Date.now() - new Date(value).getTime()) / 60000);
+  if (minutes < 2) return { label: "En ligne", online: true };
+  if (minutes < 60) return { label: `Il y a ${minutes} min`, online: false };
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return { label: `Il y a ${hours} h`, online: false };
+  const days = Math.floor(hours / 24);
+  if (days === 1) return { label: "Hier", online: false };
+  if (days < 7) return { label: `Il y a ${days} jours`, online: false };
+  const weeks = Math.floor(days / 7);
+  if (weeks < 4) return { label: `Il y a ${weeks} sem.`, online: false };
+  const months = Math.max(1, Math.floor(days / 30));
+  return { label: `Il y a ${months} mois`, online: false };
 }
 
-export function AdminUsersTable({ users, totalBlocs }: { users: EnrichedUser[]; totalBlocs: number }) {
+function tierLabel(tier: string | null) {
+  return tier === "full" ? COFFRE_LABEL : tier === "beginner" ? "Fondations" : "Gratuit";
+}
+
+function TierState({ tier }: { tier: string | null }) {
+  return <span className="adm-status" data-status={tier ?? "free"}><i aria-hidden="true" />{tierLabel(tier)}</span>;
+}
+
+export function AdminUsersTable({
+  users,
+  totalBlocs,
+  inactiveCandidateCount,
+  dataWarning,
+}: {
+  users: AdminUserRow[];
+  totalBlocs: number;
+  inactiveCandidateCount: number;
+  dataWarning: string | null;
+}) {
   const [filter, setFilter] = useState<FilterKey>("all");
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortKey>("activity");
   const [page, setPage] = useState(1);
 
-  const filteredUsers = useMemo(
-    () => users.filter((u) => matchesFilter(u.tier, filter)),
-    [users, filter]
-  );
-
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
+  const filteredUsers = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase("fr");
+    return users
+      .filter((account) => matchesFilter(account, filter))
+      .filter((account) => !normalizedQuery || `${account.email} ${account.currentPath ?? ""}`.toLocaleLowerCase("fr").includes(normalizedQuery))
+      .sort((left, right) => {
+        if (sort === "email") return left.email.localeCompare(right.email, "fr");
+        if (sort === "tier") return tierLabel(left.tier).localeCompare(tierLabel(right.tier), "fr");
+        if (sort === "views") return right.pageViews30d - left.pageViews30d;
+        if (sort === "progress") return (right.completed_blocks?.length ?? 0) - (left.completed_blocks?.length ?? 0);
+        const leftDate = left.lastActivity ?? left.lastSignIn;
+        const rightDate = right.lastActivity ?? right.lastSignIn;
+        return (rightDate ? new Date(rightDate).getTime() : 0) - (leftDate ? new Date(leftDate).getTime() : 0);
+      });
+  }, [filter, query, sort, users]);
+  const pageCount = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
   const pageUsers = filteredUsers.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  const handleFilterChange = (key: FilterKey) => {
-    setFilter(key);
+  const changeFilter = (nextFilter: FilterKey) => {
+    setFilter(nextFilter);
     setPage(1);
+    void playAppSound("select");
   };
 
   return (
-    <div>
-      {/* Filters */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {FILTERS.map((f) => (
-          <button
-            key={f.key}
-            onClick={() => handleFilterChange(f.key)}
-            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer ${
-              filter === f.key
-                ? "bg-[#e8d5b0]/20 text-[#e8d5b0] border border-[#e8d5b0]/30"
-                : "bg-white/[0.03] text-white/40 border border-white/8 hover:bg-white/[0.06] hover:text-white/70"
-            }`}
-          >
-            {f.label}
-            <span className="ml-1.5 text-white/25">
-              {users.filter((u) => matchesFilter(u.tier, f.key)).length}
-            </span>
-          </button>
-        ))}
-      </div>
+    <div className="adm-view-stack">
+      {dataWarning ? <div className="adm-notice adm-notice-error" role="alert"><AlertCircle aria-hidden="true" /><p>{dataWarning}</p></div> : null}
+      <InactiveAccountsCard candidateCount={inactiveCandidateCount} onShowCandidates={() => changeFilter("inactive")} />
 
-      {/* Table */}
-      <div className="bg-white/[0.02] border border-white/8 rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-[14px]">
-            <thead>
-              <tr className="border-b border-white/8 text-left">
-                <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
-                  Email
-                </th>
-                <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
-                  Tier
-                </th>
-                <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
-                  Modifier
-                </th>
-                <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
-                  Dernière connexion
-                </th>
-                <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
-                  Page actuelle
-                </th>
-                <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold text-right">
-                  Vues 24h / 7j / 30j
-                </th>
-                <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold">
-                  Blocs terminés
-                </th>
-                <th className="px-5 py-4 text-[11px] uppercase tracking-widest text-white/30 font-semibold text-right">
-                  Progression
-                </th>
-              </tr>
-            </thead>
+      <section className="adm-section" aria-labelledby="adm-users-heading">
+        <div className="adm-section-heading">
+          <div><h2 id="adm-users-heading">Utilisateurs</h2><p>Accès, dernière activité et progression réelle.</p></div>
+          <label className="adm-search-field">
+            <Search aria-hidden="true" />
+            <span className="sr">Rechercher un utilisateur</span>
+            <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} type="search" placeholder="E-mail ou page" />
+          </label>
+        </div>
+
+        <div className="adm-filterbar" role="group" aria-label="Filtrer les utilisateurs">
+          {FILTERS.map((item) => {
+            const count = users.filter((account) => matchesFilter(account, item.key)).length;
+            return (
+              <button
+                type="button"
+                key={item.key}
+                aria-pressed={filter === item.key}
+                onClick={() => changeFilter(item.key)}
+              >
+                {item.label}<small>{count}</small>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="adm-table-wrap">
+          <table className="adm-table">
+            <caption className="sr">Liste des utilisateurs BUILD</caption>
+            <thead><tr>
+              <th><button type="button" onClick={() => setSort("email")}>Utilisateur</button></th>
+              <th><button type="button" onClick={() => setSort("tier")}>Palier</button></th>
+              <th>Modifier</th>
+              <th><button type="button" onClick={() => setSort("activity")}>Dernière activité</button></th>
+              <th className="adm-table-wide">Page actuelle</th>
+              <th className="adm-table-num adm-table-medium"><button type="button" onClick={() => setSort("views")}>Vues 24 h, 7 j, 30 j</button></th>
+              <th className="adm-table-num"><button type="button" onClick={() => setSort("progress")}>Blocs</button></th>
+            </tr></thead>
             <tbody>
-              {pageUsers.map((u, i) => {
-                const blocks = u.completed_blocks ?? [];
-                const pct = Math.round((blocks.length / totalBlocs) * 100);
-                const seen = formatLastSeen(u.lastActivity ?? u.lastSignIn);
+              {pageUsers.map((account) => {
+                const completed = account.completed_blocks?.length ?? 0;
+                const lastSeen = formatLastSeen(account.lastActivity ?? account.lastSignIn);
                 return (
-                  <tr
-                    key={u.id}
-                    className={`border-b border-white/5 transition-colors hover:bg-white/[0.025] whitespace-nowrap ${
-                      i % 2 === 0 ? "" : "bg-white/[0.015]"
-                    }`}
-                  >
-                    {/* Email */}
-                    <td className="px-5 py-4 text-[#f0ede8]/80 font-mono text-[13px]">
-                      {u.email}
-                    </td>
-
-                    {/* Tier badge */}
-                    <td className="px-5 py-4">
-                      <TierBadge tier={u.tier} />
-                    </td>
-
-                    {/* Tier selector */}
-                    <td className="px-5 py-4">
-                      <div className="flex gap-1.5">
-                        <form action={setUserTier.bind(null, u.id, null)}>
-                          <button
-                            type="submit"
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
-                              u.tier === null
-                                ? "bg-red-500/20 text-red-300 border border-red-500/30"
-                                : "bg-white/5 text-white/30 border border-white/10 hover:bg-white/10"
-                            }`}
-                          >
-                            Gratuit
-                          </button>
-                        </form>
-                        <form action={setUserTier.bind(null, u.id, "beginner")}>
-                          <button
-                            type="submit"
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
-                              u.tier === "beginner"
-                                ? "bg-[#e8d5b0]/20 text-[#e8d5b0] border border-[#e8d5b0]/30"
-                                : "bg-white/5 text-white/30 border border-white/10 hover:bg-white/10"
-                            }`}
-                          >
-                            Fondations
-                          </button>
-                        </form>
-                        <form action={setUserTier.bind(null, u.id, "full")}>
-                          <button
-                            type="submit"
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
-                              u.tier === "full"
-                                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                : "bg-white/5 text-white/30 border border-white/10 hover:bg-white/10"
-                            }`}
-                          >
-                            {COFFRE_LABEL}
-                          </button>
-                        </form>
+                  <tr key={account.id}>
+                    <td className="adm-user-email">{account.email}</td>
+                    <td><TierState tier={account.tier} /></td>
+                    <td>
+                      <div className="adm-tier-actions" aria-label={`Modifier le palier de ${account.email}`}>
+                        {([null, "beginner", "full"] as const).map((tier) => (
+                          <form action={setUserTier.bind(null, account.id, tier)} key={tier ?? "free"}>
+                            <button type="submit" aria-current={(tier === null ? account.tier === null || account.tier === "free" : account.tier === tier) ? "true" : undefined}>
+                              {tierLabel(tier)}
+                            </button>
+                          </form>
+                        ))}
                       </div>
                     </td>
-
-                    {/* Dernière connexion */}
-                    <td className="px-5 py-4">
-                      {seen.style === "online" ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          En ligne
-                        </span>
-                      ) : seen.style === "never" ? (
-                        <span className="text-white/25 text-[13px]">-</span>
-                      ) : (
-                        <span className="text-white/40 text-[13px]">{seen.label}</span>
-                      )}
-                    </td>
-
-                    <td className="px-5 py-4">
-                      {u.currentPath ? (
-                        <div className="flex flex-col gap-1">
-                          <span className="max-w-[220px] truncate rounded-md border border-white/8 bg-white/[0.03] px-2 py-1 font-mono text-xs text-white/55">
-                            {u.currentPath}
-                          </span>
-                          <span className="text-[11px] text-white/25">{u.lastEvent ?? "activity"}</span>
-                        </div>
-                      ) : (
-                        <span className="text-white/25 text-[13px]">-</span>
-                      )}
-                    </td>
-
-                    <td className="px-5 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5 tabular-nums">
-                        <span className={`text-sm font-semibold ${u.pageViews24h > 0 ? "text-[#e8d5b0]" : "text-white/25"}`}>
-                          {u.pageViews24h}
-                        </span>
-                        <span className="text-white/15 text-xs">/</span>
-                        <span className={`text-sm ${u.pageViews7d > 0 ? "text-white/60" : "text-white/25"}`}>
-                          {u.pageViews7d}
-                        </span>
-                        <span className="text-white/15 text-xs">/</span>
-                        <span className={`text-sm ${u.pageViews30d > 0 ? "text-white/40" : "text-white/25"}`}>
-                          {u.pageViews30d}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Blocs chips */}
-                    <td className="px-5 py-4">
-                      <div className="flex flex-wrap gap-1.5">
-                        {blocks.length === 0 ? (
-                          <span className="text-white/25 text-[13px]">-</span>
-                        ) : (
-                          blocks
-                            .slice()
-                            .sort((a, b) => a - b)
-                            .map((b) => (
-                              <span
-                                key={b}
-                                className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 text-[#e8d5b0] text-[12px] font-semibold"
-                              >
-                                {b}
-                              </span>
-                            ))
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Progress bar */}
-                    <td className="px-5 py-4 min-w-[140px]">
-                      <div className="flex items-center gap-3 justify-end">
-                        <div className="w-24 h-1.5 bg-white/8 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-[#e8d5b0]/50 to-[#e8d5b0] rounded-full transition-all"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                        <span className="text-[12px] text-white/40 tabular-nums w-9 text-right">
-                          {pct}%
-                        </span>
-                      </div>
-                    </td>
+                    <td>{lastSeen.online ? <span className="adm-status" data-status="online"><i aria-hidden="true" />En ligne</span> : lastSeen.label}</td>
+                    <td className="adm-table-wide"><code>{account.currentPath ?? "Pas encore"}</code></td>
+                    <td className="adm-table-num adm-table-medium">{account.pageViews24h} / {account.pageViews7d} / {account.pageViews30d}</td>
+                    <td className="adm-table-num"><span className="adm-progress"><span><i style={{ width: `${totalBlocs ? completed / totalBlocs * 100 : 0}%` }} /></span><small>{completed} / {totalBlocs}</small></span></td>
                   </tr>
                 );
               })}
-
-              {pageUsers.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={8}
-                    className="px-5 py-10 text-center text-white/30 text-sm"
-                  >
-                    Aucun utilisateur trouvé.
-                  </td>
-                </tr>
-              )}
+              {pageUsers.length === 0 ? <tr><td colSpan={7} className="adm-table-empty">Aucun utilisateur trouvé.</td></tr> : null}
             </tbody>
           </table>
         </div>
-      </div>
 
-      {/* Pagination */}
-      {filteredUsers.length > 0 && (
-        <div className="flex items-center justify-between mt-4 px-1">
-          <p className="text-xs text-white/30">
-            {filteredUsers.length} membre{filteredUsers.length !== 1 ? "s" : ""} · page {safePage} / {totalPages}
-          </p>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={safePage <= 1}
-              className="px-3 py-1.5 rounded-lg text-[13px] font-medium bg-white/[0.03] text-white/50 border border-white/8 hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-            >
-              Précédent
-            </button>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={safePage >= totalPages}
-              className="px-3 py-1.5 rounded-lg text-[13px] font-medium bg-white/[0.03] text-white/50 border border-white/8 hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-            >
-              Suivant
-            </button>
+        <div className="adm-pagination">
+          <p>{filteredUsers.length} membre{filteredUsers.length > 1 ? "s" : ""}, page {safePage} sur {pageCount}</p>
+          <div>
+            <button type="button" disabled={safePage === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>Précédent</button>
+            <button type="button" disabled={safePage === pageCount} onClick={() => setPage((current) => Math.min(pageCount, current + 1))}>Suivant</button>
           </div>
         </div>
-      )}
+      </section>
     </div>
   );
 }

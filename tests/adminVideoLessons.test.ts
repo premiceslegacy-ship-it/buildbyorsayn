@@ -87,6 +87,7 @@ test("video admin routes authorize before Mux and the webhook unwraps the raw si
   assert.match(createRoute, /generated_subtitles/);
   assert.match(webhookRoute, /webhooks\.unwrap\(bounded\.text, request\.headers\)/);
   assert.match(webhookRoute, /pickSignedPlaybackId/);
+  assert.match(webhookRoute, /syncMuxTranscriptForReadyAsset/);
   assert.doesNotMatch(webhookRoute, /request\.json\(\)/);
 });
 
