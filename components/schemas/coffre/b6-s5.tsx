@@ -10,7 +10,7 @@ export function MemeVeriteTroisSurfacesDiagram() {
     legend="Une contradiction attire peut-être un clic, puis déçoit au premier usage."
     ariaLabel="Trois cercles autour d'un même centre, la même promesse. Le produit, mis en avant, fait ce qui est promis aujourd'hui. La page reprend les mêmes mots. La conversation commerciale garde les mêmes limites."
     accent={EM}
-    core="Même promesse"
+    core="Promesse"
     accentIndex={0}
     rings={[
       { label: "Produit", detail: "Ce qu'il fait aujourd'hui" },

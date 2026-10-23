@@ -268,7 +268,7 @@ function Hero({ s, q }: { s: Extract<SiteSection, { kind: "hero" }>; q: Quality 
     : s.image === "orbs"
       ? <Pinned pins={p} slot="image" q={q}><Orbs /></Pinned>
       : s.image
-        ? <Pinned pins={p} slot="image" q={q}><figure className={styles.heroFigure}><Photo src={s.image} alt={s.imageAlt} />{s.caption ? <figcaption>{s.caption}</figcaption> : null}</figure></Pinned>
+        ? <Pinned pins={p} slot="image" q={q}><div className={styles.heroFigure}><Photo src={s.image} alt={s.imageAlt} />{s.caption ? <span className={styles.heroCaption}>{s.caption}</span> : null}</div></Pinned>
         : null;
 
   if (s.variant === "editorial") {
@@ -305,7 +305,7 @@ function Section({ s, q }: { s: SiteSection; q: Quality }) {
             <Pinned pins={p} slot="text" q={q}><p className={styles.lead}>{s.text}</p></Pinned>
             {s.cta ? <Cta pins={p} q={q}>{s.cta}</Cta> : null}
           </div>
-          <Pinned pins={p} slot="image" q={q}><figure className={styles.storyFigure}><Photo src={s.image} alt={s.imageAlt} /></figure></Pinned>
+          <Pinned pins={p} slot="image" q={q}><div className={styles.storyFigure}><Photo src={s.image} alt={s.imageAlt} /></div></Pinned>
         </div>
       </section>;
     }

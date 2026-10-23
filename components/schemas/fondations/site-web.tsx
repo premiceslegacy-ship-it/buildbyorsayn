@@ -12,7 +12,7 @@ export function LandingRateeLandingUtileMockup() {
     afterTitle="Page utile"
     before={{
       eyebrow: "Expérience florale",
-      heading: "Sublimez chaque instant",
+      heading: "Des fleurs uniques",
       subtitle: "Des créations uniques",
       button: "Découvrir",
       proofs: ["Commencer", "Trois cartes", "Faux compteur"],

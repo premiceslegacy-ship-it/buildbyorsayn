@@ -8,7 +8,7 @@ export function UnOutilUnRoleDiagram() {
     title="Un outil, un rôle"
     description="Six rôles autour de ton projet, et un seul outil principal pour tenir chacun d'eux."
     legend="Si tu ne sais pas dire pourquoi un logo est là, il sort de la carte."
-    ariaLabel="Une carte de six rôles avec un outil chacun. Chercher avec NotebookLM, Penser avec Claude, Dessiner avec Figma, Construire avec Claude Code, Stocker avec Supabase, Livrer avec Vercel, mis en avant."
+    ariaLabel="Une carte de six rôles avec un outil chacun. Chercher avec NotebookLM, Penser avec Claude, Dessiner avec Figma, Construire avec Claude Code, Données avec Supabase, Livrer avec Vercel, mis en avant."
     accent={EM}
     accentGroup={5}
     groups={[
@@ -16,7 +16,7 @@ export function UnOutilUnRoleDiagram() {
       { role: "Penser", tools: [{ name: "Claude", description: "Clarifier le projet" }] },
       { role: "Dessiner", tools: [{ name: "Figma", description: "Poser les écrans" }] },
       { role: "Construire", tools: [{ name: "Claude Code", description: "Écrire le code" }] },
-      { role: "Stocker", tools: [{ name: "Supabase", description: "Garder les données" }] },
+      { role: "Données", tools: [{ name: "Supabase", description: "Garder les données" }] },
       { role: "Livrer", tools: [{ name: "Vercel", description: "Mettre en ligne" }] },
     ]}
   />;

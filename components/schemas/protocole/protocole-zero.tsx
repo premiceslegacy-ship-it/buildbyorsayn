@@ -243,9 +243,9 @@ export function ChangerDOutilSansRetomberDiagram() {
         { name: "Gemini", description: "Remplaçable" },
       ] },
       { role: "Ce que tu gardes", tools: [
-        { name: "Tes fiches", description: "Ta méthode écrite" },
-        { name: "Tes règles", description: "Ce qui reste vrai" },
-        { name: "Tes tests", description: "Pour vérifier le nouvel outil" },
+        { name: "Fiches", description: "Écrites" },
+        { name: "Règles", description: "Stables" },
+        { name: "Tests", description: "Rejouables" },
       ] },
     ]}
   />;

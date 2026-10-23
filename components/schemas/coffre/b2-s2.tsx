@@ -8,7 +8,7 @@ export function CarteDesOutilsParRoleDiagram() {
     title="Six rôles, puis les outils"
     description="Tu poses d'abord les rôles du projet, puis un outil principal pour chacun, jamais l'inverse."
     legend="Une marque ne reçoit jamais un rôle avant que le projet en ait besoin."
-    ariaLabel="Carte des outils par rôle : chercher avec NotebookLM, réfléchir avec Claude ou ChatGPT, dessiner avec Figma, construire avec Cursor ou Claude Code, stocker les versions avec GitHub, livrer avec Vercel."
+    ariaLabel="Carte des outils par rôle : chercher avec NotebookLM, réfléchir avec Claude ou ChatGPT, dessiner avec Figma, construire avec Cursor ou Claude Code, versionner avec GitHub, livrer avec Vercel."
     accent={EM}
     accentGroup={-1}
     groups={[
@@ -16,7 +16,7 @@ export function CarteDesOutilsParRoleDiagram() {
       { role: "Réfléchir", tools: [{ name: "Claude", description: "Raisonne sur la tâche" }, { name: "ChatGPT", description: "Compare sa sortie" }] },
       { role: "Dessiner", tools: [{ name: "Figma", description: "Pose l'interface" }] },
       { role: "Construire", tools: [{ name: "Cursor", description: "Montre le code" }, { name: "Claude Code", description: "Exécute au terminal" }] },
-      { role: "Stocker", tools: [{ name: "GitHub", description: "Garde les versions" }] },
+      { role: "Versions", tools: [{ name: "GitHub", description: "Garde les versions" }] },
       { role: "Livrer", tools: [{ name: "Vercel", description: "Met le site en ligne" }] },
     ]}
   />;

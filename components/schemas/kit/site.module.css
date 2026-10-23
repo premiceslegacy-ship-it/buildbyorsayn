@@ -194,7 +194,7 @@
 .heroSplit { display: grid; gap: clamp(28px, 6cqi, 44px); align-items: center; }
 .heroSplit .heroFigure, .storyFigure { overflow: hidden; border-radius: 20px; aspect-ratio: 4 / 3; background: var(--s-card); }
 .heroFigure { position: relative; }
-.heroFigure figcaption { position: absolute; left: 12px; bottom: 12px; right: 12px; padding: 7px 11px; width: fit-content; max-width: calc(100% - 24px); border-radius: 10px; background: rgba(255, 255, 255, .88); color: #1b1b1b; font: 550 13px/1.3 -apple-system, system-ui, sans-serif; backdrop-filter: blur(8px); }
+.heroFigure .heroCaption { position: absolute; left: 12px; bottom: 12px; right: 12px; padding: 7px 11px; width: fit-content; max-width: calc(100% - 24px); border-radius: 10px; background: rgba(255, 255, 255, .88); color: #1b1b1b; font: 550 13px/1.3 -apple-system, system-ui, sans-serif; backdrop-filter: blur(8px); }
 @container site (min-width: 560px) {
   .heroSplit { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); }
   .heroSplit .heroFigure { aspect-ratio: 4 / 5; }

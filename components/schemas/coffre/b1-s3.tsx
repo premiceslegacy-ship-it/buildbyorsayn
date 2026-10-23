@@ -49,11 +49,11 @@ export function ContexteQuiPasseDiagram() {
 export function MainAuxDecisionsDiagram() {
   return <Workflow
     title="Ta main là où ça engage"
-    description="Ton agent prépare, mais le prix et l'envoi au client passent par une personne qui dit oui."
+    description="L'IA prépare, mais le prix et l'envoi au client passent par une personne qui dit oui."
     legend="Une connexion ne donne jamais le droit de décider : le responsable reste visible."
-    ariaLabel="Ton agent prépare le dossier, tu fixes le prix puis tu valides l'envoi, et le client reçoit l'offre. Le prix et l'envoi portent une validation humaine, l'envoi est mis en avant."
+    ariaLabel="L'IA prépare le dossier, tu fixes le prix puis tu valides l'envoi, et le client reçoit l'offre. Le prix et l'envoi portent une validation humaine, l'envoi est mis en avant."
     accent={EM}
-    actors={["Ton agent", "Toi", "Le client"]}
+    actors={["L'IA", "Toi", "Le client"]}
     accentIndex={2}
     steps={[
       { actor: 0, label: "Prépare" },

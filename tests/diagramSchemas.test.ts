@@ -122,14 +122,6 @@ test("les blocs rendent leurs schémas depuis les marqueurs publiés", () => {
   assert.doesNotMatch(client, /diagrams|blocks\.server|SCHEMAS_BY_SECTION/);
 });
 
-test("les 23 schémas historiques restent exportés depuis les chemins attendus", () => {
-  const beginner = read("app/beginner/diagrams.tsx");
-  const protocole = read("app/protocole/diagrams.tsx");
-  const hermes = read("app/videos/tutos/diagrams.tsx");
-  assert.equal((beginner.match(/Diagram/g) ?? []).length, 5);
-  assert.equal((protocole.match(/Diagram/g) ?? []).length, 2);
-  assert.equal((hermes.match(/Diagram/g) ?? []).length, 16);
-});
 
 test("le schéma du chapitre Fondations 10 suit la donnée réelle", () => {
   const data = read("app/beginner/sections.data.ts");

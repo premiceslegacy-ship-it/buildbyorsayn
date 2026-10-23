@@ -6,7 +6,6 @@ import { ReaderView, type ReaderChapter } from "@/components/reader/ReaderView";
 import { navIdentity } from "@/lib/auth/navIdentity.server";
 import { hermesIntroductionMarkdown } from "@/lib/hermes/content";
 import { chapterTitle, withoutLeadingTitle } from "../../../doctrine/markdown";
-import { CHAPTER_DIAGRAMS } from "../chapterDiagrams";
 import { CHAPTER_META, chapterRedirectFromSlug, chapterSlug, chapterPathFromSlug, orderCurriculumFiles } from "../chapters";
 import { hermesGate } from "../gate.server";
 
@@ -40,7 +39,6 @@ export default async function HermesChapterPage({ params }: { params: Promise<{ 
     summary: CHAPTER_META[entry.path]?.summary,
     href: `/videos/tutos/${chapterSlug(entry.path)}`,
     markdown: entry.path === file.path ? body : undefined,
-    diagram: entry.path === file.path ? CHAPTER_DIAGRAMS[entry.path] : undefined,
   }));
 
   return <DaRoot className="da-app has-tabbar">

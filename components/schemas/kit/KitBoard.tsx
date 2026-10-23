@@ -734,7 +734,7 @@ const entries: readonly KitEntry[] = [
             nav: { brand: "Karim Placo", links: ["Services", "À propos", "Contact"], cta: "Devis" },
             sections: [
               { kind: "hero", variant: "centered", eyebrow: "✦ Solutions innovantes", title: "Sublimez vos intérieurs", accent: "intérieurs", text: "Des finitions d'exception pour des espaces qui vous ressemblent.", cta: "Découvrir", cta2: "En savoir plus", image: "orbs", pins: { eyebrow: 1, title: 2, cta2: 3 } },
-              { kind: "cards", title: "Pourquoi nous choisir", items: [{ title: "Rapide", text: "Un service efficace.", icon: "zap" }, { title: "Fiable", text: "Une qualité garantie.", icon: "shield" }, { title: "Innovant", text: "Des solutions modernes.", icon: "sparkles" }], pins: { items: 4 } },
+              { kind: "cards", title: "Pourquoi choisir", items: [{ title: "Rapide", text: "Un service efficace.", icon: "zap" }, { title: "Fiable", text: "Une qualité garantie.", icon: "shield" }, { title: "Innovant", text: "Des solutions modernes.", icon: "sparkles" }], pins: { items: 4 } },
             ],
           }}
           slopNotes={[

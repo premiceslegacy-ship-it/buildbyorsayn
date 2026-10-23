@@ -120,11 +120,11 @@ function buildSite(page: WebPageData, quality: Quality, pinOf: (slot: SiteSlot) 
   const sections: SiteSection[] = [hero];
   // Dans une comparaison, `proofs` décrit ce que la page fait (légende), pas du contenu de page.
   if (slop && (compare || page.proofs?.length)) {
-    sections.push({ kind: "cards", title: "Pourquoi nous choisir", items: SLOP_CARDS, pins: pin("items") });
+    sections.push({ kind: "cards", title: "Pourquoi choisir", items: SLOP_CARDS, pins: pin("items") });
   } else if (!compare && page.proofs?.length) {
     sections.push({ kind: "proof", logos: page.proofs, pins: pin("logos") });
   }
-  if (page.faq) sections.push({ kind: "faq", title: "Questions fréquentes", items: [{ q: page.faq }], pins: pin("faq") });
+  if (page.faq) sections.push({ kind: "faq", title: "Questions utiles", items: [{ q: page.faq }], pins: pin("faq") });
   if (slop && page.offer) sections.push({ kind: "faq", title: "En savoir plus", items: [{ q: page.offer }], pins: pin("note") });
 
   return {
