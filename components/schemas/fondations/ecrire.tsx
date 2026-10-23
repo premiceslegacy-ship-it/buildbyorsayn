@@ -66,7 +66,7 @@ export function PreuveAuBonEndroitDiagram() {
     accent={EM}
     page={{
       nav: "Atelier de Mehdi",
-      heading: "Ton vélo fait un bruit quand tu forces ? Je le trouve sous 48 h",
+      heading: "Le bruit de ton vélo, diagnostiqué sous 48 h",
       subtitle: "Dépose-le. Je vérifie, tu valides le devis avant que je touche à quoi que ce soit.",
       button: "Demander un diagnostic",
       photo: "velo",

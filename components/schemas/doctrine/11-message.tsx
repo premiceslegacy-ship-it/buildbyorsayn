@@ -48,7 +48,7 @@ export function PageQuiAideAChoisirDiagram() {
       url: "tonsite.fr",
       nav: "Ton entreprise",
       eyebrow: "Pour les artisans du bâtiment",
-      heading: "Artisans du bâtiment : repère la pièce qui manque avant que le chantier s'arrête",
+      heading: "Repère la pièce qui manque avant que le chantier s'arrête",
       subtitle: "Nous préparons le dossier, tu valides chaque envoi.",
       button: "Montre-moi un dossier bloqué",
       screen: { title: "Devis signé, pièce manquante", rows: [{ left: "Devis 2024-118", right: "signé", state: "ok" }, { left: "Attestation d'assurance", right: "manquante", state: "warn" }, { left: "Chantier", right: "bloqué", state: "warn" }] },

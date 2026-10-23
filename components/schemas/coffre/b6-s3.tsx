@@ -32,7 +32,7 @@ export function FormulaireDeuxMetiersDiagram() {
       url: "cabinet-kine.fr/compte",
       nav: "Cabinet",
       eyebrow: "Créer un compte",
-      heading: "Crée ton compte pour demander un rendez‑vous",
+      heading: "Ton rendez‑vous chez le kiné, pris en deux minutes",
       subtitle: "Ton nom, ton e-mail, puis le rôle demandé.",
       button: "Créer mon compte",
       fields: [{ label: "Nom", value: "Camille Roche" }, { label: "E-mail", value: "Ton adresse e-mail" }, { label: "Rôle", value: "Patient", kind: "select" }],

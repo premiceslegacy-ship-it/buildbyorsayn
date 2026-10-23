@@ -72,7 +72,7 @@ export function LandingProduitAnnoteeDiagram() {
       url: "tableau-demandes.fr",
       nav: "Demandes",
       eyebrow: "Pour les entreprises de nettoyage",
-      heading: "Les demandes de tes clients de nettoyage, dans un seul tableau",
+      heading: "Toutes tes demandes de nettoyage dans un seul tableau",
       subtitle: "Le formulaire remplit le tableau. Tu prépares la relance, puis tu la valides.",
       button: "Voir le tableau",
       screen: { title: "Tableau des demandes", rows: [{ left: "Mme Roux, bureaux", right: "devis à relancer", state: "warn" }, { left: "Copropriété Les Tilleuls", right: "visite jeudi", state: "ok" }, { left: "M. Lopez, vitres", right: "nouvelle demande", state: "todo" }] },

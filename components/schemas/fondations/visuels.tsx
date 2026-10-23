@@ -19,7 +19,7 @@ export function LandingGeneriqueContreMarqueMockup() {
     }}
     after={{
       nav: "Maison Lila",
-      heading: "Ton bouquet prêt demain matin, composé pour ton occasion",
+      heading: "Ton bouquet prêt demain matin",
       subtitle: "Choisis l'occasion. Maison Lila te rappelle avant la composition.",
       button: "Commander un bouquet",
       photo: "fleuriste",
@@ -106,10 +106,10 @@ export function DesignSystemOuvertMockup() {
       accent={EM}
       page={{
         nav: "Ton produit",
-        heading: "Un titre lisible, une action claire",
-        subtitle: "Le texte se lit, la surface repose l'œil.",
-        button: "Action principale",
-        screen: { title: "Envoi d'un message", rows: [{ left: "Chargement", right: "en cours", state: "todo" }, { left: "Erreur", right: "e-mail invalide", state: "warn" }, { left: "Succès", right: "message envoyé", state: "ok" }] },
+        heading: "Envoie tes devis en deux minutes",
+        subtitle: "Choisis le client, vérifie le montant, envoie. Chaque étape te dit ce qui se passe.",
+        button: "Envoyer le devis",
+        screen: { title: "Envoi du devis", rows: [{ left: "Chargement", right: "en cours", state: "todo" }, { left: "Erreur", right: "montant manquant", state: "warn" }, { left: "Succès", right: "devis envoyé", state: "ok" }] },
       }}
       annotations={[
         { number: 1, target: "heading", label: "Typographie", why: "Le fichier fixe la taille et la police du titre : tous les écrans le reprennent.", alt: "Une seule police, deux graisses." },

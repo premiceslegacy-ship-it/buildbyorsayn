@@ -19,7 +19,7 @@ export function LandingRateeLandingUtileMockup() {
     }}
     after={{
       nav: "Maison Lila",
-      heading: "Ton bouquet prêt demain matin, composé pour ton occasion",
+      heading: "Ton bouquet prêt demain matin",
       subtitle: "Dis-nous l'occasion et le budget. Maison Lila te rappelle avant de composer.",
       button: "Commander un bouquet",
       photo: "fleuriste",

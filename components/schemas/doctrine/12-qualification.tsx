@@ -31,7 +31,7 @@ export function FormulaireQuiRendQuelqueChoseMockup() {
       url: "tonsite.fr/diagnostic",
       nav: "Atelier devis",
       eyebrow: "Diagnostic en trois questions",
-      heading: "Où ton dernier devis a-t-il bloqué ?",
+      heading: "Trouve où ton dernier devis a bloqué",
       subtitle: "Dernier cas, ce qui bloque, qui décide. Rien d'autre.",
       button: "Voir ma carte",
       fields: [{ label: "Dernier cas", value: "Le devis de la salle de bains" }, { label: "Ce qui bloque", value: "Le client attend le prix" }, { label: "Qui décide", value: "Mon associé", kind: "select" }],

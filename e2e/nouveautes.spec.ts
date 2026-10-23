@@ -136,7 +136,7 @@ publicTest.describe("Nouveautés (security and performance)", () => {
   });
 
   publicTest("an oversized WebSub body is refused without work", async ({ request }) => {
-    const response = await request.post("/api/youtube/websub", { data: "x".repeat(300 * 1024), headers: { "content-type": "application/atom+xml" } });
+    const response = await request.post("/api/youtube/websub", { data: "x".repeat(300 * 1024), headers: { "content-type": "application/atom+xml", connection: "close" } });
     publicExpect(response.status()).toBe(413);
   });
 

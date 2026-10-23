@@ -80,7 +80,7 @@ export function IADansLeProduitDiagram() {
       url: "cabinet.app/dossiers",
       nav: "Dossiers du jour",
       eyebrow: "Synthèse préparée",
-      heading: "Dossier Martin : deux pièces manquent",
+      heading: "Dossier Martin, deux pièces à récupérer",
       subtitle: "Bail expiré, relevé absent. Rien ne part au client sans toi.",
       button: "Relire et valider",
       screen: { title: "Dossier Martin", rows: [{ left: "Avis d'impôt", right: "reçu", state: "ok" }, { left: "Bail", right: "expiré", state: "warn" }, { left: "Relevé", right: "absent", state: "warn" }], footer: "Rien ne part au client sans ton accord" },
