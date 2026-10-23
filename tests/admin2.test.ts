@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { shouldCloseAdminMenu } from "../components/admin/AdminShell";
 import { buildNewsInputSchema } from "../lib/buildNews/model";
 import { mergeNouveautesItems } from "../lib/nouveautes/videos";
 import {
@@ -10,6 +11,12 @@ import {
   selectMuxGeneratedSubtitleTrack,
   type MuxTranscriptClient,
 } from "../lib/mux/transcript";
+
+test("le menu admin se ferme uniquement avec Échap quand il est ouvert", () => {
+  assert.equal(shouldCloseAdminMenu("Escape", true), true);
+  assert.equal(shouldCloseAdminMenu("Escape", false), false);
+  assert.equal(shouldCloseAdminMenu("Enter", true), false);
+});
 
 test("build_news limite les champs et réserve l'écriture au service role après contrôle admin", async () => {
   const [migration, server] = await Promise.all([

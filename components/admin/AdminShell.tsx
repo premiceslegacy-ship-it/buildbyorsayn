@@ -60,10 +60,16 @@ function viewFromHash(): AdminViewKey {
   return HASH_TO_VIEW[window.location.hash.replace(/^#\/?/, "")] ?? "overview";
 }
 
+export function shouldCloseAdminMenu(key: string, menuOpen: boolean) {
+  return menuOpen && key === "Escape";
+}
+
 export function AdminShell({ userLabel, counts, views }: Props) {
   const [activeView, setActiveView] = useState<AdminViewKey>("overview");
   const [menuOpen, setMenuOpen] = useState(false);
   const activePanel = useRef<HTMLDivElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const closeMenuButton = useRef<HTMLButtonElement>(null);
   const activeItem = NAV_ITEMS.find((item) => item.key === activeView) ?? NAV_ITEMS[0];
 
   useEffect(() => {
@@ -83,6 +89,23 @@ export function AdminShell({ userLabel, counts, views }: Props) {
     );
   }, [activeView]);
 
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (!shouldCloseAdminMenu(event.key, menuOpen)) return;
+      event.preventDefault();
+      setMenuOpen(false);
+      window.requestAnimationFrame(() => menuButton.current?.focus());
+      void playAppSound("select");
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    window.requestAnimationFrame(() => closeMenuButton.current?.focus());
+  }, [menuOpen]);
+
   const selectView = (view: AdminViewKey) => {
     if (view === activeView) {
       setMenuOpen(false);
@@ -95,20 +118,23 @@ export function AdminShell({ userLabel, counts, views }: Props) {
   };
 
   const toggleMenu = () => {
-    setMenuOpen((current) => !current);
+    setMenuOpen((current) => {
+      if (current) window.requestAnimationFrame(() => menuButton.current?.focus());
+      return !current;
+    });
     void playAppSound("open");
   };
 
   return (
     <div className="adm-shell">
       <a className="adm-skip" href="#admin-main">Aller au contenu</a>
-      <aside className="adm-sidebar" data-open={menuOpen || undefined} aria-label="Administration">
+      <aside id="admin-navigation" className="adm-sidebar" data-open={menuOpen || undefined} aria-label="Administration">
         <div className="adm-side-head">
           <Link href="/admin#/vue" className="adm-logo" aria-label="BUILD, vue d'ensemble">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/da/logo-sombre.svg" alt="BUILD" width={104} height={30} />
           </Link>
-          <button className="adm-side-close" type="button" onClick={toggleMenu} aria-label="Fermer le menu">
+          <button ref={closeMenuButton} className="adm-side-close" type="button" onClick={toggleMenu} aria-label="Fermer le menu">
             <X aria-hidden="true" />
           </button>
         </div>
@@ -158,11 +184,13 @@ export function AdminShell({ userLabel, counts, views }: Props) {
       <div className="adm-workspace">
         <header className="adm-toolbar">
           <button
+            ref={menuButton}
             className="adm-menu-button"
             type="button"
             onClick={toggleMenu}
             aria-expanded={menuOpen}
-            aria-label="Ouvrir le menu"
+            aria-controls="admin-navigation"
+            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           >
             <Menu aria-hidden="true" />
           </button>
