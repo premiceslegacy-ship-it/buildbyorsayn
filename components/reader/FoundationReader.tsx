@@ -1,6 +1,5 @@
-"use client";
-
 import type { ReactNode } from "react";
+import { ProjectPipelineDiagram } from "@/components/schemas/foundations";
 import { ReaderView, type ReaderChapter } from "./ReaderView";
 import type { ReaderMode } from "./readerModel";
 
@@ -38,6 +37,7 @@ export function FoundationReader({
     summary: chapter.id === currentId ? summary : chapter.summary,
     href: chapter.href,
     content: chapter.id === currentId ? children : undefined,
+    diagram: chapter.id === currentId && currentId === "url" ? <ProjectPipelineDiagram /> : undefined,
   }));
 
   return <ReaderView

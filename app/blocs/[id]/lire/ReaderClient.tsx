@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { toggleBlocCompletion } from "@/app/actions/progress";
 import { NavBar } from "@/components/NavBar";
@@ -17,7 +17,7 @@ type BlocIdentity = {
   isAdmin: boolean;
 };
 
-export default function ReaderClient({ bloc, tier, identity, initialMode, initialChapter }: { bloc: DeliveredBloc; tier: string | null; identity: BlocIdentity; initialMode?: ReaderMode | null; initialChapter?: string | null }) {
+export default function ReaderClient({ bloc, diagrams, tier, identity, initialMode, initialChapter }: { bloc: DeliveredBloc; diagrams: Record<string, ReactNode>; tier: string | null; identity: BlocIdentity; initialMode?: ReaderMode | null; initialChapter?: string | null }) {
   const router = useRouter();
   const { checkedItems, toggleItem, globalProgress, isLoaded, setLastVisitedBloc } = useProgress();
   const previousGlobalProgress = useRef<number | null>(null);
@@ -53,7 +53,7 @@ export default function ReaderClient({ bloc, tier, identity, initialMode, initia
       title={bloc.titre}
       toolbarTitle={`Bloc ${bloc.displayNumber}`}
       backLabel={`Bloc ${bloc.displayNumber}`}
-      sections={bloc.sections}
+      sections={bloc.sections.map((section) => ({ ...section, diagram: diagrams[section.id] }))}
       totalSections={catalogBloc?.sections.length ?? bloc.sections.length}
       completedIds={checkedItems}
       initialMode={initialMode}

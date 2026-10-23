@@ -1,0 +1,234 @@
+.figure {
+  width: min(100%, 1136px);
+  min-width: 0;
+  margin: clamp(40px, 6vw, 72px) auto;
+  color: var(--t1);
+}
+
+.header {
+  display: grid;
+  gap: 12px;
+  max-width: 36em;
+  margin-bottom: 24px;
+}
+
+.title {
+  margin: 0;
+  color: var(--encre);
+  font: 600 21px/1.2 var(--font-t);
+  letter-spacing: -.02em;
+  text-wrap: balance;
+}
+
+.says {
+  margin: 0;
+  color: var(--t1);
+  font: 400 17px/1.47 var(--font);
+  text-wrap: pretty;
+}
+
+.drawing {
+  min-width: 0;
+}
+
+.caption {
+  max-width: 44em;
+  margin: 28px 0 0;
+  color: var(--t3);
+  font: 400 14px/1.45 var(--font);
+  text-wrap: pretty;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.wide {
+  max-width: 720px;
+}
+
+.compact {
+  display: none;
+  max-width: 380px;
+}
+
+.node {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.nodeRect {
+  fill: var(--carte);
+  stroke: none;
+}
+
+.nodeMuted .nodeRect {
+  fill: color-mix(in srgb, var(--encre) 8%, transparent);
+}
+
+.nodeHollow .nodeRect {
+  fill: none;
+  stroke: var(--t3);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 6;
+  stroke-linecap: round;
+}
+
+.nodeAccent .nodeRect {
+  fill: var(--em);
+}
+
+.text,
+.label {
+  fill: var(--t2);
+  stroke: none;
+  font: 400 14px/20px var(--font);
+  dominant-baseline: central;
+}
+
+.nodeTitle,
+.labelTitle,
+.labelMutedTitle {
+  fill: var(--encre);
+  stroke: none;
+  font: 600 17px/24px var(--font-t);
+  letter-spacing: -.01em;
+  dominant-baseline: central;
+}
+
+.labelMutedTitle {
+  fill: var(--t2);
+}
+
+.nodeSmall {
+  fill: var(--encre);
+  stroke: none;
+  font: 500 14px/20px var(--font);
+  dominant-baseline: central;
+}
+
+.nodeSub,
+.nodeNum,
+.labelText {
+  fill: var(--t2);
+  stroke: none;
+  font: 400 14px/20px var(--font);
+  dominant-baseline: central;
+}
+
+.labelNote {
+  fill: var(--t3);
+}
+
+.labelAccent {
+  fill: var(--em);
+}
+
+.labelError {
+  fill: var(--err);
+}
+
+.nodeAccent :is(.nodeTitle, .nodeSmall) {
+  fill: var(--sur-em);
+}
+
+.nodeAccent :is(.nodeSub, .nodeNum) {
+  fill: color-mix(in srgb, var(--sur-em) 78%, transparent);
+}
+
+.edgeLine,
+.edgeHead,
+.fixedLine {
+  fill: none;
+  stroke: var(--t3);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.edgeLine {
+  stroke-dasharray: 1 2;
+}
+
+.edgeDashed .edgeLine {
+  stroke-dasharray: 2 6;
+}
+
+.edgeAccent :is(.edgeLine, .edgeHead),
+.fixedAccent {
+  stroke: var(--em);
+}
+
+.edgeTrajectory .edgeLine {
+  stroke-width: 3;
+}
+
+.fixedLine {
+  stroke: var(--trait);
+}
+
+.fixedDashed {
+  stroke: var(--t3);
+  stroke-dasharray: 2 6;
+}
+
+.prepared [data-schema-node] {
+  opacity: 0;
+}
+
+.prepared [data-schema-edge] .edgeLine {
+  stroke-dashoffset: 1;
+}
+
+.prepared [data-schema-edge] .edgeHead,
+.prepared [data-schema-edge].edgeDashed .edgeLine {
+  opacity: 0;
+}
+
+@media (max-width: 734px) {
+  .figure {
+    width: 100%;
+    margin-block: 40px;
+  }
+
+  .wide {
+    display: none;
+  }
+
+  .compact {
+    display: block;
+  }
+}
+
+@media (min-width: 735px) {
+  .title {
+    font-size: 24px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .figure {
+    display: grid;
+    grid-template-columns: minmax(0, 22rem) minmax(0, 720px);
+    column-gap: 64px;
+    align-items: start;
+  }
+
+  .header {
+    position: sticky;
+    top: 32px;
+    margin-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prepared [data-schema-node],
+  .prepared [data-schema-edge] .edgeLine,
+  .prepared [data-schema-edge] .edgeHead {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}

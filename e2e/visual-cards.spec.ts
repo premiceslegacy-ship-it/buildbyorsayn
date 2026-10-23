@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
-import { test as authedTest, expect as authedExpect, hasE2eAccount } from "./fixtures/auth";
+import { test as authedTest, expect as authedExpect, hasBeginnerE2eAccount, hasE2eAccount } from "./fixtures/auth";
 
 async function waitForStableCardGrid(page: Page, grid: Locator) {
   await grid.scrollIntoViewIfNeeded();
@@ -61,6 +61,37 @@ authedTest.describe("Diagram visual regression", () => {
     await authedExpect(page.getByRole("radio", { name: "Texte" })).toHaveAttribute("aria-checked", "true");
     const frame = page.getByRole("figure", { name: "La fenêtre de contexte se remplit, puis oublie" });
     await authedExpect(frame).toBeVisible({ timeout: 10_000 });
+    await authedExpect(frame.getByRole("img", { name: /La fenêtre de contexte se remplit, puis oublie/ })).toBeVisible();
     await authedExpect(frame).toHaveScreenshot("diagram-frame-no-overlap.png");
+  });
+
+  authedTest("a block diagram appears only in its real chapter", async ({ authedPage: page }) => {
+    await page.goto("/blocs/1/lire?mode=text&chapter=b1-s0");
+    await authedExpect(page.getByRole("figure", { name: "Même demande, deux façons de travailler" })).toBeVisible();
+    await authedExpect(page.getByRole("figure", { name: "L'écart grandit chaque mois" })).toBeVisible();
+    await authedExpect(page.getByRole("figure", { name: "Tu relies trois choses, l'IA suit" })).toHaveCount(0);
+  });
+
+  authedTest("reduced motion leaves the complete diagram visible", async ({ authedPage: page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/beginner/environnement?mode=text");
+    const frame = page.getByRole("figure", { name: "La fenêtre de contexte se remplit, puis oublie" });
+    await authedExpect(frame).toBeVisible();
+    await authedExpect.poll(() => frame.locator("[data-schema-node]").evaluateAll((nodes) => nodes.every((node) => getComputedStyle(node).opacity === "1"))).toBe(true);
+  });
+
+  authedTest("the real Fondations chapter 10 receives its diagram", async ({ authedPage: page }) => {
+    await page.goto("/beginner/url?mode=text");
+    await authedExpect(page.getByRole("figure", { name: "De l'idée à l'URL en ligne" })).toBeVisible();
+  });
+});
+
+authedTest.describe("Diagram entitlement boundary", () => {
+  authedTest.skip(!hasBeginnerE2eAccount, "E2E_BEGINNER_TEST_EMAIL/E2E_BEGINNER_TEST_PASSWORD not configured");
+
+  authedTest("a Fondations account never receives a LE COFFRE diagram", async ({ beginnerPage: page }) => {
+    await page.goto("/blocs/2/lire?mode=text&chapter=b2-s1");
+    await authedExpect(page.getByRole("figure", { name: "Peu d'outils, bien connus" })).toHaveCount(0);
+    await authedExpect(page.getByText("Trois oui", { exact: true })).toHaveCount(0);
   });
 });

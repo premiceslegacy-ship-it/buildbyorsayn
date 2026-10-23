@@ -865,7 +865,7 @@
 }
 
 .diagramSlot {
-  width: min(100vw - 40px, 720px);
+  width: min(100vw - 40px, 1136px);
   margin: clamp(34px, 5vw, 58px) 50% 0;
   transform: translateX(-50%);
 }
@@ -873,27 +873,9 @@
 .diagramSlot figure {
   margin: 0 !important;
   border: 0 !important;
-  border-radius: var(--r-l) !important;
-  background: var(--carte) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   box-shadow: none !important;
-}
-
-.diagramSlot svg [stroke="#e8d5b0"],
-.diagramSlot svg [stroke="#e8d5b0cc"],
-.diagramSlot svg [stroke="#e8d5b066"] {
-  stroke: var(--em) !important;
-}
-
-.diagramSlot svg [fill="#e8d5b0"],
-.diagramSlot svg [fill="#e8d5b0cc"],
-.diagramSlot svg [fill="#e8d5b088"],
-.diagramSlot svg [fill="#e8d5b022"] {
-  fill: var(--em) !important;
-}
-
-.diagramSlot svg [stop-color="#e8d5b02e"],
-.diagramSlot svg [stop-color="#e8d5b010"] {
-  stop-color: rgba(34, 217, 110, .16) !important;
 }
 
 .codeBlock {
