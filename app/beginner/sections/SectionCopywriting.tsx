@@ -25,8 +25,8 @@ const PROOF_QUESTIONS = [
 
 function ToolMark({ name, src }: { name: string; src: string }) {
   return (
-    <span className="inline-flex items-center gap-2 text-sm text-white/70">
-      <Image src={src} alt="" aria-hidden="true" width={24} height={24} className="h-6 w-6 object-contain" loading="lazy" />
+    <span className="inline-flex items-center gap-2 text-sm text-[var(--t2)]">
+      <Image src={src} alt="" aria-hidden="true" width={24} height={24} className="size-6 object-contain" loading="lazy" />
       {name}
     </span>
   );
@@ -36,10 +36,10 @@ export function SectionCopywriting() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
       <div className="mb-8 flex items-center gap-3">
-        <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">03</span>
-        <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Écrire pour que la bonne personne comprenne et réponde</h2>
+        <span className="text-xs font-semibold text-[var(--em)]">03</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-[var(--encre)] md:text-3xl">Écrire pour que la bonne personne comprenne et réponde</h2>
       </div>
-      <p className="mb-10 max-w-3xl text-base leading-relaxed text-white/60">
+      <p className="mb-10 max-w-3xl text-base leading-relaxed text-[var(--t2)]">
         Le copywriting organise une décision avec des mots. Un texte utile montre une situation, un progrès, le mécanisme de l'offre, la preuve disponible, les limites et la prochaine étape. Sa force reste proportionnée à ce que tu peux livrer et démontrer.
       </p>
 
@@ -50,12 +50,12 @@ export function SectionCopywriting() {
         <p>
           Construis ensuite une carte de message. Elle rassemble les éléments qui doivent rester cohérents depuis le premier contenu jusqu'à la livraison. Une case inconnue reste une question ou une hypothèse à tester. Tu ne la complètes jamais avec une invention pratique.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {MESSAGE_PARTS.map(([label, description], index) => (
             <div key={label} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#f0ede8]">{label}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--encre)]">{label}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p>
             </div>
           ))}
         </div>
@@ -68,16 +68,16 @@ export function SectionCopywriting() {
         <p>
           Une phrase claire nomme une personne, un moment et un changement observable. Les verbes généraux comme « optimiser » ou « transformer » demandent toujours une précision. Ton lecteur doit pouvoir répondre rapidement : « cela ressemble à mon cas » ou « cela ne me concerne pas ».
         </p>
-        <div className="grid gap-8 border-y border-white/10 py-6 md:grid-cols-2">
+        <div className="grid gap-8 border-y border-[var(--trait)] py-6 md:grid-cols-2">
           <div>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">Trop flou</p>
-            <p className="text-lg leading-relaxed text-white/55">« Nous aidons les entreprises à gagner du temps grâce à l'IA. »</p>
-            <p className="mt-4 text-sm leading-relaxed text-white/40">La phrase ne dit ni qui perd du temps, ni sur quelle tâche, ni comment le travail change.</p>
+            <p className="mb-3 text-xs font-semibold text-[var(--t3)]">Trop flou</p>
+            <p className="text-lg leading-relaxed text-[var(--t2)]">« Nous aidons les entreprises à gagner du temps grâce à l'IA. »</p>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--t3)]">La phrase ne dit ni qui perd du temps, ni sur quelle tâche, ni comment le travail change.</p>
           </div>
-          <div className="border-t border-[#e8d5b0]/30 pt-5 md:border-t-0 md:border-l md:pl-8">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/70">On comprend la scène</p>
-            <p className="text-lg leading-relaxed text-[#f0ede8]">« Le client explique son besoin au téléphone. Les photos utiles suivent dans un fil WhatsApp. Le flux réunit les deux pour attribuer la réponse et sa date. »</p>
-            <p className="mt-4 text-sm leading-relaxed text-white/50">Le problème, le mécanisme et le progrès sont visibles. Il reste à vérifier que cette scène existe chez les personnes visées et que le flux sait réellement la traiter.</p>
+          <div className="rounded-[var(--r-m)] bg-[var(--carte)] p-5">
+            <p className="mb-3 text-xs font-semibold text-[var(--t3)]">On comprend la scène</p>
+            <p className="text-lg leading-relaxed text-[var(--encre)]">« Le client explique son besoin au téléphone. Les photos utiles suivent dans un fil WhatsApp. Le flux réunit les deux pour attribuer la réponse et sa date. »</p>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--t3)]">Le problème, le mécanisme et le progrès sont visibles. Il reste à vérifier que cette scène existe chez les personnes visées et que le flux sait réellement la traiter.</p>
           </div>
         </div>
         <p>
@@ -89,12 +89,12 @@ export function SectionCopywriting() {
         <p>
           Le niveau de conscience décrit ce que la personne sait déjà du problème, des solutions et de ton offre. Choisis le point d'entrée à partir d'un signal observable : sa recherche, sa question, la page visitée ou une conversation. Une supposition sur son profil ne suffit pas.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {MOMENTS.map(([label, description], index) => (
             <div key={label} className="grid gap-3 py-4 sm:grid-cols-[2rem_12rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#f0ede8]">{label}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--encre)]">{label}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p>
             </div>
           ))}
         </div>
@@ -113,14 +113,14 @@ export function SectionCopywriting() {
         <p>
           Le mécanisme relie l'offre au progrès annoncé. Décris ses entrées, ses étapes, la validation humaine et sa sortie. Cette description permet au lecteur d'inspecter le chemin et t'empêche de cacher une promesse faible derrière un nom de méthode.
         </p>
-        <div className="grid gap-6 border-y border-white/10 py-6 md:grid-cols-2">
-          <div className="border-t border-white/10 pt-4">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">Promesse qui reste vague</p>
-            <p className="text-sm leading-relaxed text-white/55">« Un flux intelligent qui garde vos décisions et vos preuves. »</p>
+        <div className="grid gap-6 border-y border-[var(--trait)] py-6 md:grid-cols-2">
+          <div className="border-t border-[var(--trait)] pt-4">
+            <p className="mb-2 text-xs font-semibold text-[var(--t3)]">Promesse qui reste vague</p>
+            <p className="text-sm leading-relaxed text-[var(--t2)]">« Un flux intelligent qui garde vos décisions et vos preuves. »</p>
           </div>
-          <div className="border-t border-[#e8d5b0]/30 pt-4">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/70">Explication que l'on peut vérifier</p>
-            <p className="text-sm leading-relaxed text-white/75">« Après chaque appel, le flux range la demande avec sa source et propose une prochaine action. Une personne la valide avant qu'elle entre dans la file de l'équipe. »</p>
+          <div className="border-t border-[var(--trait)] pt-4">
+            <p className="mb-2 text-xs font-semibold text-[var(--t3)]">Explication que l'on peut vérifier</p>
+            <p className="text-sm leading-relaxed text-[var(--t1)]">« Après chaque appel, le flux range la demande avec sa source et propose une prochaine action. Une personne la valide avant qu'elle entre dans la file de l'équipe. »</p>
           </div>
         </div>
         <FoundationEditorialNote label="Montre le chemin">
@@ -132,16 +132,16 @@ export function SectionCopywriting() {
         <p>
           Une preuve lève une incertitude précise. La preuve du problème montre que la friction existe. La preuve du mécanisme montre le fonctionnement. La preuve de compétence permet de juger l'exécution. La preuve de résultat exige un cas autorisé, daté et contextualisé.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {PROOF_QUESTIONS.map(([question, answer], index) => (
             <div key={question} className="grid gap-3 py-4 sm:grid-cols-[2rem_15rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#e8d5b0]">{question}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{answer}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--menthe)]">{question}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{answer}</p>
             </div>
           ))}
         </div>
-        <p className="text-sm leading-relaxed text-white/45">
+        <p className="text-sm leading-relaxed text-[var(--t3)]">
           Place la preuve près de l'affirmation qu'elle soutient. Si tu cites un résultat, conserve la source, la date, le contexte, la méthode, l'autorisation et la limite. Un cas ne devient jamais une promesse universelle.
         </p>
         <p>
@@ -153,9 +153,9 @@ export function SectionCopywriting() {
         <p>
           Au premier contact, tu ignores encore si la personne vit la scène et souhaite en parler. Présente-toi, donne une observation pertinente et pose une seule question facile à refuser. Un lien, un dossier complet ou une urgence ajoutée trop tôt augmente l'effort avant d'avoir établi la pertinence.
         </p>
-        <div className="border-y border-white/10 py-6">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/70">Exemple simple</p>
-          <p className="max-w-2xl text-lg leading-relaxed text-[#f0ede8]">« Bonjour, est-ce que votre équipe reçoit des demandes par téléphone et des photos dans WhatsApp ? Si oui, comment décidez-vous qui reprend chaque dossier ? »</p>
+        <div className="border-y border-[var(--trait)] py-6">
+          <p className="mb-3 text-xs font-semibold text-[var(--t3)]">Exemple simple</p>
+          <p className="max-w-2xl text-lg leading-relaxed text-[var(--encre)]">« Bonjour, est-ce que votre équipe reçoit des demandes par téléphone et des photos dans WhatsApp ? Si oui, comment décidez-vous qui reprend chaque dossier ? »</p>
         </div>
         <FoundationEditorialNote label="Ce que tu attends">
           Une réponse honnête. Si la scène n'existe pas, remercie et arrête. Si elle existe, demande un exemple récent avant de présenter une piste. La conversation reste une recherche de pertinence.
@@ -166,12 +166,12 @@ export function SectionCopywriting() {
         <p>
           Une IA peut classer une recherche, raccourcir un brouillon, comparer des structures et proposer des variantes. Elle a besoin des faits, des mots réellement entendus, de la preuve autorisée, des limites et de l'action attendue. Toute information manquante doit rester visible.
         </p>
-        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-white/10 py-5">
+        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-[var(--trait)] py-5">
           <ToolMark name="Hermes Agent" src="/brand-logos/hermes-agent-mark.png" />
           <ToolMark name="ChatGPT" src="/brand-logos/chatgpt.svg" />
           <ToolMark name="Claude" src="/brand-logos/claude.svg" />
         </div>
-        <pre className="overflow-x-auto whitespace-pre-wrap break-words border-y border-white/10 py-5 font-mono text-xs leading-6 text-[#e8d5b0]">{`Surface et objectif : [où le texte sera lu et quelle décision il aide].
+        <pre className="overflow-x-auto whitespace-pre-wrap break-words border-y border-[var(--trait)] py-5 font-mono text-xs leading-6 text-[var(--menthe)]">{`Surface et objectif : [où le texte sera lu et quelle décision il aide].
 Personne et scène observée : [rôle, déclencheur, mots réellement entendus].
 Progrès et mécanisme livré : [changement, entrées, étapes, contrôle, sortie].
 Preuve autorisée : [problème, démonstration, compétence, cas, ou aucune].

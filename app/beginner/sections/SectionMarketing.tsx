@@ -27,10 +27,10 @@ export function SectionMarketing() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
       <div className="mb-8 flex items-center gap-3">
-        <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">05</span>
-        <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Capter l'attention et rester dans les têtes</h2>
+        <span className="text-xs font-semibold text-[var(--em)]">05</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-[var(--encre)] md:text-3xl">Capter l'attention et rester dans les têtes</h2>
       </div>
-      <p className="mb-10 max-w-3xl text-base leading-relaxed text-white/60">
+      <p className="mb-10 max-w-3xl text-base leading-relaxed text-[var(--t2)]">
         Le marketing relie une offre à des personnes qui peuvent en avoir besoin. Il transforme une situation réelle en message, choisit un canal, puis observe la qualité des réactions. L'objectif est une attention utile : la bonne personne reconnaît sa scène, comprend le progrès possible et sait quelle action choisir.
       </p>
 
@@ -50,12 +50,12 @@ export function SectionMarketing() {
         <p>
           Un funnel est le parcours qui va de la découverte à une action commerciale. Chaque étape répond à une question différente. Un inconnu cherche d'abord à comprendre. Une personne intéressée veut inspecter le mécanisme. Une personne prête à décider a besoin du périmètre, des conditions et de la suite.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {FUNNEL.map(([title, description], index) => (
             <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#e8d5b0]">{title}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--menthe)]">{title}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p>
             </div>
           ))}
         </div>
@@ -77,24 +77,24 @@ export function SectionMarketing() {
         <p>
           Étudie donc la mécanique au lieu de recopier la surface. Capture le lien, la date, le public apparent et les six champs ci-dessous. Reformule ensuite le principe sur une page blanche avec les faits de ton offre. Une phrase, une promesse ou un exemple reconnaissable reste chez sa source.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {OBSERVATION_FIELDS.map(([label, question], index) => (
             <div key={label} className="grid gap-3 py-4 sm:grid-cols-[2rem_8rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#f0ede8]">{label}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{question}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--encre)]">{label}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{question}</p>
             </div>
           ))}
         </div>
-        <p className="text-xs leading-relaxed text-white/45">Écarte les slogans vagues, les chiffres sans source ni période, les témoignages impossibles à contextualiser, les captures isolées et les conseils qui ne donnent aucun chemin de vérification.</p>
+        <p className="text-xs leading-relaxed text-[var(--t3)]">Écarte les slogans vagues, les chiffres sans source ni période, les témoignages impossibles à contextualiser, les captures isolées et les conseils qui ne donnent aucun chemin de vérification.</p>
       </FoundationChapter>
 
       <FoundationChapter eyebrow="Chapitre 4" title="Volume puis qualité, avec un signal de sortie">
-        <div className="grid gap-6 border-y border-white/10 py-5 md:grid-cols-2">
+        <div className="grid gap-6 border-y border-[var(--trait)] py-5 md:grid-cols-2">
           {RULES.map(([title, description]) => (
-            <div key={title} className="border-t border-[#c9b48a]/25 pt-4">
-              <p className="mb-2 text-sm font-semibold tracking-tight text-[#e8d5b0]">{title}</p>
-              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+            <div key={title} className="border-t border-[var(--trait)] pt-4">
+              <p className="mb-2 text-sm font-semibold tracking-tight text-[var(--menthe)]">{title}</p>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p>
             </div>
           ))}
         </div>
@@ -110,7 +110,7 @@ export function SectionMarketing() {
         <p>
           L'IA peut extraire des idées, proposer des découpages et adapter une source à plusieurs formats. Elle multiplie aussi les erreurs quand le contexte manque. Donne-lui une matière que tu as le droit d'utiliser, ta position, les faits autorisés, les limites et les règles propres au canal.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {[
             ["Source", "Une conversation consentie et anonymisée, une démonstration, une décision ou un contenu que tu possèdes."],
             ["Extraction", "Les scènes, objections, mécanismes et preuves présents dans la source, sans compléter les trous."],
@@ -118,13 +118,13 @@ export function SectionMarketing() {
             ["Contrôle", "La fidélité aux faits, les droits d'usage, la voix, les conditions et la possibilité de retirer le contenu."],
           ].map(([title, description], index) => (
             <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_8rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#f0ede8]">{title}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--encre)]">{title}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p>
             </div>
           ))}
         </div>
-        <pre className="overflow-x-auto whitespace-pre-wrap break-words border-b border-white/10 py-5 font-mono text-xs leading-6 text-[#e8d5b0]">{`À partir de cette source autorisée : [colle la source].
+        <pre className="overflow-x-auto whitespace-pre-wrap break-words border-b border-[var(--trait)] py-5 font-mono text-xs leading-6 text-[var(--menthe)]">{`À partir de cette source autorisée : [colle la source].
 Extrais les scènes, objections, mécanismes et preuves présents. Marque toute information manquante.
 Propose un format pour [canal] destiné à [public], avec une seule idée et une seule prochaine étape.
 N'invente aucun fait, chiffre, témoignage, urgence ou résultat. Termine par la liste des points à vérifier.`}</pre>
@@ -132,7 +132,7 @@ N'invente aucun fait, chiffre, témoignage, urgence ou résultat. Termine par la
 
       <FoundationChapter eyebrow="Chapitre 6" title="Un calendrier que tu peux réellement tenir">
         <p>Un plan éditorial organise une boucle d'apprentissage. Choisis une cadence qui laisse du temps pour observer, produire, répondre et analyser. Chaque contenu doit avoir un propriétaire, une date, un objectif et un signal de qualité.</p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {[
             ["Jour 1 : scène", "Décris une situation de travail reconnaissable et la conséquence actuelle, sans exagérer."],
             ["Jour 2 : mécanisme", "Explique une décision ou une méthode qui rend le progrès compréhensible, avec sa limite."],
@@ -141,9 +141,9 @@ N'invente aucun fait, chiffre, témoignage, urgence ou résultat. Termine par la
             ["Jour 5 : prochaine étape", "Propose un geste proportionné : répondre, regarder un exemple, demander un échange ou passer."],
           ].map(([title, description], index) => (
             <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_12rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#f0ede8]">{title}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--encre)]">{title}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p>
             </div>
           ))}
         </div>

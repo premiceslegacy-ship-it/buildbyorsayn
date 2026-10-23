@@ -10,12 +10,12 @@ export function FoundationEditorialNote({
   className?: string;
 }) {
   return (
-    <aside className={`my-10 border-y border-[#e8d5b0]/20 py-6 sm:py-7 ${className}`}>
-      <div className="grid gap-3 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-8">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/65">
+    <aside className={`my-10 rounded-[var(--r-m)] bg-[var(--carte)] p-5 sm:p-6 ${className}`}>
+      <div className="grid min-w-0 gap-3 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-8">
+        <span className="text-sm font-semibold text-[var(--em)]">
           {label}
-        </p>
-        <div className="max-w-2xl text-[15px] leading-7 text-[#f0ede8]/85">{children}</div>
+        </span>
+        <div className="min-w-0 max-w-2xl text-[17px] leading-[1.64] text-[var(--t1)]">{children}</div>
       </div>
     </aside>
   );

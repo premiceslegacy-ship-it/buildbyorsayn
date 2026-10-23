@@ -22,12 +22,12 @@ const RULES = [
 
 export function SectionMindset() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
       <div className="flex items-center gap-3 mb-8">
-        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">01</span>
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">L'état d'esprit pour transformer l'idée en test</h2>
+        <span className="text-xs font-semibold text-[var(--em)]">01</span>
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[var(--encre)]">L'état d'esprit pour transformer l'idée en test</h2>
       </div>
-      <p className="text-white/60 text-base leading-relaxed mb-10">
+      <p className="text-[var(--t2)] text-base leading-relaxed mb-10">
         Ton premier avantage vient de ta manière de décider. Une intuition devient utile quand tu la transformes en hypothèse, en test limité et en observation écrite. Cette méthode ne promet ni client ni revenu. Elle réduit seulement le temps passé à construire sur des suppositions.
       </p>
 
@@ -36,10 +36,10 @@ export function SectionMindset() {
         <p>
           Lire prépare une décision. Le terrain la corrige. Écris ce que tu crois vrai, choisis la plus petite action capable de contredire cette croyance, puis définis le signal que tu observeras. Une boucle d'apprentissage contient cinq éléments : hypothèse, test, signal, décision et trace écrite.
         </p>
-        <div className="grid gap-2 border-y border-white/10 py-4 sm:grid-cols-5">
+        <div className="grid gap-2 border-y border-[var(--trait)] py-4 sm:grid-cols-5">
           {["Hypothèse", "Test limité", "Signal", "Décision", "Trace"].map((step, index) => (
-            <div key={step} className="flex items-center gap-2 text-sm text-white/60">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
+            <div key={step} className="flex items-center gap-2 text-sm text-[var(--t2)]">
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
               <span>{step}</span>
             </div>
           ))}
@@ -48,11 +48,11 @@ export function SectionMindset() {
           Exemple : tu penses que les restaurateurs ont besoin d'un nouveau site. Avant de produire une maquette complète, parle avec quelques responsables et demande comment arrivent les réservations aujourd'hui. S'ils citent surtout les appels manqués, ton premier service devra peut-être traiter ce flux plutôt que refaire la vitrine.
         </p>
         <p>
-          <strong className="text-[#f0ede8]">Une version limitée, livrée puis observée, t'apprend davantage qu'un grand projet gardé en préparation.</strong> La vitesse est utile quand la décision reste réversible, le coût du test est borné et les observations sont conservées.
+          <strong className="text-[var(--encre)]">Une version limitée, livrée puis observée, t'apprend davantage qu'un grand projet gardé en préparation.</strong> La vitesse est utile quand la décision reste réversible, le coût du test est borné et les observations sont conservées.
         </p>
-        <div className="border-y border-white/10 py-5">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/70">Version pour l'IA</p>
-          <p className="text-sm leading-relaxed text-white/60">
+        <div className="border-y border-[var(--trait)] py-5">
+          <p className="mb-2 text-xs font-semibold text-[var(--t3)]">Version pour l'IA</p>
+          <p className="text-sm leading-relaxed text-[var(--t2)]">
             Donne à ton IA l'hypothèse, la cible, les faits déjà observés, la contrainte de temps et les actions autorisées. Demande-lui plusieurs tests réversibles, le signal attendu et ce que chaque résultat permettrait de décider. Tu gardes le choix du test et tu notes le résultat réel.
           </p>
         </div>
@@ -69,8 +69,8 @@ export function SectionMindset() {
         <p>
           Exemple fictif : tu envoies le même message à 30 salons de coiffure de ta ville sur deux semaines. Tu obtiens 3 réponses et 1 appel. Pour le test suivant, tu changes une seule chose, par exemple la première phrase, et tu gardes la cible et le canal.
         </p>
-        <div className="border-y border-white/10 py-4">
-          <p className="text-[#e8d5b0]/90">
+        <div className="border-y border-[var(--trait)] py-4">
+          <p className="text-[var(--menthe)]">
             Quelques silences ne prouvent pas l'absence de marché. Ils demandent un diagnostic : la bonne personne a-t-elle reçu le message, au bon moment, avec une situation et une prochaine étape compréhensibles ? Note les réponses, les objections et les absences de réponse avant d'élargir.
           </p>
         </div>
@@ -78,20 +78,19 @@ export function SectionMindset() {
 
       {/* Quatre règles */}
       <SectionReveal className="mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-2">Quatre règles, dans l'ordre où elles comptent</h3>
-        <p className="text-sm text-white/45 leading-relaxed mb-5 max-w-2xl">
+        <h3 className="text-base font-semibold text-[var(--encre)] mb-2">Quatre règles, dans l'ordre où elles comptent</h3>
+        <p className="text-sm text-[var(--t3)] leading-relaxed mb-5 max-w-2xl">
           L'ordre protège ton temps : vérifier une croyance, identifier une valeur répétable, valider la livraison, puis conserver ce que tu as appris.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {RULES.map(({ t, d }, i) => (
-            <div key={t} className="relative border border-[#c9b48a]/25 bg-gradient-to-b from-white/[0.045] to-white/[0.012] p-5">
-              <div aria-hidden="true" className="pointer-events-none absolute inset-[5px] border border-[#c9b48a]/10" />
-              <div className="relative z-10">
-                <span className="inline-flex items-center justify-center w-6 h-6 border border-[#e8d5b0]/30 text-[11px] font-bold text-[#e8d5b0] mb-3">
+            <div key={t} className="rounded-[var(--r-m)] bg-[var(--carte)] p-5">
+              <div>
+                <span className="inline-flex items-center justify-center size-6 border border-[var(--trait)] text-xs font-bold text-[var(--menthe)] mb-3">
                   {i + 1}
                 </span>
-                <p className="text-sm font-semibold text-[#e8d5b0] mb-2 tracking-tight leading-snug">{t}</p>
-                <p className="text-[13px] text-white/65 leading-[1.65]">{d}</p>
+                <p className="text-sm font-semibold text-[var(--menthe)] mb-2 tracking-tight leading-snug">{t}</p>
+                <p className="text-sm text-[var(--t2)] leading-[1.65]">{d}</p>
               </div>
             </div>
           ))}
@@ -99,8 +98,8 @@ export function SectionMindset() {
       </SectionReveal>
 
       {/* Synthèse */}
-      <SectionReveal className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 px-6 py-5">
-        <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
+      <SectionReveal className="rounded-[var(--r-m)] bg-[var(--carte)] px-6 py-5">
+        <p className="text-sm text-[var(--menthe)] leading-relaxed">
           À faire maintenant : écris une croyance qui bloque ton projet. Reformule-la en une phrase vérifiable. Choisis un test que tu peux arrêter facilement, un signal observable et une date de décision. Après le test, conserve la conclusion, les faits et la prochaine action dans ton dossier de projet. Compte 20 minutes ce soir. Tu repars avec une hypothèse, un test et une date.
         </p>
       </SectionReveal>

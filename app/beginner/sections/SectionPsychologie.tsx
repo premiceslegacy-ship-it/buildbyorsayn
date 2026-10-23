@@ -30,12 +30,12 @@ const LEVERS = [
 
 export function SectionPsychologie() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
       <div className="flex items-center gap-3 mb-8">
-        <span className="text-xs font-semibold text-[#e8d5b0]/60 uppercase tracking-widest">02</span>
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#f0ede8]">Comprendre ce qui fait agir les gens</h2>
+        <span className="text-xs font-semibold text-[var(--em)]">02</span>
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[var(--encre)]">Comprendre ce qui fait agir les gens</h2>
       </div>
-      <p className="text-white/60 text-base leading-relaxed mb-10">
+      <p className="text-[var(--t2)] text-base leading-relaxed mb-10">
         Une décision mélange faits, émotions, habitudes, identité et perception du risque. La psychologie appliquée consiste à comprendre ces ressorts pour mieux qualifier une situation. Elle ne donne aucune permission d'exploiter une vulnérabilité, de cacher une condition ou de promettre un résultat automatique.
       </p>
 
@@ -49,9 +49,9 @@ export function SectionPsychologie() {
         <p>
           Exemple : une dirigeante dit qu'elle veut « un site premium ». Demande ce qui a déclenché la demande. Elle explique qu'après chaque recommandation, elle renvoie manuellement les mêmes photos et références. Tu peux maintenant discuter d'un parcours précis au lieu d'interpréter le mot « premium » à sa place.
         </p>
-        <div className="border-y border-white/10 py-5">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/70">Version pour l'IA</p>
-          <p className="text-sm leading-relaxed text-white/60">
+        <div className="border-y border-[var(--trait)] py-5">
+          <p className="mb-2 text-xs font-semibold text-[var(--t3)]">Version pour l'IA</p>
+          <p className="text-sm leading-relaxed text-[var(--t2)]">
             Fournis une retranscription anonymisée et demande à l'IA de séparer les faits, émotions exprimées, risques nommés, alternatives actuelles et informations manquantes. Exige une citation interne pour chaque observation. Relis ensuite la source : le modèle propose un classement, il ne lit pas l'intention de la personne.
           </p>
         </div>
@@ -59,25 +59,24 @@ export function SectionPsychologie() {
 
       {/* Les ressorts */}
       <SectionReveal className="mb-6">
-        <h3 className="text-base font-semibold text-[#f0ede8] mb-2">Six ressorts psychologiques</h3>
-        <p className="text-sm text-white/45 leading-relaxed mb-5 max-w-2xl">
+        <h3 className="text-base font-semibold text-[var(--encre)] mb-2">Six ressorts psychologiques</h3>
+        <p className="text-sm text-[var(--t3)] leading-relaxed mb-5 max-w-2xl">
           Chaque ressort répond à une incertitude différente. Utilise seulement ceux que la situation rend visibles et laisse toujours le refus accessible.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {LEVERS.map(({ t, d }) => (
-            <div key={t} className="relative border border-[#c9b48a]/25 bg-gradient-to-b from-white/[0.045] to-white/[0.012] p-5">
-              <div aria-hidden="true" className="pointer-events-none absolute inset-[5px] border border-[#c9b48a]/10" />
-              <div className="relative z-10">
-                <p className="text-sm font-semibold text-[#e8d5b0] mb-2 tracking-tight leading-snug">{t}</p>
-                <p className="text-[13px] text-white/65 leading-[1.65]">{d}</p>
+            <div key={t} className="rounded-[var(--r-m)] bg-[var(--carte)] p-5">
+              <div>
+                <p className="text-sm font-semibold text-[var(--menthe)] mb-2 tracking-tight leading-snug">{t}</p>
+                <p className="text-sm text-[var(--t2)] leading-[1.65]">{d}</p>
               </div>
             </div>
           ))}
         </div>
       </SectionReveal>
 
-      <SectionReveal className="bg-[#e8d5b0]/5 border border-[#e8d5b0]/15 px-6 py-5">
-        <p className="text-sm text-[#e8d5b0]/85 leading-relaxed">
+      <SectionReveal className="rounded-[var(--r-m)] bg-[var(--carte)] px-6 py-5">
+        <p className="text-sm text-[var(--menthe)] leading-relaxed">
           À faire maintenant : reprends une demande réelle et écris la scène, le progrès recherché, le risque perçu et la preuve disponible. Marque chaque interprétation comme une hypothèse. Prépare ensuite une question ouverte pour vérifier ce qui manque, sans suggérer la réponse. Compte 25 minutes. Tu repars avec une fiche de quatre lignes et une question prête à poser.
         </p>
       </SectionReveal>

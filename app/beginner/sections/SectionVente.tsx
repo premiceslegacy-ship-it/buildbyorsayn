@@ -26,10 +26,10 @@ export function SectionVente() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
       <div className="mb-8 flex items-center gap-3">
-        <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">04</span>
-        <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Vendre, c'est de la psychologie appliquée</h2>
+        <span className="text-xs font-semibold text-[var(--em)]">04</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-[var(--encre)] md:text-3xl">Vendre, c'est de la psychologie appliquée</h2>
       </div>
-      <p className="mb-10 max-w-3xl text-base leading-relaxed text-white/60">
+      <p className="mb-10 max-w-3xl text-base leading-relaxed text-[var(--t2)]">
         Vendre consiste à comprendre une situation, vérifier qu'un problème mérite une action, puis proposer un chemin que tu sais livrer. La personne garde sa décision. Ton rôle est de poser les bonnes questions, rendre le choix lisible et arrêter quand l'offre ne correspond pas.
       </p>
 
@@ -43,12 +43,12 @@ export function SectionVente() {
         <p>
           Exemple fictif : tu demandes à la gérante d'une auto-école de raconter la dernière annulation. Un élève a prévenu par SMS à 7 h, le moniteur l'a appris à 9 h, et le créneau est resté vide. Elle estime à 5 le nombre de créneaux perdus ainsi chaque mois.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {DISCOVERY_QUESTIONS.map(([label, question], index) => (
             <div key={label} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#f0ede8]">{label}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{question}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--encre)]">{label}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{question}</p>
             </div>
           ))}
         </div>
@@ -61,7 +61,7 @@ export function SectionVente() {
         <p>
           Chaque étape prépare la suivante et possède une condition d'arrêt. Si tu ne comprends pas le problème, tu continues le diagnostic. Si l'offre ne correspond pas, tu le dis. Si une condition importante manque, tu ne forces pas la proposition.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {[
             ["Comprendre", "Faire raconter la situation, le déclencheur, l'alternative actuelle, le coût et le progrès recherché."],
             ["Reformuler", "Résumer les faits avec les mots de la personne, puis lui demander ce que tu as mal compris ou oublié."],
@@ -70,9 +70,9 @@ export function SectionVente() {
             ["Vérifier", "Demander ce qui bloque encore, confirmer les responsabilités et laisser une sortie claire."],
           ].map(([title, description], index) => (
             <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#f0ede8]">{title}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--encre)]">{title}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p>
             </div>
           ))}
         </div>
@@ -85,12 +85,12 @@ export function SectionVente() {
         <p>
           Une offre est un contrat de progrès. Elle indique ce qui change, comment le travail sera mené, ce que chacun fournit et où s'arrête la responsabilité. Une longue liste de fonctions ne remplace aucune de ces réponses.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {OFFER_ELEMENTS.map(([label, description], index) => (
             <div key={label} className="grid gap-3 py-4 sm:grid-cols-[2rem_9rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#f0ede8]">{label}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--encre)]">{label}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p>
             </div>
           ))}
         </div>
@@ -106,11 +106,11 @@ export function SectionVente() {
         <p>
           Une objection signale une information, une confiance ou une priorité manquante. Commence par la reformuler, demande si tu as visé juste, puis réponds avec le fait ou la preuve adaptés. Vérifie ensuite si la question est résolue. Accepte qu'une réponse puisse rester négative.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {OBJECTIONS.map(([objection, response]) => (
             <div key={objection} className="grid gap-3 py-4 md:grid-cols-[14rem_1fr] md:items-start">
-              <strong className="text-sm text-[#e8d5b0]">« {objection} »</strong>
-              <p className="text-sm leading-relaxed text-white/60">{response}</p>
+              <strong className="text-sm text-[var(--menthe)]">« {objection} »</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{response}</p>
             </div>
           ))}
         </div>
@@ -122,7 +122,7 @@ export function SectionVente() {
       <FoundationChapter eyebrow="Chapitre 5" title="Passer du problème à une offre proposable">
         <p>Le diagnostic devient utile quand il produit un livrable clair, un prix explicable et une prochaine étape volontaire. Construis cette offre à partir du terrain, puis ajuste-la après des conversations et des livraisons documentées.</p>
         <p>Exemple fictif : tu choisis les salons de coiffure de ta ville, tu en appelles 10, et tu notes chaque échange dans un CRM minimal, c'est-à-dire un tableau de suivi des prospects avec une ligne par salon.</p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {[
             ["Choisir un terrain", "Pars d'un segment que tu peux atteindre, dont tu comprends les contraintes et où tu peux observer le travail réel. La niche sert de premier terrain d'apprentissage."],
             ["Formuler le livrable", "Décris ce qui sera remis, dans quel format, avec quels critères d'acceptation, quelles limites et quelles informations le client fournit."],
@@ -131,15 +131,15 @@ export function SectionVente() {
             ["Suivre sans harceler", "Conserve dans ton tableau de suivi le problème, la dernière interaction, la prochaine date consentie, le statut et la raison d'un refus. Arrête quand il n'y a plus de suite convenue."],
           ].map(([title, description], index) => (
             <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_11rem_1fr] sm:items-start">
-              <span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span>
-              <strong className="text-sm text-[#f0ede8]">{title}</strong>
-              <p className="text-sm leading-relaxed text-white/60">{description}</p>
+              <span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span>
+              <strong className="text-sm text-[var(--encre)]">{title}</strong>
+              <p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p>
             </div>
           ))}
         </div>
-        <div className="border-b border-white/10 py-5">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/70">Version pour l'IA</p>
-          <p className="text-sm leading-relaxed text-white/60">
+        <div className="border-b border-[var(--trait)] py-5">
+          <p className="mb-2 text-xs font-semibold text-[var(--t3)]">Version pour l'IA</p>
+          <p className="text-sm leading-relaxed text-[var(--t2)]">
             Donne à l'IA des notes anonymisées, le livrable réel, les limites et ta grille de qualification. Demande-lui de séparer faits, hypothèses, objections et questions manquantes, puis de préparer une reformulation et un brouillon de suivi. Relis chaque ligne avec la source avant tout envoi.
           </p>
         </div>

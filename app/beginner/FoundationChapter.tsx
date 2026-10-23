@@ -13,16 +13,16 @@ export function FoundationChapter({
   className?: string;
 }) {
   return (
-    <SectionReveal className={`border-t border-white/10 pt-8 md:pt-10 ${className}`}>
+    <SectionReveal className={`pt-12 md:pt-16 ${className}`}>
       {eyebrow ? (
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e8d5b0]/65">
+        <span className="mb-3 block text-sm font-semibold text-[var(--em)]">
           {eyebrow}
-        </p>
+        </span>
       ) : null}
-      <h3 className="mb-5 text-xl font-semibold tracking-tight text-[#f0ede8] md:text-2xl">
+      <h3 className="mb-6 text-balance text-2xl font-semibold tracking-tight text-[var(--encre)] md:text-3xl">
         {title}
       </h3>
-      <div className="space-y-4 text-sm leading-[1.75] text-white/65 md:text-[15px]">
+      <div className="flex flex-col gap-5 text-[17px] leading-[1.64] text-[var(--t2)]">
         {children}
       </div>
     </SectionReveal>

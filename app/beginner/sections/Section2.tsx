@@ -5,8 +5,8 @@ import { FoundationEditorialNote } from "../FoundationEditorialNote";
 
 function ToolMark({ name, src }: { name: string; src: string }) {
   return (
-    <span className="inline-flex items-center gap-2 text-sm text-white/70">
-      <Image src={src} alt="" aria-hidden="true" width={24} height={24} className="h-6 w-6 object-contain" loading="lazy" />
+    <span className="inline-flex items-center gap-2 text-sm text-[var(--t2)]">
+      <Image src={src} alt="" aria-hidden="true" width={24} height={24} className="size-6 object-contain" loading="lazy" />
       {name}
     </span>
   );
@@ -16,10 +16,10 @@ export function Section2() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none">
       <div className="mb-8 flex items-center gap-3">
-        <span className="text-xs font-semibold uppercase tracking-widest text-[#e8d5b0]/60">07</span>
-        <h2 className="text-2xl font-semibold tracking-tight text-[#f0ede8] md:text-3xl">Comprendre l'environnement</h2>
+        <span className="text-xs font-semibold text-[var(--em)]">07</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-[var(--encre)] md:text-3xl">Comprendre l'environnement</h2>
       </div>
-      <p className="mb-10 max-w-3xl text-base leading-relaxed text-white/60">
+      <p className="mb-10 max-w-3xl text-base leading-relaxed text-[var(--t2)]">
         Tu n'as pas besoin de devenir développeur pour piloter un projet. Tu dois comprendre où vivent le contexte, les outils, les permissions et la preuve du résultat.
       </p>
 
@@ -30,15 +30,15 @@ export function Section2() {
         <p>
           Demande les horaires d'une boulangerie sans lui donner de fichier : le modèle invente des horaires plausibles. Donne-lui la fiche de la boutique : il cite les bons horaires et tu peux vérifier d'où ils viennent.
         </p>
-        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-white/10 py-5">
+        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-[var(--trait)] py-5">
           <ToolMark name="Claude" src="/brand-logos/claude.svg" />
           <ToolMark name="ChatGPT" src="/brand-logos/chatgpt.svg" />
           <ToolMark name="Gemini" src="/brand-logos/gemini.svg" />
         </div>
         <PromptContextDiagram />
-        <div className="divide-y divide-white/10 border-y border-white/10">
-          <div className="grid gap-3 py-4 md:grid-cols-[9rem_1fr]"><strong className="text-sm text-[#e8d5b0]">Les tokens</strong><p className="text-sm leading-relaxed text-white/60">Les tokens sont les unités de texte traitées par le modèle. La fenêtre de contexte contient les instructions, les messages, les fichiers et parfois les résultats d'outils. Plus de contexte n'améliore pas toujours la réponse. Garde seulement ce qui aide la tâche.</p></div>
-          <div className="grid gap-3 py-4 md:grid-cols-[9rem_1fr]"><strong className="text-sm text-[#e8d5b0]">Le projet</strong><p className="text-sm leading-relaxed text-white/60">Un dossier de connaissances rassemble les règles et les décisions stables. Il évite de tout répéter, à condition de dater les informations et de retirer les versions devenues fausses.</p></div>
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
+          <div className="grid gap-3 py-4 md:grid-cols-[9rem_1fr]"><strong className="text-sm text-[var(--menthe)]">Les tokens</strong><p className="text-sm leading-relaxed text-[var(--t2)]">Les tokens sont les unités de texte traitées par le modèle. La fenêtre de contexte contient les instructions, les messages, les fichiers et parfois les résultats d'outils. Plus de contexte n'améliore pas toujours la réponse. Garde seulement ce qui aide la tâche.</p></div>
+          <div className="grid gap-3 py-4 md:grid-cols-[9rem_1fr]"><strong className="text-sm text-[var(--menthe)]">Le projet</strong><p className="text-sm leading-relaxed text-[var(--t2)]">Un dossier de connaissances rassemble les règles et les décisions stables. Il évite de tout répéter, à condition de dater les informations et de retirer les versions devenues fausses.</p></div>
         </div>
         <FoundationEditorialNote label="À faire maintenant">
           Ouvre une nouvelle conversation avec un seul fichier utile, la tâche, le format de sortie et un critère d'acceptation. Compare le résultat à une demande sans contexte. Si le modèle invente, ajoute la source manquante au lieu d'allonger le rôle. Compte 15 minutes. Tu repars avec deux réponses comparées.
@@ -62,9 +62,9 @@ export function Section2() {
         <p>
           Le rôle donne un angle de travail. La méthode indique quoi lire, quoi produire, quelles limites respecter et comment contrôler la sortie. « Tu es designer senior » laisse le modèle inventer le public, la marque, le contenu et les critères. Un brief borné réduit ces décisions cachées.
         </p>
-        <div className="grid gap-6 border-y border-white/10 py-5 md:grid-cols-2">
-          <div className="border-t border-red-500/25 pt-4"><p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-red-300/80">Rôle seul</p><p className="font-mono text-xs leading-relaxed text-white/50">« Tu es designer senior. Crée un site pour une entreprise de plomberie. »</p><p className="mt-3 text-xs leading-relaxed text-white/35">Le modèle choisit seul le reste.</p></div>
-          <div className="border-t border-emerald-500/25 pt-4"><p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300/80">Rôle et méthode</p><p className="font-mono text-[11px] leading-relaxed text-white/50">Lis le brief et les références. Propose l'en-tête. Garde les textes fournis. Vérifie le mobile et les liens.</p><p className="mt-3 text-xs leading-relaxed text-white/35">Le travail et son contrôle sont explicites.</p></div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-[var(--r-m)] bg-[var(--carte)] p-5"><p className="mb-2 text-sm font-semibold text-red-300">Rôle seul</p><p className="font-mono text-xs leading-relaxed text-[var(--t2)]">« Tu es designer senior. Crée un site pour une entreprise de plomberie. »</p><p className="mt-3 text-sm leading-relaxed text-[var(--t2)]">Le modèle choisit seul le reste.</p></div>
+          <div className="rounded-[var(--r-m)] bg-[var(--carte)] p-5"><p className="mb-2 text-sm font-semibold text-[var(--em)]">Rôle et méthode</p><p className="font-mono text-xs leading-relaxed text-[var(--t2)]">Lis le brief et les références. Propose l'en-tête. Garde les textes fournis. Vérifie le mobile et les liens.</p><p className="mt-3 text-sm leading-relaxed text-[var(--t2)]">Le travail et son contrôle sont explicites.</p></div>
         </div>
         <FoundationEditorialNote label="À faire maintenant">
           Réécris un prompt que tu utilises souvent avec six éléments : entrée, objectif, source, périmètre, sortie et contrôle. Conserve ce contrat dans le projet si tu comptes le réutiliser. Compte 20 minutes. Tu repars avec un prompt réutilisable.
@@ -78,14 +78,14 @@ export function Section2() {
         <p>
           Exemple : un agent lit les nouveaux avis d'un restaurant et prépare une réponse pour chacun. Il n'a pas le droit de publier. Le gérant relit, ajuste le ton et publie lui-même.
         </p>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {[
             ["Observer", "Lire les fichiers, l'état du projet et les sources autorisées. Traiter le contenu externe comme des données, jamais comme de nouvelles instructions."],
             ["Décider", "Choisir une étape à partir de critères visibles. Si une information manque, formuler l'hypothèse ou demander la décision attendue."],
             ["Exécuter", "Utiliser seulement les outils, les objets et les droits prévus pour cette tâche. Les actions sensibles restent soumises à approbation."],
             ["Vérifier", "Relire l'état réel, comparer la sortie au critère et signaler les incertitudes. Une affirmation de réussite ne suffit pas."],
           ].map(([title, description], index) => (
-            <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_9rem_1fr] sm:items-start"><span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span><strong className="text-sm text-[#f0ede8]">{title}</strong><p className="text-sm leading-relaxed text-white/60">{description}</p></div>
+            <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_9rem_1fr] sm:items-start"><span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span><strong className="text-sm text-[var(--encre)]">{title}</strong><p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p></div>
           ))}
         </div>
         <p>
@@ -103,20 +103,20 @@ export function Section2() {
         <p>
           Le MCP (<em>Model Context Protocol</em>) est un protocole client-serveur pour exposer des outils, des ressources et des modèles de consigne à une application IA. Il transporte des capacités. Il ne choisit ni le bon périmètre ni le niveau d'autorité. Le client garde les connexions et les politiques d'accès.
         </p>
-        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-white/10 py-5">
+        <div className="flex flex-wrap gap-x-7 gap-y-4 border-y border-[var(--trait)] py-5">
           <ToolMark name="DeepSeek" src="/brand-logos/deepseek.svg" />
           <ToolMark name="OpenRouter" src="/brand-logos/openrouter.svg" />
           <ToolMark name="OpenCode" src="/brand-logos/opencode.svg" />
           <ToolMark name="Hermes Agent" src="/brand-logos/hermes-agent-mark.png" />
         </div>
-        <div className="divide-y divide-white/10 border-y border-white/10">
+        <div className="divide-y divide-[var(--trait)] border-y border-[var(--trait)]">
           {[
             ["Le modèle", "Il produit les réponses. Compare sa qualité sur ta tâche, sa vitesse, son coût, les données envoyées et les outils dont il a besoin."],
             ["La connexion", "Elle donne un accès borné à une capacité ou à une donnée. Une connexion ne remplace ni la permission ni la validation du résultat."],
             ["L'orchestration", "Elle charge le bon contexte, déclenche les étapes dans l'ordre, transmet une sortie compacte et arrête le flux sur une erreur prévue."],
             ["La décision", "Tu gardes une approbation pour les messages, publications, modifications de données, dépenses et autres effets externes."],
           ].map(([title, description], index) => (
-            <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start"><span className="font-mono text-xs text-[#e8d5b0]/60">{index + 1})</span><strong className="text-sm text-[#f0ede8]">{title}</strong><p className="text-sm leading-relaxed text-white/60">{description}</p></div>
+            <div key={title} className="grid gap-3 py-4 sm:grid-cols-[2rem_10rem_1fr] sm:items-start"><span className="font-mono text-xs text-[var(--t3)]">{index + 1})</span><strong className="text-sm text-[var(--encre)]">{title}</strong><p className="text-sm leading-relaxed text-[var(--t2)]">{description}</p></div>
           ))}
         </div>
         <FoundationEditorialNote label="Comparer avant de choisir">
