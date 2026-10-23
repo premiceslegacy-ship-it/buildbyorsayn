@@ -34,8 +34,13 @@ async function expectNoUpgradeStripeLink(page: Page, path: string) {
   }
 }
 
+/** `main` désigne la page rendue : on ignore le gabarit de chargement (`aria-busy`) encore présent pendant le streaming. */
+function zoneOf(page: Page, scope: string) {
+  return page.locator(scope === "main" ? "main:not([aria-busy])" : scope);
+}
+
 async function expectBothOffersAndBand(page: Page, scope: string) {
-  const zone = page.locator(scope);
+  const zone = zoneOf(page, scope);
   const fondations = zone.getByRole("article", { name: /^Fondations$/ });
   const coffre = zone.getByRole("article", { name: /^LE\sCOFFRE$/ });
   await expect(fondations).toBeVisible();
@@ -43,17 +48,18 @@ async function expectBothOffersAndBand(page: Page, scope: string) {
   await expect(coffre).toBeVisible();
   await expect(coffre).toContainText(euro(COFFRE_PRICE));
   await expect(coffre).toContainText("Recommandé");
-  await expect(zone.getByText(euro(UPGRADE_PRICE)).first()).toBeVisible();
+  // Sur mobile la montée est dans un carrousel : le prix peut être dans une diapositive hors champ.
+  await expect(zone.getByText(euro(UPGRADE_PRICE)).first()).toBeAttached();
   const upgradeAction = zone.getByRole("link", { name: /Passer à LE\sCOFFRE/ });
   const upgradeBand = zone.getByText("la différence", { exact: true });
   await expect(upgradeAction.or(upgradeBand).first()).toBeVisible();
 }
 
 async function expectOnlyUpgradeCard(page: Page, scope: string) {
-  const zone = page.locator(scope);
+  const zone = zoneOf(page, scope);
   await expect(zone.getByRole("link", { name: /^Prendre (Fondations|LE\sCOFFRE)$/ })).toHaveCount(0);
   await expect(zone).not.toContainText(euro(FONDATIONS_PRICE));
-  await expect(zone.getByText(euro(UPGRADE_PRICE)).first()).toBeVisible();
+  await expect(zone.getByText(euro(UPGRADE_PRICE)).first()).toBeAttached();
 
   // Le lien Stripe du complément n'est jamais dans la page : la carte passe par la porte serveur.
   await expect(zone.getByRole("link", { name: /Passer à LE\sCOFFRE/ })).toHaveAttribute("href", UPGRADE_PATH);
@@ -62,8 +68,8 @@ async function expectOnlyUpgradeCard(page: Page, scope: string) {
 }
 
 async function expectNoPurchaseCard(page: Page, scope: string) {
-  const zone = page.locator(scope);
-  await expect(zone.getByRole("heading", { name: "Tu as tout BUILD." })).toBeVisible();
+  const zone = zoneOf(page, scope);
+  await expect(zone.getByRole("heading", { name: "Tu as tout BUILD." }).last()).toBeVisible();
   await expect(zone.getByRole("link", { name: /^(Prendre|Passer à)/ })).toHaveCount(0);
   await expect(zone.locator('a[href^="https://buy.stripe.com/"]')).toHaveCount(0);
   await expect(zone.getByRole("link", { name: "Ouvrir mon espace" })).toHaveAttribute("href", "/dashboard");
