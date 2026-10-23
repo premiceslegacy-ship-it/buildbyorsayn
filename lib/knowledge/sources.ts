@@ -1,5 +1,6 @@
 import type { McpTier } from "@/lib/mcpAccess";
 import type { SkillAccess } from "@/lib/skillsCatalog";
+import { skillCatalogKnowledgeContent } from "@/lib/knowledge/skillCatalogDescription";
 import { z } from "zod";
 import {
   formatTimecode,
@@ -105,7 +106,7 @@ export async function collectSkillsCatalogDocuments(): Promise<KnowledgeDocument
     source: "skills-catalog",
     sourceId: skill.slug,
     title: skill.title,
-    content: skill.description,
+    content: skillCatalogKnowledgeContent(skill),
     tier: skillAccessToTier(skill.access),
   }));
 }

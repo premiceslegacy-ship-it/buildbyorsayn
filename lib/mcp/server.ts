@@ -62,6 +62,70 @@ const KNOWLEDGE_MATCH_SCHEMA = z.object({
 
 export type KnowledgeMatch = z.infer<typeof KNOWLEDGE_MATCH_SCHEMA>;
 
+const SEARCH_STOP_WORDS = new Set([
+  "avec", "avoir", "cette", "comme", "comment", "dans", "des", "donne", "elle", "entre",
+  "est", "faire", "fait", "les", "leur", "mais", "pour", "puis", "quel", "quelle", "sans",
+  "ses", "son", "sur", "une", "the", "this", "that", "with", "from", "into", "what", "when",
+]);
+
+function searchTerms(value: string): Set<string> {
+  return new Set(
+    value
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase()
+      .match(/[a-z0-9]+/g)
+      ?.filter((term) => term.length >= 3 && !SEARCH_STOP_WORDS.has(term)) ?? [],
+  );
+}
+
+/**
+ * The database supplies the best semantic candidates. A small lexical pass
+ * then rewards the concrete trade terms from the request, which prevents a
+ * broadly related long passage from hiding a more precise result.
+ */
+export function rerankKnowledgeMatches(
+  query: string,
+  matches: KnowledgeMatch[],
+  limit: number,
+): KnowledgeMatch[] {
+  const queryTerms = searchTerms(query);
+  if (queryTerms.size === 0) return matches.slice(0, limit);
+
+  const ranked = matches
+    .map((match, originalIndex) => {
+      const titleTerms = searchTerms(match.title);
+      const contentTerms = searchTerms(match.content);
+      let lexicalPoints = 0;
+      for (const term of queryTerms) {
+        if (titleTerms.has(term)) lexicalPoints += 2;
+        else if (contentTerms.has(term)) lexicalPoints += 1;
+      }
+      const lexicalCoverage = lexicalPoints / (queryTerms.size * 2);
+      const semanticScore = Math.max(0, Math.min(1, match.similarity));
+      return {
+        match,
+        originalIndex,
+        score: semanticScore * 0.72 + lexicalCoverage * 0.28,
+      };
+    })
+    .sort((left, right) => right.score - left.score || left.originalIndex - right.originalIndex)
+    .map(({ match }) => match);
+
+  const distinct: KnowledgeMatch[] = [];
+  const repeated: KnowledgeMatch[] = [];
+  const seenTitles = new Set<string>();
+  for (const match of ranked) {
+    const identity = `${match.source}\n${match.title}`;
+    if (seenTitles.has(identity)) repeated.push(match);
+    else {
+      seenTitles.add(identity);
+      distinct.push(match);
+    }
+  }
+  return [...distinct, ...repeated].slice(0, limit);
+}
+
 export function validateKnowledgeMatches(
   value: unknown,
   requesterTier: McpTier
@@ -155,7 +219,7 @@ export function createBuildMcpServer(
     {
       title: "Rechercher dans le savoir-faire BUILD",
       description:
-        "Cherche un passage de savoir-faire BUILD quand la personne demande une explication, un choix, une méthode ou un plan. Donne une question autonome avec le contexte utile, pas une liste de mots. Utilise source seulement si tu sais où se trouve la réponse : blocs pour le programme, protocole pour les trois phases, accompagnement pour la remise d'un site, skills-catalog pour choisir un skill, skills-content pour le texte markdown publié, doctrine pour LE COFFRE. Pour le palier, les prix et la liste des skills accessibles, appelle plutôt list_available_content.",
+        "Cherche un passage de savoir-faire BUILD quand la personne demande une explication, un choix, une méthode ou un plan. Donne une phrase autonome avec le contexte utile et conserve les termes métier concrets, pas une liste de mots génériques. Utilise source seulement si tu sais où se trouve la réponse : blocs pour le programme, protocole pour les trois phases, accompagnement pour la remise d'un site, skills-catalog pour choisir un skill, skills-content pour le texte markdown publié, doctrine pour LE COFFRE. Pour le palier, les prix et la liste des skills accessibles, appelle plutôt list_available_content.",
       inputSchema: SEARCH_KNOWLEDGE_INPUT_SHAPE,
       annotations: READ_ONLY_TOOL_ANNOTATIONS,
     },
@@ -188,18 +252,20 @@ export function createBuildMcpServer(
 
       const queryEmbedding = await embedQuery(query, runtime);
       if (!queryEmbedding) return toolError("La recherche est temporairement indisponible.");
+      const requestedLimit = limit ?? 8;
       const { data: rawMatches, error } = await admin.rpc("match_mcp_knowledge_chunks", {
         query_embedding: queryEmbedding.embedding,
         p_token_hash: auth.tokenHash,
         p_expected_resource: getMcpResourceUrl(),
-        match_count: limit ?? 8,
+        match_count: 20,
         source_filter: source ?? null,
         embedding_fingerprint: queryEmbedding.fingerprint,
       });
       if (error) return toolError("La recherche a échoué.");
 
-      const results = validateKnowledgeMatches(rawMatches ?? [], auth.tier);
-      if (!results) return toolError("La recherche a retourné une réponse invalide.");
+      const candidates = validateKnowledgeMatches(rawMatches ?? [], auth.tier);
+      if (!candidates) return toolError("La recherche a retourné une réponse invalide.");
+      const results = rerankKnowledgeMatches(query, candidates, requestedLimit);
       if (results.length === 0) {
         return {
           content: [{
