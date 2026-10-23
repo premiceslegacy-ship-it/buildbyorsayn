@@ -31,6 +31,7 @@ export function ModeSwitch({ mode, onChange }: { mode: ReaderMode; onChange: (mo
       onKeyDown={(event) => {
         if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
         event.preventDefault();
+        event.stopPropagation();
         select(mode === "video" ? "texte" : "video");
       }}
     >

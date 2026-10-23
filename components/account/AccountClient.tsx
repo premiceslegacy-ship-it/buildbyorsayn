@@ -42,7 +42,7 @@ export function AccountClient({
   useEffect(() => {
     const readHash = () => {
       const candidate = window.location.hash.slice(1) as Section;
-      if (SECTION_IDS.includes(candidate)) setSection(candidate);
+      setSection(SECTION_IDS.includes(candidate) ? candidate : null);
     };
     readHash();
     window.addEventListener("hashchange", readHash);
@@ -51,7 +51,7 @@ export function AccountClient({
 
   const rows = useMemo(() => [
     { id: "profile" as const, icon: "user" as const, label: "Profil", value: name },
-    { id: "email" as const, icon: "mail" as const, label: "E-mail", value: email },
+    { id: "email" as const, icon: "mail" as const, label: "E‑mail", value: email },
     { id: "password" as const, icon: "key" as const, label: "Mot de passe", value: "••••••••" },
     { id: "subscription" as const, icon: "card" as const, label: "Abonnement", value: accountTierLabel(tier) },
     { id: "connections" as const, icon: "plug" as const, label: "Connexions", value: connectionStatus === "connected" ? "Active" : connectionStatus === "disconnected" ? "À configurer" : "Indisponible" },
@@ -86,10 +86,10 @@ export function AccountClient({
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const nextEmail = String(form.get("email") ?? "").trim();
-    if (!/^\S+@\S+\.\S+$/.test(nextEmail)) return finish({ tone: "error", text: "Cette adresse e-mail n’a pas l’air correcte." });
+    if (!/^\S+@\S+\.\S+$/.test(nextEmail)) return finish({ tone: "error", text: "Cette adresse e‑mail n’a pas l’air correcte." });
     setBusy(true);
     const { error } = await createClient().auth.updateUser({ email: nextEmail });
-    finish(error ? { tone: "error", text: "L’adresse n’a pas pu être modifiée. Réessaie." } : { tone: "success", text: "Regarde tes e-mails pour confirmer la nouvelle adresse." });
+    finish(error ? { tone: "error", text: "L’adresse n’a pas pu être modifiée. Réessaie." } : { tone: "success", text: "Regarde tes e‑mails pour confirmer la nouvelle adresse." });
   }
 
   async function savePassword(event: FormEvent<HTMLFormElement>) {
@@ -125,12 +125,12 @@ export function AccountClient({
       <div className="ui3-account-grid" data-section={section ?? ""}>
         <nav className="ui3-settings" aria-label="Réglages du compte">
           <div className="ui3-settings-group">
-            {rows.slice(0, 3).map((row) => <SettingRow key={row.id} {...row} active={section === row.id} onSelect={select} />)}
+            {rows.slice(0, 3).map((row) => <SettingRow key={row.id} {...row} active={activeSection === row.id} onSelect={select} />)}
           </div>
           <div className="ui3-settings-group">
-            {rows.slice(3, 5).map((row) => <SettingRow key={row.id} {...row} active={section === row.id} onSelect={select} />)}
+            {rows.slice(3, 5).map((row) => <SettingRow key={row.id} {...row} active={activeSection === row.id} onSelect={select} />)}
           </div>
-          <div className="ui3-settings-group"><SettingRow {...rows[5]} active={section === "devices"} onSelect={select} /></div>
+          <div className="ui3-settings-group"><SettingRow {...rows[5]} active={activeSection === "devices"} onSelect={select} /></div>
           <div className="ui3-settings-group">
             <form action="/api/signout" method="post"><button className="ui3-setting ui3-setting-danger" type="submit"><span className="ui3-setting-icon"><AccountIcon name="logout" /></span><span>Se déconnecter</span></button></form>
           </div>
@@ -140,9 +140,9 @@ export function AccountClient({
           <button className="ui3-back" type="button" onClick={() => { setSection(null); setNotice(null); window.history.pushState(null, "", window.location.pathname); void playAppSound("select"); }}>Compte</button>
           {notice ? <p className={`ui3-notice ui3-notice-${notice.tone}`} role={notice.tone === "error" ? "alert" : "status"}>{notice.text}</p> : null}
 
-          {activeSection === "profile" ? <div className="ui3-pane-section"><h2>Profil</h2><form className="ui3-form" onSubmit={saveProfile}><label>Prénom<input name="name" value={name} onChange={(event) => setName(event.target.value)} maxLength={40} autoComplete="given-name" /></label><p className="ui3-hint">C’est le prénom affiché dans BUILD et dans les e-mails que tu reçois.</p><button className="btn btn--p" disabled={busy}>{busy ? "Enregistrement" : "Enregistrer"}</button></form></div> : null}
+          {activeSection === "profile" ? <div className="ui3-pane-section"><h2>Profil</h2><form className="ui3-form" onSubmit={saveProfile}><label>Prénom<input name="name" value={name} onChange={(event) => setName(event.target.value)} maxLength={40} autoComplete="given-name" /></label><p className="ui3-hint">C’est le prénom affiché dans BUILD et dans les e‑mails que tu reçois.</p><button className="btn btn--p" disabled={busy}>{busy ? "Enregistrement" : "Enregistrer"}</button></form></div> : null}
 
-          {activeSection === "email" ? <div className="ui3-pane-section"><h2>E-mail</h2><p>Ton adresse actuelle : <strong>{email}</strong></p><form className="ui3-form" onSubmit={saveEmail}><label>Nouvelle adresse<input name="email" type="email" autoComplete="email" placeholder="toi@exemple.com" /></label><p className="ui3-hint">Supabase envoie les confirmations nécessaires. L’adresse ne change qu’après validation.</p><button className="btn btn--p" disabled={busy}>{busy ? "Envoi" : "Changer mon e-mail"}</button></form></div> : null}
+          {activeSection === "email" ? <div className="ui3-pane-section"><h2>E‑mail</h2><p>Ton adresse actuelle : <strong>{email}</strong></p><form className="ui3-form" onSubmit={saveEmail}><label>Nouvelle adresse<input name="email" type="email" autoComplete="email" placeholder="toi@exemple.com" /></label><p className="ui3-hint">Supabase envoie les confirmations nécessaires. L’adresse ne change qu’après validation.</p><button className="btn btn--p" disabled={busy}>{busy ? "Envoi" : "Changer mon e‑mail"}</button></form></div> : null}
 
           {activeSection === "password" ? <div className="ui3-pane-section"><h2>Mot de passe</h2><form className="ui3-form" onSubmit={savePassword}><label>Nouveau mot de passe<input name="password" type="password" autoComplete="new-password" /></label><p className="ui3-hint">Au moins 8 caractères, une majuscule, une minuscule et un chiffre.</p><label>Écris-le encore une fois<input name="confirmation" type="password" autoComplete="new-password" /></label><button className="btn btn--p" disabled={busy}>{busy ? "Enregistrement" : "Changer le mot de passe"}</button></form><Link className="ui3-text-link" href="/forgot-password">Mot de passe oublié ?</Link></div> : null}
 
@@ -153,10 +153,11 @@ export function AccountClient({
           {activeSection === "devices" ? <div className="ui3-pane-section"><h2>Appareils</h2><p>Supabase ne fournit pas la liste fiable des appareils dans ce produit. Tu peux toutefois couper toutes les autres sessions.</p><div className="ui3-device"><span className="ui3-setting-icon"><AccountIcon name="devices" /></span><span><strong>Cette session</strong><small>L’appareil que tu utilises maintenant</small></span></div><button className={confirmEverywhere ? "btn ui3-danger-button" : "btn btn--g"} type="button" disabled={busy} onClick={signOutEverywhere}>{busy ? "Déconnexion" : confirmEverywhere ? "Confirmer la déconnexion partout" : "Se déconnecter partout"}</button>{confirmEverywhere ? <button className="ui3-text-link" type="button" onClick={() => setConfirmEverywhere(false)}>Annuler</button> : null}</div> : null}
         </section>
       </div>
+      <footer className="foot"><Image src="/da/logo-sombre.svg" alt="BUILD" width={96} height={24} /></footer>
     </main>
   );
 }
 
 function SettingRow({ id, icon, label, value, active, onSelect }: { id: Section; icon: "user" | "mail" | "key" | "card" | "plug" | "devices"; label: string; value: string; active: boolean; onSelect: (id: Section) => void }) {
-  return <button type="button" className={`ui3-setting${active ? " is-active" : ""}`} onClick={() => onSelect(id)} aria-current={active ? "page" : undefined}><span className="ui3-setting-icon"><AccountIcon name={icon} /></span><span>{label}</span><small>{value}</small><AccountIcon name="chevron" /></button>;
+  return <button type="button" className={`ui3-setting${active ? " is-active" : ""}`} onClick={() => onSelect(id)} aria-current={active ? "page" : undefined}><span className="ui3-setting-icon"><AccountIcon name={icon} /></span><span className="ui3-setting-label">{label}</span><small>{value}</small><AccountIcon name="chevron" /></button>;
 }

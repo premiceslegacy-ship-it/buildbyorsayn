@@ -6,7 +6,9 @@ import { BLOCS_DATA as privateCorpus } from "../lib/mockData";
 import {
   READER_MODE_STORAGE_KEY,
   chapterProgressLabel,
+  chapterSummary,
   parseReaderMode,
+  readerModeQuery,
   readingProgress,
   resolveChapterIndex,
   resolveReaderMode,
@@ -22,6 +24,8 @@ test("le mode du lecteur donne la priorité à l'adresse, puis au choix mémoris
   assert.equal(resolveReaderMode("invalide", "invalide"), "video");
   assert.equal(parseReaderMode("video"), "video");
   assert.equal(parseReaderMode("texte"), "texte");
+  assert.equal(parseReaderMode("text"), "texte");
+  assert.equal(readerModeQuery("texte"), "text");
   assert.equal(parseReaderMode("TEXT"), null);
 });
 
@@ -49,9 +53,10 @@ test("la progression de lecture et les états vides restent bornés", () => {
   assert.equal(readingProgress(900, 1000, 500), 1);
   assert.equal(readingProgress(0, 500, 500), 0);
   assert.equal(chapterProgressLabel(0, 0), "Aucun chapitre disponible");
-  assert.equal(chapterProgressLabel(0, 3), "3 chapitres");
-  assert.equal(chapterProgressLabel(1, 3), "1 chapitre sur 3 lu");
-  assert.equal(chapterProgressLabel(3, 3), "Terminé");
+  assert.equal(chapterProgressLabel(0, 3), "0 chapitres sur 3 vus");
+  assert.equal(chapterProgressLabel(1, 3), "1 chapitre sur 3 vu");
+  assert.equal(chapterProgressLabel(3, 3), "3 chapitres sur 3 vus");
+  assert.equal(chapterSummary("## Titre\n\nLa première phrase est entière. La seconde reste dans le texte."), "Titre La première phrase est entière.");
 });
 
 test("les trois paliers ne reçoivent que les chapitres autorisés", () => {
@@ -68,12 +73,25 @@ test("les trois paliers ne reçoivent que les chapitres autorisés", () => {
 
 test("le lecteur expose les états chargement, erreur, vide et les interactions clavier", () => {
   const view = read("components/reader/ReaderView.tsx");
+  const overview = read("components/reader/BlocOverview.tsx");
+  const blocPage = read("app/blocs/[id]/page.tsx");
+  const blocClient = read("app/blocs/[id]/BlocClient.tsx");
+  const readerPage = read("app/blocs/[id]/lire/page.tsx");
   const foundation = read("components/reader/FoundationReader.tsx");
   const player = read("components/lessons/LessonPlayer.tsx");
   const state = read("components/reader/ReaderState.tsx");
-  for (const marker of ["Escape", 'role="radiogroup"', "aria-current", "Envoyer à mon IA", "Marquer comme lu"]) {
+  for (const marker of ["Escape", "ArrowLeft", "ArrowRight", 'event.key === "Home"', 'event.key === "End"', 'role="radiogroup"', "aria-current", "Envoyer à mon IA", "Marquer comme lu"]) {
     assert.ok(`${view}\n${foundation}\n${read("components/reader/ModeSwitch.tsx")}`.includes(marker), marker);
   }
+  assert.doesNotMatch(blocPage, /ReaderView/);
+  assert.match(blocPage, /redirect\(`\/blocs\/\$\{id\}\/lire\?/);
+  assert.match(blocClient, /router\.replace\(`\/blocs\/\$\{bloc\.id\}\/lire\?chapter=/);
+  assert.match(blocClient, /section\.lesson \? "video" : "text"/);
+  assert.match(readerPage, /parseReaderMode/);
+  assert.match(overview, /\/lire\?chapter=/);
+  assert.match(overview, /className="mot"/);
+  assert.match(overview, /styles\.equalizer/);
+  assert.match(view, /router\.push\(backHref\)/);
   assert.match(player, /lesson-loading/);
   assert.match(player, /lesson-unavailable/);
   assert.match(player, /Réessayer/);

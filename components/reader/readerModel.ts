@@ -8,7 +8,13 @@ export type ReaderMarkdownSection = {
 };
 
 export function parseReaderMode(value: string | null | undefined): ReaderMode | null {
-  return value === "video" || value === "texte" ? value : null;
+  if (value === "video") return "video";
+  if (value === "texte" || value === "text") return "texte";
+  return null;
+}
+
+export function readerModeQuery(mode: ReaderMode): "video" | "text" {
+  return mode === "texte" ? "text" : "video";
 }
 
 export function resolveReaderMode(
@@ -55,7 +61,18 @@ export function readingProgress(
 
 export function chapterProgressLabel(done: number, total: number): string {
   if (total <= 0) return "Aucun chapitre disponible";
-  if (done >= total) return "Terminé";
-  if (done <= 0) return `${total} chapitre${total > 1 ? "s" : ""}`;
-  return `${done} chapitre${done > 1 ? "s" : ""} sur ${total} lu${done > 1 ? "s" : ""}`;
+  const bounded = Math.min(total, Math.max(0, done));
+  return `${bounded} chapitre${bounded === 1 ? "" : "s"} sur ${total} vu${bounded === 1 ? "" : "s"}`;
+}
+
+export function chapterSummary(content: string): string {
+  const plain = content
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^[-\d]+[.)]?\s+/gm, "")
+    .replace(/[*_`>#]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!plain) return "";
+  return plain.match(/^.+?[.!?](?=\s|$)/u)?.[0]?.trim() ?? plain;
 }

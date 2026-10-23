@@ -58,6 +58,9 @@ test("Compte garde les contrôles de session et les confirmations", async () => 
   assert.match(client, /auth\.updateUser\(\{ password \}\)/);
   assert.match(client, /signOut\(\{ scope: "others" \}\)/);
   assert.match(client, /confirmEverywhere/);
+  assert.match(client, /active=\{activeSection === row\.id\}/);
+  assert.match(client, /ui3-setting-label/);
+  assert.match(client, /<footer className="foot">/);
   assert.doesNotMatch(client, /deleteUser|Supprimer mon compte/);
   assert.match(loading, /aria-busy="true"/);
   assert.match(error, /reset/);

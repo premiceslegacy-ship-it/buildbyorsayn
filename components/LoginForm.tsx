@@ -37,8 +37,8 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
     const next = { ...EMPTY_ERRORS };
-    if (!email) next.email = "Écris ton adresse e-mail.";
-    else if (!/^\S+@\S+\.\S+$/.test(email)) next.email = "Cette adresse e-mail n’a pas l’air correcte.";
+    if (!email) next.email = "Écris ton adresse e‑mail.";
+    else if (!/^\S+@\S+\.\S+$/.test(email)) next.email = "Cette adresse e‑mail n’a pas l’air correcte.";
     if (!password) next.password = "Écris ton mot de passe.";
     else if (isSignup) next.password = signupPasswordError(password);
     if (next.email || next.password) return reportError(next);
@@ -53,7 +53,7 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) {
           const auth = error.message.includes("already registered") || error.message.includes("user_already_exists")
-            ? "Un compte existe déjà avec cet e-mail. Connecte-toi."
+            ? "Un compte existe déjà avec cet e‑mail. Connecte‑toi."
             : error.message.includes("disabled") || error.message.includes("not allowed")
               ? "Les inscriptions sont désactivées. Contacte l’administrateur."
               : error.message.includes("rate limit") || error.message.includes("too many")
@@ -73,10 +73,10 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
           const auth = error.message.includes("Email not confirmed")
-            ? "Ton adresse e-mail n’est pas encore confirmée. Regarde ta boîte mail."
+            ? "Ton adresse e‑mail n’est pas encore confirmée. Regarde ta boîte mail."
             : error.message.includes("rate limit") || error.message.includes("too many")
               ? "Trop de tentatives. Réessaie dans quelques minutes."
-              : "E-mail ou mot de passe incorrect.";
+              : "E‑mail ou mot de passe incorrect.";
           setIsLoading(false);
           return reportError({ ...EMPTY_ERRORS, auth });
         }
@@ -98,12 +98,12 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
 
   return (
     <>
-      <h1>{isSignup ? "Crée ton compte." : "Connecte-toi à BUILD."}</h1>
+      <h1>{isSignup ? "Crée ton compte." : "Connecte‑toi à BUILD."}</h1>
       {errors.auth ? <p className="ui3-auth-alert ui3-auth-alert-error" role="alert">{errors.auth}</p> : null}
       {info ? <p className="ui3-auth-alert ui3-auth-alert-success" role="status">{info}</p> : null}
       <form className="ui3-auth-form" onSubmit={handleSubmit} noValidate>
         <label className="ui3-field" data-invalid={Boolean(errors.email)}>
-          <span>E-mail</span>
+          <span>E‑mail</span>
           <input name="email" type="email" autoComplete="username" inputMode="email" placeholder="toi@exemple.com" aria-invalid={Boolean(errors.email)} />
           {errors.email ? <span className="ui3-field-error"><AccountIcon name="mail" />{errors.email}</span> : null}
         </label>

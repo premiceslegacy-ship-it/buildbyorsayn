@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
 
   async function sendCode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) return fail("Cette adresse e-mail n’a pas l’air correcte.");
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) return fail("Cette adresse e‑mail n’a pas l’air correcte.");
     setError("");
     setIsLoading(true);
     await createClient().auth.resetPasswordForEmail(email.trim());
@@ -34,11 +34,11 @@ export default function ForgotPasswordPage() {
 
   async function verifyCode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (otp.length !== 6) return fail("Saisis le code reçu par e-mail : 6 chiffres.");
+    if (otp.length !== 6) return fail("Saisis le code reçu par e‑mail : 6 chiffres.");
     setError("");
     setIsLoading(true);
     const { error: verifyError } = await createClient().auth.verifyOtp({ email: email.trim(), token: otp, type: "recovery" });
-    if (verifyError) return fail("Code invalide ou expiré. Vérifie ton e-mail et réessaie.");
+    if (verifyError) return fail("Code invalide ou expiré. Vérifie ton e‑mail et réessaie.");
     void playAppSound("confirm");
     router.push("/update-password");
   }
@@ -52,10 +52,10 @@ export default function ForgotPasswordPage() {
           {step === "email" ? <>
             <Link className="ui3-text-link" href="/login">Retour à la connexion</Link>
             <h1 id="recovery-title">Mot de passe oublié.</h1>
-            <p className="ui3-auth-copy">Écris ton e-mail. On t’envoie un code à 6 chiffres.</p>
+            <p className="ui3-auth-copy">Écris ton e‑mail. On t’envoie un code à 6 chiffres.</p>
             {error ? <p className="ui3-auth-alert ui3-auth-alert-error" role="alert">{error}</p> : null}
             <form className="ui3-auth-form" onSubmit={sendCode} noValidate>
-              <label className="ui3-field" data-invalid={Boolean(error)}><span>E-mail</span><input type="email" value={email} onChange={(event) => { setEmail(event.target.value); setError(""); }} autoComplete="username" inputMode="email" placeholder="toi@exemple.com" aria-invalid={Boolean(error)} /></label>
+              <label className="ui3-field" data-invalid={Boolean(error)}><span>E‑mail</span><input type="email" value={email} onChange={(event) => { setEmail(event.target.value); setError(""); }} autoComplete="username" inputMode="email" placeholder="toi@exemple.com" aria-invalid={Boolean(error)} /></label>
               <div className="ui3-auth-actions"><button className="btn btn--p" disabled={isLoading}>{isLoading ? "Envoi" : "Envoyer le code"}</button></div>
             </form>
           </> : <>

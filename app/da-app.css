@@ -31,6 +31,7 @@
 .da.da-app .btn--l { height: auto; padding: 4px 0; background: none; color: var(--menthe); font-weight: 500; }
 .da.da-app .btn--l:hover { color: #fff; }
 .da.da-app .btn--xl { height: 52px; padding-inline: 30px; font-size: 17px; }
+.da.da-app :is(h1, h2, h3, .btn, .navbar__nav a, .tabbar__label) { overflow-wrap: normal; word-break: normal; hyphens: none; }
 
 @media (min-width: 735px) {
   .da.da-app { --cols: 3.35; --cols-sq: 4.6; --bar: 52px; --btn-h: 44px; --btn-p: 21px; --gap: 20px; }

@@ -1,9 +1,10 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, Copy, LockKeyhole, Play, RotateCcw, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ArrowRight, Check, Copy, Play, RotateCcw, Sparkles } from "lucide-react";
 import { LessonPlayer } from "@/components/lessons/LessonPlayer";
 import { LessonMeta, formatLessonDuration } from "@/components/lessons/LessonMeta";
 import type { BlocSection } from "@/lib/blocCatalog";
@@ -14,7 +15,8 @@ import { ReaderEmpty } from "./ReaderState";
 import { ReaderProse } from "./ReaderProse";
 import {
   READER_MODE_STORAGE_KEY,
-  chapterProgressLabel,
+  chapterSummary,
+  readerModeQuery,
   readingProgress,
   resolveChapterIndex,
   resolveReaderMode,
@@ -33,29 +35,19 @@ type ReaderViewProps = {
   initialChapter?: string | null;
   onToggleChapter: (sectionId: string) => void | Promise<void>;
   onValidateBloc: () => void | Promise<void>;
-  checkoutHref: string;
-  checkoutLabel: string;
-  checkoutPrice: string;
   nextBloc?: { href: string; label: string };
-  previousBloc?: { href: string; label: string };
-  headerExtra?: ReactNode;
+  backHref: string;
 };
 
 type ReaderSize = "small" | "normal" | "large";
 
 function summaryFromContent(content: string) {
-  return content
-    .replace(/```[\s\S]*?```/g, "")
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/^[-\d]+[.)]?\s+/gm, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 180);
+  return chapterSummary(content);
 }
 
 function updateAddress(mode: ReaderMode, sectionId: string) {
   const url = new URL(window.location.href);
-  url.searchParams.set("mode", mode);
+  url.searchParams.set("mode", readerModeQuery(mode));
   url.searchParams.set("chapter", sectionId);
   url.hash = sectionId;
   window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
@@ -116,13 +108,10 @@ export function ReaderView({
   initialChapter,
   onToggleChapter,
   onValidateBloc,
-  checkoutHref,
-  checkoutLabel,
-  checkoutPrice,
   nextBloc,
-  previousBloc,
-  headerExtra,
+  backHref,
 }: ReaderViewProps) {
+  const router = useRouter();
   const initialIndex = resolveChapterIndex(sections.map((section) => section.id), initialChapter);
   const [selected, setSelected] = useState(Math.max(0, initialIndex));
   const [mode, setMode] = useState<ReaderMode>(initialMode ?? "video");
@@ -171,17 +160,6 @@ export function ReaderView({
     return () => { window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
   }, [mode, selected]);
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || mode !== "texte") return;
-      event.preventDefault();
-      setMode("video");
-      window.requestAnimationFrame(() => modeControl.current?.querySelector<HTMLButtonElement>('button[role="radio"]')?.focus());
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [mode]);
-
   const chooseChapter = useCallback((index: number) => {
     const section = sections[index];
     if (!section) return;
@@ -191,6 +169,25 @@ export function ReaderView({
     if (root.current) animateAppElement(root.current, [{ opacity: .82 }, { opacity: 1 }], "doux");
     window.requestAnimationFrame(() => window.scrollTo({ top: mode === "texte" ? 0 : Math.max(0, (root.current?.offsetTop ?? 0) - 70), behavior: "smooth" }));
   }, [mode, sections]);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable]")) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        router.push(backHref);
+        return;
+      }
+      const nextIndex = event.key === "ArrowLeft" ? selected - 1 : event.key === "ArrowRight" ? selected + 1 : event.key === "Home" ? 0 : event.key === "End" ? sections.length - 1 : null;
+      if (nextIndex === null || nextIndex < 0 || nextIndex >= sections.length) return;
+      event.preventDefault();
+      chooseChapter(nextIndex);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [backHref, chooseChapter, router, sections.length, selected]);
 
   const setReaderMode = (next: ReaderMode) => {
     setEnded(false);
@@ -222,32 +219,11 @@ export function ReaderView({
 
   const cycleSize = () => setSize((value) => value === "small" ? "normal" : value === "normal" ? "large" : "small");
 
-  return <div ref={root} className={styles.page}>
-    <header className={styles.hero}>
-      <div className={styles.heroInner}>
-        <span className={styles.eyebrow}>Bloc {displayNumber}{hasLockedChapters ? ", accès limité" : ""}</span>
-        <h1>{title.replace(/^Bloc \d+\s*:\s*/, "")}</h1>
-        <div className={styles.segments} role="img" aria-label={chapterProgressLabel(completedCount, totalSections)}>
-          <div className={styles.segmentTrack} style={{ "--reader-total": Math.max(1, totalSections) } as CSSProperties}>
-            {Array.from({ length: totalSections }, (_, index) => <span key={index} data-state={index < completedCount ? "done" : index === completedCount ? "current" : "todo"} />)}
-          </div>
-          <span className={styles.segmentLabel}>{chapterProgressLabel(completedCount, totalSections)}</span>
-        </div>
-        {sections.length > 0 ? <div className={styles.heroActions}>
-          <button className="btn btn--p btn--xl" type="button" data-sfx="none" onClick={() => { void playAppSound(current?.lesson ? "confirm" : "open"); setReaderMode(current?.lesson ? "video" : "texte"); root.current?.scrollIntoView({ behavior: "smooth" }); }}>
-            {current?.lesson ? <Play aria-hidden="true" /> : null}{current?.lesson ? "Regarder" : "Lire le texte"}
-          </button>
-          <button className="btn btn--l" type="button" onClick={() => root.current?.querySelector<HTMLElement>(`.${styles.chapterHeading}`)?.scrollIntoView({ behavior: "smooth" })}>Voir les chapitres</button>
-        </div> : null}
-      </div>
-    </header>
-
-    {headerExtra ? <div className={styles.headerExtra}>{headerExtra}</div> : null}
-
-    {sections.length > 0 && current ? <main className={styles.reader}>
+  return <div ref={root} className={`${styles.page} ${styles.readerPage}`}>
+    {sections.length > 0 && current ? <main className={`${styles.reader} ${styles.readerOnly}`}>
       <div className={styles.toolbar} ref={modeControl}>
         <div className={styles.toolbarSide}>
-          <Link className={styles.iconButton} href="/programme" aria-label="Retour au programme"><ArrowLeft aria-hidden="true" /></Link>
+          <Link className={styles.backButton} href={backHref} aria-label={`Retour au bloc ${displayNumber}`}><ArrowLeft aria-hidden="true" /><span>Bloc {displayNumber}</span></Link>
           <span className={styles.toolbarTitle}><span>Bloc {displayNumber}</span><b>{current.title}</b></span>
         </div>
         <ModeSwitch mode={mode} onChange={setReaderMode} />
@@ -292,15 +268,5 @@ export function ReaderView({
       {allDeliveredComplete && !hasLockedChapters ? <section className={styles.finishCard}><Sparkles aria-hidden="true" /><div><h2>Ce bloc est terminé.</h2><p>Valide ta progression pour continuer dans le programme.</p></div><button className="btn btn--em" type="button" onClick={() => void onValidateBloc()}>{nextBloc ? "Passer au bloc suivant" : "Terminer le programme"}</button></section> : null}
     </main> : totalSections === 0 ? <ReaderEmpty /> : null}
 
-    {hasLockedChapters ? <section className={styles.paywall} aria-label="Accès réservé">
-      <span className={styles.paywallIcon}><LockKeyhole aria-hidden="true" /></span>
-      <div className={styles.paywallCopy}><h2>Continue avec {checkoutLabel}</h2><p>Ton accès actuel ne transmet aucun texte réservé à ce navigateur.</p></div>
-      <div className={styles.paywallAction}><span className={styles.paywallPrice}>{checkoutPrice}</span><a className="btn btn--em" href={checkoutHref}>Voir l'accès</a></div>
-    </section> : null}
-
-    {(previousBloc || nextBloc) ? <nav className={styles.blocNeighbors} aria-label="Blocs voisins">
-      {previousBloc ? <Link href={previousBloc.href}><ArrowLeft aria-hidden="true" />{previousBloc.label}</Link> : <span />}
-      {nextBloc ? <Link href={nextBloc.href}>{nextBloc.label}<ArrowRight aria-hidden="true" /></Link> : <span />}
-    </nav> : null}
   </div>;
 }
