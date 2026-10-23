@@ -1,4 +1,4 @@
-import Link from "next/link";
+// Pas de next/link : /checkout/upgrade crée une session Stripe, un prefetch ne doit jamais l'appeler.
 import { COFFRE_LABEL, COFFRE_PRICE, UPGRADE_PRICE, UPGRADE_PATH, formatEuro } from "@/lib/pricing";
 import { AccountIcon } from "./AccountIcon";
 import { accountUpgradeTarget } from "./accountPresentation";
@@ -19,7 +19,7 @@ export function UpgradeCard({ tier }: { tier: string | null }) {
         <h3 id="ui3-upgrade-title">{beginner ? `Passe à ${COFFRE_LABEL}.` : `Débloque tout BUILD.`}</h3>
         <p>{beginner ? "Tu as déjà Fondations. Tu ne paies que le complément." : "Retrouve tous les blocs, les skills et ORACLE."}</p>
         <p className="ui3-upgrade-price"><strong>{formatEuro(price)}</strong><span>{beginner ? `au lieu de ${formatEuro(COFFRE_PRICE)}` : "paiement unique, accès à vie"}</span></p>
-        <Link className="btn btn--p" href={beginner ? UPGRADE_PATH : "/checkout"}>{beginner ? `Passer à ${COFFRE_LABEL}` : `Débloquer ${COFFRE_LABEL}`}</Link>
+        <a className="btn btn--p" href={beginner ? UPGRADE_PATH : "/checkout"}>{beginner ? `Passer à ${COFFRE_LABEL}` : `Débloquer ${COFFRE_LABEL}`}</a>
       </div>
     </aside>
   );
