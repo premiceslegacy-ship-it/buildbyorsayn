@@ -16,26 +16,14 @@ test("the member MCP entry resolves an honest state for every access and connect
   assert.equal(resolveMcpDashboardEntryState({ visible: true, profileReady: true, tier: "admin", status: "unknown" }), "unknown");
 });
 
-test("the member dashboard exposes one functional MCP rail with free-standing client logos", async () => {
+test("the account menu keeps the existing MCP connection route", async () => {
   const dashboard = await readFile("app/dashboard/page.tsx", "utf8");
-  const entry = await readFile("components/McpDashboardEntry.tsx", "utf8");
+  const nav = await readFile("components/NavBar.tsx", "utf8");
 
-  assert.match(dashboard, /import \{ McpDashboardEntry \}/);
-  assert.match(dashboard, /<McpDashboardEntry tier=\{tier\} profileReady=\{profileReady\} resumeTitle=\{resumeBloc\.titre\} \/>/);
-  assert.match(dashboard, /Carte "Reprendre"[\s\S]*?<\/LiquidCard>[\s\S]*?<McpDashboardEntry/);
-  assert.match(entry, /getMcpConnectionStatus/);
-  assert.match(entry, /resolveMcpDashboardEntryState/);
-  assert.match(entry, /\/brand-logos\/claude\.svg/);
-  assert.match(entry, /\/brand-logos\/chatgpt\.svg/);
-  assert.match(entry, /Assistant connecté/);
-  assert.match(entry, /Reprends ta formation sans chercher le bon bloc/);
-  assert.match(entry, /resumeTitle/);
-  assert.match(entry, /href:\s*"\/mcp\/start"/);
-  assert.match(entry, /href:\s*"\/dashboard\/mcp"/);
-  assert.doesNotMatch(entry, /LiquidCard|rounded-2xl|backdrop-blur|from-.*to-/);
-  const chatgptLogo = await readFile("public/brand-logos/chatgpt.svg", "utf8");
-  assert.match(chatgptLogo, /fill="#fff(?:fff)?"/);
-  assert.match(chatgptLogo, /fill="#0e0e0f"/);
+  assert.match(dashboard, /loadResumeItem/);
+  assert.match(nav, /href="\/dashboard\/mcp"/);
+  assert.match(nav, />Connexion IA</);
+  assert.doesNotMatch(dashboard, /McpDashboardEntry|LiquidCard/);
 });
 
 test("the MCP setup page gates instructions by paid access and uses a focused layout", async () => {

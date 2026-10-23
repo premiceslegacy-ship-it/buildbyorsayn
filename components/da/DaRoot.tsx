@@ -1,4 +1,5 @@
 import "@/app/da.css";
+import "@/app/da-app.css";
 import type { ReactNode } from "react";
 import { preload } from "react-dom";
 

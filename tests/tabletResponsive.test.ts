@@ -4,9 +4,11 @@ import test from "node:test";
 
 test("la navigation BUILD reste compacte sur tablette", async () => {
   const nav = await readFile("components/NavBar.tsx", "utf8");
+  const styles = await readFile("app/da-app.css", "utf8");
 
-  assert.match(nav, /hidden xl:flex items-center gap-6 text-sm/);
-  assert.match(nav, /flex xl:hidden items-center gap-3/);
-  assert.doesNotMatch(nav, /hidden md:flex items-center gap-6 text-sm/);
-  assert.match(nav, /md:px-8 xl:px-12 xl:py-6/);
+  assert.match(nav, /className="navbar__nav"/);
+  assert.match(nav, /className="tabbar"/);
+  assert.match(styles, /@media \(min-width: 735px\)[^}]*navbar__nav \{ display: flex; \}/);
+  assert.match(styles, /@media \(min-width: 735px\)[^}]*tabbar \{ display: none; \}/);
+  assert.match(styles, /width: min\(402px, calc\(100% - 32px\)\)/);
 });

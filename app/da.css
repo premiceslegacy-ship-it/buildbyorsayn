@@ -32,6 +32,7 @@
 .da .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .da .wrap { width: min(var(--wrap), 100% - 2 * var(--gutter)); margin-inline: auto; }
 .da .ic { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.da .ic--f { fill: currentColor; stroke: none; }
 
 /* ───────── texte ───────── */
 .da .t-aff { font: 700 clamp(44px, 7.4vw, 100px)/1.02 var(--font-t); letter-spacing: -.045em; color: var(--encre); text-wrap: balance; }

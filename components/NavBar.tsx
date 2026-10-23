@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GraduationCap, ShieldCheck, Menu, X, ChevronDown, PhoneCall } from "lucide-react";
-import { Logo } from "@/components/Logo";
-import { normalizeProfileTier } from "@/lib/mcpAccess";
-import { GooeyNav, type GooeyNavItem } from "@/components/ui/gooey-nav";
-import { NouveautesBadge, NouveautesNavLink } from "@/components/nouveautes/NouveautesNavLink";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { DaIcon } from "@/components/da/DaIcon";
+import { SearchDialog } from "@/components/da/SearchDialog";
 import { useNouveautesUnseenCount } from "@/components/nouveautes/useNouveautesUnseenCount";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
+import { animateAppElement, installAppMotionTokens, motionAllowed } from "@/lib/ui/motion";
+import { playAppSound, useAppSound } from "@/lib/ui/sound";
 
 interface NavBarProps {
   activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "nouveautes" | "protocole" | "videos-tutos" | "accompagnement";
@@ -21,332 +22,158 @@ interface NavBarProps {
   onStackClick?: () => void;
 }
 
-export function NavBar({
-  activeLink,
-  tier,
-  isAdmin = false,
-  displayName,
-  displayEmail,
-  initials,
-  onFondationsClick,
-  onStackClick,
-}: NavBarProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isFondationsOpen, setIsFondationsOpen] = useState(false);
+const NAV = [
+  { label: "Aujourd'hui", href: "/dashboard", icon: "home" as const },
+  { label: "Programme", href: "/programme", icon: "grid" as const },
+  { label: "Skills", href: "/skills", icon: "skill" as const },
+  { label: "Nouveautés", href: "/nouveautes", icon: "news" as const },
+];
+
+function tierLabel(tier: string | null | undefined) {
+  const normalized = normalizeProfileTier(tier);
+  if (normalized === "full") return "LE COFFRE";
+  if (normalized === "beginner") return "Fondations";
+  if (normalized === "preview") return "Aperçu";
+  return "Gratuit";
+}
+
+export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initials }: NavBarProps) {
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const desktopDropdownRef = useRef<HTMLDivElement>(null);
-  const mobileDropdownRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const fondationsRef = useRef<HTMLDivElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const avatar = useRef<HTMLButtonElement>(null);
+  const menuAnimation = useRef<Animation | null>(null);
+  const { enabled, setEnabled } = useAppSound();
+  const unseenCount = useNouveautesUnseenCount();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    installAppMotionTokens();
+    const onScroll = () => setScrolled(window.scrollY > 18);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      const isInsideDropdown =
-        desktopDropdownRef.current?.contains(target) ||
-        mobileDropdownRef.current?.contains(target);
-
-      if (!isInsideDropdown) {
-        setIsDropdownOpen(false);
-      }
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
-        setIsMobileMenuOpen(false);
-      }
-      if (fondationsRef.current && !fondationsRef.current.contains(target)) {
-        setIsFondationsOpen(false);
-      }
+    const selector = '[data-sfx], a[href], button, [role="tab"], summary, .chip';
+    let pressed = false;
+    const kindOf = (target: HTMLElement) => target.dataset.sfx || (target.closest('[role="tablist"], .tabs, .seg') ? "select" : "click");
+    const pointer = (event: PointerEvent) => {
+      const target = (event.target as Element | null)?.closest<HTMLElement>(selector);
+      pressed = false;
+      if (!target || target.matches(":disabled") || target.getAttribute("aria-disabled") === "true") return;
+      const kind = kindOf(target);
+      if (kind === "none") return;
+      pressed = true;
+      void playAppSound(kind as "click" | "select" | "open" | "confirm" | "error");
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    const click = (event: MouseEvent) => {
+      const target = (event.target as Element | null)?.closest<HTMLElement>(selector);
+      if (!target || target.matches(":disabled")) return;
+      if (!pressed && event.detail === 0) {
+        const kind = kindOf(target);
+        if (kind !== "none") void playAppSound(kind as "click" | "select" | "open" | "confirm" | "error");
+      }
+      pressed = false;
+    };
+    document.addEventListener("pointerdown", pointer, true);
+    document.addEventListener("click", click);
+    return () => { document.removeEventListener("pointerdown", pointer, true); document.removeEventListener("click", click); };
   }, []);
 
-  const linkClass = (link: string) =>
-    activeLink === link
-      ? "text-[#f0ede8] font-medium"
-      : "text-white/40 hover:text-white/80 transition-colors";
+  const closeMenu = useCallback((focusBack = false) => {
+    if (!menu.current) { setMenuOpen(false); return; }
+    menuAnimation.current?.cancel();
+    if (!motionAllowed()) { setMenuOpen(false); if (focusBack) avatar.current?.focus(); return; }
+    setMenuClosing(true);
+    menuAnimation.current = menu.current.animate([{ opacity: 1 }, { opacity: 0, transform: "scale(.97)" }], { duration: 140, easing: "cubic-bezier(.4,0,.6,1)" });
+    menuAnimation.current.onfinish = () => { setMenuOpen(false); setMenuClosing(false); menuAnimation.current = null; };
+    if (focusBack) avatar.current?.focus({ preventScroll: true });
+  }, []);
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
+  useEffect(() => {
+    if (!menuOpen) return;
+    menuAnimation.current?.cancel();
+    if (menu.current) {
+      menuAnimation.current = animateAppElement(menu.current, [{ opacity: 0, transform: "scale(.92) translateY(-8px)" }, { opacity: 1, transform: "none" }], "doux");
+      menu.current.querySelector<HTMLElement>('[role^="menuitem"]')?.focus({ preventScroll: true });
+    }
+    const outside = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!menu.current?.contains(target) && !avatar.current?.contains(target)) closeMenu(false);
+    };
+    const key = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); closeMenu(true); return; }
+      if (event.key === "Tab") { closeMenu(false); return; }
+      const items = [...(menu.current?.querySelectorAll<HTMLElement>('[role^="menuitem"]') ?? [])];
+      const current = items.indexOf(document.activeElement as HTMLElement);
+      if (event.key === "ArrowDown") { event.preventDefault(); items[(current + 1) % items.length]?.focus(); }
+      if (event.key === "ArrowUp") { event.preventDefault(); items[(current + items.length - 1) % items.length]?.focus(); }
+      if (event.key === "Home") { event.preventDefault(); items[0]?.focus(); }
+      if (event.key === "End") { event.preventDefault(); items.at(-1)?.focus(); }
+    };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", key);
+    return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", key); };
+  }, [closeMenu, menuOpen]);
 
-  const normalizedTier = normalizeProfileTier(tier);
-  const hasFoundationAccess = normalizedTier === "beginner" || normalizedTier === "full";
-  const pathname = usePathname();
-  const nouveautesUnseen = useNouveautesUnseenCount();
+  useEffect(() => {
+    const shortcut = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (target.matches("input, textarea, [contenteditable=true]")) return;
+      if (((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") || event.key === "/") {
+        event.preventDefault();
+        setSearchOpen(true);
+        void playAppSound("open");
+      }
+    };
+    document.addEventListener("keydown", shortcut);
+    return () => document.removeEventListener("keydown", shortcut);
+  }, []);
 
-  const gooeyItems: GooeyNavItem[] = useMemo(
-    () => [
-      { label: "Tableau de bord", href: "/dashboard" },
-      { label: "Skills", href: "/skills" },
-      { label: "Nouveautés", href: "/nouveautes", badge: <NouveautesBadge count={nouveautesUnseen} /> },
-      { label: "Hermes Agent", href: "/videos/tutos" },
-    ],
-    [nouveautesUnseen]
-  );
-  const gooeyActiveIndex = gooeyItems.findIndex(
-    (item) => typeof item !== "string" && item.href === pathname
-  );
-
-  const navLinks = (
-    <>
-      <Link href="/dashboard" className={linkClass("dashboard")} onClick={() => setIsMobileMenuOpen(false)}>
-        Tableau de bord
-      </Link>
-
-      {hasFoundationAccess ? (
-        <Link href="/beginner" className={`${linkClass("beginner")} flex items-center gap-1.5`} onClick={() => setIsMobileMenuOpen(false)}>
-          <GraduationCap className="w-3.5 h-3.5" /> Fondations
-        </Link>
-      ) : (
-        <button
-          onClick={() => { setIsMobileMenuOpen(false); onFondationsClick?.(); }}
-          className="text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5 bg-transparent border-none font-[inherit] text-sm cursor-pointer"
-        >
-          <GraduationCap className="w-3.5 h-3.5" /> Fondations
-        </button>
-      )}
-
-      {hasFoundationAccess && (
-        <Link href="/protocole" className={`${linkClass("protocole")} pl-4`} onClick={() => setIsMobileMenuOpen(false)}>
-          Protocole Zéro
-        </Link>
-      )}
-
-      {hasFoundationAccess ? (
-        <Link href="/sources" className={linkClass("sources")} onClick={() => setIsMobileMenuOpen(false)}>
-          La stack
-        </Link>
-      ) : (
-        <button
-          onClick={() => { setIsMobileMenuOpen(false); onStackClick?.(); }}
-          className="text-white/40 hover:text-white/80 transition-colors bg-transparent border-none font-[inherit] text-sm cursor-pointer"
-        >
-          La stack
-        </button>
-      )}
-
-      <Link href="/skills" className={linkClass("skills")} onClick={() => setIsMobileMenuOpen(false)}>
-        Skills
-      </Link>
-
-      <NouveautesNavLink count={nouveautesUnseen} className={linkClass("nouveautes")} onClick={() => setIsMobileMenuOpen(false)} />
-
-      <Link href="/videos/tutos" className={linkClass("videos-tutos")} onClick={() => setIsMobileMenuOpen(false)}>
-        Hermes Agent
-      </Link>
-
-      <Link
-        href="/accompagnement"
-        className={`${activeLink === "accompagnement" ? "text-[#e8d5b0] font-medium" : "text-[#e8d5b0]/80 hover:text-[#e8d5b0]"} flex items-center gap-1.5`}
-        onClick={() => setIsMobileMenuOpen(false)}
-      >
-        <PhoneCall className="w-3.5 h-3.5" /> Accompagnement
-      </Link>
-
-      {isAdmin && (
-        <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-          <ShieldCheck className="w-4 h-4" aria-label="Administration" />
-        </Link>
-      )}
-    </>
-  );
-
-  const desktopNavLinks = (
-    <>
-      {hasFoundationAccess ? (
-        <div className="relative" ref={fondationsRef}>
-          <button
-            type="button"
-            onClick={() => setIsFondationsOpen(!isFondationsOpen)}
-            className={`${linkClass("beginner")} flex items-center gap-1.5 bg-transparent border-none font-[inherit] text-sm cursor-pointer`}
-            aria-expanded={isFondationsOpen}
-            aria-controls="foundations-navigation"
-            aria-haspopup="menu"
-          >
-            <GraduationCap className="w-3.5 h-3.5" /> Fondations
-            <ChevronDown className={`w-3 h-3 transition-transform ${isFondationsOpen ? "rotate-180" : ""}`} />
-          </button>
-
-          {isFondationsOpen && (
-            <div id="foundations-navigation" className="absolute left-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-44 z-50 flex flex-col gap-0.5">
-              <Link
-                href="/beginner"
-                onClick={() => setIsFondationsOpen(false)}
-                className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
-                  activeLink === "beginner" ? "text-[#f0ede8] bg-white/5" : "text-white/50 hover:bg-white/5 hover:text-white/80"
-                }`}
-              >
-                Fondations
-              </Link>
-              <Link
-                href="/protocole"
-                onClick={() => setIsFondationsOpen(false)}
-                className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
-                  activeLink === "protocole" ? "text-[#f0ede8] bg-white/5" : "text-white/50 hover:bg-white/5 hover:text-white/80"
-                }`}
-              >
-                Protocole Zéro
-              </Link>
-            </div>
-          )}
-        </div>
-      ) : (
-        <button
-          onClick={() => onFondationsClick?.()}
-          className="text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5 bg-transparent border-none font-[inherit] text-sm cursor-pointer"
-        >
-          <GraduationCap className="w-3.5 h-3.5" /> Fondations
-        </button>
-      )}
-
-      {hasFoundationAccess ? (
-        <Link href="/sources" className={linkClass("sources")}>
-          La stack
-        </Link>
-      ) : (
-        <button
-          onClick={() => onStackClick?.()}
-          className="text-white/40 hover:text-white/80 transition-colors bg-transparent border-none font-[inherit] text-sm cursor-pointer"
-        >
-          La stack
-        </button>
-      )}
-
-      <GooeyNav items={gooeyItems} value={gooeyActiveIndex} size="sm" aria-label="Navigation secondaire" />
-
-      <Link
-        href="/accompagnement"
-        className={`${activeLink === "accompagnement" ? "text-[#e8d5b0] font-medium" : "text-[#e8d5b0]/80 hover:text-[#e8d5b0]"} flex items-center gap-1.5`}
-      >
-        <PhoneCall className="w-3.5 h-3.5" /> Accompagnement
-      </Link>
-
-      {isAdmin && (
-        <Link href="/admin" className="text-white/30 hover:text-[#e8d5b0] transition-colors">
-          <ShieldCheck className="w-4 h-4" aria-label="Administration" />
-        </Link>
-      )}
-    </>
-  );
+  const openMenu = () => {
+    if (menuClosing) {
+      menuAnimation.current?.cancel();
+      setMenuClosing(false);
+      if (menu.current) menuAnimation.current = animateAppElement(menu.current, [{ opacity: 0, transform: "scale(.92) translateY(-8px)" }, { opacity: 1, transform: "none" }], "doux");
+      void playAppSound("open");
+      return;
+    }
+    if (menuOpen) { closeMenu(true); return; }
+    setMenuOpen(true);
+    void playAppSound("open");
+  };
+  const openSearch = () => { setSearchOpen(true); void playAppSound("open"); };
+  const isCurrent = (href: string) => pathname === href || (href === "/skills" && pathname.startsWith("/skills"));
+  const signedIn = Boolean(displayEmail || displayName);
 
   return (
-    <header
-      className={`sticky top-0 z-40 w-full backdrop-blur-xl border-b transition-colors duration-300 ${
-        scrolled
-          ? "bg-[#0e0e0f]/70 border-white/[0.07] shadow-[0_8px_32px_-12px_rgba(0,0,0,0.55)]"
-          : "bg-transparent border-transparent"
-      }`}
-    >
-    <nav aria-label="Navigation principale" className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 py-4 md:px-8 xl:px-12 xl:py-6">
-      <Link href="/" aria-label="Accueil BUILD" className="inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0e0f]">
-        <Logo layout="horizontal" className="h-6" hideText={false} />
-      </Link>
-
-      {/* Desktop links */}
-      <div className="hidden xl:flex items-center gap-6 text-sm">
-        {desktopNavLinks}
-
-        {displayEmail ? (
-          <div className="relative" ref={desktopDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
-              aria-label="Menu du compte"
-              aria-expanded={isDropdownOpen}
-              aria-controls="desktop-account-menu"
-              aria-haspopup="menu"
-            >
-              {initials && initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
-            </button>
-
-            {isDropdownOpen && (
-              <div id="desktop-account-menu" className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
-                {displayName && (
-                  <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
-                )}
-                <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
-                <form action="/api/signout" method="post">
-                  <button
-                    type="submit"
-                    className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
-                  >
-                    Se déconnecter
-                  </button>
-                </form>
-              </div>
-            )}
-          </div>
-        ) : (
-          <Link href="/login" className="text-[#e8d5b0] hover:text-[#f0ede8] transition-colors font-medium">
-            Se connecter
-          </Link>
-        )}
-      </div>
-
-      {/* Mobile: hamburger + avatar */}
-      <div className="flex xl:hidden items-center gap-3">
-        {displayEmail ? (
-          <div className="relative" ref={mobileDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="min-w-11 min-h-11 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium text-[#e8d5b0] border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
-              aria-label="Menu du compte"
-              aria-expanded={isDropdownOpen}
-              aria-controls="mobile-account-menu"
-              aria-haspopup="menu"
-            >
-              {initials && initials !== "?" ? initials : <span className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />}
-            </button>
-            {isDropdownOpen && (
-              <div id="mobile-account-menu" className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-2 w-48 z-50">
-                {displayName && (
-                  <div className="px-2 pt-2 text-sm text-[#f0ede8] font-medium">{displayName}</div>
-                )}
-                <div className="px-2 pb-2 mb-2 text-xs text-white/40 border-b border-white/10">{displayEmail}</div>
-                <form action="/api/signout" method="post">
-                  <button
-                    type="submit"
-                    className="w-full text-left px-2 py-1.5 text-sm text-[#f87171] hover:bg-white/5 rounded-md transition-colors cursor-pointer"
-                  >
-                    Se déconnecter
-                  </button>
-                </form>
-              </div>
-            )}
-          </div>
-        ) : (
-          <Link href="/login" className="text-[#e8d5b0] hover:text-[#f0ede8] transition-colors text-sm font-medium">
-            Se connecter
-          </Link>
-        )}
-
-        <div ref={mobileMenuRef} className="relative">
-          <button
-            type="button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="min-w-11 min-h-11 bg-white/10 rounded-lg flex items-center justify-center border border-white/10 cursor-pointer hover:bg-white/20 transition-colors"
-            aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            aria-expanded={isMobileMenuOpen}
-            aria-controls="mobile-navigation"
-            aria-haspopup="menu"
-          >
-            {isMobileMenuOpen ? <X className="w-4 h-4 text-[#f0ede8]" /> : <Menu className="w-4 h-4 text-[#f0ede8]" />}
-          </button>
-
-          {isMobileMenuOpen && (
-            <div id="mobile-navigation" className="absolute right-0 mt-2 bg-[#161618] border border-white/10 shadow-2xl rounded-xl p-3 w-52 z-50 flex flex-col gap-1">
-              {navLinks}
-            </div>
-          )}
+    <div className="da da-app nav-shell">
+      <header className={`navbar${scrolled ? " solid" : ""}`}>
+        <Link className="navbar__logo" href={signedIn ? "/dashboard" : "/"} aria-label="BUILD"><Image src="/da/logo-sombre.svg" alt="BUILD" width={112} height={28} priority /></Link>
+        <nav className="navbar__nav" aria-label="Principal">{NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}{item.href === "/nouveautes" && unseenCount ? <span className="nav-unseen" aria-label={`${unseenCount} nouveautés non vues`}>{unseenCount > 99 ? "99+" : unseenCount}</span> : null}</Link>)}</nav>
+        <div className="navbar__r">
+          {signedIn && <button className="navbar__ib" type="button" aria-label="Rechercher" data-sfx="none" onClick={openSearch}><DaIcon name="search" /></button>}
+          {signedIn && <button className="navbar__ib" type="button" aria-label="Sons de l'interface" aria-pressed={enabled} data-sfx="none" onClick={() => { setEnabled(!enabled); void playAppSound("select"); }}><DaIcon name={enabled ? "volume" : "mute"} /></button>}
+          {signedIn ? <button ref={avatar} className="avatar" type="button" aria-label="Compte" aria-haspopup="menu" aria-expanded={menuOpen && !menuClosing} data-sfx="none" onClick={openMenu}>{initials || displayName?.slice(0, 2).toUpperCase() || "?"}</button> : <Link className="btn btn--g btn--s" href="/login">Se connecter</Link>}
         </div>
-      </div>
-    </nav>
-    </header>
+      </header>
+      {signedIn && menuOpen && <div className="amenu" ref={menu} role="menu" aria-label="Compte">
+        <div className="amenu__h"><span className="avatar amenu__av">{initials || displayName?.slice(0, 2).toUpperCase()}</span><span className="amenu__id"><b>{displayName}</b><small>{displayEmail}</small></span><span className="pastille amenu__tier"><b />{tierLabel(tier)}</span></div>
+        <div className="amenu__l">
+          <Link role="menuitem" href="/compte"><DaIcon name="user" />Compte</Link>
+          <Link role="menuitem" href="/checkout"><DaIcon name="creditCard" />Abonnement</Link>
+          <Link role="menuitem" href="/dashboard/mcp"><DaIcon name="plug" />Connexion IA</Link>
+          {isAdmin && <Link role="menuitem" href="/admin"><DaIcon name="grid" />Administration</Link>}
+          <button role="menuitemcheckbox" aria-checked={enabled} type="button" data-sfx="none" onClick={() => { setEnabled(!enabled); void playAppSound("select"); }}><DaIcon name={enabled ? "volume" : "mute"} />Sons<span className="amenu__sw" /></button>
+        </div>
+        <div className="amenu__l amenu__l--b"><form action="/api/signout" method="post"><button role="menuitem" type="submit"><DaIcon name="logout" />Se déconnecter</button></form></div>
+      </div>}
+      {signedIn && <nav className="tabbar" aria-label="Navigation mobile">{NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}><DaIcon name={item.icon} /><span className="tabbar__label">{item.label}</span>{item.href === "/nouveautes" && unseenCount ? <span className="nav-unseen nav-unseen--mobile" aria-label={`${unseenCount} nouveautés non vues`}>{unseenCount > 99 ? "99+" : unseenCount}</span> : null}</Link>)}</nav>}
+      {signedIn && <SearchDialog open={searchOpen} onClose={closeSearch} />}
+    </div>
   );
 }

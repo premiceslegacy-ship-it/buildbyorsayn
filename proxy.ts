@@ -55,6 +55,7 @@ function guardsPathname(pathname: string): boolean {
     const under = (base: string) => pathname === base || pathname.startsWith(`${base}/`);
     return (
         under("/dashboard") ||
+        pathname === "/programme" ||
         under("/blocs") ||
         pathname === "/sources" ||
         pathname === "/skills" ||

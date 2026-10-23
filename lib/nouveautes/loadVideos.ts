@@ -2,6 +2,7 @@ import { NOUVEAUTES_LIMIT, type FeedVideo } from "./videos";
 
 export const YOUTUBE_VIDEOS_CACHE_TAG = "youtube-videos";
 const REVALIDATE_SECONDS = 300;
+export type NouveautesFeed = { status: "ready"; videos: FeedVideo[] } | { status: "empty"; videos: [] } | { status: "error"; videos: [] };
 
 /**
  * Public list of channel videos. Reads PostgREST with the anon key and no
@@ -11,9 +12,13 @@ const REVALIDATE_SECONDS = 300;
  * immediately instead of after the 5-minute window.
  */
 export async function loadNouveautesVideos(fetchImpl: typeof fetch = fetch): Promise<FeedVideo[]> {
+  return (await loadNouveautesFeed(fetchImpl)).videos;
+}
+
+export async function loadNouveautesFeed(fetchImpl: typeof fetch = fetch): Promise<NouveautesFeed> {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!base || !anonKey) return [];
+  if (!base || !anonKey) return { status: "empty", videos: [] };
   try {
     const query = new URLSearchParams({ select: "video_id,title,published_at", order: "published_at.desc", limit: String(NOUVEAUTES_LIMIT) });
     const response = await fetchImpl(`${base}/rest/v1/youtube_videos?${query}`, {
@@ -21,9 +26,10 @@ export async function loadNouveautesVideos(fetchImpl: typeof fetch = fetch): Pro
       next: { revalidate: REVALIDATE_SECONDS, tags: [YOUTUBE_VIDEOS_CACHE_TAG] },
     });
     if (!response.ok) throw new Error(`PostgREST responded ${response.status}`);
-    return (await response.json()) as FeedVideo[];
+    const videos = (await response.json()) as FeedVideo[];
+    return videos.length ? { status: "ready", videos } : { status: "empty", videos: [] };
   } catch (error) {
     console.error("nouveautes.load.failed", error instanceof Error ? error.message : error);
-    return [];
+    return { status: "error", videos: [] };
   }
 }

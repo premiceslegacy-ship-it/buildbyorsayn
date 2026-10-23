@@ -16,6 +16,8 @@ test("les pages protégées gardent leur contenu dans des Server Components", ()
     "app/sources/page.tsx": 'requirePageAccess("beginner", "/sources")',
     "app/beginner/page.tsx": 'requirePageAccess("beginner", "/beginner")',
     "app/skills/page.tsx": 'requirePageAccess("authenticated", "/skills")',
+    "app/dashboard/page.tsx": 'requirePageAccess("authenticated", "/dashboard")',
+    "app/programme/page.tsx": 'requirePageAccess("authenticated", "/programme")',
   };
   for (const [path, accessCheck] of Object.entries(requirements)) {
     const source = readFileSync(path, "utf8");
