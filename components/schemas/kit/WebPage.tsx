@@ -1,5 +1,5 @@
 import { Check, X } from "lucide-react";
-import { KitFrame } from "./KitFrame";
+import { KitFrame, SITE_DESIGN_DISCLAIMER } from "./KitFrame";
 import type { KitBaseProps } from "./types";
 import styles from "./kit.module.css";
 
@@ -49,7 +49,7 @@ function BrowserPage({ page, annotations = [], quality }: { page: WebPageData; a
 }
 
 export function WebPage({ page, annotations, ...frame }: WebPageProps) {
-  return <KitFrame {...frame} kind="web-page">
+  return <KitFrame {...frame} kind="web-page" keys={annotations.length ? [{ swatch: "accent", label: "Chaque pastille renvoie à son explication" }] : undefined} disclaimer={SITE_DESIGN_DISCLAIMER}>
     <div className={styles.webAnnotated}>
       <BrowserPage page={page} annotations={annotations} />
       <ol className={styles.webNotes}>{annotations.map((annotation) => <li key={annotation.number}><span>{annotation.number}</span><p>{annotation.label}</p></li>)}</ol>
@@ -65,7 +65,7 @@ export type WebPageCompareProps = KitBaseProps & {
 };
 
 export function WebPageCompare({ beforeTitle, afterTitle, before, after, ...frame }: WebPageCompareProps) {
-  return <KitFrame {...frame} kind="web-page-compare">
+  return <KitFrame {...frame} kind="web-page-compare" disclaimer={SITE_DESIGN_DISCLAIMER}>
     <div className={styles.webCompare}>
       <section><h4><X aria-hidden="true" />{beforeTitle}</h4><BrowserPage page={before} quality="weak" /></section>
       <section><h4><Check aria-hidden="true" />{afterTitle}</h4><BrowserPage page={after} quality="useful" /></section>

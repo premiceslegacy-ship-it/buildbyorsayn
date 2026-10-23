@@ -66,6 +66,7 @@ export default function ReaderClient({ bloc, tier, identity, initialMode, initia
       finishTitle="Ce bloc est terminé."
       thumbnailSrc={`/da/mini/b${bloc.displayNumber}.jpg`}
       videoIntroductionMarkdown={bloc.introduction}
+      readingScope="bloc"
     />
   </DaRoot>;
 }

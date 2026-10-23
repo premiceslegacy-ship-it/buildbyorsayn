@@ -1,53 +1,55 @@
-import { Cycle, Fork, Steps, Workflow } from "../kit";
+import { Cycle, Fork, Rings, Steps, Workflow } from "../kit";
 
 const EM = "#22d96e";
 
 export function DuDossierAuDomaineDiagram() {
   return <Steps
-    title="Chaque objet garde son rôle"
-    description="Le dossier avance jusqu'à l'enseigne publique sans se confondre avec elle."
-    ariaLabel="Une ligne de montage va du dossier au domaine par Git, GitHub et Vercel."
+    title="Du dossier au domaine"
+    description="Exemple : Maison Lila. Chaque pièce a son rôle, et l'adresse publique n'est que le dernier maillon."
+    legend="Lis de gauche à droite : un commit, un push, une publication, puis l'adresse."
+    ariaLabel="Le dossier maison-lila vit sur l'ordinateur, Git nomme chaque version par un commit, GitHub garde le dépôt, Vercel publie la version choisie et le domaine maisonlila.fr y conduit, mis en avant."
     accent={EM}
     accentIndex={4}
     items={[
-      { label: "Dossier", detail: "Vit sur l'ordinateur" },
-      { label: "Git", detail: "Garde l'histoire" },
-      { label: "GitHub", detail: "Conserve le dépôt", tools: ["GitHub"] },
+      { label: "Dossier", detail: "maison-lila, sur l'ordinateur" },
+      { label: "Git", detail: "Un commit par version" },
+      { label: "GitHub", detail: "Garde le dépôt", tools: ["GitHub"] },
       { label: "Vercel", detail: "Publie la version", tools: ["Vercel"] },
-      { label: "Domaine", detail: "Allume l'adresse" },
+      { label: "Domaine", detail: "maisonlila.fr" },
     ]}
   />;
 }
 
 export function OuvrirOuClonerMockup() {
   return <Fork
-    title="Où est le projet ?"
-    description="Tu ouvres ce qui existe ici ou tu clones ce qui vit sur GitHub."
-    ariaLabel="Deux portes distinguent un dossier déjà sur l'ordinateur d'un dépôt seulement sur GitHub, puis demandent de vérifier le chemin."
+    title="Où est le projet ?"
+    description="Dans Antigravity, tu ouvres ce qui existe sur ton ordinateur ou tu clones ce qui vit sur GitHub."
+    legend="Dans les deux cas, ouvre seulement le dossier du projet, jamais tout ton Bureau."
+    ariaLabel="Deux boutons d'Antigravity : Open Folder quand le dossier maison-lila est déjà sur l'ordinateur, Clone Repository quand le projet existe seulement sur GitHub."
     accent={EM}
-    situation="Où est le projet ?"
+    situation="Où vit maison-lila ?"
     outcomes={[
-      { label: "Open Folder", condition: "Déjà sur cet ordinateur" },
-      { label: "Clone Repository", condition: "Seulement sur GitHub" },
-      { label: "Vérifie le chemin", condition: "Dossier principal et branche", recommended: true },
+      { label: "Open Folder", condition: "Le dossier est déjà sur ton ordinateur" },
+      { label: "Clone Repository", condition: "Le projet existe seulement sur GitHub" },
     ]}
   />;
 }
 
 export function BouclePetiteTacheDiagram() {
   return <Cycle
-    title="Une petite tâche tourne jusqu'au vrai test"
-    description="La main reprend l'écran après chaque modification."
-    ariaLabel="La boucle lit, modifie, ouvre, teste et corrige, avec ouvrir mis en avant."
+    title="Une petite tâche, puis le vrai test"
+    description="Exemple : l'en-tête de Maison Lila. L'outil modifie, toi tu ouvres la page et tu testes avant la suite."
+    legend="Passe à la partie suivante seulement quand un tour se termine sans correction."
+    ariaLabel="La boucle lit le résumé de mission, modifie l'en-tête avec Claude Code, ouvre la page en local, teste les liens, le bouton et le mobile, puis corrige avec un retour précis avant de recommencer."
     accent={EM}
-    entryIndex={2}
-    centerLabel="Premier écran"
+    entryIndex={0}
+    centerLabel="Partie suivante"
     steps={[
-      { label: "Lire", detail: "Comprendre le brief" },
-      { label: "Modifier", detail: "Changer en petit", tool: "Codex" },
-      { label: "Ouvrir", detail: "Voir le rendu", tool: "Claude Code" },
-      { label: "Tester", detail: "Faire le geste" },
-      { label: "Corriger", detail: "Reprendre ce qui casse" },
+      { label: "Lire", detail: "Mission et fichiers touchés" },
+      { label: "Modifier", detail: "L'en-tête seulement", tool: "Claude Code" },
+      { label: "Ouvrir", detail: "La page en local" },
+      { label: "Tester", detail: "Liens, bouton, mobile" },
+      { label: "Corriger", detail: "Un retour précis" },
     ]}
   />;
 }
@@ -55,34 +57,37 @@ export function BouclePetiteTacheDiagram() {
 export function DepotVersHebergeurDiagram() {
   return <Workflow
     title="Publie une version connue"
-    description="Le trajet se termine seulement quand l'adresse publique est testée."
-    ariaLabel="Un commit est poussé vers GitHub, construit par Vercel, ouvert à son adresse publique puis testé."
+    description="Exemple : Maison Lila. Le commit relu part sur GitHub, Vercel le construit, puis tu testes l'adresse."
+    legend="Ouvre GitHub après le push : le bon commit doit y apparaître avant la publication."
+    ariaLabel="Tu fais un commit relu, tu le pousses sur GitHub, Vercel construit le dépôt et le met en ligne, puis tu testes l'adresse publique, mis en avant."
     accent={EM}
-    actors={["Dépôt", "GitHub", "Vercel", "Public"]}
+    actors={["Toi", "GitHub", "Vercel"]}
     accentIndex={4}
     steps={[
-      { actor: 0, label: "Commit", transfer: "tampon" },
-      { actor: 1, label: "Push", tool: "GitHub" },
-      { actor: 2, label: "Construire", tool: "Vercel" },
-      { actor: 3, label: "Adresse publique", transfer: "téléphone" },
-      { actor: 3, label: "Tester", humanValidation: true },
+      { actor: 0, label: "Commit" },
+      { actor: 1, label: "Push", transfer: "le commit", tool: "GitHub" },
+      { actor: 2, label: "Build", transfer: "le dépôt", tool: "Vercel" },
+      { actor: 2, label: "En ligne", transfer: "le site" },
+      { actor: 0, label: "Test", transfer: "l'adresse", humanValidation: true },
     ]}
   />;
 }
 
 export function InfrastructurePriveeDiagram() {
-  return <Steps
-    title="Une tour qui reste entretenue"
-    description="Chaque étage protège une responsabilité compréhensible."
-    ariaLabel="Une infrastructure privée empile le compte, le réseau privé, l'agent, les journaux et la sauvegarde."
+  return <Rings
+    title="Ce qui entoure ton serveur"
+    description="Un VPS garde ton agent disponible, à condition d'entretenir chaque couche autour de lui."
+    legend="Tailscale ne remplace ni les mises à jour ni le pare-feu : chaque couche compte."
+    ariaLabel="Autour de l'agent installé sur un VPS, cinq couches : un compte sans droits administrateur, une clé SSH, le réseau privé Tailscale mis en avant, un pare-feu qui ferme les accès inutiles et une sauvegarde pour récupérer."
     accent={EM}
-    accentIndex={4}
-    items={[
-      { label: "Compte", detail: "Qui peut entrer" },
-      { label: "Réseau privé", detail: "La porte principale", tools: ["Tailscale", "Cloudflare"] },
-      { label: "Agent", detail: "Ce qui agit", tools: ["Hermes Agent"] },
-      { label: "Journaux", detail: "Ce qui s'est passé" },
-      { label: "Sauvegarde", detail: "La copie restaurée" },
+    core="Agent"
+    accentIndex={2}
+    rings={[
+      { label: "Compte", detail: "Sans droits administrateur" },
+      { label: "Clé SSH", detail: "Pas de mot de passe" },
+      { label: "Tailscale", detail: "Administration hors du web" },
+      { label: "Pare-feu", detail: "Accès inutiles fermés" },
+      { label: "Sauvegarde", detail: "Une voie de récupération" },
     ]}
   />;
 }
@@ -90,16 +95,17 @@ export function InfrastructurePriveeDiagram() {
 export function RemiseDesClesDiagram() {
   return <Steps
     title="Le client repart avec les clés"
-    description="Chaque accès ouvre un objet précis et la procédure explique les gestes."
-    ariaLabel="La remise contient le dépôt, l'hébergement, le domaine, la mesure et une procédure mise en avant."
+    description="Exemple : Maison Lila reçoit chaque compte à son nom, plus la procédure pour continuer sans toi."
+    legend="Le site est remis quand la fleuriste publie seule un bouquet de test."
+    ariaLabel="Maison Lila récupère le dépôt dans son organisation GitHub, le projet Vercel à son nom, son domaine, la mesure avec Search Console et PostHog, et la procédure de reprise, mise en avant."
     accent={EM}
     accentIndex={4}
     items={[
-      { label: "Dépôt", detail: "Compte du client", tools: ["GitHub"] },
-      { label: "Hébergement", detail: "Projet transféré", tools: ["Vercel"] },
-      { label: "Domaine", detail: "Adresse contrôlée" },
-      { label: "Mesure", detail: "Recherche et usage", tools: ["Search Console", "PostHog"] },
-      { label: "Procédure", detail: "Refaire les gestes" },
+      { label: "Dépôt", detail: "Son organisation", tools: ["GitHub"] },
+      { label: "Hébergement", detail: "Projet à son nom", tools: ["Vercel"] },
+      { label: "Domaine", detail: "maisonlila.fr reste à elle" },
+      { label: "Mesure", detail: "Recherche et visites", tools: ["Search Console", "PostHog"] },
+      { label: "Procédure", detail: "Publier, restaurer, appeler" },
     ]}
   />;
 }

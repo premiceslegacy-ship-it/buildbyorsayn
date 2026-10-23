@@ -1,7 +1,71 @@
-import type { CourseVisualDefinition } from "../protocole/kit-instance";
+import { Fork, WebPage, Workflow } from "../kit";
+import type { HandcraftedVisual } from "../coffre/types";
+
+const EM = "#22d96e";
+
+export function TroisRoutesSelonLaClarteDiagram() {
+  return <Fork
+    title="La clarté choisit la route"
+    description="La route dépend de ce que la personne comprend déjà de son besoin et de ton offre."
+    legend="Un non-fit reste une bonne sortie si tu dis ce qui manque."
+    ariaLabel="Selon ce que la personne comprend déjà, quatre routes : parler si besoin et offre sont clairs, montrer si le fonctionnement reste flou, diagnostiquer si le besoin est dur à nommer, ou une sortie utile qui dit quoi préparer."
+    accent={EM}
+    situation="Que comprend-elle déjà ?"
+    outcomes={[
+      { label: "Parler", condition: "Besoin et offre sont clairs" },
+      { label: "Montrer", condition: "Fonctionnement flou" },
+      { label: "Diagnostiquer", condition: "Le besoin est dur à nommer" },
+      { label: "Sortie utile", condition: "Dire ce qu'il faut préparer" },
+    ]}
+  />;
+}
+
+export function FormulaireQuiRendQuelqueChoseMockup() {
+  return <WebPage
+    title="Un formulaire qui rend une carte"
+    description="Trois questions qui changent la suite, puis une restitution que la personne garde."
+    legend="Si une question ne change aucune décision, retire-la."
+    ariaLabel="Une page de diagnostic pose trois questions, dernier cas, ce qui bloque et qui décide, puis le bouton Voir ma carte rend une scène observée, un point de perte et une prochaine décision."
+    accent={EM}
+    page={{
+      url: "tonsite.fr/diagnostic",
+      nav: "Atelier devis",
+      eyebrow: "Diagnostic en trois questions",
+      heading: "Où ton dernier devis a-t-il bloqué ?",
+      subtitle: "Dernier cas, ce qui bloque, qui décide. Rien d'autre.",
+      button: "Voir ma carte",
+      imageLabel: "Ta carte du point à vérifier",
+      proofs: ["Scène observée", "Point de perte", "Prochaine décision"],
+    }}
+    annotations={[
+      { number: 1, target: "heading", label: "Part du dernier cas réel" },
+      { number: 2, target: "button", label: "La personne repart avec quelque chose" },
+      { number: 3, target: "proofs", label: "Ce que la carte rend tout de suite" },
+    ]}
+  />;
+}
+
+export function MemePromesseJusquaLaValeurDiagram() {
+  return <Workflow
+    title="La même histoire jusqu'à la valeur"
+    description="Du post à la livraison, chaque étape parle du même dossier de devis."
+    legend="Si la promesse change après le clic, c'est là que tu perds la personne."
+    ariaLabel="Le même dossier de devis traverse le post Instagram, la page, l'appel dans Google Agenda, la proposition par Gmail et la livraison, en gardant la même scène, la même preuve et la même limite."
+    accent={EM}
+    actors={["Toi"]}
+    accentIndex={4}
+    steps={[
+      { actor: 0, label: "Post", tool: "Instagram" },
+      { actor: 0, label: "Page", transfer: "scène" },
+      { actor: 0, label: "Appel", tool: "Google Agenda", transfer: "preuve" },
+      { actor: 0, label: "Proposition", tool: "Gmail", transfer: "limite" },
+      { actor: 0, label: "Livraison", transfer: "le dossier" },
+    ]}
+  />;
+}
 
 export const doctrine12 = [
-  { name: "TroisRoutesSelonLaClarte", kind: "schema", chapter: "10-qualification-experimentation-premiere-valeur.md", template: "fork", title: "La clarté choisit la route", description: "La personne prend une voie différente selon ce qu'elle comprend déjà du problème.", ariaLabel: "Un carrefour propose parler, montrer ou diagnostiquer.", labels: ["Besoin", "Parler", "Montrer", "Diagnostiquer"], accentIndex: 2 },
-  { name: "FormulaireQuiRendQuelqueChose", kind: "maquette", chapter: "10-qualification-experimentation-premiere-valeur.md", template: "web-page", title: "Un formulaire qui rend une carte", description: "Trois champs utiles mènent immédiatement à une scène, un manque et une prochaine décision.", ariaLabel: "Un formulaire demande dernier cas, blocage et décideur puis rend une carte utile.", labels: ["Dernier cas", "Ce qui bloque", "Qui décide", "Scène", "Manque", "Prochaine décision", "Voir la carte"], accentIndex: 6 },
-  { name: "MemePromesseJusquaLaValeur", kind: "schema", chapter: "10-qualification-experimentation-premiere-valeur.md", template: "workflow", title: "La même histoire jusqu'à la valeur", description: "Le dossier traverse contenu, page, appel, proposition et livraison sans changer de promesse.", ariaLabel: "La même scène, la même preuve et la même limite traversent tout le parcours.", labels: ["Même scène", "Post", "Page", "Appel", "Proposition", "Même preuve", "Même limite"], tools: ["Instagram", "Instagram", "Gmail", "Google Agenda", "Gmail"], accentIndex: 6 },
-] as const satisfies readonly CourseVisualDefinition[];
+  { name: "TroisRoutesSelonLaClarte", kind: "schema", chapter: "10-qualification-experimentation-premiere-valeur.md", component: TroisRoutesSelonLaClarteDiagram },
+  { name: "FormulaireQuiRendQuelqueChose", kind: "maquette", chapter: "10-qualification-experimentation-premiere-valeur.md", component: FormulaireQuiRendQuelqueChoseMockup },
+  { name: "MemePromesseJusquaLaValeur", kind: "schema", chapter: "10-qualification-experimentation-premiere-valeur.md", component: MemePromesseJusquaLaValeurDiagram },
+] as const satisfies readonly HandcraftedVisual[];

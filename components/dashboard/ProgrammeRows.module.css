@@ -33,23 +33,6 @@
   height: 13px;
 }
 
-.progress {
-  display: block;
-  height: 3px;
-  margin: 0 14px 14px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(241, 245, 242, 0.12);
-}
-
-.progress > i {
-  display: block;
-  width: var(--card-progress, 0%);
-  height: 100%;
-  border-radius: inherit;
-  background: var(--em);
-}
-
 .rowProgress {
   display: grid;
   grid-template-columns: repeat(var(--row-count), minmax(0, 1fr));

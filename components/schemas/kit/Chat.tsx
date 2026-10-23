@@ -25,7 +25,7 @@ export type ChatProps = KitBaseProps & {
 };
 
 export function Chat({ platform, contact, messages, backstageTitle = "En coulisse", actions, ...frame }: ChatProps) {
-  return <KitFrame {...frame} kind="chat">
+  return <KitFrame {...frame} kind="chat" keys={actions.some((action) => action.humanValidation) ? [{ swatch: "human", label: "Un humain valide avant l'envoi" }] : undefined}>
     <div className={styles.chatLayout}>
       <section className={styles.phone}>
         <header>{platform !== "Neutre" ? <ToolMark name={platform} size={36} /> : <span className={styles.neutralAvatar}>{contact.charAt(0)}</span>}<div><strong>{contact}</strong><span>{platform}</span></div></header>

@@ -55,5 +55,6 @@ export function FoundationReader({
     videoIntroductionMarkdown={introductionMarkdown}
     syncAddress={false}
     thumbnailSrc={currentIndex >= 0 && currentIndex < 5 ? "/da/mini/fondations-1.jpg" : "/da/mini/fondations-2.jpg"}
+    readingScope="fondations"
   />;
 }

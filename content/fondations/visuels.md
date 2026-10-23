@@ -6,51 +6,49 @@ ordre: 8
 
 ## Une belle image peut quand même rendre ton site oubliable
 
-Tu demandes une landing page moderne, alors l'IA ajoute un halo violet, un titre en dégradé et un faux tableau de bord interchangeable.
+Tu écris « fais-moi une landing page moderne » (une landing page, c'est la page qui présente une seule offre). L'IA te rend un halo violet, un titre en dégradé et un faux tableau de bord. Tu changes le nom en haut : la page pourrait être celle d'un fleuriste, d'un cabinet comptable ou d'un logiciel.
 
-Retire le logo : si personne ne reconnaît le métier, tu n'as pas encore une direction, seulement une décoration.
+Fais ce test sur ta page : cache le logo. Si personne ne devine le métier, tu as une décoration, pas une direction visuelle.
 
 ## Tu vas apprendre à diriger l'image
 
-Un visuel sert le message en montrant le produit, en installant une ambiance ou en guidant la prochaine action.
+Une image sur un site fait un de ces trois jobs : montrer ce que tu vends, installer une ambiance, ou pointer vers le bouton. Si elle ne fait aucun des trois, elle prend de la place.
 
-À la fin, tu auras une direction visuelle, un brief d'image prêt à tester et des règles cohérentes entre tes pages.
+Dans ce chapitre, tu apprends à demander une image comme on briefe un photographe. À la fin, tu as une planche de références, un brief d'image prêt à tester et un petit fichier de règles que tu réutilises sur toutes tes pages.
 
 ## Le rendu générique commence quand le contexte s'arrête
 
-On appelle parfois AI slop les images et interfaces qui reprennent les mêmes lumières, les mêmes cartes et les mêmes mots vagues.
+On appelle AI slop les images et les pages qui se ressemblent toutes : même lumière violette, mêmes cartes arrondies, mêmes mots vagues. L'IA les fabrique quand tu ne lui donnes rien de précis, parce qu'elle choisit ce qui revient le plus souvent.
 
 [[maquette:LandingGeneriqueContreMarque]]
 
-La version faible parle d'innovation avec une forme abstraite, tandis que la version utile montre le vrai objet, le vrai geste et la vraie personne.
+À gauche, la page faible affiche le mot « innovation » sur une forme abstraite. À droite, la page utile montre un vrai objet, un vrai geste, une vraie personne.
 
-Pour une fleuriste, montre les mains qui composent un bouquet ; pour un plaquiste, montre le plan, les mesures et le chantier protégé.
+Pour une fleuriste, ce sont des mains qui nouent un bouquet. Pour un plaquiste, un plan imprimé, un mètre et un chantier dont le sol est protégé.
 
-Pourquoi ? Parce que ton client ne cherche pas seulement une ambiance. Il cherche un signe qui lui prouve qu'il est au bon endroit.
+Ton client arrive avec une question : « Suis-je au bon endroit ? ». Une main qui tient un rail de plafond répond. Une forme abstraite ne répond pas.
 
 ==Une marque devient visible quand ses objets et ses scènes ne peuvent appartenir qu'à elle.==
 
 :::avant-apres
-Avant : Une image premium et futuriste pour une entreprise artisanale.
+Avant : Une image premium et futuriste pour une entreprise artisanale.
 
-Après : Vue serrée d'une main qui aligne un rail de plafond sur un plan imprimé. Lumière froide du matin. Matières mates. Aucun texte dans l'image. Aucun chantier sale.
+Après : Vue serrée d'une main qui aligne un rail de plafond sur un plan imprimé. Lumière froide du matin. Matières mates. Aucun texte dans l'image. Aucun chantier sale.
 
-Pourquoi : la seconde demande montre un geste, une matière et une limite propres au métier.
+Pourquoi : la seconde demande montre un geste, une matière et une limite propres au métier.
 :::
 
 ## Une référence doit répondre à une seule question
 
-Ne collectionne pas cinquante captures sans raison : chaque référence doit t'aider à prendre une décision visible.
+Avant de rédiger le moindre brief, tu rassembles des références : des images ou des pages que tu regardes pour décider. Cinquante captures dans un dossier ne décident rien. Chacune doit répondre à une seule question.
 
-Pinterest aide à chercher une ambiance, Refero montre des parcours et Figma permet de composer avant de construire.
+Pour chercher, Pinterest donne des ambiances, Refero montre des parcours d'écrans de vraies applications et Figma te laisse composer une page avant de la construire.
 
 [[schema:ReferencesVersDirection]]
 
-Prends une référence pour la composition, une autre pour la typographie, une pour la lumière et une anti-référence pour tes refus.
+Garde quatre références, chacune avec son rôle : une pour la composition, une pour la typographie, une pour la lumière, et une anti-référence qui montre ce que tu refuses.
 
-Ne copie jamais la peau complète d'une marque : observe un choix précis, puis traduis-le dans ton propre projet.
-
-Concrètement : sous chaque capture, écris une seule phrase. « Je garde ce cadrage parce qu'il rend le produit immédiatement visible. »
+Sous chaque capture, écris une seule phrase : « Je garde ce cadrage parce qu'il rend le produit visible tout de suite. » Tu observes un choix précis et tu le refais à ta façon. Tu ne copies jamais l'apparence complète d'une marque.
 
 :::retiens
 Une référence sans note nourrit le goût. Une référence expliquée nourrit une décision.
@@ -58,13 +56,11 @@ Une référence sans note nourrit le goût. Une référence expliquée nourrit u
 
 ## Écris ton prompt comme un brief photo
 
-Une image devient plus précise quand tu fixes le sujet, le cadre, la lumière et les matières comme dans un vrai brief.
-
-Ajoute aussi les couleurs et les éléments interdits pour montrer clairement ce qui doit rester hors de l'image.
+Un photographe à qui tu dis « fais joli » te rend ce qu'il veut. Donne-lui un brief : le sujet, le cadre, la lumière, les matières, les couleurs, et ce qui doit rester hors de l'image. L'IA fonctionne pareil.
 
 [[maquette:BriefPhotoAnnote]]
 
-Un bon brief ne cherche pas à paraître savant ; il donne des choix visibles que tu peux comparer au résultat.
+Chaque ligne du brief se vérifie sur le résultat : le sujet est-il à droite ? la lumière vient-elle d'une fenêtre ? Si tu ne peux pas le vérifier du regard, la ligne est trop vague.
 
 ```text
 Fonction : image principale d'une page pour une céramiste.
@@ -77,60 +73,60 @@ Interdits : texte, logo inventé, fumée excessive, peau lissée, objets flottan
 Format : horizontal, pensé pour un premier écran de site.
 ```
 
-Les outils changent vite. Les documents officiels lus pour cette version confirment que GPT Image et les modèles d'image Gemini peuvent générer et modifier des images. Vérifie toujours les formats et les réglages disponibles le jour où tu produis.
+Les outils changent vite. Les documents officiels lus pour cette version confirment que GPT Image et les modèles d'image Gemini peuvent générer et modifier des images. Ouvre leurs pages le jour où tu produis pour vérifier les formats et les réglages disponibles.
 
-Le choix du moteur arrive après ton brief, parmi les outils adaptés au besoin. Ne bâtis jamais ta méthode sur une promesse non testée.
+Tu choisis le moteur après avoir écrit le brief. Lance le même brief dans deux outils et garde celui dont le résultat te sert, pas celui dont la vidéo de démonstration te plaît.
 
 ## Une direction doit devenir un système
 
-« Fais comme Apple » ne dit ni quelle couleur utiliser ni comment afficher une erreur ; la référence ne remplace pas tes choix.
+Tu as une belle image. Page suivante, l'IA choisit un autre vert pour le bouton, un autre arrondi pour les cartes. Dire « fais comme Apple » n'y change rien : ça ne dit ni quelle couleur prendre, ni comment afficher une erreur.
 
-Un design system est la notice visuelle qui relie les couleurs, les textes, les espacements et les formes à des usages précis.
+Il te faut un design system : la notice visuelle de ton projet. Elle relie chaque couleur, chaque taille de texte, chaque espacement et chaque forme à un usage précis. Tu l'écris dans un fichier, par exemple `DESIGN-SYSTEM.md`.
 
 [[maquette:DesignSystemOuvert]]
 
-Une couleur brute peut s'appeler « vert 500 ». Son rôle peut être « action principale » ou « succès ». Ce rôle évite de choisir au hasard sur chaque page.
+Une couleur brute s'appelle « vert 500 ». Son rôle s'appelle « action principale » ou « succès ». Avec le rôle, l'IA ne choisit plus au hasard à chaque page : elle prend « action principale ».
 
-Pour chaque valeur, note son origine dans le code, une mesure ou une décision nouvelle. Une capture fixe ne donne jamais la durée d'une animation.
+Pour chaque valeur, note d'où elle vient : le code existant, une mesure prise sur la référence, ou une décision que tu viens de prendre. Une capture fixe ne dit pas combien de temps dure une animation : ne l'invente pas.
 
-Garde le visuel fixe validé avant d'ajouter du mouvement. Une animation reste une version du même message, pas une excuse pour le changer.
+Valide d'abord l'image fixe. Ajoute le mouvement ensuite, en gardant le même message.
 
 ## Teste la vraie vie, pas seulement la belle maquette
 
-Un système doit rester propre avec un titre long, une image absente et une erreur, pas seulement sur l'écran idéal.
+Ta maquette est belle avec le titre idéal et la photo parfaite. Puis un client entre un nom de trois lignes, une photo ne charge pas, le réseau coupe en plein envoi. Ton système doit rester propre dans ces cas-là.
 
 [[maquette:EcranDansTousSesEtats]]
 
-Teste le chargement, l'état vide, l'erreur et le succès, puis ouvre le même écran sur mobile.
+Ouvre ton écran dans quatre états : le chargement, l'écran vide (aucune donnée encore), l'erreur et le succès. Ouvre-le ensuite sur ton téléphone.
 
-Le bouton de chargement dit ce qui se passe et bloque le double envoi, tandis qu'une erreur garde la saisie et explique la reprise.
+Pendant le chargement, le bouton écrit « Envoi en cours… » et ne se laisse pas cliquer deux fois. Après une erreur, le formulaire garde ce que la personne a tapé et dit quoi corriger.
 
-Chaque image garde son fichier source, son usage et son texte alternatif quand elle apporte une information. Vérifie les droits d'usage avant la publication.
+Pour chaque image, garde le fichier source, la page où elle sert et un texte alternatif (la phrase lue aux personnes qui ne voient pas l'écran) quand elle apporte une information. Vérifie les droits d'usage avant de publier.
 
 ==La cohérence se voit surtout quand quelque chose ne se passe pas comme prévu.==
 
-## Prends Amel, pâtissière à Roubaix
+## Prends Manon, pâtissière à Roubaix
 
-:::exemple Amel remplace le gâteau qui flotte
-Amel veut une page pour ses gâteaux de mariage. Sa première image montre un gâteau brillant dans un décor violet. L'image attire l'œil, mais elle ne ressemble ni à sa boutique ni à son travail.
+:::exemple Manon remplace le gâteau qui flotte
+Manon veut une page pour ses gâteaux de mariage. Elle demande une image à l'IA et reçoit un gâteau brillant sur un décor violet. Ça attire l'œil, mais ça ne ressemble ni à sa boutique de Roubaix ni à ses gâteaux.
 
-Elle rassemble trois références. La première donne la lumière. La deuxième montre un cadrage de main. La dernière apporte une palette crème et cerise.
+Elle rassemble trois références : l'une pour la lumière, l'une pour le cadrage d'une main, l'une pour une palette crème et cerise.
 
-Amel photographie aussi sa spatule, ses rubans et une boîte réelle. Elle demande une composition qui garde ces objets reconnaissables.
+Un dimanche, elle photographie sa spatule, ses rubans et une de ses vraies boîtes, puis demande une composition où ces objets restent reconnaissables.
 
-Le nouveau premier écran montre un geste de finition dans son atelier. La page ressemble enfin à une pâtisserie précise, pas à une démonstration d'outil.
+Le nouveau premier écran montre une main qui lisse un glaçage dans son atelier. Quand on voit la page, on voit sa pâtisserie.
 :::
 
 ## À toi de jouer
 
 Compte quarante-cinq minutes aujourd'hui.
 
-1. Choisis une image importante pour ton site.
-2. Trouve quatre références avec un rôle différent.
-3. Écris ton brief avec sujet, cadre, lumière et interdits.
-4. Compare deux versions sur la page réelle et sur mobile.
+1. Choisis l'image la plus importante de ton site (celle du premier écran).
+2. Trouve quatre références, chacune avec son rôle : composition, typographie, lumière, anti-référence.
+3. Écris ton brief : sujet, cadre, lumière, matières, couleurs, interdits.
+4. Génère deux versions et compare-les sur la page réelle, puis sur ton téléphone.
 
-À la fin, tu as une planche de direction et un brief prêt à réutiliser.
+À la fin, tu as une planche de références et un brief que tu peux relancer pour la prochaine image.
 
 ## Version pour ton IA
 
@@ -156,4 +152,4 @@ Je choisirai la direction et je validerai les droits avant publication.
 
 ## La suite
 
-Ta direction visuelle est claire. Tu vas maintenant l'assembler avec le message dans un site que la personne peut vraiment parcourir.
+Tu as maintenant une image et des règles qui ne ressemblent qu'à ton projet. Dans le prochain chapitre, tu les assembles avec les mots, du premier écran jusqu'au bouton, dans un site que la personne parcourt vraiment.

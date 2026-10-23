@@ -6,45 +6,38 @@ ordre: 12
 
 ## Tu as mis un site en ligne. Demain, l'outil change
 
-Ton site fonctionne et le client est content, mais la nouvelle IA ouverte six mois plus tard ignore tes choix, tes erreurs et ta méthode.
+Ton site est en ligne et le client est content. Six mois plus tard, tu ouvres une nouvelle IA : elle ne connaît ni tes choix, ni tes erreurs, ni ta méthode. Si tout vivait dans une conversation, tu repars presque de zéro.
 
-Si tout vivait dans une conversation, tu repars presque de zéro.
+## Ce que tu possèdes vraiment
 
-## Tu vas voir ce que tu possèdes vraiment
+Tu sais comprendre une personne, tester une offre, publier un premier site et travailler avec une IA sans lui laisser toutes les décisions. Reste une question : qu'est-ce qui t'appartient quand le projet est fini ?
 
-Les Fondations t'ont appris à comprendre une personne, tester une offre et publier un premier site. Tu sais aussi travailler avec une IA sans lui remettre toutes les décisions.
-
-Ce chapitre montre la prochaine marche entre un projet terminé et une méthode que tu peux reprendre, transmettre et améliorer.
-
-## Un projet terminé peut encore disparaître
-
-Regarde ton dernier projet : où sont le brief, les sources, les choix, le code, les accès et la procédure de reprise ?
+Ouvre ton dernier projet et cherche six choses : le brief, les sources, les choix, le code, les accès et la procédure de reprise.
 
 [[schema:CeQueTuPossedes]]
 
-Si la réponse est « dans le chat », tu loues encore une partie de ton savoir-faire et tu reconstruiras au prochain changement d'outil.
+Si la réponse est « dans le chat », tu loues encore une partie de ton savoir-faire, et tu le reconstruiras au prochain changement d'outil.
 
-Quand ces éléments vivent dans tes dossiers, le projet suivant commence avec un brief plus clair, des tests plus rapides et des erreurs déjà comprises.
+Quand ces éléments vivent dans un dossier à toi, le projet suivant démarre avec un brief plus net, des tests plus rapides et des erreurs déjà comprises.
 
 [[schema:PremierProjetVersMethode]]
 
-Pourquoi ? Parce qu'un projet te paie une fois, tandis qu'un apprentissage rangé après vérification peut servir plusieurs fois.
+Un projet te paie une fois. Une règle rangée après vérification, par exemple « toujours envoyer un email de test avant de changer les DNS », resservira à chaque mission.
 
 ==Le vrai passage se fait quand ton projet terminé rend le suivant plus facile.==
 
-## La prochaine marche ne consiste pas à collectionner des prompts
+## Prompt isolé ou méthode
 
-Un prompt isolé peut produire une bonne sortie, tandis qu'une méthode relie durablement des sources, des choix, des fichiers et des contrôles.
+Un prompt isolé peut donner une bonne sortie une fois. Une méthode relie des sources, des choix, des fichiers et des contrôles, et elle se rejoue.
 
-ORACLE transforme une demande floue en dossier puis en plan validable, où chaque document aide le suivant sans demander à l'IA de deviner.
+Quatre mots reviendront dans la suite de ton parcours :
 
-La logique business relie une personne accessible, un problème vu et une offre testable. Le terrain choisit si tu continues, modifies ou arrêtes.
+1. ORACLE est la méthode de BUILD. Elle part d'une demande floue (« je veux un site »), la transforme en dossier, puis en plan que tu valides document par document, sans demander à l'IA de deviner.
+2. La logique business relie une personne que tu peux joindre, un problème que tu as vu et une offre que tu peux tester. Le terrain dit ensuite si tu continues, modifies ou arrêtes.
+3. L'architecture produit décide où vivent les données, qui a quels droits et quels services travaillent derrière l'écran. Elle compte dès que tu construis plus qu'une page simple, par exemple un espace où le client se connecte.
+4. Un skill est un fichier de procédure que tu recharges : il dit quoi lire, quoi faire, où s'arrêter et comment juger la sortie.
 
-L'architecture produit organise les données, les droits et les services derrière l'écran. Elle compte dès que tu construis plus qu'une page simple.
-
-Un skill est une procédure que tu peux recharger. Il dit quoi lire, quoi faire, où s'arrêter et comment juger la sortie.
-
-La doctrine agentique découpe un métier en tâches et en responsabilités. Chaque agent reçoit seulement les outils utiles. Une personne garde les choix sensibles.
+La doctrine agentique prolonge cela : tu découpes un métier en tâches, chaque agent reçoit seulement les outils utiles, et une personne garde les choix sensibles.
 
 :::retiens
 Tu n'as pas besoin de plus d'automatisation au départ. Tu as besoin de mieux garder ce qui marche déjà.
@@ -52,15 +45,13 @@ Tu n'as pas besoin de plus d'automatisation au départ. Tu as besoin de mieux ga
 
 ## Deux portes s'ouvrent maintenant
 
-Tu peux continuer chaque projet avec une conversation neuve, retrouver tes anciens choix à la main et répéter certaines erreurs.
+Première porte : tu ouvres une conversation neuve à chaque projet, tu retrouves tes anciens choix à la main et tu répètes certaines erreurs.
 
-Tu peux aussi construire ton propre point de départ, enrichi après chaque mission par une source, une règle, un exemple ou un test.
+Seconde porte : tu construis ton propre point de départ, enrichi après chaque mission par une source, une règle, un exemple ou un test.
 
 [[schema:DeuxPortesDuSeuil]]
 
-La vérité, c'est que la seconde porte demande du travail. Tu dois relire, trier et retirer ce qui ne tient pas. Tu dois aussi continuer à parler au marché.
-
-Aucun cours ne remplace la vente, la livraison et les retours du terrain, mais il peut mieux organiser ce que ces expériences t'apprennent.
+La seconde porte demande du travail : relire, trier, retirer ce qui ne tient pas, et continuer à parler au marché. Aucun cours ne remplace une vente, une livraison ou un retour client, mais ton dossier peut mieux ranger ce qu'ils t'apprennent.
 
 `{COFFRE_LABEL}` approfondit ce travail. Son accès complet coûte {COFFRE_PRICE}. Si tu as déjà les Fondations, tu peux passer au programme complet pour {UPGRADE_PRICE}.
 

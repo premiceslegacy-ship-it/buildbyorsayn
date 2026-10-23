@@ -1,34 +1,69 @@
 import { Steps, ToolMap } from "../kit";
 
+const EM = "#22d96e";
+
 export function TroisPortesUnServiceDiagram() {
-  return <ToolMap title="Trois portes, le même compte" description="La porte technique ne change jamais les droits du service." ariaLabel="API, CLI et MCP mènent au Même compte Hermes." groups={[
-    { role: "API", tools: [{ name: "Hermes Agent", description: "Même compte" }] },
-    { role: "CLI", tools: [{ name: "Ghostty", description: "Même compte" }] },
-    { role: "MCP", tools: [{ name: "Hermes Agent", description: "Même compte" }] },
-  ]} accentGroup={1} />;
+  return <ToolMap
+    title="Trois portes, un seul compte"
+    description="API, CLI et MCP sont trois façons de parler au même logiciel."
+    legend="Quelle que soit la porte, ce sont les droits du compte qui décident."
+    ariaLabel="Une API envoie une demande structurée à un service comme Stripe, une CLI passe par une commande dans le terminal Ghostty, et MCP présente des outils à l'agent. Dans les trois cas, les droits du compte restent la limite."
+    accent={EM}
+    groups={[
+      { role: "API", tools: [{ name: "Stripe", description: "Une demande structurée" }] },
+      { role: "CLI", tools: [{ name: "Ghostty", description: "Une commande rejouable" }] },
+      { role: "MCP", tools: [{ name: "Hermes Agent", description: "Des outils pour l'agent" }] },
+    ]}
+    accentGroup={1}
+  />;
 }
 
 export function ToolAccessDiagramV2() {
-  return <Steps title="La porte, le réglage, l'action" description="Le chemin technique garde un contrôle avant l'opération." ariaLabel="API, CLI ou MCP mène à Droit vérifié, puis à Action." items={[
-    { label: "API, CLI ou MCP", detail: "La porte choisie" },
-    { label: "Droit vérifié", detail: "Le compte autorise" },
-    { label: "Action", detail: "L'opération précise" },
-  ]} accentIndex={1} />;
+  return <Steps
+    title="La porte, les droits, l'action"
+    description="Une connexion n'ouvre rien toute seule : le compte autorise ou refuse chaque opération."
+    legend="Teste une lecture autorisée et un refus avant d'activer une écriture."
+    ariaLabel="Trois étapes : choisir une porte parmi API, CLI ou MCP, laisser le compte vérifier ses droits, puis exécuter une seule opération précise."
+    accent={EM}
+    items={[
+      { label: "Une porte", detail: "API, CLI ou MCP" },
+      { label: "Les droits", detail: "Le service autorise ou refuse" },
+      { label: "Une opération", detail: "Une seule, sur une cible" },
+    ]}
+    accentIndex={1}
+  />;
 }
 
 export function CarteOutilsParRoleDiagram() {
-  return <ToolMap title="Chaque outil tient une place" description="Quatre tuiles entourent le même dossier sans partager le même droit." ariaLabel="Gmail sert à Lire, Notion à Ranger, Stripe à Vérifier et Telegram à Valider." groups={[
-    { role: "Lire", tools: [{ name: "Gmail", description: "Messages entrants" }] },
-    { role: "Ranger", tools: [{ name: "Notion", description: "État du dossier" }] },
-    { role: "Vérifier", tools: [{ name: "Stripe", description: "État du paiement" }] },
-    { role: "Valider", tools: [{ name: "Telegram", description: "Accord humain" }] },
-  ]} accentGroup={3} />;
+  return <ToolMap
+    title="Une phrase par outil"
+    description="Chaque outil reçoit une opération précise, jamais un accès général."
+    legend="Garde les outils d'écriture éteints au premier essai."
+    ariaLabel="Gmail lit les demandes et prépare des brouillons, Notion garde la fiche de travail, Stripe montre l'état d'un paiement, Telegram reçoit la demande de validation."
+    accent={EM}
+    groups={[
+      { role: "Lire", tools: [{ name: "Gmail", description: "Demandes et brouillons" }] },
+      { role: "Ranger", tools: [{ name: "Notion", description: "La fiche de travail" }] },
+      { role: "Vérifier", tools: [{ name: "Stripe", description: "L'état du paiement" }] },
+      { role: "Valider", tools: [{ name: "Telegram", description: "Ton accord" }] },
+    ]}
+    accentGroup={3}
+  />;
 }
 
 export function LireAgirRelireDiagram() {
-  return <Steps title="Une action se ferme par une relecture" description="Le service confirme ce qui s'est vraiment passé." ariaLabel="Trois étapes relient Lire, Agir et Relire. Relire est mis en avant." items={[
-    { label: "Lire", detail: "Connaître l'état initial" },
-    { label: "Agir", detail: "Tenter une opération" },
-    { label: "Relire", detail: "Confirmer l'état final" },
-  ]} accentIndex={2} />;
+  return <Steps
+    title="Une action se ferme par une relecture"
+    description="Une commande peut finir sans erreur alors que le service a refusé l'action."
+    legend="Si tu ne sais pas si le message est parti, ne le renvoie pas tout de suite."
+    ariaLabel="Quatre étapes : lire l'état avant, agir une seule fois, relire le service qui fait foi, puis décider. En cas de doute, on ne renvoie pas."
+    accent={EM}
+    items={[
+      { label: "Lire", detail: "L'état avant l'action" },
+      { label: "Agir", detail: "Une seule tentative" },
+      { label: "Relire", detail: "Le service qui fait foi" },
+      { label: "Décider", detail: "Pas de renvoi si doute" },
+    ]}
+    accentIndex={2}
+  />;
 }

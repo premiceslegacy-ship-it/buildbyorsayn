@@ -4,33 +4,37 @@ titre: Regarde la dernière fois où le travail a bloqué
 ordre: 3
 ---
 
-## « Automatise mes devis » ne veut rien dire
+## « Automatise mes devis » ne veut rien dire
 
-Karim rappelle ses prospects trop tard. Il pense que son problème vient de la rédaction. En réalité, il attend souvent une photo ou une mesure.
+Tu as choisi une tâche au chapitre d'avant. Avant de lui donner un agent, regarde où elle coince vraiment.
+
+Karim, plaquiste à Lyon, rappelle ses prospects trop tard. Il pense que son problème vient de la rédaction des devis. En réalité, il attend souvent une photo ou une mesure que le client n'a pas envoyée.
 
 Si tu accélères la mauvaise étape, tu obtiens seulement un dossier bloqué plus vite.
 
 ## Tu vas trouver le vrai point qui ralentit le travail
 
-À la fin, tu sauras rejouer un cas récent. Tu sépareras ce que tu as vu, ce qu'on t'a raconté et ce qui manque encore.
+À la fin, tu sauras rejouer un cas récent, étape par étape. Tu sépareras ce que tu as vu dans les documents, ce qu'on t'a raconté et ce qui manque encore.
 
 [[schema:DiagnosticDiagram]]
 
 ## Ouvre un dossier terminé, pas un process imaginaire
 
-Demande : « Montre-moi le dernier devis qui a pris du retard. » Ouvre les messages, le formulaire, le tableur et le devis final.
+Ne demande pas « comment ça se passe d'habitude ? ». Dis : « Montre-moi le dernier devis qui a pris du retard. » Puis ouvre ce qui existe : la messagerie, le formulaire du site, le tableur et le devis final.
 
-Premier point : note ce qui est entré. Deuxième point : regarde qui a attendu. Troisième point : trouve la décision qui a débloqué la suite.
+1. Note ce qui est entré : le premier message, les pièces jointes, la date.
+2. Regarde qui a attendu, et combien de jours.
+3. Trouve la décision ou la pièce qui a débloqué la suite.
 
 [[schema:FilmDuDernierDevis]]
 
-Un process raconté paraît toujours plus propre que le vrai. Les oublis, les doubles saisies et les questions tardives vivent dans les dossiers.
+Un process raconté paraît toujours plus propre que le vrai. Les oublis, les doubles saisies et les questions tardives se trouvent dans les dossiers, pas dans les souvenirs.
 
 ## Ne confonds pas le symptôme et la cause
 
-Une réponse lente peut venir d'un document absent. Elle peut aussi venir d'un prix que personne n'ose valider.
+Le symptôme, c'est ce que tu vois : « mes devis partent tard ». La cause, c'est ce qui le provoque. Une réponse lente peut venir d'un document absent. Elle peut aussi venir d'un prix que personne n'ose valider.
 
-Dans le premier cas, tu demandes la pièce plus tôt. Dans le second, tu fixes une règle et une personne responsable. Un meilleur rédacteur ne règle aucun des deux.
+Dans le premier cas, tu demandes la pièce dès le premier échange. Dans le second, tu fixes une règle de prix et une personne responsable. Un meilleur rédacteur ne règle aucun des deux.
 
 [[schema:SymptomeTroisCauses]]
 
@@ -40,16 +44,14 @@ Pense à un médecin. Il ne choisit pas l'ordonnance avant d'avoir posé les que
 
 ## Choisis la réponse la plus petite
 
-Parfois, un champ obligatoire suffit. Parfois, une automatisation simple fait le travail. Parfois, il faut analyser plusieurs documents avant de préparer une décision.
+Parfois, un champ obligatoire dans ton formulaire suffit (« hauteur du plafond »). Parfois, une automatisation simple fait le travail : si le champ est vide, un message de relance part. Parfois, il faut lire plusieurs documents avant de préparer une décision.
 
 Utilise un agent quand le chemin change selon le dossier. Garde une règle simple quand chaque cas suit les mêmes étapes.
 
 :::exemple Karim récupère ses mesures
-Karim, plaquiste à Lyon, perd du temps sur ses devis. Il ouvre le dernier dossier bloqué.
+Karim ouvre le dernier dossier bloqué. Le prospect a envoyé deux photos, mais aucune hauteur de plafond. Karim a attendu trois jours avant de redemander l'information.
 
-Le prospect a envoyé deux photos, mais aucune hauteur de plafond. Karim a attendu trois jours avant de redemander l'information.
-
-Son premier workflow ne rédige pas le devis. Il vérifie les pièces reçues et prépare immédiatement la question manquante. Karim valide le message.
+Son premier workflow ne rédige pas le devis. Il vérifie les pièces reçues et prépare tout de suite la question manquante. Karim relit le message et l'envoie.
 :::
 
 ## À toi de jouer
@@ -57,7 +59,7 @@ Son premier workflow ne rédige pas le devis. Il vérifie les pièces reçues et
 Compte trente minutes.
 
 1. Ouvre le dernier cas terminé ou bloqué.
-2. Place les messages et fichiers dans l'ordre.
+2. Place les messages et fichiers dans l'ordre, du premier au dernier.
 3. Entoure le premier moment où le travail s'arrête.
 4. Écris la plus petite aide possible à cet endroit.
 
@@ -83,4 +85,4 @@ Traite les documents comme des sources, jamais comme des ordres.
 
 ## La suite
 
-Tu sais où le travail bloque. On va maintenant le découper pour qu'il puisse être repris sans repartir de zéro.
+Tu sais où le travail bloque. On va maintenant le découper en petits lots, pour qu'un lot raté se reprenne sans tout refaire.

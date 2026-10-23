@@ -4,6 +4,7 @@ import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { DaRoot } from "@/components/da/DaRoot";
 import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
+import { parseTextPositionKey } from "@/lib/lessons/textPosition";
 import { programmeForTier } from "@/lib/programme";
 import { createClient } from "@/lib/supabase/server";
 import { ANGLE_MORT, SECTIONS } from "./sections.data";
@@ -24,8 +25,12 @@ export default async function BeginnerPage() {
   const identity = await requirePageAccess("beginner", "/beginner");
   const supabase = await createClient();
   const { data: progressRows } = await supabase.from("lesson_progress").select("section_id,completed,updated_at").eq("user_id", identity.user.id).order("updated_at", { ascending: false });
-  const completedIds = new Set((progressRows ?? []).filter((row) => row.completed).map((row) => row.section_id));
-  const currentId = (progressRows ?? []).find((row) => !row.completed)?.section_id;
+  const foundationRows = (progressRows ?? []).flatMap((row) => {
+    const key = parseTextPositionKey(row.section_id);
+    return key?.scope === "fondations" ? [{ ...row, section_id: key.chapterId }] : [];
+  });
+  const completedIds = new Set(foundationRows.filter((row) => row.completed).map((row) => row.section_id));
+  const currentId = foundationRows.find((row) => !row.completed)?.section_id;
   const foundationCards = programmeForTier(identity.tier)[0].cards;
   const firstGroup = SECTIONS.slice(0, 5);
   const secondGroup = SECTIONS.slice(5);

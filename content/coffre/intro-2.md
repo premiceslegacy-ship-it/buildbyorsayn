@@ -1,19 +1,19 @@
-Tu installes un outil parce que tout le monde en parle. Trois jours plus tard, tes fichiers sont ailleurs et ton travail n'a pas avancé. Puis un nouvel outil arrive.
+Dimanche soir, tu vois une vidéo sur un nouvel outil d'IA. Tu crées un compte, tu y déplaces tes fichiers. Trois jours plus tard, tu ne retrouves plus ton dernier devis et ton travail n'a pas avancé. Puis un autre outil sort.
 
-Une stack, c'est simplement l'ensemble des outils qui t'aident à produire, vérifier et livrer. La bonne stack n'est pas la plus longue. Elle donne un rôle clair à chaque outil.
+Une stack, c'est l'ensemble des outils que tu utilises pour produire, vérifier et livrer. La bonne n'est pas la plus longue. Chaque outil y a un rôle que tu peux dire en une phrase, comme chaque clé accrochée à son clou dans l'atelier.
 
 [[schema:UnOutilUnRole]]
 
 ## Tu vas construire ta carte
 
-À la fin, tu sauras expliquer pourquoi chaque outil est là. Tu connaîtras aussi les données qu'il touche, les droits qu'il demande et la façon de récupérer ton travail.
+À la fin, tu sauras dire pourquoi chaque outil est là. Tu sauras aussi quelles données il touche, quels droits il demande et comment récupérer ton travail le jour où tu le quittes.
 
-La vérité, c'est que ton client ne paie pas ta collection d'abonnements. Il paie un résultat compréhensible et un travail bien livré.
+Ton client ne paie pas ta pile d'abonnements. Il paie un résultat qu'il comprend, livré proprement.
 
 ## On commence par retirer
 
-Tu vas d'abord tester la place de chaque outil. Ensuite, tu composeras une carte par rôle. Enfin, tu choisiras la connexion la plus simple pour une opération précise.
+Tu testes d'abord la place de chaque outil que tu as déjà. Ensuite, tu composes une carte par rôle pour un vrai projet. Enfin, tu choisis la façon la plus simple de connecter un outil à ton IA pour une action précise, par exemple lire les commandes du jour.
 
 ==Un outil entre parce qu'un travail le réclame. Il ne crée jamais le besoin.==
 
-Concrètement, garde le projet devant toi. Chaque logo doit pouvoir répondre à une seule question : qu'est-ce que tu m'aides à faire ici ?
+Garde ton projet ouvert à côté. Chaque logo doit répondre à une question : qu'est-ce que tu m'aides à faire ici ? Premier chapitre : le tri.

@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import { Compare, Cycle, FileCard, Fork, Funnel, Ladder, Rings, Steps, ToolMap } from "@/components/schemas/kit";
-import type { CoffreVisualDefinition } from "./types";
+import type { CoffreVisualDefinition, CoffreVisualEntry } from "./types";
 
 /** Définition minimale commune aux cours dont les schémas sont décrits par des libellés. */
 export type LabelVisualDefinition = Omit<CoffreVisualDefinition, "tools" | "template"> & { template: string; tools?: readonly string[] };
@@ -71,7 +71,9 @@ export function LabelVisual({ definition }: { definition: LabelVisualDefinition 
   return <div data-coffre-visual={definition.name} data-coffre-template={definition.template}>{visual}</div>;
 }
 
-export function createCoffreVisualComponent(definition: CoffreVisualDefinition): ComponentType {
+export function createCoffreVisualComponent(entry: CoffreVisualEntry): ComponentType {
+  if ("component" in entry) return entry.component;
+  const definition: CoffreVisualDefinition = entry;
   const CoffreVisual = () => <LabelVisual definition={definition} />;
   CoffreVisual.displayName = `${definition.name}CoffreVisual`;
   return CoffreVisual;

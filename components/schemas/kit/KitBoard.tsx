@@ -12,6 +12,7 @@ import {
   Funnel,
   Ladder,
   Rings,
+  SiteCompare,
   Steps,
   ToolMap,
   WebPage,
@@ -689,6 +690,55 @@ const entries: readonly KitEntry[] = [
           before={{ value: "7", label: "surfaces prévues" }}
           after={{ value: "1", label: "page utile" }}
           sentence="Elle montre son style, son déroulé et un seul formulaire."
+        />,
+      },
+    ],
+  },
+  {
+    name: "SiteMockup",
+    summary: "Un vrai site recréé en HTML, annoté section par section, seul ou en face d'une version générée par IA.",
+    examples: [
+      {
+        label: "Plaquiste à Lyon",
+        source: "Fondations, construire un site web",
+        node: <SiteCompare
+          title="Même artisan, deux premiers écrans"
+          description="À gauche, le gabarit d'IA ; à droite, une page qui montre le chantier et la prochaine étape."
+          legend="Compare d'abord les titres : lequel te dit pour qui c'est et quoi faire ?"
+          ariaLabel="Deux premiers écrans du site d'un plaquiste lyonnais : une version générique avec surtitre, dégradé et trois cartes, puis une version avec photo de chantier, titre concret et un seul bouton."
+          accent={EM}
+          slopTitle="Généré par réflexe"
+          premiumTitle="Pensé pour le client"
+          slop={{
+            url: "karim-plaquiste.fr",
+            theme: "encre",
+            nav: { brand: "Karim Placo", links: ["Services", "À propos", "Contact"], cta: "Devis" },
+            sections: [
+              { kind: "hero", variant: "centered", eyebrow: "✦ Solutions innovantes", title: "Sublimez vos intérieurs", accent: "intérieurs", text: "Des finitions d'exception pour des espaces qui vous ressemblent.", cta: "Découvrir", cta2: "En savoir plus", image: "orbs", pins: { eyebrow: 1, title: 2, cta2: 3 } },
+              { kind: "cards", title: "Pourquoi nous choisir", items: [{ title: "Rapide", text: "Un service efficace.", icon: "zap" }, { title: "Fiable", text: "Une qualité garantie.", icon: "shield" }, { title: "Innovant", text: "Des solutions modernes.", icon: "sparkles" }], pins: { items: 4 } },
+            ],
+          }}
+          slopNotes={[
+            { pin: 1, role: "Surtitre", why: "Répète une catégorie vague au-dessus du titre.", alt: "Le titre dit déjà le métier." },
+            { pin: 2, role: "Mot en dégradé", why: "Effet sans sens, lisibilité réduite.", alt: "Un mot en valeur par le poids." },
+            { pin: 3, role: "Deux boutons égaux", why: "Le visiteur hésite entre deux gestes.", alt: "Un seul bouton : le devis." },
+            { pin: 4, role: "Trois cartes à icône", why: "Affirment sans rien montrer.", alt: "Une photo de chantier fini." },
+          ]}
+          premium={{
+            url: "karim-plaquiste.fr",
+            theme: "chaux",
+            nav: { brand: "Karim Placo", links: ["Chantiers", "Tarifs", "Contact"] },
+            sections: [
+              { kind: "hero", variant: "editorial", title: "Cloisons et faux plafonds à Lyon, posés en une semaine", text: "Envoie ton plan et trois photos : Karim te rappelle sous 48 h avec un prix.", cta: "Préparer ma demande", image: "/schemas/sites/plaquiste-platre-truelles.jpg", imageAlt: "Truelles et plâtre sur un chantier", pins: { title: 1, cta: 2, image: 3 } },
+              { kind: "proof", quote: { text: "Le plafond de la cuisine était fini le vendredi, comme prévu.", author: "Sophie", role: "Villeurbanne" }, pins: { quote: 4 } },
+            ],
+          }}
+          premiumNotes={[
+            { pin: 1, role: "Titre concret", why: "Métier, ville et délai en une phrase.", alt: "Une question du client, mot pour mot." },
+            { pin: 2, role: "Un seul geste", why: "Le bouton dit ce qui se passe ensuite.", alt: "Un lien d'appel sur mobile." },
+            { pin: 3, role: "Photo du vrai métier", why: "On reconnaît le chantier, pas une ambiance.", alt: "Avant et après d'une pièce." },
+            { pin: 4, role: "Preuve proche", why: "Un avis précis, juste sous la promesse.", alt: "Une photo de chantier daté." },
+          ]}
         />,
       },
     ],

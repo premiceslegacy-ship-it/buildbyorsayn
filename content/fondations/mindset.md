@@ -8,39 +8,39 @@ ordre: 1
 
 Tu as une idée depuis trois semaines et tu regardes encore des vidéos pour être sûr de ne pas te tromper. Pendant ce temps, aucune personne concernée ne l'a vue ni ne t'a répondu.
 
-La vérité, c'est que tu cherches dans ta tête une réponse qui vit dehors, au milieu des gestes quotidiens d'une vraie personne.
+La réponse que tu cherches ne vit ni dans ta tête ni dans une vidéo. Elle vit dans la journée d'une vraie personne, par exemple le restaurateur qui décroche le téléphone entre deux commandes.
 
 ## Ce chapitre va te faire passer à l'action
 
-Tu peux passer un mois entier sur une mauvaise idée avec le meilleur outil du monde. Tu peux aussi apprendre beaucoup sur le besoin réel avec une personne en lançant un petit test simple cette semaine.
+Avec le meilleur outil du monde, un mois passé sur une mauvaise idée reste un mois perdu. Un petit test lancé cette semaine t'apprend déjà quelque chose sur le besoin réel d'une personne.
 
-À la fin, tu sauras transformer une croyance qui te bloque en question vraiment concrète. Tu auras un test simple et une date précise pour décider de la suite.
+À la fin, tu auras transformé une croyance qui te bloque en question concrète. Tu auras un test simple et une date pour décider de la suite.
 
 ## Une croyance n'est pas encore un fait
 
-« Le marché est saturé » ressemble à une conclusion. Cette phrase ne dit pourtant rien sur la personne visée, son problème ou ton offre.
+« Le marché est saturé » ressemble à une conclusion, mais cette phrase ne dit rien sur la personne visée, son problème ou ton offre.
 
-Pose plutôt une question qu'une conversation ou un geste peut éclairer. Par exemple : « Les restaurants de mon quartier ratent-ils des réservations quand personne ne répond ? » Là, tu peux aller voir.
+Remplace-la par une question qu'une conversation peut éclairer : « Les restaurants de mon quartier ratent-ils des réservations quand personne ne répond ? » Cette fois, tu peux aller voir : tu passes un mardi à 15 h, entre deux services, et tu poses la question.
 
 [[schema:CroyanceVersQuestion]]
 
-Pourquoi ? Parce qu'une croyance te bloque. Une question te donne un prochain geste.
+Une croyance te laisse sur ta chaise. Une question te donne un geste à faire.
 
-Lire et réfléchir t'aident à préparer ce geste sans commettre une erreur évidente. Mais seule une vraie personne peut te raconter comment elle travaille aujourd'hui.
+Lire et réfléchir t'aident à préparer ce geste et à éviter l'erreur évidente. Mais seule une vraie personne peut te raconter comment elle travaille aujourd'hui.
 
 ==Tu n'as pas besoin de défendre ton idée. Tu dois découvrir où elle se trompe.==
 
 ## Fais petit, mais va chercher une vraie réponse
 
-Ne construis pas tout ton projet pendant plusieurs semaines pour apprendre une seule chose. Choisis la plus petite action qui peut te donner une réponse : un appel, un message ou une page simple.
+Ne construis pas tout ton projet pendant plusieurs semaines pour apprendre une seule chose. Choisis la plus petite action qui peut te donner une réponse : un appel de dix minutes, un message, une page d'une seule section.
 
-Ton test doit mener à trois sorties claires : tu continues, tu modifies un élément ou tu arrêtes cette piste.
+Ton test doit mener à trois sorties claires : tu continues, tu modifies un élément ou tu arrêtes cette piste.
 
 [[schema:PetitTestTroisSorties]]
 
 Pense à un GPS qui ne te demande jamais de prévoir tout le trajet dans ta tête. Il te donne le prochain virage, puis il recalcule avec la route réelle.
 
-Concrètement : écris ce que tu veux apprendre avant de lancer le test. Sinon, tu trouveras toujours une raison de voir ce que tu espérais voir.
+Avant de lancer le test, écris sur une ligne ce que tu veux apprendre. Sans cette ligne, tu trouveras toujours une raison de voir ce que tu espérais voir.
 
 :::retiens
 Une petite version montrée à quelqu'un t'apprend plus qu'un grand projet caché.
@@ -48,33 +48,33 @@ Une petite version montrée à quelqu'un t'apprend plus qu'un grand projet cach�
 
 ## Change une seule chose entre deux essais
 
-Tu envoies quelques messages sans recevoir de réponse et tu pourrais conclure que le marché ne veut rien.
+Tu envoies quelques messages, aucun ne reçoit de réponse, et tu en conclus que le marché ne veut rien.
 
-Le problème peut venir de la personne visée. Il peut venir du moment ou du message. Si tu changes tout ensemble, tu ne sauras jamais ce qui a compté.
+Le silence peut venir de la personne visée, du moment où tu as écrit ou du message lui-même. Si tu changes les trois à la fois, tu ne sauras jamais lequel a compté.
 
 [[schema:UneSeuleChoseChange]]
 
-Garde donc la même base pendant un essai. Au suivant, change un seul élément. C'est comme à la salle de sport : si tu modifies chaque exercice chaque jour, tu ne sais pas ce qui te fait progresser.
+Garde donc la même base pendant un essai : même personne visée, même message. À l'essai suivant, change un seul élément, par exemple la première phrase. C'est comme à la salle de sport : si tu modifies chaque exercice chaque jour, tu ne sais pas ce qui te fait progresser.
 
-Quelques silences ne prouvent pas que le besoin n'existe pas dans ce marché. Ils te demandent de regarder plus précisément la personne, le moment et ton message.
+Quelques silences ne prouvent pas que le besoin n'existe pas. Regarde à qui tu as écrit, à quel moment et avec quels mots.
 
 ==La vitesse devient utile quand chaque essai t'apprend quelque chose.==
 
 ## Un oui poli ne paie pas une mauvaise idée
 
-Une personne peut trouver ton projet intéressant et ne jamais l'utiliser. Cherche un geste qui lui demande un petit effort réel.
+Quelqu'un te dit « C'est super, ton projet » puis ne l'utilise jamais. Un compliment ne lui a rien coûté.
 
-Elle peut raconter un épisode précis, partager un document ou demander un devis. Quand l'offre est claire, elle peut aussi accepter un essai ou payer.
+Cherche un geste qui lui demande un petit effort réel : raconter un épisode précis, t'envoyer un document, demander un devis. Quand l'offre est claire, elle peut aussi accepter un essai ou payer.
 
 [[schema:EchelleEngagement]]
 
-Je vais te dire le piège : beaucoup de gens confondent un compliment avec une demande. « C'est super » fait plaisir, tandis qu'un document envoyé ou un devis demandé t'apprend davantage.
+« C'est super » fait plaisir, tandis qu'un document envoyé ou un devis demandé t'apprend davantage sur sa vraie demande.
 
-La vente ne termine pas le test : tu dois encore livrer, puis vérifier si ton travail aide vraiment.
+La vente ne termine pas le test : tu dois encore livrer, puis vérifier si ton travail aide vraiment.
 
 ## Garde ce que le terrain t'apprend
 
-Chaque test doit te laisser quelque chose. Note ta question, ton action, ce qui s'est passé, puis ta décision et sa raison.
+Après chaque test, ouvre ton fichier de notes et écris quatre lignes : ta question, ton action, ce qui s'est passé, puis ta décision et sa raison.
 
 [[schema:CeQueTuGardes]]
 
@@ -91,7 +91,7 @@ Inès pense que les restaurants de son quartier ont besoin d'un nouveau site. El
 
 Deux lui disent que leur site leur suffit, tandis qu'une restauratrice veut surtout de meilleures photos. Le dernier rate des réservations quand personne ne répond au téléphone.
 
-Inès comprend que son idée mélange plusieurs problèmes. Elle choisit une seule scène : la réservation perdue pendant le service.
+Inès comprend que son idée mélange plusieurs problèmes. Elle choisit une seule scène : la réservation perdue pendant le service.
 
 Elle prépare une page simple avec les horaires et la réservation. Le restaurateur la relit avec elle et corrige deux questions souvent posées par ses clients.
 
@@ -102,7 +102,7 @@ Inès n'a pas construit une activité entière, mais elle a remplacé une croyan
 
 Compte trente minutes aujourd'hui.
 
-1. Écris une croyance qui bloque ton projet.
+1. Écris une croyance qui bloque ton projet, par exemple « Personne ne paiera pour ça ».
 2. Écris le fait qui pourrait te donner tort.
 3. Choisis une action que tu peux lancer cette semaine.
 4. Fixe le jour où tu décideras de continuer, modifier ou arrêter.

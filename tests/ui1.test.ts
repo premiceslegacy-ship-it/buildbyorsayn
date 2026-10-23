@@ -7,7 +7,7 @@ import { APP_SOUNDS, SOUND_STORAGE_KEY } from "../lib/ui/sound";
 import { completedBlocCount, programmeForTier } from "../lib/programme";
 import { buildSearchCatalog, searchCatalog } from "../lib/search/catalog";
 import { groupVideosByMonth } from "../lib/nouveautes/videos";
-import { resumeForTier, resumeFromProgress } from "../lib/dashboard/today";
+import { buildContinueRail } from "../lib/dashboard/today";
 import { TOOL_LOGOS, toolLogoSrc } from "../lib/tools/registry";
 import { navItemsFor } from "../components/NavBar";
 
@@ -68,15 +68,27 @@ test("les nouveautés sont groupées par mois de Paris et gardent leur ordre", (
   assert.deepEqual(groups[0].videos.map((video) => video.video_id), ["A", "B"]);
 });
 
-test("Aujourd'hui reprend uniquement une progression liée au catalogue", () => {
-  const resume = resumeFromProgress({ section_id: "b5-s3", position_seconds: 42 });
-  assert.equal(resume?.blocNumber, 3);
-  assert.equal(resume?.chapter, 3);
-  assert.equal(resume?.positionSeconds, 42);
-  assert.equal(resumeFromProgress({ section_id: "absent", position_seconds: 4 }), null);
-  assert.equal(resumeFromProgress(null), null);
-  assert.equal(resumeForTier({ section_id: "b5-s3", position_seconds: 42 }, "beginner"), null);
-  assert.equal(resumeForTier({ section_id: "b5-s3", position_seconds: 42 }, "full")?.sectionId, "b5-s3");
+test("Aujourd'hui reprend les chapitres en cours, texte et vidéo, puis la suite d'un chapitre fini", () => {
+  const none = new Set<string>();
+  const rows = [
+    { section_id: "b5-s3", position_seconds: 42, completed: false, updated_at: "2026-10-20T10:00:00Z" },
+    { section_id: "texte:fondations:vente", position_seconds: 420, completed: false, updated_at: "2026-10-22T10:00:00Z" },
+    { section_id: "texte:bloc:b1-s1", position_seconds: 1000, completed: true, updated_at: "2026-10-21T10:00:00Z" },
+    { section_id: "texte:bloc:b1-s3", position_seconds: 5, completed: false, updated_at: "2026-10-23T10:00:00Z" },
+    { section_id: "absent", position_seconds: 4, completed: false, updated_at: "2026-10-23T10:00:00Z" },
+  ];
+  const full = buildContinueRail(rows, "full", none, new Map([["b5-s3", 600]]));
+  assert.deepEqual(full.map((item) => item.id), ["reprendre:fondations:vente", "suivre:bloc:b1-s2", "reprendre:bloc:b5-s3"]);
+  assert.equal(full[0].href, "/beginner/vente?mode=text");
+  assert.equal(full[0].progress, 0.42);
+  assert.equal(full[1].href, "/blocs/1/lire?mode=text&chapter=b1-s2");
+  assert.equal(full[2].href, "/blocs/5/lire?mode=video&chapter=b5-s3");
+  assert.equal(full[2].heroNumber, "3");
+  assert.equal(full[2].progress, 0.07);
+  assert.deepEqual(buildContinueRail(rows, "beginner", none, new Map()).map((item) => item.id), ["reprendre:fondations:vente", "suivre:bloc:b1-s2"]);
+  assert.deepEqual(buildContinueRail(rows, "free", none, new Map()), []);
+  assert.deepEqual(buildContinueRail([], "full", none, new Map()), []);
+  assert.deepEqual(buildContinueRail(rows.slice(2, 3), "full", new Set(["b1-s2"]), new Map()), []);
 });
 
 test("navigation et pages exposent les liens, accès et états attendus sans ancien libellé", async () => {
@@ -93,7 +105,7 @@ test("navigation et pages exposent les liens, accès et états attendus sans anc
   assert.match(nav, /formatNouveautesBadge/);
   assert.equal(nav.match(/data-testid="nouveautes-badge"/g)?.length, 2);
   assert.doesNotMatch(nav, /unseenCount > 99/);
-  assert.match(dashboard, /resume \?/);
+  assert.match(dashboard, /lead \?/);
   assert.match(programme, /programmeForTier/);
   assert.match(nouveautes, /feed\.status === "error"/);
   assert.match(nouveautes, /groups\.length === 0/);

@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, Copy, List, RotateCcw, X } from "lucide-react";
 import { LessonPlayer } from "@/components/lessons/LessonPlayer";
+import { useTextPosition } from "@/hooks/useTextPosition";
+import { textPositionKey, type TextScope } from "@/lib/lessons/textPosition";
 import { LessonMeta, formatLessonDuration } from "@/components/lessons/LessonMeta";
 import type { BlocSection } from "@/lib/blocCatalog";
 import { animateAppElement, installAppMotionTokens } from "@/lib/ui/motion";
@@ -72,6 +74,8 @@ type ReaderViewProps = {
   finishActionLabel?: string;
   thumbnailSrc?: string;
   videoIntroductionMarkdown?: string;
+  /** Remembers the reading position of each chapter in text mode, for Aujourd'hui and the next visit. */
+  readingScope?: TextScope;
 };
 
 type ReaderSize = "small" | "normal" | "large";
@@ -180,6 +184,7 @@ export function ReaderView({
   finishActionLabel,
   thumbnailSrc,
   videoIntroductionMarkdown,
+  readingScope,
 }: ReaderViewProps) {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
@@ -203,6 +208,8 @@ export function ReaderView({
   const hasLockedChapters = sections.length < totalSections;
   const showChapterNavigation = hasChapterNavigation(sections.length);
   const totalDuration = sections.reduce((sum, section) => sum + (section.lesson?.durationSeconds ?? 0), 0);
+  const readingKey = readingScope && mode === "texte" && current ? textPositionKey(readingScope, current.id) : null;
+  useTextPosition(readingKey);
 
   const markdown = useMemo(() => {
     if (copyMarkdown) return copyMarkdown;
@@ -417,7 +424,7 @@ export function ReaderView({
             </motion.aside>
           </> : null}
         </AnimatePresence>
-        <motion.article key={current.id} ref={article} className={styles.article} data-size={size} data-focus-ring="none" tabIndex={-1} aria-label={`Lecture de ${current.title}`} initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 30 }}>
+        <motion.article key={current.id} ref={article} className={styles.article} data-size={size} data-focus-ring="none" data-reading-key={readingKey ?? undefined} tabIndex={-1} aria-label={`Lecture de ${current.title}`} initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 30 }}>
           <header className={`${styles.articleHeader} ${current.hideArticleHeader ? styles.articleHeaderLabelOnly : ""}`}><span>Chapitre {selected + 1}</span>{!current.hideArticleHeader ? <><h1>{current.title}</h1>{current.summary ? <p>{current.summary}</p> : null}</> : null}</header>
           <div className={styles.prose}>
             {currentMarkdown ? <ReaderProse section={{ content: currentMarkdown, skillFiles: current.skillFiles }} allowedLocalPaths={markdownLocalPaths} localBaseHref={markdownBaseHref} /> : current.content}

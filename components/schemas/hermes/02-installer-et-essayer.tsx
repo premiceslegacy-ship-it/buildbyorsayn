@@ -1,38 +1,71 @@
 import { FileCard, Steps } from "../kit";
 
+const EM = "#22d96e";
+
 export function TerminalInstallationHermesMockup() {
-  return <FileCard title="La commande au bon endroit" description="Tu contrôles le domaine, tu colles une fois, puis tu recharges le terminal." ariaLabel="Un terminal Ghostty montre la commande officielle d'installation Hermes et trois repères de contrôle." filename="Terminal" tool="Ghostty" lines={[
-    { text: "$ curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash" },
-    { text: "Téléchargement de Hermes Agent", tone: "muted" },
-    { text: "Installation terminée", tone: "heading" },
-    { text: "$ hermes --version" },
-  ]} annotations={[
-    { line: 1, label: "Vérifie le domaine" },
-    { line: 3, label: "Colle une seule fois" },
-    { line: 4, label: "Recharge le terminal" },
-  ]} />;
+  return <FileCard
+    title="Installer, recharger, puis vérifier"
+    description="La commande officielle installe l'outil en une ligne, puis trois commandes confirment qu'il répond."
+    legend="Lis le domaine avant de coller, car cette ligne peut changer ta machine."
+    ariaLabel="Un terminal Ghostty montre la commande officielle d'installation pour Linux, macOS ou WSL2, le rechargement du terminal, puis les commandes hermes --version, hermes doctor et hermes status --all."
+    accent={EM}
+    filename="Terminal"
+    tool="Ghostty"
+    lines={[
+      { text: "# Linux, macOS ou WSL2", tone: "muted" },
+      { text: "$ curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash" },
+      { text: "# Recharge ton terminal", tone: "muted" },
+      { text: "$ hermes --version" },
+      { text: "$ hermes doctor" },
+      { text: "$ hermes status --all" },
+    ]}
+    annotations={[
+      { line: 2, label: "Vérifie le domaine" },
+      { line: 3, label: "Recharge avant de tester" },
+      { line: 4, label: "Trois vérifications" },
+    ]}
+  />;
 }
 
 export function TroisVoyantsInstallationDiagram() {
-  return <Steps title="Trois voyants, trois réponses" description="Chaque commande vérifie une partie différente de l'installation." ariaLabel="Version confirme l'installation, Diagnostic cherche les problèmes et État complet confirme la configuration." items={[
-    { label: "Version", detail: "L'outil répond", tools: ["Hermes Agent"] },
-    { label: "Diagnostic", detail: "Les problèmes ressortent", tools: ["Hermes Agent"] },
-    { label: "État complet", detail: "La configuration est lisible", tools: ["Hermes Agent"] },
-  ]} accentIndex={1} />;
+  return <Steps
+    title="Trois commandes, trois réponses"
+    description="Lance version, doctor puis status : chaque commande vérifie une partie différente de l'installation."
+    legend="Une clé acceptée prouve seulement que la connexion marche."
+    ariaLabel="Trois commandes dans l'ordre : hermes --version confirme la version installée, hermes doctor fait ressortir les problèmes de configuration, hermes status --all affiche l'état complet sans montrer les clés. La deuxième est mise en avant."
+    accent={EM}
+    items={[
+      { label: "Version", detail: "La version installée répond" },
+      { label: "Diagnostic", detail: "Les problèmes de réglage ressortent" },
+      { label: "État complet", detail: "Tout s'affiche, clés masquées" },
+    ]}
+    accentIndex={1}
+  />;
 }
 
 export function PremierEssaiTerminalMockup() {
-  return <FileCard title="Trois faux dossiers, une sortie vérifiable" description="Le test travaille sur des sources fictives et ne peut rien envoyer." ariaLabel="Un terminal montre trois fichiers fictifs et une fiche Faits, Manques, Décision et Source sans action extérieure." filename="exemples/" tool="Hermes Agent" lines={[
-    { text: "Aucun client réel", tone: "heading" },
-    { text: "demande-01.txt   demande-02.txt   demande-03.txt" },
-    { text: "Faits : informations présentes" },
-    { text: "Manques : éléments absents" },
-    { text: "Décision : validation attendue" },
-    { text: "Source : demande-01.txt" },
-    { text: "Aucun envoi", tone: "heading" },
-  ]} annotations={[
-    { line: 2, label: "Sources fictives" },
-    { line: 7, label: "Interdits écrits" },
-    { line: 3, label: "Sortie vérifiable" },
-  ]} />;
+  return <FileCard
+    title="Un essai qui ne peut rien envoyer"
+    description="Exemple : trois demandes fictives de peinture deviennent chacune une fiche, sans prix ni envoi."
+    legend="Tu vois tout de suite si l'outil marche, sans exposer un vrai client."
+    ariaLabel="Une fiche produite à partir de trois demandes fictives : un appartement, un commerce et une cage d'escalier. La fiche de la cage d'escalier liste les faits, les manques, la décision attendue et la source, et confirme qu'aucun envoi n'a eu lieu."
+    accent={EM}
+    filename="fiche-escalier.md"
+    tool="Hermes Agent"
+    lines={[
+      { text: "Lus : appartement.txt, commerce.txt, escalier.txt", tone: "muted" },
+      { text: "# Cage d'escalier", tone: "heading" },
+      { text: "Faits : photos reçues, trois étages" },
+      { text: "Manques : surface, date souhaitée" },
+      { text: "Décision : le prix reste à toi" },
+      { text: "Source : escalier.txt" },
+      { text: "Envoi : aucun. Modification : aucune.", tone: "muted" },
+    ]}
+    annotations={[
+      { line: 1, label: "Trois faux dossiers" },
+      { line: 4, label: "Le manque reste visible" },
+      { line: 6, label: "Le bon fichier lu" },
+      { line: 7, label: "Rien n'est parti" },
+    ]}
+  />;
 }

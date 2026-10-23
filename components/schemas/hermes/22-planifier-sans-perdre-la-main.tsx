@@ -1,59 +1,104 @@
 import { FileCard, Fork, Steps, Workflow } from "../kit";
 
+const EM = "#22d96e";
+
 export function CalendrierTachePlanifieeMockup() {
-  return <FileCard title="Une routine complète dans le calendrier" description="L'horaire, le skill, les sources, la destination et l'arrêt restent visibles." ariaLabel="Une carte Veille marketing dans Google Agenda indique Lecture seule, Rapport Telegram et Aucune publication." filename="Veille marketing" tool="Google Agenda" lines={[
-    { text: "Horaire : chaque matin à 07:00" },
-    { text: "Skill : veille-marketing" },
-    { text: "Sources : liste validée" },
-    { text: "Lecture seule", tone: "heading" },
-    { text: "Destination : Rapport Telegram" },
-    { text: "Arrêt : aucune source récente" },
-    { text: "Responsable : Lina" },
-    { text: "Aucune publication", tone: "heading" },
-  ]} annotations={[
-    { line: 1, label: "Quand" },
-    { line: 2, label: "Avec quoi" },
-    { line: 7, label: "Qui regarde" },
-  ]} />;
+  return <FileCard
+    title="Une routine dans le calendrier"
+    description="Exemple : la veille marketing de Lina, avec son horaire, sa destination et son arrêt."
+    legend="Si une ligne manque, la tâche n'est pas prête à tourner seule."
+    ariaLabel="Une carte Veille marketing dans Google Agenda : chaque matin à 7 heures, skill veille-marketing, sources validées, lecture seule, rapport sur Telegram, arrêt si aucune source récente, responsable Lina, aucune publication."
+    accent={EM}
+    filename="Veille marketing"
+    tool="Google Agenda"
+    lines={[
+      { text: "Horaire : chaque matin, 07:00" },
+      { text: "Skill : veille-marketing" },
+      { text: "Sources : liste validée" },
+      { text: "Droits : lecture seule", tone: "heading" },
+      { text: "Livre : rapport sur Telegram" },
+      { text: "Arrêt : aucune source récente" },
+      { text: "Responsable : Lina" },
+      { text: "Publication : aucune", tone: "heading" },
+    ]}
+    annotations={[
+      { line: 1, label: "Quand" },
+      { line: 2, label: "Avec quoi" },
+      { line: 7, label: "Qui regarde" },
+    ]}
+  />;
 }
 
 export function ManuelPuisPlanifieDiagram() {
-  return <Steps title="La planification vient en dernier" description="Deux preuves tamponnent le permis avant l'horaire." ariaLabel="Essai manuel puis Cas qui casse doivent réussir avant Planifier. Planifier est mis en avant." items={[
-    { label: "Essai manuel", detail: "Le chemin normal réussit", tools: ["Hermes Agent"] },
-    { label: "Cas qui casse", detail: "L'erreur est contrôlée", tools: ["Hermes Agent"] },
-    { label: "Planifier", detail: "L'horaire peut démarrer", tools: ["Google Agenda"] },
-  ]} accentIndex={2} />;
+  return <Steps
+    title="La planification vient en dernier"
+    description="Une tâche automatique se réveille sans toi : elle doit d'abord avoir réussi à la main."
+    legend="Pas de réussite à la main, pas d'horaire."
+    ariaLabel="Trois étapes : un essai manuel sur un vrai cas autorisé, un cas qui casse comme une pièce manquante provoquée, puis la planification avec hermes cron."
+    accent={EM}
+    items={[
+      { label: "Essai manuel", detail: "Un vrai cas autorisé", tools: ["Hermes Agent"] },
+      { label: "Cas qui casse", detail: "Une pièce manquante" },
+      { label: "Planifier", detail: "hermes cron, en dernier" },
+    ]}
+    accentIndex={2}
+  />;
 }
 
 export function TerminalCronEtHistoriqueMockup() {
-  return <FileCard title="Créer, lancer et relire la tâche" description="Le terminal garde l'état final et la sortie livrée." ariaLabel="Un terminal Hermes cron montre Tâche active, Dernière exécution et Sortie livrée avec trois repères." filename="hermes cron" tool="Ghostty" lines={[
-    { text: "$ hermes cron list" },
-    { text: "veille-marketing     Tâche active", tone: "heading" },
-    { text: "$ hermes cron run veille-marketing" },
-    { text: "Dernière exécution : réussie" },
-    { text: "Sortie livrée : Telegram", tone: "heading" },
-  ]} annotations={[
-    { line: 2, label: "Choisis la tâche" },
-    { line: 3, label: "Lance un essai" },
-    { line: 4, label: "Relis l'état" },
-  ]} />;
+  return <FileCard
+    title="Relire la tâche après un lancement"
+    description="Exemple : ce que tu vérifies dans le terminal après le premier essai de la tâche."
+    legend="Tu relis l'état et la sortie avant de la laisser tourner seule."
+    ariaLabel="Un terminal ouvert avec hermes cron, puis trois repères à vérifier : la tâche active, la dernière exécution réussie et la sortie livrée sur Telegram."
+    accent={EM}
+    filename="hermes cron"
+    tool="Ghostty"
+    lines={[
+      { text: "$ hermes cron" },
+      { text: "Tâche : veille-marketing, active", tone: "heading" },
+      { text: "Dernière exécution : réussie" },
+      { text: "Sortie : livrée sur Telegram", tone: "heading" },
+    ]}
+    annotations={[
+      { line: 2, label: "La tâche existe" },
+      { line: 3, label: "Elle a tourné" },
+      { line: 4, label: "Le rapport est arrivé" },
+    ]}
+  />;
 }
 
 export function VeillePlanifieeAvecFreinDiagram() {
-  return <Workflow title="La veille avance, la publication attend" description="Le travail automatique s'arrête devant ton choix." ariaLabel="Perplexity fournit les Sources, Hermes prépare Trois idées, Telegram les livre, Ton choix valide puis Instagram publie." actors={["Recherche", "Agent", "Toi", "Réseau"]} steps={[
-    { actor: 0, label: "Sources", tool: "Perplexity" },
-    { actor: 1, label: "Trois idées", tool: "Hermes Agent", transfer: "sources" },
-    { actor: 1, label: "Rapport", tool: "Telegram" },
-    { actor: 2, label: "Ton choix", humanValidation: true, transfer: "rapport" },
-    { actor: 3, label: "Publication", tool: "Instagram", transfer: "accord" },
-  ]} accentIndex={3} />;
+  return <Workflow
+    title="La veille avance, la publication attend"
+    description="Chaque matin le rapport arrive tout seul. La publication, elle, reste ton geste."
+    legend="Le travail automatique s'arrête au rapport. Après, c'est toi."
+    ariaLabel="Perplexity fournit les sources, l'agent prépare trois idées, Telegram livre le rapport, tu choisis une idée, puis tu publies sur Instagram."
+    accent={EM}
+    actors={["Recherche", "Agent", "Livraison", "Toi", "Réseau"]}
+    steps={[
+      { actor: 0, label: "Sources", tool: "Perplexity" },
+      { actor: 1, label: "Trois idées", tool: "Hermes Agent", transfer: "sources" },
+      { actor: 2, label: "Rapport", tool: "Telegram", transfer: "idées" },
+      { actor: 3, label: "Ton choix", humanValidation: true, transfer: "rapport" },
+      { actor: 4, label: "Publication", tool: "Instagram", transfer: "accord" },
+    ]}
+    accentIndex={3}
+  />;
 }
 
 export function PauseNarretePasLeTrainDiagram() {
-  return <Fork title="La pause ferme les nouveaux départs" description="Le travail déjà lancé continue jusqu'à son état final." ariaLabel="Nouveaux départs bloqués n'arrête pas Déjà lancé. Il faut Vérifier les livraisons." situation="Pause globale"
+  return <Fork
+    title="La pause n'arrête pas le train"
+    description="La pause globale ferme les nouveaux départs. Ce qui est lancé continue."
+    legend="Après une pause, relis les livraisons avant de relancer quoi que ce soit."
+    ariaLabel="Une pause globale bloque les nouveaux départs, laisse finir les tâches déjà lancées, et oblige à relire les livraisons en attente avant de recommencer."
+    accent={EM}
+    situation="Pause globale"
     outcomes={[
-      { label: "Nouveaux départs bloqués", condition: "La barrière reste fermée", rejected: true },
-      { label: "Déjà lancé", condition: "Le train rejoint son état final", recommended: true },
-      { label: "Vérifier les livraisons", condition: "Relire avant de recommencer" },
-    ]} />;
+      { label: "Départs bloqués", condition: "Aucune nouvelle tâche", rejected: true },
+      { label: "Déjà lancé", condition: "Finit son travail" },
+      { label: "Livraisons", condition: "Tu les relis avant de relancer", recommended: true },
+    ]}
+  />;
 }

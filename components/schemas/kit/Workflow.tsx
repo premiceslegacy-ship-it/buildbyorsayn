@@ -1,5 +1,5 @@
-import { Check, Hand } from "lucide-react";
-import { KitFrame } from "./KitFrame";
+import { ArrowRight, Check, Hand } from "lucide-react";
+import { KitFrame, type KitKey } from "./KitFrame";
 import { ToolMark } from "./ToolMark";
 import type { KitBaseProps } from "./types";
 import styles from "./kit.module.css";
@@ -18,27 +18,28 @@ export type WorkflowProps = KitBaseProps & {
   accentIndex: number;
 };
 
+/** Un relais : chaque carte dit qui agit, avec quel outil, et ce qu'elle reçoit de la carte d'avant. */
 export function Workflow({ actors, steps, accentIndex, ...frame }: WorkflowProps) {
-  const gridStyle = {
-    "--kit-actors": actors.length,
-    "--kit-workflow-steps": steps.length,
-  } as React.CSSProperties;
-  return <KitFrame {...frame} kind="workflow">
-    <div className={styles.workflow} style={gridStyle}>
-      {actors.map((actor, index) => <span className={styles.workflowActor} style={{ gridRow: index + 1 }} key={actor}>{actor}</span>)}
-      {actors.map((actor, index) => <span aria-hidden="true" className={styles.workflowLane} style={{ gridRow: index + 1 }} key={`lane-${actor}`} />)}
-      {steps.map((step, index) => <div
-        className={`${styles.workflowStep} ${index === accentIndex ? styles.isAccent : ""}`}
-        style={{ gridColumn: index + 2, gridRow: step.actor + 1 }}
-        key={`${step.label}-${index}`}
-      >
-        <span className={styles.workflowActorCompact}>{actors[step.actor]}</span>
-        {step.transfer ? <span className={styles.workflowTransfer}>{step.transfer}</span> : null}
-        {step.tool ? <ToolMark name={step.tool} size={32} /> : null}
-        <strong>{step.label}</strong>
-        {step.humanValidation ? <span className={styles.humanCheck} aria-label="Validation humaine"><Hand /><Check /></span> : null}
-      </div>)}
-    </div>
+  const keys: KitKey[] = [];
+  if (steps.some((step) => step.transfer)) keys.push({ swatch: "arrow", label: "Ce qui passe d'une carte à la suivante" });
+  if (steps.some((step) => step.humanValidation)) keys.push({ swatch: "human", label: "Un humain valide avant la suite" });
+  if (steps[accentIndex]) keys.push({ swatch: "accent", label: "En vert : le passage qui compte ici" });
+  const showActors = actors.length > 1;
+
+  return <KitFrame {...frame} kind="workflow" keys={keys}>
+    <ol className={styles.track} data-count={steps.length} data-variant="relay">
+      {steps.map((step, index) => <li className={index === accentIndex ? styles.isAccent : undefined} key={`${step.label}-${index}`}>
+        <span className={styles.trackDot}>{index + 1}</span>
+        <div className={styles.trackCard}>
+          {showActors || step.tool ? <div className={styles.trackWho}>
+            {step.tool ? <ToolMark name={step.tool} size={32} /> : null}
+            {showActors ? <span>{actors[step.actor]}</span> : null}
+          </div> : null}
+          {step.transfer ? <span className={styles.trackTransfer}><ArrowRight aria-hidden="true" />{step.transfer}</span> : null}
+          <strong>{step.label}</strong>
+          {step.humanValidation ? <span className={styles.humanCheck} aria-label="Validation humaine"><Hand /><Check /></span> : null}
+        </div>
+      </li>)}
+    </ol>
   </KitFrame>;
 }
-

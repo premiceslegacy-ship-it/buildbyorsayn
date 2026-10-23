@@ -1,49 +1,49 @@
-Tu reçois un message sur Telegram. Un prospect demande un devis. Ton agent retrouve les bonnes informations, prépare la réponse et te montre ce qu'il veut envoyer. Tu corriges le prix. Tu valides. Le CRM reçoit ensuite la prochaine action.
+Mardi, 18 h. Un prospect t'écrit sur Telegram : « Tu peux me faire un devis pour vendredi ? » Ton agent ouvre le dossier du client, retrouve tes tarifs et prépare une réponse. Il te la montre avant de l'envoyer. Tu corriges le prix. Tu valides. La prochaine action arrive dans ton CRM (l'outil où tu ranges tes clients).
 
-Voilà de quoi parle cette vidéo. Pas d'un robot qui dirige ton entreprise. On parle d'un assistant qui fait avancer une tâche précise et te rend la main au bon moment.
+Voilà ce que tu vas construire dans ces vidéos : un assistant qui fait avancer une tâche précise, du message reçu au CRM rangé, puis te rend la main au moment de valider.
 
 [[schema:PremierWorkflowVisible]]
 
 ## Tu vas construire quelque chose qui travaille vraiment
 
-Hermes Agent peut discuter, lire des fichiers, utiliser des outils, mémoriser certaines informations et lancer des tâches planifiées. Mais l'installation ne fait pas le travail à ta place.
+Hermes Agent est un assistant IA que tu installes sur ton ordinateur. Il discute, lit tes fichiers, utilise des outils, retient certaines informations et lance des tâches à heure fixe. Mais l'installer ne fait pas le travail à ta place.
 
-La vérité, c'est qu'un agent sans mission ressemble à un nouvel employé sans poste. Il a peut-être du talent. Il ne sait ni ce qu'il doit livrer, ni ce qu'il ne doit jamais faire.
+Un agent sans mission ressemble à un nouvel employé arrivé sans fiche de poste. Il a peut-être du talent, mais il ne sait ni ce qu'il doit livrer, ni ce qu'il ne doit jamais faire.
 
-À la fin, tu auras construit un premier workflow de métier. Tu choisiras une tâche réelle. Tu décideras ce qu'il prépare seul. Tu placeras ta validation avant l'envoi, la publication ou la dépense.
+À la fin, tu auras un premier workflow de métier, c'est-à-dire une suite d'étapes qui va d'un message reçu à une suite rangée. Tu choisiras une tâche réelle. Tu décideras ce que l'agent prépare seul. Tu placeras ta validation avant l'envoi, la publication ou la dépense.
 
-==Ton premier objectif n'est pas l'autonomie. C'est un travail clair que tu peux relire et reprendre.==
+==Ton premier objectif, c'est un travail clair que tu peux relire et reprendre. L'autonomie vient après.==
 
-## On avance du plus simple au plus sensible
+## On avance dans l'ordre où tu travailles vraiment
 
-Premier point : tu installes l'outil et tu vérifies une conversation normale. Ensuite, tu regardes une tâche que tu connais déjà.
+Premier point : tu installes l'outil et tu vérifies qu'il répond dans une conversation normale. Ensuite, tu regardes une tâche que tu connais déjà.
 
-Deuxième point : tu lui donnes les bonnes informations. Tu sépares son identité, ta fiche utilisateur, sa mémoire et les règles du projet.
+Deuxième point : tu lui donnes les bonnes informations. Tu sépares son identité, ta fiche à toi, sa mémoire et les règles du projet, chacune dans son fichier.
 
-Troisième point : tu connectes une seule porte d'entrée. Cela peut être Telegram, WhatsApp ou Slack. Un message ouvre un dossier. Il ne déclenche pas directement une action sensible.
+Troisième point : tu branches une seule porte d'entrée, Telegram, WhatsApp ou Slack. Un message ouvre un dossier. Il ne déclenche jamais directement une action sensible comme un envoi de prix.
 
-Quatrième point : tu testes. Tu mesures le résultat complet, y compris tes corrections. Puis tu planifies seulement ce qui tient déjà à la main.
+Quatrième point : tu testes sur de faux cas. Tu comptes le résultat complet, tes corrections comprises. Tu ne planifies à heure fixe que ce qui tient déjà quand tu le lances à la main.
 
 [[schema:OrdreDuPremierWorkflow]]
 
 ## Tu verras de vraies scènes de travail
 
-Une coach reçoit les mêmes questions tous les soirs. Un plaquiste oublie de relancer des devis. Une petite agence prépare des créatives publicitaires. Une boutique répond à ses clients sur WhatsApp.
+Une coach reçoit les mêmes questions en message privé tous les soirs. Un plaquiste oublie de relancer ses devis. Une petite agence prépare des visuels publicitaires. Une boutique répond à ses clients sur WhatsApp.
 
-Pour chaque scène, tu verras trois rôles. Toi, tu fixes le résultat et tu valides. L'agent cherche, compare et prépare. L'outil lit, enregistre ou transmet ce qui lui est demandé.
+Dans chaque scène, trois rôles. Toi, tu fixes le résultat et tu valides. L'agent cherche, compare et prépare. L'outil (Gmail, Notion, Stripe) lit, enregistre ou transmet ce qu'on lui demande, rien de plus.
 
 [[schema:ToiAgentOutil]]
 
-Tu verras aussi l'endroit précis où tu reprends la main. Le bot peut proposer une réponse de support. Il ne promet pas un remboursement seul. Il peut préparer un devis. Il ne choisit pas le prix final.
+Tu verras aussi l'endroit exact où tu reprends la main. Le bot peut proposer une réponse de support, mais il ne promet pas un remboursement tout seul. Il peut préparer un devis, mais il ne fixe pas le prix final.
 
 ## Avant de continuer
 
-Prends une feuille. Écris une tâche que tu fais au moins deux fois par semaine. Choisis un cas que tu connais assez bien pour repérer une mauvaise réponse.
+Prends une feuille. Écris une tâche que tu fais au moins deux fois par semaine, par exemple répondre à la demande de devis du jour. Choisis un cas que tu connais assez bien pour repérer une mauvaise réponse du premier coup d'œil.
 
-Évite la tâche la plus risquée de ton activité. Commence par une préparation en lecture seule. Par exemple : classer cinq demandes, préparer un rapport ou proposer trois réponses sans les envoyer.
+Évite la tâche la plus risquée de ton activité. Commence par une préparation en lecture seule : classer cinq demandes, préparer un rapport ou proposer trois réponses sans les envoyer.
 
 :::retiens
 Tu apprends d'abord à conduire sur un parking vide. La route arrive après.
 :::
 
-Dans le premier chapitre, tu vas installer l'outil et vérifier qu'il fonctionne. Rien ne sera connecté à un vrai client.
+Dans le premier chapitre, tu installes l'outil et tu vérifies qu'il répond, depuis ton terminal (la fenêtre où tu tapes des commandes). Rien ne sera connecté à un vrai client.

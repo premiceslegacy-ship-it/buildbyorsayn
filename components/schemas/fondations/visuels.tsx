@@ -30,19 +30,19 @@ export function LandingGeneriqueContreMarqueMockup() {
 }
 
 export function ReferencesVersDirectionDiagram() {
-  return <Workflow
-    title="Une référence, une pièce"
-    description="Chaque source apporte une décision, jamais une page à copier."
-    ariaLabel="Pinterest et Figma aident à extraire la lumière, le cadre, la matière et ce qu'il faut éviter avant notre direction."
+  return <Steps
+    title="Une référence, une décision"
+    description="Chaque image épinglée t'apprend une seule chose : tu la nommes, puis tu l'écris dans ta direction."
+    legend="Une référence par décision, plus une anti-référence pour tes refus."
+    ariaLabel="Tu épingles des références sur Pinterest, tu en tires la lumière, la composition sur Figma, la matière et ce que tu refuses, puis tu écris ta direction visuelle."
     accent={EM}
-    actors={["Références", "Direction"]}
     accentIndex={4}
-    steps={[
-      { actor: 0, label: "Lumière", tool: "Pinterest" },
-      { actor: 0, label: "Cadre", tool: "Figma" },
-      { actor: 0, label: "Matière" },
-      { actor: 0, label: "À éviter" },
-      { actor: 1, label: "Notre direction", humanValidation: true },
+    items={[
+      { label: "Lumière", detail: "Une image de fenêtre, le matin", tools: ["Pinterest"] },
+      { label: "Composition", detail: "Où l'œil entre dans la page", tools: ["Figma"] },
+      { label: "Matière", detail: "Bois sombre, céramique mate" },
+      { label: "À éviter", detail: "L'image que tu refuses" },
+      { label: "Direction", detail: "Quatre décisions en une page" },
     ]}
   />;
 }
@@ -79,6 +79,7 @@ export function DesignSystemOuvertMockup() {
     <FileCard
       title="Les décisions restent ouvertes"
       description="Le fichier nomme les règles que l'interface applique."
+      legend="Un rôle (« action principale ») vaut mieux qu'une couleur brute (« vert 500 »)."
       ariaLabel="Le fichier DESIGN-SYSTEM.md contient les couleurs, la typographie, les espacements, les formes, les états et le mobile."
       accent={EM}
       filename="DESIGN-SYSTEM.md"
@@ -115,6 +116,7 @@ export function EcranDansTousSesEtatsMockup() {
   return <Steps
     title="Le même écran dans tous ses états"
     description="La qualité reste visible quand tout ne se passe pas bien."
+    legend="Teste ces cinq états avant de dire que l'écran est fini."
     ariaLabel="Un formulaire passe par chargement, vide, erreur, succès et mobile, avec la correction mise en avant."
     accent={EM}
     accentIndex={2}

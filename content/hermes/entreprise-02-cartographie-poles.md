@@ -6,31 +6,31 @@ ordre: 14
 
 ## Les dossiers se perdent entre les équipes
 
-Le marketing livre un prospect. La vente pense qu'il est qualifié. La production découvre qu'une pièce manque. Chacun a fait sa partie, mais personne ne possède le passage.
+Chaque métier a maintenant sa source. Reste le moment où le dossier change de main. Lundi, le marketing livre un prospect. La vente pense qu'il est qualifié. Jeudi, la production découvre qu'il manque les plans du client. Chacun a fait sa partie, mais personne ne possède le passage de l'un à l'autre.
 
-Tu dois suivre l'objet qui change de main, pas dessiner un bel organigramme.
+Tu vas donc suivre l'objet qui voyage (un devis, une demande), pas dessiner un bel organigramme.
 
 ## Tu vas voir les passages qui créent les oublis
 
-À la fin, tu auras choisi un dossier réel et noté ses versions, ses refus, ses attentes et la personne qui reprend.
+À la fin, tu auras pris un dossier réel et noté, à chaque passage, sa version, l'accord de celui qui le reçoit, le chemin en cas de refus et la personne qui reprend.
 
 [[schema:RelaisDuDossier]]
 
 ## Pars d'un objet concret
 
-Choisis un devis, une demande de support, une campagne ou un onboarding client. Suis-le depuis son arrivée jusqu'à sa fin.
+Choisis un devis, une demande de support, une campagne ou l'accueil d'un nouveau client (on dit onboarding). Suis-le depuis le jour où il arrive jusqu'au jour où il est clos.
 
-À chaque passage, demande : qu'est-ce qui est transmis, dans quelle version, qui accepte et que se passe-t-il en cas de refus ?
+À chaque passage, pose quatre questions. Qu'est-ce qui est transmis ? Dans quelle version (devis v2, par exemple) ? Qui accepte ? Que se passe-t-il s'il refuse ?
 
 [[schema:PasseportDuDossier]]
 
 Un organigramme dit qui dépend de qui. Le trajet du dossier montre où le travail attend vraiment.
 
-## Montre les cinq workflows de l'entreprise
+## Montre les cinq parcours de l'entreprise
 
-Le marketing transforme une veille en contenu validé. Les ads transforment une recherche en variantes puis en rapport. Le CRM transforme un message en prochaine action.
+Un parcours, ici, c'est ce qui se passe entre un point de départ et un point d'arrivée. Il y en a cinq. Le marketing transforme une veille (les articles repérés cette semaine) en contenu validé. Les pubs transforment une recherche en variantes, puis en rapport du lundi. Le CRM transforme un message reçu en prochaine action.
 
-Le support transforme une question en réponse ou en demande d'aide. Le devis transforme des pièces en proposition validée.
+Le support transforme une question en réponse, ou en demande d'aide à un collègue. Le devis transforme des pièces reçues en proposition validée par le client.
 
 [[schema:CinqParcoursMetier]]
 
@@ -38,16 +38,16 @@ Le support transforme une question en réponse ou en demande d'aide. Le devis tr
 
 ## Fais apparaître les refus
 
-Un refus n'est pas un trou dans le dessin. Il doit indiquer ce qui manque, qui corrige et où reprendre.
+Un refus n'est pas un trou dans ton dessin. Il doit dire ce qui manque, qui corrige et où on reprend.
 
-Si la production refuse une date, le commercial ne recommence pas tout. Il reçoit la raison, une date possible et la décision attendue.
+Imagine que la production refuse la date du 14. Le commercial ne recommence pas tout. Il reçoit la raison (« planning plein »), une date possible (le 21) et la décision qu'on attend de lui : accepter ou renégocier.
 
 [[schema:RefusQuiAide]]
 
 :::exemple Un onboarding ne disparaît plus
 Une agence reçoit un formulaire client. Le commercial vérifie l'offre. La production vérifie les pièces. La finance vérifie l'acompte.
 
-Chaque équipe pose son accord sur la même fiche. Si une pièce manque, le dossier revient avec une question précise.
+Chaque équipe pose son accord sur la même fiche. Si une pièce manque, le dossier revient avec une question précise, par exemple « il manque le logo en vectoriel ».
 
 Le client ne reçoit pas trois demandes contradictoires.
 :::
@@ -57,23 +57,23 @@ Le client ne reçoit pas trois demandes contradictoires.
 Compte quarante-cinq minutes.
 
 1. Choisis un dossier terminé cette semaine.
-2. Liste chaque métier qui l'a touché.
-3. Note la version et l'accord à chaque passage.
-4. Ajoute le chemin d'un refus réel.
+2. Liste chaque métier qui l'a touché, dans l'ordre où il est intervenu.
+3. À chaque passage, note la version et l'accord obtenu.
+4. Ajoute le chemin d'un refus qui s'est vraiment produit.
 
-À la fin, tu vois exactement où une demande peut se perdre.
+À la fin, tu vois exactement où une demande peut se perdre chez toi.
 
 ## Version pour ton IA
 
 ```text
-Voici l'histoire d'un dossier : [colle les étapes].
+Voici l'histoire d'un dossier : [colle les étapes].
 
-Représente chaque passage avec :
-1. le métier qui remet ;
-2. l'objet remis ;
-3. sa version ;
-4. le métier qui reçoit ;
-5. son critère d'accord ;
+Représente chaque passage avec :
+1. le métier qui remet ;
+2. l'objet remis ;
+3. sa version ;
+4. le métier qui reçoit ;
+5. son critère d'accord ;
 6. le retour prévu en cas de refus.
 
 Signale les passages sans responsable.
@@ -82,4 +82,4 @@ Ne complète aucun manque par supposition.
 
 ## La suite
 
-Tu vois où le dossier passe. Il faut maintenant donner une place stable à chaque information qu'il transporte.
+Tu vois où le dossier passe. Il faut maintenant donner une place fixe à chaque information qu'il transporte : le prix, la date, la version du devis.

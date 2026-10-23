@@ -1,3 +1,5 @@
+import type { ComponentType } from "react";
+
 export type CoffreTemplate =
   | "ad-card"
   | "big-number"
@@ -16,6 +18,7 @@ export type CoffreTemplate =
   | "web-compare"
   | "workflow";
 
+/** Ancienne définition par libellés, rendue par le rendu générique. */
 export type CoffreVisualDefinition = {
   name: string;
   kind: "schema" | "maquette";
@@ -28,3 +31,13 @@ export type CoffreVisualDefinition = {
   tools: readonly string[];
   accentIndex: number;
 };
+
+/** Schéma écrit à la main avec le kit : le composant porte toutes ses données. */
+export type HandcraftedVisual = {
+  name: string;
+  kind: "schema" | "maquette";
+  chapter: string;
+  component: ComponentType;
+};
+
+export type CoffreVisualEntry = CoffreVisualDefinition | HandcraftedVisual;

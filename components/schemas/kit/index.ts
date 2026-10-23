@@ -9,6 +9,7 @@ export * from "./Fork";
 export * from "./Funnel";
 export * from "./Ladder";
 export * from "./Rings";
+export * from "./SiteMockup";
 export * from "./Steps";
 export * from "./ToolMap";
 export * from "./WebPage";

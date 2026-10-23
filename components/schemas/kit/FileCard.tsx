@@ -22,7 +22,7 @@ export type FileCardProps = KitBaseProps & {
 
 export function FileCard({ filename, lines, annotations, tool, ...frame }: FileCardProps) {
   const notesByLine = new Map(annotations.map((annotation, index) => [annotation.line, index + 1]));
-  return <KitFrame {...frame} kind="file-card">
+  return <KitFrame {...frame} kind="file-card" keys={annotations.length ? [{ swatch: "accent", label: "Chaque pastille renvoie à la ligne surlignée" }] : undefined}>
     <div className={styles.fileLayout}>
       <section className={styles.editor}>
         <header><span>{filename}</span>{tool ? <ToolMark name={tool} size={28} /> : null}</header>

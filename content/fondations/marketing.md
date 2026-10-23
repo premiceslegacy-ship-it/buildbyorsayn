@@ -8,40 +8,40 @@ ordre: 5
 
 Tu publies une belle image en parlant de qualité, de passion et d'innovation. Les bonnes personnes passent devant sans comprendre que tu parles d'elles.
 
-Le marketing commence là : faire reconnaître une situation assez vite pour mériter la suite.
+Le marketing commence là : faire reconnaître une situation assez vite pour mériter la suite.
 
 ## Tu vas chercher une attention qui sert ton offre
 
-Capter l'attention ne veut pas dire faire du bruit. Tu dois attirer les personnes concernées, leur donner une idée utile et leur proposer un geste adapté.
+Capter l'attention, c'est faire lever la tête à la bonne personne : le fleuriste qui voit ton post et pense « c'est mon jeudi soir ». Tu lui donnes ensuite une idée utile et un geste adapté.
 
 À la fin, tu auras une idée de contenu, six ouvertures prêtes à adapter et une petite série que tu peux réellement tenir.
 
 ## Une idée claire arrête mieux que cinq promesses
 
-Ton contenu doit porter une seule idée : une scène précise l'ouvre, une explication la développe et une action simple la termine.
+Ton contenu doit porter une seule idée : une scène précise l'ouvre, une explication la développe et une action simple la termine.
 
 [[schema:UneIdeeUnePersonne]]
 
-La vérité, c'est qu'un contenu pour tout le monde ne parle à personne. Choisis un groupe que tu peux reconnaître par son travail, pas par un profil inventé.
+Un contenu pour tout le monde ne parle à personne. Choisis un groupe que tu peux reconnaître par son travail, pas par un profil inventé.
 
-Par exemple : les fleuristes qui reçoivent des commandes tardives pour le lendemain. Tu vois la scène et peux parler du vrai problème sans écrire « entrepreneurs ambitieux ».
+Par exemple : les fleuristes qui reçoivent des commandes tardives pour le lendemain. Tu vois la scène et peux parler du vrai problème sans écrire « entrepreneurs ambitieux ».
 
 ==L'attention devient utile quand la bonne personne se reconnaît vite.==
 
 :::avant-apres
-Avant : H1 d'un traiteur : « Des repas mémorables pour tous tes événements. »
+Avant : H1 d'un traiteur : « Des repas mémorables pour tous tes événements. »
 
-Après : H1 : « Ton repas d'équipe prêt sans courir après les réponses. »
+Après : H1 : « Ton repas d'équipe prêt sans courir après les réponses. »
 
-Pourquoi : le titre nomme un moment et un problème. La page peut ensuite expliquer les menus, les choix et le délai.
+Pourquoi : le titre nomme un moment et un problème. La page peut ensuite expliquer les menus, les choix et le délai.
 :::
 
 :::avant-apres
-Avant : sous-titre d'un électricien : « Qualité, réactivité et savoir-faire à ton service. »
+Avant : sous-titre d'un électricien : « Qualité, réactivité et savoir-faire à ton service. »
 
-Après : « Tu envoies la photo du tableau. Je te dis quelles informations manquent avant le déplacement. »
+Après : « Tu envoies la photo du tableau. Je te dis quelles informations manquent avant le déplacement. »
 
-Pourquoi : la personne comprend le premier échange. La phrase ne promet ni prix ni réparation avant le diagnostic.
+Pourquoi : la personne comprend le premier échange. La phrase ne promet ni prix ni réparation avant le diagnostic.
 :::
 
 ## L'attention avance en trois temps
@@ -54,14 +54,14 @@ Le premier temps fait découvrir une scène, le deuxième montre comment tu trav
 
 On appelle souvent ce parcours un funnel, ou entonnoir. L'image montre beaucoup de personnes au début, puis seulement les personnes concernées qui continuent.
 
-Pourquoi cet ordre ? Parce que tu ne demandes pas les clés d'une maison avant d'avoir dit pourquoi tu sonnes. Un post propose un exemple, une démonstration ouvre un échange et une page claire peut proposer l'achat.
+Cet ordre ressemble à une visite : tu ne demandes pas les clés d'une maison avant d'avoir dit pourquoi tu sonnes. Un post propose un exemple, une démonstration ouvre un échange et une page claire peut proposer l'achat.
 
 :::avant-apres
-Avant : bouton d'une professeure de langues : « En savoir plus ».
+Avant : bouton d'une professeure de langues : « En savoir plus ».
 
-Après : « Tester mon niveau à l'oral ».
+Après : « Tester mon niveau à l'oral ».
 
-Pourquoi : le bouton annonce le geste et ce que la personne va obtenir. Il correspond à une première rencontre.
+Pourquoi : le bouton annonce le geste et ce que la personne va obtenir. Il correspond à une première rencontre.
 :::
 
 ## Observe les mécaniques, jamais les costumes
@@ -72,59 +72,59 @@ Regarde la scène, la tension, l'explication, la preuve, l'action demandée et l
 
 [[schema:ObserverSansCopier]]
 
-Je vais te dire le piège : tu vois une accroche ailleurs et tu changes deux mots. Tu récupères sa surface, mais pas le marché ni l'offre qui la rendaient logique.
+Le piège : tu vois une accroche ailleurs et tu changes deux mots. Tu récupères sa surface, mais pas le marché ni l'offre qui la rendaient logique.
 
-Concrètement : garde le principe, jamais la phrase. Si une publicité ouvre sur une scène précise, trouve un moment aussi concret dans ton propre métier.
+Garde le principe, jamais la phrase. Si une publicité ouvre sur une scène précise, trouve un moment aussi concret dans ton propre métier.
 
 :::avant-apres
-Avant : accroche de publicité d'une fleuriste : « Fais plaisir à ceux que tu aimes. »
+Avant : accroche de publicité d'une fleuriste : « Fais plaisir à ceux que tu aimes. »
 
-Après : « Tu as pensé aux fleurs le matin même ? »
+Après : « Tu as pensé aux fleurs le matin même ? »
 
-Pourquoi : la seconde phrase ouvre une scène connue. La publicité doit ensuite dire quelles commandes sont réellement possibles ce jour-là.
+Pourquoi : la seconde phrase ouvre une scène connue. La publicité doit ensuite dire quelles commandes sont réellement possibles ce jour-là.
 :::
 
 :::avant-apres
-Avant : script vidéo courte d'un coach sportif : « Trois secrets pour transformer ton corps rapidement. »
+Avant : script vidéo courte d'un coach sportif : « Trois secrets pour transformer ton corps rapidement. »
 
-Après : « Tu tiens ton programme trois jours, puis le travail reprend le dessus. Préparons une semaine qui survit à ton agenda. »
+Après : « Tu tiens ton programme trois jours, puis le travail reprend le dessus. Préparons une semaine qui survit à ton agenda. »
 
-Pourquoi : le script nomme la rupture réelle et annonce un travail concret. Il ne promet aucun résultat physique.
+Pourquoi : le script nomme la rupture réelle et annonce un travail concret. Il ne promet aucun résultat physique.
 :::
 
 ## Produis assez pour apprendre, puis resserre
 
 Au début, tu as besoin de comparer plusieurs angles. Choisis une scène, publie quelques variations et note les réponses qui montrent une vraie compréhension.
 
-Ne change qu'une chose entre deux essais : l'ouverture, la preuve ou le format. Si tu changes tout, tu obtiens des chiffres sans apprendre pourquoi.
+Ne change qu'une chose entre deux essais : l'ouverture, la preuve ou le format. Si tu changes tout, tu obtiens des chiffres sans apprendre pourquoi.
 
 [[schema:VolumePuisQualite]]
 
 La portée seule ne suffit pas. Une réponse précise, une demande d'exemple ou une objection nouvelle t'apprennent davantage, tandis qu'une confusion répétée montre quoi corriger.
 
-Quand une direction ouvre régulièrement de bonnes conversations, améliore sa preuve, son ouverture et sa distribution. Tu n'as plus besoin de chercher une nouvelle idée chaque matin.
+Quand une direction ouvre régulièrement de bonnes conversations, continue dedans : preuve plus nette, ouverture plus courte, publication à jours fixes. Tu n'as plus besoin de chercher une nouvelle idée chaque matin.
 
 :::avant-apres
-Avant : objet d'e-mail d'un fournisseur de restaurants : « Découvrez nos nouveautés ».
+Avant : objet d'e-mail d'un fournisseur de restaurants : « Découvrez nos nouveautés ».
 
-Après : « Il te manque encore les boissons de vendredi ? »
+Après : « Il te manque encore les boissons de vendredi ? »
 
-Pourquoi : l'objet part d'une échéance de travail. L'e-mail doit donner la disponibilité réelle et la manière de commander.
+Pourquoi : l'objet part d'une échéance de travail. L'e-mail doit donner la disponibilité réelle et la manière de commander.
 :::
 
 :::avant-apres
-Avant : accroche de page d'une assistante administrative : « Délègue pour retrouver ta liberté. »
+Avant : accroche de page d'une assistante administrative : « Délègue pour retrouver ta liberté. »
 
-Après : « Tes factures sont prêtes, mais les relances attendent encore ? »
+Après : « Tes factures sont prêtes, mais les relances attendent encore ? »
 
-Pourquoi : la seconde phrase montre la tâche laissée en attente. Elle qualifie les personnes qui vivent vraiment cette scène.
+Pourquoi : la seconde phrase montre la tâche laissée en attente. Elle qualifie les personnes qui vivent vraiment cette scène.
 :::
 
 ## Une bonne source peut nourrir plusieurs formats
 
 Une conversation, une démonstration ou une décision peut contenir plusieurs idées. Extrais les scènes, les questions et les preuves réellement présentes, sans remplir les trous.
 
-Tu peux adapter la même idée : un post montre la scène, une vidéo démontre le chemin, un e-mail développe et la page présente l'offre.
+Tu peux adapter la même idée : un post montre la scène, une vidéo démontre le chemin, un e-mail développe et la page présente l'offre.
 
 [[schema:SourceVersBibliotheque]]
 
@@ -139,13 +139,13 @@ Le canal change la forme. Le problème, la preuve et les limites restent les mê
 :::exemple Amel part d'une seule question
 Amel publie surtout de belles photos de tables, mais ses futurs clients ne voient pas ce qu'elle résout pendant la préparation.
 
-Pendant un appel, une mariée lui demande : « Qui vérifie que les prestataires ont tous la bonne heure ? » Amel comprend que cette question porte une vraie tension.
+Pendant un appel, une mariée lui demande : « Qui vérifie que les prestataires ont tous la bonne heure ? » Amel comprend que cette question porte une vraie tension.
 
-Elle en fait un post avec une scène : la veille du mariage, trois horaires différents circulent. Puis elle montre sa feuille de route et qui la valide.
+Elle en fait un post avec une scène : la veille du mariage, trois horaires différents circulent. Puis elle montre sa feuille de route et qui la valide.
 
 La même matière devient une vidéo courte sur la vérification. Son e-mail détaille les informations demandées aux prestataires. Sa page explique ce qui est inclus dans la coordination.
 
-Amel n'a pas inventé quatre idées : elle a développé une question réelle dans quatre formats qui mènent vers la même offre.
+Amel n'a pas inventé quatre idées : elle a développé une question réelle dans quatre formats qui mènent vers la même offre.
 :::
 
 ## À toi de jouer
@@ -184,4 +184,4 @@ Je choisirai et vérifierai la version avant publication.
 
 ## La suite
 
-Tu sais maintenant tester une idée, comprendre une personne, vendre, écrire et capter l'attention. La prochaine vidéo va transformer cette matière en projet construit et publié.
+Tu sais maintenant tester une idée, comprendre une personne, vendre, écrire et capter l'attention. Le prochain chapitre transforme cette matière en projet construit et publié.

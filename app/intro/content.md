@@ -1,38 +1,46 @@
-Tu pourrais ouvrir le programme, regarder trois vidéos et te sentir productif. Puis fermer l'onglet sans avoir rien changé dans ton activité.
+Mardi soir, tu ouvres le programme, tu regardes trois vidéos et tu te sens productif. Tu fermes l'onglet. Le lendemain, ton site, tes devis et tes messages clients sont exactement comme la veille.
 
-Cette page sert à éviter ça.
+Cette page est là pour que ça n'arrive pas.
 
 [[schema:ConsommerOuConstruire]]
 
-BUILD vient de projets livrés, d'erreurs corrigées et de méthodes reprises. Tu n'as pas besoin de tout retenir. Tu dois prendre une idée, la transformer en objet et la montrer au réel.
+BUILD vient de projets livrés, d'erreurs corrigées et de méthodes qui ont servi plusieurs fois. Tu n'as pas à tout retenir. Tu prends une idée, tu en fais un objet que tu peux ouvrir (une page, un modèle de devis, un message type) et tu le montres à quelqu'un qui n'est pas toi.
 
-À la fin de cette page, tu auras choisi ton prochain bloc. Tu auras aussi fixé un créneau et nommé le livrable que tu veux terminer.
+Dans quelques minutes, tu auras trois choses : ton premier bloc choisi (un bloc, c'est une partie du programme, avec son propre objet à finir), un créneau dans ton agenda, et le nom de l'objet que tu veux terminer. Cet objet s'appelle un livrable : quelque chose de fini que tu peux envoyer ou montrer.
 
 ## Ton parcours tient en trois temps
 
-Tu commences par comprendre le problème et la personne. Ensuite, tu construis quelque chose qui répond à ce besoin. Enfin, tu regardes ce qui marche et tu le rends plus facile à reprendre.
+Tu commences par comprendre le problème et la personne qui l'a. Une plaquiste qui perd des devis parce qu'elle rappelle trop tard n'a pas le même problème qu'un coach qui répond aux mêmes questions en DM tous les soirs. Ensuite, tu construis un objet qui répond à ce problème. Enfin, tu regardes ce qui a marché, puis tu le ranges pour le reprendre la prochaine fois sans repartir de zéro.
 
 [[schema:CarteDuParcoursBUILD]]
 
-Tu peux revenir en arrière. Tu peux corriger. Mais tu ne sautes pas la compréhension pour aller directement vers un outil impressionnant.
+Tu peux revenir en arrière et corriger. Mais tu ne sautes pas le premier temps pour aller droit sur un outil qui impressionne : un outil sans problème précis en face, tu l'ouvres une fois et tu ne le rouvres plus.
 
 ## Garde quatre habitudes
 
-Exécute assez vite pour obtenir une réponse. Reste curieux pour comprendre ce qui se passe. Encaisse l'erreur sans défendre ton ego. Garde un rythme que tu peux tenir.
+1. Tu agis assez vite pour obtenir une réponse : un message envoyé aujourd'hui vaut mieux qu'une page parfaite dans trois semaines.
+2. Tu restes curieux : quand quelque chose casse, tu regardes pourquoi avant de recommencer.
+3. Tu acceptes l'erreur sans te défendre : un client qui dit « je ne comprends pas » te rend service.
+4. Tu gardes un rythme que tu peux tenir : deux créneaux de quarante-cinq minutes par semaine, tenus, valent mieux qu'un dimanche de sept heures suivi de trois semaines de vide (ce sont des exemples, ajuste à ta vie).
 
 [[schema:BoussoleDesQuatreHabitudes]]
 
-La vérité, c'est qu'une bonne idée non appliquée ne change rien. Une première version imparfaite peut au moins te donner une réponse.
+Une bonne idée qui reste dans ta tête ne change rien. Une première version moyenne, envoyée à une vraie personne, te donne au moins une réponse.
 
 ## Ta règle pendant tout BUILD
 
-Pour chaque bloc, décide ce que tu vas produire. Termine une première version. Montre-la. Note ce que le retour change.
+À chaque bloc, tu fais quatre gestes, dans cet ordre :
+
+1. Tu écris ce que tu vas produire, en une phrase.
+2. Tu termines une première version, même imparfaite.
+3. Tu la montres à une personne.
+4. Tu notes ce que sa réaction t'a appris.
 
 [[schema:UnBlocUnLivrable]]
 
 ==Un bloc, un livrable, un retour du réel.==
 
-Ouvre maintenant ton agenda. Bloque ton premier créneau. Puis écris le nom du livrable avant d'ouvrir le programme.
+Ouvre maintenant ton agenda et bloque ton premier créneau. Écris le nom du livrable dans l'événement, avant d'ouvrir le programme.
 
 ## Version pour ton IA
 
@@ -59,4 +67,4 @@ N'invente aucune information sur mon activité.
 
 ## La suite
 
-Ton créneau est fixé. Ouvre le programme et construis le premier objet.
+Ton créneau est dans l'agenda et ton livrable a un nom. Ouvre le programme et construis le premier objet.

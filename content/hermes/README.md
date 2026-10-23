@@ -6,39 +6,39 @@ ordre: 1
 
 ## Ton terminal doit répondre avant ton entreprise
 
-Tu viens d'installer un nouvel outil. La tentation, c'est de brancher Gmail, Telegram et ton CRM. Attends.
+Tu viens d'installer un nouvel outil. La tentation, c'est de brancher Gmail, Telegram et ton CRM dès ce soir. Attends.
 
-Commence par une conversation simple dans un dossier vide. Pourquoi ? Parce que tu veux séparer un problème d'installation d'un problème de travail.
+Ouvre ton terminal, la fenêtre où tu tapes des commandes, et commence par une conversation simple dans un dossier vide. Pourquoi ? Parce que si quelque chose casse, tu veux savoir si c'est l'installation ou le travail. Un seul problème à la fois.
 
 ## Tu vas vérifier la base en quelques minutes
 
-À la fin, tu sauras installer Hermes Agent, choisir un modèle et lancer un essai sans donnée client. Tu auras aussi vérifié l'état réel de ta configuration.
+À la fin, tu sauras installer Hermes Agent, choisir un modèle (le cerveau IA qui répond, fourni par une entreprise comme Anthropic ou OpenAI) et lancer un essai sans donnée client. Tu auras aussi vérifié l'état réel de ta configuration.
 
 [[maquette:TerminalInstallationHermes]]
 
 ## Installe avec la commande prévue pour ta machine
 
-Sur macOS et Windows, tu peux utiliser l'application Desktop officielle. Sur macOS, le paquet actuel demande une machine Apple Silicon.
+Sur macOS et Windows, tu peux utiliser l'application Desktop officielle. Sur macOS, le paquet actuel demande une machine Apple Silicon (puce M1 ou plus récente).
 
-Pour une installation en ligne de commande sur Linux, macOS ou WSL2, garde cette commande exacte :
+Pour une installation en ligne de commande sur Linux, macOS ou WSL2 (Linux dans Windows), copie cette commande exacte dans ton terminal :
 
 ```bash
 curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
-Sur Windows natif, lance PowerShell et garde cette commande exacte :
+Sur Windows natif, ouvre PowerShell et copie cette commande exacte :
 
 ```powershell
 iex (irm https://hermes-agent.nousresearch.com/install.ps1)
 ```
 
-Une commande téléchargée depuis Internet peut changer ta machine. Lis la source et vérifie le domaine avant de l'exécuter. Si ton entreprise impose un paquet signé, suis cette règle.
+Une commande téléchargée depuis Internet peut modifier ta machine. Avant de l'exécuter, ouvre l'adresse dans ton navigateur pour lire le script, et vérifie le nom de domaine. Si ton entreprise impose un paquet signé, suis cette règle.
 
 ==Installer le moteur ne lui donne encore aucun travail ni aucun droit.==
 
 ## Vérifie ce qui fonctionne vraiment
 
-Recharge ton terminal. Lance ensuite ces commandes, dans cet ordre :
+Ferme ton terminal, rouvre-le, puis tape ces trois commandes, dans cet ordre :
 
 ```bash
 hermes --version
@@ -46,26 +46,31 @@ hermes doctor
 hermes status --all
 ```
 
-La première confirme la version installée. La deuxième cherche les problèmes de configuration. La troisième affiche l'état complet sans montrer les clés en clair.
+1. `hermes --version` affiche la version installée. Si une ligne s'affiche, la commande existe.
+2. `hermes doctor` cherche les problèmes de configuration, comme un contrôle technique.
+3. `hermes status --all` affiche l'état complet, sans montrer tes clés en clair.
 
 [[schema:TroisVoyantsInstallation]]
 
-Choisis ton fournisseur et ton modèle avec `hermes model`. Configure les outils plus tard avec `hermes tools`. Une clé acceptée prouve seulement que la connexion marche.
+Ensuite, tape `hermes model` pour choisir ton fournisseur et ton modèle. Les outils (accès aux fichiers, au web) se règlent plus tard avec `hermes tools`. Une clé acceptée prouve seulement que la connexion marche.
 
-Pense à une voiture. Le moteur démarre. Cela ne te dit pas où aller, qui peut conduire ou ce que tu transportes.
+Pense à une voiture. Le moteur démarre. Cela ne te dit pas où aller, qui peut conduire ni ce que tu transportes.
 
 ## Fais un essai qui ne peut rien envoyer
 
-Crée un dossier avec trois faux messages de prospects. Demande une fiche par message. Interdis tout envoi, toute modification et toute invention.
+1. Crée un dossier vide sur ton bureau, par exemple `essai-hermes`.
+2. Dedans, écris trois faux messages de prospects, un fichier chacun.
+3. Lance l'agent dans ce dossier et demande une fiche par message.
+4. Écris-lui noir sur blanc : aucun envoi, aucune modification, aucune invention.
 
 [[maquette:PremierEssaiTerminal]]
 
-Ton test doit montrer quatre choses. Le bon fichier a été lu. Les informations manquantes restent visibles. Aucune action extérieure n'a été tentée. La sortie peut être comprise sans relire toute la conversation.
+Relis ensuite le résultat. Il doit montrer quatre choses. Le bon fichier a été lu. Les informations manquantes restent visibles. Aucune action extérieure n'a été tentée. Et tu comprends la sortie sans relire toute la conversation.
 
 :::exemple Karim teste sans client
-Karim dirige une petite entreprise de peinture. Il crée trois demandes fictives : un appartement, un commerce et une cage d'escalier.
+Karim est plaquiste à Lyon. Un soir, il crée trois demandes fictives : un appartement, un commerce et une cage d'escalier.
 
-L'agent classe les pièces reçues et les pièces manquantes. Il ne calcule aucun prix. Karim voit tout de suite si l'installation fonctionne sans exposer un vrai devis.
+L'agent classe les pièces reçues et les pièces manquantes (photos, mesures). Il ne calcule aucun prix. Karim voit tout de suite si l'installation fonctionne, sans avoir exposé un vrai devis.
 :::
 
 ## À toi de jouer
@@ -99,37 +104,37 @@ Arrête-toi si deux fichiers se contredisent.
 
 ## La suite
 
-Ton terminal fonctionne. Dans le prochain chapitre, tu vas choisir le vrai travail à lui confier.
+Ton terminal répond et ton premier essai n'a rien envoyé. Dans le prochain chapitre, tu choisis le vrai travail à lui confier.
 
 ## Un agent impressionnant peut quand même être inutile
 
-Il écrit, cherche et clique très vite. Pourtant, personne dans ton équipe ne sait quoi lui demander demain matin.
+Ton terminal répond. L'agent écrit, cherche et clique très vite. Pourtant, personne dans ton équipe ne sait quoi lui demander demain matin à 9 h.
 
-La vérité, c'est que tu n'as pas besoin d'un spectacle. Tu as besoin d'une tâche qui se termine clairement.
+Ce qui compte, c'est une tâche qui se termine clairement : un brouillon de devis prêt à relire, une demande classée, une relance prête à partir.
 
 ## Tu vas choisir un premier workflow qui a du sens
 
-À la fin, tu sauras distinguer une tâche, un workflow, un skill, un outil et une validation. Tu auras choisi un cas simple de ton activité.
+À la fin, tu sauras distinguer cinq choses qu'on mélange tout le temps : une tâche, un workflow, un skill, un outil et une validation. Tu auras choisi un cas simple de ton activité.
 
 [[schema:CinqObjetsPasUnSeul]]
 
 ## Une tâche n'est qu'un morceau du trajet
 
-« Prépare une réponse » est une tâche. Le workflow commence plus tôt et finit plus tard.
+« Prépare une réponse » est une tâche. Le workflow, lui, commence plus tôt et finit plus tard.
 
 Un message arrive. Il faut reconnaître la demande, chercher les bonnes informations, préparer une réponse, la faire valider et ranger la suite. Voilà le trajet complet.
 
 [[schema:MessageJusquaSuite]]
 
-Un skill est différent. C'est une méthode écrite que l'agent peut charger. Il explique comment faire un travail, avec quels choix et quels tests.
+Un skill est une fiche de méthode que l'agent peut charger, comme la fiche recette collée sur le frigo : n'importe qui refait le plat. Elle dit comment faire un travail, avec quels choix et quels tests.
 
-L'outil, lui, réalise une opération. Gmail lit un e-mail. Notion ouvre une fiche. Stripe montre un paiement. Aucun ne décide seul ce que ton entreprise doit promettre.
+L'outil, lui, réalise une seule opération. Gmail lit un e-mail. Notion ouvre une fiche. Stripe montre un paiement. Aucun ne décide seul ce que ton entreprise doit promettre. La validation, c'est le moment où une personne dit oui avant que ça parte.
 
 ## Choisis une fin que quelqu'un peut reconnaître
 
-« Aide-moi avec le marketing » ne possède aucune ligne d'arrivée. « Prépare trois idées de contenu à partir de cinq avis clients » en possède une.
+« Aide-moi avec le marketing » n'a aucune ligne d'arrivée. « Prépare trois idées de contenu à partir de cinq avis clients » en a une.
 
-Pourquoi ? Parce qu'une autre personne peut compter les idées, retrouver les avis et refuser une invention.
+Pourquoi ? Parce qu'une autre personne peut compter les idées, retrouver les avis et refuser une invention.
 
 Pense à une livraison. Le livreur connaît l'adresse, le colis et la personne qui reçoit. Sans ces trois éléments, rouler plus vite ne sert à rien.
 
@@ -139,16 +144,16 @@ Pense à une livraison. Le livreur connaît l'adresse, le colis et la personne q
 
 ## Commence par une tâche fréquente et peu risquée
 
-Choisis un travail que tu connais. Il revient souvent, mais une erreur ne doit pas envoyer un mauvais prix ou supprimer une donnée.
+Choisis un travail que tu connais. Il revient souvent, mais une erreur ne doit pas envoyer un mauvais prix ni supprimer une donnée.
 
-Bon départ : préparer un résumé de support, classer des demandes, relever des concurrents ou proposer un brouillon de relance.
+Bon départ : préparer un résumé de support, classer les demandes du matin, relever les prix de trois concurrents ou proposer un brouillon de relance.
 
-Mauvais départ : publier automatiquement, rembourser un client, signer un devis ou modifier toute la base.
+Mauvais départ : publier automatiquement, rembourser un client, signer un devis ou modifier toute la base.
 
 :::exemple Léa choisit son premier cas
 Léa vend des formations à distance. Elle pense commencer par un bot qui répond à tous ses clients.
 
-Elle réduit la mission. Chaque matin, il rassemble les questions reçues et propose une réponse à partir de sa documentation. Léa choisit ce qui part.
+Elle réduit la mission. Chaque matin, l'agent rassemble les questions reçues et propose une réponse à partir de sa documentation. Léa choisit ce qui part.
 
 Elle garde le support humain. Elle retire seulement la recherche répétitive.
 :::
@@ -183,4 +188,4 @@ Pose-moi une question si la fin du travail reste floue.
 
 ## La suite
 
-Tu as choisi une tâche. On va maintenant regarder la dernière fois où elle a vraiment bloqué.
+Tu as choisi une tâche. On va maintenant ouvrir le dernier dossier où elle a vraiment bloqué.

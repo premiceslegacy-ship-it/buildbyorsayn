@@ -1,7 +1,62 @@
-import type { CourseVisualDefinition } from "../protocole/kit-instance";
+import { Compare, Rings, ToolMap } from "../kit";
+import type { HandcraftedVisual } from "../coffre/types";
+
+const EM = "#22d96e";
+
+export function EntrepriseSansSuperAgentDiagram() {
+  return <Rings
+    title="Quatre rôles, aucun super-agent"
+    description="Autour d'un objet partagé, chaque responsabilité reste à sa place."
+    legend="AI-first : le logiciel aide dès le départ, pas un modèle dans chaque geste."
+    ariaLabel="Autour de l'objet partagé, quatre couches séparées : les outils appliquent les droits, le système métier garde l'état, la connaissance explique, la direction donne le pourquoi."
+    accent={EM}
+    core="Objet"
+    accentIndex={0}
+    rings={[
+      { label: "Outils", detail: "Appliquent les droits" },
+      { label: "Système métier", detail: "Garde l'état" },
+      { label: "Connaissance", detail: "Explique la méthode" },
+      { label: "Direction", detail: "Donne le pourquoi" },
+    ]}
+  />;
+}
+
+export function ArchipelDesAutoritesDiagram() {
+  return <ToolMap
+    title="Chaque source garde son état"
+    description="Le CRM, le planning et la comptabilité font foi chacun pour un état différent."
+    legend="Relie par identifiant stable : deux noms identiques ne prouvent rien."
+    ariaLabel="HubSpot fait foi sur l'opportunité, Notion sur la charge des opérations, Stripe sur le paiement, et ton agent les relie par identifiant sans recopier leurs données."
+    accent={EM}
+    accentGroup={3}
+    groups={[
+      { role: "L'opportunité", tools: [{ name: "HubSpot", description: "Le CRM fait foi" }] },
+      { role: "La charge", tools: [{ name: "Notion", description: "Le planning des opérations" }] },
+      { role: "Le paiement", tools: [{ name: "Stripe", description: "La facture et l'encaissement" }] },
+      { role: "Le lien", tools: [{ name: "Hermes Agent", description: "Lit par identifiant, sans copier" }] },
+    ]}
+  />;
+}
+
+export function ProjectionSansDossierCompletDiagram() {
+  return <Compare
+    title="Voir le blocage, pas le dossier"
+    description="La vue de direction montre l'état, la raison et la personne, sans ouvrir les pièces."
+    legend="Montre juste assez pour savoir qui relancer."
+    ariaLabel="Le conseil juridique, les pièces du client et les échanges internes restent fermés ; la vue de direction affiche seulement bloqué, validation juridique manquante et la responsable."
+    accent={EM}
+    beforeTitle="Reste fermé"
+    afterTitle="Vue de direction"
+    rows={[
+      { before: "Le conseil juridique complet", after: "Bloqué" },
+      { before: "Les pièces du client", after: "Validation juridique manquante" },
+      { before: "Les échanges internes", after: "Qui : la juriste" },
+    ]}
+  />;
+}
 
 export const doctrine13 = [
-  { name: "EntrepriseSansSuperAgent", kind: "schema", chapter: "entreprise-01-cerveau-federe.md", template: "rings", title: "Une vue commune sans clé universelle", description: "Les métiers restent responsables de leurs objets tandis que les liens rendent l'ensemble lisible.", ariaLabel: "Direction, vente, opérations et finance restent séparées autour de liens communs.", labels: ["Direction", "Vente", "Opérations", "Finance", "Liens"], accentIndex: 4 },
-  { name: "ArchipelDesAutorites", kind: "schema", chapter: "entreprise-01-cerveau-federe.md", template: "tool-map", title: "Chaque île garde son autorité", description: "Le CRM, le planning et la comptabilité restent sources de vérité pour des états différents.", ariaLabel: "HubSpot porte l'état, Notion la charge et Stripe le paiement, reliés par des ponts.", labels: ["État", "Charge", "Paiement"], tools: ["HubSpot", "Notion", "Stripe"], accentIndex: 1 },
-  { name: "ProjectionSansDossierComplet", kind: "schema", chapter: "entreprise-01-cerveau-federe.md", template: "big-number", title: "Voir le blocage, pas le dossier", description: "La supervision montre un voyant, une raison et un responsable sans exposer les pièces sensibles.", ariaLabel: "Une projection montre bloqué, pourquoi et qui tout en laissant le dossier fermé.", labels: ["Dossier fermé", "Détails protégés", "Bloqué", "Pourquoi et qui"], accentIndex: 2 },
-] as const satisfies readonly CourseVisualDefinition[];
+  { name: "EntrepriseSansSuperAgent", kind: "schema", chapter: "entreprise-01-cerveau-federe.md", component: EntrepriseSansSuperAgentDiagram },
+  { name: "ArchipelDesAutorites", kind: "schema", chapter: "entreprise-01-cerveau-federe.md", component: ArchipelDesAutoritesDiagram },
+  { name: "ProjectionSansDossierComplet", kind: "schema", chapter: "entreprise-01-cerveau-federe.md", component: ProjectionSansDossierCompletDiagram },
+] as const satisfies readonly HandcraftedVisual[];

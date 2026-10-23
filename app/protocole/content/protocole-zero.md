@@ -6,103 +6,101 @@ ordre: 1
 
 ## Tu peux aller très vite dans la mauvaise direction
 
-Tu donnes une demande floue à une IA. Elle te rend quelque chose de propre. Tu le livres sans savoir ce qui est juste, fragile ou faux.
+Mardi, 18 h. Tu demandes à une IA la page d'offre d'un client. Elle te rend un texte propre, avec un joli titre. Tu l'envoies sans savoir ce qui est juste, ce qui est fragile et ce qui est faux.
 
-Le problème n'est pas l'outil. Le problème, c'est que tu ne possèdes aucun critère pour juger sa sortie.
-
-Pourquoi ? Parce qu'une réponse convaincante peut cacher une mauvaise décision. Le protocole zéro te fait construire le jugement derrière le résultat.
+Ton outil fait son travail. Ce qui te manque, c'est un moyen de juger ce qu'il te rend. Une réponse qui sonne bien peut cacher une mauvaise décision : un prix absurde, une promesse que ton client ne peut pas tenir. Le protocole zéro te fait construire ce jugement derrière chaque résultat.
 
 ## Voilà ce que tu vas construire
 
-Tu vas apprendre une tâche assez précise pour être testée. Tu vas la mettre devant une vraie personne. Puis tu vas garder ce qui résiste au réel.
+Tu vas apprendre une tâche assez précise pour être testée. Tu la mets devant une vraie personne. Puis tu gardes ce qui a tenu face à elle.
 
-À la fin, tu ne seras pas expert de tout. Tu auras une méthode pour apprendre, livrer et progresser sans repartir de zéro.
+À la fin, tu ne seras pas expert de tout. Tu auras une méthode écrite pour apprendre, livrer et reprendre sans repartir de zéro, et tu sauras faire la première étape dès aujourd'hui.
 
 ## Commence par une tâche que tu peux montrer
 
-« Devenir bon en marketing » ne te donne aucune prise. « Écrire la page d'offre d'un artisan » produit un objet que quelqu'un peut lire et corriger.
+« Devenir bon en marketing » ne te donne aucune prise : tu ne sais pas par où commencer lundi matin. « Écrire la page d'offre d'un plombier qui intervient en urgence » donne un objet que quelqu'un peut lire et corriger.
 
 [[schema:TacheSousLaLoupe]]
 
-La première étape consiste donc à rétrécir. Choisis une personne, une situation et un résultat visible. Note aussi l'erreur qui coûterait cher.
+Pour rétrécir ta tâche, réponds à quatre questions par écrit : pour quelle personne, dans quelle situation, avec quel résultat visible, et quelle erreur coûterait cher.
 
-Pense à une salle de sport. « Être en forme » reste vague. « Faire dix pompes propres » te donne un mouvement à observer et un progrès à mesurer.
+Pense à une salle de sport. « Être en forme », tu ne sais pas le mesurer. « Faire dix pompes propres » te donne un mouvement à observer et un progrès à compter.
 
 ==Tu n'apprends pas un grand domaine. Tu apprends le prochain geste utile.==
 
 ### Croise les sources au lieu de chercher un gourou
 
-Prends une source officielle, des exemples de travail et des retours du terrain. Ajoute des vidéos, des articles ou des livres si cela t'aide.
+Rassemble trois types de matière : la documentation officielle de l'outil, des exemples de travail déjà faits et des retours de gens du métier. Des vidéos, des articles ou des livres peuvent s'ajouter.
 
 [[schema:CarteDesSources]]
 
-Chaque source voit une partie du problème. Une documentation explique le fonctionnement. Un bon livrable montre le niveau attendu. Une personne du métier raconte ce qui se passe vraiment.
+Chacune voit une partie du problème. La documentation explique comment l'outil fonctionne. Un bon livrable montre le niveau attendu. Un plombier te dit ce qui se passe vraiment quand le client appelle à 22 h avec une fuite.
 
-Un transcript est le texte d'une vidéo ou d'un audio. Il accélère la lecture. Il ne transforme pas la vidéo en vérité.
+Un transcript est le texte écrit d'une vidéo ou d'un audio. Tu le lis en dix minutes au lieu de regarder une heure. Il reste ce que la personne a dit, pas une vérité.
 
-Tu peux utiliser NotebookLM pour interroger tes sources. Tu peux aussi confier cette lecture à Hermes Agent, Claude ou ChatGPT. Dans tous les cas, garde le passage d'origine et relis les désaccords.
+Pour interroger tes sources, tu peux utiliser NotebookLM, l'outil de Google qui répond à partir des documents que tu lui donnes. Ton agent, Claude ou ChatGPT peuvent aussi faire cette lecture. Dans tous les cas, garde le passage d'origine à côté de chaque réponse et relis les endroits où deux sources se contredisent.
 
 ### Transforme la matière en fiche provisoire
 
-Ta fiche répond à six questions : quel résultat, pour qui, dans quelle situation, avec quelles étapes, quels pièges et quelle preuve.
+Ta fiche d'une page répond à six questions, dans cet ordre : quel résultat, pour qui, dans quelle situation, avec quelles étapes, quels pièges, et à quoi tu verras que ça marche.
 
 [[schema:SourceVersFiche]]
 
-Une SOP est une procédure stable, écrite étape par étape. Un skill va plus loin. Il indique aussi quand choisir une autre route et quand s'arrêter.
+Si ta fiche suit des étapes toujours identiques, c'est une SOP, une procédure écrite pas à pas, comme la fiche recette collée sur le frigo. Si elle doit aussi dire quand prendre une autre route et quand s'arrêter, c'est un skill : la même recette, plus les cas où le cuisinier change de plan.
 
-Ne grave rien trop tôt. À ce stade, ta fiche reste une hypothèse. Elle devient intéressante quand elle affronte un cas réel.
+Ne grave rien trop tôt. Pour l'instant, ta fiche est une hypothèse. Elle devient utile le jour où elle rencontre un cas réel.
 
 [[schema:FicheContreCasReel]]
 
 :::exemple Lina apprend sans se noyer
 Lina veut écrire des pages d'offre pour des artisans. Elle choisit un seul cas : la page d'un plombier qui intervient en urgence.
 
-Elle lit la documentation des outils utilisés. Elle compare trois pages existantes. Puis elle parle vingt minutes avec un plombier.
+Lundi, elle lit la documentation de ses outils. Mardi, elle compare trois pages existantes. Mercredi, elle parle vingt minutes avec un plombier.
 
-Sa fiche tient sur une page. Elle contient la scène, les questions du client, les preuves disponibles et le prochain geste. Elle ne prétend pas résumer tout le marketing.
+Sa fiche tient sur une page : la scène (une fuite un dimanche soir), les trois questions du client, les preuves disponibles (photos de chantier, avis) et le prochain geste. Elle ne prétend pas résumer tout le marketing.
 :::
 
 ## Va chercher une réponse sur le terrain
 
-Ta fiche peut être brillante et rester fausse. Le terrain te montre où elle casse.
+Ta fiche peut sembler brillante et rester fausse. Seule une vraie personne te montre où elle casse.
 
-Commence par une offre simple. Choisis une personne identifiable. Promets seulement ce que tu peux livrer avec ton niveau actuel.
+Commence par une offre simple, adressée à une personne que tu peux nommer, et promets seulement ce que tu sais livrer avec ton niveau d'aujourd'hui.
 
 [[schema:PremierClientAvantSysteme]]
 
-Je vais te dire le piège. Beaucoup de gens construisent le système parfait avant la première conversation. Ils organisent un travail que personne n'a encore demandé.
+Beaucoup de gens construisent le système parfait avant la première conversation : un tableau à huit colonnes, trois automatisations, pour un travail que personne n'a encore demandé.
 
-Parle, propose, livre. Chaque étape répond à une question différente. Une réponse montre l'intérêt. Une vente montre un choix. Une livraison acceptée montre que le travail tient jusqu'au bout.
+Fais l'inverse, dans l'ordre : tu parles, tu proposes, tu livres. Une réponse te montre l'intérêt. Une vente te montre qu'on t'a choisi. Une livraison acceptée te montre que ton travail tient jusqu'au bout.
 
 ### Suis le parcours complet
 
-Un CRM est un outil qui suit tes contacts et tes ventes. Un simple tableau suffit pour commencer.
+Pour garder la trace de tes conversations, un CRM suffit : un outil qui retient tes contacts et leur avancement. Au début, un simple tableau fait l'affaire.
 
 [[schema:ParcoursDuTerrain]]
 
-Note le contact, le canal, la réponse, la prochaine étape et la décision. Ajoute ensuite le temps de livraison, les corrections et le coût des outils.
+Une ligne par personne. Note le contact, le canal (Instagram, mail, téléphone), sa réponse, la prochaine étape et ta décision. Ajoute ensuite le temps de livraison, le nombre de corrections demandées et le coût des outils.
 
-Le but n'est pas d'envoyer le plus de messages possible. Le but est de comprendre où le parcours bloque.
+Ton but n'est pas d'envoyer le plus de messages possible. Ton but est de voir à quelle ligne le parcours s'arrête : pas de réponse, pas de vente, ou pas de livraison acceptée.
 
 ### Donne le bon rôle à ton IA
 
-Ton IA peut préparer une recherche, classer des réponses et écrire un brouillon. Elle peut aussi résumer un appel ou rappeler une relance.
+Ton IA prépare une recherche, trie les réponses reçues et écrit un brouillon de message. Elle peut aussi résumer un appel ou te rappeler une relance.
 
 [[schema:ToiEtTonIAEnSprint]]
 
-Toi, tu choisis la personne, tu relis le message et tu décides l'envoi. Tu gardes aussi la main sur le prix, la promesse et les actions sensibles.
+Toi, tu choisis la personne, tu relis le message et tu appuies sur Envoyer. Le prix, la promesse faite au client et toute action sensible restent dans tes mains.
 
-Ne colle jamais une clé secrète dans un prompt. Donne un accès limité au service utile. Puis teste aussi ce que l'agent doit refuser.
+Ne colle jamais une clé secrète (le mot de passe qui donne accès à un service) dans un prompt. Donne à l'IA un accès limité au seul service utile. Puis teste ce que ton agent doit refuser, par exemple envoyer un message sans ton accord.
 
 ### Regarde la marge, pas seulement la vente
 
-Une vente peut cacher une mauvaise activité. Compte la préparation, la livraison, les corrections, le support et les outils.
+Une vente peut cacher une mauvaise affaire. Compte tout : la préparation, la livraison, les corrections, le support et les abonnements d'outils.
 
 [[schema:MargeReelle]]
 
-Prends Nora, qui prépare un formulaire de réservation pour un salon. La cliente achète. Nora passe ensuite trois soirées sur des corrections qu'elle n'avait pas prévues.
+Prends Nora, qui prépare un formulaire de réservation pour un salon de coiffure. La cliente achète. Ensuite, Nora passe trois soirées sur des corrections qu'elle n'avait pas prévues.
 
-La vente est réelle. Le système n'est pas encore bon. Son prochain test porte sur le brief et la limite des retours.
+La vente est réelle, mais l'affaire n'est pas encore bonne. Son prochain test : un brief écrit avant de commencer, et un nombre de retours fixé dans l'offre.
 
 :::retiens
 Une conversation t'apprend ce que la personne dit. Une livraison t'apprend ce que ton offre demande vraiment.
@@ -110,41 +108,41 @@ Une conversation t'apprend ce que la personne dit. Une livraison t'apprend ce qu
 
 ## Sors la méthode de ta tête
 
-Après quelques projets, les mêmes questions reviennent. Les mêmes erreurs apparaissent. Pourtant, tout reste dispersé dans tes messages.
+Après trois ou quatre projets, les mêmes questions reviennent et les mêmes erreurs aussi. Mais tout reste éparpillé dans tes messages, tes notes et tes conversations avec l'IA.
 
 [[schema:ProjetQuiDisparaitOuReste]]
 
-La distillation commence ici. Tu prends une observation du terrain. Tu gardes sa source, son contexte et sa limite. Puis tu choisis où la ranger.
+Distiller, c'est reprendre une observation du terrain et la ranger. Tu notes ce que tu as vu, d'où ça vient (quel client, quelle semaine) et dans quels cas ça ne s'applique pas. Puis tu choisis où le ranger.
 
 ### Choisis le bon contenant
 
-Une règle stable rejoint une SOP. Un choix avec plusieurs routes rejoint un skill. Un livrable réutilisable devient un modèle. Une erreur reproductible devient un test.
+Une règle qui ne change jamais va dans une SOP. Un choix entre plusieurs routes va dans un skill. Un livrable que tu refais souvent devient un modèle (par exemple ton brief client). Une erreur qui revient devient un test : une question que tu te poses avant d'envoyer.
 
 [[schema:BonContenant]]
 
-Un résultat isolé reste une observation. Il ne devient pas une règle pour tout le monde.
+Un résultat obtenu une seule fois reste une observation. Ne la transforme pas en règle.
 
-Pense à une boîte à outils. Tu ne verses pas toutes les vis dans la même case. Tu ranges chaque pièce là où tu pourras la retrouver au bon moment.
+Une boîte à outils, c'est pareil : tu ne verses pas toutes les vis dans la même case. Chaque pièce va à l'endroit où tu la retrouveras au bon moment.
 
 ### Fais proposer le changement, puis relis-le
 
-Ton IA peut comparer trois projets et proposer une modification précise de ta méthode. Elle doit montrer la source, la raison et ce qui change.
+Donne à ton IA tes notes de trois projets et demande-lui une modification précise de ta fiche. Elle doit citer la note qui la justifie, expliquer la raison et montrer la ligne avant et après.
 
 [[schema:PatchDeMethode]]
 
-Tu relis cette proposition. Tu la testes sur un cas normal, un cas limite et une entrée qui tente de détourner la consigne. Ensuite seulement, tu gardes la nouvelle version.
+Tu relis sa proposition. Tu l'essaies sur un cas normal, sur un cas limite (un client qui change d'avis en cours de route) et sur un texte piégé qui tente de détourner la consigne. Si les trois passent, tu gardes la nouvelle version.
 
-Concrètement : ne demande pas « améliore mon skill ». Demande une modification ligne par ligne, avec le cas qui la justifie et le test à ajouter.
+Concrètement, ne demande pas « améliore mon skill ». Demande : « modifie ligne par ligne, montre le cas qui justifie chaque changement et ajoute le test correspondant ».
 
 ### Chaque projet rend le suivant plus facile
 
-Le premier projet te donne une fiche. Le suivant corrige une étape. Le troisième ajoute un exemple et un test.
+Le premier projet te donne une fiche. Le deuxième corrige une étape. Le troisième ajoute un exemple et un test.
 
 [[schema:EscalierDuCapital]]
 
-Tu continues d'utiliser des outils loués. La différence, c'est que ton savoir-faire ne reste plus prisonnier d'une conversation.
+Tu continues à louer des outils. Mais ton savoir-faire ne reste plus enfermé dans une conversation que tu as supprimée.
 
-Si un modèle change, tu adaptes la méthode. Tu ne retombes pas à zéro.
+Le jour où un modèle change, tu adaptes ta fiche en une heure au lieu de tout recommencer.
 
 [[schema:ChangerDOutilSansRetomber]]
 
@@ -154,12 +152,12 @@ Si un modèle change, tu adaptes la méthode. Tu ne retombes pas à zéro.
 
 Compte une heure aujourd'hui.
 
-1. Choisis une tâche que tu veux savoir faire cette semaine.
-2. Rassemble cinq sources, dont un exemple réel et une personne du métier si possible.
-3. Écris une fiche d'une page avec le résultat, les étapes, les pièges et la preuve.
-4. Choisis le premier cas réel qui peut corriger cette fiche.
+1. Choisis une tâche que tu veux savoir faire cette semaine, et écris-la en une phrase (pour qui, quel résultat visible).
+2. Rassemble cinq sources : un exemple réel, la documentation de l'outil et, si possible, une personne du métier à qui tu peux parler.
+3. Écris une fiche d'une page avec le résultat, les étapes, les pièges et ce qui te dira que ça marche.
+4. Choisis la première personne réelle qui peut corriger cette fiche, et fixe le jour où tu lui en parles.
 
-À la fin, tu as une tâche précise, une fiche provisoire et un rendez-vous avec le réel.
+À la fin de l'heure, tu as une tâche précise, une fiche provisoire et un rendez-vous avec le réel.
 
 ## Version pour ton IA
 
@@ -187,4 +185,4 @@ Termine par trois questions que je dois poser à une personne du métier.
 
 ## La suite
 
-Tu sais maintenant apprendre sans louer toute ta valeur. Retourne dans le programme et applique cette boucle à chaque nouveau bloc.
+Tu sais maintenant apprendre une tâche, la tester et garder ce qu'elle t'a appris. Retourne dans le programme et refais cette boucle à chaque nouveau bloc.

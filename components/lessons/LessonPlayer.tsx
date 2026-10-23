@@ -19,7 +19,24 @@ type PlayerState = { status: "loading" } | { status: "unavailable" } | { status:
 export function LessonPlayer({ sectionId, title, onCompleted, onEnded }: LessonPlayerProps) {
   const [state, setState] = useState<PlayerState>({ status: "loading" });
   const tokenRefreshed = useRef(false);
+  const watched = useRef({ time: 0, duration: 0 });
   const { report } = useLessonPosition(sectionId, onCompleted);
+
+  // Leaving the lesson (another chapter, Aujourd'hui, a closed tab) keeps the exact second, not the last 15 s checkpoint.
+  useEffect(() => {
+    const flush = () => {
+      const { time, duration } = watched.current;
+      if (time > 0) report(time, duration, true);
+    };
+    const onHidden = () => { if (document.visibilityState === "hidden") flush(); };
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", onHidden);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", onHidden);
+      flush();
+    };
+  }, [report]);
 
   const load = useCallback(async () => {
     const playback = await getLessonPlayback(sectionId);
@@ -78,7 +95,7 @@ export function LessonPlayer({ sectionId, title, onCompleted, onEnded }: LessonP
         disableCookies
         metadata={{ video_id: sectionId, video_title: title }}
         style={{ width: "100%", height: "100%" }}
-        onTimeUpdate={(event) => { const { time, duration } = readTime(event); report(time, duration); }}
+        onTimeUpdate={(event) => { const { time, duration } = readTime(event); watched.current = { time, duration }; report(time, duration); }}
         onPause={(event) => { const { time, duration } = readTime(event); report(time, duration, true); }}
         onEnded={(event) => { const { duration } = readTime(event); report(duration, duration, true); onEnded?.(); }}
         onError={handleError}

@@ -6,51 +6,47 @@ ordre: 9
 
 ## Ton site peut être magnifique et perdre tout le monde
 
-La page s'ouvre avec une grande animation, un logo qui tourne et des cartes brillantes. Pourtant, personne ne comprend ce que tu vends.
+Tu as ton image et ton design system. Tu les mets sur une page : une grande animation, un logo qui tourne, des cartes brillantes. Un ami l'ouvre sur son téléphone et te demande : « Tu vends quoi, exactement ? »
 
-Un site aide une personne à comprendre, croire et faire le prochain geste, bien loin d'un simple concours de décoration.
+Un site sert à trois choses, dans cet ordre : la personne comprend, elle croit, elle fait le geste suivant (appeler, réserver, envoyer sa demande).
 
 ## Tu vas construire un parcours, pas empiler des blocs
 
-L'IA peut chercher, écrire, maquetter et coder plus vite, tout en ayant besoin de ton client, de tes preuves et de tes choix.
+L'IA cherche, écrit, dessine une maquette et code très vite. Elle ne connaît ni ton client, ni tes preuves, ni ce que tu refuses de promettre : ça vient de toi.
 
-À la fin, tu auras la structure d'une première page complète, construite par petites parties puis testée dans son vrai parcours.
+À la fin du chapitre, tu as le plan d'une première page, un premier écran construit et testé sur ton téléphone, et une liste de questions qui décide de l'ordre du reste.
 
 ## Choisis le site à partir de l'action attendue
 
-Commence avec cette question : que doit pouvoir faire la personne après sa visite ? La réponse choisit souvent le bon format.
+Avant de choisir le type de site, pose-toi une question : que doit pouvoir faire la personne après sa visite ? Réserver un créneau ? Demander un devis ? Acheter un bouquet ? La réponse choisit le format.
 
-Une landing page présente une offre et pousse une action précise, tandis qu'un site vitrine explique une activité et ses réalisations.
+Une landing page présente une seule offre et pousse vers une seule action. Un site vitrine explique ton activité et montre tes réalisations. Un portfolio met ton travail au premier plan. Un site de contenu répond à des questions. Une boutique aide à choisir et à payer.
 
-Un portfolio met le travail au premier plan, un site de contenu répond à des questions et une boutique aide à choisir.
+Un site connecté, avec compte, paiement ou données privées, ne se justifie que si la personne doit retrouver quelque chose en revenant.
 
-Un site connecté devient utile lorsque la personne doit retrouver son compte, son paiement ou ses données privées après la visite.
+Si ta page doit seulement obtenir trois demandes de devis par semaine, ne construis pas d'espace membre. Chaque couche ajoute du travail, des droits à gérer et des erreurs possibles.
 
-Ne construis pas un espace membre pour une page qui doit seulement obtenir trois demandes qualifiées. Chaque couche ajoute du travail, des droits et des erreurs possibles.
-
-Concrètement : écris « La personne arrive pour [raison]. Elle comprend [message]. Puis elle fait [action]. » Si l'action reste floue, simplifie le projet.
+Complète cette phrase : « La personne arrive pour [raison]. Elle comprend [message]. Puis elle fait [action]. » Si tu ne sais pas remplir la dernière case, simplifie le projet avant d'ouvrir Figma.
 
 ==Le bon site est le plus petit site qui aide la bonne personne jusqu'au prochain geste.==
 
 ## Une landing page suit les questions du lecteur
 
-Une landing page n'obéit pas à une liste magique de sections. Son ordre dépend de ce que la personne sait déjà et de la preuve disponible.
+Aucune liste magique de sections ne marche pour tout le monde. L'ordre de ta page dépend de ce que la personne sait déjà et de la preuve que tu peux lui montrer.
 
 [[maquette:LandingRateeLandingUtile]]
 
-La page faible commence par l'entreprise, empile des promesses et cache l'action dans plusieurs boutons. La page utile commence par une scène reconnue.
+À gauche, la page ratée commence par l'histoire de l'entreprise, empile des promesses et répète trois boutons différents. À droite, la page utile commence par une scène que le visiteur reconnaît : « Tes demandes de devis arrivent par trois canaux et tu en oublies une par semaine. »
 
-Ton premier écran répond vite à quatre questions : est-ce pour moi, qu'est-ce qui change, comment et que dois-je faire maintenant ?
+Dans les premières secondes, le premier écran répond à quatre questions : est-ce pour moi, qu'est-ce qui change, comment, et que dois-je faire maintenant ?
 
 [[maquette:AnatomiePremierEcran]]
 
-Le reste de la page continue cette conversation en montrant le problème, le changement, la méthode, une démonstration et les conditions.
-
-Le bouton propose la prochaine étape, puis la phrase suivante explique précisément ce qui se passe après le clic.
+Le reste de la page continue la conversation, dans cet ordre : le problème, le changement, la méthode, une démonstration, les conditions. Le bouton propose la prochaine étape, et la phrase dessous dit ce qui se passe après le clic (« Tu reçois une réponse sous 48 heures », si c'est vrai).
 
 [[schema:TrajetDeDecision]]
 
-Avant d'ajouter une section, écris la question à laquelle elle répond. Si deux sections répondent à la même question, fusionne-les.
+Avant d'ajouter une section, écris en haut la question du visiteur à laquelle elle répond. Deux sections qui répondent à la même question n'en font qu'une.
 
 :::retiens
 La page n'avance pas au rythme de ton entreprise. Elle avance au rythme des questions de la personne.
@@ -58,130 +54,120 @@ La page n'avance pas au rythme de ton entreprise. Elle avance au rythme des ques
 
 ## Les mots doivent montrer une scène
 
-« Nous créons des solutions digitales » ne permet à personne de se reconnaître. Prends les mots entendus dans les appels, les messages et les demandes de devis.
+« Nous créons des solutions digitales » : personne ne s'y reconnaît. Pour écrire la phrase juste, ouvre tes appels, tes messages WhatsApp et tes demandes de devis, et reprends les mots que tes clients y emploient.
 
 :::avant-apres
-Avant : Nous créons des solutions digitales pour faire grandir votre entreprise.
+Avant : Nous créons des solutions digitales pour faire grandir votre entreprise.
 
-Après : Tes demandes arrivent par téléphone et WhatsApp. Le site les rassemble pour que tu saches qui rappeler.
+Après : Tes demandes arrivent par téléphone et WhatsApp. Le site les rassemble pour que tu saches qui rappeler.
 
-Pourquoi : l'après montre un moment, deux outils connus et un changement visible.
+Pourquoi : l'après montre un moment, deux outils connus et un changement visible.
 :::
 
 :::avant-apres
-Avant : Une expérience premium pour vos projets.
+Avant : Une expérience premium pour vos projets.
 
-Après : Envoie ton plan et trois photos. Tu reçois un rendez-vous de cadrage avant le devis.
+Après : Envoie ton plan et trois photos. Tu reçois un rendez-vous de cadrage avant le devis.
 
-Pourquoi : l'après explique l'effort demandé et la prochaine étape.
+Pourquoi : l'après explique l'effort demandé et la prochaine étape.
 :::
 
 :::avant-apres
-Avant : En savoir plus.
+Avant : En savoir plus.
 
-Après : Voir un chantier terminé.
+Après : Voir un chantier terminé.
 
-Pourquoi : le bouton annonce exactement ce qui va s'ouvrir.
+Pourquoi : le bouton annonce exactement ce qui va s'ouvrir.
 :::
 
 :::avant-apres
-Avant : Envoyer.
+Avant : Envoyer.
 
-Après : Envoyer ma demande de bouquet.
+Après : Envoyer ma demande de bouquet.
 
-Pourquoi : la personne sait ce qu'elle remet et peut anticiper la suite.
+Pourquoi : la personne sait ce qu'elle remet et peut anticiper la suite.
 :::
 
-Le formulaire demande seulement ce qui sert à l'étape suivante, avec un libellé visible et une erreur qui explique la correction.
+Le formulaire pose seulement les questions utiles à l'étape suivante : nom, téléphone, date. Chaque champ a un libellé visible, et chaque erreur dit quoi corriger (« Il manque un chiffre dans ton numéro »).
 
-Après l'envoi, la page confirme la réception, annonce la suite et explique près du bouton l'usage des données.
+Après l'envoi, la page écrit « Demande bien reçue », annonce ce qui suit et précise, près du bouton, ce que tu fais des données.
 
-La réassurance reste vraie : n'annonce aucun délai intenable, car une démonstration honnête peut rassurer davantage qu'un compteur.
+Annonce uniquement un délai que tu tiens. Montrer un vrai devis anonymisé rassure plus qu'un compteur « 24 h chrono ».
 
 ## L'identité relie tes mots et tes images
 
-Reprends la direction du chapitre précédent pour servir la marque, l'audience et le moment de décision.
+Ouvre le `DESIGN-SYSTEM.md` du chapitre précédent : c'est lui qui relie ta page à ta marque. Il contient les couleurs, les styles de texte et les formes, les états (chargement, erreur), la version mobile et les règles de mouvement.
 
-Tu peux chercher des idées dans l'architecture, la photographie, le packaging, l'édition, la mode ou la signalétique.
+Pour trouver des idées neuves, regarde hors du web : une façade d'architecte, un packaging de boulangerie, une affiche de théâtre, un panneau de gare. Note le contraste, le rythme, la matière ou le cadrage que tu gardes, et seulement cela.
 
-Nomme le contraste, le rythme, la matière ou le cadrage que tu gardes sans transformer la référence en permission de copier.
-
-Ton fichier `DESIGN-SYSTEM.md` garde les couleurs, les textes et les formes. Il garde aussi les états, le mobile et les règles de mouvement.
-
-Utilise de vraies photos, captures et preuves. Ne fabrique jamais un avis, un logo client, un compteur ou un résultat.
+Mets de vraies photos, de vraies captures et de vraies preuves. N'invente jamais un avis, un logo de client, un compteur ou un résultat.
 
 > Le beau attire l'œil. Le vrai donne une raison de rester.
 
 ## Fais construire une petite partie complète
 
-Ne demande pas « fais-moi tout le site » sans donner le brief, le contenu, les références et les règles visuelles.
+Si tu écris « fais-moi tout le site » sans brief, sans textes ni références, l'IA comble les trous avec ce qu'elle a vu mille fois. Donne-lui d'abord ton brief, tes textes validés, tes références et ton design system.
 
-Commence par le premier écran de la page la plus importante, puis ouvre le résultat avant d'ajouter la section suivante.
+Puis demande une seule petite partie : le premier écran de ta page la plus importante. Ouvre le résultat dans ton navigateur et sur ton téléphone avant de demander la section suivante.
 
 [[schema:SiteParTranches]]
 
-Un seul skill peut suffire pour une landing page simple, tandis qu'un projet plus large peut demander recherche, design, backend ou SEO.
+Pour que l'IA suive ta méthode d'une session à l'autre, donne-lui un skill : une fiche de procédure qu'elle relit avant de travailler, comme la fiche recette collée sur le frigo. Un seul skill peut suffire pour une landing page simple. Un projet plus large en combine plusieurs : recherche, design, backend, SEO.
 
-Le Protocole Zéro apprend ce qui manque au projet depuis des sources solides, puis garde la méthode qui a marché sur le vrai site.
+Dans BUILD, `deep-research-vertical` t'aide à comprendre le terrain de ton client. `oracle-site-web` enchaîne ensuite le cadrage, les textes, le code, le SEO et la livraison. Ajoute `ux-ui-design` si le visuel demande plus de travail, et `backend-orsayn` si le site gère des comptes, des paiements ou des données.
 
-Dans BUILD, `deep-research-vertical` aide à comprendre le terrain. `oracle-site-web` relie le cadrage, les textes, le code, le SEO et la livraison.
+Le Protocole Zéro, c'est la méthode de BUILD qui apprend ce qui manque au projet depuis des sources solides, puis garde la méthode qui a marché sur le vrai site.
 
-Ajoute `ux-ui-design` si le besoin visuel demande plus de profondeur. Utilise `backend-orsayn` si le site gère des comptes, des paiements ou des données.
+Côté outils, Figma sert à maquetter, puis Claude Code, Codex ou Cursor travaillent sur le code.
 
-Les outils restent des portes d'entrée : Figma pour maquetter, puis Claude Code, Codex ou Cursor pour travailler sur le code.
-
-Quand un site complet est validé, transforme sa structure, son système visuel et ses contrôles en skill, puis remplace les éléments du client.
-
-Une agence peut garder une galerie de bases approuvées sans livrer des clones, car elle réécrit le message, les preuves et les images.
+Quand un site est validé, transforme sa structure, son système visuel et ses contrôles en skill, puis remplace tout ce qui est propre au client. Une agence garde ainsi une galerie de bases approuvées, et réécrit à chaque nouveau client le message, les preuves et les images pour ne jamais livrer deux clones.
 
 ==Une bonne base te fait gagner du temps. Le nouveau client doit toujours se reconnaître dans le résultat.==
 
 ## Le site doit être trouvé, utilisé et mesuré
 
-Le SEO aide un moteur à relier chaque page à une question, en commençant par une intention réelle et précise.
+Ta page est prête. Reste à la faire trouver. Le SEO, c'est ce qui aide Google à comprendre ta page et à la montrer aux bonnes personnes. Il part d'une intention réelle : quelqu'un tape « fleuriste mariage Lille » et ta page répond à cette phrase-là.
 
-Donne à la page un titre unique, un H1 clair, une adresse lisible et des sous-titres qui guident la lecture.
+Pour chaque page, écris un titre unique (celui de l'onglet du navigateur), un H1 clair (le grand titre de la page), une adresse lisible comme `/mariage` plutôt que `/page-3` et des sous-titres qui guident la lecture.
 
-Les liens internes aident la personne à continuer. Un article peut mener vers un service. Une réalisation peut montrer la méthode avant le contact.
+Ajoute des liens internes, c'est-à-dire des liens d'une de tes pages vers une autre : un article mène vers un service, une réalisation vers la page de contact.
 
-Le sitemap liste les adresses importantes, `robots.txt` laisse passer les pages utiles et l'adresse canonique indique leur version principale.
-
-Les données structurées décrivent la page aux moteurs sans jamais contredire ce que la personne voit.
+Quatre fichiers ou balises aident ensuite les moteurs. Le sitemap liste tes adresses importantes. `robots.txt` laisse passer les pages utiles. L'adresse canonique indique la version principale d'une page présente à plusieurs endroits. Les données structurées décrivent la page aux moteurs, et ne doivent jamais contredire ce que la personne voit.
 
 [[schema:SiteTrouveEtUtilise]]
 
-Google Search Console montre les requêtes, les clics et certains problèmes, tandis qu'un sitemap aide la découverte sans promettre une position.
+Google Search Console te montre les requêtes qui t'amènent des visites, les clics et certains problèmes. Un sitemap aide la découverte, il ne promet aucune position.
 
-Plausible ou PostHog mesurent les visites et actions utiles, tandis que PageSpeed Insights repère ce qui ralentit ou déplace la page.
+Pour mesurer, Plausible ou PostHog comptent les visites et les actions utiles. PageSpeed Insights repère ce qui ralentit la page ou la fait sauter pendant le chargement.
 
-Choisis la mesure avant l'outil : pour une fleuriste, le formulaire de commande terminé raconte davantage qu'une simple visite.
+Choisis la mesure avant l'outil. Pour une fleuriste, le nombre de formulaires de commande terminés compte plus que le nombre de visites.
 
-Teste enfin le parcours sur téléphone et ordinateur. Utilise le clavier, envoie une bonne saisie puis une mauvaise. Ouvre les liens et regarde les erreurs.
+Pour finir, passe le parcours en revue sur ton téléphone et sur ton ordinateur. Navigue au clavier, envoie une saisie correcte puis une fausse, clique chaque lien et note chaque erreur.
 
 ## Prends Léa, photographe à Strasbourg
 
 :::exemple Léa retire quatre pages inutiles
-Léa veut refaire son site de mariage. Elle prévoit une page d'accueil, une galerie, un blog, une page à propos et trois formulaires.
+Léa veut refaire son site de photographe de mariage. Sur sa feuille, elle a noté une page d'accueil, une galerie, un blog, une page à propos et trois formulaires.
 
-Ses futurs clients viennent surtout d'une recommandation. Ils veulent voir son style, comprendre son accompagnement et connaître sa disponibilité.
+Elle relit ses derniers contacts : presque tous sont venus par recommandation. Ils veulent voir son style, comprendre comment elle travaille et savoir si sa date est libre.
 
-Léa commence avec une seule page. Le premier écran montre un couple dans une scène naturelle. Le titre explique sa manière de photographier sans les faire poser.
+Elle barre quatre pages. Il reste une seule page. Le premier écran montre un couple qui rit dans un champ, et le titre dit qu'elle photographie sans les faire poser.
 
-La page montre ensuite une série complète, son déroulé et un formulaire court. Le bouton dit « Vérifier ma date ».
+Dessous, une série complète du même mariage, le déroulé de sa journée avec eux, puis un formulaire de trois champs. Le bouton dit « Vérifier ma date ».
 
-Elle ouvre la page sur son téléphone et envoie une demande de test. Elle ajoutera le blog quand elle aura de vrais sujets à publier.
+Elle ouvre la page sur son téléphone, envoie une demande de test et la reçoit dans sa boîte mail. Le blog viendra le jour où elle aura de vrais sujets à publier.
 :::
 
 ## À toi de jouer
 
 Compte une heure aujourd'hui.
 
-1. Choisis le format le plus simple pour ton action principale.
+1. Choisis le format le plus simple pour ton action principale, et remplis la phrase « La personne arrive pour… ».
 2. Écris le H1, le sous-titre et le bouton du premier écran.
-3. Dessine les questions du lecteur dans l'ordre.
-4. Fais construire seulement le premier écran et teste-le sur mobile.
+3. Note sur une feuille les questions du visiteur, dans l'ordre où il se les pose.
+4. Fais construire seulement le premier écran et teste-le sur ton téléphone.
 
-À la fin, tu as une première partie complète que tu peux montrer à une vraie personne.
+À la fin, tu as un premier écran que tu peux montrer à une vraie personne et lui demander : « Tu comprends ce que je propose ? »
 
 ## Version pour ton IA
 
@@ -210,4 +196,4 @@ Je validerai le message, la direction et la suite.
 
 ## La suite
 
-Ton site fonctionne maintenant dans ton espace de travail. Il faut le relier à son histoire, le publier et remettre les clés.
+Ton site tourne maintenant sur ton ordinateur, et ton ordinateur est le seul à pouvoir l'ouvrir. Dans le prochain chapitre, tu le mets en ligne : le dossier, Git, GitHub, l'hébergeur, le domaine, puis les clés que tu remets à la bonne personne.

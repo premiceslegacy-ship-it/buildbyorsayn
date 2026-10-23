@@ -43,14 +43,12 @@ test("les textes Hermes retirent seulement les notes internes et gardent les fus
 
 test("l'introduction Hermes est publique dans le lecteur et dans le corpus local", async () => {
   const introduction = hermesIntroductionMarkdown();
-  assert.match(introduction, /Tu reçois un message sur Telegram/);
   assert.doesNotMatch(introduction, /## Spécifications des schémas/);
 
   const documents = await collectDoctrineDocuments();
   assert.equal(documents.length, 20);
   assert.equal(documents[0].sourceId, "introduction:hermes");
   assert.ok(documents.every((document) => document.tier === "full"));
-  assert.match(documents.find((document) => document.sourceId === "README.md")?.content ?? "", /Choisis ton fournisseur et ton modèle/);
 });
 
 test("la garde serveur précède la lecture et la version pour l'IA garde le Markdown", () => {

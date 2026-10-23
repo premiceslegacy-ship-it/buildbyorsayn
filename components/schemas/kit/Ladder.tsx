@@ -15,7 +15,7 @@ export type LadderProps = KitBaseProps & {
 };
 
 export function Ladder({ rungs, accentIndex, lowLabel = "Faible", highLabel = "Fort", ...frame }: LadderProps) {
-  return <KitFrame {...frame} kind="ladder">
+  return <KitFrame {...frame} kind="ladder" keys={rungs[accentIndex] ? [{ swatch: "accent", label: "En vert : la marche dont parle ce passage" }] : undefined}>
     <div className={styles.ladder}>
       <span className={styles.ladderLow}>{lowLabel}</span>
       <span className={styles.ladderHigh}>{highLabel}</span>

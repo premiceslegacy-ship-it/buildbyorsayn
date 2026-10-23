@@ -14,14 +14,23 @@ export type StepsProps = KitBaseProps & {
   accentIndex: number;
 };
 
-export function Steps({ items, accentIndex, ...frame }: StepsProps) {
-  return <KitFrame {...frame} kind="steps">
-    <ol className={`${styles.steps} ${items.length > 4 ? styles.stepsDense : ""}`} style={{ "--kit-count": items.length } as React.CSSProperties}>
+/** Étapes dans l'ordre : une pastille numérotée sur un rail, puis la carte. Le rail ne passe jamais sur le texte. */
+export function Steps({ items, accentIndex, legend, ...frame }: StepsProps) {
+  const accent = items[accentIndex];
+  return <KitFrame
+    {...frame}
+    kind="steps"
+    legend={legend}
+    keys={accent ? [{ swatch: "accent", label: "En vert : l'étape sur laquelle ce passage insiste" }] : undefined}
+  >
+    <ol className={styles.track} data-count={items.length}>
       {items.map((item, index) => <li className={index === accentIndex ? styles.isAccent : undefined} key={`${item.label}-${index}`}>
-        <span className={styles.stepNumber}>{String(index + 1).padStart(2, "0")}</span>
-        <strong>{item.label}</strong>
-        <p>{item.detail}</p>
-        {item.tools?.length ? <div className={styles.stepTools}>{item.tools.map((tool) => <ToolMark key={tool} name={tool} size={28} />)}</div> : null}
+        <span className={styles.trackDot}>{index + 1}</span>
+        <div className={styles.trackCard}>
+          <strong>{item.label}</strong>
+          {item.detail ? <p>{item.detail}</p> : null}
+          {item.tools?.length ? <div className={styles.trackTools}>{item.tools.map((tool) => <ToolMark key={tool} name={tool} size={28} />)}</div> : null}
+        </div>
       </li>)}
     </ol>
   </KitFrame>;

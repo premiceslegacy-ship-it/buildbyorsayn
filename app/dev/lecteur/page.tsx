@@ -46,7 +46,7 @@ export default async function DevReaderPage({ searchParams }: { searchParams: Pr
         sections={[{
           id: requestedVisual.chapter,
           number: "01",
-          title: "title" in requestedVisual ? requestedVisual.title : heading,
+          title: "title" in requestedVisual && typeof requestedVisual.title === "string" ? requestedVisual.title : heading,
           markdown: `[[${requestedVisual.kind}:${requestedVisual.name}]]`,
         }]}
         initialMode="texte"
@@ -70,7 +70,7 @@ export default async function DevReaderPage({ searchParams }: { searchParams: Pr
       ? [{
           id: chapterId,
           number: introMatch ? "0" : String(Math.max(1, bloc.sections.findIndex((section) => section.id === chapterId) + 1)),
-          title: introMatch ? "Introduction" : selectedSection?.title ?? requestedVisual.title,
+          title: introMatch ? "Introduction" : selectedSection?.title ?? requestedVisual.name,
           markdown: `[[${requestedVisual.kind}:${requestedVisual.name}]]`,
         }]
       : introMatch

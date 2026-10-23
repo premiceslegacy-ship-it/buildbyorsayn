@@ -1,36 +1,69 @@
-import { Fork, ToolMap } from "../kit";
+import { Fork, ToolMap, Workflow } from "../kit";
+
+const EM = "#22d96e";
 
 export function FederatedBrainDiagramV2() {
-  return <ToolMap title="Quatre responsabilités, aucun compte universel" description="Chaque métier garde sa source, ses outils et son responsable." ariaLabel="Vente, Production, Finance et Support restent séparés tout en alimentant une vue commune." groups={[
-    { role: "Vente", tools: [{ name: "Notion", description: "Prospects et décisions" }] },
-    { role: "Production", tools: [{ name: "Hermes Agent", description: "Dossiers et méthodes" }] },
-    { role: "Finance", tools: [{ name: "Stripe", description: "Paiements" }] },
-    { role: "Support", tools: [{ name: "Gmail", description: "Demandes client" }] },
-  ]} accentGroup={1} />;
+  return <ToolMap
+    title="Chaque métier garde sa source"
+    description="Pour chaque sujet, un seul outil fait foi. L'agent ne les remplace pas."
+    legend="Quand deux chiffres se contredisent, tu relis l'outil du métier concerné."
+    ariaLabel="Quatre métiers et l'outil qui fait foi : Notion pour la relation commerciale, Google Agenda pour les disponibilités, Stripe pour les paiements, Figma pour les livrables."
+    accent={EM}
+    groups={[
+      { role: "Vente", tools: [{ name: "Notion", description: "La relation client" }] },
+      { role: "Planning", tools: [{ name: "Google Agenda", description: "Les disponibilités" }] },
+      { role: "Comptabilité", tools: [{ name: "Stripe", description: "Les paiements" }] },
+      { role: "Projet", tools: [{ name: "Figma", description: "Les livrables" }] },
+    ]}
+    accentGroup={0}
+  />;
 }
 
 export function QuatreMetiersUneVueDiagram() {
-  return <ToolMap title="Quatre métiers alimentent une vue" description="Les liens circulent sans effacer le rôle de chaque système." ariaLabel="Vente, Production, Finance et Support alimentent une Vue commune avec Notion, Hermes, Stripe, Gmail et Slack." groups={[
-    { role: "Vente", tools: [{ name: "Notion", description: "Opportunités" }] },
-    { role: "Production", tools: [{ name: "Hermes Agent", description: "Travail préparé" }] },
-    { role: "Finance", tools: [{ name: "Stripe", description: "Paiements" }] },
-    { role: "Support", tools: [{ name: "Gmail", description: "Demandes" }, { name: "Slack", description: "Vue commune" }] },
-  ]} accentGroup={3} />;
+  return <Workflow
+    title="Trois sources, un dossier"
+    description="Exemple : une agence reçoit un client, chaque métier ajoute sa pièce."
+    legend="L'agent réunit les pièces. Il ne devient pas une seconde base."
+    ariaLabel="Le commercial transmet l'offre acceptée depuis Notion, la production ajoute la date possible depuis Google Agenda, la finance confirme l'acompte dans Stripe, puis l'agent prépare le dossier de démarrage."
+    accent={EM}
+    actors={["Vente", "Production", "Finance", "Ton agent"]}
+    steps={[
+      { actor: 0, label: "Offre acceptée", tool: "Notion" },
+      { actor: 1, label: "Date possible", tool: "Google Agenda", transfer: "offre" },
+      { actor: 2, label: "Acompte", tool: "Stripe", transfer: "date" },
+      { actor: 3, label: "Dossier prêt", tool: "Hermes Agent", transfer: "3 sources" },
+    ]}
+    accentIndex={3}
+  />;
 }
 
 export function AgentsParTravailDiagram() {
-  return <ToolMap title="Un établi par travail" description="Chaque assistant reçoit seulement les outils de son métier." ariaLabel="Marketing utilise Instagram, Support utilise Gmail et Opérations utilise Notion. Hermes reste séparé sur chaque établi." groups={[
-    { role: "Marketing", tools: [{ name: "Instagram", description: "Contenu" }, { name: "Hermes Agent", description: "Préparation" }] },
-    { role: "Support", tools: [{ name: "Gmail", description: "Demandes" }, { name: "Hermes Agent", description: "Brouillons" }] },
-    { role: "Opérations", tools: [{ name: "Notion", description: "Dossiers" }, { name: "Hermes Agent", description: "Contrôles" }] },
-  ]} accentGroup={2} />;
+  return <ToolMap
+    title="Un agent par travail"
+    description="Chaque assistant ne reçoit que ce qui sert son travail, rien de plus."
+    legend="Le marketing ne voit pas les factures, le support ne voit pas le dépôt."
+    ariaLabel="L'assistant marketing lit les briefs dans Notion et les résultats sur Instagram. L'assistant support lit les demandes dans Gmail et les commandes utiles dans Stripe."
+    accent={EM}
+    groups={[
+      { role: "Assistant marketing", tools: [{ name: "Notion", description: "Les briefs" }, { name: "Instagram", description: "Les résultats" }] },
+      { role: "Assistant support", tools: [{ name: "Gmail", description: "Les demandes" }, { name: "Stripe", description: "Les commandes utiles" }] },
+    ]}
+    accentGroup={1}
+  />;
 }
 
 export function DesaccordVisibleDiagram() {
-  return <Fork title="Le désaccord remonte au responsable" description="Deux dates contradictoires deviennent une décision humaine." ariaLabel="Date promise et Date possible convergent vers À décider." situation="Deux sources se contredisent"
+  return <Fork
+    title="Le désaccord remonte"
+    description="Exemple : le commercial promet une date, les opérations disent non."
+    legend="L'agent montre l'écart et nomme qui tranche. Il ne choisit pas seul."
+    ariaLabel="Deux sources se contredisent sur une date. Le commercial a promis une date, les opérations en confirment une autre. L'agent présente la comparaison et le responsable décide."
+    accent={EM}
+    situation="Deux dates différentes"
     outcomes={[
-      { label: "Date promise", condition: "La vente s'est engagée" },
-      { label: "Date possible", condition: "La production répond" },
-      { label: "À décider", condition: "Le responsable tranche", recommended: true },
-    ]} />;
+      { label: "Date promise", condition: "Donnée par le commercial" },
+      { label: "Date possible", condition: "Confirmée par les opérations" },
+      { label: "Décision", condition: "Le responsable tranche", recommended: true },
+    ]}
+  />;
 }

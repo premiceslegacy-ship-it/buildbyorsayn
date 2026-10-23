@@ -6,37 +6,37 @@ ordre: 18
 
 ## Le travail utile traverse plusieurs outils
 
-Une publicité attire. Un formulaire reçoit. Le CRM classe. Un commercial répond. La production livre. Le support continue.
+Jeudi, 14 h. Une personne clique sur ta publicité Instagram. Elle remplit un formulaire. Sa fiche arrive dans le CRM (le carnet où tu notes tes prospects). Tu lui réponds, tu fais un devis, tu livres, puis elle écrit au support.
 
-Si personne ne garde le même dossier, chaque outil recommence l'histoire à sa manière.
+Si personne ne garde le même dossier d'un bout à l'autre, chaque outil raconte l'histoire à sa façon, et la personne doit tout répéter.
 
 ## Tu vas construire un workflow complet de métier
 
-À la fin, tu verras qui fait quoi entre toi, l'agent et les outils. Tu placeras une validation à chaque engagement.
+À la fin, tu sauras dire qui fait quoi entre toi, ton agent et les outils, à chaque étape. Et tu auras posé une validation de ta main avant chaque engagement : une publication, une dépense, un prix.
 
 [[schema:ParcoursProspectComplet]]
 
-## Marketing : de la veille à la publication
+## Marketing : de la veille à la publication
 
-`Perplexity` cherche des sources. `Notion` garde les idées retenues. `Hermes Agent` prépare trois angles. `Instagram` ou `YouTube` reçoit seulement le contenu validé.
+Le matin, `Perplexity` cherche des sources sur ton sujet. `Notion` garde les idées retenues. Ton agent prépare trois angles de post. `Instagram` ou `YouTube` ne reçoit que le contenu que tu as validé.
 
-Toi, tu choisis l'angle, la preuve et le moment de publication.
+Toi, tu choisis l'angle, la preuve et l'heure de publication.
 
 [[schema:WorkflowMarketing]]
 
-## Ads : de la recherche au rapport
+## Ads : de la recherche au rapport
 
-L'agent rassemble les créations concurrentes autorisées, classe les angles et prépare des variantes. `Figma` sert à finaliser les visuels. La plateforme publicitaire reçoit la campagne après ton accord.
+L'agent rassemble les créations concurrentes que tu as le droit de consulter, classe les angles et prépare des variantes. Tu finalises les visuels dans `Figma`. La plateforme publicitaire ne reçoit la campagne qu'après ton accord.
 
-Chaque semaine, il prépare les dépenses, les écarts et trois pistes. Tu choisis le budget et le changement.
+Chaque lundi, il prépare un tableau : dépenses de la semaine, écarts par rapport au prévu, trois pistes. Tu décides du budget et du changement.
 
 [[schema:WorkflowAds]]
 
-## CRM, support et devis : la personne reste visible
+## CRM, support et devis : la personne reste visible
 
-`Gmail` ou `WhatsApp` reçoit la demande. `Notion` garde la fiche prospect. `Google Agenda` garde le rendez-vous. `Stripe` confirme un paiement.
+Quand le prospect écrit, `Gmail` ou `WhatsApp` reçoit la demande. `Notion` garde sa fiche. `Google Agenda` garde le rendez-vous. `Stripe` confirme l'acompte.
 
-Pour le support, l'agent cherche la réponse et prépare le message. Pour le devis, il vérifie les pièces et remplit le modèle. Toi, tu valides le geste commercial, le prix et l'envoi.
+Au support, l'agent cherche la réponse dans tes documents et prépare le message. Pour le devis, il vérifie les pièces reçues et remplit le modèle. Toi, tu valides le geste commercial, le prix et l'envoi.
 
 [[schema:WorkflowCRMDevisSupport]]
 
@@ -44,42 +44,42 @@ Pour le support, l'agent cherche la réponse et prépare le message. Pour le dev
 
 ## Garde la même identité du début à la fin
 
-Le dossier porte un identifiant, sa version, son état et le prochain responsable. Chaque outil ajoute ce qu'il sait sans effacer l'origine.
+Le dossier porte un numéro (par exemple « D-0142 »), sa version, son état (en attente, en cours, terminé) et le nom du prochain responsable. Chaque outil ajoute ce qu'il sait sans effacer l'origine.
 
 [[schema:WorkflowCrossPoleDiagram]]
 
 :::exemple Une coach suit un prospect sans le harceler
 Une publicité mène vers un formulaire. Le CRM reçoit le besoin et la date souhaitée.
 
-L'agent prépare une réponse et propose un rendez-vous. La coach valide le message. Après l'appel, il prépare le devis sans choisir le prix.
+L'agent prépare une réponse et propose un rendez-vous. La coach relit et valide le message. Après l'appel, il prépare le devis, sans choisir le prix.
 
-Si la personne refuse, la raison reste dans la fiche. Aucune relance automatique ne repart sans règle prévue.
+Si la personne dit non, la raison reste écrite dans sa fiche. Aucune relance ne repart sans une règle que la coach a posée.
 :::
 
 ## À toi de jouer
 
 Compte une heure.
 
-1. Dessine le chemin d'un prospect réel.
-2. Place un outil par opération.
-3. Écris qui décide à chaque passage.
-4. Ajoute les refus, les doublons et les coupures.
+1. Dessine sur une feuille le chemin d'un prospect réel, de la pub au suivi.
+2. Place un seul outil par opération.
+3. Écris à chaque passage qui décide.
+4. Ajoute trois cas qui cassent : un refus, un doublon, une coupure en plein envoi.
 
-À la fin, tu as un workflow complet que l'équipe peut relire.
+À la fin, tu as un workflow complet que ton équipe peut relire.
 
 ## Version pour ton IA
 
 ```text
-Voici le parcours actuel d'un prospect : [étapes].
+Voici le parcours actuel d'un prospect : [étapes].
 
 Transforme-le en workflow complet.
-Pour chaque étape, indique :
-1. l'objet transmis ;
-2. l'outil utilisé ;
-3. ce que je fais ;
-4. ce que l'agent prépare ;
-5. ce que l'outil exécute ;
-6. l'endroit où une personne valide ;
+Pour chaque étape, indique :
+1. l'objet transmis ;
+2. l'outil utilisé ;
+3. ce que je fais ;
+4. ce que l'agent prépare ;
+5. ce que l'outil exécute ;
+6. l'endroit où une personne valide ;
 7. la suite en cas de refus ou de coupure.
 
 Garde le même identifiant de dossier.
@@ -88,4 +88,4 @@ Ne propose aucune publication, dépense ou relance sans accord.
 
 ## La suite
 
-Le workflow complet est visible. Tu vas maintenant le lancer sur un petit nombre de cas et élargir seulement ce qui tient.
+Ton parcours est dessiné de bout en bout. Au chapitre suivant, tu le lances sur quelques vrais dossiers, et tu n'élargis que ce qui tient.

@@ -4,46 +4,46 @@ titre: Écrire pour vendre
 ordre: 4
 ---
 
-## « Nous aidons les entreprises à se transformer »
+## « Nous aidons les entreprises à se transformer »
 
 Tu lis cette phrase sur une page sans voir personne ni comprendre ce qui change. Tu ne sais même pas si le message te concerne.
 
-Le lecteur ne manque pas d'attention : il manque d'une scène précise dans laquelle entrer.
+Le lecteur ne manque pas d'attention : il manque d'une scène précise dans laquelle entrer.
 
 ## Tu vas écrire avec ce que le terrain t'a donné
 
-Le copywriting organise une décision avec des mots. Ton texte montre une situation, le changement proposé et la manière d'y arriver. Il apporte ensuite une preuve et une prochaine étape.
+Le copywriting, c'est l'écriture qui aide quelqu'un à décider. Ton texte montre une situation, le changement proposé et la manière d'y arriver. Il apporte ensuite une preuve et une prochaine étape.
 
 À la fin, tu auras une carte de message. Tu sauras écrire un titre, un sous-titre, un bouton, une accroche, un script et un objet d'e-mail.
 
 ## Commence par un mardi matin
 
-Avant d'écrire ton titre, raconte un moment réel. Qui fait quoi, que vient-il de se passer et où le travail se bloque-t-il ?
+Avant d'écrire ton titre, raconte un moment réel. Qui fait quoi, que vient-il de se passer et où le travail se bloque-t-il ?
 
 Imagine un plaquiste qui reçoit une demande pendant qu'il pose une cloison. Le client appelle, les photos arrivent plus tard et aucun message ne porte le nom du chantier.
 
 [[schema:CarteDuMessage]]
 
-Ta carte tient en cinq parties : le moment, le vrai problème, le changement recherché, son explication et le prochain geste.
+Ta carte tient en cinq parties : le moment, le vrai problème, le changement recherché, son explication et le prochain geste.
 
-Pourquoi ? Parce qu'un texte sans carte ressemble à un sac préparé dans le noir : tu emportes beaucoup de choses qui ne vont pas ensemble.
+Sans carte, ton texte ressemble à un sac préparé dans le noir : tu emportes beaucoup de choses qui ne vont pas ensemble.
 
 ==Le lecteur doit voir sa journée avant de voir ton produit.==
 
 :::avant-apres
-Avant : H1 d'une toiletteuse canine : « Le bien-être de ton animal, notre priorité. »
+Avant : H1 d'une toiletteuse canine (le H1, c'est le grand titre tout en haut de la page) : « Le bien-être de ton animal, notre priorité. »
 
-Après : H1 : « Ton chien propre sans bloquer ta matinée. »
+Après : H1 : « Ton chien propre sans bloquer ta matinée. »
 
-Pourquoi : le second titre montre un progrès concret en neuf mots. Le sous-titre pourra préciser la prise en charge et les conditions.
+Pourquoi : le second titre montre un progrès concret en neuf mots. Le sous-titre pourra préciser la prise en charge et les conditions.
 :::
 
 :::avant-apres
-Avant : sous-titre d'une photographe : « Des souvenirs uniques pour des moments inoubliables. »
+Avant : sous-titre d'une photographe : « Des souvenirs uniques pour des moments inoubliables. »
 
-Après : « Tu choisis tes photos dans une galerie privée. Je prépare ensuite l'album avec tes retours. »
+Après : « Tu choisis tes photos dans une galerie privée. Je prépare ensuite l'album avec tes retours. »
 
-Pourquoi : la cliente voit le chemin et son rôle. Aucun adjectif ne lui demande de croire sur parole.
+Pourquoi : la cliente voit le chemin et son rôle. Aucun adjectif ne lui demande de croire sur parole.
 :::
 
 ## Le même texte n'arrive pas au même moment
@@ -59,52 +59,52 @@ Au début, montre la scène et explique ensuite pourquoi le problème revient. P
 Un post vu au hasard demande plus de contexte qu'une page ouverte après une recherche. Un devis déjà relu appelle surtout une réponse précise aux dernières questions.
 
 :::avant-apres
-Avant : bouton d'une diététicienne : « Envoyer ».
+Avant : bouton d'une diététicienne : « Envoyer ».
 
-Après : « Recevoir mon plan de repas ».
+Après : « Recevoir mon plan de repas ».
 
-Pourquoi : le bouton dit ce que la personne obtient. Elle comprend mieux la conséquence du clic.
+Pourquoi : le bouton dit ce que la personne obtient. Elle comprend mieux la conséquence du clic.
 :::
 
 :::avant-apres
-Avant : objet d'e-mail d'un comptable : « Notre newsletter de mars ».
+Avant : objet d'e-mail d'un comptable : « Notre newsletter de mars ».
 
-Après : « Les trois pièces qui bloquent ta clôture ».
+Après : « Les trois pièces qui bloquent ta clôture ».
 
-Pourquoi : l'objet nomme une situation que le client peut reconnaître. L'e-mail doit ensuite livrer exactement ces trois pièces.
+Pourquoi : l'objet nomme une situation que le client peut reconnaître. L'e-mail doit ensuite livrer exactement ces trois pièces.
 :::
 
 ## Montre comment le changement arrive
 
-Les mots « optimiser », « automatiser » et « transformer » cachent souvent le travail réel. Remplace-les par les gestes que la personne verra vraiment.
+Les mots « optimiser », « automatiser » et « transformer » cachent souvent le travail réel. Remplace-les par les gestes que la personne verra vraiment.
 
 Ton mécanisme explique le passage entre le problème et le changement. Demande ce qui entre, quelles étapes suivent, qui valide et ce qui sort.
 
 [[schema:MecanismeVisible]]
 
-Concrètement : « Après chaque appel, la demande rejoint une liste. Une personne vérifie les informations et l'équipe voit ensuite qui doit répondre. » Là, tu peux montrer le chemin.
+Exemple : « Après chaque appel, la demande rejoint une liste. Une personne vérifie les informations et l'équipe voit ensuite qui doit répondre. » Chaque verbe se voit.
 
 Ne donne pas un grand nom à une méthode que tu ne peux pas expliquer. Un nom attire peut-être l'œil, tandis qu'une démonstration aide à décider.
 
 :::avant-apres
-Avant : accroche de publicité pour un réparateur de vélos : « Redécouvre le plaisir de rouler. »
+Avant : accroche de publicité pour un réparateur de vélos : « Redécouvre le plaisir de rouler. »
 
-Après : « Ton vélo grince seulement quand tu montes une côte ? »
+Après : « Ton vélo grince seulement quand tu montes une côte ? »
 
-Pourquoi : la question nomme un moment précis. Le réparateur peut ensuite expliquer son diagnostic sans promettre la réparation.
+Pourquoi : la question nomme un moment précis. Le réparateur peut ensuite expliquer son diagnostic sans promettre la réparation.
 :::
 
 :::avant-apres
-Avant : script vidéo courte d'une agente immobilière : « Aujourd'hui, je vais te donner mes meilleurs conseils pour vendre. »
+Avant : script vidéo courte d'une agente immobilière : « Aujourd'hui, je vais te donner mes meilleurs conseils pour vendre. »
 
-Après : « Tu as des visites, mais personne ne rappelle. Regarde ce que les acheteurs voient dans les trente premières secondes. »
+Après : « Tu as des visites, mais personne ne rappelle. Regarde ce que les acheteurs voient dans les trente premières secondes. »
 
-Pourquoi : le début montre le problème et annonce ce que la vidéo va examiner. La suite doit montrer ces premières secondes.
+Pourquoi : le début montre le problème et annonce ce que la vidéo va examiner. La suite doit montrer ces premières secondes.
 :::
 
 ## Chaque preuve répond à une question
 
-Une preuve ne décore pas la page : elle enlève un doute précis au moment où il apparaît.
+Une preuve ne décore pas la page : elle enlève un doute précis au moment où il apparaît.
 
 Le lecteur peut se demander si son cas ressemble au tien, alors montre une scène comparable. S'il doute de ton travail, montre une démonstration ou un exemple du document remis.
 
@@ -113,11 +113,11 @@ Le lecteur peut se demander si son cas ressemble au tien, alors montre une scèn
 Place la preuve près de la phrase qu'elle soutient. Si tu cites un résultat, garde sa date et son contexte. Précise aussi ce qui peut changer d'un cas à l'autre.
 
 :::avant-apres
-Avant : « Notre méthode a déjà changé la vie de nombreux clients. »
+Avant : « Notre méthode a déjà changé la vie de nombreux clients. »
 
-Après : « Voici le document remis après l'audit : les demandes, leur responsable et la prochaine action. »
+Après : « Voici le document remis après l'audit : les demandes, leur responsable et la prochaine action. »
 
-Pourquoi : la seconde phrase montre une preuve du travail. Elle ne transforme pas un exemple en promesse générale.
+Pourquoi : la seconde phrase montre une preuve du travail. Elle ne transforme pas un exemple en promesse générale.
 :::
 
 ## Le premier message cherche une réponse
@@ -125,25 +125,25 @@ Pourquoi : la seconde phrase montre une preuve du travail. Elle ne transforme pa
 Tu ne sais pas encore si la personne vit le problème. Présente-toi, donne une observation exacte et pose une question. N'ajoute ni lien, ni long discours, ni urgence.
 
 :::avant-apres
-Avant : message d'un créateur de sites : « Je peux refaire ton site avec l'IA. Voici mon portfolio : [lien]. »
+Avant : message d'un créateur de sites : « Je peux refaire ton site avec l'IA. Voici mon portfolio : [lien]. »
 
-Après : « Bonjour Sarah, j'ai vu que les réservations passent encore par téléphone. Quand la salle est pleine, qui rappelle les demandes manquées ? »
+Après : « Bonjour Sarah, j'ai vu que les réservations passent encore par téléphone. Quand la salle est pleine, qui rappelle les demandes manquées ? »
 
-Pourquoi : le second message vérifie la scène avant de présenter une offre. Sarah peut répondre en une phrase ou arrêter l'échange.
+Pourquoi : le second message vérifie la scène avant de présenter une offre. Sarah peut répondre en une phrase ou arrêter l'échange.
 :::
 
-La vérité, c'est que ton texte ne peut pas réparer une offre floue. Il peut seulement rendre plus claire une chose que tu comprends déjà.
+Un texte ne répare pas une offre floue : il rend plus claire une chose que tu comprends déjà.
 
 ## Prends Mehdi, réparateur de vélos à Grenoble
 
 :::exemple Mehdi remplace les slogans par des scènes
-Mehdi veut remplir son atelier au printemps. Sa première page dit : « L'excellence au service de ta mobilité. » Personne ne peut expliquer ce qu'il fait différemment.
+Mehdi veut remplir son atelier au printemps. Sa première page dit : « L'excellence au service de ta mobilité. » Personne ne peut expliquer ce qu'il fait différemment.
 
-Il reprend les questions reçues au comptoir et en retrouve une souvent posée : « Mon vélo fait un bruit seulement quand je force, tu peux regarder ? »
+Il reprend les questions reçues au comptoir et en retrouve une souvent posée : « Mon vélo fait un bruit seulement quand je force, tu peux regarder ? »
 
-Mehdi transforme cette question en accroche, puis explique son chemin : dépôt du vélo, vérification, accord sur le devis et réparation. Il montre une fiche de diagnostic anonymisée.
+Mehdi transforme cette question en accroche, puis explique son chemin : dépôt du vélo, vérification, accord sur le devis et réparation. Il montre une fiche de diagnostic anonymisée.
 
-Son bouton devient « Demander un diagnostic ». Sa page ne promet pas chaque réparation, mais elle montre comment le client obtient une réponse.
+Son bouton devient « Demander un diagnostic ». Sa page ne promet pas chaque réparation, mais elle montre comment le client obtient une réponse.
 
 Tout vient du terrain puisque la scène, les mots, la question et la preuve existaient déjà. Mehdi les a simplement rangés dans le bon ordre.
 :::

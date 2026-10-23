@@ -20,7 +20,7 @@ test("the account menu keeps the existing MCP connection route", async () => {
   const dashboard = await readFile("app/dashboard/page.tsx", "utf8");
   const nav = await readFile("components/NavBar.tsx", "utf8");
 
-  assert.match(dashboard, /loadResumeItem/);
+  assert.match(dashboard, /loadTodayProgress/);
   assert.match(nav, /href="\/dashboard\/mcp"/);
   assert.match(nav, />Connexion IA</);
   assert.doesNotMatch(dashboard, /McpDashboardEntry|LiquidCard/);

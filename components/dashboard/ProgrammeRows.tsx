@@ -21,10 +21,9 @@ function ProgrammeCardView({ card, progress, showProgress }: { card: ProgrammeSe
           <span className={`card__img ${card.locked ? styles.lockedImage : ""}`}>
             <Image src={card.image} alt="" fill sizes="(max-width: 734px) 47vw, (max-width: 1068px) 30vw, 23vw" />
             {card.locked ? <span className={styles.accessLabel}><DaIcon name="lock" />Voir l’accès</span> : null}
+            {showProgress && !card.locked && clampedProgress > 0 ? <span className="pbar" aria-hidden="true"><i style={{ width: `${clampedProgress}%` }} /></span> : null}
           </span>
           <span className="card__cap"><span className="card__txt"><span className="card__t">{card.title}</span><span className="card__m">{card.meta}</span></span></span>
-          {showProgress && !card.locked ? <span className={styles.progress} aria-hidden="true" style={{ "--card-progress": `${clampedProgress}%` } as CSSProperties}><i /></span> : null}
-          <span className="card__pop"><span className="pop__b"><span className="pb pb--p"><DaIcon name="play" /></span></span><span className="pop__t">{card.title}</span><span className="pop__m"><span>{card.meta}</span></span></span>
         </span>
       </Link>
     </li>

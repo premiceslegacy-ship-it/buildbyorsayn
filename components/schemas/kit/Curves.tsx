@@ -72,7 +72,11 @@ export function Curves({ labels, series, annotations = [], ...frame }: CurvesPro
           ><i /><b>{annotation.label}</b></span>;
         })}
       </div>
-      <div className={styles.curveLabels} data-label-count={labels.length} style={{ "--kit-labels": labels.length } as React.CSSProperties}>{labels.map((label) => <span key={label}>{label}</span>)}</div>
+      <div className={styles.curveLabels} data-label-count={labels.length}>{labels.map((label, index) => {
+        const x = labels.length === 1 ? 50 : ((10 + index * (540 / (labels.length - 1))) / 560) * 100;
+        const edge = index === 0 ? "start" : index === labels.length - 1 ? "end" : "middle";
+        return <span data-edge={edge} style={{ left: `${x}%` }} key={label}>{label}</span>;
+      })}</div>
     </div>
   </KitFrame>;
 }

@@ -47,16 +47,12 @@ test("chaque marqueur publié du protocole et de l'introduction possède une ins
   assert.match(registry, /INTRO_VISUAL_CATALOG\.map/);
 });
 
-test("les 63 marqueurs publiés de doctrine sont des données du kit et sont branchés au registre", () => {
+test("les 63 marqueurs publiés de doctrine sont définis une seule fois et branchés au registre", () => {
   const doctrineSource = definitionSources("doctrine");
   const doctrineDefined = definedMarkers(doctrineSource);
   assert.equal(doctrineDefined.length, 63);
   assert.equal(new Set(doctrineDefined.map(({ name }) => name)).size, 63);
   assert.equal(doctrineDefined.filter(({ kind }) => kind === "maquette").length, 2);
-  assert.doesNotMatch(doctrineSource, /<svg|<path|<rect|<circle|className=/);
-
-  const templates = new Set([...doctrineSource.matchAll(/template:\s*"([^"]+)"/g)].map((match) => match[1]));
-  assert.ok(templates.size >= 12, `${templates.size} gabarits seulement`);
 
   const registry = read("components/schemas/registry.ts");
   assert.match(registry, /DOCTRINE_VISUAL_CATALOG/);

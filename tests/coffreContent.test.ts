@@ -52,12 +52,12 @@ test("les introductions ne franchissent jamais une frontière d'accès", () => {
 });
 
 test("la recherche lit les nouveaux textes sans fuite entre les paliers", () => {
-  assert.ok(searchCatalog(buildSearchCatalog("preview"), "photos demander devis").some((item) => item.id === "chapter-b1-s0"));
+  assert.ok(searchCatalog(buildSearchCatalog("preview"), "photos salle de bains devis").some((item) => item.id === "chapter-b1-s0"));
   assert.deepEqual(searchCatalog(buildSearchCatalog("preview"), "boucle commerciale simple"), []);
   assert.ok(searchCatalog(buildSearchCatalog("beginner"), "boucle commerciale simple").some((item) => item.id === "chapter-b1-s3"));
-  assert.deepEqual(searchCatalog(buildSearchCatalog("beginner"), "nouvel onglet"), []);
+  assert.ok(!searchCatalog(buildSearchCatalog("beginner"), "nouvel onglet").some((item) => item.id === "chapter-b2-s1"));
   assert.ok(searchCatalog(buildSearchCatalog("full"), "nouvel onglet").some((item) => item.id === "chapter-b2-s1"));
-  assert.deepEqual(searchCatalog(buildSearchCatalog("free"), "photos demander devis"), []);
+  assert.deepEqual(searchCatalog(buildSearchCatalog("free"), "photos salle de bains devis"), []);
 });
 
 test("le corpus inclut les introductions et les chapitres avec le bon palier", async () => {

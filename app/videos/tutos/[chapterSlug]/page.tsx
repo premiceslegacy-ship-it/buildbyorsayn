@@ -66,6 +66,7 @@ export default async function HermesChapterPage({ params }: { params: Promise<{ 
       markdownLocalPaths={curriculumFiles.map((entry) => entry.path)}
       markdownBaseHref="/videos/tutos"
       thumbnailSrc="/da/mini/hermes.jpg"
+      readingScope="hermes"
     />
   </DaRoot>;
 }

@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import { LabelVisual } from "../coffre/render";
+import type { HandcraftedVisual } from "../coffre/types";
 
 export type CourseVisualTemplate =
   | "ad-card"
@@ -32,7 +33,11 @@ export type CourseVisualDefinition = {
   accentIndex: number;
 };
 
-export function createCourseVisualComponent(definition: CourseVisualDefinition, course: string): ComponentType {
+export type CourseVisualEntry = CourseVisualDefinition | HandcraftedVisual;
+
+export function createCourseVisualComponent(entry: CourseVisualEntry, course: string): ComponentType {
+  if ("component" in entry) return entry.component;
+  const definition: CourseVisualDefinition = entry;
   const Visual = () => <div data-course={course}><LabelVisual definition={definition} /></div>;
   Visual.displayName = `${definition.name}CourseVisual`;
   return Visual;

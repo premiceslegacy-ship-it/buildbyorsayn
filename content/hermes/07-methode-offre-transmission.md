@@ -6,19 +6,19 @@ ordre: 10
 
 ## Le client part, ton savoir-faire doit rester
 
-Tu termines une mission. Les fichiers du client lui appartiennent. Mais les questions utiles, les contrôles et la manière de décider peuvent nourrir la suite.
+Ta méthode vient de passer ses cinq tests. Vendredi, tu termines la mission. Les fichiers appartiennent au client. Mais les questions que tu as posées, les contrôles et ta façon de décider peuvent servir au projet suivant.
 
-Le but n'est pas de copier son dossier. Le but est de garder la méthode.
+Tu ne gardes pas son dossier. Tu gardes ta méthode.
 
 ## Tu vas transformer une mission en actif réutilisable
 
-À la fin, tu sauras séparer les données du client et le savoir-faire général. Tu choisiras quoi ranger dans une décision, un modèle ou un skill.
+Un actif, c'est quelque chose que tu réutilises sans le refaire. À la fin, tu sauras séparer les données du client de ton savoir-faire général. Tu sauras aussi dans quel fichier ranger chaque apprentissage : une décision, un modèle ou un skill.
 
 [[schema:TransmissionDiagram]]
 
 ## Sépare le cas et la méthode
 
-Le cas contient le nom, les messages, les prix et les documents du client. La méthode contient les questions, les choix, les contrôles et les erreurs fréquentes.
+Le cas, c'est le nom du client, ses messages, ses prix et ses documents. La méthode, c'est les questions posées, les choix faits, les contrôles et les erreurs fréquentes.
 
 [[schema:ValiseClientBoiteMethode]]
 
@@ -28,28 +28,33 @@ Pense à un chef. Il ne repart pas avec l'assiette du client. Il garde la recett
 
 ## Choisis la bonne destination
 
-Une préférence personnelle va dans `USER.md`. Un fait appris sur l'environnement va dans `MEMORY.md`. Une règle de projet va dans `AGENTS.md`.
+Chaque apprentissage a son tiroir. Tu les connais déjà pour la plupart :
 
-Une méthode testée va dans un skill. Une décision durable va dans un registre de décisions. Un modèle vide va dans une bibliothèque de départ.
+1. une préférence personnelle va dans `USER.md` ;
+2. un fait appris sur ton environnement va dans `MEMORY.md` ;
+3. une règle de projet va dans `AGENTS.md` ;
+4. une méthode testée va dans un skill ;
+5. une décision durable va dans un registre de décisions, un simple fichier daté ;
+6. un modèle vide va dans une bibliothèque de départ, le dossier d'où tu pars pour chaque nouveau client.
 
 [[schema:CinqTiroirsDuSavoir]]
 
-Tout ne mérite pas d'être gardé. Une réussite isolée reste une observation. Une règle demande plusieurs cas et une date de revue.
+Tout ne mérite pas d'être gardé. Une réussite isolée reste une observation. Une règle demande plusieurs cas et une date de revue, par exemple « à relire dans trois mois ».
 
 ## Écris aussi quand la méthode ne marche pas
 
-Ajoute les contre-exemples. Note le type de dossier qui demande encore une personne. Écris la raison de retirer la méthode.
+Ajoute les contre-exemples. Note le type de dossier qui demande encore une personne. Écris la raison qui te ferait retirer la méthode.
 
-Une bonne méthode dit autant « arrête-toi ici » que « fais ceci ».
+Une bonne méthode dit « arrête-toi ici » aussi souvent que « fais ceci ».
 
 [[schema:CarteConditionDeRetrait]]
 
 :::exemple Amel garde sa méthode de relance
-Amel aide des artisans à suivre leurs devis. Chez un client, une relance courte fonctionne mieux après une visite.
+Amel aide des artisans à suivre leurs devis. Chez un plaquiste, une relance courte fonctionne mieux le lendemain d'une visite de chantier.
 
-Elle ne copie ni les contacts ni les prix. Elle garde trois choses : attendre le compte rendu, rappeler le besoin cité et demander une prochaine date.
+Elle ne copie ni les contacts ni les prix. Elle garde trois choses : attendre le compte rendu de visite, rappeler le besoin cité par le client et demander une date pour la suite.
 
-Elle note aussi que la méthode ne s'applique pas à un litige. Ce cas part au responsable.
+Elle note aussi que la méthode ne s'applique pas à un litige. Ce cas part chez le responsable.
 :::
 
 ## À toi de jouer
@@ -57,11 +62,11 @@ Elle note aussi que la méthode ne s'applique pas à un litige. Ce cas part au r
 Compte trente-cinq minutes.
 
 1. Prends une mission terminée.
-2. Sépare les données du client et les choix généraux.
+2. Écris deux colonnes : les données du client, et les choix qui valent pour tout le monde.
 3. Classe chaque apprentissage dans le bon fichier.
 4. Ajoute un cas où la méthode doit s'arrêter.
 
-À la fin, tu as une méthode utile sans emporter le dossier d'origine.
+À la fin, tu as une méthode utile, sans le dossier d'origine.
 
 ## Version pour ton IA
 
@@ -82,4 +87,4 @@ Ajoute une condition de retrait pour chaque méthode proposée.
 
 ## La suite
 
-Ton savoir-faire est clair. Tu peux maintenant l'expliquer à un prospect sans lui vendre une boîte noire.
+Ton savoir-faire est rangé. Maintenant, tu apprends à l'expliquer à un prospect avec ses mots à lui, sans lui vendre une boîte noire.

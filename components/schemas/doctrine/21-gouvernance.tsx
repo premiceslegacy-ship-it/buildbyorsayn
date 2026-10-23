@@ -1,7 +1,71 @@
-import type { CourseVisualDefinition } from "../protocole/kit-instance";
+import { FileCard, Ladder, Steps } from "../kit";
+import type { HandcraftedVisual } from "../coffre/types";
+
+const EM = "#22d96e";
+
+export function TableauDeBordHuitCasesDiagram() {
+  return <FileCard
+    title="Le contrat tient sur huit cases"
+    description="Résultat, humain, source, entrées, sortie, droits, reprise et revue, remplis avant le lancement."
+    legend="Sans reprise écrite, tu caches le travail dans une machine."
+    ariaLabel="Le contrat d'une relance de devis remplit huit cases : résultat, humain responsable, source HubSpot, entrées, sortie en brouillon Gmail, droits sans envoi, état de reprise et date de revue."
+    accent={EM}
+    filename="contrat.yaml"
+    lines={[
+      { text: "resultat: relance préparée" },
+      { text: "humain: responsable commercial" },
+      { text: "source: HubSpot, devis ouverts" },
+      { text: "entrees: devis sans réponse" },
+      { text: "sortie: brouillon dans Gmail" },
+      { text: "droits: lire, préparer" },
+      { text: "reprise: état écrit au dossier" },
+      { text: "revue: date fixée au lancement" },
+    ]}
+    annotations={[
+      { line: 2, label: "Une personne nommée tranche" },
+      { line: 6, label: "Préparer, jamais envoyer seul" },
+      { line: 7, label: "Une autre personne reprend" },
+    ]}
+  />;
+}
+
+export function TroisCerclesDAutoriteDiagram() {
+  return <Ladder
+    title="L'accord grandit avec l'effet"
+    description="Préparer, modifier et engager ne demandent pas le même niveau d'accord."
+    legend="Une ancienne décision ne devient jamais une permission générale."
+    ariaLabel="Trois marches d'accord : lire et préparer reste limité sans effet dehors, modifier demande une instruction précise, engager demande un accord sur l'action exacte."
+    accent={EM}
+    accentIndex={2}
+    lowLabel="Accord léger"
+    highLabel="Accord exact"
+    rungs={[
+      { label: "Préparer", detail: "Lire et rédiger" },
+      { label: "Modifier", detail: "Une instruction précise" },
+      { label: "Engager", detail: "Envoyer, payer, publier" },
+    ]}
+  />;
+}
+
+export function ManuelAvantAutomatiqueDiagram() {
+  return <Steps
+    title="Le manuel précède l'automatique"
+    description="Le travail se fait d'abord à la main, puis se teste et se limite avant d'être planifié."
+    legend="Une pause bloque les nouveaux départs, pas forcément ce qui tourne."
+    ariaLabel="Quatre étapes : comprendre en le faisant à la main, tester une coupure avec ton agent, limiter le coût et l'effet, puis planifier dans Google Agenda."
+    accent={EM}
+    accentIndex={1}
+    items={[
+      { label: "Comprendre", detail: "Le faire à la main" },
+      { label: "Tester", detail: "Coupure, réglage manquant", tools: ["Hermes Agent"] },
+      { label: "Limiter", detail: "Coût, effet, pause" },
+      { label: "Planifier", detail: "Une heure fixe", tools: ["Google Agenda"] },
+    ]}
+  />;
+}
 
 export const doctrine21 = [
-  { name: "TableauDeBordHuitCases", kind: "schema", chapter: "entreprise-09-gouvernance-capacites-et-reprise.md", template: "file-card", title: "Le contrat tient sur huit voyants", description: "Le panneau garde résultat, humain, source, entrées, sortie, droits, reprise et date de revue.", ariaLabel: "Huit voyants décrivent le contrat, avec reprise mise en avant.", labels: ["Résultat", "Humain", "Source", "Entrées", "Sortie", "Droits", "Reprise", "Revoir"], accentIndex: 6 },
-  { name: "TroisCerclesDAutorite", kind: "schema", chapter: "entreprise-09-gouvernance-capacites-et-reprise.md", template: "rings", title: "L'accord grandit avec l'effet", description: "Préparer, modifier et engager occupent des cercles de plus en plus exigeants.", ariaLabel: "Trois cercles croissants représentent préparer, modifier et engager.", labels: ["Préparer", "Modifier", "Engager"], accentIndex: 2 },
-  { name: "ManuelAvantAutomatique", kind: "schema", chapter: "entreprise-09-gouvernance-capacites-et-reprise.md", template: "steps", title: "Le manuel précède l'automatique", description: "Le travail est compris puis testé et limité avant toute planification.", ariaLabel: "Comprendre, tester, limiter puis planifier forment l'ordre de mise en automatique.", labels: ["Comprendre", "Tester", "Limiter", "Planifier"], tools: ["Hermes Agent", "Hermes Agent", "Hermes Agent", "Google Agenda"], accentIndex: 1 },
-] as const satisfies readonly CourseVisualDefinition[];
+  { name: "TableauDeBordHuitCases", kind: "schema", chapter: "entreprise-09-gouvernance-capacites-et-reprise.md", component: TableauDeBordHuitCasesDiagram },
+  { name: "TroisCerclesDAutorite", kind: "schema", chapter: "entreprise-09-gouvernance-capacites-et-reprise.md", component: TroisCerclesDAutoriteDiagram },
+  { name: "ManuelAvantAutomatique", kind: "schema", chapter: "entreprise-09-gouvernance-capacites-et-reprise.md", component: ManuelAvantAutomatiqueDiagram },
+] as const satisfies readonly HandcraftedVisual[];
