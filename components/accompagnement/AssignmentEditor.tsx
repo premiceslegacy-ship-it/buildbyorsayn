@@ -100,16 +100,16 @@ export function AssignmentEditor({
   }
 
   return (
-    <div className={compact ? "space-y-5" : "space-y-7"}>
-      <form onSubmit={(event) => void handleSubmit(event)} className="space-y-6">
+    <div className={compact ? "flex flex-col gap-5" : "flex flex-col gap-7"}>
+      <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-6">
         <input type="hidden" name="user_id" value={selectedUserId} />
         <div className="grid gap-5 sm:grid-cols-2">
-          <label className="text-sm text-[#bdb9b0] sm:col-span-2">
+          <label className="text-sm text-[var(--t2)] sm:col-span-2">
             Personne accompagnée
             <select
               value={selectedUserId}
               onChange={(event) => setSelectedUserId(event.target.value)}
-              className="mt-2 w-full border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+              className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
               required
             >
               <option value="">Choisir une personne</option>
@@ -120,34 +120,34 @@ export function AssignmentEditor({
               ))}
             </select>
           </label>
-          <label className="text-sm text-[#bdb9b0]">
+          <label className="text-sm text-[var(--t2)]">
             Accompagnement
             <input
               value="Création de sites web avec l'IA"
               readOnly
-              className="mt-2 w-full border border-[#3a3a3e] bg-[#1c1c1f] px-3 py-3 text-[#8f8b84] outline-none"
+              className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait)] bg-[var(--carte)] px-3 py-3 text-[var(--t3)] outline-none"
             />
           </label>
-          <label className="text-sm text-[#bdb9b0]">
+          <label className="text-sm text-[var(--t2)]">
             Parcours
             <select
               name="track"
               value={track}
               onChange={(event) => setTrack(event.target.value as AccompanimentTrack)}
-              className="mt-2 w-full border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+              className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
             >
               {TRACKS.map((item) => (
                 <option key={item.id} value={item.id}>{item.label}</option>
               ))}
             </select>
           </label>
-          <label className="text-sm text-[#bdb9b0]">
+          <label className="text-sm text-[var(--t2)]">
             Statut
             <select
               name="status"
               value={status}
               onChange={(event) => setStatus(event.target.value as AccompanimentAssignmentStatus)}
-              className="mt-2 w-full border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+              className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
             >
               <option value="planned">Prévu, accès fermé</option>
               <option value="active">En cours, accès ouvert</option>
@@ -155,53 +155,53 @@ export function AssignmentEditor({
               <option value="revoked">Accès retiré</option>
             </select>
           </label>
-          <label className="text-sm text-[#bdb9b0]">
+          <label className="text-sm text-[var(--t2)]">
             Du
             <input
               type="date"
               name="starts_on"
               value={startsOn}
               onChange={(event) => setStartsOn(event.target.value)}
-              className="mt-2 w-full border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+              className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
               required
             />
           </label>
-          <label className="text-sm text-[#bdb9b0]">
+          <label className="text-sm text-[var(--t2)]">
             Au, facultatif
             <input
               type="date"
               name="ends_on"
               value={endsOn}
               onChange={(event) => setEndsOn(event.target.value)}
-              className="mt-2 w-full border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+              className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
             />
           </label>
         </div>
 
         <fieldset>
-          <legend className="text-sm text-[#f0ede8]">Thèmes à couvrir</legend>
-          <p className="mt-1 text-xs leading-5 text-[#8f8b84]">Ce sont les seuls thèmes visibles dans l'espace membre.</p>
+          <legend className="text-sm text-[var(--encre)]">Thèmes à couvrir</legend>
+          <p className="mt-1 text-xs leading-5 text-[var(--t3)]">Ce sont les seuls thèmes visibles dans l'espace membre.</p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             {themes.map((theme) => {
               const checked = themeIds.includes(theme.id);
               return (
-                <label key={theme.id} className={`flex cursor-pointer items-start gap-3 border px-3 py-3 text-sm transition ${checked ? "border-[#c9b48a] bg-[#211f1b] text-[#f0ede8]" : "border-[#3a3a3e] text-[#8f8b84] hover:border-[#6a6253]"}`}>
+                <label key={theme.id} className={`flex cursor-pointer items-start gap-3 rounded-[var(--r-s)] border px-3 py-3 text-sm transition ${checked ? "border-[var(--em)] bg-[rgba(34,217,110,.1)] text-[var(--encre)]" : "border-[var(--trait)] text-[var(--t2)] hover:border-[var(--trait-f)]"}`}>
                   <input
                     type="checkbox"
                     name="theme_id"
                     value={theme.id}
                     checked={checked}
                     onChange={() => toggleTheme(theme.id)}
-                    className="mt-0.5 accent-[#c9b48a]"
+                    className="mt-0.5 accent-[var(--em)]"
                   />
-                  <span><span className="mr-2 text-[#c9b48a]">{theme.marker}</span>{theme.title}</span>
+                  <span><span className="mr-2 text-[var(--menthe)]">{theme.marker}</span>{theme.title}</span>
                 </label>
               );
             })}
           </div>
         </fieldset>
 
-        <label className="block text-sm text-[#bdb9b0]">
+        <label className="block text-sm text-[var(--t2)]">
           Note formateur
           <textarea
             name="notes"
@@ -209,7 +209,7 @@ export function AssignmentEditor({
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
             placeholder="Objectif de l'accompagnement, point d'attention ou décision importante."
-            className="mt-2 w-full resize-y border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+            className="mt-2 w-full resize-y rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
           />
         </label>
 
@@ -217,7 +217,7 @@ export function AssignmentEditor({
           <button
             type="submit"
             disabled={isSaving}
-            className="border border-[#c9b48a] bg-[#e8d5b0] px-4 py-3 text-sm text-[#171719] transition hover:bg-[#f0ede8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] disabled:cursor-wait disabled:opacity-60"
+            className="btn btn--p disabled:cursor-wait disabled:opacity-60"
           >
             {isSaving ? "Enregistrement..." : "Enregistrer l'accompagnement"}
           </button>
@@ -229,14 +229,14 @@ export function AssignmentEditor({
                 form?.requestSubmit();
               }}
               disabled={isSaving || assignment.status === "revoked"}
-              className="text-sm text-[#bdb9b0] underline underline-offset-4 hover:text-[#e8d5b0] disabled:opacity-50"
+              className="ui3-text-link min-h-11 text-sm underline underline-offset-4 disabled:opacity-50"
             >
               Retirer l'accès
             </button>
           ) : null}
         </div>
         {feedback?.message ? (
-          <p className={`text-sm ${feedback.ok ? "text-[#c9b48a]" : "text-[#f0a9a9]"}`} role="status">
+          <p className={`ui3-notice text-sm ${feedback.ok ? "ui3-notice-success" : "ui3-notice-error"}`} role="status">
             {feedback.message}
           </p>
         ) : null}

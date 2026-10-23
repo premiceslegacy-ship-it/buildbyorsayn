@@ -19,25 +19,25 @@ export function MarkdownFilePreview({
   const [fullscreen, setFullscreen] = useState(false);
 
   const body = (
-    <div className="font-mono text-[12.5px] leading-[1.75] text-white/70 whitespace-pre-wrap [&_strong]:text-[#e8d5b0] [&_strong]:font-semibold [&_em]:text-white/50 [&_em]:not-italic">
+    <div className="whitespace-pre-wrap font-mono text-[12.5px] leading-[1.75] text-[var(--t2)] [&_em]:text-[var(--t3)] [&_em]:not-italic [&_strong]:font-semibold [&_strong]:text-[var(--menthe)]">
       {children}
     </div>
   );
 
   return (
-    <div className="relative my-6 rounded-lg border border-white/[0.08] bg-[#0a0a0b] overflow-hidden">
-      <div className="flex items-center justify-between gap-3 border-b border-white/[0.08] bg-white/[0.02] px-4 py-2.5">
-        <div className="flex items-center gap-2 min-w-0">
-          <FileText className="w-3.5 h-3.5 text-[#e8d5b0]/60 shrink-0" />
-          <span className="truncate text-xs font-mono text-white/50">{filename}</span>
+    <div className="relative my-6 overflow-hidden rounded-[var(--r-s)] border border-[var(--trait)] bg-[var(--nuit)]">
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--trait)] bg-[var(--carte)] px-4 py-2.5">
+        <div className="flex min-w-0 items-center gap-2">
+          <FileText className="shrink-0 text-[var(--menthe)]" size={14} />
+          <span className="truncate font-mono text-xs text-[var(--t3)]">{filename}</span>
         </div>
         <button
           type="button"
           onClick={() => setFullscreen(true)}
           aria-label="Lire en plein écran"
-          className="shrink-0 inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-[10px] text-white/45 hover:text-[#e8d5b0] hover:border-[#e8d5b0]/30 transition-colors cursor-pointer"
+          className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-[var(--trait-f)] bg-[rgba(241,245,242,.08)] px-3 py-1 text-xs text-[var(--t2)] transition-colors hover:bg-[rgba(241,245,242,.14)] hover:text-[var(--encre)]"
         >
-          <Maximize2 className="w-3 h-3" />
+          <Maximize2 data-icon="inline-start" size={14} />
           <span className="hidden sm:inline">Plein écran</span>
         </button>
       </div>
@@ -54,21 +54,21 @@ export function MarkdownFilePreview({
           aria-label={filename}
         >
           <div
-            className="relative flex flex-col w-full max-w-3xl max-h-full rounded-xl border border-white/10 bg-[#0a0a0b] overflow-hidden"
+            className="relative flex max-h-full w-full max-w-3xl flex-col overflow-hidden rounded-[var(--r-m)] border border-[var(--trait)] bg-[var(--nuit)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between gap-3 border-b border-white/[0.08] bg-white/[0.03] px-5 py-3 shrink-0">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--trait)] bg-[var(--carte)] px-5 py-3">
               <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#e8d5b0]/70" />
-                <p className="text-sm font-mono text-white/60">{filename}</p>
+                <FileText className="text-[var(--menthe)]" size={16} />
+                <p className="font-mono text-sm text-[var(--t2)]">{filename}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setFullscreen(false)}
                 aria-label="Fermer"
-                className="shrink-0 rounded-md border border-white/10 bg-white/[0.03] p-1.5 text-white/50 hover:text-[#e8d5b0] hover:border-[#e8d5b0]/30 transition-colors cursor-pointer"
+                className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--trait-f)] bg-[rgba(241,245,242,.08)] text-[var(--t2)] transition-colors hover:bg-[rgba(241,245,242,.14)] hover:text-[var(--encre)]"
               >
-                <X className="w-4 h-4" />
+                <X data-icon="inline-start" size={16} />
               </button>
             </div>
             <div className="overflow-y-auto px-6 py-6 sm:px-8 sm:py-8">

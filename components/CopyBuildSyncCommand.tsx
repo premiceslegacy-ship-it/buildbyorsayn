@@ -16,9 +16,9 @@ export function CopyBuildSyncCommand({ label, command }: { label: string; comman
         setCopied(true);
         window.setTimeout(() => setCopied(false), 2_000);
       }}
-      className="flex size-11 shrink-0 items-center justify-center border-l border-white/10 bg-white/[0.06] text-white/55 transition hover:text-[#e8d5b0]"
+      className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-text/10 text-text-secondary transition hover:border-border-hover hover:text-accent"
     >
-      {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+      {copied ? <Check data-icon="inline-start" size={16} /> : <Copy data-icon="inline-start" size={16} />}
     </button>
   );
 }

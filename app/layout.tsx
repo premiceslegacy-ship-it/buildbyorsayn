@@ -53,7 +53,7 @@ export default async function RootLayout({
   await connection();
   return (
     <html lang="fr" className="dark" data-scroll-behavior="smooth">
-      <body className={`${inter.className} bg-[#0e0e0f] text-[#f0ede8] antialiased min-h-screen w-full`}>
+      <body className={`${inter.className} min-h-screen w-full antialiased`}>
         <AuthProvider>
           {children}
         </AuthProvider>

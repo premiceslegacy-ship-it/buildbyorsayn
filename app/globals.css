@@ -10,24 +10,26 @@ html {
    breaks sticky positioning for anything inside it. */
 body {
   overflow-x: clip;
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 @theme {
   /* Colors */
-  --color-background: #0e0e0f;
-  --color-background-secondary: #161618;
-  --color-background-tertiary: #1c1c1f;
+  --color-background: #050806;
+  --color-background-secondary: #131715;
+  --color-background-tertiary: #1b201d;
 
-  --color-accent: #e8d5b0;
-  --color-accent-dark: #c9b48a;
+  --color-accent: #22d96e;
+  --color-accent-dark: #0e8a43;
 
-  --color-text: #f0ede8;
-  --color-text-secondary: rgba(240, 237, 232, 0.50);
-  --color-text-tertiary: rgba(240, 237, 232, 0.25);
+  --color-text: #f1f5f2;
+  --color-text-secondary: rgba(241, 245, 242, 0.72);
+  --color-text-tertiary: rgba(241, 245, 242, 0.58);
 
-  --color-border: rgba(255, 255, 255, 0.07);
-  --color-border-active: rgba(232, 213, 176, 0.20);
-  --color-border-hover: rgba(255, 255, 255, 0.12);
+  --color-border: rgba(241, 245, 242, 0.10);
+  --color-border-active: rgba(34, 217, 110, 0.38);
+  --color-border-hover: rgba(241, 245, 242, 0.18);
 
   --color-success: rgba(74, 222, 128, 0.80);
   --color-error: rgba(248, 113, 113, 0.80);
@@ -40,7 +42,7 @@ body {
   --tracking-tightest: -0.03em;
 
   /* Box shadow */
-  --shadow-glow: 0 0 60px -15px rgba(232, 213, 176, 0.15);
+  --shadow-glow: 0 0 60px -15px rgba(34, 217, 110, 0.18);
 
   /* Animations */
   --animate-apple-splash: appleSplash 3s ease-in-out forwards;
@@ -178,7 +180,7 @@ body {
 }
 
 .build-flow-base-line {
-  stroke: #c9b48a;
+  stroke: var(--color-accent-dark);
   opacity: 0.84;
 }
 
@@ -187,29 +189,29 @@ body {
 }
 
 .build-flow-rail-face {
-  stroke: #9d8960;
+  stroke: var(--color-accent-dark);
   filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.68));
 }
 
 .build-flow-trace {
-  stroke: #fff7df;
+  stroke: var(--color-text);
   stroke-dasharray: 0.24 0.76;
   stroke-dashoffset: 1;
   stroke-linecap: round;
   stroke-width: 2.5;
   opacity: 1;
-  filter: drop-shadow(0 0 4px rgba(232, 213, 176, 0.46));
+  filter: drop-shadow(0 0 4px rgba(34, 217, 110, 0.46));
 }
 
 .build-flow-port {
-  fill: #171719;
-  stroke: #e8d5b0;
+  fill: var(--color-background-secondary);
+  stroke: var(--color-accent);
   stroke-width: 1.4;
   vector-effect: non-scaling-stroke;
 }
 
 .build-flow-port-core {
-  fill: #f0ede8;
+  fill: var(--color-text);
 }
 
 .guidance-ascii-scene {
@@ -285,36 +287,36 @@ body {
 }
 
 .build-cta-primary {
-  border: 1px solid #c9b48a;
-  border-bottom-color: #8f8060;
-  background: #e8d5b0;
-  color: #171719;
+  border: 1px solid var(--color-text);
+  border-bottom-color: rgba(241, 245, 242, 0.72);
+  background: var(--color-text);
+  color: #060806;
   font-weight: 500;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68), inset 0 -2px 0 rgba(111, 91, 56, 0.22), 0 3px 0 #6f5b38, 0 8px 14px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68), inset 0 -2px 0 rgba(5, 8, 6, 0.16), 0 3px 0 #7c837f, 0 8px 14px rgba(0, 0, 0, 0.2);
 }
 
 .build-cta-primary:hover {
-  background: #f0ede8;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78), inset 0 -2px 0 rgba(111, 91, 56, 0.16), 0 4px 0 #6f5b38, 0 10px 16px rgba(0, 0, 0, 0.22);
+  background: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78), inset 0 -2px 0 rgba(5, 8, 6, 0.12), 0 4px 0 #7c837f, 0 10px 16px rgba(0, 0, 0, 0.22);
   transform: translateY(-1px);
 }
 
 .build-cta-primary:active {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(111, 91, 56, 0.34), 0 1px 0 #6f5b38, 0 3px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(5, 8, 6, 0.24), 0 1px 0 #7c837f, 0 3px 8px rgba(0, 0, 0, 0.18);
   transform: translateY(2px);
 }
 
 .build-cta-secondary {
-  border: 1px solid #716653;
-  border-bottom-color: #3a3328;
-  background: #171719;
-  color: #e8d5b0;
+  border: 1px solid var(--color-border-hover);
+  border-bottom-color: var(--color-border);
+  background: var(--color-background-secondary);
+  color: #b9f5cf;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -2px 0 rgba(0, 0, 0, 0.28), 0 3px 0 #0a0a0b, 0 8px 14px rgba(0, 0, 0, 0.18);
 }
 
 .build-cta-secondary:hover {
-  border-color: #c9b48a;
-  background: #242326;
+  border-color: var(--color-accent);
+  background: var(--color-background-tertiary);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -2px 0 rgba(0, 0, 0, 0.2), 0 4px 0 #0a0a0b, 0 10px 16px rgba(0, 0, 0, 0.22);
   transform: translateY(-1px);
 }
@@ -322,11 +324,6 @@ body {
 .build-cta-secondary:active {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.36), 0 1px 0 #0a0a0b, 0 3px 8px rgba(0, 0, 0, 0.18);
   transform: translateY(2px);
-}
-
-.build-cta:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px #0e0e0f, 0 0 0 5px #e8d5b0, 0 3px 0 #6f5b38;
 }
 
 .build-atmosphere-noise {
@@ -341,7 +338,7 @@ body {
   pointer-events: none;
   position: absolute;
   border-radius: 999px;
-  background: #c9b48a;
+  background: var(--color-accent);
   filter: blur(46px);
   opacity: 0.035;
 }
@@ -358,7 +355,7 @@ body {
   bottom: 10%;
   width: 31%;
   height: 25%;
-  background: #e8d5b0;
+  background: var(--color-accent);
 }
 
 .build-atmosphere-orb-three {
@@ -420,6 +417,6 @@ body {
 }
 
 *:focus-visible {
-  outline: 2px solid #d6e3e8 !important;
+  outline: 2px solid var(--color-accent) !important;
   outline-offset: 3px !important;
 }

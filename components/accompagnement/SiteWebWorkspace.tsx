@@ -292,14 +292,14 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
 
   if (!activeTheme || !activeGuidance) {
     return (
-      <main className="min-h-screen bg-[#0e0e0f] px-5 py-16 text-[#f0ede8] sm:px-8">
-        <div className="mx-auto max-w-3xl border border-[#3b362b] bg-[#161618] p-8">
-          <p className="text-xs uppercase tracking-[0.18em] text-[#c9b48a]">Accès membre</p>
+      <main className="min-h-screen bg-[var(--nuit)] px-5 py-16 text-[var(--encre)] sm:px-8">
+        <div className="mx-auto max-w-3xl rounded-[var(--r-m)] border border-[var(--trait)] bg-[var(--carte)] p-8">
+          <p className="text-xs uppercase tracking-[0.18em] text-[var(--menthe)]">Accès membre</p>
           <h1 className="mt-4 text-3xl font-medium">Ton parcours doit encore être préparé.</h1>
-          <p className="mt-4 max-w-xl text-[#bdb9b0]">
+          <p className="mt-4 max-w-xl text-[var(--t2)]">
             Le formateur doit associer au moins un thème avant d'ouvrir cet espace.
           </p>
-          <Link className="mt-8 inline-flex border border-[#c9b48a] px-4 py-3 text-sm text-[#e8d5b0]" href="/accompagnement">
+          <Link className="btn btn--g mt-8" href="/accompagnement">
             Revenir aux accompagnements
           </Link>
         </div>
@@ -308,34 +308,34 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
   }
 
   return (
-    <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8]">
-      <header className="border-b border-[#29292c] bg-[#0e0e0f]/95 px-5 py-4 sm:px-8">
+    <main className="min-h-screen bg-[var(--nuit)] text-[var(--encre)]">
+      <header className="border-b border-[var(--trait)] bg-[rgba(5,8,6,.95)] px-5 py-4 sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Link
-              className="inline-flex h-10 w-10 items-center justify-center border border-[#3a3a3e] text-xl text-[#d8d3c8] transition hover:border-[#c9b48a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
+              className="inline-flex size-11 items-center justify-center rounded-full border border-[var(--trait-f)] text-xl text-[var(--t2)] transition hover:bg-[rgba(241,245,242,.1)]"
               href="/accompagnement"
               aria-label="Revenir aux accompagnements"
             >
               ←
             </Link>
             <div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#c9b48a]">Espace membre</p>
-              <p className="mt-1 text-sm text-[#bdb9b0]">Accompagnement activité</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-[var(--menthe)]">Espace membre</p>
+              <p className="mt-1 text-sm text-[var(--t2)]">Accompagnement activité</p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <Link
               href="/accompagnement/espace/guide"
               target="_blank"
-              className="border border-[#3a3a3e] px-3 py-2 text-[#d8d3c8] transition hover:border-[#c9b48a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
+              className="btn btn--g btn--s"
             >
               Guide PDF
             </Link>
             <button
               type="button"
               onClick={downloadGuide}
-              className="border border-[#c9b48a] bg-[#e8d5b0] px-3 py-2 text-[#171719] transition hover:bg-[#f0ede8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
+              className="btn btn--g btn--s"
             >
               Télécharger .md
             </button>
@@ -343,36 +343,36 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
         </div>
       </header>
 
-      <section className="border-b border-[#29292c] px-5 py-10 sm:px-8 sm:py-14">
+      <section className="border-b border-[var(--trait)] px-5 py-10 sm:px-8 sm:py-14">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-wrap items-end justify-between gap-8">
             <div className="max-w-2xl">
-              <p className="text-sm text-[#c9b48a]">{memberName ? `Bonjour ${memberName}.` : "Ton accompagnement."}</p>
+              <p className="text-sm text-[var(--menthe)]">{memberName ? `Bonjour ${memberName}.` : "Ton accompagnement."}</p>
               <h1 className="mt-3 text-4xl font-medium tracking-[-0.03em] sm:text-6xl">Un thème à la fois.</h1>
-              <p className="mt-5 max-w-xl text-base leading-7 text-[#bdb9b0]">
+              <p className="mt-5 max-w-xl text-base leading-7 text-[var(--t2)]">
                 Regarde ce que le thème te fait gagner. Quand tu as compris, coche-le et passe au suivant.
               </p>
             </div>
             <div className="w-full max-w-xs">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-[#bdb9b0]">Progression</span>
-                <strong className="font-medium text-[#f0ede8]">{completedCount}/{validThemeIds.length}</strong>
+                <span className="text-[var(--t2)]">Progression</span>
+                <strong className="font-medium text-[var(--encre)]">{completedCount}/{validThemeIds.length}</strong>
               </div>
-              <div className="mt-3 h-2 bg-[#29292c]" aria-hidden="true">
-                <div className="h-full bg-[#c9b48a] transition-[width]" style={{ width: `${progressPercent}%` }} />
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--carte-2)]" aria-hidden="true">
+                <div className="h-full rounded-full bg-[var(--em)] transition-[width]" style={{ width: `${progressPercent}%` }} />
               </div>
-              <p className="mt-2 text-xs text-[#8f8b84]">{assignmentLabel} · {getTrackLabel(assignment.track)}</p>
+              <p className="mt-2 text-xs text-[var(--t3)]">{assignmentLabel} · {getTrackLabel(assignment.track)}</p>
             </div>
           </div>
           {syncMessage ? (
-            <p className="mt-6 border-l-2 border-[#c9b48a] pl-3 text-sm text-[#d8d3c8]" role="status">
+            <p className="mt-6 max-w-3xl rounded-[var(--r-s)] bg-[var(--carte)] px-4 py-3 text-sm text-[var(--t2)]" role="status">
               {syncMessage}
             </p>
           ) : null}
           {assignment.notes ? (
-            <div className="mt-6 max-w-3xl border-l-2 border-[#c9b48a] pl-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-[#c9b48a]">Note du formateur</p>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#d8d3c8]">{assignment.notes}</p>
+            <div className="mt-6 max-w-3xl rounded-[var(--r-s)] bg-[var(--carte)] px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.14em] text-[var(--menthe)]">Note du formateur</p>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[var(--t2)]">{assignment.notes}</p>
             </div>
           ) : null}
         </div>
@@ -380,11 +380,11 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
 
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[280px_minmax(0,1fr)] lg:py-12">
         <aside className="min-w-0">
-          <div className="border-b border-[#29292c] pb-3">
-            <p className="text-xs uppercase tracking-[0.16em] text-[#8f8b84]">Ton parcours</p>
-            <p className="mt-2 text-sm text-[#bdb9b0]">{completedCount} thème{completedCount > 1 ? "s" : ""} compris</p>
+          <div className="border-b border-[var(--trait)] pb-3">
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--t3)]">Ton parcours</p>
+            <p className="mt-2 text-sm text-[var(--t2)]">{completedCount} thème{completedCount > 1 ? "s" : ""} compris</p>
           </div>
-          <nav className="mt-3 space-y-1" aria-label="Thèmes de l'accompagnement">
+          <nav className="mt-3 flex flex-col gap-1" aria-label="Thèmes de l'accompagnement">
             {assignedThemes.map((theme, index) => {
               if (!theme) return null;
               const isActive = theme.id === activeTheme.id;
@@ -394,15 +394,15 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
                   key={theme.id}
                   type="button"
                   onClick={() => setActiveThemeId(theme.id)}
-                  className={`flex w-full items-center gap-3 border-b px-2 py-3 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] ${
-                    isActive ? "border-[#c9b48a] bg-[#1c1c1f]" : "border-[#29292c] hover:bg-[#161618]"
+                  className={`flex min-h-12 w-full items-center gap-3 rounded-[var(--r-s)] px-2 py-3 text-left transition ${
+                    isActive ? "bg-[var(--carte-2)]" : "hover:bg-[var(--carte)]"
                   }`}
                   aria-current={isActive ? "step" : undefined}
                 >
-                  <span className={`flex h-7 w-7 shrink-0 items-center justify-center border text-xs ${isDone ? "border-[#c9b48a] text-[#e8d5b0]" : "border-[#3a3a3e] text-[#8f8b84]"}`}>
+                  <span className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs ${isDone ? "border-[var(--em)] text-[var(--menthe)]" : "border-[var(--trait-f)] text-[var(--t3)]"}`}>
                     {isDone ? "✓" : String(index + 1).padStart(2, "0")}
                   </span>
-                  <span className="min-w-0 flex-1 text-sm leading-5 text-[#d8d3c8]">{theme.title}</span>
+                  <span className="min-w-0 flex-1 text-sm leading-5 text-[var(--t2)]">{theme.title}</span>
                 </button>
               );
             })}
@@ -410,44 +410,40 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
         </aside>
 
         <section className="min-w-0" aria-labelledby="active-theme-title">
-          <div className="border border-[#3a362d] bg-[#161618] p-5 sm:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.16em] text-[#8f8b84]">
+          <div className="rounded-[var(--r-m)] border border-[var(--trait)] bg-[var(--carte)] p-5 sm:p-8">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.16em] text-[var(--t3)]">
               <span>Thème {String(activeThemeIndex + 1).padStart(2, "0")}</span>
               <span>{activeTheme.marker}</span>
             </div>
             <h2 id="active-theme-title" className="mt-5 max-w-3xl text-3xl font-medium tracking-[-0.02em] sm:text-4xl">
               {activeTheme.title}
             </h2>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-[#c8c3ba]">{activeGuidance.competency}</p>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--t2)]">{activeGuidance.competency}</p>
 
-            <div className="mt-8 grid gap-px border border-[#3a3a3e] bg-[#3a3a3e] sm:grid-cols-2">
-              <div className="bg-[#1c1c1f] p-5">
-                <p className="text-xs uppercase tracking-[0.14em] text-[#8f8b84]">Compétence gagnée</p>
-                <p className="mt-3 text-sm leading-6 text-[#f0ede8]">{activeGuidance.competency}</p>
+            <div className="mt-8 grid gap-px overflow-hidden rounded-[var(--r-s)] border border-[var(--trait)] bg-[var(--trait)] sm:grid-cols-2">
+              <div className="bg-[var(--carte-2)] p-5">
+                <p className="text-xs uppercase tracking-[0.14em] text-[var(--t3)]">Compétence gagnée</p>
+                <p className="mt-3 text-sm leading-6 text-[var(--encre)]">{activeGuidance.competency}</p>
               </div>
-              <div className="bg-[#1c1c1f] p-5">
-                <p className="text-xs uppercase tracking-[0.14em] text-[#8f8b84]">Étape franchie</p>
-                <p className="mt-3 text-sm leading-6 text-[#f0ede8]">{activeGuidance.milestone}</p>
+              <div className="bg-[var(--carte-2)] p-5">
+                <p className="text-xs uppercase tracking-[0.14em] text-[var(--t3)]">Étape franchie</p>
+                <p className="mt-3 text-sm leading-6 text-[var(--encre)]">{activeGuidance.milestone}</p>
               </div>
             </div>
 
-            <div className="mt-8 border-l-2 border-[#c9b48a] pl-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-[#c9b48a]">Repère pour la suite</p>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#bdb9b0]">{activeGuidance.autonomyTip}</p>
+            <div className="mt-8 rounded-[var(--r-s)] bg-[rgba(34,217,110,.08)] px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.14em] text-[var(--menthe)]">Repère pour la suite</p>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--t2)]">{activeGuidance.autonomyTip}</p>
             </div>
 
-            <div className="mt-9 flex flex-wrap items-center gap-4 border-t border-[#29292c] pt-6">
+            <div className="mt-9 flex flex-wrap items-center gap-4 border-t border-[var(--trait)] pt-6">
               <button
                 type="button"
                 role="checkbox"
                 aria-checked={understoodThemeIds.includes(activeTheme.id)}
                 disabled={pendingThemeIds.includes(activeTheme.id)}
                 onClick={() => toggleTheme(activeTheme.id)}
-                className={`inline-flex min-h-12 items-center gap-3 border px-4 py-3 text-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] disabled:cursor-wait disabled:opacity-60 ${
-                  understoodThemeIds.includes(activeTheme.id)
-                    ? "border-[#c9b48a] bg-[#e8d5b0] text-[#171719]"
-                    : "border-[#c9b48a] text-[#e8d5b0] hover:bg-[#2a261f]"
-                }`}
+                className="btn btn--p min-h-12 disabled:cursor-wait disabled:opacity-60"
               >
                 <span aria-hidden="true" className="text-base">{understoodThemeIds.includes(activeTheme.id) ? "✓" : "○"}</span>
                 {pendingThemeIds.includes(activeTheme.id)
@@ -460,7 +456,7 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
                 <Link
                   href={`/accompagnement/espace#${nextTheme.id}`}
                   onClick={() => setActiveThemeId(nextTheme!.id)}
-                  className="text-sm text-[#d8d3c8] underline decoration-[#c9b48a] underline-offset-4 hover:text-[#e8d5b0] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
+                  className="ui3-text-link min-h-11 text-sm underline underline-offset-4"
                 >
                   Ouvrir le thème suivant
                 </Link>
@@ -471,47 +467,47 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
       </div>
 
       <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
-        <details className="border-t border-[#29292c] pt-6">
-          <summary className="cursor-pointer text-sm text-[#d8d3c8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]">
+        <details className="border-t border-[var(--trait)] pt-6">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm text-[var(--t2)]">
             Ajouter du contexte partagé à ton guide
           </summary>
           <div className="mt-6 grid max-w-4xl gap-5 sm:grid-cols-3">
-            <label className="text-sm text-[#bdb9b0]">
+            <label className="text-sm text-[var(--t2)]">
               Activité ou entreprise
               <input
                 value={profile.company}
                 maxLength={200}
                 onChange={(event) => setProfile((current) => ({ ...current, company: event.target.value }))}
-                className="mt-2 w-full border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+                className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
               />
             </label>
-            <label className="text-sm text-[#bdb9b0]">
+            <label className="text-sm text-[var(--t2)]">
               Projet actuel
               <input
                 value={profile.project}
                 maxLength={500}
                 onChange={(event) => setProfile((current) => ({ ...current, project: event.target.value }))}
-                className="mt-2 w-full border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+                className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
               />
             </label>
-            <label className="text-sm text-[#bdb9b0]">
+            <label className="text-sm text-[var(--t2)]">
               Lien principal de l&apos;activité
               <input
                 type="url"
                 value={profile.siteUrl}
                 maxLength={500}
                 onChange={(event) => setProfile((current) => ({ ...current, siteUrl: event.target.value }))}
-                className="mt-2 w-full border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+                className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
               />
             </label>
-            <label className="text-sm text-[#bdb9b0] sm:col-span-3">
+            <label className="text-sm text-[var(--t2)] sm:col-span-3">
               Notes partagées avec le formateur
               <textarea
                 rows={3}
                 value={followUp.observations}
                 maxLength={4000}
                 onChange={(event) => setFollowUp((current) => ({ ...current, observations: event.target.value }))}
-                className="mt-2 w-full resize-y border border-[#3a3a3e] bg-[#161618] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+                className="mt-2 w-full resize-y rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--carte-2)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
                 placeholder="Une décision, un apprentissage ou un point à vérifier."
               />
             </label>
@@ -521,14 +517,14 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
               type="button"
               onClick={() => void saveSharedContext()}
               disabled={isSavingContext}
-              className="border border-[#c9b48a] bg-[#e8d5b0] px-4 py-3 text-sm text-[#171719] transition hover:bg-[#f0ede8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] disabled:cursor-wait disabled:opacity-60"
+              className="btn btn--g disabled:cursor-wait disabled:opacity-60"
             >
               {isSavingContext ? "Enregistrement..." : "Enregistrer dans l'espace"}
             </button>
             <button
               type="button"
               onClick={downloadGuide}
-              className="border border-[#c9b48a] px-4 py-3 text-sm text-[#e8d5b0] transition hover:bg-[#2a261f] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0]"
+              className="btn btn--g"
             >
               Télécharger le guide .md
             </button>
@@ -536,13 +532,13 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
               type="button"
               onClick={() => void resetProgress()}
               disabled={isResetting}
-              className="text-sm text-[#8f8b84] underline underline-offset-4 hover:text-[#d8d3c8] disabled:opacity-50"
+              className="ui3-text-link min-h-11 text-sm underline underline-offset-4 disabled:opacity-50"
             >
               {isResetting ? "Réinitialisation..." : "Réinitialiser ma progression"}
             </button>
           </div>
           {contextMessage ? (
-            <p className="mt-4 text-sm text-[#d8d3c8]" role="status">{contextMessage}</p>
+            <p className="ui3-notice ui3-notice-success mt-4 text-sm" role="status">{contextMessage}</p>
           ) : null}
         </details>
       </section>

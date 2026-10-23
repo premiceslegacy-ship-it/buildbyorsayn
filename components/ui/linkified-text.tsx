@@ -19,7 +19,7 @@ export function LinkifiedText({ text }: { text: string }) {
                             href={href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#e8d5b0] hover:text-[#f0dfc0] underline underline-offset-2 transition-colors drop-shadow-[0_0_8px_rgba(232,213,176,0.3)] relative z-20"
+                            className="relative z-20 text-accent underline underline-offset-2 transition-colors hover:text-[#b9f5cf]"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {part}

@@ -38,42 +38,42 @@ export function SharedContextEditor({ assignmentId, context }: Props) {
   }
 
   return (
-    <form onSubmit={(event) => void handleSubmit(event)} className="mt-7 border-t border-[#29292c] pt-6">
+    <form onSubmit={(event) => void handleSubmit(event)} className="mt-7 border-t border-[var(--trait)] pt-6">
       <input type="hidden" name="assignment_id" value={assignmentId} />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.14em] text-[#c9b48a]">Contexte partagé</p>
-          <h4 className="mt-2 text-lg font-medium text-[#f0ede8]">Informations visibles des deux côtés</h4>
+          <p className="text-xs uppercase tracking-[0.14em] text-[var(--menthe)]">Contexte partagé</p>
+          <h4 className="mt-2 text-lg font-medium text-[var(--encre)]">Informations visibles des deux côtés</h4>
         </div>
         {context?.updatedAt ? (
-          <p className="text-xs text-[#8f8b84]">
+          <p className="text-xs text-[var(--t3)]">
             Mis à jour le {new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(new Date(context.updatedAt))}
           </p>
         ) : null}
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <label className="text-sm text-[#bdb9b0]">
+        <label className="text-sm text-[var(--t2)]">
           Activité ou entreprise
           <input
             name="company"
             value={company}
             maxLength={200}
             onChange={(event) => setCompany(event.target.value)}
-            className="mt-2 w-full border border-[#3a3a3e] bg-[#0e0e0f] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+            className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--nuit)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
           />
         </label>
-        <label className="text-sm text-[#bdb9b0]">
+        <label className="text-sm text-[var(--t2)]">
           Projet actuel
           <input
             name="project"
             value={project}
             maxLength={500}
             onChange={(event) => setProject(event.target.value)}
-            className="mt-2 w-full border border-[#3a3a3e] bg-[#0e0e0f] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+            className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--nuit)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
           />
         </label>
-        <label className="text-sm text-[#bdb9b0] sm:col-span-2">
+        <label className="text-sm text-[var(--t2)] sm:col-span-2">
           URL principale
           <input
             type="url"
@@ -82,10 +82,10 @@ export function SharedContextEditor({ assignmentId, context }: Props) {
             maxLength={500}
             placeholder="https://"
             onChange={(event) => setSiteUrl(event.target.value)}
-            className="mt-2 w-full border border-[#3a3a3e] bg-[#0e0e0f] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+            className="mt-2 min-h-12 w-full rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--nuit)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
           />
         </label>
-        <label className="text-sm text-[#bdb9b0] sm:col-span-2">
+        <label className="text-sm text-[var(--t2)] sm:col-span-2">
           Notes partagées
           <textarea
             name="shared_notes"
@@ -93,7 +93,7 @@ export function SharedContextEditor({ assignmentId, context }: Props) {
             maxLength={4000}
             rows={4}
             onChange={(event) => setSharedNotes(event.target.value)}
-            className="mt-2 w-full resize-y border border-[#3a3a3e] bg-[#0e0e0f] px-3 py-3 text-[#f0ede8] outline-none focus:border-[#c9b48a]"
+            className="mt-2 w-full resize-y rounded-[var(--r-s)] border border-[var(--trait-f)] bg-[var(--nuit)] px-3 py-3 text-[var(--encre)] outline-none transition hover:border-[rgba(241,245,242,.4)]"
             placeholder="Décision, blocage, apprentissage ou prochaine étape."
           />
         </label>
@@ -103,12 +103,12 @@ export function SharedContextEditor({ assignmentId, context }: Props) {
         <button
           type="submit"
           disabled={isSaving}
-          className="border border-[#c9b48a] bg-[#e8d5b0] px-4 py-3 text-sm text-[#171719] transition hover:bg-[#f0ede8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8d5b0] disabled:cursor-wait disabled:opacity-60"
+          className="btn btn--g disabled:cursor-wait disabled:opacity-60"
         >
           {isSaving ? "Enregistrement..." : "Enregistrer le contexte"}
         </button>
         {feedback?.message ? (
-          <p className={`text-sm ${feedback.ok ? "text-[#c9b48a]" : "text-[#f0a9a9]"}`} role="status">
+          <p className={`ui3-notice text-sm ${feedback.ok ? "ui3-notice-success" : "ui3-notice-error"}`} role="status">
             {feedback.message}
           </p>
         ) : null}
