@@ -150,7 +150,7 @@
 .da .ui3-rdv-hero { display: grid; justify-items: center; text-align: center; width: min(100%, 52rem); }
 .da .ui3-rdv-art { width: clamp(200px, 34vw, 380px); aspect-ratio: 1; margin-bottom: clamp(-24px, -2vw, -8px); filter: drop-shadow(0 32px 48px rgba(0,0,0,.5)); }
 .da .ui3-rdv-art img { width: 100%; height: 100%; object-fit: contain; }
-.da .ui3-rdv-hero h1 { max-width: 14em; font-size: clamp(40px, 6vw, 64px); }
+.da.da-app .ui3-rdv-title { width: min(100%, 760px); max-width: none; font-size: 40px; text-wrap: balance; }
 .da .ui3-rdv-hero .t-lede { margin-top: 20px; max-width: 28em; }
 .da .ui3-rdv-hero .btn { margin-top: 36px; min-width: 220px; height: 52px; }
 .da .ui3-rdv-note { margin-top: 14px; font: 400 14px/1.4 var(--font); color: var(--t3); }
@@ -161,7 +161,7 @@
 .da .ui3-accompaniment-intro { display: grid; justify-items: center; width: min(100%, 58rem); margin-inline: auto; padding: calc(68px + 40px) var(--gutter) clamp(64px, 8vw, 104px); text-align: center; }
 .da .ui3-accompaniment-art { width: clamp(180px, 28vw, 320px); aspect-ratio: 1; margin-bottom: -24px; filter: drop-shadow(0 28px 44px rgba(0,0,0,.48)); }
 .da .ui3-accompaniment-art img { width: 100%; height: 100%; object-fit: contain; }
-.da .ui3-accompaniment-intro h1 { max-width: 14em; }
+.da .ui3-accompaniment-intro h1 { max-width: 14em; text-wrap: balance; }
 .da .ui3-accompaniment-intro .t-lede { max-width: 32em; margin-top: 20px; }
 .da .ui3-accompaniment-intro .btn { min-width: 220px; height: 52px; margin-top: 32px; }
 .da .ui3-accompaniment-themes { width: min(calc(100% - 2 * var(--gutter)), 1120px); margin-inline: auto; }
@@ -173,6 +173,15 @@
 .da .ui3-theme-grid p { margin-top: 7px; color: var(--t2); font: 400 14px/1.45 var(--font); }
 .da.ui3-accompaniment-workspace > main { min-height: 100svh; background: var(--nuit) !important; color: var(--encre) !important; font-family: var(--font); }
 .da.ui3-accompaniment-workspace [class*="border-l-"] { border-left-width: 0 !important; padding-left: 0 !important; }
+.da.da-app .foot--public { margin-top: clamp(48px, 7vw, 110px); padding: 40px var(--gutter) 56px; box-shadow: 0 -.5px 0 var(--trait); }
+.da.da-app .foot--public img { width: auto; height: 22px; opacity: 1; }
+
+@media (min-width: 735px) {
+  .da.da-app .ui3-rdv-title { font-size: 56px; }
+}
+@media (min-width: 1100px) {
+  .da.da-app .ui3-rdv-title { font-size: 64px; }
+}
 
 /* Hermes */
 .da .ui3-hermes-face { width: clamp(200px, 24vw, 320px); aspect-ratio: 1; object-fit: contain; margin-block: -18px -34px; }

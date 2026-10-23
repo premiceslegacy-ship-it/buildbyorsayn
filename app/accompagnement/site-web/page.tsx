@@ -56,6 +56,7 @@ export default async function SiteWebAccompagnementPage() {
           </ol>
         </section>
       </main>
+      <footer className="foot foot--public"><Image src="/da/logo-sombre.svg" alt="BUILD" width={96} height={24} /></footer>
     </DaRoot>
   );
 }

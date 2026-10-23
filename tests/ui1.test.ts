@@ -9,6 +9,7 @@ import { buildSearchCatalog, searchCatalog } from "../lib/search/catalog";
 import { groupVideosByMonth } from "../lib/nouveautes/videos";
 import { resumeForTier, resumeFromProgress } from "../lib/dashboard/today";
 import { TOOL_LOGOS, toolLogoSrc } from "../lib/tools/registry";
+import { navItemsFor } from "../components/NavBar";
 
 test("le programme projette les accès réels pour chaque palier", () => {
   const byTier = Object.fromEntries(["free", "preview", "beginner", "full"].map((tier) => [tier, programmeForTier(tier)]));
@@ -98,6 +99,34 @@ test("navigation et pages exposent les liens, accès et états attendus sans anc
   assert.match(nouveautes, /groups\.length === 0/);
   assert.match(searchRoute, /supabase\.auth\.getUser\(\)/);
   assert.match(searchRoute, /status: 401/);
+});
+
+test("la navigation anonyme ne propose que des destinations publiques réelles", async () => {
+  const publicItems = navItemsFor(false);
+  const [home, landingBento, nav, legal, login] = await Promise.all([
+    readFile("app/page.tsx", "utf8"),
+    readFile("components/da/LandingBento.tsx", "utf8"),
+    readFile("components/NavBar.tsx", "utf8"),
+    readFile("components/da/LegalPage.tsx", "utf8"),
+    readFile("app/login/page.tsx", "utf8"),
+  ]);
+  assert.deepEqual(publicItems.map(({ label, href }) => ({ label, href })), [
+    { label: "Programme", href: "/#contenu" },
+    { label: "Skills", href: "/#contenu" },
+    { label: "Prix", href: "/#prix" },
+  ]);
+  for (const { href } of publicItems) {
+    assert.ok(href.startsWith("/#"));
+    assert.match(`${home}\n${landingBento}`, new RegExp(`id=[{\"]${href.slice(2)}`));
+  }
+  assert.ok(publicItems.every(({ href }) => !["/dashboard", "/programme", "/skills", "/nouveautes"].includes(href)));
+  assert.match(nav, /signedIn \? <button[\s\S]*: <Link[^>]*href="\/login">Se connecter<\/Link>/);
+
+  const legalHeader = legal.match(/<header[\s\S]*?<\/header>/)?.[0] ?? "";
+  assert.doesNotMatch(legalHeader, /\/(dashboard|programme|skills|nouveautes)/);
+  assert.doesNotMatch(login, /\/(dashboard|programme|skills|nouveautes)/);
+
+  assert.deepEqual(navItemsFor(true).map(({ href }) => href), ["/dashboard", "/programme", "/skills", "/nouveautes"]);
 });
 
 test("chaque page portée a un état de chargement, d'erreur et de reprise", async () => {

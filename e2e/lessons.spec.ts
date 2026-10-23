@@ -65,4 +65,23 @@ test.describe("Bloc lessons (member)", () => {
     await page.keyboard.press("Escape");
     await expect(page).toHaveURL(/\/blocs\/1$/);
   });
+
+  test("the reader never rewrites the address in a loop", async ({ authedPage: page }) => {
+    await page.addInitScript(() => {
+      const counter = { count: 0 };
+      (window as unknown as { __addressWrites: typeof counter }).__addressWrites = counter;
+      const original = history.replaceState.bind(history);
+      history.replaceState = (...args: Parameters<History["replaceState"]>) => {
+        counter.count += 1;
+        return original(...args);
+      };
+    });
+    await page.goto("/blocs/1/lire?mode=text&chapter=b1-s1");
+    await expect(page.getByRole("radio", { name: "Texte" })).toHaveAttribute("aria-checked", "true");
+    await page.waitForTimeout(2000);
+    const writes = await page.evaluate(() => (window as unknown as { __addressWrites: { count: number } }).__addressWrites.count);
+    expect(writes).toBeLessThan(10);
+    await page.keyboard.press("ArrowRight");
+    await expect(page).toHaveURL(/chapter=b1-s2/);
+  });
 });

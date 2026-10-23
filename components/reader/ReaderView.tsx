@@ -82,7 +82,10 @@ function updateAddress(mode: ReaderMode, sectionId: string) {
   url.searchParams.set("mode", readerModeQuery(mode));
   url.searchParams.set("chapter", sectionId);
   url.hash = sectionId;
-  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  const next = `${url.pathname}${url.search}${url.hash}`;
+  // Next relie replaceState au routeur : réécrire la même adresse relance le rendu et boucle sans fin.
+  if (next === `${window.location.pathname}${window.location.search}${window.location.hash}`) return;
+  window.history.replaceState({}, "", next);
 }
 
 function withMode(href: string, mode: ReaderMode) {

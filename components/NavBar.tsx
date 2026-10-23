@@ -23,12 +23,22 @@ interface NavBarProps {
   onStackClick?: () => void;
 }
 
-const NAV = [
+export const MEMBER_NAV = [
   { label: "Aujourd'hui", href: "/dashboard", icon: "home" as const },
   { label: "Programme", href: "/programme", icon: "grid" as const },
   { label: "Skills", href: "/skills", icon: "skill" as const },
   { label: "Nouveautés", href: "/nouveautes", icon: "news" as const },
 ];
+
+export const PUBLIC_NAV = [
+  { label: "Programme", href: "/#contenu" },
+  { label: "Skills", href: "/#contenu" },
+  { label: "Prix", href: "/#prix" },
+] as const;
+
+export function navItemsFor(signedIn: boolean) {
+  return signedIn ? MEMBER_NAV : PUBLIC_NAV;
+}
 
 function tierLabel(tier: string | null | undefined) {
   const normalized = normalizeProfileTier(tier);
@@ -151,12 +161,13 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
   const openSearch = () => { setSearchOpen(true); void playAppSound("open"); };
   const isCurrent = (href: string) => pathname === href || (href === "/skills" && pathname.startsWith("/skills"));
   const signedIn = Boolean(displayEmail || displayName);
+  const navItems = navItemsFor(signedIn);
 
   return (
     <div className="da da-app nav-shell">
       <header className={`navbar${scrolled ? " solid" : ""}`}>
         <Link className="navbar__logo" href={signedIn ? "/dashboard" : "/"} aria-label="BUILD"><Image src="/da/logo-sombre.svg" alt="BUILD" width={112} height={28} priority /></Link>
-        <nav className="navbar__nav" aria-label="Principal">{NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</nav>
+        <nav className="navbar__nav" aria-label="Principal">{navItems.map((item) => <Link key={`${item.label}-${item.href}`} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</nav>
         <div className="navbar__r">
           {signedIn && <button className="navbar__ib" type="button" aria-label="Rechercher" data-sfx="none" onClick={openSearch}><DaIcon name="search" /></button>}
           {signedIn && <button className="navbar__ib" type="button" aria-label="Sons de l'interface" aria-pressed={enabled} data-sfx="none" onClick={() => { setEnabled(!enabled); void playAppSound("select"); }}><DaIcon name={enabled ? "volume" : "mute"} /></button>}
@@ -174,7 +185,7 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
         </div>
         <div className="amenu__l amenu__l--b"><form action="/api/signout" method="post"><button role="menuitem" type="submit"><DaIcon name="logout" />Se déconnecter</button></form></div>
       </div>}
-      {signedIn && <nav className="tabbar" aria-label="Navigation mobile">{NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}><DaIcon name={item.icon} /><span className="tabbar__label">{item.label}</span>{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen nav-unseen--mobile" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</nav>}
+      {signedIn && <nav className="tabbar" aria-label="Navigation mobile">{MEMBER_NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}><DaIcon name={item.icon} /><span className="tabbar__label">{item.label}</span>{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen nav-unseen--mobile" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</nav>}
       {signedIn && <SearchDialog open={searchOpen} onClose={closeSearch} />}
     </div>
   );
