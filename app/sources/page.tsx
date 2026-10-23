@@ -1,12 +1,11 @@
-import Link from "next/link";
 import {
-  ArrowLeft, ExternalLink, Search, Terminal, Database, BookOpen,
+  ExternalLink, Search, Terminal, Database, BookOpen,
   Video, PlaySquare, Briefcase, Code, Bot, Brain, Sparkles,
   Wand2, Pen, Smartphone, Palette, Box, GitBranch, Zap, Layers,
   CreditCard, Mail, Bug, BarChart2, FileText, LayoutList, Shield,
   BookMarked, Globe, Monitor, Plug,
 } from "lucide-react";
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
+import { Ui4Header, Ui4Shell, ui4Styles as styles } from "@/components/ui4/Ui4Shell";
 import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
 import { SourceCategoryFilter } from "./SourceCategoryFilter";
 
@@ -295,79 +294,49 @@ const SOURCES = [
 ];
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "La stack du builder | BUILD", robots: { index: false, follow: false } };
 
 export default async function SourcesPage() {
-  await requirePageAccess("beginner", "/sources");
+  const identity = await requirePageAccess("beginner", "/sources");
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1c1c1f] via-[#0e0e0f] to-[#0e0e0f] text-[#f0ede8] font-sans selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
-      {/* Navigation */}
-      <div className="pt-8 pl-8">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-2 text-white/50 hover:text-white/90 transition-colors text-sm font-medium"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Retour au dashboard
-        </Link>
-      </div>
-
-      {/* Header */}
-      <div className="mt-12 mb-12 px-6">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-center text-[#f0ede8]">
-          La Stack du Builder.
-        </h1>
-        <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-12">
-          Les outils et les cerveaux qui font tourner le système.
-        </p>
-
-      </div>
-
-      <SourceCategoryFilter
-        categories={CATEGORIES}
-        entries={SOURCES.map((source, index) => {
+    <Ui4Shell identity={identity} activeLink="sources">
+      <Ui4Header
+        eyebrow="Tes références"
+        title={<>La Stack du <span className="mot">Builder.</span></>}
+        lead="Les outils et les cerveaux qui font tourner le système."
+      />
+      <div className={styles.content}>
+        <SourceCategoryFilter
+          categories={CATEGORIES}
+          entries={SOURCES.map((source) => {
           const Icon = source.icon;
           const card = (
-                    <LiquidCard className="p-6 transition-all duration-500 flex flex-col justify-between h-full min-h-[200px]">
-                      {/* Glow background on hover */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
-
-                      {/* Top Section */}
-                      <div className="flex justify-between items-start relative z-10">
-                        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#e8d5b0] shadow-[0_4px_16px_rgba(0,0,0,0.2)] group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_16px_rgba(232,213,176,0.15)] transition-all duration-500">
-                          <Icon className="w-6 h-6 drop-shadow-[0_0_8px_rgba(232,213,176,0.5)]" strokeWidth={1.5} />
-                        </div>
-                        {source.url && (
-                          <ExternalLink className="w-5 h-5 text-white/20 group-hover:text-white/70 transition-colors duration-300" />
-                        )}
-                      </div>
-
-                      {/* Bottom Section */}
-                      <div className="mt-8 relative z-10">
-                        <h3 className="text-lg font-semibold text-[#f0ede8] mb-2 tracking-tight">
-                          {source.name}
-                        </h3>
-                        <p className="text-sm text-[rgba(240,237,232,0.65)] leading-relaxed line-clamp-2">
-                          {source.description}
-                        </p>
-                      </div>
-                    </LiquidCard>
+            <>
+              <span className={styles.sourceTop}>
+                <span className={styles.cardIcon}><Icon aria-hidden="true" /></span>
+                {source.url ? <ExternalLink aria-hidden="true" /> : null}
+              </span>
+              <span className={styles.sourceCopy}>
+                <h3>{source.name}</h3>
+                <p>{source.description}</p>
+              </span>
+            </>
           );
-          const className = "group animate-reveal h-full block";
-          const style = { animationDelay: `${index * 100}ms`, animationFillMode: "both" as const };
           return {
             id: source.id,
             category: source.type,
             content: source.url ? (
-              <a href={source.url} target="_blank" rel="noopener noreferrer" className={`${className} cursor-pointer`} style={style}>
+              <a href={source.url} target="_blank" rel="noopener noreferrer" className={styles.sourceCard}>
                 {card}
               </a>
             ) : (
-              <div className={className} style={style}>{card}</div>
+              <article className={styles.sourceCard}>{card}</article>
             ),
           };
         })}
-      />
-    </main>
+        />
+      </div>
+    </Ui4Shell>
   );
 }

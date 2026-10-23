@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import styles from "@/components/ui4/ui4.module.css";
+import { filterSourceEntries } from "./filter";
 
 type SourceEntry = {
   id: number;
@@ -16,35 +18,31 @@ export function SourceCategoryFilter({
   entries: SourceEntry[];
 }) {
   const [activeCategory, setActiveCategory] = useState(categories[0] ?? "");
-  const visibleEntries = entries.filter(
-    (entry) => activeCategory === categories[0] || entry.category === activeCategory,
-  );
+  const visibleEntries = filterSourceEntries(entries, activeCategory, categories[0] ?? "");
 
   return (
-    <>
-      <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+    <section className={styles.section} aria-label="Sources par catégorie">
+      <div className={styles.filterBar} role="group" aria-label="Filtrer les sources">
         {categories.map((category) => (
           <button
             type="button"
             key={category}
             onClick={() => setActiveCategory(category)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeCategory === category
-              ? "bg-[#e8d5b0] text-[#0e0e0f] shadow-[0_0_15px_rgba(232,213,176,0.4)]"
-              : "bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 hover:text-white/90"
-            }`}
+            className={styles.filterButton}
+            aria-pressed={activeCategory === category}
           >
             {category}
           </button>
         ))}
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 pb-24 mt-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {visibleEntries.length > 0 ? (
+        <div className={styles.sourceGrid} aria-live="polite">
           {visibleEntries.map((entry) => (
-            <div key={entry.id} className="h-full">{entry.content}</div>
+            <div key={entry.id}>{entry.content}</div>
           ))}
         </div>
-      </div>
-    </>
+      ) : <p className={styles.empty} role="status">Aucune source n’est disponible dans cette catégorie.</p>}
+    </section>
   );
 }

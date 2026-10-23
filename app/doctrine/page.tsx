@@ -1,8 +1,11 @@
 import "server-only";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { Ui4Shell, Ui4State, ui4Styles as styles } from "@/components/ui4/Ui4Shell";
 import { doctrineAccessStatus } from "@/lib/doctrine/access.server";
 import { readPublishedDoctrine } from "@/lib/doctrine/storage";
+import { navIdentity } from "@/lib/auth/navIdentity.server";
 import { DoctrineContent } from "./DoctrineContent";
 
 export const dynamic = "force-dynamic";
@@ -12,27 +15,23 @@ export const metadata = { title: "Doctrine agentique | BUILD", robots: { index: 
 export default async function DoctrinePage() {
   const status = await doctrineAccessStatus();
   if (status === 401) redirect("/login");
-  if (status !== 200) return <main className="mx-auto max-w-3xl px-6 py-12 text-white">
-    <Link href="/skills" className="underline">Retour aux skills</Link>
-    <h1 className="mt-8 text-3xl font-semibold">Doctrine agentique</h1>
-    <p className="mt-4">Cette bibliothèque est réservée au Coffre.</p>
-  </main>;
+  const identity = await navIdentity();
+  if (status !== 200) return <Ui4Shell identity={identity} activeLink="skills"><Ui4State title="Doctrine agentique" detail="Cette bibliothèque est réservée au Coffre." action={{ href: "/checkout", label: "Voir l’accès" }} /></Ui4Shell>;
   let files;
   try {
     files = await readPublishedDoctrine();
   } catch {
-    return <main className="mx-auto max-w-3xl px-6 py-12 text-white">
-      <Link href="/skills" className="underline">Retour aux skills</Link>
-      <h1 className="mt-8 text-3xl font-semibold">Doctrine momentanément indisponible</h1>
-      <p className="mt-4">Réessaie plus tard. Aucun contenu non vérifié ne sera affiché.</p>
-    </main>;
+    return <Ui4Shell identity={identity} activeLink="skills"><Ui4State title="Doctrine momentanément indisponible" detail="Réessaie plus tard. Aucun contenu non vérifié n’est affiché." action={{ href: "/skills", label: "Retour aux skills" }} /></Ui4Shell>;
   }
-  return <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8]">
-    <div className="mx-auto max-w-3xl px-6 py-12">
-      <Link href="/skills" className="text-sm underline underline-offset-4 focus-visible:outline-2">Retour aux skills</Link>
-      <h1 className="mt-8 text-3xl font-semibold">Doctrine agentique</h1>
-      <p className="mt-3 text-white/70">Le parcours de référence du Coffre, à lire dans l’ordre ou selon ton besoin.</p>
+  return <Ui4Shell identity={identity} activeLink="skills">
+    <div className={styles.doctrineWrap}>
+      <Link href="/skills" className={styles.backLink}><ArrowLeft aria-hidden="true" />Retour aux skills</Link>
+      <header className={styles.doctrineHead}>
+        <p className={styles.eyebrow}>Bibliothèque du Coffre</p>
+        <h1 className="t-1">Doctrine <span className="mot">agentique.</span></h1>
+        <p>Le parcours de référence du Coffre, à lire dans l’ordre ou selon ton besoin.</p>
+      </header>
       <DoctrineContent files={files} />
     </div>
-  </main>;
+  </Ui4Shell>;
 }

@@ -1,220 +1,113 @@
-import { Zap, Shield, Target, Brain, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { Logo } from "@/components/Logo";
+import { Brain, Shield, Target, Zap } from "lucide-react";
+import { Ui4Header, Ui4SectionHeading, Ui4Shell, ui4Styles as styles } from "@/components/ui4/Ui4Shell";
 import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
 
+const PHASES = [
+  {
+    number: "01",
+    title: "Les fondations",
+    label: "Comprendre et vendre",
+    blocs: "Blocs 1 et 2",
+    description: "Comprends le système. Clarifie l’offre. Trouve le besoin.",
+  },
+  {
+    number: "02",
+    title: "La construction",
+    label: "Passer à l’action",
+    blocs: "Blocs 3 et 4",
+    description: "Prépare. Construis. Mets en ligne.",
+  },
+  {
+    number: "03",
+    title: "L’amélioration",
+    label: "Garder ce qui marche",
+    blocs: "Blocs 5, 6 et 7",
+    description: "Choisis mieux. Réutilise. Itère.",
+  },
+];
+
 const MANIFESTO_POINTS = [
-  {
-    title: "La base.",
-    description: "Ce système est une base. Pas une fin en soi."
-  },
-  {
-    title: "Le focus.",
-    description: "La règle numéro un : le focus paie. La dispersion tue."
-  },
-  {
-    title: "L'avantage compétitif.",
-    description: "Le vrai avantage dans le business IA, c'est la curiosité et la profondeur."
-  }
+  { title: "La base", description: "Ce système est une base. Pas une fin en soi." },
+  { title: "Le focus", description: "La règle numéro un : le focus paie. La dispersion tue." },
+  { title: "L’avantage compétitif", description: "Le vrai avantage dans le business IA, c’est la curiosité et la profondeur." },
 ];
 
 const CORE_SKILLS = [
-  {
-    icon: Target,
-    title: "L'exécution",
-    description: "L'idée ne vaut rien. Seule l'exécution compte. Déployer vite et itérer."
-  },
-  {
-    icon: Brain,
-    title: "La curiosité",
-    description: "Comprendre les modèles, tester les limites, chercher l'optimisation en continu."
-  },
-  {
-    icon: Shield,
-    title: "La résilience",
-    description: "Accepter l'échec comme une donnée. Corriger le tir et recommencer sans relâche."
-  },
-  {
-    icon: Zap,
-    title: "La vélocité",
-    description: "Livrer vite, mesurer, corriger. La vitesse est votre meilleure arme."
-  }
+  { icon: Target, title: "L’exécution", description: "L’idée ne vaut rien. Seule l’exécution compte. Déploie vite et itère." },
+  { icon: Brain, title: "La curiosité", description: "Comprends les modèles, teste les limites et cherche l’optimisation en continu." },
+  { icon: Shield, title: "La résilience", description: "Accepte l’échec comme une donnée. Corrige le tir et recommence sans relâche." },
+  { icon: Zap, title: "La vélocité", description: "Livre vite, mesure et corrige. La vitesse est ton meilleur levier." },
 ];
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Avant de commencer | BUILD", robots: { index: false, follow: false } };
 
 export default async function IntroPage() {
-  await requirePageAccess("full", "/intro");
+  const identity = await requirePageAccess("full", "/intro");
 
   return (
-    <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] font-sans relative selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0] overflow-hidden">
-      {/* Background Halos - Web3 Vibe */}
-      <div className="fixed top-[-10%] left-[-10%] bg-[#e8d5b0] opacity-[0.03] blur-[150px] w-[800px] h-[800px] rounded-full pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[-10%] bg-blue-500 opacity-[0.03] blur-[150px] w-[600px] h-[600px] rounded-full pointer-events-none" />
-      
-      {/* Grid Pattern */}
-      <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-[0.02] pointer-events-none" />
-
-      <div className="absolute top-8 left-6 md:left-12 z-50">
-        <Logo layout="horizontal" />
+    <Ui4Shell identity={identity}>
+      <div className={`${styles.content} ${styles.introOpening}`}>
+        <section className={styles.section} aria-labelledby="intro-phases">
+          <Ui4SectionHeading
+            eyebrow="Le Protocole Zéro"
+            id="intro-phases"
+            title="Tu es sur quelle phase ?"
+            lead="Les blocs BUILD correspondent à chaque étape du chemin."
+          />
+          <div className={styles.rowList}>
+            {PHASES.map((phase) => (
+              <article className={styles.row} key={phase.number}>
+                <span className={styles.rowNumber}>{phase.number}</span>
+                <div className={styles.rowBody}>
+                  <h3>{phase.title}</h3>
+                  <p>{phase.label}. {phase.description} {phase.blocs}.</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-12 py-16 md:py-24 relative z-10">
+      <Ui4Header
+        eyebrow="Le Protocole Zéro"
+        title={<>Avant de <span className="mot">commencer.</span></>}
+        lead="Ce système a été construit à partir d’une pratique réelle, des projets livrés, des erreurs corrigées. Tout ce qui est ici est actionnable."
+      />
 
-        {/* Protocole Zéro, carte d'orientation */}
-        <section className="mb-24 pt-4">
-          <div className="flex flex-col gap-6 animate-reveal">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-2">Le Protocole Zéro</p>
-              <h2 className="text-2xl font-medium tracking-tight text-[#f0ede8]">Tu es sur quelle phase ?</h2>
-              <p className="text-white/40 text-sm mt-1">Les blocs Build correspondent à chaque étape du chemin.</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {[
-                {
-                  num: "01",
-                  titre: "Les fondations",
-                  label: "Comprendre et vendre",
-                  blocs: "Blocs 1 et 2",
-                  desc: "Comprends le système. Clarifie l'offre. Trouve le besoin.",
-                },
-                {
-                  num: "02",
-                  titre: "La construction",
-                  label: "Passer à l'action",
-                  blocs: "Blocs 3 et 4",
-                  desc: "Prépare. Construis. Mets en ligne.",
-                },
-                {
-                  num: "03",
-                  titre: "L'amélioration",
-                  label: "Garder ce qui marche",
-                  blocs: "Blocs 5, 6 et 7",
-                  desc: "Choisis mieux. Réutilise. Itère.",
-                },
-              ].map((phase) => (
-                <LiquidCard key={phase.num} className="p-5">
-                  <div className="flex items-start gap-3 mb-3">
-                    <span className="text-[#e8d5b0]/30 font-mono font-bold text-base flex-shrink-0">{phase.num}</span>
-                    <div>
-                      <p className="text-[#f0ede8] font-semibold text-sm">{phase.titre}</p>
-                      <p className="text-[#e8d5b0] text-xs opacity-60">{phase.label}</p>
-                    </div>
-                  </div>
-                  <p className="text-white/40 text-xs leading-relaxed mb-3">{phase.desc}</p>
-                  <div className="inline-flex items-center gap-1.5 bg-[#e8d5b0]/8 border border-[#e8d5b0]/15 rounded-full px-2.5 py-1">
-                    <span className="text-[10px] text-[#e8d5b0] font-medium">{phase.blocs}</span>
-                  </div>
-                </LiquidCard>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Hero Section */}
-        <section className="min-h-[60vh] flex flex-col justify-center mb-24">
-          <div className="animate-reveal">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-[#f0ede8] to-white/40 leading-[1.05]">
-              Avant de commencer.
-            </h1>
-
-            <p className="text-xl md:text-2xl text-white/50 max-w-3xl leading-relaxed font-light">
-              Ce système a été construit à partir d&apos;une pratique réelle, des projets livrés, des erreurs corrigées. Tout ce qui est ici est actionnable.
-            </p>
-          </div>
-        </section>
-
-        {/* Manifesto Section */}
-        <section className="py-24 border-t border-white/10">
-          <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
-            <div className="lg:w-1/3 animate-reveal">
-              <h2 className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-4 sticky top-32">
-                Les règles du jeu
-              </h2>
-              <p className="text-3xl font-medium tracking-tight leading-snug sticky top-44">
-                Construire pour durer, déployer pour itérer.
-              </p>
-            </div>
-            
-            <div className="lg:w-2/3 space-y-16">
-              {MANIFESTO_POINTS.map((point, index) => (
-                <div
-                  key={index}
-                  className="space-y-4 animate-reveal"
-                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: "both" }}
-                >
-                  <h3 className="text-2xl md:text-3xl font-medium tracking-tight text-[#f0ede8]">{point.title}</h3>
-                  <p className="text-lg text-white/50 leading-relaxed">
-                    {point.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Core Principles Grid */}
-        <section className="py-24">
-          <div className="mb-16 animate-reveal">
-            <h2 className="text-[11px] uppercase tracking-[0.2em] text-[#e8d5b0] font-semibold mb-4">
-              Mindset
-            </h2>
-            <p className="text-3xl font-medium tracking-tight leading-snug">
-              L'état d'esprit pour réussir.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {CORE_SKILLS.map(({ icon: Icon, title, description }, index) => (
-              <div
-                key={index}
-                className="animate-reveal"
-                style={{ animationDelay: `${index * 100}ms`, animationFillMode: "both" }}
-              >
-                <LiquidCard className="p-8 group hover:bg-white/[0.04] transition-colors duration-500 h-full">
-                  <div className="w-12 h-12 mb-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center group-hover:border-[#e8d5b0]/30 group-hover:shadow-[0_0_20px_rgba(232,213,176,0.1)] transition-all duration-500">
-                    <Icon className="w-5 h-5 text-[#e8d5b0]" />
-                  </div>
-                  <h4 className="text-xl font-medium mb-3 text-[#f0ede8]">{title}</h4>
-                  <p className="text-white/50 leading-relaxed text-sm">
-                    {description}
-                  </p>
-                </LiquidCard>
-              </div>
+      <div className={styles.content}>
+        <section className={styles.section} aria-labelledby="intro-rules">
+          <Ui4SectionHeading eyebrow="Les règles du jeu" id="intro-rules" title="Construire pour durer, déployer pour itérer." />
+          <div className={styles.rowList}>
+            {MANIFESTO_POINTS.map((point, index) => (
+              <article className={styles.row} key={point.title}>
+                <span className={styles.rowNumber}>{String(index + 1).padStart(2, "0")}</span>
+                <div className={styles.rowBody}><h3>{point.title}</h3><p>{point.description}</p></div>
+              </article>
             ))}
           </div>
         </section>
 
-        {/* Call to Action */}
-        <section className="py-24">
-          <div className="animate-reveal">
-            <Link href="/dashboard" className="block group">
-            <LiquidCard className="p-8 sm:p-12 md:p-20 flex flex-col items-center text-center relative overflow-hidden cursor-pointer">
-              
-              <div className="relative z-10 max-w-2xl mx-auto">
-                <div className="w-16 h-16 mx-auto mb-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  <TrendingUp className="w-8 h-8 text-[#e8d5b0]" />
-                </div>
-                
-                <h2 className="text-3xl md:text-5xl font-semibold tracking-tight mb-6 text-[#f0ede8]">
-                  Ta progression globale.
-                </h2>
-                <p className="text-xl text-white/50 mb-12 font-light">
-                  Coche chaque bloc au fur et à mesure que tu avances. Sois honnête avec toi-même, cocher sans avoir appliqué ne sert à rien.
-                </p>
-                
-                <LiquidButton size="xl" className="whitespace-nowrap px-8 group-hover:scale-105 transition-transform duration-500 shadow-[0_0_20px_rgba(232,213,176,0.1)] hover:shadow-[0_0_30px_rgba(232,213,176,0.2)]">
-                  Accéder au dashboard
-                </LiquidButton>
-              </div>
-            </LiquidCard>
-            </Link>
+        <section className={styles.section} aria-labelledby="intro-mindset">
+          <Ui4SectionHeading eyebrow="Mindset" id="intro-mindset" title="L’état d’esprit pour réussir." />
+          <div className={styles.cardGrid}>
+            {CORE_SKILLS.map(({ icon: Icon, title, description }) => (
+              <article className={styles.card} key={title}>
+                <span className={styles.cardIcon}><Icon aria-hidden="true" /></span>
+                <h3>{title}</h3>
+                <p>{description}</p>
+              </article>
+            ))}
           </div>
         </section>
 
+        <section className={styles.cta} aria-labelledby="intro-progress">
+          <h2 className="t-2" id="intro-progress">Ta progression globale.</h2>
+          <p>Coche chaque bloc au fur et à mesure que tu avances. Sois honnête avec toi-même : cocher sans avoir appliqué ne sert à rien.</p>
+          <Link className="btn btn--p" href="/dashboard">Accéder au dashboard</Link>
+        </section>
       </div>
-    </main>
+    </Ui4Shell>
   );
 }
