@@ -23,9 +23,9 @@ export function KitFrame({ title, description, ariaLabel, accent = "#22d96e", ki
     role="img"
     aria-label={ariaLabel}
     style={style}
-    initial={{ opacity: 0, y: 12, scale: .985 }}
+    initial={{ opacity: 1, y: 12, scale: .985 }}
     whileInView={{ opacity: 1, y: 0, scale: 1 }}
-    viewport={{ once: true, amount: .16 }}
+    viewport={{ once: true, amount: .15 }}
     transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 158, damping: 25, mass: 1 }}
   >
     <figcaption className={styles.frameHeader}>

@@ -51,7 +51,7 @@ export type CourseVisualDefinition = {
 
 const EMERALD = "#22d96e";
 
-function labelsFor(definition: CourseVisualDefinition, minimum = 4): string[] {
+function labelsFor(definition: CourseVisualDefinition, minimum = 1): string[] {
   const labels = [...definition.labels];
   while (labels.length < minimum) labels.push(labels.at(-1) ?? definition.title);
   return labels;
@@ -106,7 +106,7 @@ function CourseVisual({ course, definition }: { course: string; definition: Cour
       visual = <Fork {...frame} situation={labels[0]} outcomes={labels.slice(1).map((label, index) => ({ label, condition: "", recommended: index + 1 === accentIndex, rejected: index === labels.length - 2 && accentIndex !== labels.length - 1 }))} />;
       break;
     case "funnel":
-      visual = <Funnel {...frame} stages={labels.slice(0, 6).map((label, index) => ({ label, value: Math.max(18, 100 - index * 17), valueLabel: label }))} leakIndex={Math.min(accentIndex, Math.min(labels.length, 6) - 1)} leakLabel={labels[accentIndex]} tool={tools[0]} />;
+      visual = <Funnel {...frame} stages={labels.slice(0, 6).map((label, index) => ({ label, value: Math.max(18, 100 - index * 17), valueLabel: "" }))} leakIndex={Math.min(accentIndex, Math.min(labels.length, 6) - 1)} leakLabel={labels[accentIndex]} tool={tools[0]} />;
       break;
     case "ladder":
       visual = <Ladder {...frame} rungs={labels.slice(0, 6).map((label) => ({ label, detail: "" }))} accentIndex={Math.min(accentIndex, 5)} lowLabel={labels[0]} highLabel={labels.at(-1)} />;
@@ -122,7 +122,7 @@ function CourseVisual({ course, definition }: { course: string; definition: Cour
       break;
     case "tool-map": {
       const toolNames = tools.length ? tools : labels.slice(0, 6);
-      const groups = toolNames.slice(0, 4).map((name, index) => ({ role: labels[index] ?? labels[accentIndex], tools: [{ name, description: labels[index + 1] ?? labels[accentIndex] }] }));
+      const groups = toolNames.slice(0, 4).map((name, index) => ({ role: labels[index] ?? labels[accentIndex], tools: [{ name, description: labels[index] ?? labels[accentIndex] }] }));
       visual = <ToolMap {...frame} groups={groups} accentGroup={Math.min(accentIndex, groups.length - 1)} />;
       break;
     }

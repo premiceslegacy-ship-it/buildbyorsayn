@@ -14,11 +14,20 @@ export type RingsProps = KitBaseProps & {
 };
 
 export function Rings({ core, rings, accentIndex, ...frame }: RingsProps) {
+  const ringStep = rings.length > 1 ? Math.min(84, 252 / (rings.length - 1)) : 0;
+
   return <KitFrame {...frame} kind="rings">
     <div className={styles.ringsWide}>
       {rings.slice().reverse().map((ring, reverseIndex) => {
         const index = rings.length - reverseIndex - 1;
-        return <div className={`${styles.ring} ${index === accentIndex ? styles.isAccent : ""}`} style={{ "--kit-ring": reverseIndex } as React.CSSProperties} key={ring.label}><span>{ring.label}</span></div>;
+        return <div
+          className={`${styles.ring} ${index === accentIndex ? styles.isAccent : ""}`}
+          style={{
+            "--kit-ring-depth": reverseIndex,
+            "--kit-ring-size": `${350 - reverseIndex * ringStep}px`,
+          } as React.CSSProperties}
+          key={ring.label}
+        ><span>{ring.label}</span></div>;
       })}
       <strong className={styles.ringCore}>{core}</strong>
     </div>
@@ -28,4 +37,3 @@ export function Rings({ core, rings, accentIndex, ...frame }: RingsProps) {
     </div>
   </KitFrame>;
 }
-

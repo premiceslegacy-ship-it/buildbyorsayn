@@ -29,14 +29,14 @@ export type FoundationIntroductionId = keyof typeof INTRODUCTION_FILES;
 const cache = new Map<string, string>();
 
 function readMarkdown(fileName: string): string {
-  const cached = cache.get(fileName);
+  const cached = process.env.NODE_ENV === "development" ? undefined : cache.get(fileName);
   if (cached !== undefined) return cached;
 
   const content = readFileSync(path.join(CONTENT_ROOT, fileName), "utf8")
     .replaceAll("{COFFRE_LABEL}", COFFRE_LABEL)
     .replaceAll("{COFFRE_PRICE}", formatEuro(COFFRE_PRICE))
     .replaceAll("{UPGRADE_PRICE}", formatEuro(UPGRADE_PRICE));
-  cache.set(fileName, content);
+  if (process.env.NODE_ENV !== "development") cache.set(fileName, content);
   return content;
 }
 

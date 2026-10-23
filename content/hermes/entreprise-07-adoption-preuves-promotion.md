@@ -30,7 +30,7 @@ Pense à un permis de conduire. Tu ne commences pas sur l'autoroute, de nuit, av
 
 ## Mesure le résultat complet
 
-Compte les dossiers acceptés, les corrections, les oublis, le temps humain et le coût total. Note aussi combien de fois quelqu'un a dû reprendre après une coupure.
+Compte les dossiers acceptés, les corrections et les oublis. Ajoute le temps humain et le coût total. Note aussi combien de fois quelqu'un a dû reprendre après une coupure.
 
 Une réponse rapide ne vaut rien si elle demande vingt minutes de correction.
 

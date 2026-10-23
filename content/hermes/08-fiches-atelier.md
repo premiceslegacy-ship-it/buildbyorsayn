@@ -116,7 +116,7 @@ Une valeur critique manque ? Écris `A_RENSEIGNER` et garde le pilote éteint.
 
 ## Termine par un compte rendu de passage
 
-Écris ce qui a été fait, ce qui a été vérifié, les objets touchés, les accords reçus, les doutes restants et la prochaine action.
+Écris ce qui a été fait et ce qui a été vérifié. Note les objets touchés, les accords reçus, les doutes restants et la prochaine action.
 
 Ne recopie pas tous les journaux. Donne seulement ce qui permet de reprendre sans refaire ni doubler une action.
 

@@ -14,7 +14,7 @@ import { ANGLE_MORT, SECTIONS, type BeginnerSectionId } from "@/app/beginner/sec
 import { CHAPTER_META, chapterSlug } from "@/app/videos/tutos/chapters";
 import { DevReaderScroll } from "./DevReaderScroll";
 
-type Query = { cours?: string | string[]; id?: string | string[]; nom?: string | string[]; scroll?: string | string[] };
+type Query = { cours?: string | string[]; id?: string | string[]; nom?: string | string[]; scroll?: string | string[]; sommaire?: string | string[] };
 
 /** Lecteur réel, sans garde d'accès, disponible uniquement sur le serveur de développement. */
 export default async function DevReaderPage({ searchParams }: { searchParams: Promise<Query> }) {
@@ -25,6 +25,7 @@ export default async function DevReaderPage({ searchParams }: { searchParams: Pr
   const requestedId = typeof query.id === "string" ? query.id : "mindset";
   const requestedScroll = typeof query.scroll === "string" ? Number(query.scroll) : 0;
   const scrollTop = Number.isFinite(requestedScroll) ? Math.max(0, requestedScroll) : 0;
+  const initialOutlineOpen = query.sommaire === "ouvert" ? true : query.sommaire === "ferme" ? false : undefined;
 
   if (course === "protocole" || course === "intro" || course === "doctrine") {
     const catalog = course === "protocole"
@@ -50,6 +51,7 @@ export default async function DevReaderPage({ searchParams }: { searchParams: Pr
         }]}
         initialMode="texte"
         initialChapter={requestedVisual.chapter}
+        initialOutlineOpen={initialOutlineOpen}
         syncAddress={false}
       />
     </DaRoot>;
@@ -85,6 +87,7 @@ export default async function DevReaderPage({ searchParams }: { searchParams: Pr
         sections={sections}
         initialMode="texte"
         initialChapter={chapterId}
+        initialOutlineOpen={initialOutlineOpen}
         syncAddress={false}
       />
     </DaRoot>;
@@ -119,6 +122,7 @@ export default async function DevReaderPage({ searchParams }: { searchParams: Pr
         sections={sections}
         initialMode="texte"
         initialChapter={selected.id}
+        initialOutlineOpen={initialOutlineOpen}
         syncAddress={false}
       />
     </DaRoot>;
@@ -141,6 +145,7 @@ export default async function DevReaderPage({ searchParams }: { searchParams: Pr
         sections={[{ id: introductionId, number: "0", title, markdown: foundationIntroductionMarkdown(introductionId) }]}
         initialMode="texte"
         initialChapter={introductionId}
+        initialOutlineOpen={initialOutlineOpen}
         syncAddress={false}
       />
     </DaRoot>;
@@ -167,6 +172,7 @@ export default async function DevReaderPage({ searchParams }: { searchParams: Pr
       sections={sections}
       initialMode="texte"
       initialChapter={selected.id}
+      initialOutlineOpen={initialOutlineOpen}
       showUpcomingVideo
       syncAddress={false}
     />

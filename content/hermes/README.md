@@ -43,7 +43,7 @@ Recharge ton terminal. Lance ensuite ces commandes, dans cet ordre :
 ```bash
 hermes --version
 hermes doctor
-hermes status --full
+hermes status --all
 ```
 
 La première confirme la version installée. La deuxième cherche les problèmes de configuration. La troisième affiche l'état complet sans montrer les clés en clair.

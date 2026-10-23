@@ -28,7 +28,7 @@ Pense à un GPS. Il a besoin de la destination. Il n'a pas besoin de connaître 
 
 ## Mets le CRM au service de la prochaine action
 
-Une fiche utile répond à cinq questions : qui est la personne, que veut-elle, qu'est-ce qui manque, qui reprend et quand.
+Une fiche utile répond à cinq questions. Qui est la personne ? Que veut-elle ? Qu'est-ce qui manque ? Qui reprend, et quand ?
 
 L'agent peut préparer cette fiche depuis Gmail ou WhatsApp. Le CRM garde ensuite l'état commercial. La messagerie garde l'échange d'origine.
 

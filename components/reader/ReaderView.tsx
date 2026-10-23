@@ -57,6 +57,7 @@ type ReaderViewProps = {
   completedIds?: readonly string[];
   initialMode?: ReaderMode | null;
   initialChapter?: string | null;
+  initialOutlineOpen?: boolean;
   toolbarTitle?: string;
   showUpcomingVideo?: boolean;
   syncAddress?: boolean;
@@ -164,6 +165,7 @@ export function ReaderView({
   completedIds = [],
   initialMode = null,
   initialChapter,
+  initialOutlineOpen,
   toolbarTitle = title,
   showUpcomingVideo = false,
   syncAddress = true,
@@ -190,7 +192,7 @@ export function ReaderView({
   const [readProgress, setReadProgress] = useState(0);
   const [readingMinutes, setReadingMinutes] = useState(0);
   const [ended, setEnded] = useState(false);
-  const [outlineOpen, setOutlineOpen] = useState(false);
+  const [outlineOpen, setOutlineOpen] = useState(initialOutlineOpen ?? false);
   const root = useRef<HTMLDivElement>(null);
   const article = useRef<HTMLElement>(null);
   const copyButton = useRef<HTMLButtonElement>(null);
@@ -228,12 +230,13 @@ export function ReaderView({
   }, [hasVideoMode, sectionIdsKey]);
 
   useEffect(() => {
+    if (initialOutlineOpen !== undefined) return;
     const stored = window.localStorage.getItem(READER_OUTLINE_STORAGE_KEY);
     const frame = window.requestAnimationFrame(() => {
-      setOutlineOpen(stored === null ? window.matchMedia("(min-width: 1280px)").matches : stored === "1");
+      setOutlineOpen(stored === "1");
     });
     return () => window.cancelAnimationFrame(frame);
-  }, []);
+  }, [initialOutlineOpen]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("r2-reader-open", mode === "texte");

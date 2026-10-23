@@ -165,11 +165,17 @@ test("le style du lecteur garde les marges mobiles et n'ajoute aucune bande lat�
 
 test("le texte riche garde un rythme lisible et borne ses visuels dans la voie disponible", () => {
   const css = read("components/reader/reader.module.css");
+  const view = read("components/reader/ReaderView.tsx");
   assert.match(css, /\.prose > p \+ p \{\s*margin-top: \.95em !important;/);
   assert.match(css, /\.prose h2 \{[\s\S]*?font-size: calc\(28px \* var\(--reader-font-scale\)\) !important;[\s\S]*?font-weight: 600 !important;/);
   assert.match(css, /@media \(max-width: 734px\)[\s\S]*?\.prose h2 \{[\s\S]*?font-size: calc\(22px \* var\(--reader-font-scale\)\) !important;/);
   assert.match(css, /\.textLayout\[data-outline-open="true"\] \{\s*--reader-wide-width: min\(960px,/);
+  assert.match(css, /\.textLayout\[data-outline-open="false"\] \.article \{\s*grid-column: 1 \/ -1;\s*justify-self: center;/);
+  assert.match(css, /\.textLayout\[data-outline-open="true"\] \.article \{\s*grid-column: 2;\s*justify-self: center;/);
   assert.match(css, /\.textLayout \{\s*--reader-wide-width: calc\(100vw - 40px\);\s*width: auto;/);
+  assert.match(view, /useState\(initialOutlineOpen \?\? false\)/);
+  assert.match(view, /initialOutlineOpen !== undefined\) return;/);
+  assert.match(view, /setOutlineOpen\(stored === "1"\)/);
   assert.match(css, /\.codeBlock pre \{\s*padding-top: 64px;/);
   assert.match(css, /box-decoration-break: clone/);
   assert.match(css, /-webkit-box-decoration-break: clone/);
@@ -181,6 +187,8 @@ test("la route de contrôle du lecteur reste locale au développement et charge 
   assert.match(page, /foundationMarkdown\(chapter\.id as BeginnerSectionId\)/);
   assert.match(page, /initialMode="texte"/);
   assert.match(page, /syncAddress=\{false\}/);
+  assert.match(page, /query\.sommaire === "ouvert"/);
+  assert.match(page, /initialOutlineOpen=\{initialOutlineOpen\}/);
 });
 
 test("la ligne active garde exactement la grille et les métriques des autres chapitres", () => {

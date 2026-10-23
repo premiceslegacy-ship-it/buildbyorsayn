@@ -12,7 +12,7 @@ Tu n'as pas un problème d'IA. Tu as trop de copies sans propriétaire.
 
 ## Tu vas choisir une maison pour chaque information
 
-À la fin, tu sauras où garder un fait vivant, une règle, un document, un échange et un index de recherche.
+À la fin, tu sauras où garder un fait vivant, une règle et un document. Tu sauras aussi où placer un échange et un index de recherche.
 
 [[schema:DataFormatsDiagram]]
 

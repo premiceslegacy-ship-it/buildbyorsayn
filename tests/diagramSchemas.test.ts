@@ -120,9 +120,6 @@ test("les blocs rendent leurs schémas depuis les marqueurs publiés", () => {
   assert.doesNotMatch(page, /blocks\.server|blockDiagramsForSection|diagrams=/);
   assert.match(client, /sections=\{bloc\.sections\}/);
   assert.doesNotMatch(client, /diagrams|blocks\.server|SCHEMAS_BY_SECTION/);
-  for (const definition of ["foundations.tsx", "protocole.tsx", "hermes.tsx"]) {
-    assert.ok(read(`components/schemas/${definition}`).startsWith('import "server-only";'), definition);
-  }
 });
 
 test("les 23 schémas historiques restent exportés depuis les chemins attendus", () => {

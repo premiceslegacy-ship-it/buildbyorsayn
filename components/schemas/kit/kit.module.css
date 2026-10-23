@@ -914,6 +914,7 @@
 
 /* Tool map */
 .toolMap { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.toolMap:has(> section:nth-child(4):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .toolMap > section { min-width: 0; overflow: hidden; border-radius: 18px; background: rgba(241,245,242,.035); box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
 .toolMap h4 { margin: 0; padding: 16px 16px 12px; color: var(--kit-copy); font: 600 14px/1.2 var(--font, sans-serif); }
 .toolMap section.isAccent h4 { color: var(--kit-em); }
@@ -943,7 +944,7 @@
 
 /* Rings */
 .ringsWide { min-height: 370px; position: relative; display: grid; place-items: center; }
-.ring { --kit-ring: 0; width: calc(350px - var(--kit-ring) * 84px); height: calc(350px - var(--kit-ring) * 84px); position: absolute; display: flex; align-items: flex-start; justify-content: center; padding-top: 17px; border: 1px solid rgba(241,245,242,.19); border-radius: 50%; background: color-mix(in srgb, #252a27 calc(13% + var(--kit-ring) * 5%), transparent); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+.ring { width: var(--kit-ring-size); height: var(--kit-ring-size); position: absolute; display: flex; align-items: flex-start; justify-content: center; padding-top: 17px; border: 1px solid rgba(241,245,242,.19); border-radius: 50%; background: color-mix(in srgb, #252a27 calc(13% + var(--kit-ring-depth) * 5%), transparent); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
 .ring > span { max-width: 140px; padding: 4px 9px; border-radius: 8px; background: #1c201e; color: var(--kit-copy); font: 600 13px/1.2 var(--font, sans-serif); text-align: center; }
 .ring.isAccent { border-color: var(--kit-em); box-shadow: 0 0 30px color-mix(in srgb, var(--kit-em) 8%, transparent), inset 0 1px 0 color-mix(in srgb, var(--kit-em) 38%, transparent); }
 .ring.isAccent > span { color: var(--kit-em); }
@@ -1062,7 +1063,8 @@
   .cycleCompact li.isAccent > span { background: var(--kit-em); color: #07110b; }
   .cycleCompact li.isAccent strong { color: var(--kit-em); }
 
-  .toolMap { grid-template-columns: minmax(0, 1fr); }
+  .toolMap,
+  .toolMap:has(> section:nth-child(4):last-child) { grid-template-columns: minmax(0, 1fr); }
   .toolMap li { min-height: 68px; }
 
   .fork { gap: 28px; }

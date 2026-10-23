@@ -27,6 +27,16 @@ test("les surfaces animées sont déjà dans leur état final en mouvement rédu
   assert.match(revealCss, /prefers-reduced-motion: reduce[\s\S]*?opacity: 1 !important;[\s\S]*?transform: none !important;/);
 });
 
+test("les révélations restent visibles si l'observation de la fenêtre ne se déclenche pas", () => {
+  const frame = read("components/schemas/kit/KitFrame.tsx");
+  const reveal = read("components/ui/section-reveal.tsx");
+
+  assert.match(frame, /initial=\{\{ opacity: 1, y: 12, scale: \.985 \}\}/);
+  assert.match(frame, /viewport=\{\{ once: true, amount: \.15 \}\}/);
+  assert.match(reveal, /initial=\{\{ opacity: 1, y: 16 \}\}/);
+  assert.match(reveal, /viewport=\{\{ once: true, amount: 0\.15 \}\}/);
+});
+
 test("l'accent du kit reste une propriété stable du premier rendu", () => {
   const frame = read("components/schemas/kit/KitFrame.tsx");
 
