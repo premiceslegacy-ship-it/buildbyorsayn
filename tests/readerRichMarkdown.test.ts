@@ -171,7 +171,7 @@ Pourquoi : Le résultat est visible.
   assert.doesNotMatch(html, /<del>/);
   assert.match(html, /Plaquiste/);
   assert.match(html, /data-schema-container="true"/);
-  assert.match(html, /data-reader-mockup="true"/);
+  assert.match(html, /data-kit-schema="site-mockup"/);
   assert.match(html, /<blockquote>Une citation sans bande\.<\/blockquote>/);
 });
 

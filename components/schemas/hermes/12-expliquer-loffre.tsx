@@ -28,8 +28,14 @@ export function OffreCRMAvantApresMockup() {
     accent={EM}
     beforeTitle="Avant"
     afterTitle="Après"
-    before={{ nav: "Qualif.IA", heading: "Agent IA de qualification commerciale", subtitle: "Automatise et gagne du temps.", button: "En savoir plus", imageLabel: "Logo robot" }}
-    after={{ nav: "Suivi prospects", heading: "Chaque nouveau prospect reçoit une fiche claire", subtitle: "Tu vois son besoin, les pièces manquantes et la prochaine question.", button: "Voir une fiche type", imageLabel: "Fiche prospect" }}
+    before={{ nav: "Qualif.IA", heading: "Agent IA de qualification commerciale", subtitle: "Automatise et gagne du temps.", button: "En savoir plus" }}
+    after={{ nav: "Suivi prospects", heading: "Chaque nouveau prospect reçoit une fiche claire", subtitle: "Tu vois son besoin, les pièces manquantes et la prochaine question.", button: "Voir une fiche type", screen: { title: "Fiche prospect", rows: [{ left: "Besoin", right: "Cuisine à rénover", state: "ok" }, { left: "Pièces manquantes", right: "Plan, photos", state: "warn" }, { left: "Prochaine question", right: "Quel budget ?", state: "todo" }] } }}
+    afterNotes={[
+      { pin: 1, role: "Un titre qui se filme", why: "On peut voir la scène : un prospect arrive et reçoit une fiche.", alt: "Une date : chaque lundi, les nouveaux prospects." },
+      { pin: 2, role: "Ce que le prospect reçoit", why: "Le besoin, les pièces manquantes et la prochaine question : trois choses concrètes.", alt: "Un exemple de fiche rempli." },
+      { pin: 3, role: "Un bouton qui montre", why: "Voir une fiche type : on regarde avant de s'engager.", alt: "Un essai sur un dossier fictif." },
+      { pin: 4, role: "La fiche elle-même", why: "Le livrable est affiché tel qu'il sera reçu, avec de vraies lignes.", alt: "Une courte vidéo de la fiche qui se remplit." },
+    ]}
   />;
 }
 

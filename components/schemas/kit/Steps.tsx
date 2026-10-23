@@ -21,7 +21,7 @@ export function Steps({ items, accentIndex, legend, ...frame }: StepsProps) {
     {...frame}
     kind="steps"
     legend={legend}
-    keys={accent ? [{ swatch: "accent", label: "En vert : l'étape sur laquelle ce passage insiste" }] : undefined}
+    keys={accent ? [{ swatch: "accent", label: "En vert : l'étape sur laquelle ce passage insiste" }] : undefined}
   >
     <ol className={styles.track} data-count={items.length}>
       {items.map((item, index) => <li className={index === accentIndex ? styles.isAccent : undefined} key={`${item.label}-${index}`}>

@@ -70,18 +70,18 @@ export function PageRenovationAnnoteeDiagram() {
       url: "renovation-grenoble.fr",
       nav: "Rénovation Grenoble",
       eyebrow: "Grenoble et alentours",
-      heading: "Rénove ta maison sans chercher cinq artisans",
-      subtitle: "Un seul interlocuteur pour préparer et suivre ton chantier.",
+      heading: "Rénove à Grenoble sans chercher cinq artisans",
+      subtitle: "Un seul interlocuteur du devis à la réception, avec un devis détaillé sous 5 jours.",
       button: "Décrire mon chantier",
-      imageLabel: "Chantier avant et après",
+      photo: "piece",
       proofs: ["Cuisine", "Salle de bain", "Maison entière"],
       offer: "Le déroulé en quatre étapes",
     }}
     annotations={[
-      { number: 1, target: "heading", label: "La zone et le type de chantier" },
-      { number: 2, target: "image", label: "Des réalisations autorisées" },
-      { number: 3, target: "offer", label: "Le déroulé avant les questions" },
-      { number: 4, target: "button", label: "Un formulaire court, utile au rappel" },
+      { number: 1, target: "heading", label: "La zone et le type de chantier", why: "On voit tout de suite si la page parle de soi : la zone et le chantier sont dans le titre.", alt: "Le délai moyen d'un chantier." },
+      { number: 2, target: "image", label: "Des réalisations autorisées", why: "Des photos de chantiers que les clients ont acceptées : la preuve se voit avant toute parole.", alt: "Un curseur avant et après." },
+      { number: 3, target: "offer", label: "Le déroulé avant les questions", why: "Le déroulé répond à « et ensuite ? » avant que la question ne bloque le clic.", alt: "Une frise en quatre pastilles." },
+      { number: 4, target: "button", label: "Un formulaire court, utile au rappel", why: "Juste de quoi te rappeler et préparer le rendez-vous : le reste vient à l'appel.", alt: "Un numéro de téléphone pour ceux qui préfèrent appeler." },
     ]}
   />;
 }

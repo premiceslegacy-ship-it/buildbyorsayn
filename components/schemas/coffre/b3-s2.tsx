@@ -47,10 +47,10 @@ export function QuestionsDansLaPageDiagram() {
     accent={EM}
     accentIndex={3}
     items={[
-      { label: "Pour moi ?", detail: "Le titre nomme son cas" },
-      { label: "Crédible ?", detail: "Un chantier réel montré" },
-      { label: "Comment ?", detail: "Le déroulé en étapes" },
-      { label: "Et maintenant ?", detail: "Un seul bouton clair" },
+      { label: "Pour moi ?", detail: "Le titre nomme son cas" },
+      { label: "Crédible ?", detail: "Un chantier réel montré" },
+      { label: "Comment ?", detail: "Le déroulé en étapes" },
+      { label: "Et maintenant ?", detail: "Un seul bouton clair" },
     ]}
   />;
 }
@@ -95,17 +95,29 @@ export function TroisCalquesUnePageDiagram() {
       heading: "Ton estimation en deux minutes",
       subtitle: "Remplis les quinze champs du formulaire.",
       button: "Envoyer",
-      imageLabel: "Salon de luxe",
     }}
     after={{
       url: "interieur-lille.fr",
       nav: "Atelier intérieur",
-      heading: "Planifie ta pièce avant d'acheter",
-      subtitle: "Une visite, un budget clair, un plan d'aménagement.",
+      heading: "Ta pièce planifiée avant le premier achat",
+      subtitle: "Une visite à Lille, un budget chiffré, un plan coté. Réponse sous 48 h.",
       button: "Préparer ma visite",
-      imageLabel: "Plan d'une pièce réelle",
+      photo: "piece",
       proofs: ["Plan", "Budget", "Matières"],
     }}
+    beforeNotes={[
+      { pin: 1, role: "Le titre promet deux minutes", why: "Il annonce une démarche rapide, sur laquelle la suite de la page ne tient pas.", alt: "Promettre ce que la page tient vraiment : une visite et un budget clair." },
+      { pin: 2, role: "Le formulaire demande quinze champs", why: "La page contredit son titre : quinze champs ne se remplissent pas en deux minutes.", alt: "Trois champs, le reste à la visite." },
+      { pin: 3, role: "Le bouton ne dit rien", why: "« Envoyer » ne dit pas ce qui se passe ensuite.", alt: "Un verbe précis : Préparer ma visite." },
+      { pin: 4, role: "Un second bouton à égalité", why: "Deux gestes pour une seule demande : le regard hésite.", alt: "Un seul bouton, le reste en simple lien." },
+      { pin: 5, role: "Une image de salon de luxe", why: "Elle raconte une troisième histoire : le haut de gamme, loin de la demande d'estimation.", alt: "Le plan d'une vraie pièce, avec ses cotes." },
+    ]}
+    afterNotes={[
+      { pin: 1, role: "Un titre, une promesse", why: "Planifier avant d'acheter : la page entière sert cette seule idée.", alt: "Un chiffre : économies faites sur un premier projet." },
+      { pin: 2, role: "Un sous-titre qui montre le trajet", why: "Une visite, un budget clair, un plan : trois livrables, dans l'ordre.", alt: "Trois pastilles sous le titre." },
+      { pin: 3, role: "Un bouton qui annonce la suite", why: "Préparer ma visite : le verbe dit ce qui se passe au clic.", alt: "Un numéro de téléphone en simple lien." },
+      { pin: 4, role: "Un plan à la place du décor", why: "Un plan de pièce réelle tient la même histoire que le titre et le bouton.", alt: "Une photo avant et après du même projet." },
+    ]}
   />;
 }
 

@@ -25,7 +25,7 @@ export function Funnel({ stages, leakIndex, leakLabel, tool, ...frame }: FunnelP
     kind="funnel"
     keys={[
       { swatch: "muted", label: "Plus l'étage est étroit, moins il reste de monde" },
-      ...(stages[leakIndex] && leakLabel ? [{ swatch: "accent" as const, label: "En vert : là où on perd le plus" }] : []),
+      ...(stages[leakIndex] && leakLabel ? [{ swatch: "accent" as const, label: "En vert : là où on perd le plus" }] : []),
     ]}
   >
     <div className={styles.funnel}>

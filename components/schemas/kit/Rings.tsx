@@ -16,7 +16,7 @@ export type RingsProps = KitBaseProps & {
 export function Rings({ core, rings, accentIndex, ...frame }: RingsProps) {
   const ringStep = rings.length > 1 ? Math.min(22, 58 / (rings.length - 1)) : 0;
 
-  return <KitFrame {...frame} kind="rings" keys={rings[accentIndex] ? [{ swatch: "accent", label: "En vert : la couche qui compte ici" }] : undefined}>
+  return <KitFrame {...frame} kind="rings" keys={rings[accentIndex] ? [{ swatch: "accent", label: "En vert : la couche qui compte ici" }] : undefined}>
     <div className={styles.ringsLayout}>
     <div className={styles.ringsWide}>
       {rings.slice().reverse().map((ring, reverseIndex) => {

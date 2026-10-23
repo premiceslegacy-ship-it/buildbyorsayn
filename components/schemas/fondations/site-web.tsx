@@ -15,15 +15,14 @@ export function LandingRateeLandingUtileMockup() {
       heading: "Sublimez chaque instant",
       subtitle: "Des créations uniques",
       button: "Découvrir",
-      imageLabel: "Image abstraite",
       proofs: ["Commencer", "Trois cartes", "Faux compteur"],
     }}
     after={{
       nav: "Maison Lila",
-      heading: "Ton bouquet prêt pour demain",
+      heading: "Ton bouquet prêt demain matin, composé pour ton occasion",
       subtitle: "Dis-nous l'occasion et le budget. Maison Lila te rappelle avant de composer.",
       button: "Commander un bouquet",
-      imageLabel: "Composition en cours",
+      photo: "fleuriste",
       proofs: ["Trois bouquets réels"],
       offer: "Rappel pendant les horaires d'ouverture",
       faq: "Comment ça se passe ?",
@@ -39,17 +38,17 @@ export function AnatomiePremierEcranMockup() {
     accent={EM}
     page={{
       eyebrow: "Plaquiste à Lyon",
-      heading: "Ton devis part avec les bonnes mesures",
-      subtitle: "Envoie ton plan et trois photos. Karim te rappelle avant de chiffrer.",
-      button: "Préparer ma demande",
-      imageLabel: "Photo de chantier",
-      proofs: ["Tes photos restent jointes au projet"],
+      heading: "Cloisons et faux plafonds à Lyon, posés en une semaine",
+      subtitle: "Envoie ton plan et trois photos. Karim te rappelle sous 48 h avec un prix.",
+      button: "Recevoir mon prix",
+      photo: "plaquiste",
+      offer: "Tes photos restent jointes au projet",
     }}
     annotations={[
-      { number: 1, target: "heading", label: "Pour qui ?" },
-      { number: 2, target: "image", label: "Quel changement ?" },
-      { number: 3, target: "subtitle", label: "Comment ?" },
-      { number: 4, target: "button", label: "Quel geste ?" },
+      { number: 1, target: "heading", label: "Pour qui ?", why: "Le métier, la ville et le délai sont dans le titre : le bon client se reconnaît tout de suite.", alt: "Le type de chantier dans le titre." },
+      { number: 2, target: "image", label: "Quel changement ?", why: "La photo montre l'outil et la matière : c'est du vrai chantier.", alt: "Un avant et après." },
+      { number: 3, target: "subtitle", label: "Comment ?", why: "Deux gestes pour le client, un rappel sous 48 h : le fonctionnement tient en deux phrases.", alt: "Trois pastilles : plan, photos, rappel." },
+      { number: 4, target: "button", label: "Quel geste ?", why: "Un verbe précis, un seul bouton : il n'y a pas d'autre chemin.", alt: "Un numéro de téléphone en simple lien." },
     ]}
   />;
 }
@@ -62,11 +61,11 @@ export function TrajetDeDecisionDiagram() {
     accent={EM}
     accentIndex={4}
     items={[
-      { label: "C'est pour moi ?", detail: "Je me reconnais" },
-      { label: "Qu'est-ce qui change ?", detail: "Je vois le résultat" },
-      { label: "Comment ?", detail: "Je suis le chemin" },
-      { label: "Je peux croire ?", detail: "Je trouve la preuve" },
-      { label: "Je fais quoi ?", detail: "J'avance" },
+      { label: "C'est pour moi ?", detail: "Je me reconnais" },
+      { label: "Qu'est-ce qui change ?", detail: "Je vois le résultat" },
+      { label: "Comment ?", detail: "Je suis le chemin" },
+      { label: "Je peux croire ?", detail: "Je trouve la preuve" },
+      { label: "Je fais quoi ?", detail: "J'avance" },
     ]}
   />;
 }

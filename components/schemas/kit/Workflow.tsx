@@ -23,7 +23,7 @@ export function Workflow({ actors, steps, accentIndex, ...frame }: WorkflowProps
   const keys: KitKey[] = [];
   if (steps.some((step) => step.transfer)) keys.push({ swatch: "arrow", label: "Ce qui passe d'une carte à la suivante" });
   if (steps.some((step) => step.humanValidation)) keys.push({ swatch: "human", label: "Un humain valide avant la suite" });
-  if (steps[accentIndex]) keys.push({ swatch: "accent", label: "En vert : le passage qui compte ici" });
+  if (steps[accentIndex]) keys.push({ swatch: "accent", label: "En vert : le passage qui compte ici" });
   const showActors = actors.length > 1;
 
   return <KitFrame {...frame} kind="workflow" keys={keys}>

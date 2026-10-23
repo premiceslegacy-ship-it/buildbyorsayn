@@ -16,7 +16,7 @@ export type ForkProps = KitBaseProps & {
 };
 
 export function Fork({ situation, outcomes, ...frame }: ForkProps) {
-  return <KitFrame {...frame} kind="fork" keys={outcomes.some((outcome) => outcome.recommended) ? [{ swatch: "accent", label: "En vert : le chemin conseillé" }] : undefined}>
+  return <KitFrame {...frame} kind="fork" keys={outcomes.some((outcome) => outcome.recommended) ? [{ swatch: "accent", label: "En vert : le chemin conseillé" }] : undefined}>
     <div className={styles.fork}>
       <div className={styles.forkSituation}><span>Situation</span><strong>{situation}</strong></div>
       <div className={styles.forkBranches} style={{ "--kit-count": outcomes.length } as React.CSSProperties}>{outcomes.map((outcome) => <article className={outcome.recommended ? styles.isAccent : outcome.rejected ? styles.forkRejected : undefined} key={outcome.label}>

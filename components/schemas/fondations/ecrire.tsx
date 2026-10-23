@@ -66,15 +66,15 @@ export function PreuveAuBonEndroitDiagram() {
     accent={EM}
     page={{
       nav: "Atelier de Mehdi",
-      heading: "Ton vélo fait un bruit quand tu forces ?",
-      subtitle: "Dépose-le. Je vérifie, tu valides le devis, puis je répare.",
+      heading: "Ton vélo fait un bruit quand tu forces ? Je le trouve sous 48 h",
+      subtitle: "Dépose-le. Je vérifie, tu valides le devis avant que je touche à quoi que ce soit.",
       button: "Demander un diagnostic",
-      imageLabel: "Fiche de diagnostic",
+      photo: "velo",
     }}
     annotations={[
-      { number: 1, target: "image", label: "Ton travail ? Une vraie fiche remise" },
-      { number: 2, target: "heading", label: "Mon cas ? Sa scène exacte" },
-      { number: 3, target: "subtitle", label: "Pour moi ? Ce qui se passe ensuite" },
+      { number: 1, target: "image", label: "Ton travail ? Une vraie fiche remise", why: "Une photo de l'atelier répond à « est-ce du vrai travail ? » avant toute phrase.", alt: "Une photo de la fiche de diagnostic remise au client." },
+      { number: 2, target: "heading", label: "Mon cas ? Sa scène exacte", why: "Le bruit que le client a déjà entendu : il se reconnaît en une ligne.", alt: "Le nom du vélo ou du modèle." },
+      { number: 3, target: "subtitle", label: "Pour moi ? Ce qui se passe ensuite", why: "Déposer, vérifier, valider le devis, réparer : les quatre gestes dans l'ordre.", alt: "Un délai : réponse sous 48 h." },
     ]}
   />;
 }

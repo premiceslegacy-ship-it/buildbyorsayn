@@ -102,7 +102,7 @@ import { AdoptionLaddersDiagramV2, EscalierDesDroitsDiagram, SortieDeSecoursDiag
 import { ArborescencePiloteTerminalMockup, ContratMissionLisibleMockup, PassationEnSixCartesDiagram, TemplateTreeDiagram } from "./hermes/21-laisser-un-dossier";
 import { CalendrierTachePlanifieeMockup, ManuelPuisPlanifieDiagram, PauseNarretePasLeTrainDiagram, TerminalCronEtHistoriqueMockup, VeillePlanifieeAvecFreinDiagram } from "./hermes/22-planifier-sans-perdre-la-main";
 import { FlowDiagram } from "./layouts";
-import { AnnotatedMockup } from "./mockup";
+import { WebPage } from "./kit";
 
 export type ReaderVisualKind = "maquette" | "schema";
 export type ReaderVisualComponent = ComponentType;
@@ -137,22 +137,24 @@ function ProjectStepsSchema() {
 }
 
 function OfferPageMockup() {
-  return createElement(AnnotatedMockup, {
+  return createElement(WebPage, {
     title: "Une page qui se comprend dans l'ordre",
     description: "Le regard trouve la promesse, la preuve et l'action sans devoir décoder la mise en page.",
-    blocks: [
-      { kind: "header" },
-      { kind: "heading", text: "Un résultat que ton client reconnaît" },
-      { kind: "subtitle", text: "Une phrase explique pour qui, quand et comment." },
-      { kind: "button", text: "Voir l'offre" },
-      { kind: "image" },
-      { kind: "proof", text: "Preuves" },
-      { kind: "offer", text: "L'offre", detail: "Contenu, prix et prochaine étape" },
-    ],
+    ariaLabel: "Une page d'offre de chauffagiste annotée : le titre nomme le résultat et le délai, la preuve vient avant le bouton, et l'offre réunit contenu, prix et prochaine étape.",
+    accent: "#22d96e",
+    page: {
+      url: "atelier-dupre.fr",
+      nav: "Atelier Dupré",
+      heading: "Chaudière remplacée en une journée, devis fixe sous 48 h",
+      subtitle: "Dépose de l'ancienne, pose de la nouvelle, mise en service le jour même.",
+      button: "Voir l'offre",
+      screen: { title: "Ton offre", rows: [{ left: "Contenu", right: "dépose, pose, mise en service", state: "ok" }, { left: "Prix", right: "fixe, annoncé avant", state: "ok" }, { left: "Prochaine étape", right: "visite sous 5 jours", state: "todo" }] },
+      proofs: ["Photos de vrais chantiers"],
+    },
     annotations: [
-      { number: 1, label: "Le titre nomme le résultat attendu.", x: 42, y: 23 },
-      { number: 2, label: "La preuve arrive avant la demande d'action.", x: 76, y: 61 },
-      { number: 3, label: "L'offre réunit les détails au même endroit.", x: 55, y: 86 },
+      { number: 1, target: "heading", label: "Le titre nomme le résultat attendu.", why: "Le résultat (une chaudière remplacée) et le délai (une journée) sont dans la même phrase.", alt: "Le nombre de chaudières posées l'an dernier." },
+      { number: 2, target: "image", label: "L'offre réunit les détails au même endroit.", why: "Contenu, prix et prochaine étape se lisent d'un coup d'œil, sans changer de page.", alt: "Un devis type en PDF, à télécharger." },
+      { number: 3, target: "proofs", label: "La preuve arrive avant la demande d'action.", why: "Des photos de vrais chantiers répondent à « est-ce sérieux ? » avant le clic.", alt: "L'avis d'un client, avec son quartier." },
     ],
   });
 }

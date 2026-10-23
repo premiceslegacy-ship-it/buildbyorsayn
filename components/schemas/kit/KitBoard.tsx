@@ -415,19 +415,17 @@ const entries: readonly KitEntry[] = [
             url: "karim-plaquiste.fr",
             nav: "Karim",
             eyebrow: "Plaquiste à Lyon",
-            heading: "Ton devis part avec les bonnes mesures",
-            subtitle: "Envoie ton plan et trois photos. Karim te rappelle avant de chiffrer.",
-            button: "Préparer ma demande",
-            imageLabel: "Chantier réel",
-            proofs: ["Plan", "Photos", "Rappel"],
+            heading: "Cloisons et faux plafonds à Lyon, posés en une semaine",
+            subtitle: "Envoie ton plan et trois photos. Karim te rappelle sous 48 h avec un prix.",
+            button: "Recevoir mon prix",
+            photo: "plaquiste",
             offer: "Tes photos restent jointes au projet",
-            faq: "Comment préparer les mesures ?",
           }}
           annotations={[
-            { number: 1, target: "heading", label: "Pour qui et quel changement ?" },
-            { number: 2, target: "subtitle", label: "Comment ça se passe ?" },
-            { number: 3, target: "button", label: "Quel geste maintenant ?" },
-            { number: 4, target: "image", label: "Une preuve du métier réel" },
+            { number: 1, target: "heading", label: "Pour qui et quel changement ?", why: "Le métier, la ville et le délai sont dans le titre : le bon client se reconnaît tout de suite.", alt: "Le type de chantier dans le titre." },
+            { number: 2, target: "subtitle", label: "Comment ça se passe ?", why: "Deux gestes pour le client, un rappel sous 48 h : le fonctionnement tient en deux phrases.", alt: "Trois pastilles : plan, photos, rappel." },
+            { number: 3, target: "button", label: "Quel geste maintenant ?", why: "Un verbe précis, un seul bouton : il n'y a pas d'autre chemin.", alt: "Un numéro de téléphone en simple lien." },
+            { number: 4, target: "image", label: "Une preuve du métier réel", why: "La photo montre l'outil et la matière : c'est du vrai chantier.", alt: "Un avant et après." },
           ]}
         />,
       },
@@ -447,16 +445,14 @@ const entries: readonly KitEntry[] = [
             heading: "Sublimez chaque instant",
             subtitle: "Des créations uniques",
             button: "Découvrir ou commencer",
-            imageLabel: "Image abstraite",
             proofs: ["Avis", "Carte", "Blog"],
           }}
           after={{
             nav: "Maison Lila",
-            heading: "Ton bouquet prêt pour demain",
+            heading: "Ton bouquet prêt demain matin, composé pour ton occasion",
             subtitle: "Dis-nous l'occasion et le budget. Maison Lila te rappelle avant de composer.",
             button: "Commander un bouquet",
-            imageLabel: "Bouquets réels",
-            proofs: ["Mariage", "Merci", "Fête"],
+            photo: "fleuriste",
             offer: "Rappel pendant les horaires d'ouverture",
           }}
         />,
@@ -721,7 +717,7 @@ const entries: readonly KitEntry[] = [
           slopNotes={[
             { pin: 1, role: "Surtitre", why: "Répète une catégorie vague au-dessus du titre.", alt: "Le titre dit déjà le métier." },
             { pin: 2, role: "Mot en dégradé", why: "Effet sans sens, lisibilité réduite.", alt: "Un mot en valeur par le poids." },
-            { pin: 3, role: "Deux boutons égaux", why: "Le visiteur hésite entre deux gestes.", alt: "Un seul bouton : le devis." },
+            { pin: 3, role: "Deux boutons égaux", why: "Le visiteur hésite entre deux gestes.", alt: "Un seul bouton : le devis." },
             { pin: 4, role: "Trois cartes à icône", why: "Affirment sans rien montrer.", alt: "Une photo de chantier fini." },
           ]}
           premium={{

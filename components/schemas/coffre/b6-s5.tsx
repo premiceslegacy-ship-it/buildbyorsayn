@@ -72,19 +72,19 @@ export function LandingProduitAnnoteeDiagram() {
       url: "tableau-demandes.fr",
       nav: "Demandes",
       eyebrow: "Pour les entreprises de nettoyage",
-      heading: "Toutes tes demandes dans un seul tableau",
+      heading: "Les demandes de tes clients de nettoyage, dans un seul tableau",
       subtitle: "Le formulaire remplit le tableau. Tu prépares la relance, puis tu la valides.",
       button: "Voir le tableau",
-      imageLabel: "Écran du tableau",
+      screen: { title: "Tableau des demandes", rows: [{ left: "Mme Roux, bureaux", right: "devis à relancer", state: "warn" }, { left: "Copropriété Les Tilleuls", right: "visite jeudi", state: "ok" }, { left: "M. Lopez, vitres", right: "nouvelle demande", state: "todo" }] },
       proofs: ["Capture de l'écran réel", "Relance validée par toi"],
       faq: "Le tableau planifie-t-il mes équipes ?",
     }}
     annotations={[
-      { number: 1, target: "heading", label: "Pour qui, et ce qu'il aide à faire" },
-      { number: 2, target: "image", label: "La démonstration de l'écran" },
-      { number: 3, target: "proofs", label: "Les preuves répondent aux doutes" },
-      { number: 4, target: "faq", label: "La limite, dite avant l'achat" },
-      { number: 5, target: "button", label: "L'action qui vient ensuite" },
+      { number: 1, target: "heading", label: "Pour qui, et ce qu'il aide à faire", why: "Le titre nomme le métier et promet un seul endroit pour toutes les demandes.", alt: "Un chiffre : combien de demandes se perdent chaque mois." },
+      { number: 2, target: "image", label: "La démonstration de l'écran", why: "L'écran réel montre le produit tel qu'il sera utilisé, avec de vraies lignes.", alt: "Une courte vidéo de l'écran." },
+      { number: 3, target: "proofs", label: "Les preuves répondent aux doutes", why: "Chaque preuve répond à un doute : est-ce réel, et qui garde la main.", alt: "L'avis d'un vrai client." },
+      { number: 4, target: "faq", label: "La limite, dite avant l'achat", why: "Dire que le tableau ne planifie pas les équipes évite une déception après l'achat.", alt: "La réponse ouverte directement sous la question." },
+      { number: 5, target: "button", label: "L'action qui vient ensuite", why: "Un seul geste, placé après les preuves et la limite.", alt: "Un lien Voir un exemple à côté." },
     ]}
   />;
 }

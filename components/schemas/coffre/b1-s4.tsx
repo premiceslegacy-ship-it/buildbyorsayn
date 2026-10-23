@@ -58,13 +58,13 @@ export function DemoEtroiteDiagram() {
       heading: "Deux pièces manquent",
       subtitle: "Pièce d'identité expirée, avis d'impôt absent.",
       button: "Valider la relance",
-      imageLabel: "Liste des pièces",
+      screen: { title: "Dossier Martin", rows: [{ left: "Pièce d'identité", right: "expirée", state: "warn" }, { left: "Avis d'impôt", right: "absent", state: "warn" }, { left: "Bulletin de salaire", right: "reçu", state: "ok" }], footer: "Données fictives" },
       proofs: ["Ne relance jamais seule", "Tu relis avant l'envoi"],
     }}
     annotations={[
-      { number: 1, target: "heading", label: "Son travail : la liste préparée" },
-      { number: 2, target: "proofs", label: "Ses limites, dites clairement" },
-      { number: 3, target: "button", label: "Ta reprise en main" },
+      { number: 1, target: "heading", label: "Son travail : la liste préparée", why: "La démo fait une seule chose et la montre en résultat, pas en promesse.", alt: "Une capture du vrai dossier, floutée." },
+      { number: 2, target: "proofs", label: "Ses limites, dites clairement", why: "Dire ce qu'elle ne fait pas rassure plus que cacher les trous.", alt: "Une ligne de limites en bas de l'écran." },
+      { number: 3, target: "button", label: "Ta reprise en main", why: "La reprise en main reste un clic humain : rien ne part sans ta validation.", alt: "Un second bouton Corriger à côté." },
     ]}
   />;
 }

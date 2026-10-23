@@ -48,17 +48,17 @@ export function PageQuiAideAChoisirDiagram() {
       url: "tonsite.fr",
       nav: "Ton entreprise",
       eyebrow: "Pour les artisans du bâtiment",
-      heading: "Repère la pièce qui manque avant le chantier",
+      heading: "Artisans du bâtiment : repère la pièce qui manque avant que le chantier s'arrête",
       subtitle: "Nous préparons le dossier, tu valides chaque envoi.",
       button: "Montre-moi un dossier bloqué",
-      imageLabel: "Un devis signé, une pièce manquante",
+      screen: { title: "Devis signé, pièce manquante", rows: [{ left: "Devis 2024-118", right: "signé", state: "ok" }, { left: "Attestation d'assurance", right: "manquante", state: "warn" }, { left: "Chantier", right: "bloqué", state: "warn" }] },
       proofs: ["Démo sur un dossier fictif", "Aucun envoi sans toi"],
     }}
     annotations={[
-      { number: 1, target: "heading", label: "Le titre ouvre la porte" },
-      { number: 2, target: "subtitle", label: "Le sous-titre montre le mécanisme" },
-      { number: 3, target: "button", label: "Un geste volontaire" },
-      { number: 4, target: "proofs", label: "La preuve réduit le doute" },
+      { number: 1, target: "heading", label: "Le titre ouvre la porte", why: "Il nomme une peur précise du métier, pas une fonction du produit.", alt: "Une scène datée : Mardi, le chantier s'arrête." },
+      { number: 2, target: "subtitle", label: "Le sous-titre montre le mécanisme", why: "Qui prépare, qui valide : le fonctionnement tient en une phrase.", alt: "Trois étapes sous le bouton." },
+      { number: 3, target: "button", label: "Un geste volontaire", why: "Le bouton demande de voir, pas d'acheter : l'engagement est minimal.", alt: "Un lien vers une démo de deux minutes." },
+      { number: 4, target: "proofs", label: "La preuve réduit le doute", why: "Deux phrases honnêtes : c'est une démo, et rien ne part sans toi.", alt: "L'avis d'un vrai artisan." },
     ]}
   />;
 }

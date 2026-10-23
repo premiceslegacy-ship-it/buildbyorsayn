@@ -35,14 +35,14 @@ export function FormulaireDeuxMetiersDiagram() {
       heading: "Demande ton rendez-vous en ligne",
       subtitle: "Ton nom, ton e-mail, puis le rôle demandé.",
       button: "Créer mon compte",
-      imageLabel: "Rôle : patient, accueil, praticien",
+      fields: [{ label: "Nom", value: "Camille Roche" }, { label: "E-mail", value: "Ton adresse e-mail" }, { label: "Rôle", value: "Patient", kind: "select" }],
       proofs: ["E-mail déjà utilisé", "Rôle non autorisé"],
     }}
     annotations={[
-      { number: 1, target: "heading", label: "Visuel : ordre et libellés" },
-      { number: 2, target: "proofs", label: "Visuel : messages d'erreur" },
-      { number: 3, target: "image", label: "Contrat commun : trois rôles" },
-      { number: 4, target: "button", label: "Backend : vérifie données et droits" },
+      { number: 1, target: "heading", label: "Visuel : ordre et libellés", why: "Le titre et l'ordre des champs se règlent à l'écran : c'est le travail du visuel.", alt: "Un titre qui nomme le rôle choisi." },
+      { number: 2, target: "proofs", label: "Visuel : messages d'erreur", why: "Les erreurs se lisent près du champ concerné, avec des mots simples.", alt: "Une petite icône d'alerte à côté du message." },
+      { number: 3, target: "image", label: "Contrat commun : trois rôles", why: "Patient, accueil, praticien : le choix suit le contrat que les deux métiers ont lu.", alt: "Un rôle par défaut selon le lien d'invitation." },
+      { number: 4, target: "button", label: "Backend : vérifie données et droits", why: "Le bouton envoie, mais c'est le serveur qui vérifie qui a le droit de quoi.", alt: "Un e-mail de confirmation après la création." },
     ]}
   />;
 }

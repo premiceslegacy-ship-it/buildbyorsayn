@@ -22,12 +22,12 @@ export type SiteTheme = {
 };
 
 export const SITE_THEMES = {
-  chaux: { bg: "#f6f2ec", ink: "#1d1a16", muted: "#6a6358", accent: "#b4532a", accentInk: "#ffffff", card: "#ece6dc", line: "rgba(29,26,22,.14)", serif: true },
-  bois: { bg: "#efe6d8", ink: "#241a11", muted: "#6f5f4d", accent: "#7a4a21", accentInk: "#ffffff", card: "#e4d8c4", line: "rgba(36,26,17,.16)", serif: true },
-  sauge: { bg: "#eff2ec", ink: "#15201a", muted: "#5c6b61", accent: "#2f6b4f", accentInk: "#ffffff", card: "#e1e8df", line: "rgba(21,32,26,.14)", serif: true },
-  encre: { bg: "#ffffff", ink: "#0b1220", muted: "#586174", accent: "#0a64ff", accentInk: "#ffffff", card: "#f3f5f9", line: "rgba(11,18,32,.12)" },
+  chaux: { bg: "#ffffff", ink: "#1d1d1f", muted: "#6e6e73", accent: "#b4532a", accentInk: "#ffffff", card: "#f5f5f7", line: "rgba(29,29,31,.14)" },
+  bois: { bg: "#ffffff", ink: "#1d1d1f", muted: "#6e6e73", accent: "#7a4a21", accentInk: "#ffffff", card: "#f5f5f7", line: "rgba(29,29,31,.14)" },
+  sauge: { bg: "#ffffff", ink: "#1d1d1f", muted: "#6e6e73", accent: "#2f6b4f", accentInk: "#ffffff", card: "#f5f5f7", line: "rgba(29,29,31,.14)" },
+  encre: { bg: "#ffffff", ink: "#1d1d1f", muted: "#6e6e73", accent: "#0066cc", accentInk: "#ffffff", card: "#f5f5f7", line: "rgba(29,29,31,.12)" },
   nuit: { bg: "#0d100e", ink: "#f3f1ea", muted: "#a2aaa4", accent: "#22d96e", accentInk: "#04120a", card: "#171b18", line: "rgba(243,241,234,.14)" },
-  braise: { bg: "#17110d", ink: "#f6ece1", muted: "#b6a595", accent: "#e8a15a", accentInk: "#1a0f06", card: "#241a13", line: "rgba(246,236,225,.14)", serif: true },
+  braise: { bg: "#17110d", ink: "#f6ece1", muted: "#b6a595", accent: "#e8a15a", accentInk: "#1a0f06", card: "#241a13", line: "rgba(246,236,225,.14)" },
   slopNuit: { bg: "#0b0820", ink: "#ffffff", muted: "#a9a6c9", accent: "#7c5cff", accentInk: "#ffffff", card: "#161237", line: "rgba(255,255,255,.12)" },
   slopClair: { bg: "#f7f7ff", ink: "#16163a", muted: "#6b6b8f", accent: "#6d4aff", accentInk: "#ffffff", card: "#ffffff", line: "rgba(22,22,58,.1)" },
 } as const satisfies Record<string, SiteTheme>;
@@ -247,7 +247,7 @@ function Nav({ nav, q }: { nav: SiteNav; q: Quality }) {
 
 function Cta({ pins, q, children, secondary }: { pins?: SitePins; q: Quality; children: ReactNode; secondary?: boolean }) {
   return <Pinned pins={pins} slot={secondary ? "cta2" : "cta"} q={q}>
-    <span className={secondary ? styles.ctaSecondary : styles.cta}>{children}{secondary ? null : <ArrowRight aria-hidden="true" />}</span>
+    <span className={secondary ? styles.ctaSecondary : styles.cta}>{children}{secondary ? (q === "slop" ? null : <ChevronRight aria-hidden="true" />) : q === "slop" ? <ArrowRight aria-hidden="true" /> : null}</span>
   </Pinned>;
 }
 
@@ -392,7 +392,7 @@ function Section({ s, q }: { s: SiteSection; q: Quality }) {
       const p = s.pins;
       return <section className={styles.block}>
         <Pinned pins={p} slot="title" q={q}><h4 className={styles.h2}>{s.title}</h4></Pinned>
-        {s.text ? <p className={styles.lead}>{s.text}</p> : null}
+        {s.text ? <Pinned pins={p} slot="text" q={q}><p className={styles.lead}>{s.text}</p></Pinned> : null}
         <Pinned pins={p} slot="fields" q={q}>
           <div className={styles.form}>{s.fields.map((field) => <div key={field.label} data-kind={field.kind ?? "text"}>
             <small>{field.label}</small>
@@ -400,7 +400,7 @@ function Section({ s, q }: { s: SiteSection; q: Quality }) {
           </div>)}</div>
         </Pinned>
         <Cta pins={p} q={q}>{s.button}</Cta>
-        {s.note ? <small className={styles.noteLine}>{s.note}</small> : null}
+        {s.note ? <Pinned pins={p} slot="note" q={q}><small className={styles.noteLine}>{s.note}</small></Pinned> : null}
       </section>;
     }
     case "footer": {

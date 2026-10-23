@@ -22,7 +22,7 @@ export function Cycle({ steps, entryIndex, centerLabel = "On recommence, en mieu
     {...frame}
     kind="cycle"
     keys={[
-      ...(steps[entryIndex] ? [{ swatch: "accent" as const, label: "En vert : par où tu entres dans la boucle" }] : []),
+      ...(steps[entryIndex] ? [{ swatch: "accent" as const, label: "En vert : par où tu entres dans la boucle" }] : []),
       { swatch: "loop", label: "La dernière étape renvoie à la première" },
     ]}
   >

@@ -414,3 +414,29 @@
 @container sitebox (min-width: 680px) {
   .single .notes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+
+/* Premium : le socle Apple de la maison. Titres 600 serrés, hero centré avec l'image dessous, cartes à 28 px sans bord,
+   une pilule pleine et un lien, fonds qui alternent blanc et gris. La marque ne change que l'accent et les photos. */
+.page:not([data-quality="slop"]) .nav:not([data-overlay]) { border-bottom: 1px solid var(--s-line); }
+.page:not([data-quality="slop"]) .heroTitle { font-size: clamp(28px, 6.2cqi, 54px); font-weight: 600; letter-spacing: -.035em; line-height: 1.06; }
+.page:not([data-quality="slop"]) .h2 { font-weight: 600; letter-spacing: -.03em; line-height: 1.08; }
+.page:not([data-quality="slop"]) .h3 { font-weight: 600; }
+.page:not([data-quality="slop"]) .accentWord { font-style: normal; }
+.page:not([data-quality="slop"]) .cta { padding: 12px 22px; font-size: 17px; font-weight: 400; }
+.page:not([data-quality="slop"]) .ctaSecondary { padding: 0; border: 0; border-radius: 0; color: var(--s-accent); font-size: 17px; font-weight: 400; gap: 2px; }
+.page:not([data-quality="slop"]) .ctaSecondary svg { width: 18px; height: 18px; }
+.page:not([data-quality="slop"]) .heroCentered > .pinned,
+.page:not([data-quality="slop"]) .heroCentered > .heroFigure { width: min(100%, 860px); }
+.page:not([data-quality="slop"]) .heroCentered .heroFigure,
+.page:not([data-quality="slop"]) .heroSplit .heroFigure,
+.page:not([data-quality="slop"]) .storyFigure { border-radius: 28px; }
+.page:not([data-quality="slop"]) .gallery li img,
+.page:not([data-quality="slop"]) .steps li > img { border-radius: 18px; }
+.page:not([data-quality="slop"]) .cards li,
+.page:not([data-quality="slop"]) .plans > li { border: 0; border-radius: 28px; background: var(--s-bg); }
+.page:not([data-quality="slop"]) .plans > li[data-featured] { background: color-mix(in srgb, var(--s-accent) 10%, var(--s-bg)); box-shadow: none; }
+.page:not([data-quality="slop"]) > section.block:nth-of-type(even) { background: transparent; }
+.page:not([data-quality="slop"]) > section.block:nth-of-type(odd) { background: var(--s-card); }
+.page:not([data-quality="slop"]) .logos { gap: 8px; }
+.page:not([data-quality="slop"]) .logos li { padding: 7px 14px; border-radius: 999px; background: color-mix(in srgb, var(--s-ink) 7%, transparent); color: var(--s-ink); font-size: 14px; font-weight: 500; letter-spacing: 0; text-transform: none; }

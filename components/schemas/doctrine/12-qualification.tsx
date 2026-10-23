@@ -34,13 +34,13 @@ export function FormulaireQuiRendQuelqueChoseMockup() {
       heading: "Où ton dernier devis a-t-il bloqué ?",
       subtitle: "Dernier cas, ce qui bloque, qui décide. Rien d'autre.",
       button: "Voir ma carte",
-      imageLabel: "Ta carte du point à vérifier",
-      proofs: ["Scène observée", "Point de perte", "Prochaine décision"],
+      fields: [{ label: "Dernier cas", value: "Le devis de la salle de bains" }, { label: "Ce qui bloque", value: "Le client attend le prix" }, { label: "Qui décide", value: "Mon associé", kind: "select" }],
+      offer: "Tu repars avec une scène observée, un point de perte et une prochaine décision.",
     }}
     annotations={[
-      { number: 1, target: "heading", label: "Part du dernier cas réel" },
-      { number: 2, target: "button", label: "La personne repart avec quelque chose" },
-      { number: 3, target: "proofs", label: "Ce que la carte rend tout de suite" },
+      { number: 1, target: "heading", label: "Part du dernier cas réel", why: "Une question sur le dernier cas appelle une réponse vraie, pas une réponse polie.", alt: "Une question sur le pire cas." },
+      { number: 2, target: "button", label: "La personne repart avec quelque chose", why: "Le bouton annonce ce qu'on reçoit (une carte), pas ce qu'on donne (ses données).", alt: "Le résultat montré sur la même page." },
+      { number: 3, target: "offer", label: "Ce que la carte rend tout de suite", why: "Trois éléments nommés : le visiteur sait qu'il ne donne pas ses réponses pour rien.", alt: "Une carte d'exemple, floutée, sous le formulaire." },
     ]}
   />;
 }

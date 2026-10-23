@@ -1420,27 +1420,14 @@
   box-shadow: none;
 }
 
-.typedKit :global(figure[data-kit-schema="web-page-compare"] section > h4),
 .typedKit :global(figure[data-kit-schema="ad-card"] section > h4) {
   margin: 0 !important;
   color: var(--t3) !important;
   font: 600 13px/1.2 var(--font) !important;
 }
 
-.typedKit :global(figure[data-kit-schema] section:last-child > h4) {
+.typedKit :global(figure[data-kit-schema="ad-card"] section:last-child > h4) {
   color: var(--menthe) !important;
-}
-
-.typedKit :global(figure[data-kit-schema="web-page-compare"] section div h4) {
-  margin: 0 !important;
-  color: #111512 !important;
-  font: 700 clamp(21px, 3.5cqw, 34px)/1.05 var(--font-t) !important;
-}
-
-.typedKit :global(figure[data-kit-schema="web-page-compare"] section div p) {
-  margin: 0 !important;
-  color: #5e675f !important;
-  font: 500 13px/1.38 var(--font) !important;
 }
 
 .typedKit :global(figure[data-kit-schema="ad-card"] section:first-child article) {

@@ -1,4 +1,4 @@
-import { FileCard, Steps, WebPage, WebPageCompare, Workflow } from "../kit";
+import { FileCard, Steps, WebPage, WebPageCompare } from "../kit";
 
 const EM = "#22d96e";
 
@@ -15,15 +15,14 @@ export function LandingGeneriqueContreMarqueMockup() {
       heading: "Réinventez votre expérience",
       subtitle: "Des solutions innovantes pour vos besoins",
       button: "Commencer",
-      imageLabel: "Faux tableau de bord",
       proofs: ["Carte vide", "Faux chiffre"],
     }}
     after={{
       nav: "Maison Lila",
-      heading: "Ton bouquet prêt pour demain",
+      heading: "Ton bouquet prêt demain matin, composé pour ton occasion",
       subtitle: "Choisis l'occasion. Maison Lila te rappelle avant la composition.",
       button: "Commander un bouquet",
-      imageLabel: "Bouquets dans l'atelier",
+      photo: "fleuriste",
       proofs: ["Métier visible", "Sans faux chiffre"],
     }}
   />;
@@ -48,28 +47,30 @@ export function ReferencesVersDirectionDiagram() {
 }
 
 export function BriefPhotoAnnoteMockup() {
-  return <WebPage
+  return <FileCard
     title="Le brief pointe vers l'image"
-    description="Chaque décision désigne une zone visible de la photo."
-    ariaLabel="Une fausse interface annote une tasse noire mate, son cadrage, sa lumière, sa matière, sa zone de texte et l'absence de logo."
+    description="Chaque ligne du brief désigne une zone visible de la photo."
+    legend="Si une ligne ne se voit pas dans l'image, elle n'a rien à faire dans le brief."
+    ariaLabel="Un brief de photo décrit une tasse noire mate : cadrage serré, lumière de fenêtre, matières nommées, zone réservée au titre, format du site et refus de logo."
     accent={EM}
-    page={{
-      nav: "OpenAI + Gemini",
-      eyebrow: "Sans logo",
-      heading: "Tasse noire mate",
-      subtitle: "Plan serré, lumière de fenêtre",
-      button: "Bois sombre",
-      imageLabel: "Texte ici",
-      proofs: ["Format du site"],
-      faq: "Sans logo",
-    }}
+    filename="brief-photo-tasse.md"
+    tool="OpenAI + Gemini"
+    lines={[
+      { text: "# Tasse noire mate", tone: "heading" },
+      { text: "Cadrage : plan serré, la tasse au centre" },
+      { text: "Lumière : fenêtre à gauche, ombres douces" },
+      { text: "Matières : céramique mate, bois sombre" },
+      { text: "Zone de texte : en haut à gauche, pour le titre" },
+      { text: "Format : celui du site, seize neuvièmes" },
+      { text: "Refus : pas de logo, pas de texte dans l'image" },
+    ]}
     annotations={[
-      { number: 1, target: "heading", label: "Sujet reconnaissable" },
-      { number: 2, target: "image", label: "Espace réservé au H1" },
-      { number: 3, target: "subtitle", label: "Lumière cohérente" },
-      { number: 4, target: "button", label: "Matières nommées" },
-      { number: 5, target: "proofs", label: "Format du site" },
-      { number: 6, target: "faq", label: "Refus visibles" },
+      { line: 1, label: "Sujet reconnaissable" },
+      { line: 2, label: "Cadrage choisi" },
+      { line: 3, label: "Lumière cohérente" },
+      { line: 4, label: "Matières nommées" },
+      { line: 5, label: "Espace réservé au titre" },
+      { line: 7, label: "Refus visibles" },
     ]}
   />;
 }
@@ -99,14 +100,21 @@ export function DesignSystemOuvertMockup() {
     />
     <WebPage
       title="Les règles deviennent une interface"
-      description="Chaque décision rejoint le composant qu'elle contrôle."
-      ariaLabel="Une page applique les règles au texte, à la surface, au chargement, à l'erreur et au bouton action."
+      description="Chaque décision du fichier rejoint le composant qu'elle contrôle."
+      legend="Ouvre le fichier avant de demander un écran : sans lui, chaque écran invente ses règles."
+      ariaLabel="Une page de produit applique les règles : un titre lisible, un bouton d'action principale, et un écran qui montre le chargement, l'erreur et le succès."
       accent={EM}
-      page={{ heading: "Texte", subtitle: "Surface", button: "Action", imageLabel: "Chargement", proofs: ["Erreur"] }}
+      page={{
+        nav: "Ton produit",
+        heading: "Un titre lisible, une action claire",
+        subtitle: "Le texte se lit, la surface repose l'œil.",
+        button: "Action principale",
+        screen: { title: "Envoi d'un message", rows: [{ left: "Chargement", right: "en cours", state: "todo" }, { left: "Erreur", right: "e-mail invalide", state: "warn" }, { left: "Succès", right: "message envoyé", state: "ok" }] },
+      }}
       annotations={[
-        { number: 1, target: "button", label: "Couleur et forme" },
-        { number: 2, target: "heading", label: "Typographie" },
-        { number: 3, target: "proofs", label: "État visible" },
+        { number: 1, target: "heading", label: "Typographie", why: "Le fichier fixe la taille et la police du titre : tous les écrans le reprennent.", alt: "Une seule police, deux graisses." },
+        { number: 2, target: "button", label: "Couleur et forme", why: "L'action principale a un rôle, pas une couleur brute : elle change partout d'un seul coup.", alt: "Un bouton contour pour l'action secondaire." },
+        { number: 3, target: "image", label: "États visibles", why: "Chargement, erreur et succès sont dessinés d'avance : rien n'est improvisé le jour de la panne.", alt: "Un état vide avec une phrase qui guide." },
       ]}
     />
   </>;
