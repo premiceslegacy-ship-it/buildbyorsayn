@@ -17,6 +17,7 @@ import { findKnowledgeSecretHazards } from "@/lib/knowledge/safety";
 import {
   collectAccompagnementDocuments,
   collectBlocsDocuments,
+  collectFondationsDocuments,
   collectProtocoleDocuments,
   collectSkillsCatalogDocuments,
   collectSkillsContentDocuments,
@@ -44,6 +45,7 @@ const admin = createClient(supabaseUrl, serviceRoleKey, {
 });
 
 const ALWAYS_SCANNED_SOURCES = [
+  "fondations",
   "blocs",
   "protocole",
   "accompagnement",
@@ -66,6 +68,7 @@ async function collectAllDocuments(): Promise<{
   obsidianHazards: string[];
 }> {
   const documents: KnowledgeDocument[] = [];
+  documents.push(...(await collectFondationsDocuments()));
   documents.push(...(await collectBlocsDocuments()));
   documents.push(...(await collectProtocoleDocuments()));
   documents.push(...(await collectAccompagnementDocuments()));

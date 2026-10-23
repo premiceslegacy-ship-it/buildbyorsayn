@@ -21,6 +21,8 @@ const nextConfig = {
   outputFileTracingIncludes: {
     "/api/mcp/showcase-asset": ["./private/brand-assets/build-mcp-connector-characters.webp"],
     "/api/mcp/logo": ["./public/mcp/build-logo.png"],
+    "/api/search": ["./content/fondations/*.md"],
+    "/beginner/*": ["./content/fondations/*.md"],
   },
 
   async redirects() {

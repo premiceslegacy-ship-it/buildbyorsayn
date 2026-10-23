@@ -10,8 +10,10 @@ export function canReadBlocSection(tier: string | null, blocId: string, sectionI
 
 // Only this projected result may cross the server/client boundary.
 export function projectBlocForTier(bloc: DeliveredBloc, tier: string | null): DeliveredBloc {
+  const sections = bloc.sections.filter(section => canReadBlocSection(tier, bloc.id, section.id));
   return {
     id: bloc.id, titre: bloc.titre, displayNumber: bloc.displayNumber,
-    sections: bloc.sections.filter(section => canReadBlocSection(tier, bloc.id, section.id))
+    introduction: sections.length > 0 ? bloc.introduction : undefined,
+    sections,
   };
 }

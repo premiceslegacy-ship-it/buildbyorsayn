@@ -1,62 +1,72 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+const CONTENT_ROOT = path.join(process.cwd(), "app", "protocole", "content");
+
+const cache = new Map<string, string>();
+
+function readMarkdown(fileName: string): string {
+  const cached = cache.get(fileName);
+  if (cached !== undefined) return cached;
+
+  const content = readFileSync(path.join(CONTENT_ROOT, fileName), "utf8");
+  cache.set(fileName, content);
+  return content;
+}
+
+export function protocoleIntroductionMarkdown(): string {
+  return readMarkdown("introduction.md");
+}
+
+export function protocoleMarkdown(): string {
+  return readMarkdown("protocole-zero.md");
+}
+
+function stripFrontmatter(content: string): string {
+  return content.replace(/^---\n[\s\S]*?\n---\s*/, "");
+}
+
+function splitAt(content: string, heading: string): [string, string] {
+  const index = content.indexOf(heading);
+  if (index < 0) throw new Error(`Section Protocole introuvable : ${heading}`);
+  return [content.slice(0, index).trim(), content.slice(index).trim()];
+}
+
+const body = stripFrontmatter(protocoleMarkdown());
+const [absorption, afterAbsorption] = splitAt(body, "## Va chercher une réponse sur le terrain");
+const [production, distillation] = splitAt(afterAbsorption, "## Sors la méthode de ta tête");
+
+/**
+ * Identifiants historiques conservés pour l'ingestion du corpus.
+ * L'interface affiche désormais un seul chapitre continu, mais les trois
+ * documents restent stables pour ne pas déplacer les lignes déjà indexées.
+ */
 export const PHASES = [
   {
     num: "01",
-    titre: "L'absorption",
-    label: "La méthode Sharingan",
-    duree: "Jusqu'à un premier test propre",
-    douleur: "Tu dois réduire vite l'écart entre ce que tu sais faire aujourd'hui et le niveau que le marché attend. Tu produis alors qu'une partie du métier t'échappe encore. Les outils peuvent générer une réponse convaincante sans te donner les critères nécessaires pour la juger.",
-    solution: [
-      "Choisis une compétence étroite et une tâche réelle. « Écrire la page d'offre d'un artisan » est testable. « Devenir bon en marketing » ne donne ni sortie ni critère de qualité. Décris le résultat, le contexte, les erreurs qui coûtent cher et la preuve attendue.",
-      "Exemple fictif : Lina veut vendre des pages d'offre à des artisans. En une semaine, elle rassemble huit sources : deux guides officiels, trois vidéos, deux pages d'artisans qu'elle juge claires et un appel de vingt minutes avec un plombier. Sa fiche tient sur une page. Une fleuriste qui apprend à vendre des bouquets aux entreprises suit le même chemin.",
-      "Côté humain, construis une carte de sources variées : documentation officielle, livres, articles, vidéos, exemples de livrables, retours du terrain et méthodes internes. Note pour chaque source son auteur, sa date, son contexte, ce qu'elle affirme et ce qu'elle ne permet pas de conclure. Compare les désaccords au lieu de chercher une voix unique à imiter.",
-      "Un transcript, c'est-à-dire le texte écrit d'une vidéo ou d'un audio, accélère la lecture sans transformer une vidéo en vérité. Utilise NotebookLM, un agent Hermes, un assistant conversationnel ou ton outil d'extraction pour repérer les principes répétés, les étapes, les décisions, les exemples, les exceptions, les contradictions et les faits à vérifier. Donne aussi le même texte à plusieurs modèles et compare leurs lectures : un écart signale un passage à relire. Garde un lien vers le passage d'origine pour que l'humain puisse contrôler.",
-      "Transforme la matière en fiche provisoire : principe, contexte de validité, entrée, étapes, exemple, contre-exemple, pièges, sortie, preuve et condition d'arrêt. Si le chemin est stable, prépare une SOP, une procédure écrite étape par étape. Si le travail demande de choisir entre plusieurs routes, prépare un skill, un fichier de méthode que ton agent relit, avec ses variables et ses critères de décision.",
-      "Le pipeline pour l'IA, la chaîne d'étapes qu'elle suit, reste visible : sources autorisées, extraction, analyse structurée, revue humaine, procédure versionnée, essai sur une tâche réelle et bilan. L'agent doit séparer ce qu'il observe, ce qu'il déduit et ce qu'il ignore. Une information sans source reste une hypothèse.",
-      "Ajoute une source terrain. Observe un tunnel de vente accessible, demande un appel de découverte lorsque c'est légitime, étudie l'offre, les questions, les relances, le devis, les niveaux d'engagement et les objections traitées. Tu récupères les mécanismes, jamais l'identité, les textes, les données privées ou les preuves d'un autre.",
-      "Teste la fiche contre une consigne naïve, une demande d'une ligne sans méthode, sur les mêmes entrées. Vérifie l'exactitude, le format, l'utilité et l'absence de dérive. L'absorption est terminée lorsque tu peux expliquer le mécanisme, l'exécuter sur un cas simple, reconnaître un cas où il échoue et nommer ce qui doit encore être appris.",
-      "À faire ce soir, en une heure : choisis une seule tâche que tu veux savoir faire, par exemple « écrire la relance d'un devis ». Rassemble cinq sources, dont une conversation avec une personne du métier si tu peux. Remplis la fiche provisoire : principe, exemple, contre-exemple, pièges et sortie. Tu repars avec une page à tester demain sur un cas réel.",
-    ],
-    citation: "L'outil te fait gagner du temps lorsque tu sais quoi lui montrer, quoi lui demander et comment contrôler sa sortie. La capacité que tu gardes doit survivre au changement d'outil.",
+    titre: "Absorber",
+    label: "Choisir et apprendre une tâche",
+    duree: "",
+    douleur: absorption,
+    solution: [] as string[],
+    citation: "",
   },
   {
     num: "02",
-    titre: "Le sprint cash",
-    label: "La preuve terrain",
-    duree: "Jusqu'à une boucle vendue, livrée et mesurée",
-    douleur: "Ta fiche fonctionne sur un exercice, mais le marché n'a encore validé ni l'offre, ni la livraison, ni la marge. Sans conversations et sans usage réel, tu risques de perfectionner une méthode construite en chambre.",
-    solution: [
-      "Choisis une offre simple, un acheteur identifiable et une livraison compatible avec ta capacité actuelle. Les modèles et logiciels loués peuvent accélérer la production. Utilise-les volontairement, tout en gardant tes sources, tes décisions, tes procédures et tes données dans des formats que tu peux reprendre.",
-      "Côté humain, organise une cadence de conversations et de livraison. Contenu, appels, messages ciblés, introductions et relances sont des canaux à comparer, pas des obligations universelles. Le contenu nourrit la confiance, les appels donnent un retour direct, les messages ouvrent des portes et la livraison révèle ce que le marché accepte vraiment. Chaque contact part d'une scène métier réelle, respecte le consentement du canal et mène vers une prochaine étape claire.",
-      "Trace le parcours complet dans un registre ou un CRM, l’outil qui suit tes contacts et tes ventes (un tableau suffit pour commencer) : recherche minimale, premier contact, réponse, relance, rendez-vous, proposition, décision, livraison et suite. Mesure les conversations utiles, les réponses, les rendez-vous, les offres, les décisions, le délai de livraison, les corrections et la marge. Un volume élevé de messages sans qualité ne prouve rien.",
-      "Exemple fictif, pour lire ces chiffres : tu proposes à des salons de coiffure un formulaire de réservation qui rappelle le rendez-vous la veille. Sur trente messages envoyés en deux semaines, cinq répondent, trois acceptent un appel et un achète. La livraison te prend neuf heures, dont trois de corrections. Tu sais alors où travailler : le message, l'appel ou la livraison.",
-      "L'IA peut préparer une recherche, classer une réponse, proposer un brouillon, résumer un appel ou signaler une relance. Donne-lui un périmètre, des données autorisées, un format de sortie et un niveau d'autonomie. Le choix du destinataire, le message final et l'envoi restent contrôlés lorsque l'action engage une relation ou un risque.",
-      "Compresse les temps morts plutôt que les contrôles. Regroupe les créneaux de prospection, décide plus vite, relance les dossiers ouverts et révise les retours chaque jour de sprint. La qualité de la promesse, la sécurité et les critères d'acceptation restent en place.",
-      "Le format peut être un site, une automatisation bornée, un service répétable, un audit suivi d'une mise en œuvre ou un petit produit validé avec un premier acheteur. Compare le prix avec le temps de préparation, de correction, de support, de suivi et le coût des outils. Une vente non rentable n'est pas une preuve de système.",
-      "Construis une réserve adaptée à ta situation afin de réduire les décisions prises dans l'urgence. Aucun montant universel ne convient à tout le monde. Le repère utile vient de tes dépenses, de la stabilité de tes revenus, de tes responsabilités et du risque accepté.",
-      "Après chaque livraison, note les objections, les demandes, les incidents, les corrections, les délais et les critères d'acceptation. Le sprint se termine lorsque tu disposes d'une preuve autorisée, d'un bilan économique et d'une liste de patterns candidats, c'est-à-dire de gestes qui semblent se répéter et restent à vérifier. Un résultat isolé reste une observation.",
-      "À faire ce soir, en quarante-cinq minutes : ouvre un tableau avec six colonnes, contact, date, canal, réponse, prochaine étape et décision. Inscris dix personnes d'un même métier que tu peux joindre cette semaine, qu'il s'agisse d'une boutique, d'un cabinet ou d'un indépendant. Écris le premier message pour la première. Tu repars avec ton registre de sprint prêt à remplir.",
-    ],
-    citation: "Le terrain transforme une méthode provisoire en jugement. Tu vends, tu livres, tu mesures et tu gardes les traces qui expliqueront ensuite ce qui mérite d'être systématisé.",
+    titre: "Produire",
+    label: "Confronter la fiche au terrain",
+    duree: "",
+    douleur: production,
+    solution: [] as string[],
+    citation: "",
   },
   {
     num: "03",
-    titre: "La grande distillation",
-    label: "Capital organique",
-    duree: "Continue, avec des révisions datées",
-    douleur: "Les résultats existent, mais la valeur reste dispersée dans ta tête, tes messages, tes fichiers et les habitudes de l'équipe. Chaque nouveau projet te force à réexpliquer les mêmes décisions.",
-    solution: [
-      "Commence par les traces du terrain. Sépare faits, incidents, décisions, exceptions et patterns candidats. Transforme seulement ce qui a une source, un contexte de validité et une preuve en SOP, skill, template, bibliothèque d'exemples ou règle de décision. Le reste garde son statut d'hypothèse.",
-      "Côté humain, choisis le bon contenant. Une SOP décrit un chemin stable avec ses prérequis, ses étapes, ses pièges, sa sortie et sa vérification. Un skill encode du jugement avec ses variables, ses contraintes, ses routes, ses interdits, ses délégations et ses portes de qualité.",
-      "Côté IA, donne les traces autorisées et demande une proposition de patch, c'est-à-dire une modification précise que tu peux relire ligne par ligne, plutôt qu'une réécriture silencieuse du système. Le patch contient la source, la date, la raison, les conditions de validité, les tests à ajouter et la règle de retour arrière. Une personne relit puis approuve la promotion.",
-      "Versionne la mémoire, c'est-à-dire garde chaque état daté pour pouvoir revenir en arrière : procédures, skills, modèles, données autorisées, décisions, journaux d'exécution, incidents, métriques et règles de promotion. Une nouvelle version passe sur un périmètre borné. Si elle dégrade la qualité, la marge ou la sécurité, reviens à la version précédente et conserve l'incident.",
-      "Révise selon le terrain et le retour sur investissement. Les modèles, les canaux, les concurrents et les attentes changent. Renforce ce qui améliore une mesure utile, simplifie ce qui ajoute de la dette, ce travail d'entretien qui ne rapporte rien, et retire ce qui n'a plus de contexte valide.",
-      "Exemple fictif : après trois sites livrés à des restaurants, tu remarques que chaque client demande où afficher les allergènes. Tu notes les trois cas, tu écris une règle dans ton skill de site pour restaurant, puis tu la testes sur le quatrième projet. Une boutique de vêtements qui répond vingt fois par mois à la même question de taille remplace ces réponses par un modèle relu.",
-      "Le volume vient après la preuve. Dans une niche connue, tu peux réutiliser une offre, une prospection, une architecture, des standards de livraison et des contrôles déjà éprouvés. Les éléments propres au nouveau client restent réécrits, et les exceptions remontent vers la mémoire.",
-      "Tu peux alors sortir d'une partie de l'exécution sans quitter le métier. Tu observes les mesures, arbitres les priorités, corriges les exceptions et protèges la marge. Un agent peut préparer les dossiers, déclencher des étapes bornées, comparer les sorties et signaler les blocages. Il ne reçoit pas toutes les clés par défaut et ne décide pas seul d'une action sensible.",
-      "Une audience consentie, une newsletter, un groupe, des événements ou une bibliothèque de ressources peuvent devenir un actif de distribution qui ne dépend pas entièrement d'un algorithme de plateforme. Une offre, un partenariat, un sponsoring ou une recommandation peuvent financer cet actif si la relation, la provenance des contacts, l'intérêt annoncé et les limites restent transparents. Ce qui t'appartient vraiment, c'est la relation, la connaissance du sujet, la qualité de la distribution et la capacité à créer de la valeur sans trahir cette confiance. La portée prêtée par un algorithme ne t'appartient pas.",
-      "Teste chaque procédure sur un cas typique, un cas limite et une entrée qui tente de détourner l'instruction. Compare la version distillée à une consigne courte. La promotion est acceptée seulement si la méthode améliore la sortie sans masquer ses erreurs ni dépasser son autonomie.",
-      "À faire ce soir, en trente minutes : ouvre tes trois derniers projets ou tes trois dernières ventes. Note une question, une erreur ou une décision qui revient au moins deux fois. Écris-la en règle d'une phrase avec sa source, sa date et le cas où elle ne s'applique pas. Tu repars avec un premier élément de capital à tester sur le prochain client.",
-    ],
-    citation: "La distillation transforme une preuve située en capacité réutilisable. Le système accélère ce que tu as déjà appris à juger et garde l'humain au centre des arbitrages.",
+    titre: "Distiller",
+    label: "Garder ce qui résiste au réel",
+    duree: "",
+    douleur: distillation,
+    solution: [] as string[],
+    citation: "",
   },
-];
+] as const;

@@ -25,9 +25,18 @@ const AGENTIQUE_V1 = [
 ] as const;
 
 const COFFRE_V1 = [
-  ...AGENTIQUE_V1,
+  "README.md",
+  ...SOCLE_V1,
   "09-message-decision-preuve.md",
   "10-qualification-experimentation-premiere-valeur.md",
+  "entreprise-01-cerveau-federe.md",
+  "entreprise-02-cartographie-poles.md",
+  "entreprise-formats.md",
+  "entreprise-04-competences-skills-sop.md",
+  "entreprise-05-outils-api-cli-mcp.md",
+  "entreprise-06-workflows-interpoles.md",
+  "entreprise-07-adoption-preuves-promotion.md",
+  "entreprise-08-templates-et-exercices.md",
   "entreprise-09-gouvernance-capacites-et-reprise.md",
 ] as const;
 

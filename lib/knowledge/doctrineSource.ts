@@ -10,6 +10,21 @@ export function doctrineDocuments(files: readonly DoctrineFile[]): KnowledgeDocu
   }));
 }
 export async function collectDoctrineDocuments(): Promise<KnowledgeDocument[]> {
-  const { readPublishedDoctrine } = await import("../doctrine/storage");
-  return doctrineDocuments(await readPublishedDoctrine());
+  const [{ CHAPTER_META }, { allHermesMarkdown, hermesIntroductionMarkdown }] = await Promise.all([
+    import("../../app/videos/tutos/chapters"),
+    import("../hermes/content"),
+  ]);
+  const chapters = doctrineDocuments(allHermesMarkdown()).map((document) => ({
+    ...document,
+    title: CHAPTER_META[document.sourceId]?.displayTitle ?? document.title,
+    metadata: { kind: "chapter" },
+  }));
+  return [{
+    source: "doctrine",
+    sourceId: "introduction:hermes",
+    title: "Hermes Agent : de zéro à ton premier workflow",
+    content: hermesIntroductionMarkdown(),
+    tier: "full",
+    metadata: { kind: "introduction" },
+  }, ...chapters];
 }

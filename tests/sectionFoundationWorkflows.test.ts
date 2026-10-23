@@ -1,64 +1,83 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
+import { ANGLE_MORT, SECTIONS } from "../app/beginner/sections.data";
+import {
+  allFoundationIntroductions,
+  allFoundationMarkdown,
+  foundationMarkdown,
+} from "../lib/fondations/content";
+import { collectFondationsDocuments } from "../lib/knowledge/sources";
+import { buildSearchCatalog, searchCatalog } from "../lib/search/catalog";
 
-const sectionPath = new URL(
-  "../app/beginner/sections/Section1.tsx",
-  import.meta.url
-);
-const foundationGridPath = new URL("../app/beginner/page.tsx", import.meta.url);
-const foundationDataPath = new URL("../app/beginner/sections.data.ts", import.meta.url);
-const foundationComponentsPath = new URL("../app/beginner/sections.components.tsx", import.meta.url);
-const foundationDetailPath = new URL("../app/beginner/[sectionId]/page.tsx", import.meta.url);
-const brandLogoReadmePath = new URL("../public/brand-logos/README.md", import.meta.url);
-const blocClientPath = new URL("../app/blocs/[id]/BlocClient.tsx", import.meta.url);
+const read = (relativePath: string) => readFileSync(new URL(`../${relativePath}`, import.meta.url), "utf8");
 
-test("les Fondations rendent visibles les workflows du chantier E", () => {
-  assert.equal(existsSync(sectionPath), true);
-  const source = readFileSync(sectionPath, "utf8");
-
-  for (const requiredContent of [
-    "Les workflows se prouvent dans le travail réel",
-    "Recherche vers résultat",
-    "Skill et synchronisation",
-    "Source vers contenu",
-    "Connexion vers action",
-    "Miniature YouTube",
-    "SEO et visibilité générative",
-    "readback",
-    "/brand-logos/hermes-agent-mark.png",
-    "/brand-logos/tiktok.svg",
-    "/brand-logos/youtube.svg",
-    "/brand-logos/github.svg",
-  ]) {
-    assert.ok(source.includes(requiredContent), `contenu absent: ${requiredContent}`);
-  }
-
-  for (const privateMarker of ["Nora", "Atelier Marketing", "tiktok-2", "Treg", "Google Search Console"]) {
-    assert.equal(source.includes(privateMarker), false, `marqueur interne exposé: ${privateMarker}`);
-  }
-
-  assert.equal(source.includes(String.fromCodePoint(0x2014)), false);
+test("les Fondations suivent l'ordre validé sans changer les identifiants", () => {
+  assert.deepEqual(SECTIONS.map((section) => section.id), [
+    "mindset",
+    "psychologie",
+    "vente",
+    "copywriting",
+    "marketing",
+    "penser",
+    "environnement",
+    "visuels",
+    "site-web",
+    "url",
+  ]);
+  assert.equal(ANGLE_MORT.num, "12");
+  assert.deepEqual(SECTIONS.map((section) => section.num), ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]);
+  assert.equal(ANGLE_MORT.id, "angle-mort");
 });
 
-test("la grille client des Fondations ne transporte pas les chapitres payants", () => {
-  const gridSource = readFileSync(foundationGridPath, "utf8");
-  const dataSource = readFileSync(foundationDataPath, "utf8");
-  const componentsSource = readFileSync(foundationComponentsPath, "utf8");
-  const detailSource = readFileSync(foundationDetailPath, "utf8");
+test("les fichiers Markdown publics excluent les notes internes et le titre déjà rendu", () => {
+  const chapters = allFoundationMarkdown();
+  const introductions = allFoundationIntroductions();
+  assert.equal(chapters.length, 11);
+  assert.equal(introductions.length, 2);
 
-  assert.equal(gridSource.includes("./sections/"), false);
-  assert.equal(dataSource.includes("./sections/"), false);
-  assert.equal(dataSource.includes("Component:"), false);
-  assert.ok(componentsSource.startsWith('import "server-only";'));
-  assert.equal(detailSource.includes('"use client"'), false);
-  assert.ok(detailSource.includes('from "@/lib/supabase/server"'));
-  assert.ok(detailSource.includes("normalizeProfileTier"));
+  for (const { id, content } of [...chapters, ...introductions]) {
+    const body = content.replace(/^---\n[\s\S]*?\n---\n/, "");
+    assert.doesNotMatch(body, /^#\s/m, `${id}: titre H1 dupliqué`);
+    assert.doesNotMatch(content, /^## Inventaire des idées/m, `${id}: inventaire interne exposé`);
+    assert.doesNotMatch(content, /^## Spécifications? (?:des |du )?(?:schémas|maquettes)/m, `${id}: spécification interne exposée`);
+    assert.doesNotMatch(content, /[\u2013\u2014]/, `${id}: tiret interdit`);
+  }
+
+  assert.match(foundationMarkdown("copywriting"), /:::avant-apres/);
+  assert.match(foundationMarkdown("url"), /```bash[\s\S]*git push -u origin main/);
+  assert.match(foundationMarkdown("angle-mort"), /LE\u00a0COFFRE/);
+  assert.doesNotMatch(foundationMarkdown("angle-mort"), /\{(?:COFFRE_LABEL|COFFRE_PRICE|UPGRADE_PRICE)\}/);
+});
+
+test("le lecteur commun reçoit le Markdown après la garde d'accès", () => {
+  const detail = read("app/beginner/[sectionId]/page.tsx");
+  const foundationReader = read("components/reader/FoundationReader.tsx");
+  const readerView = read("components/reader/ReaderView.tsx");
+
+  assert.equal(detail.includes('"use client"'), false);
+  assert.ok(detail.indexOf('tier !== "beginner"') < detail.indexOf("foundationMarkdown(current.id)"));
+  assert.match(detail, /markdown=\{markdown\}/);
+  assert.match(foundationReader, /markdown: chapter\.id === currentId \? markdown : undefined/);
+  assert.match(readerView, /currentMarkdown \? <ReaderProse/);
+  assert.match(readerView, /videoIntroductionMarkdown/);
+  assert.equal(existsSync(new URL("../app/beginner/sections.components.tsx", import.meta.url)), false);
+});
+
+test("la recherche et le corpus utilisent le nouveau texte sans l'exposer au palier gratuit", async () => {
+  const beginnerCatalog = buildSearchCatalog("beginner");
+  assert.ok(searchCatalog(beginnerCatalog, "sac préparé dans le noir").some((item) => item.id === "chapter-copywriting"));
+  assert.deepEqual(searchCatalog(buildSearchCatalog("free"), "sac préparé dans le noir"), []);
+
+  const documents = await collectFondationsDocuments();
+  assert.equal(documents.length, 13);
+  assert.ok(documents.every((document) => document.source === "fondations" && document.tier === "beginner"));
+  assert.match(documents.find((document) => document.sourceId === "vente")?.content ?? "", /Le premier objectif d'une vente est de comprendre si tu dois vendre/);
 });
 
 test("les actifs publics n'exposent pas de connexion interne ni de preuve sociale non étayée", () => {
-  const brandLogoReadme = readFileSync(brandLogoReadmePath, "utf8");
-  const blocClient = readFileSync(blocClientPath, "utf8");
+  const brandLogoReadme = read("public/brand-logos/README.md");
+  const blocClient = read("app/blocs/[id]/BlocClient.tsx");
 
   assert.equal(brandLogoReadme.includes("treg.to"), false);
   assert.equal(blocClient.includes("Communauté privée de builders actifs"), false);

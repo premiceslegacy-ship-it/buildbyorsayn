@@ -1,12 +1,13 @@
 import "server-only";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { DaRoot } from "@/components/da/DaRoot";
 import { NavBar } from "@/components/NavBar";
 import { ReaderView, type ReaderChapter } from "@/components/reader/ReaderView";
 import { navIdentity } from "@/lib/auth/navIdentity.server";
+import { hermesIntroductionMarkdown } from "@/lib/hermes/content";
 import { chapterTitle, withoutLeadingTitle } from "../../../doctrine/markdown";
 import { CHAPTER_DIAGRAMS } from "../chapterDiagrams";
-import { CHAPTER_META, chapterSlug, chapterPathFromSlug, orderCurriculumFiles } from "../chapters";
+import { CHAPTER_META, chapterRedirectFromSlug, chapterSlug, chapterPathFromSlug, orderCurriculumFiles } from "../chapters";
 import { hermesGate } from "../gate.server";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,9 @@ export const revalidate = 0;
 
 export default async function HermesChapterPage({ params }: { params: Promise<{ chapterSlug: string }> }) {
   const { chapterSlug: slug } = await params;
+  const redirectSlug = chapterRedirectFromSlug(slug);
+  if (redirectSlug) permanentRedirect(`/videos/tutos/${redirectSlug}`);
+
   const [gate, identity] = await Promise.all([hermesGate(), navIdentity()]);
   if (gate.files === null) return gate.render;
 
@@ -23,7 +27,10 @@ export default async function HermesChapterPage({ params }: { params: Promise<{ 
 
   const meta = CHAPTER_META[file.path];
   const displayTitle = meta?.displayTitle ?? chapterTitle(file);
-  const body = withoutLeadingTitle(file).content;
+  const chapterBody = withoutLeadingTitle(file).content;
+  const body = file.path === "README.md"
+    ? `${hermesIntroductionMarkdown()}\n\n${chapterBody}`
+    : chapterBody;
   const curriculumFiles = orderCurriculumFiles(gate.files);
   const currentId = chapterSlug(file.path);
   const sections: ReaderChapter[] = curriculumFiles.map((entry, index) => ({

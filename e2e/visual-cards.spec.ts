@@ -55,7 +55,7 @@ authedTest.describe("Diagram visual regression", () => {
   authedTest.skip(!hasE2eAccount, "E2E_TEST_EMAIL/E2E_TEST_PASSWORD not configured");
 
   authedTest("a Frame diagram never overlaps the BUILD mark with its own content", async ({ authedPage: page }) => {
-    // Section2 (Fondations "Démystifier le LLM") renders PromptContextDiagram
+    // Le chapitre Fondations « Comprendre l'environnement » rend ses schémas via ReaderProse.
     // inline in its markup. Fondations requires a signed-in session.
     await page.goto("/beginner/environnement?mode=text");
     await authedExpect(page.getByRole("radio", { name: "Texte" })).toHaveAttribute("aria-checked", "true");

@@ -14,17 +14,17 @@ export const SECTIONS = [
     illustrationId: "fondations-tech-foundation",
   },
   {
-    id: "copywriting",
+    id: "vente",
     num: "03",
-    label: "Écrire pour vendre",
-    summary: "Écris pour que la bonne personne se reconnaisse, comprenne ce qui change et sache quoi faire.",
+    label: "Vendre",
+    summary: "La vente fait peur parce qu'on l'imagine comme du baratin de marchand de tapis. C'est l'inverse.",
     illustrationId: "fondations-tech-foundation",
   },
   {
-    id: "vente",
+    id: "copywriting",
     num: "04",
-    label: "Vendre",
-    summary: "La vente fait peur parce qu'on l'imagine comme du baratin de marchand de tapis. C'est l'inverse.",
+    label: "Écrire pour vendre",
+    summary: "Écris pour que la bonne personne se reconnaisse, comprenne ce qui change et sache quoi faire.",
     illustrationId: "fondations-tech-foundation",
   },
   {
@@ -73,7 +73,7 @@ export const SECTIONS = [
 
 export const ANGLE_MORT = {
   id: "angle-mort",
-  num: "11",
+  num: "12",
   label: "Le seuil",
   summary: "Tu as les Fondations entre les mains. Regarde maintenant ce qui te fait sortir de la dépendance pour de bon.",
   illustrationId: "fondations-tech-foundation",

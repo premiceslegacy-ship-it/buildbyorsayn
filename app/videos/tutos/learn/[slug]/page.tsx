@@ -4,8 +4,9 @@ import { DaRoot } from "@/components/da/DaRoot";
 import { NavBar } from "@/components/NavBar";
 import { ReaderView, type ReaderChapter } from "@/components/reader/ReaderView";
 import { navIdentity } from "@/lib/auth/navIdentity.server";
+import { HERMES_CHAPTER_PATHS, hermesMarkdown } from "@/lib/hermes/content";
 import { hermesGate } from "../../gate.server";
-import { HermesLearningContent, isLearningSlug, LEARNING_BLOCKS } from "../content";
+import { isLearningSlug, LEARNING_BLOCKS } from "../content";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -17,6 +18,7 @@ export default async function HermesLearningBlockPage({ params }: { params: Prom
 
   const [identity, gate] = await Promise.all([navIdentity(), hermesGate()]);
   if (gate.files === null) return gate.render;
+  const currentBlock = LEARNING_BLOCKS.find((block) => block.slug === slug)!;
 
   const sections: ReaderChapter[] = LEARNING_BLOCKS.map((block) => ({
     id: block.slug,
@@ -26,7 +28,7 @@ export default async function HermesLearningBlockPage({ params }: { params: Prom
     durationLabel: block.duration,
     href: `/videos/tutos/learn/${block.slug}`,
     hideArticleHeader: block.slug === slug,
-    content: block.slug === slug ? <HermesLearningContent slug={slug} /> : undefined,
+    markdown: block.slug === slug ? hermesMarkdown(block.chapterPath) : undefined,
   }));
 
   return <DaRoot className="da-app has-tabbar">
@@ -47,6 +49,9 @@ export default async function HermesLearningBlockPage({ params }: { params: Prom
       initialMode="texte"
       initialChapter={slug}
       syncAddress={false}
+      copyMarkdown={hermesMarkdown(currentBlock.chapterPath)}
+      markdownLocalPaths={HERMES_CHAPTER_PATHS}
+      markdownBaseHref="/videos/tutos"
     />
   </DaRoot>;
 }

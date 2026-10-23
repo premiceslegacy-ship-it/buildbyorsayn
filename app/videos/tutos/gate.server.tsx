@@ -4,6 +4,7 @@ import { ArrowLeft, Lock } from "lucide-react";
 import { redirect } from "next/navigation";
 import { doctrineAccessStatus } from "@/lib/doctrine/access.server";
 import { readPublishedDoctrine } from "@/lib/doctrine/storage";
+import { allHermesMarkdown } from "@/lib/hermes/content";
 import type { DoctrineFile } from "../../doctrine/markdown";
 import { COFFRE_LABEL, COFFRE_PRICE } from "@/lib/pricing";
 import { DaRoot } from "@/components/da/DaRoot";
@@ -59,8 +60,8 @@ export async function hermesGate(): Promise<HermesGateResult> {
   if (status !== 200) return { ok: false, render: <LockedGate />, files: null };
 
   try {
-    const files = await readPublishedDoctrine();
-    return { ok: true, render: null, files };
+    await readPublishedDoctrine();
+    return { ok: true, render: null, files: allHermesMarkdown() };
   } catch {
     return { ok: false, render: <UnavailableGate />, files: null };
   }

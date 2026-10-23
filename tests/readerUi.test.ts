@@ -163,6 +163,25 @@ test("le style du lecteur garde les marges mobiles et n'ajoute aucune bande lat�
   assert.doesNotMatch(css, /\.article\s*\{[^}]*border-left\s*:/s);
 });
 
+test("le texte riche garde un rythme lisible et borne ses visuels dans la voie disponible", () => {
+  const css = read("components/reader/reader.module.css");
+  assert.match(css, /\.prose > p \+ p \{\s*margin-top: \.95em !important;/);
+  assert.match(css, /\.prose h2 \{[\s\S]*?font-size: calc\(28px \* var\(--reader-font-scale\)\) !important;[\s\S]*?font-weight: 600 !important;/);
+  assert.match(css, /@media \(max-width: 734px\)[\s\S]*?\.prose h2 \{[\s\S]*?font-size: calc\(22px \* var\(--reader-font-scale\)\) !important;/);
+  assert.match(css, /\.textLayout\[data-outline-open="true"\] \{\s*--reader-wide-width: min\(960px,/);
+  assert.match(css, /\.textLayout \{\s*--reader-wide-width: calc\(100vw - 40px\);\s*width: auto;/);
+  assert.match(css, /box-decoration-break: clone/);
+  assert.match(css, /-webkit-box-decoration-break: clone/);
+});
+
+test("la route de contrôle du lecteur reste locale au développement et charge le vrai chapitre", () => {
+  const page = read("app/dev/lecteur/page.tsx");
+  assert.match(page, /process\.env\.NODE_ENV !== "development"/);
+  assert.match(page, /foundationMarkdown\(chapter\.id as BeginnerSectionId\)/);
+  assert.match(page, /initialMode="texte"/);
+  assert.match(page, /syncAddress=\{false\}/);
+});
+
 test("la ligne active garde exactement la grille et les métriques des autres chapitres", () => {
   const view = read("components/reader/ReaderView.tsx");
   const css = read("components/reader/reader.module.css");

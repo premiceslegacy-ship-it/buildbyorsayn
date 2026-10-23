@@ -11,8 +11,23 @@ export function stripFrontmatter(content: string): string {
   return end < 0 ? "" : text.slice(4 + end).replace(/^[^\n]*(?:\n|$)/, "");
 }
 
+function frontmatterValue(content: string, key: string): string | undefined {
+  const text = content.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+  if (!text.startsWith("---\n")) return undefined;
+  const end = text.indexOf("\n---\n", 4);
+  if (end < 0) return undefined;
+  return text.slice(4, end).match(new RegExp(`^${key}:\\s*(.+?)\\s*$`, "m"))?.[1];
+}
+
 export function chapterTitle(file: DoctrineFile): string {
-  return stripFrontmatter(file.content).match(/^#\s+(.+?)\s*#*$/m)?.[1] || file.path.replace(/\.md$/, "");
+  return frontmatterValue(file.content, "titre")
+    ?? frontmatterValue(file.content, "title")
+    ?? stripFrontmatter(file.content).match(/^#\s+(.+?)\s*#*$/m)?.[1]
+    ?? file.path.replace(/\.md$/, "");
+}
+
+export function doctrineChapterId(file: DoctrineFile): string | undefined {
+  return frontmatterValue(file.content, "id");
 }
 
 /**
@@ -25,6 +40,16 @@ export function withoutLeadingTitle(file: DoctrineFile): DoctrineFile {
   const stripped = stripFrontmatter(file.content);
   const withoutHeading = stripped.replace(/^#\s+.+?\s*#*$(?:\n|$)/m, "");
   return { ...file, content: withoutHeading };
+}
+
+export function splitDoctrineAnnex(file: DoctrineFile): { chapter: DoctrineFile; annex?: DoctrineFile } {
+  const marker = "<!-- doctrine-annexes -->";
+  const index = file.content.indexOf(marker);
+  if (index < 0) return { chapter: withoutLeadingTitle(file) };
+  return {
+    chapter: withoutLeadingTitle({ ...file, content: file.content.slice(0, index) }),
+    annex: { ...file, content: file.content.slice(index + marker.length).trim() },
+  };
 }
 
 export function doctrineHref(

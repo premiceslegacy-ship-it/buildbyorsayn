@@ -1,5 +1,5 @@
 // Privileged runtime reader. Import only from server components or operator scripts.
-import { DOCTRINE_BUCKET, DOCTRINE_MANIFEST_PATH, doctrineArtifactPath, parseDoctrineManifest, verifyDoctrineFiles, type DoctrineFile } from "./publication";
+import { DOCTRINE_BUCKET, DOCTRINE_MANIFEST_PATH, parseDoctrineManifest, verifyDoctrineFiles, type DoctrineFile } from "./publication";
 import { DOCTRINE_MANIFEST_MAX_BYTES, DOCTRINE_TOTAL_MAX_BYTES, DOCTRINE_READ_TIMEOUT_MS, readBoundedResponse, withinDoctrineReadDeadline, type DoctrineReadBudget } from "./readbounded";
 import { doctrineInventory } from "./inventory";
 
@@ -42,7 +42,7 @@ async function readPublishedDoctrineUncached(): Promise<readonly DoctrineFile[]>
     const bucket = decode(await fetchBounded(`bucket/${DOCTRINE_BUCKET}`, { remainingBytes: DOCTRINE_MANIFEST_MAX_BYTES, deadline: sharedDeadline }));
     if (!bucket || bucket.public !== false) throw new Error("Private doctrine bucket required");
     const manifest = parseDoctrineManifest(decode(await fetchBounded(`object/${DOCTRINE_BUCKET}/${DOCTRINE_MANIFEST_PATH}`, { remainingBytes: DOCTRINE_MANIFEST_MAX_BYTES, deadline: sharedDeadline })));
-    doctrineInventory(manifest.artifacts.map((artifact) => artifact.path));
+    const order = doctrineInventory(manifest.artifacts.map((artifact) => artifact.path));
     // Fail before artifact requests; total stays bounded even though each
     // artifact now carries its own isolated sub-budget below.
     const totalArtifactBytes = manifest.artifacts.reduce((sum, artifact) => sum + artifact.bytes, 0);
@@ -51,7 +51,8 @@ async function readPublishedDoctrineUncached(): Promise<readonly DoctrineFile[]>
       fetchBounded(`object/${DOCTRINE_BUCKET}/${path}`, { remainingBytes: artifact.bytes, deadline: sharedDeadline })
     );
     if (performance.now() >= sharedDeadline) throw new Error("Published doctrine unavailable");
-    return files;
+    const byPath = new Map(files.map((file) => [file.path, file]));
+    return order.map((path) => byPath.get(path)!);
   } catch { throw new Error("Published doctrine unavailable"); }
   finally { controller.abort(); }
 }

@@ -19,6 +19,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /** Dossiers et fichiers de contenu lus. Tout ce qui s'affiche à la personne qui apprend ou achète. */
 const CONTENT_TARGETS = [
+  "content/fondations",
   "app/beginner",
   "app/blocs",
   "app/videos/tutos",

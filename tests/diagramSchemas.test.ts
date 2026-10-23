@@ -17,6 +17,14 @@ const schemaSources = [
   "components/schemas/fondations/vendre.tsx",
   "components/schemas/fondations/ecrire.tsx",
   "components/schemas/fondations/attention.tsx",
+  "components/schemas/fondations/shared-b.tsx",
+  "components/schemas/fondations/intro-url.tsx",
+  "components/schemas/fondations/penser.tsx",
+  "components/schemas/fondations/environnement.tsx",
+  "components/schemas/fondations/visuels.tsx",
+  "components/schemas/fondations/site-web.tsx",
+  "components/schemas/fondations/url.tsx",
+  "components/schemas/fondations/seuil.tsx",
   "components/schemas/hermes/shared.tsx",
   "components/schemas/hermes/01-intro.tsx",
   "components/schemas/hermes/02-installer-et-essayer.tsx",
@@ -146,20 +154,12 @@ test("les 23 schémas historiques restent exportés depuis les chemins attendus"
 
 test("le schéma du chapitre Fondations 10 suit la donnée réelle", () => {
   const data = read("app/beginner/sections.data.ts");
+  const markdown = read("content/fondations/url.md");
   const reader = read("components/reader/FoundationReader.tsx");
   assert.match(data, /id: "url"[\s\S]*num: "10"[\s\S]*label: "De l'idée à l'URL en ligne"/);
-  assert.match(reader, /import \{ ProjectPipelineDiagram \} from "@\/components\/schemas\/foundations"/);
-  assert.match(reader, /currentId === "url" \? <ProjectPipelineDiagram \/>/);
+  assert.match(markdown, /\[\[schema:DuDossierAuDomaine\]\]/);
+  assert.doesNotMatch(reader, /ProjectPipelineDiagram/);
   assert.doesNotMatch(reader, /use client/);
-});
-
-test("les schémas Fondations et Protocole restent aux points d'insertion réels", () => {
-  const penser = read("app/beginner/sections/Section1.tsx");
-  const environnement = read("app/beginner/sections/Section2.tsx");
-  const protocole = read("app/protocole/page.tsx");
-  for (const component of ["ContextFilesDiagram", "FounderDossierDiagram"]) assert.match(penser, new RegExp(`<${component} \\/>`));
-  for (const component of ["PromptContextDiagram", "ApiFlowDiagram"]) assert.match(environnement, new RegExp(`<${component} \\/>`));
-  for (const component of ["LocataireVsCapitalDiagram", "ProtocolePipelineDiagram"]) assert.match(protocole, new RegExp(`<${component} \\/>`));
 });
 
 test("chaque marqueur de la vidéo Ce qui ne change pas est enregistré", (context) => {
@@ -191,7 +191,7 @@ test("chaque marqueur de la vidéo Ce qui ne change pas est enregistré", (conte
 
   assert.equal(markers.length, 25, "les six fiches contiennent 25 marqueurs");
   assert.equal(new Set(markers).size, markers.length, "les marqueurs sont uniques");
-  assert.deepEqual([...registered].sort(), [...markers].sort());
+  assert.deepEqual([...registered].filter((name) => markers.includes(name)).sort(), [...markers].sort());
 });
 
 test("chaque marqueur des onze premiers chapitres Hermes est enregistré", (context) => {

@@ -9,6 +9,7 @@ import { chunkText } from "../../lib/knowledge/chunk";
 import {
   collectAccompagnementDocuments,
   collectBlocsDocuments,
+  collectFondationsDocuments,
   collectProtocoleDocuments,
   collectSkillsCatalogDocuments,
 } from "../../lib/knowledge/sources";
@@ -54,6 +55,7 @@ let offlineCorpusPromise: Promise<KnowledgeMatch[]> | null = null;
 
 function offlineCorpus(): Promise<KnowledgeMatch[]> {
   offlineCorpusPromise ??= Promise.all([
+    collectFondationsDocuments(),
     collectBlocsDocuments(),
     collectProtocoleDocuments(),
     collectAccompagnementDocuments(),

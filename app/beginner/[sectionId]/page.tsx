@@ -5,10 +5,9 @@ import { NavBar } from "@/components/NavBar";
 import { DaRoot } from "@/components/da/DaRoot";
 import { FoundationReader } from "@/components/reader/FoundationReader";
 import { parseReaderMode } from "@/components/reader/readerModel";
-import { Section5 } from "../sections/Section5";
+import { foundationIntroductionForSection, foundationMarkdown } from "@/lib/fondations/content";
 import { ANGLE_MORT, findSectionIndex, SECTIONS } from "../sections.data";
-import { SectionContent } from "../sections.components";
-import { UPGRADE_PATH } from "@/lib/pricing";
+import { FoundationUpgradeCard } from "../FoundationUpgradeCard";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +55,8 @@ export default async function BeginnerSectionPage({ params, searchParams }: Prop
     ...chapter,
     href: `/beginner/${chapter.id}`,
   }));
+  const markdown = foundationMarkdown(current.id);
+  const introductionMarkdown = foundationIntroductionForSection(current.id);
 
   return <DaRoot className="da-app has-tabbar">
     <NavBar
@@ -75,10 +76,9 @@ export default async function BeginnerSectionPage({ params, searchParams }: Prop
       previous={previous}
       next={next}
       initialMode={parseReaderMode(query.mode)}
-    >
-      {isAngleMort
-        ? <Section5 upgradeUrl={UPGRADE_PATH} isFullUser={tier === "full"} />
-        : section ? <SectionContent id={section.id} /> : null}
-    </FoundationReader>
+      markdown={markdown}
+      introductionMarkdown={introductionMarkdown}
+      afterContent={isAngleMort && tier !== "full" ? <FoundationUpgradeCard /> : undefined}
+    />
   </DaRoot>;
 }

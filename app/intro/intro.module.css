@@ -1,9 +1,11 @@
-.header {
-  width: min(100% - 2 * var(--gutter), 74rem);
+.page {
+  width: min(100% - 2 * var(--gutter), 64rem);
   margin-inline: auto;
-  padding-top: calc(var(--bar) + clamp(70px, 10vw, 136px));
-  display: grid;
-  gap: 20px;
+  padding: calc(var(--bar) + clamp(64px, 9vw, 120px)) 0 clamp(72px, 9vw, 120px);
+}
+
+.header {
+  margin-bottom: clamp(42px, 7vw, 76px);
 }
 
 .header h1 {
@@ -14,54 +16,89 @@
   text-wrap: balance;
 }
 
-.header p {
-  max-width: 43rem;
+.prose {
   color: var(--t2);
-  font: 400 clamp(18px, 1.8vw, 22px)/1.5 var(--font);
+  font: 400 18px/1.72 var(--font);
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose h2,
+.prose h3 {
+  color: var(--encre);
+  font-family: var(--font-t);
+  font-weight: 650;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.prose h2 {
+  max-width: 18ch;
+  margin: clamp(64px, 9vw, 104px) 0 24px;
+  font-size: clamp(30px, 4.5vw, 52px);
+  letter-spacing: -.04em;
+}
+
+.prose h3 {
+  margin: 34px 0 14px;
+  font-size: clamp(22px, 2.5vw, 30px);
+  letter-spacing: -.025em;
+}
+
+.prose p,
+.prose ol,
+.prose ul {
+  max-width: 45rem;
+  margin-block: 1.15rem;
   text-wrap: pretty;
 }
 
-.content {
-  width: min(100% - 2 * var(--gutter), 74rem);
-  margin: clamp(76px, 10vw, 132px) auto 0;
+.prose ol,
+.prose ul {
   display: grid;
-  gap: clamp(80px, 10vw, 136px);
+  gap: 10px;
+  padding-left: 1.5rem;
 }
 
-.section { display: grid; gap: clamp(30px, 4vw, 52px); }
-.sectionHead { max-width: 46rem; display: grid; gap: 12px; }
-.sectionHead h2 { color: var(--encre); font: 650 clamp(30px, 4vw, 48px)/1.08 var(--font-t); letter-spacing: -.035em; text-wrap: balance; }
-.sectionHead p { color: var(--t2); font: 400 17px/1.55 var(--font); text-wrap: pretty; }
+.prose ol { list-style: decimal; }
+.prose ul { list-style: disc; }
 
-.rows { display: grid; }
-.row { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: clamp(18px, 3vw, 38px); padding: clamp(24px, 3vw, 38px) 0; border-top: 1px solid var(--trait); }
-.row:last-child { border-bottom: 1px solid var(--trait); }
-.number { color: var(--t3); font: 600 clamp(22px, 3vw, 34px)/1 var(--font-t); letter-spacing: -.04em; }
-.rowBody { display: grid; gap: 8px; }
-.rowBody h3 { color: var(--encre); font: 600 clamp(20px, 2.2vw, 26px)/1.25 var(--font-t); }
-.rowBody p { max-width: 56rem; color: var(--t2); font: 400 17px/1.55 var(--font); }
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-top: clamp(72px, 10vw, 128px);
+  padding: clamp(34px, 5vw, 58px) 0;
+  border-top: 1px solid var(--trait);
+}
 
-.skills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); }
-.skill { min-height: 260px; display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: clamp(18px, 3vw, 34px); padding: clamp(24px, 3vw, 34px); border-radius: var(--r-m); background: var(--carte); }
-.skill img { width: 112px; height: 112px; object-fit: contain; }
-.skillCopy { display: grid; gap: 10px; }
-.skill h3 { color: var(--encre); font: 600 21px/1.25 var(--font-t); }
-.skill p { color: var(--t2); font: 400 15px/1.52 var(--font); text-wrap: pretty; }
+.actionCopy {
+  display: grid;
+  gap: 10px;
+}
 
-.action { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: clamp(34px, 5vw, 58px) 0; border-top: 1px solid var(--trait); }
-.actionCopy { display: grid; gap: 10px; }
-.action h2 { color: var(--encre); font: 650 clamp(28px, 3.6vw, 42px)/1.12 var(--font-t); letter-spacing: -.03em; }
-.action p { max-width: 40rem; color: var(--t2); font: 400 17px/1.55 var(--font); }
+.action h2 {
+  color: var(--encre);
+  font: 650 clamp(28px, 3.6vw, 42px)/1.12 var(--font-t);
+  letter-spacing: -.03em;
+}
+
+.action p {
+  max-width: 40rem;
+  color: var(--t2);
+  font: 400 17px/1.55 var(--font);
+}
+
 .action :global(.btn) { flex: none; }
 
-@media (max-width: 850px) {
-  .skills { grid-template-columns: 1fr; }
-}
-
 @media (max-width: 620px) {
-  .row { grid-template-columns: 42px minmax(0, 1fr); }
-  .skill { grid-template-columns: 82px minmax(0, 1fr); }
-  .skill img { width: 82px; height: 82px; }
-  .action { align-items: flex-start; flex-direction: column; }
+  .action {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .action :global(.btn) { width: 100%; }
 }

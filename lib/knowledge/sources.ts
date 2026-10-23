@@ -1,4 +1,6 @@
 import type { McpTier } from "@/lib/mcpAccess";
+import { ANGLE_MORT, SECTIONS } from "@/app/beginner/sections.data";
+import { allFoundationIntroductions, allFoundationMarkdown } from "@/lib/fondations/content";
 import type { SkillAccess } from "@/lib/skillsCatalog";
 import { skillCatalogKnowledgeContent } from "@/lib/knowledge/skillCatalogDescription";
 import { z } from "zod";
@@ -44,6 +46,14 @@ export async function collectBlocsDocuments(): Promise<KnowledgeDocument[]> {
   const documents: KnowledgeDocument[] = [];
 
   for (const bloc of BLOCS_DATA) {
+    documents.push({
+      source: "blocs",
+      sourceId: `introduction:b${bloc.id}`,
+      title: bloc.titre,
+      content: bloc.introduction,
+      tier: bloc.displayNumber === 1 ? "preview" : "full",
+      metadata: { kind: "introduction" },
+    });
     for (const section of bloc.sections) {
       const isShowcaseSection = bloc.displayNumber === 1 && section.id === "b1-s0";
       documents.push({
@@ -52,11 +62,33 @@ export async function collectBlocsDocuments(): Promise<KnowledgeDocument[]> {
         title: `${bloc.titre} - ${section.title}`,
         content: section.content,
         tier: bloc.displayNumber !== 1 ? "full" : isShowcaseSection ? "preview" : "beginner",
+        metadata: { kind: "chapter" },
       });
     }
   }
 
   return documents;
+}
+
+export async function collectFondationsDocuments(): Promise<KnowledgeDocument[]> {
+  const metadata = new Map([...SECTIONS, ANGLE_MORT].map((chapter) => [chapter.id, chapter]));
+  const introductions = allFoundationIntroductions().map((introduction) => ({
+    source: "fondations",
+    sourceId: `introduction:${introduction.id}`,
+    title: introduction.id === "ce-qui-ne-change-pas" ? "Fondations 1 : ce qui ne change pas" : "Fondations 2 : de l'idée à l'URL",
+    content: introduction.content,
+    tier: "beginner" as const,
+    metadata: { kind: "introduction" },
+  }));
+  const chapters = allFoundationMarkdown().map((chapter) => ({
+    source: "fondations",
+    sourceId: chapter.id,
+    title: metadata.get(chapter.id)?.label ?? chapter.id,
+    content: chapter.content,
+    tier: "beginner" as const,
+    metadata: { kind: "chapter" },
+  }));
+  return [...introductions, ...chapters];
 }
 
 export async function collectProtocoleDocuments(): Promise<KnowledgeDocument[]> {

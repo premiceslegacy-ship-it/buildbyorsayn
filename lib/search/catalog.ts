@@ -1,7 +1,8 @@
 import { ANGLE_MORT, SECTIONS } from "@/app/beginner/sections.data";
 import { CHAPTER_META } from "@/app/videos/tutos/chapters";
-import { BLOCS_DATA } from "@/lib/blocCatalog";
+import { BLOCS_DATA } from "@/lib/mockData";
 import { canReadBlocSection } from "@/lib/blocAccess";
+import { foundationIntroductionMarkdown, foundationMarkdown } from "@/lib/fondations/content";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { SKILLS_CATALOG, SKILL_CATEGORY_LABELS } from "@/lib/skillsCatalog";
 
@@ -18,16 +19,16 @@ export function buildSearchCatalog(rawTier: string | null): SearchItem[] {
   const tier = normalizeProfileTier(rawTier);
   const foundationAllowed = tier === "beginner" || tier === "full";
   const items: SearchItem[] = [];
-  const foundationGroups = [
-    { id: "fondations-1", title: "Fondations 1 : ce qui ne change pas", chapters: SECTIONS.slice(0, 5), image: "/da/mini/fondations-1.jpg" },
-    { id: "fondations-2", title: "Fondations 2 : de l'idée à l'URL", chapters: SECTIONS.slice(5), image: "/da/mini/fondations-2.jpg" },
-    { id: "distillation", title: "LA DISTILLATION : absorber, produire, distiller", chapters: [ANGLE_MORT], image: "/da/mini/protocole.jpg" },
-  ];
   if (foundationAllowed) {
+    const foundationGroups = [
+      { id: "fondations-1", title: "Fondations 1 : ce qui ne change pas", chapters: SECTIONS.slice(0, 5), image: "/da/mini/fondations-1.jpg", introduction: foundationIntroductionMarkdown("ce-qui-ne-change-pas") },
+      { id: "fondations-2", title: "Fondations 2 : de l'idée à l'URL", chapters: SECTIONS.slice(5), image: "/da/mini/fondations-2.jpg", introduction: foundationIntroductionMarkdown("de-l-idee-a-l-url") },
+      { id: "distillation", title: "LA DISTILLATION : absorber, produire, distiller", chapters: [ANGLE_MORT], image: "/da/mini/protocole.jpg", introduction: "" },
+    ];
     for (const group of foundationGroups) {
       const href = group.id === "distillation" ? "/protocole" : `/beginner#${group.chapters[0]?.id ?? ""}`;
-      items.push({ id: `video-${group.id}`, kind: "Vidéo", title: group.title, context: `${group.chapters.length} chapitres`, href, image: group.image, locked: false, searchText: `${group.title} ${group.chapters.map((chapter) => `${chapter.label} ${chapter.summary}`).join(" ")}` });
-      group.chapters.forEach((chapter) => items.push({ id: `chapter-${chapter.id}`, kind: "Chapitre", title: chapter.label, context: group.title, href: group.id === "distillation" ? "/protocole" : `/beginner#${chapter.id}`, image: group.image, locked: false, searchText: `${chapter.label} ${chapter.summary} ${group.title}` }));
+      items.push({ id: `video-${group.id}`, kind: "Vidéo", title: group.title, context: `${group.chapters.length} chapitres`, href, image: group.image, locked: false, searchText: `${group.title} ${group.introduction} ${group.chapters.map((chapter) => `${chapter.label} ${chapter.summary} ${foundationMarkdown(chapter.id)}`).join(" ")}` });
+      group.chapters.forEach((chapter) => items.push({ id: `chapter-${chapter.id}`, kind: "Chapitre", title: chapter.label, context: group.title, href: `/beginner/${chapter.id}`, image: group.image, locked: false, searchText: `${chapter.label} ${chapter.summary} ${group.title} ${foundationMarkdown(chapter.id)}` }));
     }
   }
   BLOCS_DATA.forEach((bloc) => {
@@ -35,8 +36,8 @@ export function buildSearchCatalog(rawTier: string | null): SearchItem[] {
     const unlocked = bloc.sections.some((section) => canReadBlocSection(tier, bloc.id, section.id));
     if (unlocked) {
       const visibleSections = bloc.sections.filter((section) => canReadBlocSection(tier, bloc.id, section.id));
-      items.push({ id: `video-bloc-${bloc.id}`, kind: "Vidéo", title: bloc.titre, context: `${visibleSections.length} chapitres`, href: `/blocs/${bloc.id}`, image, locked: false, searchText: `${bloc.titre} ${visibleSections.map((section) => section.title).join(" ")}` });
-      visibleSections.forEach((section) => items.push({ id: `chapter-${section.id}`, kind: "Chapitre", title: section.title, context: bloc.titre, href: `/blocs/${bloc.id}#${section.id}`, image, locked: false, searchText: `${section.title} ${bloc.titre}` }));
+      items.push({ id: `video-bloc-${bloc.id}`, kind: "Vidéo", title: bloc.titre, context: `${visibleSections.length} chapitres`, href: `/blocs/${bloc.id}`, image, locked: false, searchText: `${bloc.titre} ${bloc.introduction} ${visibleSections.map((section) => `${section.title} ${section.content}`).join(" ")}` });
+      visibleSections.forEach((section) => items.push({ id: `chapter-${section.id}`, kind: "Chapitre", title: section.title, context: bloc.titre, href: `/blocs/${bloc.id}#${section.id}`, image, locked: false, searchText: `${section.title} ${bloc.titre} ${section.content}` }));
     }
   });
   const hermesAllowed = tier === "full";
@@ -49,10 +50,12 @@ export function buildSearchCatalog(rawTier: string | null): SearchItem[] {
 }
 
 export function searchCatalog(items: SearchItem[], query: string) {
-  const terms = query.toLocaleLowerCase("fr-FR").normalize("NFD").replace(/\p{Diacritic}/gu, "").trim().split(/\s+/).filter(Boolean);
+  const normalizedQuery = query.toLocaleLowerCase("fr-FR").normalize("NFD").replace(/\p{Diacritic}/gu, "").trim();
+  const terms = normalizedQuery.split(/\s+/).filter(Boolean);
   if (!terms.length) return [];
   return items.filter((item) => {
     const haystack = `${item.title} ${item.context} ${item.searchText}`.toLocaleLowerCase("fr-FR").normalize("NFD").replace(/\p{Diacritic}/gu, "");
-    return terms.every((term) => haystack.includes(term));
+    const numericExpressionMatches = !terms.some((term) => /^\d+$/.test(term)) || haystack.includes(normalizedQuery);
+    return numericExpressionMatches && terms.every((term) => haystack.includes(term));
   }).slice(0, 24);
 }
