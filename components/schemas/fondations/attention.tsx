@@ -41,8 +41,8 @@ export function ObserverSansCopierDiagram() {
   return <AdCard
     title="Garde le principe, pas la phrase"
     description="Exemple : une accroche de coach recopiée par une organisatrice de mariages, puis réécrite avec ses faits."
-    legend="Les deux ouvrent sur une scène : seule celle de droite vient de son vrai métier."
-    ariaLabel="À gauche, l'accroche d'un coach recopiée avec deux mots changés : tu tiens trois jours, puis les mariages reprennent le dessus. À droite, la même mécanique avec les faits d'Amel : la veille du mariage, trois horaires différents circulent, voici qui les vérifie."
+    legend="Les deux ouvrent sur une scène : seule la seconde vient de son vrai métier."
+    ariaLabel="Deux publications d'une organisatrice de mariages. À gauche, l'accroche d'un coach recopiée avec deux mots changés et une photo de salle de sport. À droite, la même mécanique avec ses faits : la veille du mariage, trois horaires circulent, avec la photo de sa feuille de route annotée."
     accent={EM}
     variant="social"
     beforeTitle="Copiée, deux mots changés"
@@ -50,15 +50,35 @@ export function ObserverSansCopierDiagram() {
     before={{
       account: "Amel Mariages",
       text: "« Tu tiens trois jours, puis les mariages reprennent le dessus. »",
-      visual: "Photo de salle de sport",
+      image: "/schemas/ads/salle-de-sport.jpg",
+      visual: "Une photo de salle de sport",
+      headline: "Tiens la distance",
+      domain: "AMELMARIAGES.FR",
       action: "En savoir plus",
+      pins: { text: 1, image: 2, headline: 3, action: 4 },
     }}
     after={{
       account: "Amel Mariages",
       text: "« La veille du mariage, trois horaires différents circulent. Voici qui les vérifie. »",
-      visual: "Sa feuille de route annotée",
+      image: "/schemas/ads/feuille-de-route-mariage.jpg",
+      visual: "Sa feuille de route annotée, sur la table de la salle",
+      headline: "Une feuille de route que tout le monde relit",
+      domain: "AMELMARIAGES.FR",
       action: "Voir la feuille de route",
+      pins: { text: 1, image: 2, headline: 3, action: 4 },
     }}
+    beforeNotes={[
+      { pin: 1, role: "Une accroche empruntée", why: "Deux mots changés sur la phrase d'un coach : la scène n'est pas la sienne.", alt: "Garder la mécanique (une scène qui se répète) avec ses propres faits." },
+      { pin: 2, role: "Une photo qui n'est pas la sienne", why: "Une salle de sport ne prouve rien pour un mariage.", alt: "Son propre document, sur son vrai lieu." },
+      { pin: 3, role: "Un titre sans objet", why: "« Tiens la distance » parle de sport, pas de mariage.", alt: "Le bénéfice du client : des horaires que personne ne contredit." },
+      { pin: 4, role: "Un bouton générique", why: "« En savoir plus » ne promet rien de précis.", alt: "Un verbe et un objet : « Voir la feuille de route »." },
+    ]}
+    afterNotes={[
+      { pin: 1, role: "La même mécanique, ses faits", why: "Elle garde la scène qui se répète, mais prend un moment qu'elle vit vraiment : la veille du mariage.", alt: "La scène racontée par une mariée, avec son accord." },
+      { pin: 2, role: "Son vrai objet", why: "Sa feuille de route annotée, sur la table de la salle : la preuve est dans l'image.", alt: "Une photo de la feuille signée par le traiteur." },
+      { pin: 3, role: "Le bénéfice en titre", why: "Le titre dit ce que le client obtient : une feuille que tout le monde relit.", alt: "Le nombre de mariages déjà passés avec cette feuille, si c'est vrai." },
+      { pin: 4, role: "Un geste précis", why: "Le bouton nomme l'objet qu'on va voir.", alt: "Un lien « Demander un exemple »." },
+    ]}
   />;
 }
 

@@ -1,7 +1,7 @@
 ---
 id: build-coffre-doctrine-autorite
 titre: Choisis ses outils, ses droits et son budget
-ordre: 7
+ordre: 6
 ---
 
 ## Une règle écrite ne verrouille aucune porte

@@ -1,12 +1,12 @@
 ---
 id: build-agentique-entreprise-09
 titre: Planifie sans perdre le contrôle
-ordre: 21
+ordre: 20
 ---
 
 ## Une tâche automatique se réveille sans toi
 
-Lundi, 7 h. Elle démarre, que tu sois devant ton écran ou non. Peut-être qu'une clé d'accès a changé, qu'une source a disparu, ou que personne ne lira le résultat.
+Ton premier palier tient. Reste à le faire tourner tout seul, à heure fixe. Une tâche planifiée, c'est un travail que ton agent lance sans que tu le demandes : lundi, 7 h, elle démarre, que tu sois devant ton écran ou non. Peut-être qu'une clé d'accès a changé, qu'une source a disparu, ou que personne ne lira le résultat.
 
 C'est pour ça que tu ne planifies jamais un travail que tu n'as pas déjà réussi à la main.
 
@@ -20,7 +20,7 @@ C'est pour ça que tu ne planifies jamais un travail que tu n'as pas déjà réu
 
 Exécute la mission sur un vrai cas autorisé. Regarde quels outils elle appelle, ce qu'elle coûte et ce qu'elle rend. Puis retire-lui une pièce, par exemple une source, pour voir comment elle réagit.
 
-Quand le travail tient, ouvre la planification avec la commande `hermes cron` (cron, c'est le réveil du terminal : il lance une tâche à l'heure dite). Une tâche peut tourner une fois ou se répéter. Elle peut recevoir un ou plusieurs skills et livrer sa sortie dans un fichier ou dans une messagerie que tu as configurée.
+Quand le travail tient, ouvre la planification avec la commande `hermes cron`. Cron, c'est le réveil de ton terminal : tu lui donnes un horaire, par exemple « chaque lundi à 7 h », et il lance la tâche à ce moment-là. Une tâche peut tourner une fois ou se répéter. Elle peut recevoir un ou plusieurs skills et livrer sa sortie dans un fichier ou dans une messagerie que tu as configurée.
 
 [[schema:ManuelPuisPlanifie]]
 

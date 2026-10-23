@@ -41,7 +41,7 @@ export function AvantApresPromesseAssistantDiagram() {
     title="Montrer la validation humaine"
     description="La même annonce pour un assistant de relances, avant et après l'alignement sur le vrai produit."
     legend="L'après dit ce que le produit fait, validation comprise."
-    ariaLabel="Deux publications pour un assistant de relances. Avant : l'assistant envoie toutes tes relances automatiquement, ce que le produit ne fait pas. Après : il prépare tes relances, puis tu valides chaque envoi, avec un visuel de brouillon à valider."
+    ariaLabel="Deux publications pour un assistant de relances. Avant : l'assistant envoie toutes tes relances automatiquement, ce que le produit ne fait pas. Après : il prépare tes relances, puis tu valides chaque envoi, avec la photo d'un brouillon à valider."
     accent={EM}
     variant="social"
     beforeTitle="Promesse fausse"
@@ -49,15 +49,36 @@ export function AvantApresPromesseAssistantDiagram() {
     before={{
       account: "Assistant relances",
       text: "L'assistant envoie toutes tes relances automatiquement.",
-      visual: "Relances parties seules",
+      image: "/schemas/ads/robot-souriant.jpg",
+      visual: "Un robot souriant en 3D",
+      overlay: "Tes relances partent seules",
+      headline: "Zéro effort, zéro oubli",
+      domain: "ASSISTANT-RELANCES.FR",
       action: "Essayer",
+      pins: { text: 1, image: 2, headline: 3, action: 4 },
     }}
     after={{
       account: "Assistant relances",
-      text: "Prépare tes relances, puis valide chaque envoi.",
-      visual: "Brouillon à valider",
+      text: "Prépare tes relances, puis valide chaque envoi. Rien ne part sans toi.",
+      image: "/schemas/ads/relance-brouillon-valider.jpg",
+      visual: "Un brouillon de relance avec son bouton Valider",
+      headline: "Tes relances prêtes, tu valides",
+      domain: "ASSISTANT-RELANCES.FR",
       action: "Voir un brouillon",
+      pins: { text: 1, image: 2, headline: 3, action: 4 },
     }}
+    beforeNotes={[
+      { pin: 1, role: "Une promesse fausse", why: "Le produit prépare les relances, il ne les envoie pas seul : l'annonce promet ce qu'il ne fait pas.", alt: "Dire ce qu'il fait vraiment : il prépare, tu valides." },
+      { pin: 2, role: "Un robot qui rassure à tort", why: "L'image et le texte posé dessus suggèrent une automatisation totale.", alt: "Un vrai brouillon, avec le bouton de validation." },
+      { pin: 3, role: "Un titre creux", why: "« Zéro effort, zéro oubli » n'est vérifiable ni dans l'image ni dans le produit.", alt: "Le bénéfice réel : des relances prêtes chaque matin." },
+      { pin: 4, role: "Un bouton sans contexte", why: "« Essayer » ne dit pas ce qu'on va voir.", alt: "« Voir un brouillon »." },
+    ]}
+    afterNotes={[
+      { pin: 1, role: "La promesse tenue", why: "Elle dit ce que le produit fait et garde la validation humaine dans la phrase.", alt: "Un exemple daté : « Lundi 8 h, trois relances prêtes »." },
+      { pin: 2, role: "Un brouillon visible", why: "Le client voit l'objet qu'il recevra, avec le bouton qui reste le sien.", alt: "Une capture d'écran réelle, plus tard." },
+      { pin: 3, role: "Le bénéfice en titre", why: "« Tes relances prêtes, tu valides » nomme ce qu'on gagne et ce qu'on garde.", alt: "Un chiffre de ta démo, si tu en as un." },
+      { pin: 4, role: "Un geste léger", why: "Voir un brouillon ne coûte rien et prouve la promesse.", alt: "Un lien « Voir un exemple » sous le texte." },
+    ]}
   />;
 }
 

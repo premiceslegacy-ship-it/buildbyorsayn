@@ -1,7 +1,7 @@
 ---
 id: build-coffre-doctrine-diagnostic
 titre: Regarde la dernière fois où le travail a bloqué
-ordre: 3
+ordre: 2
 ---
 
 ## « Automatise mes devis » ne veut rien dire

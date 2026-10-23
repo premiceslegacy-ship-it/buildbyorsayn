@@ -92,14 +92,23 @@ export const CHAPTER_META: Record<string, ChapterMeta> = {
     order: 4,
     summary: "Tu places une validation devant chaque action sensible.",
   },
-  "08-fiches-atelier.md": {
-    path: "08-fiches-atelier.md",
+  "08-pilote-comprehensible.md": {
+    path: "08-pilote-comprehensible.md",
     displayTitle: "Prépare un pilote qu'un collègue peut comprendre",
     illustrationId: "hermes-agent-unified",
     group: "socle",
     section: "first-workflow",
     order: 5,
-    summary: "Tu réunis la mission, les sources, les interdits, les tests et la procédure d'arrêt. Tu rassembles les modèles utiles sans inventer les cases vides.",
+    summary: "Tu réunis la mission, les outils, les cas difficiles et la façon d'arrêter, sans inventer les cases vides.",
+  },
+  "08-dossier-final-et-passation.md": {
+    path: "08-dossier-final-et-passation.md",
+    displayTitle: "Range le dossier final pour qu'on puisse reprendre ton pilote",
+    illustrationId: "hermes-agent-unified",
+    group: "socle",
+    section: "first-workflow",
+    order: 6,
+    summary: "Tu ranges le pilote en quatre dossiers, avec un contrat de mission, une fiche d'outil et un compte rendu de passage.",
   },
   "06-preuve-iteration-skills.md": {
     path: "06-preuve-iteration-skills.md",
@@ -213,7 +222,8 @@ export const CHAPTER_META: Record<string, ChapterMeta> = {
 
 export const CHAPTER_REDIRECTS = {
   "00-parcours": "readme",
-  "entreprise-08-templates-et-exercices": "08-fiches-atelier",
+  "08-fiches-atelier": "08-pilote-comprehensible",
+  "entreprise-08-templates-et-exercices": "08-dossier-final-et-passation",
 } as const;
 
 const CURRICULUM_SECTION_ORDER = new Map(

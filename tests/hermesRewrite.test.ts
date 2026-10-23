@@ -14,15 +14,16 @@ import {
 } from "../lib/hermes/content";
 import { collectDoctrineDocuments } from "../lib/knowledge/doctrineSource";
 
-test("la réécriture Hermes publie dix-neuf chapitres et garde les anciens slugs", () => {
-  assert.equal(HERMES_CHAPTER_PATHS.length, 19);
-  assert.equal(Object.keys(CHAPTER_META).length, 19);
+test("la réécriture Hermes publie vingt chapitres et garde les anciens slugs", () => {
+  assert.equal(HERMES_CHAPTER_PATHS.length, 20);
+  assert.equal(Object.keys(CHAPTER_META).length, 20);
   assert.deepEqual(CHAPTER_REDIRECTS, {
     "00-parcours": "readme",
-    "entreprise-08-templates-et-exercices": "08-fiches-atelier",
+    "08-fiches-atelier": "08-pilote-comprehensible",
+    "entreprise-08-templates-et-exercices": "08-dossier-final-et-passation",
   });
   assert.equal(chapterRedirectFromSlug("00-parcours"), "readme");
-  assert.equal(chapterRedirectFromSlug("entreprise-08-templates-et-exercices"), "08-fiches-atelier");
+  assert.equal(chapterRedirectFromSlug("entreprise-08-templates-et-exercices"), "08-dossier-final-et-passation");
   assert.equal(chapterRedirectFromSlug("01-diagnostic-et-offre"), undefined);
 });
 
@@ -36,9 +37,11 @@ test("les textes Hermes retirent seulement les notes internes et gardent les fus
   assert.match(first, /Ton terminal doit répondre avant ton entreprise/);
   assert.match(first, /Un agent impressionnant peut quand même être inutile/);
 
-  const pilot = files.find((file) => file.path === "08-fiches-atelier.md")?.content ?? "";
+  const pilot = files.find((file) => file.path === "08-pilote-comprehensible.md")?.content ?? "";
+  const handover = files.find((file) => file.path === "08-dossier-final-et-passation.md")?.content ?? "";
   assert.match(pilot, /Si tu es le seul à comprendre, ce n'est pas prêt/);
-  assert.match(pilot, /Une arborescence propre ne suffit pas/);
+  assert.doesNotMatch(pilot, /Une arborescence propre ne suffit pas/);
+  assert.match(handover, /Une arborescence propre ne suffit pas/);
 });
 
 test("l'introduction Hermes est publique dans le lecteur et dans le corpus local", async () => {
@@ -46,7 +49,7 @@ test("l'introduction Hermes est publique dans le lecteur et dans le corpus local
   assert.doesNotMatch(introduction, /## Spécifications des schémas/);
 
   const documents = await collectDoctrineDocuments();
-  assert.equal(documents.length, 20);
+  assert.equal(documents.length, 21);
   assert.equal(documents[0].sourceId, "introduction:hermes");
   assert.ok(documents.every((document) => document.tier === "full"));
 });

@@ -72,7 +72,7 @@ export function CinqCartesDeTestDiagram() {
 }
 
 export const doctrine10 = [
-  { name: "ArmoireDuPilote", kind: "schema", chapter: "08-fiches-atelier.md", component: ArmoireDuPiloteDiagram },
-  { name: "TrouQuiBloque", kind: "schema", chapter: "08-fiches-atelier.md", component: TrouQuiBloqueDiagram },
-  { name: "CinqCartesDeTest", kind: "schema", chapter: "08-fiches-atelier.md", component: CinqCartesDeTestDiagram },
+  { name: "ArmoireDuPilote", kind: "schema", chapter: "08-dossier-final-et-passation.md", component: ArmoireDuPiloteDiagram },
+  { name: "TrouQuiBloque", kind: "schema", chapter: "08-pilote-comprehensible.md", component: TrouQuiBloqueDiagram },
+  { name: "CinqCartesDeTest", kind: "schema", chapter: "08-pilote-comprehensible.md", component: CinqCartesDeTestDiagram },
 ] as const satisfies readonly HandcraftedVisual[];

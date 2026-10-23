@@ -44,13 +44,25 @@ export function MessageQuiOuvreDiagram() {
       preview: "Découvre notre offre innovante",
       text: "Bonjour, nous proposons des solutions digitales innovantes aux restaurants. Serais-tu disponible pour un appel ?",
       action: "Réserver un appel",
+      pins: { subject: 1, text: 2, action: 3 },
     }}
     after={{
       subject: "Les réservations après le service",
       preview: "Une seule question",
       text: "Bonjour Lina, quand une réservation arrive après le service, qui la reprend le lendemain ?",
       action: "Répondre",
+      pins: { subject: 1, text: 2, action: 3 },
     }}
+    beforeNotes={[
+      { pin: 1, role: "Un objet de catégorie", why: "« Solutions digitales » nomme un rayon de magasin, pas une raison d'ouvrir.", alt: "Un moment de son quotidien, dans ses mots." },
+      { pin: 2, role: "Un message sur l'expéditeur", why: "« Nous proposons » parle de toi, pas d'elle, et demande tout de suite une heure.", alt: "Une scène de son service que tu as observée." },
+      { pin: 3, role: "Un appel dès le premier message", why: "Réserver un appel demande une heure à une inconnue : c'est un gros pas.", alt: "Une question à laquelle on répond en une ligne." },
+    ]}
+    afterNotes={[
+      { pin: 1, role: "Un objet qui nomme son moment", why: "« Les réservations après le service » : elle reconnaît son quotidien avant d'ouvrir.", alt: "Son prénom dans l'objet." },
+      { pin: 2, role: "Une seule question", why: "Une phrase, un cas concret, une réponse possible en dix secondes.", alt: "Deux options à choisir : « le lendemain, ou le soir même ? »." },
+      { pin: 3, role: "Un geste minuscule", why: "Répondre coûte dix secondes : le bouton ne demande pas de s'engager.", alt: "Pas de bouton du tout : elle répond à l'e-mail." },
+    ]}
   />;
 }
 

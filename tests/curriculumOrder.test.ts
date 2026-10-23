@@ -3,7 +3,7 @@ import test from "node:test";
 import { collectBlocsDocuments } from "../lib/knowledge/sources";
 import { BLOCS_DATA } from "../lib/mockData";
 
-const EXPECTED_SOURCE_ORDER = ["1", "2", "5", "3", "6", "4", "7"];
+const EXPECTED_SOURCE_ORDER = ["1", "2", "5", "4", "3", "6", "7"];
 
 test("les blocs suivent l'ordre pédagogique validé", () => {
   assert.deepEqual(

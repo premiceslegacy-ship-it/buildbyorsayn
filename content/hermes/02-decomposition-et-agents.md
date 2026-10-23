@@ -1,7 +1,7 @@
 ---
 id: build-coffre-doctrine-decomposition
 titre: Découpe le travail pour pouvoir le reprendre
-ordre: 4
+ordre: 3
 ---
 
 ## Une mission trop grande cache les erreurs

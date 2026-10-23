@@ -469,13 +469,26 @@ const entries: readonly KitEntry[] = [
         node: <AdCard
           title="Une scène vaut mieux qu'un slogan"
           description="La question précise ouvre le diagnostic sans promettre le résultat."
-          ariaLabel="Une publicité générique de réparateur de vélos est comparée à une accroche précise sur un grincement en montée."
+          legend="Une photo du vrai atelier et une question que le client s'est déjà posée."
+          ariaLabel="Une publicité générique de réparateur de vélos, avec un vélo neuf sur fond blanc, est comparée à une accroche précise sur un grincement en montée, avec la photo de l'atelier."
           accent={EM}
           variant="social"
           beforeTitle="Avant"
           afterTitle="Après"
-          before={{ account: "Atelier Vélo", text: "Redécouvre le plaisir de rouler.", visual: "Vélo générique", action: "En savoir plus" }}
-          after={{ account: "Atelier Vélo", text: "Ton vélo grince seulement quand tu montes une côte ?", visual: "Diagnostic à l'atelier", action: "Décrire le bruit" }}
+          before={{ account: "Atelier Vélo", text: "Redécouvre le plaisir de rouler.", image: "/schemas/ads/velo-neuf-studio.jpg", visual: "Un vélo neuf sur fond blanc", headline: "Le plaisir de rouler", domain: "ATELIERVELO.FR", action: "En savoir plus", pins: { text: 1, image: 2, headline: 3, action: 4 } }}
+          after={{ account: "Atelier Vélo", text: "Ton vélo grince seulement quand tu montes une côte ?", image: "/schemas/sites/atelier-velo-reparation.jpg", visual: "Un mécanicien à l'atelier", headline: "Diagnostic sous 48 h à l'atelier", domain: "ATELIERVELO.FR", action: "Décrire le bruit", pins: { text: 1, image: 2, headline: 3, action: 4 } }}
+          beforeNotes={[
+            { pin: 1, role: "Un slogan", why: "« Le plaisir de rouler » pourrait venir de n'importe quelle marque de vélo.", alt: "Un bruit, une panne, un moment que le client a vécu." },
+            { pin: 2, role: "Une photo de catalogue", why: "Un vélo neuf sur fond blanc ne prouve aucun savoir-faire d'atelier.", alt: "L'atelier réel, avec le mécanicien au travail." },
+            { pin: 3, role: "Un titre qui répète", why: "Il redit le slogan sans dire ce que l'atelier fait.", alt: "Le service et le délai en clair." },
+            { pin: 4, role: "Un bouton flou", why: "« En savoir plus » ne dit pas ce qui va se passer.", alt: "Un geste précis : « Décrire le bruit »." },
+          ]}
+          afterNotes={[
+            { pin: 1, role: "Une question reconnue", why: "Le grincement en côte : le cycliste l'a déjà entendu, il s'arrête.", alt: "Un bruit différent pour chaque saison." },
+            { pin: 2, role: "Le vrai atelier", why: "Un mécanicien et ses outils : la preuve est dans la photo.", alt: "La fiche de diagnostic remise au client." },
+            { pin: 3, role: "Un délai tenu", why: "Le titre promet un diagnostic sous 48 h : un bénéfice qu'on peut vérifier.", alt: "Un prix de diagnostic, si l'atelier l'affiche." },
+            { pin: 4, role: "Un geste facile", why: "Décrire le bruit demande un message, pas un rendez-vous.", alt: "Un numéro de téléphone en simple lien." },
+          ]}
         />,
       },
       {
@@ -489,8 +502,18 @@ const entries: readonly KitEntry[] = [
           variant="email"
           beforeTitle="Avant"
           afterTitle="Après"
-          before={{ subject: "Notre newsletter de mars", preview: "Les actualités du cabinet", text: "Retrouve nos conseils et nos nouveautés du mois.", action: "Lire la suite" }}
-          after={{ subject: "Les trois pièces qui bloquent ta clôture", preview: "La liste à vérifier avant vendredi", text: "Voici les justificatifs à retrouver et où les demander.", action: "Voir la liste" }}
+          before={{ subject: "Notre newsletter de mars", preview: "Les actualités du cabinet", text: "Retrouve nos conseils et nos nouveautés du mois.", action: "Lire la suite", pins: { subject: 1, text: 2, action: 3 } }}
+          after={{ subject: "Les trois pièces qui bloquent ta clôture", preview: "La liste à vérifier avant vendredi", text: "Voici les justificatifs à retrouver et où les demander.", action: "Voir la liste", pins: { subject: 1, text: 2, action: 3 } }}
+          beforeNotes={[
+            { pin: 1, role: "Un objet de calendrier", why: "« Notre newsletter de mars » parle de l'expéditeur et du mois, pas du lecteur.", alt: "Le blocage que le lecteur a ce mois-ci." },
+            { pin: 2, role: "Une promesse vague", why: "« Nos conseils et nos nouveautés » ne dit rien qu'on puisse vérifier.", alt: "Trois pièces nommées, que le mail livre vraiment." },
+            { pin: 3, role: "Un bouton neutre", why: "« Lire la suite » ne dit pas ce qu'on va trouver.", alt: "« Voir la liste »." },
+          ]}
+          afterNotes={[
+            { pin: 1, role: "Un objet qui nomme le blocage", why: "Il dit ce qui bloque (la clôture) et combien de pièces sont en cause.", alt: "La date limite dans l'objet." },
+            { pin: 2, role: "Un contenu annoncé", why: "Le texte livre ce que l'objet promet : les justificatifs et où les demander.", alt: "La liste directement dans le mail." },
+            { pin: 3, role: "Un bouton qui nomme l'objet", why: "« Voir la liste » promet exactement ce qui s'ouvre.", alt: "Un lien vers un modèle à imprimer." },
+          ]}
         />,
       },
     ],

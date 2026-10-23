@@ -201,7 +201,8 @@ test("les seize schémas Hermes gardent leur chapitre réel", () => {
     ["05-autorite-outils-couts.md", "AuthorityLayersDiagram"],
     ["06-preuve-iteration-skills.md", "ProofLayersDiagram"],
     ["07-methode-offre-transmission.md", "TransmissionDiagram"],
-    ["08-fiches-atelier.md", "WorkshopDiagram"],
+    ["08-pilote-comprehensible.md", "WorkshopDiagram"],
+    ["08-dossier-final-et-passation.md", "TemplateTreeDiagram"],
     ["entreprise-01-cerveau-federe.md", "FederatedBrainDiagram"],
     ["entreprise-02-cartographie-poles.md", "PoleMapDiagram"],
     ["entreprise-formats.md", "DataFormatsDiagram"],
@@ -209,7 +210,6 @@ test("les seize schémas Hermes gardent leur chapitre réel", () => {
     ["entreprise-05-outils-api-cli-mcp.md", "ToolAccessDiagram"],
     ["entreprise-06-workflows-interpoles.md", "WorkflowCrossPoleDiagram"],
     ["entreprise-07-adoption-preuves-promotion.md", "AdoptionLaddersDiagram"],
-    ["entreprise-08-templates-et-exercices.md", "TemplateTreeDiagram"],
   ] as const;
   for (const [chapter, component] of expected) {
     assert.match(associations, new RegExp(`"${chapter}"\\s*:\\s*<${component} \\/>`), `${chapter} -> ${component}`);

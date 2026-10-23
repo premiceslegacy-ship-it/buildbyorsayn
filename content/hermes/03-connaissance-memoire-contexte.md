@@ -1,7 +1,7 @@
 ---
 id: build-coffre-doctrine-connaissance
 titre: Donne-lui une identité, une mémoire et le bon contexte
-ordre: 5
+ordre: 4
 ---
 
 ## Ton agent n'a pas besoin de tout savoir

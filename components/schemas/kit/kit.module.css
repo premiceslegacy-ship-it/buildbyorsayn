@@ -840,48 +840,8 @@
 }
 .fileNotes p { margin: 3px 0 0; color: var(--kit-copy); font: 500 14px/1.38 var(--font, sans-serif); }
 
-.adCompare {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
-  gap: 16px;
-}
-.adCompare > section { min-width: 0; display: grid; gap: 10px; }
-.adCompare > section > h4 { margin: 0; display: flex; align-items: center; gap: 8px; color: var(--kit-copy); font: 600 14px/1.2 var(--font, sans-serif); }
 
 /* Ads */
-.socialAd,
-.emailAd {
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid rgba(241,245,242,.11);
-  border-radius: 18px;
-  background: #141816;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-}
-.socialAd > header { display: flex; align-items: center; gap: 10px; padding: 14px; }
-.socialAd > header > span { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: #303632; color: var(--kit-ink); font: 650 14px/1 var(--font, sans-serif); }
-.socialAd > header > div { min-width: 0; display: grid; gap: 3px; }
-.socialAd header strong { color: var(--kit-ink); font: 600 14px/1.2 var(--font, sans-serif); }
-.socialAd header small { color: var(--kit-muted); font: 500 13px/1.2 var(--font, sans-serif); }
-.socialAd > p { min-height: 62px; margin: 0; padding: 0 14px 14px; color: var(--kit-copy); font: 500 14px/1.4 var(--font, sans-serif); }
-.adVisual { min-height: 130px; display: grid; place-items: end start; padding: 14px; background: linear-gradient(145deg, #39413b, #222724); color: var(--kit-copy); font: 600 13px/1.2 var(--font, sans-serif); }
-.socialAd footer { min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; }
-.socialAd footer svg { width: 20px; height: 20px; color: var(--kit-muted); }
-.socialAd button,
-.emailAd button { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 14px; border: 0; border-radius: 999px; background: rgba(241,245,242,.1); color: var(--kit-ink); font: 650 13px/1.2 var(--font, sans-serif); }
-.socialAd.isAccent button,
-.emailAd.isAccent button { background: var(--kit-em); color: #07110b; }
-.emailAd { display: grid; gap: 14px; padding: 16px; }
-.emailAd > header { min-width: 0; display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: start; gap: 10px; }
-.emailAd > header svg { width: 22px; height: 22px; color: var(--kit-muted); }
-.emailAd > header div { min-width: 0; display: grid; gap: 5px; }
-.emailAd header strong { color: var(--kit-ink); font: 600 15px/1.3 var(--font-t, sans-serif); }
-.emailAd header span { color: var(--kit-muted); font: 500 13px/1.3 var(--font, sans-serif); }
-.emailAd > p { margin: 0; color: var(--kit-copy); font: 500 14px/1.42 var(--font, sans-serif); }
-.emailAd button { justify-self: start; }
-.emailAd button svg { width: 15px; height: 15px; }
-
 /* Cycle : voir Track */
 
 /* Tool map */
@@ -996,7 +956,6 @@
   .track[data-count="5"] .trackCard > p { font-size: 13.5px; }
 
   .compare,
-  .adCompare,
   .chatLayout,
   .fileLayout { grid-template-columns: minmax(0, 1fr); }
   .compare { gap: 12px; }
@@ -1030,8 +989,6 @@
   .fileNotes li { position: relative; top: auto; left: auto; width: auto; transform: none; }
   .fileNotes li::before { display: none; }
 
-
-  .socialAd > p { min-height: auto; }
 
   .cycleReturn { height: auto; margin: 6px 0 0; border: 0; }
   .cycleReturn::before { display: none; }

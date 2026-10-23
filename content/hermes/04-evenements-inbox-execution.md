@@ -1,7 +1,7 @@
 ---
 id: build-coffre-doctrine-boucle
 titre: Fais entrer un message et suis ce qu'il devient
-ordre: 6
+ordre: 5
 ---
 
 ## Un message ne doit pas déclencher une promesse

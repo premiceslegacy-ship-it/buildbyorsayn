@@ -8,7 +8,7 @@ Ta méthode n'est écrite nulle part ailleurs que dans cette conversation.
 
 Un skill est un dossier que ton agent (l'IA qui travaille avec des outils, vue au Bloc 2) ouvre quand la tâche correspond. Il contient un fichier principal, `SKILL.md` (un simple fichier texte), et au besoin des références, des scripts ou des gabarits.
 
-Au Bloc 6, tu as installé le skill ORACLE sans l'ouvrir. Dans ce bloc, tu ouvres un vrai dossier de skill et tu lis son `SKILL.md`. Puis tu le découpes en compétences, tu relies les compétences par des fichiers nommés, et tu ranges ce que chaque projet t'apprend.
+Au Bloc 6, tu utiliseras un skill complet, ORACLE, la méthode de construction de BUILD. Avant, dans ce bloc, tu ouvres un vrai dossier de skill et tu lis son `SKILL.md`. Puis tu le découpes en compétences, tu relies les compétences par des fichiers nommés, et tu ranges ce que chaque projet t'apprend.
 
 À la fin, tu auras :
 

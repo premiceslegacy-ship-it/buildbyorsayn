@@ -1420,42 +1420,6 @@
   box-shadow: none;
 }
 
-.typedKit :global(figure[data-kit-schema="ad-card"] section > h4) {
-  margin: 0 !important;
-  color: var(--t3) !important;
-  font: 600 13px/1.2 var(--font) !important;
-}
-
-.typedKit :global(figure[data-kit-schema="ad-card"] section:last-child > h4) {
-  color: var(--menthe) !important;
-}
-
-.typedKit :global(figure[data-kit-schema="ad-card"] section:first-child article) {
-  opacity: .56;
-  filter: saturate(.15);
-}
-
-.typedKit :global(figure[data-kit-schema="ad-card"] section article) {
-  border-radius: 18px !important;
-  background: #141816 !important;
-}
-
-.typedKit :global(figure[data-kit-schema="ad-card"] section article > p) {
-  margin: 0 !important;
-  color: #c4cdc7 !important;
-  font: 500 14px/1.4 var(--font) !important;
-}
-
-.typedKit :global(figure[data-kit-schema="ad-card"] section > h4)::before {
-  content: "×";
-  font-size: 18px;
-  line-height: 1;
-}
-
-.typedKit :global(figure[data-kit-schema="ad-card"] section:last-child > h4)::before {
-  content: "✓";
-}
-
 .prose .whyLine {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);

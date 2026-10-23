@@ -1,4 +1,4 @@
-Ton offre est écrite (Bloc 5) et ton chantier préparé (Bloc 3). Pour construire un produit complet, une phrase ne suffit plus.
+Ton offre est écrite (Bloc 5), ta méthode rangée en skills (Bloc 4) et ton chantier préparé (Bloc 3). Pour construire un produit complet, une phrase ne suffit plus.
 
 Une idée tient en une phrase : « une application pour suivre mes chantiers ». Un produit doit tenir quand une personne se connecte, se trompe de mot de passe, revient le lendemain matin et demande de l'aide.
 
