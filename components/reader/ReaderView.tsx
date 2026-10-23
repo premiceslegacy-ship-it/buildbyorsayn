@@ -189,20 +189,21 @@ export function ReaderView({
     return markdownSections.length > 0 ? serializeReaderMarkdown(title, markdownSections) : null;
   }, [copyMarkdown, sections, title]);
 
-  // La liste de chapitres peut être recréée à chaque rendu du parent : seule une vraie différence d'identifiants relit l'adresse.
-  // Sinon un rendu intermédiaire (changement de mode) renvoyait au chapitre encore présent dans l'URL.
+  // L'adresse n'est relue qu'à l'ouverture d'une liste de chapitres (montage ou autre bloc). Après cela, l'état du lecteur fait foi :
+  // Next réconcilie l'URL de façon asynchrone après un replaceState, relire l'adresse à chaque rendu renvoyait au chapitre d'origine.
   const sectionIdsKey = sections.map((section) => section.id).join("\u0000");
+  const openingChapter = useRef(initialChapter);
   useEffect(() => {
     installAppMotionTokens();
     const address = new URL(window.location.href);
     const nextMode = hasVideoMode ? resolveReaderMode(address.searchParams.get("mode"), window.localStorage.getItem(READER_MODE_STORAGE_KEY)) : "texte";
-    const requestedChapter = address.searchParams.get("chapter") || address.hash || initialChapter;
+    const requestedChapter = address.searchParams.get("chapter") || address.hash || openingChapter.current;
     const frame = window.requestAnimationFrame(() => {
       setMode(nextMode);
       setSelected(Math.max(0, resolveChapterIndex(sectionIdsKey.split("\u0000"), requestedChapter)));
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [hasVideoMode, initialChapter, sectionIdsKey]);
+  }, [hasVideoMode, sectionIdsKey]);
 
   useEffect(() => {
     if (!current) return;
