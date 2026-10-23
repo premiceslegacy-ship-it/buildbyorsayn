@@ -3,7 +3,7 @@ import test from "node:test";
 import { collectBlocsDocuments } from "../lib/knowledge/sources";
 import { BLOCS_DATA } from "../lib/mockData";
 
-const EXPECTED_SOURCE_ORDER = ["1", "2", "5", "4", "3", "6", "7"];
+const EXPECTED_SOURCE_ORDER = ["1", "2", "5", "3", "4", "6", "7"];
 
 test("les blocs suivent l'ordre pédagogique validé", () => {
   assert.deepEqual(
@@ -28,4 +28,11 @@ test("l'ingestion MCP reprend le même ordre et les mêmes numéros visibles", a
     [...firstTitleBySourceBlock.values()],
     BLOCS_DATA.map((bloc) => bloc.titre)
   );
+});
+
+test("le catalogue public suit exactement l'ordre et les titres du corpus", async () => {
+  const { BLOCS_DATA: corpus } = await import("../lib/mockData");
+  const { BLOCS_DATA: catalog } = await import("../lib/blocCatalog");
+  assert.deepEqual(catalog.map((bloc) => bloc.id), corpus.map((bloc) => bloc.id));
+  assert.deepEqual(catalog.map((bloc) => bloc.titre), corpus.map((bloc) => bloc.titre));
 });

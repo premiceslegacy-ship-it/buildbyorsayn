@@ -121,8 +121,8 @@ export function LandingBento() {
             <div className="vig__vis">
               <div className="etapes" aria-hidden="true">
                 <figure><Image src="/da/objets/offre.png" alt="" width={256} height={256} /><em><DaIcon name="check" /></em><figcaption>Offre</figcaption></figure>
-                <figure><Image src="/da/objets/bloc.png" alt="" width={256} height={256} /><em><DaIcon name="check" /></em><figcaption>Site</figcaption></figure>
                 <figure><Image src="/da/objets/vente.png" alt="" width={256} height={256} /><em><DaIcon name="check" /></em><figcaption>Vente</figcaption></figure>
+                <figure><Image src="/da/objets/bloc.png" alt="" width={256} height={256} /><em><DaIcon name="check" /></em><figcaption>Site</figcaption></figure>
                 <figure><Image src="/da/objets/livraison.png" alt="" width={256} height={256} /><figcaption>Livraison</figcaption></figure>
               </div>
             </div>

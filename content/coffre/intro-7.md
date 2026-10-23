@@ -1,4 +1,4 @@
-Ton premier projet est livré. Tu as appris une méthode : dans deux semaines, tu l'auras oubliée si elle reste dans ta tête. Elle survit si elle devient un geste simple, écrit, qui revient dans chaque projet.
+Ton premier projet est cadré et sa page alignée (Bloc 6). Tu as appris une méthode : dans deux semaines, tu l'auras oubliée si elle reste dans ta tête. Elle survit si elle devient un geste simple, écrit, qui revient dans chaque projet.
 
 [[schema:DuGesteAuSystemeVivant]]
 

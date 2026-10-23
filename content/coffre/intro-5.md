@@ -6,7 +6,7 @@ Tu peux construire un produit propre et ne jamais le vendre. Tu peux aussi vendr
 
 ## Tu vas sortir avec des mots prêts
 
-Ce bloc part du client. Tu regardes son dernier dossier, tu écris une offre d'une page, tu envoies un premier message, tu livres, puis tu regardes ce qui se passe à l'usage.
+Ce bloc part du client. Tu regardes son dernier dossier, tu écris une offre d'une page, tu prépares un premier message, tu regardes ce qui se passe à l'usage, puis tu fixes ce qui ne sortira jamais.
 
 À la fin, tu auras :
 

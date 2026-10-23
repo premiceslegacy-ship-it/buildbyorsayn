@@ -1,4 +1,4 @@
-Tu as écrit ta méthode en skills (Bloc 4). Il reste à préparer un vrai site avant d'écrire le moindre code.
+Ton offre est écrite et testée sur le terrain (Bloc 5). Il reste à préparer un vrai site avant d'écrire le moindre code.
 
 Tu ouvres ton éditeur de code avec une idée simple : « Je vais faire un site pour mon artisan. » Dix minutes plus tard, l'IA te demande quelle stack utiliser. Tu cites un nom connu. Elle invente le reste : le titre, les sections, même les chantiers que l'artisan accepte.
 

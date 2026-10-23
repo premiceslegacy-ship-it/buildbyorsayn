@@ -60,7 +60,7 @@ export default function ReaderClient({ bloc, tier, identity, initialMode, initia
       initialChapter={initialChapter}
       onToggleChapter={toggleItem}
       onValidateBloc={validateBloc}
-      nextBloc={nextBloc ? { href: `/blocs/${nextBloc.id}`, label: nextBloc.titre } : undefined}
+      nextBloc={nextBloc ? { href: `/blocs/${nextBloc.id}`, label: nextBloc.titre, thumbnailSrc: `/da/mini/b${nextBloc.displayNumber}.jpg` } : undefined}
       backHref={`/blocs/${bloc.id}`}
       showUpcomingVideo
       finishTitle="Ce bloc est terminé."

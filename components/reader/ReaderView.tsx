@@ -68,7 +68,7 @@ type ReaderViewProps = {
   markdownBaseHref?: string;
   onToggleChapter?: (sectionId: string) => void | Promise<void>;
   onValidateBloc?: () => void | Promise<void>;
-  nextBloc?: { href: string; label: string };
+  nextBloc?: { href: string; label: string; thumbnailSrc?: string };
   finishTitle?: string;
   finishDetail?: string;
   finishActionLabel?: string;
@@ -93,11 +93,6 @@ function summaryFromSection(section: ReaderChapter) {
 function chapterReadingTime(section: ReaderChapter): string {
   const minutes = estimateReadingMinutes(chapterMarkdown(section) ?? section.summary ?? section.title);
   return minutes > 0 ? `${minutes} min de lecture` : "Lecture courte";
-}
-
-function inferredThumbnail(href: string | undefined, fallback: string | undefined): string | undefined {
-  const blocId = href?.match(/^\/blocs\/(\d+)/)?.[1];
-  return blocId ? `/da/mini/b${blocId}.jpg` : fallback;
 }
 
 function updateAddress(mode: ReaderMode, sectionId: string) {
@@ -358,7 +353,7 @@ export function ReaderView({
   const cycleSize = () => setSize((value) => value === "small" ? "normal" : value === "normal" ? "large" : "small");
   const nextChapter = sections[selected + 1];
   const endNextLabel = nextChapter?.title ?? nextBloc?.label;
-  const endNextThumbnail = nextChapter ? thumbnailSrc : inferredThumbnail(nextBloc?.href, thumbnailSrc);
+  const endNextThumbnail = nextChapter ? thumbnailSrc : nextBloc?.thumbnailSrc ?? thumbnailSrc;
 
   return <div ref={root} className={`${styles.page} ${styles.readerPage}`} data-reader-mode={mode}>
     {sections.length > 0 && current ? <main className={`${styles.reader} ${styles.readerOnly}`}>

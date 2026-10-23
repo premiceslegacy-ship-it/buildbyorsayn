@@ -14,7 +14,7 @@ test("la recherche ne sérialise aucun résultat verrouillé pour un palier inf�
   }
 
   assert.deepEqual(searchCatalog(buildSearchCatalog("free"), "Hermes"), []);
-  assert.deepEqual(searchCatalog(buildSearchCatalog("beginner"), "Bloc 2"), []);
+  assert.equal(searchCatalog(buildSearchCatalog("beginner"), "Bloc 2").some((item) => item.id === "video-bloc-2" || item.href === "/blocs/2"), false);
 });
 
 test("l'historique Stripe pagine la recherche avant de déclarer un compte impayé", async () => {

@@ -50,12 +50,12 @@ export function TerminalCronEtHistoriqueMockup() {
     title="Relire la tâche après un lancement"
     description="Exemple : ce que tu vérifies dans le terminal après le premier essai de la tâche."
     legend="Tu relis l'état et la sortie avant de la laisser tourner seule."
-    ariaLabel="Un terminal ouvert avec hermes cron, puis trois repères à vérifier : la tâche active, la dernière exécution réussie et la sortie livrée sur Telegram."
+    ariaLabel="Un terminal ouvert avec hermes cron list, puis trois repères à vérifier : la tâche active, la dernière exécution réussie et la sortie livrée sur Telegram."
     accent={EM}
-    filename="hermes cron"
+    filename="hermes cron list"
     tool="Ghostty"
     lines={[
-      { text: "$ hermes cron" },
+      { text: "$ hermes cron list" },
       { text: "Tâche : veille-marketing, active", tone: "heading" },
       { text: "Dernière exécution : réussie" },
       { text: "Sortie : livrée sur Telegram", tone: "heading" },

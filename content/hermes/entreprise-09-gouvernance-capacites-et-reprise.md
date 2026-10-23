@@ -20,15 +20,15 @@ C'est pour ça que tu ne planifies jamais un travail que tu n'as pas déjà réu
 
 Exécute la mission sur un vrai cas autorisé. Regarde quels outils elle appelle, ce qu'elle coûte et ce qu'elle rend. Puis retire-lui une pièce, par exemple une source, pour voir comment elle réagit.
 
-Quand le travail tient, ouvre la planification avec la commande `hermes cron`. Cron, c'est le réveil de ton terminal : tu lui donnes un horaire, par exemple « chaque lundi à 7 h », et il lance la tâche à ce moment-là. Une tâche peut tourner une fois ou se répéter. Elle peut recevoir un ou plusieurs skills et livrer sa sortie dans un fichier ou dans une messagerie que tu as configurée.
+Quand le travail tient, crée la tâche avec `hermes cron create`, puis relis-la avec `hermes cron list`. Cron, c'est le réveil de ta passerelle (le service qui reste allumé en arrière-plan pour ton agent) : tant qu'elle tourne, tu lui donnes un horaire, par exemple « chaque lundi à 7 h », et il lance la tâche à ce moment-là. Une tâche peut tourner une fois ou se répéter. Elle peut recevoir un ou plusieurs skills et livrer sa sortie dans un fichier ou dans une messagerie que tu as configurée.
 
 [[schema:ManuelPuisPlanifie]]
 
 ## Donne-lui une heure, un modèle et une destination
 
-Une tâche planifiée démarre dans une session neuve. Elle ne se souvient pas de ta conversation d'hier : elle doit retrouver seule ses sources et ses règles.
+Une tâche planifiée démarre dans une session neuve. Elle ne se souvient pas de ta conversation d'hier : elle doit retrouver seule ses sources et ses règles. Ton `AGENTS.md` n'est lu que si tu donnes le dossier du projet avec `--workdir`.
 
-Le modèle d'IA utilisé suit cet ordre : celui choisi pour la tâche, sinon le réglage commun du calendrier, sinon ton modèle principal. Écris le modèle attendu dans la fiche pour ne pas avoir de surprise.
+Le modèle d'IA utilisé suit cet ordre : celui choisi pour la tâche, sinon le réglage commun des tâches planifiées, sinon ton modèle principal. Écris le modèle attendu dans la fiche pour ne pas avoir de surprise.
 
 [[maquette:TerminalCronEtHistorique]]
 
@@ -64,7 +64,7 @@ Compte une heure, une fois ton essai manuel réussi.
 
 1. Choisis une tâche en lecture seule.
 2. Attache le skill déjà testé et une destination de test.
-3. Lance-la une fois à la main depuis le calendrier.
+3. Lance-la une fois à la main avec `hermes cron run` suivi du nom de la tâche.
 4. Relis l'historique, puis teste la pause et la reprise.
 
 À la fin, tu as une tâche planifiée qui prépare sans publier.

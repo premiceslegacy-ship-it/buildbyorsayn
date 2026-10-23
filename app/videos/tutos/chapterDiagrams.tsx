@@ -7,7 +7,6 @@ import {
   AuthorityLayersDiagram,
   ProofLayersDiagram,
   TransmissionDiagram,
-  WorkshopDiagram,
   FederatedBrainDiagram,
   PoleMapDiagram,
   DataFormatsDiagram,
@@ -15,7 +14,6 @@ import {
   ToolAccessDiagram,
   WorkflowCrossPoleDiagram,
   AdoptionLaddersDiagram,
-  TemplateTreeDiagram,
 } from "./diagrams";
 
 /**
@@ -31,8 +29,6 @@ export const CHAPTER_DIAGRAMS: Record<string, ReactNode> = {
   "05-autorite-outils-couts.md": <AuthorityLayersDiagram />,
   "06-preuve-iteration-skills.md": <ProofLayersDiagram />,
   "07-methode-offre-transmission.md": <TransmissionDiagram />,
-  "08-pilote-comprehensible.md": <WorkshopDiagram />,
-  "08-dossier-final-et-passation.md": <TemplateTreeDiagram />,
   "entreprise-01-cerveau-federe.md": <FederatedBrainDiagram />,
   "entreprise-02-cartographie-poles.md": <PoleMapDiagram />,
   "entreprise-formats.md": <DataFormatsDiagram />,

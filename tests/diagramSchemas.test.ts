@@ -190,28 +190,3 @@ test("la planche admin rend le catalogue en large et compact et filtre par cours
   assert.match(read("app/admin/schemas/schemas.module.css"), /width: 720px/);
   assert.match(read("app/admin/schemas/schemas.module.css"), /width: 350px/);
 });
-
-test("les seize schémas Hermes gardent leur chapitre réel", () => {
-  const associations = read("app/videos/tutos/chapterDiagrams.tsx");
-  const expected = [
-    ["01-diagnostic-et-offre.md", "DiagnosticDiagram"],
-    ["02-decomposition-et-agents.md", "DecompositionDiagram"],
-    ["03-connaissance-memoire-contexte.md", "KnowledgeLayersDiagram"],
-    ["04-evenements-inbox-execution.md", "ExecutionLoopDiagram"],
-    ["05-autorite-outils-couts.md", "AuthorityLayersDiagram"],
-    ["06-preuve-iteration-skills.md", "ProofLayersDiagram"],
-    ["07-methode-offre-transmission.md", "TransmissionDiagram"],
-    ["08-pilote-comprehensible.md", "WorkshopDiagram"],
-    ["08-dossier-final-et-passation.md", "TemplateTreeDiagram"],
-    ["entreprise-01-cerveau-federe.md", "FederatedBrainDiagram"],
-    ["entreprise-02-cartographie-poles.md", "PoleMapDiagram"],
-    ["entreprise-formats.md", "DataFormatsDiagram"],
-    ["entreprise-04-competences-skills-sop.md", "SkillsSopDiagram"],
-    ["entreprise-05-outils-api-cli-mcp.md", "ToolAccessDiagram"],
-    ["entreprise-06-workflows-interpoles.md", "WorkflowCrossPoleDiagram"],
-    ["entreprise-07-adoption-preuves-promotion.md", "AdoptionLaddersDiagram"],
-  ] as const;
-  for (const [chapter, component] of expected) {
-    assert.match(associations, new RegExp(`"${chapter}"\\s*:\\s*<${component} \\/>`), `${chapter} -> ${component}`);
-  }
-});

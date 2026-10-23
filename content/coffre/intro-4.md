@@ -1,3 +1,5 @@
+Ton chantier est préparé (Bloc 3). Reste à écrire la méthode que tu suis pour le mener.
+
 Mardi, 14 h. Tu expliques à ton IA comment tu écris tes devis : les questions que tu poses, le ton que tu tiens, ce que tu refuses de promettre. Elle suit très bien. Le mardi suivant, nouvelle conversation : page blanche. Tu retapes tout avec d'autres mots, et le résultat change.
 
 Ta méthode n'est écrite nulle part ailleurs que dans cette conversation.
