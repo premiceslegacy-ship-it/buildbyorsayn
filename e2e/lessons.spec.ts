@@ -20,7 +20,7 @@ test.describe("Bloc lessons (member)", () => {
     await expect(page.getByRole("radiogroup", { name: "Mode de lecture" })).toBeVisible({ timeout: 10_000 });
     const hasLesson = await page.getByTestId("lesson-player").or(page.getByTestId("lesson-unavailable")).or(page.getByTestId("lesson-loading")).count();
     if (hasLesson === 0) {
-      await expect(page.getByText("Vidéo à venir")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Vidéo à venir", exact: true })).toBeVisible();
       await page.getByRole("radio", { name: "Texte" }).click();
       await expect(page.getByRole("button", { name: "Marquer comme lu" })).toBeVisible();
     }
@@ -57,7 +57,7 @@ test.describe("Bloc lessons (member)", () => {
     await expect(page).toHaveURL(/\/blocs\/1\/lire\?.*chapter=b1-s1.*mode=text|\/blocs\/1\/lire\?.*mode=text.*chapter=b1-s1/);
     await page.getByRole("radio", { name: "Vidéo" }).click();
     await expect(page).toHaveURL(/chapter=b1-s1/);
-    await page.getByRole("main").click({ position: { x: 2, y: 2 } });
+    await page.keyboard.press("Tab");
     await page.keyboard.press("End");
     await expect(page).toHaveURL(/chapter=b1-s4/);
     await page.keyboard.press("Home");

@@ -5,16 +5,16 @@ test.describe("Fondations navigation", () => {
 
   test("opens a section detail route and offers a next-section CTA", async ({ authedPage: page }) => {
     await page.goto("/beginner");
-    const mindsetCard = page.locator('a[href="/beginner/mindset"]');
+    const mindsetCard = page.getByRole("link", { name: /^01 L'état d'esprit qui fait l'argent/ });
     await expect(mindsetCard).toBeVisible({ timeout: 10_000 });
     await mindsetCard.click();
     await page.waitForURL("/beginner/mindset");
     await expect(page.locator("h2").first()).toBeVisible();
 
-    const next = page.getByRole("link", { name: /suivant/i });
+    const next = page.getByRole("link", { name: "Chapitre suivant", exact: true });
     await expect(next).toBeVisible();
     await next.click();
-    await page.waitForURL("/beginner/psychologie");
+    await page.waitForURL((url) => url.pathname === "/beginner/psychologie");
   });
 
   test("walking every section eventually reaches a disabled last-item state", async ({ authedPage: page }) => {
@@ -24,6 +24,6 @@ test.describe("Fondations navigation", () => {
     const next = page.getByRole("link", { name: /suivant/i });
     await expect(next).toBeVisible();
     await next.click();
-    await page.waitForURL("/beginner/angle-mort");
+    await page.waitForURL((url) => url.pathname === "/beginner/angle-mort");
   });
 });

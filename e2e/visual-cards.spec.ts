@@ -34,7 +34,7 @@ authedTest.describe("IllustratedCard visual regression (skills, requires a sessi
 
   authedTest("a skills card grid renders consistently", async ({ authedPage: page }) => {
     await page.goto("/skills");
-    const grid = page.locator("#catalogue").locator("xpath=following-sibling::div[1]");
+    const grid = page.getByRole("region", { name: "Catalogue" }).getByRole("list");
     await authedExpect(grid).toBeVisible({ timeout: 10_000 });
     await waitForStableCardGrid(page, grid);
     await authedExpect(grid).toHaveScreenshot("skills-card-grid.png");
@@ -42,12 +42,12 @@ authedTest.describe("IllustratedCard visual regression (skills, requires a sessi
 });
 
 test.describe("IllustratedCard visual regression (accompagnement, public page)", () => {
-  test("accompagnement card grid renders on mobile width", async ({ page }) => {
+  test("accompagnement page renders on mobile width", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 800 });
     await page.goto("/accompagnement");
-    const grid = page.getByRole("main").filter({ has: page.getByRole("complementary", { name: "À venir" }) });
-    await grid.scrollIntoViewIfNeeded();
-    await expect(grid).toHaveScreenshot("accompagnement-grid-mobile.png");
+    const pageMain = page.getByRole("main").filter({ has: page.getByRole("complementary", { name: "À venir" }) });
+    await pageMain.scrollIntoViewIfNeeded();
+    await expect(pageMain).toHaveScreenshot("accompagnement-grid-mobile.png");
   });
 });
 
@@ -57,8 +57,9 @@ authedTest.describe("Diagram visual regression", () => {
   authedTest("a Frame diagram never overlaps the BUILD mark with its own content", async ({ authedPage: page }) => {
     // Section2 (Fondations "Démystifier le LLM") renders PromptContextDiagram
     // inline in its markup. Fondations requires a signed-in session.
-    await page.goto("/beginner/environnement");
-    const frame = page.locator("figure").first();
+    await page.goto("/beginner/environnement?mode=text");
+    await authedExpect(page.getByRole("radio", { name: "Texte" })).toHaveAttribute("aria-checked", "true");
+    const frame = page.getByRole("figure", { name: "La fenêtre de contexte se remplit, puis oublie" });
     await authedExpect(frame).toBeVisible({ timeout: 10_000 });
     await authedExpect(frame).toHaveScreenshot("diagram-frame-no-overlap.png");
   });

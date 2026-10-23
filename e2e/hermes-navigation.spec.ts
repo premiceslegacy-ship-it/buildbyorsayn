@@ -13,13 +13,14 @@ test.describe("Hermes Agent navigation", () => {
   });
 
   test("a chapter route enforces the same doctrine gate as the grid", async ({ authedPage: page }) => {
-    // A signed-in but non-full account must see the paywall, never the
-    // markdown content, on both the grid and a direct chapter URL.
+    // The direct route exposes exactly one access surface: the paywall for a
+    // non-full account, or the reader for a full account.
     await page.goto("/videos/tutos/readme");
-    const isGated = await page.getByText(/réservé à/i).isVisible().catch(() => false);
-    const hasContent = await page.locator("article.doctrine-reader").isVisible().catch(() => false);
-    // Exactly one of these should be true depending on the test account's tier.
-    expect(isGated !== hasContent).toBeTruthy();
+    const gate = page.getByRole("heading", { name: /Hermes Agent : organiser le travail avec l'IA/i });
+    const reader = page.getByRole("article", { name: /^Lecture de / });
+    const accessSurface = gate.or(reader);
+    await expect(accessSurface).toHaveCount(1);
+    await expect(accessSurface).toBeVisible();
   });
 });
 

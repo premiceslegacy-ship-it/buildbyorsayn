@@ -8,6 +8,7 @@ import { DaIcon } from "@/components/da/DaIcon";
 import { SearchDialog } from "@/components/da/SearchDialog";
 import { useNouveautesUnseenCount } from "@/components/nouveautes/useNouveautesUnseenCount";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
+import { formatNouveautesBadge } from "@/lib/nouveautes/seen";
 import { animateAppElement, installAppMotionTokens, motionAllowed } from "@/lib/ui/motion";
 import { playAppSound, useAppSound } from "@/lib/ui/sound";
 
@@ -48,6 +49,7 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
   const menuAnimation = useRef<Animation | null>(null);
   const { enabled, setEnabled } = useAppSound();
   const unseenCount = useNouveautesUnseenCount();
+  const unseenLabel = formatNouveautesBadge(unseenCount);
 
   useEffect(() => {
     installAppMotionTokens();
@@ -154,7 +156,7 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
     <div className="da da-app nav-shell">
       <header className={`navbar${scrolled ? " solid" : ""}`}>
         <Link className="navbar__logo" href={signedIn ? "/dashboard" : "/"} aria-label="BUILD"><Image src="/da/logo-sombre.svg" alt="BUILD" width={112} height={28} priority /></Link>
-        <nav className="navbar__nav" aria-label="Principal">{NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}{item.href === "/nouveautes" && unseenCount ? <span className="nav-unseen" aria-label={`${unseenCount} nouveautés non vues`}>{unseenCount > 99 ? "99+" : unseenCount}</span> : null}</Link>)}</nav>
+        <nav className="navbar__nav" aria-label="Principal">{NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</nav>
         <div className="navbar__r">
           {signedIn && <button className="navbar__ib" type="button" aria-label="Rechercher" data-sfx="none" onClick={openSearch}><DaIcon name="search" /></button>}
           {signedIn && <button className="navbar__ib" type="button" aria-label="Sons de l'interface" aria-pressed={enabled} data-sfx="none" onClick={() => { setEnabled(!enabled); void playAppSound("select"); }}><DaIcon name={enabled ? "volume" : "mute"} /></button>}
@@ -172,7 +174,7 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
         </div>
         <div className="amenu__l amenu__l--b"><form action="/api/signout" method="post"><button role="menuitem" type="submit"><DaIcon name="logout" />Se déconnecter</button></form></div>
       </div>}
-      {signedIn && <nav className="tabbar" aria-label="Navigation mobile">{NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}><DaIcon name={item.icon} /><span className="tabbar__label">{item.label}</span>{item.href === "/nouveautes" && unseenCount ? <span className="nav-unseen nav-unseen--mobile" aria-label={`${unseenCount} nouveautés non vues`}>{unseenCount > 99 ? "99+" : unseenCount}</span> : null}</Link>)}</nav>}
+      {signedIn && <nav className="tabbar" aria-label="Navigation mobile">{NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}><DaIcon name={item.icon} /><span className="tabbar__label">{item.label}</span>{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen nav-unseen--mobile" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</nav>}
       {signedIn && <SearchDialog open={searchOpen} onClose={closeSearch} />}
     </div>
   );

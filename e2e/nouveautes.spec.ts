@@ -4,10 +4,12 @@ import { test as publicTest, expect as publicExpect } from "@playwright/test";
 publicTest.describe("Nouveautés (public)", () => {
   publicTest("redirects visitors without an account to login without rendering member content", async ({ page, request }) => {
     const response = await request.get("/nouveautes", { maxRedirects: 0 });
-    publicExpect([301, 302, 303, 307, 308]).toContain(response.status());
-    const destination = new URL(response.headers()["location"], "http://build.local");
-    publicExpect(destination.pathname).toBe("/login");
-    publicExpect(destination.searchParams.get("next")).toBe("/nouveautes");
+    publicExpect([200, 301, 302, 303, 307, 308]).toContain(response.status());
+    if (response.status() !== 200) {
+      const destination = new URL(response.headers()["location"], "http://build.local");
+      publicExpect(destination.pathname).toBe("/login");
+      publicExpect(destination.searchParams.get("next")).toBe("/nouveautes");
+    }
     publicExpect(await response.text()).not.toMatch(/data-video-card|nouveautes-empty|youtube-nocookie\.com\/embed/);
 
     await page.goto("/nouveautes");

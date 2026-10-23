@@ -1,10 +1,17 @@
 import { test, expect, hasBeginnerE2eAccount, hasE2eAccount, hasE2eFreeAccount } from "./fixtures/auth";
 import type { Page } from "@playwright/test";
+import {
+  COFFRE_PRICE,
+  FONDATIONS_PRICE,
+  UPGRADE_PATH,
+  UPGRADE_PRICE,
+} from "../lib/pricing";
 
 // La zone d'offres s'adapte à l'accès : un compte gratuit voit les deux offres, Fondations ne voit que la montée,
 // l'accès complet ne voit aucun achat. Le complément n'ouvre le paiement qu'aux comptes Fondations (porte /checkout/upgrade).
 
 const STRIPE_URL = /https:\/\/buy\.stripe\.com\/[^"'\s<>\\]+/g;
+const euro = (amount: number) => new RegExp(`${amount}\\s*€`);
 
 /** Bloque toute requête vers Stripe (aucun paiement ne part) et garde la liste de ce qui a été demandé. */
 async function blockStripe(page: Page): Promise<string[]> {
@@ -20,7 +27,8 @@ async function blockStripe(page: Page): Promise<string[]> {
 async function expectNoUpgradeStripeLink(page: Page, path: string) {
   const response = await page.goto(path);
   const html = (await response?.text()) ?? "";
-  const shown = await page.locator('a[href*="buy.stripe.com"]').evaluateAll((links) => links.map((a) => (a as HTMLAnchorElement).href));
+  await expect(page.getByRole("heading", { name: "Chargement des niveaux…" })).toHaveCount(0);
+  const shown = await page.getByRole("link", { name: /^Prendre (Fondations|LE\sCOFFRE)$/ }).evaluateAll((links) => links.map((a) => (a as HTMLAnchorElement).href));
   for (const url of html.match(STRIPE_URL) ?? []) {
     expect(shown, `lien Stripe inattendu dans le HTML de ${path}`).toContain(url.replace(/&amp;/g, "&"));
   }
@@ -28,41 +36,37 @@ async function expectNoUpgradeStripeLink(page: Page, path: string) {
 
 async function expectBothOffersAndBand(page: Page, scope: string) {
   const zone = page.locator(scope);
-  const fondations = zone.locator("article.offre").filter({ has: page.locator("#px-f") });
-  const coffre = zone.locator("article.offre").filter({ has: page.locator("#px-c") });
+  const fondations = zone.getByRole("article", { name: /^Fondations$/ });
+  const coffre = zone.getByRole("article", { name: /^LE\sCOFFRE$/ });
   await expect(fondations).toBeVisible();
-  await expect(fondations).toContainText(/97\s€/);
+  await expect(fondations).toContainText(euro(FONDATIONS_PRICE));
   await expect(coffre).toBeVisible();
-  await expect(coffre).toContainText(/267\s€/);
+  await expect(coffre).toContainText(euro(COFFRE_PRICE));
   await expect(coffre).toContainText("Recommandé");
-  await expect(zone.locator(".montee")).toContainText(/170\s€/);
-  await expect(zone.locator("#px-up")).toHaveCount(0);
+  await expect(zone.getByText(euro(UPGRADE_PRICE)).first()).toBeVisible();
+  const upgradeAction = zone.getByRole("link", { name: /Passer à LE\sCOFFRE/ });
+  const upgradeBand = zone.getByText("la différence", { exact: true });
+  await expect(upgradeAction.or(upgradeBand).first()).toBeVisible();
 }
 
 async function expectOnlyUpgradeCard(page: Page, scope: string) {
   const zone = page.locator(scope);
-  await expect(zone.locator("#px-up")).toBeVisible();
-  await expect(zone.locator("#px-f")).toHaveCount(0);
-  await expect(zone.locator("#px-c")).toHaveCount(0);
-  await expect(zone.locator(".montee")).toHaveCount(0);
-  await expect(zone).not.toContainText(/97\s€/);
-  await expect(zone.locator("article.offre")).toHaveCount(1);
-  await expect(zone.locator("article.offre")).toContainText(/170\s€/);
+  await expect(zone.getByRole("link", { name: /^Prendre (Fondations|LE\sCOFFRE)$/ })).toHaveCount(0);
+  await expect(zone).not.toContainText(euro(FONDATIONS_PRICE));
+  await expect(zone.getByText(euro(UPGRADE_PRICE)).first()).toBeVisible();
 
   // Le lien Stripe du complément n'est jamais dans la page : la carte passe par la porte serveur.
-  const card = zone.locator("article.offre");
-  await expect(card.locator('a.btn[href="/checkout/upgrade"]')).toBeVisible();
-  await expect(card.locator('a[href*="buy.stripe.com"]')).toHaveCount(0);
+  await expect(zone.getByRole("link", { name: /Passer à LE\sCOFFRE/ })).toHaveAttribute("href", UPGRADE_PATH);
+  await expect(zone.locator('a[href*="buy.stripe.com"]')).toHaveCount(0);
   expect(await page.content()).not.toContain("buy.stripe.com");
 }
 
 async function expectNoPurchaseCard(page: Page, scope: string) {
   const zone = page.locator(scope);
-  await expect(zone.locator("#px-ok")).toBeVisible();
-  await expect(zone.locator("#px-f, #px-c, #px-up")).toHaveCount(0);
-  await expect(zone.locator(".montee")).toHaveCount(0);
+  await expect(zone.getByRole("heading", { name: "Tu as tout BUILD." })).toBeVisible();
+  await expect(zone.getByRole("link", { name: /^(Prendre|Passer à)/ })).toHaveCount(0);
   await expect(zone.locator('a[href^="https://buy.stripe.com/"]')).toHaveCount(0);
-  await expect(zone.locator('a[href="/dashboard"]')).toBeVisible();
+  await expect(zone.getByRole("link", { name: "Ouvrir mon espace" })).toHaveAttribute("href", "/dashboard");
 }
 
 test.describe("Offres pour un compte Fondations", () => {
@@ -114,20 +118,13 @@ test.describe("Offres pour un compte gratuit", () => {
     await expectNoUpgradeStripeLink(page, "/checkout");
   });
 
-  test("le tableau de bord s'ouvre pour un compte gratuit et sa fenêtre montre les deux offres", async ({ freePage: page }) => {
+  test("le tableau de bord s'ouvre pour un compte gratuit et mène vers les offres", async ({ freePage: page }) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await page.goto("/dashboard");
 
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Bienvenue");
-    await expect(page.getByText("Gratuit", { exact: true }).first()).toBeVisible();
-    await page.getByRole("button", { name: /Voir les offres/ }).click();
-    const dialog = page.getByRole("dialog", { name: "Les offres BUILD" });
-    await expect(dialog).toBeVisible();
-    await expect(page.getByRole("button", { name: "Fermer" })).toBeFocused();
-    await expectBothOffersAndBand(page, '[role="dialog"]');
-    await page.keyboard.press("Escape");
-    await expect(dialog).toBeHidden();
+    await expect(page.getByRole("heading", { level: 1, name: "Aujourd'hui" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Voir l'accès", exact: true })).toHaveAttribute("href", "/checkout");
     expect(errors).toEqual([]);
   });
 });

@@ -89,6 +89,9 @@ test("navigation et pages exposent les liens, accès et états attendus sans anc
   for (const href of ["/dashboard", "/programme", "/skills", "/nouveautes", "/compte", "/checkout", "/dashboard/mcp"]) assert.ok(nav.includes(`href: "${href}"`) || nav.includes(`href="${href}"`), href);
   assert.doesNotMatch(nav, />Tableau de bord</);
   assert.match(nav, /useNouveautesUnseenCount/);
+  assert.match(nav, /formatNouveautesBadge/);
+  assert.equal(nav.match(/data-testid="nouveautes-badge"/g)?.length, 2);
+  assert.doesNotMatch(nav, /unseenCount > 99/);
   assert.match(dashboard, /resume \?/);
   assert.match(programme, /programmeForTier/);
   assert.match(nouveautes, /feed\.status === "error"/);
