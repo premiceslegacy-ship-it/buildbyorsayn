@@ -13,14 +13,17 @@ export function DiagramMotion({ children }: { children: ReactNode }) {
   useEffect(() => {
     const host = root.current;
     if (!host || !motionAllowed() || !("IntersectionObserver" in window)) return;
-    const visibleSvg = Array.from(host.querySelectorAll<SVGSVGElement>("svg[data-schema-layout]"))
-      .find((svg) => window.getComputedStyle(svg).display !== "none");
-    if (!visibleSvg) return;
 
     host.classList.add(styles.prepared);
     const observer = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
       observer.disconnect();
+      const visibleSvg = Array.from(host.querySelectorAll<SVGSVGElement>("svg[data-schema-layout]"))
+        .find((svg) => window.getComputedStyle(svg).display !== "none");
+      if (!visibleSvg) {
+        host.classList.remove(styles.prepared);
+        return;
+      }
       const animations: Animation[] = [];
 
       visibleSvg.querySelectorAll<SVGGElement>("[data-schema-node]").forEach((element) => {
@@ -54,9 +57,9 @@ export function DiagramMotion({ children }: { children: ReactNode }) {
       animations.forEach((animation) => void animation.finished.then(() => animation.cancel(), () => undefined));
     }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
 
-    observer.observe(visibleSvg);
+    observer.observe(host);
     return () => observer.disconnect();
   }, []);
 
-  return <div ref={root}>{children}</div>;
+  return <div ref={root} className={styles.container} data-schema-container="true">{children}</div>;
 }

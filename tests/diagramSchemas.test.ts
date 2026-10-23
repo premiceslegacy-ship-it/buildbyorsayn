@@ -34,15 +34,43 @@ test("chaque figure et chaque SVG ont un nom, un titre et une description", () =
   assert.match(read("components/schemas/foundations.tsx"), /title = "La fenêtre de contexte se remplit, puis oublie"/);
 });
 
-test("la version compacte est une composition distincte et ne rétrécit pas le SVG large", () => {
+test("chaque schéma du registre expose un seul rendu selon la largeur de son conteneur", () => {
   const primitives = read("components/schemas/primitives.tsx");
+  const motion = read("components/schemas/DiagramMotion.tsx");
+  const registry = read("components/schemas/blocks.server.tsx");
   assert.match(primitives, /width: 680 \| 328/);
   assert.match(primitives, /layout="wide" width=\{680\}/);
   assert.match(primitives, /layout="compact" width=\{328\}/);
+  assert.match(motion, /data-schema-container="true"/);
   const css = read("components/schemas/schema.module.css");
-  assert.match(css, /@media \(max-width: 734px\)/);
-  assert.match(css, /\.wide\s*\{\s*display: none;/s);
-  assert.match(css, /\.compact\s*\{\s*display: block;/s);
+  assert.match(css, /container: build-schema \/ inline-size/);
+  const switchRule = css.match(/@container build-schema \(min-width: (\d+)px\) \{([\s\S]*?)\n\}/);
+  assert.ok(switchRule, "la bascule dépend du conteneur");
+  const threshold = Number(switchRule[1]);
+  assert.ok(threshold >= Math.ceil(680 * 12 / 14), "le texte large de 14 px reste au moins à 12 px");
+  assert.match(css, /\.figure \.svg\s*\{\s*display: none;/s);
+  assert.match(css, /\.figure \.compact\s*\{\s*display: block;/s);
+  assert.match(switchRule[2], /\.figure \.wide\s*\{\s*display: block;/s);
+  assert.match(switchRule[2], /\.figure \.compact\s*\{\s*display: none;/s);
+
+  const registryIds = [...registry.matchAll(/\{ id: "([^"]+)"/g)].map((match) => match[1]);
+  assert.ok(registryIds.length > 0, "le registre contient des schémas");
+  assert.equal(new Set(registryIds).size, registryIds.length, "les identifiants du registre sont uniques");
+  const historicalComponents = ["foundations.tsx", "protocole.tsx", "hermes.tsx"]
+    .flatMap((path) => [...read(`components/schemas/${path}`).matchAll(/export function (\w+Diagram)\(/g)].map((match) => match[1]));
+  assert.equal(historicalComponents.length, 23, "les 23 schémas historiques passent par le même sélecteur");
+  const cases = [
+    { viewport: 390, container: 350, expected: "compact" },
+    { viewport: 834, container: 640, expected: "wide" },
+    { viewport: 1440, container: 640, expected: "wide" },
+    { viewport: 1920, container: 640, expected: "wide" },
+  ] as const;
+  for (const id of [...registryIds, ...historicalComponents]) {
+    for (const { viewport, container, expected } of cases) {
+      const visibleLayouts = container >= threshold ? ["wide"] : ["compact"];
+      assert.deepEqual(visibleLayouts, [expected], `${id} dans ${container}px à ${viewport}px`);
+    }
+  }
 });
 
 test("le mouvement joue une fois et disparaît en mouvement réduit", () => {

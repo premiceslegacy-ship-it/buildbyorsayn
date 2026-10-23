@@ -151,6 +151,18 @@ test("le style du lecteur garde les marges mobiles et n'ajoute aucune bande lat�
   assert.doesNotMatch(css, /\.article\s*\{[^}]*border-left\s*:/s);
 });
 
+test("la ligne active garde exactement la grille et les métriques des autres chapitres", () => {
+  const css = read("components/reader/reader.module.css");
+  const rowRule = css.match(/\.chapterRow\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
+  const activeRule = css.match(/\.chapterRow\[aria-current\]\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
+  for (const declaration of ["box-sizing: border-box", "width: 100%", "appearance: none", "border: 0", "font: inherit"]) {
+    assert.match(rowRule, new RegExp(declaration.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), declaration);
+  }
+  assert.doesNotMatch(activeRule, /(?:width|height|margin|padding|gap|grid|transform|font|letter-spacing)\s*:/);
+  assert.match(css, /\.diagramSlot\s*\{[\s\S]*?width: 100%;[\s\S]*?max-width: 100%;[\s\S]*?min-width: 0;/);
+  assert.doesNotMatch(css, /\.diagramSlot\s*\{[^}]*100vw/s);
+});
+
 test("Protocole et Hermes utilisent le lecteur commun avec leurs libellés", () => {
   const protocole = read("app/protocole/page.tsx");
   const hermes = read("app/videos/tutos/[chapterSlug]/page.tsx");
