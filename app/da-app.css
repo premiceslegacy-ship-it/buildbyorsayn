@@ -267,10 +267,9 @@
 .da.da-app .foot { margin-top: clamp(48px, 7vw, 110px); display: grid; place-items: center; padding: 36px var(--gutter) calc(108px + env(safe-area-inset-bottom)); }
 .da.da-app .foot img { height: 24px; width: auto; opacity: .62; }
 .da.da-app .tlw { white-space: nowrap; }
-.da.da-app .tlg { display: inline-grid; place-items: center; width: 1.15em; height: 1.15em; margin-right: .35em; vertical-align: middle; position: relative; top: -.07em; margin-block: -.2em; border-radius: .32em; background: #f1f5f2; padding: .18em; line-height: 0; }
+.da.da-app .tlg { display: inline-grid; place-items: center; width: 1.3em; height: 1.3em; margin-right: .3em; vertical-align: middle; position: relative; top: -.08em; margin-block: -.25em; line-height: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,.45)); }
 .da.da-app .tlg img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.da.da-app .tlg--b { background: none; padding: 0; box-shadow: none; }
-.da.da-app .tlg--d { background: #0c0f0d; box-shadow: inset 0 0 0 1px rgba(241,245,242,.24); }
+.da.da-app .tlg--flat { border-radius: .32em; background: #f1f5f2; padding: .18em; }
 
 @media (prefers-reduced-motion: reduce) {
   .da.da-app .skeleton { animation: none; }
