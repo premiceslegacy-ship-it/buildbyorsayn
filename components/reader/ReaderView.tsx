@@ -189,6 +189,9 @@ export function ReaderView({
     return markdownSections.length > 0 ? serializeReaderMarkdown(title, markdownSections) : null;
   }, [copyMarkdown, sections, title]);
 
+  // La liste de chapitres peut être recréée à chaque rendu du parent : seule une vraie différence d'identifiants relit l'adresse.
+  // Sinon un rendu intermédiaire (changement de mode) renvoyait au chapitre encore présent dans l'URL.
+  const sectionIdsKey = sections.map((section) => section.id).join("\u0000");
   useEffect(() => {
     installAppMotionTokens();
     const address = new URL(window.location.href);
@@ -196,10 +199,10 @@ export function ReaderView({
     const requestedChapter = address.searchParams.get("chapter") || address.hash || initialChapter;
     const frame = window.requestAnimationFrame(() => {
       setMode(nextMode);
-      setSelected(Math.max(0, resolveChapterIndex(sections.map((section) => section.id), requestedChapter)));
+      setSelected(Math.max(0, resolveChapterIndex(sectionIdsKey.split("\u0000"), requestedChapter)));
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [hasVideoMode, initialChapter, sections]);
+  }, [hasVideoMode, initialChapter, sectionIdsKey]);
 
   useEffect(() => {
     if (!current) return;
