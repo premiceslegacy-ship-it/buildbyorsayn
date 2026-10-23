@@ -9,7 +9,7 @@ import {
 test.describe("Skills catalog cards", () => {
   test.skip(!hasE2eAccount, "E2E_TEST_EMAIL/E2E_TEST_PASSWORD not configured");
 
-  test("cards render uniformly with an illustration and access badge", async ({ authedPage: page }) => {
+  test("cards render uniformly with an illustration, an anchor and one action", async ({ authedPage: page }) => {
     await page.goto("/skills");
     const catalogue = page.getByRole("region", { name: "Catalogue" });
     await catalogue.scrollIntoViewIfNeeded();
@@ -19,7 +19,8 @@ test.describe("Skills catalog cards", () => {
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
       await expect(cards.nth(index).locator("img")).toBeVisible();
-      await expect(cards.nth(index).getByText(/^(Fondations|LE\sCOFFRE|Gratuit)$/)).toBeVisible();
+      await expect(cards.nth(index)).toHaveAttribute("id", /^[a-z0-9-]+$/);
+      await expect(cards.nth(index).getByRole("button", { name: /Télécharger|Mettre à jour|Téléchargé/ }).or(cards.nth(index).getByRole("link", { name: /COFFRE|Fondations|Passer/ }))).toHaveCount(1);
     }
   });
 });

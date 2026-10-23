@@ -13,12 +13,11 @@ test.describe("Hermes Agent navigation", () => {
   });
 
   test("a chapter route enforces the same doctrine gate as the grid", async ({ authedPage: page }) => {
-    // The direct route exposes exactly one access surface: the paywall for a
-    // non-full account, or the reader for a full account.
-    await page.goto("/videos/tutos/readme");
-    const gate = page.getByRole("heading", { name: /Hermes Agent : organiser le travail avec l'IA/i });
+    // A full account reads the chapter; any other account is sent to the offers before any chapter text renders.
+    await page.goto("/videos/tutos/01-diagnostic-et-offre?mode=text");
     const reader = page.getByRole("article", { name: /^Lecture de / });
-    const accessSurface = gate.or(reader);
+    const offers = page.getByRole("heading", { name: /Passe à LE COFFRE/i });
+    const accessSurface = reader.or(offers);
     await expect(accessSurface).toHaveCount(1);
     await expect(accessSurface).toBeVisible();
   });

@@ -2241,6 +2241,13 @@
     display: none;
   }
 
+  /* En mode Vidéo la barre du site reste visible : la barre du lecteur se pose dessous, jamais dessus. */
+  .readerPage[data-reader-mode="video"] .toolbar {
+    top: var(--bar);
+    margin-top: var(--bar);
+    background: #0a0d0b;
+  }
+
   .toolbarWithoutModes {
     grid-template-columns: minmax(74px, 1fr) auto;
   }

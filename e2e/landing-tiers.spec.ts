@@ -27,10 +27,12 @@ async function blockStripe(page: Page): Promise<string[]> {
 async function expectNoUpgradeStripeLink(page: Page, path: string) {
   const response = await page.goto(path);
   const html = (await response?.text()) ?? "";
-  await expect(page.getByRole("heading", { name: "Chargement des niveaux…" })).toHaveCount(0);
+  await page.waitForLoadState("networkidle");
   const shown = await page.getByRole("link", { name: /^Prendre (Fondations|LE\sCOFFRE)$/ }).evaluateAll((links) => links.map((a) => (a as HTMLAnchorElement).href));
+  // Le HTML porte aussi la charge RSC, où la requête est encodée autrement : on compare le lien de paiement lui-même.
+  const shownLinks = shown.map((href) => href.split("?")[0]);
   for (const url of html.match(STRIPE_URL) ?? []) {
-    expect(shown, `lien Stripe inattendu dans le HTML de ${path}`).toContain(url.replace(/&amp;/g, "&"));
+    expect(shownLinks, `lien Stripe inattendu dans le HTML de ${path}`).toContain(url.split("?")[0]);
   }
 }
 

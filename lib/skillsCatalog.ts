@@ -35,7 +35,7 @@ export const SKILLS_CATALOG_V2: SkillCatalogItem[] = [
     slug: "oracle-by-orsayn",
     title: "ORACLE by Orsayn",
     description:
-      "Le chef d'orchestre avant le code : interview fondatrice, documents et capacités bien rangés, data, sécurité, UX, copy, GTM - puis délègue aux bons skills.",
+      "Le chef d'orchestre avant le code : interview fondatrice, documents et capacités bien rangés, data, sécurité, UX, copy, GTM. Ensuite, il délègue aux bons skills.",
     access: "full",
     fileName: "oracle-by-orsayn.zip",
     category: "produit",

@@ -56,7 +56,7 @@ test.describe("Bloc lessons (member)", () => {
     await page.keyboard.press("ArrowRight");
     await expect(page).toHaveURL(/\/blocs\/1\/lire\?.*chapter=b1-s1.*mode=text|\/blocs\/1\/lire\?.*mode=text.*chapter=b1-s1/);
     // La navigation vers le chapitre doit être terminée : un changement de mode pendant le vol relit l'état précédent.
-    await expect(page.locator('[aria-current="true"]').filter({ hasText: "Une IA utile commence dans le métier" })).toBeVisible();
+    await expect(page.getByRole("article", { name: "Lecture de Une IA utile commence dans le métier" })).toBeVisible();
     await page.getByRole("radio", { name: "Vidéo" }).click();
     await expect(page).toHaveURL(/chapter=b1-s1/);
     await page.keyboard.press("Tab");
