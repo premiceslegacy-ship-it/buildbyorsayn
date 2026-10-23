@@ -28,10 +28,12 @@ export function KitFrame({ title, description, ariaLabel, accent = "#22d96e", ki
     viewport={{ once: true, amount: .15 }}
     transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 158, damping: 25, mass: 1 }}
   >
-    <figcaption className={styles.frameHeader}>
-      <h3>{title}</h3>
-      <p>{description}</p>
-    </figcaption>
-    <div className={styles.canvas}>{children}</div>
+    <div className={styles.canvas}>
+      <figcaption className={styles.frameHeader}>
+        <h3>{title}</h3>
+        {description ? <p>{description}</p> : null}
+      </figcaption>
+      <div className={styles.body}>{children}</div>
+    </div>
   </motion.figure>;
 }

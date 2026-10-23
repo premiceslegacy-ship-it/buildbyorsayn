@@ -14,9 +14,10 @@ export type RingsProps = KitBaseProps & {
 };
 
 export function Rings({ core, rings, accentIndex, ...frame }: RingsProps) {
-  const ringStep = rings.length > 1 ? Math.min(84, 252 / (rings.length - 1)) : 0;
+  const ringStep = rings.length > 1 ? Math.min(22, 58 / (rings.length - 1)) : 0;
 
   return <KitFrame {...frame} kind="rings">
+    <div className={styles.ringsLayout}>
     <div className={styles.ringsWide}>
       {rings.slice().reverse().map((ring, reverseIndex) => {
         const index = rings.length - reverseIndex - 1;
@@ -24,7 +25,7 @@ export function Rings({ core, rings, accentIndex, ...frame }: RingsProps) {
           className={`${styles.ring} ${index === accentIndex ? styles.isAccent : ""}`}
           style={{
             "--kit-ring-depth": reverseIndex,
-            "--kit-ring-size": `${350 - reverseIndex * ringStep}px`,
+            "--kit-ring-size": `${100 - reverseIndex * ringStep}%`,
           } as React.CSSProperties}
           key={ring.label}
         ><span>{ring.label}</span></div>;
@@ -34,6 +35,7 @@ export function Rings({ core, rings, accentIndex, ...frame }: RingsProps) {
     <div className={styles.ringsList}>
       <strong>{core}</strong>
       <ol>{rings.map((ring, index) => <li className={index === accentIndex ? styles.isAccent : undefined} key={ring.label}><span>{index + 1}</span><div><strong>{ring.label}</strong><p>{ring.detail}</p></div></li>)}</ol>
+    </div>
     </div>
   </KitFrame>;
 }

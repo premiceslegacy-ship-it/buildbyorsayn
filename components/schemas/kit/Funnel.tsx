@@ -31,7 +31,7 @@ export function Funnel({ stages, leakIndex, leakLabel, tool, ...frame }: FunnelP
         return <div className={styles.funnelRow} style={rowStyle} key={`${stage.label}-${stage.value}`}>
           <div className={styles.funnelStage}>
             <span><strong>{stage.label}</strong>{stage.detail ? <small>{stage.detail}</small> : null}</span>
-            <b>{stage.valueLabel ?? stage.value}</b>
+            {stage.valueLabel === "" ? null : <b>{stage.valueLabel ?? stage.value}</b>}
           </div>
           {index === leakIndex ? <div className={styles.funnelLeak}>
             <i /><i /><i /><i /><i />

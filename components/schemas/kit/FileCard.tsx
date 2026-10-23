@@ -29,8 +29,9 @@ export function FileCard({ filename, lines, annotations, tool, ...frame }: FileC
         <ol>{lines.map((line, index) => {
           const lineNumber = index + 1;
           const noteNumber = notesByLine.get(lineNumber);
-          return <li className={line.tone === "heading" ? styles.fileHeading : line.tone === "muted" ? styles.fileMuted : undefined} key={`${line.text}-${lineNumber}`}>
-            <span>{lineNumber}</span><code>{line.text || " "}</code>{noteNumber ? <b>{noteNumber}</b> : null}
+          const tone = line.tone === "heading" ? styles.fileHeading : line.tone === "muted" ? styles.fileMuted : "";
+          return <li className={`${tone} ${noteNumber ? styles.fileNoted : ""}`.trim() || undefined} key={`${line.text}-${lineNumber}`}>
+            <span>{lineNumber}</span><code>{line.text || " "}</code>
           </li>;
         })}</ol>
       </section>

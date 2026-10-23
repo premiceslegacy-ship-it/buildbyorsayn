@@ -111,7 +111,7 @@ export function SkillsCatalogClient({ skills, categoryLabels, tier, beginnerHref
           const hasUpdate = Boolean(artifact && records[skill.slug] && artifact.sha256 !== records[skill.slug].sha256);
           const state = download?.slug === skill.slug ? download.status : null;
           const lockedHref = skill.access === "beginner" ? beginnerHref : fullHref;
-          return <li className="ui3-skill-card" key={skill.slug} style={{ animationDelay: `${index * 60}ms` }} aria-label={`${skill.title}, ${categoryLabels[skill.category]}`}>
+          return <li className="ui3-skill-card" id={skill.slug} key={skill.slug} style={{ animationDelay: `${index * 60}ms`, scrollMarginTop: 96 }} aria-label={`${skill.title}, ${categoryLabels[skill.category]}`}>
             <div className="ui3-skill-image"><Image src={`/da/skills/${skill.slug}.jpg`} alt="" width={640} height={360} /></div>
             <div className="ui3-skill-body">
               <h3>{skill.title}</h3>

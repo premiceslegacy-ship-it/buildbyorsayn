@@ -890,23 +890,23 @@
   font: 400 calc(19px * var(--reader-font-scale))/1.7 var(--font);
 }
 
-.prose p,
-.prose li {
+.prose p:not(figure *),
+.prose li:not(figure *) {
   color: #e6ebe7 !important;
   font-size: inherit !important;
   line-height: inherit !important;
   text-wrap: pretty;
 }
 
-.prose h2,
-.prose h3,
-.prose h4 {
+.prose h2:not(figure *),
+.prose h3:not(figure *),
+.prose h4:not(figure *) {
   color: var(--encre) !important;
   font-family: var(--font-t) !important;
   text-wrap: balance;
 }
 
-.prose h2 {
+.prose h2:not(figure *) {
   margin-top: 64px;
   margin-bottom: 16px;
   font-size: calc(28px * var(--reader-font-scale)) !important;
@@ -915,8 +915,8 @@
   letter-spacing: -.025em;
 }
 
-.prose h3,
-.prose h4 {
+.prose h3:not(figure *),
+.prose h4:not(figure *) {
   margin-top: 52px;
   margin-bottom: 14px;
   font-size: calc(23px * var(--reader-font-scale)) !important;
@@ -940,7 +940,7 @@
   margin-top: 64px !important;
 }
 
-.prose strong {
+.prose strong:not(figure *) {
   color: var(--encre) !important;
   font-weight: 600;
 }
@@ -955,28 +955,28 @@
   -webkit-box-decoration-break: clone;
 }
 
-.prose a {
+.prose a:not(figure *) {
   color: var(--menthe) !important;
   text-decoration: underline;
   text-decoration-color: rgba(185, 245, 207, .42);
   text-underline-offset: 3px;
 }
 
-.prose ul,
-.prose ol {
+.prose ul:not(figure *),
+.prose ol:not(figure *) {
   display: grid;
   gap: 10px !important;
   padding-left: 1.35em !important;
 }
 
-.prose ul { list-style: disc !important; }
-.prose ol { list-style: decimal !important; }
+.prose ul:not(figure *) { list-style: disc !important; }
+.prose ol:not(figure *) { list-style: decimal !important; }
 
-.prose li {
+.prose li:not(figure *) {
   padding: 0 0 0 .35em !important;
 }
 
-.prose pre {
+.prose pre:not(figure *) {
   max-width: 100%;
   overflow-x: auto;
   padding: 18px;
@@ -989,7 +989,7 @@
   overflow-wrap: anywhere;
 }
 
-.prose table {
+.prose table:not(figure *) {
   width: 100%;
   border-collapse: collapse;
   border-radius: var(--r-m);
@@ -997,8 +997,8 @@
   font-size: 15px !important;
 }
 
-.prose th,
-.prose td {
+.prose th:not(figure *),
+.prose td:not(figure *) {
   padding: 14px 16px !important;
   border-bottom: 1px solid var(--trait) !important;
   color: var(--t2) !important;
@@ -1006,7 +1006,7 @@
   vertical-align: top;
 }
 
-.prose th {
+.prose th:not(figure *) {
   color: var(--encre) !important;
   font-weight: 600;
 }
@@ -1031,7 +1031,7 @@
   display: block;
 }
 
-.prose blockquote {
+.prose blockquote:not(figure *) {
   margin-block: 1.8em;
   padding: 0;
   border: 0 !important;
@@ -1042,14 +1042,14 @@
   text-wrap: balance;
 }
 
-.prose hr {
+.prose hr:not(figure *) {
   height: 1px;
   margin-block: 2.2em;
   border: 0;
   background: var(--trait);
 }
 
-.prose code:not(pre code) {
+.prose code:not(pre code):not(figure *) {
   padding: .12em .38em;
   border-radius: 6px;
   background: rgba(241, 245, 242, .09);
@@ -1057,9 +1057,9 @@
   font-size: .9em;
 }
 
-.prose aside,
-.prose blockquote,
-.prose article,
+.prose aside:not(figure *),
+.prose blockquote:not(figure *),
+.prose article:not(figure *),
 .prose section[class*="rounded"] {
   border: 0 !important;
   border-radius: 28px !important;
@@ -1067,7 +1067,7 @@
   box-shadow: none !important;
 }
 
-.prose blockquote {
+.prose blockquote:not(figure *) {
   border-radius: 0 !important;
   background: transparent !important;
 }
@@ -1408,7 +1408,7 @@
   padding: 20px 24px 24px;
 }
 
-.typedKit :global(figure[data-kit-schema]) > figcaption {
+.typedKit :global(figure[data-kit-schema]) > div > figcaption {
   display: none;
 }
 
@@ -1526,10 +1526,12 @@
 
 .codeBlock {
   position: relative;
+  margin: 28px 0 32px;
 }
 
 .codeBlock pre {
-  padding-top: 64px;
+  margin: 0 !important;
+  padding: 22px 64px 22px 22px;
 }
 
 .codeBlock button {

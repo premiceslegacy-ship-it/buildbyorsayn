@@ -24,7 +24,7 @@
 .frameHeader {
   display: grid;
   gap: 8px;
-  margin: 0 0 20px;
+  margin: 0 0 28px;
 }
 
 .frameHeader h3,
@@ -49,11 +49,15 @@
 .canvas {
   min-width: 0;
   overflow: hidden;
-  padding: 24px;
+  padding: 32px;
   border: 1px solid rgba(241, 245, 242, .1);
-  border-radius: 22px;
+  border-radius: 28px;
   background: linear-gradient(155deg, var(--kit-surface) 0%, var(--kit-surface-deep) 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+.body {
+  min-width: 0;
 }
 
 .tool {
@@ -203,12 +207,12 @@
 
 .steps li {
   min-width: 0;
-  min-height: 164px;
+  min-height: 96px;
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 20px 12px;
+  padding: 18px 16px;
   border: 1px solid rgba(241, 245, 242, .1);
   border-radius: 18px;
   background: linear-gradient(160deg, #282d2a, #1b1f1d);
@@ -705,7 +709,7 @@
   min-height: 30px;
   position: relative;
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) 28px;
+  grid-template-columns: 38px minmax(0, 1fr);
   align-items: start;
   gap: 10px;
   padding: 5px 10px 5px 0;
@@ -714,16 +718,7 @@
 .editor code { min-width: 0; color: #c9d1cc; font: 500 13px/1.55 "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
 .editor li.fileHeading code { color: var(--kit-ink); font-weight: 700; }
 .editor li.fileMuted code { color: #8d9991; }
-.editor li b {
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--kit-em);
-  color: #06110a;
-  font: 700 13px/1 var(--font, sans-serif);
-}
+.editor li.fileNoted { background: linear-gradient(90deg, color-mix(in srgb, var(--kit-em) 9%, transparent), transparent 85%); }
 
 .fileNotes,
 .webNotes {
@@ -943,13 +938,22 @@
 .forkRejected { opacity: .65; }
 
 /* Rings */
-.ringsWide { min-height: 370px; position: relative; display: grid; place-items: center; }
+.ringsWide { width: 100%; max-width: 380px; aspect-ratio: 1; justify-self: center; position: relative; display: grid; place-items: center; }
 .ring { width: var(--kit-ring-size); height: var(--kit-ring-size); position: absolute; display: flex; align-items: flex-start; justify-content: center; padding-top: 17px; border: 1px solid rgba(241,245,242,.19); border-radius: 50%; background: color-mix(in srgb, #252a27 calc(13% + var(--kit-ring-depth) * 5%), transparent); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
 .ring > span { max-width: 140px; padding: 4px 9px; border-radius: 8px; background: #1c201e; color: var(--kit-copy); font: 600 13px/1.2 var(--font, sans-serif); text-align: center; }
 .ring.isAccent { border-color: var(--kit-em); box-shadow: 0 0 30px color-mix(in srgb, var(--kit-em) 8%, transparent), inset 0 1px 0 color-mix(in srgb, var(--kit-em) 38%, transparent); }
 .ring.isAccent > span { color: var(--kit-em); }
-.ringCore { z-index: 4; width: 102px; height: 102px; display: grid; place-items: center; padding: 12px; border-radius: 50%; background: linear-gradient(150deg, #303632, #1b1f1d); color: var(--kit-ink); font: 650 15px/1.22 var(--font-t, sans-serif); text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
-.ringsList { display: none; }
+.ringCore { z-index: 4; width: 84px; height: 84px; display: grid; place-items: center; padding: 10px; border-radius: 50%; background: linear-gradient(150deg, #303632, #1b1f1d); color: var(--kit-ink); font: 650 14px/1.2 var(--font-t, sans-serif); text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
+.ringsLayout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: 32px; }
+.ringsList { display: grid; gap: 12px; }
+.ringsList > strong { display: none; }
+.ringsList ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ringsList li { min-height: 64px; display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: rgba(241,245,242,.045); box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+.ringsList li > span { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: rgba(241,245,242,.08); color: var(--kit-copy); font: 650 13px/1 var(--font, sans-serif); }
+.ringsList li strong { color: var(--kit-ink); font: 600 15px/1.2 var(--font-t, sans-serif); }
+.ringsList li p { margin: 4px 0 0; color: var(--kit-copy); font: 450 14px/1.35 var(--font, sans-serif); }
+.ringsList li.isAccent > span { background: var(--kit-em); color: #07110b; }
+.ringsList li.isAccent strong { color: var(--kit-em); }
 
 /* Big number */
 .bigNumber { display: grid; grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr); align-items: center; gap: 16px; }
@@ -1035,7 +1039,7 @@
 
   .fileLayout,
   .webAnnotated { gap: 18px; }
-  .editor li { grid-template-columns: 30px minmax(0, 1fr) 26px; gap: 7px; }
+  .editor li { grid-template-columns: 30px minmax(0, 1fr); gap: 7px; }
   .editor code { font-size: 13px; }
   .fileNotes,
   .webNotes { grid-template-columns: minmax(0, 1fr); }
@@ -1072,16 +1076,9 @@
   .forkBranches::before { display: none; }
   .forkBranches article { min-height: 102px; }
 
+  .ringsLayout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .ringsWide { display: none; }
-  .ringsList { display: grid; gap: 12px; }
   .ringsList > strong { min-height: 68px; display: grid; place-items: center; padding: 14px; border-radius: 18px; background: linear-gradient(150deg, #303632, #1b1f1d); color: var(--kit-ink); font: 650 16px/1.2 var(--font-t, sans-serif); text-align: center; }
-  .ringsList ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-  .ringsList li { min-height: 64px; display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: rgba(241,245,242,.045); box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
-  .ringsList li > span { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: rgba(241,245,242,.08); color: var(--kit-copy); font: 650 13px/1 var(--font, sans-serif); }
-  .ringsList li strong { color: var(--kit-ink); font: 600 14px/1.2 var(--font-t, sans-serif); }
-  .ringsList li p { margin: 3px 0 0; color: var(--kit-copy); font: 450 13px/1.3 var(--font, sans-serif); }
-  .ringsList li.isAccent > span { background: var(--kit-em); color: #07110b; }
-  .ringsList li.isAccent strong { color: var(--kit-em); }
 
   .bigNumber { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .bigNumber > section { min-height: 150px; }

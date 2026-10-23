@@ -8,6 +8,8 @@ import { readerVisualElement, type ReaderVisualKind } from "@/components/schemas
 import { animateAppElement } from "@/lib/ui/motion";
 import { playAppSound } from "@/lib/ui/sound";
 import { readerImageSource, readerMarkdownHref } from "./readerModel";
+import { ToolLogo } from "@/components/ToolLogo";
+import { TOOL_LOGOS } from "@/lib/tools/registry";
 import {
   parseBeforeAfterPairs,
   parseDirectiveOpening,
@@ -73,7 +75,9 @@ function inline(text: string, options: MarkdownOptions): ReactNode[] {
       const href = readerMarkdownHref(link[2], options);
       nodes.push(href ? <a key={match.index} href={href} rel={href.startsWith("http") ? "noreferrer noopener" : undefined}>{inline(link[1], options)}</a> : link[1]);
     } else if (token.startsWith("`")) {
-      nodes.push(<code key={match.index}>{token.slice(1, -1)}</code>);
+      const code = token.slice(1, -1);
+      // Un nom d'outil connu s'écrit avec son logo 3D, pas comme du code (doc 07).
+      nodes.push(TOOL_LOGOS[code] ? <span className="tlw" key={match.index}><ToolLogo name={code} />{code}</span> : <code key={match.index}>{code}</code>);
     } else if (token.startsWith("==")) {
       nodes.push(<mark className={styles.highlight} data-reader-highlight="true" key={match.index}>{inline(token.slice(2, -2), options)}</mark>);
     } else {
