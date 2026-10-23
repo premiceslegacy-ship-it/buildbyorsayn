@@ -47,7 +47,7 @@ function ToolMark({ name, src }: { name: string; src: string }) {
 function SectionTitle({ eyebrow, title, intro }: { eyebrow: string; title: string; intro?: string }) {
   return (
     <div className="max-w-3xl">
-      <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">{eyebrow}</p>
+      <p className="text-[11px] tracking-[0.18em] text-[var(--em)] font-semibold mb-3">{eyebrow}</p>
       <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">{title}</h2>
       {intro ? <p className="mt-4 text-sm sm:text-base leading-relaxed text-white/55">{intro}</p> : null}
     </div>
@@ -57,8 +57,8 @@ function SectionTitle({ eyebrow, title, intro }: { eyebrow: string; title: strin
 function Step({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
   return (
     <article className="border-t border-white/[0.1] pt-5">
-      <p className="text-2xl font-light tabular-nums text-[#c9b48a]/65 mb-4">{number}</p>
-      <h3 className="text-base font-semibold tracking-tight text-[#f0ede8]">{title}</h3>
+      <p className="text-2xl font-light tabular-nums text-[var(--em)]/65 mb-4">{number}</p>
+      <h3 className="text-base font-semibold tracking-tight text-[var(--encre)]">{title}</h3>
       <div className="mt-2 text-sm leading-relaxed text-white/55">{children}</div>
     </article>
   );
@@ -66,8 +66,8 @@ function Step({ number, title, children }: { number: string; title: string; chil
 
 function Capitalise({ children }: { children: React.ReactNode }) {
   return (
-    <aside className="border-y border-[#e8d5b0]/35 py-6 sm:py-7">
-      <p className="text-[11px] tracking-[0.18em] font-semibold text-[#e8d5b0]">CE QUE TU GARDES</p>
+    <aside className="border-y border-[var(--em)]/35 py-6 sm:py-7">
+      <p className="text-[11px] tracking-[0.18em] font-semibold text-[var(--em)]">CE QUE TU GARDES</p>
       <div className="mt-3 max-w-3xl text-sm leading-relaxed text-white/60">{children}</div>
     </aside>
   );
@@ -77,7 +77,7 @@ function Case({ number, title, children }: { number: string; title: string; chil
   return (
     <article className="border-y border-white/[0.1] py-8 sm:py-10">
       <div className="grid gap-5 lg:grid-cols-[9rem_minmax(0,1fr)] lg:gap-10">
-        <p className="text-[11px] tracking-[0.18em] font-semibold text-[#e8d5b0]/75">CAS {number}</p>
+        <p className="text-[11px] tracking-[0.18em] font-semibold text-[var(--em)]/75">CAS {number}</p>
         <div>
           <h3 className="text-xl sm:text-2xl font-semibold tracking-tight">{title}</h3>
           <div className="mt-5 space-y-4 text-sm sm:text-base leading-relaxed text-white/60">{children}</div>
@@ -102,12 +102,12 @@ function NextBlock({ current }: { current: LearningSlug }) {
   if (!next) return null;
 
   return (
-    <Link href={`/videos/tutos/learn/${next.slug}`} className="group mt-16 flex items-center justify-between gap-5 border-y border-white/[0.1] py-6 transition-colors hover:border-[#e8d5b0]/50">
+    <Link href={`/videos/tutos/learn/${next.slug}`} className="group mt-16 flex items-center justify-between gap-5 border-y border-white/[0.1] py-6 transition-colors hover:border-[var(--em)]/50">
       <div>
-        <p className="text-[10px] tracking-[0.18em] font-semibold text-[#e8d5b0]/75">BLOC SUIVANT</p>
-        <p className="mt-2 text-lg font-semibold tracking-tight text-[#f0ede8]">{next.title}</p>
+        <p className="text-[10px] tracking-[0.18em] font-semibold text-[var(--em)]/75">BLOC SUIVANT</p>
+        <p className="mt-2 text-lg font-semibold tracking-tight text-[var(--encre)]">{next.title}</p>
       </div>
-      <ArrowRight className="size-5 shrink-0 text-[#e8d5b0] transition-transform group-hover:translate-x-1" />
+      <ArrowRight className="size-5 shrink-0 text-[var(--em)] transition-transform group-hover:translate-x-1" />
     </Link>
   );
 }
@@ -116,7 +116,7 @@ function MakeHermesUseful() {
   return (
     <>
       <header className="max-w-3xl">
-        <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">BLOC 01 : INSTALLER ET CADRER</p>
+        <p className="text-[11px] tracking-[0.18em] text-[var(--em)] font-semibold mb-3">BLOC 01 : INSTALLER ET CADRER</p>
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Prépare un premier workflow que tu peux arrêter.</h1>
         <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">L'installation fournit un moteur. Ta mission, tes sources, tes droits et ta preuve de fin transforment ce moteur en aide de travail. Compte 25 minutes ce soir : tu repars avec trois fiches vérifiées et un contrat de mission que tu peux réutiliser.</p>
       </header>
@@ -152,8 +152,8 @@ hermes status --all`}</code></pre>
             ["Preuve", "Comparer les fiches aux sources et vérifier qu'aucun outil externe n'a été appelé."],
           ].map(([title, body], index) => (
             <div key={title} className="grid gap-3 py-5 sm:grid-cols-[3rem_minmax(0,1fr)] sm:gap-5">
-              <p className="text-xl font-light tabular-nums text-[#c9b48a]/65">0{index + 1}</p>
-              <p className="text-sm leading-relaxed text-white/60"><strong className="font-semibold text-[#f0ede8]">{title}. </strong>{body}</p>
+              <p className="text-xl font-light tabular-nums text-[var(--em)]/65">0{index + 1}</p>
+              <p className="text-sm leading-relaxed text-white/60"><strong className="font-semibold text-[var(--encre)]">{title}. </strong>{body}</p>
             </div>
           ))}
         </div>
@@ -163,15 +163,15 @@ hermes status --all`}</code></pre>
         <SectionTitle eyebrow="AUTONOMIE PAR PALIERS" title="Élargis une seule capacité à la fois." intro="Le passage suivant dépend de la preuve du palier précédent. Un résultat impressionnant sur un exemple ne justifie pas un droit d'écriture." />
         <div className="mt-8 grid gap-5 md:grid-cols-3">
           <article className="border border-white/[0.1] p-5">
-            <h3 className="text-sm font-semibold text-[#f0ede8]">Lire et signaler</h3>
+            <h3 className="text-sm font-semibold text-[var(--encre)]">Lire et signaler</h3>
             <p className="mt-2 text-sm leading-relaxed text-white/55">L'agent consulte un périmètre défini, cite ses sources et remonte une décision. Commence ici.</p>
           </article>
           <article className="border border-white/[0.1] p-5">
-            <h3 className="text-sm font-semibold text-[#f0ede8]">Préparer dans un brouillon</h3>
+            <h3 className="text-sm font-semibold text-[var(--encre)]">Préparer dans un brouillon</h3>
             <p className="mt-2 text-sm leading-relaxed text-white/55">Il produit un fichier isolé ou une proposition. Une personne compare, corrige et accepte.</p>
           </article>
           <article className="border border-white/[0.1] p-5">
-            <h3 className="text-sm font-semibold text-[#f0ede8]">Agir dans un couloir</h3>
+            <h3 className="text-sm font-semibold text-[var(--encre)]">Agir dans un couloir</h3>
             <p className="mt-2 text-sm leading-relaxed text-white/55">L'action précise la cible, le contenu, la durée, le plafond, la trace et le retour arrière. Les actions sensibles restent approuvées.</p>
           </article>
         </div>
@@ -189,33 +189,33 @@ function ThreeReusableProjects() {
   return (
     <>
       <header className="max-w-3xl">
-        <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold mb-3">BLOC 02 : PRATIQUER SUR TROIS CAS</p>
+        <p className="text-[11px] tracking-[0.18em] text-[var(--em)] font-semibold mb-3">BLOC 02 : PRATIQUER SUR TROIS CAS</p>
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Construis trois workflows que tu peux refaire.</h1>
         <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">Chaque cas possède une entrée, une sortie, une limite, une preuve et une reprise. Tu gardes la méthode seulement après avoir contrôlé le résultat. Ce soir, choisis un seul des trois cas et compte 35 minutes : tu repars avec une recette écrite que tu pourras relancer la semaine prochaine.</p>
       </header>
 
       <section className="mt-14">
         <Case number="01" title="Préparer un carrousel fidèle à une idée">
-          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Une scène réelle, une idée principale, une preuve autorisée, une limite et la destination du contenu. Exemple : un carrousel de six écrans pour un cabinet de kinésithérapie sur les douleurs de dos au bureau, qui renvoie vers la page de prise de rendez-vous. Le brief sépare les faits, les hypothèses et les chiffres qui demandent une source.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Exécution.</strong> L'agent propose une route écran par écran. Chaque écran porte une idée utile à la compréhension. Le texte reste lisible sur téléphone et le geste final correspond à ce que la destination délivre.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Limite et preuve.</strong> Il ne publie rien. Tu relis le rendu dans son format final, les chiffres, les sources, la promesse et le lien. Après diffusion autorisée, tu compares des signaux de qualité à des contenus comparables.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Reprise.</strong> La passation garde l'idée, le dernier écran validé, les points refusés et la prochaine correction. Une interruption ne force pas à reconstruire la route.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Entrée.</strong> Une scène réelle, une idée principale, une preuve autorisée, une limite et la destination du contenu. Exemple : un carrousel de six écrans pour un cabinet de kinésithérapie sur les douleurs de dos au bureau, qui renvoie vers la page de prise de rendez-vous. Le brief sépare les faits, les hypothèses et les chiffres qui demandent une source.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Exécution.</strong> L'agent propose une route écran par écran. Chaque écran porte une idée utile à la compréhension. Le texte reste lisible sur téléphone et le geste final correspond à ce que la destination délivre.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Limite et preuve.</strong> Il ne publie rien. Tu relis le rendu dans son format final, les chiffres, les sources, la promesse et le lien. Après diffusion autorisée, tu compares des signaux de qualité à des contenus comparables.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Reprise.</strong> La passation garde l'idée, le dernier écran validé, les points refusés et la prochaine correction. Une interruption ne force pas à reconstruire la route.</p>
           <Capitalise><p>Range le brief, la structure, la direction visuelle, la checklist et la lecture du résultat. Ensemble, ces éléments forment une recette versionnée, pas une promesse de performance.</p></Capitalise>
         </Case>
 
         <Case number="02" title="Préparer l'amélioration d'une page">
-          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Une URL, une période, les requêtes et pages autorisées, ainsi que la décision visée. Exemple : la page « tarifs » d&apos;un garage sur les 28 derniers jours. La Search Console, l&apos;outil gratuit de Google qui montre les recherches menant au site, indique des impressions et des clics. Elle ne révèle pas seule l&apos;intention exacte de chaque personne.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Exécution.</strong> L'agent compare les questions visibles, le contenu présent et les passages manquants. Il propose une structure, des exemples ou une FAQ dans un brouillon séparé. Pour le garage, cela peut être une réponse claire à « combien coûte une vidange » si le prix réel est fourni par le propriétaire.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Limite et preuve.</strong> Il ne change ni la page publiée, ni la mesure. Tu contrôles les sources, le diff, c&apos;est-à-dire la liste exacte des lignes modifiées, et la lisibilité. La preuve porte d'abord sur la qualité du brouillon, puis sur l'effet observé après une publication décidée par le propriétaire.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Reprise.</strong> Le dossier garde l'URL, la version, les données lues, la proposition, l'approbation et la date de prochaine lecture.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Entrée.</strong> Une URL, une période, les requêtes et pages autorisées, ainsi que la décision visée. Exemple : la page « tarifs » d&apos;un garage sur les 28 derniers jours. La Search Console, l&apos;outil gratuit de Google qui montre les recherches menant au site, indique des impressions et des clics. Elle ne révèle pas seule l&apos;intention exacte de chaque personne.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Exécution.</strong> L'agent compare les questions visibles, le contenu présent et les passages manquants. Il propose une structure, des exemples ou une FAQ dans un brouillon séparé. Pour le garage, cela peut être une réponse claire à « combien coûte une vidange » si le prix réel est fourni par le propriétaire.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Limite et preuve.</strong> Il ne change ni la page publiée, ni la mesure. Tu contrôles les sources, le diff, c&apos;est-à-dire la liste exacte des lignes modifiées, et la lisibilité. La preuve porte d'abord sur la qualité du brouillon, puis sur l'effet observé après une publication décidée par le propriétaire.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Reprise.</strong> Le dossier garde l'URL, la version, les données lues, la proposition, l'approbation et la date de prochaine lecture.</p>
           <Capitalise><p>Conserve les intentions, structures, preuves et règles de qualité qui ont survécu à la revue. Retire les conclusions fondées sur une seule variation.</p></Capitalise>
         </Case>
 
         <Case number="03" title="Préparer la semaine autour des décisions">
-          <p><strong className="font-semibold text-[#f0ede8]">Entrée.</strong> Un espace de projets défini, une fenêtre de temps et la liste des personnes autorisées. Les conversations privées et les dossiers sans rapport restent hors périmètre.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Exécution.</strong> L'agent relève les décisions, blocages, échéances et personnes qui attendent une réponse. Chaque point indique sa source, son état, sa prochaine action et le responsable qui tranche.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Limite et preuve.</strong> Le brief reste une préparation. La réunion valide ou corrige. La version validée remplace le brouillon et devient l'état de reprise.</p>
-          <p><strong className="font-semibold text-[#f0ede8]">Planification.</strong> Lance d'abord le workflow manuellement. Quand il tient, crée une tâche planifiée avec un profil, un dossier, des outils filtrés, une destination de test et un arrêt. Consulte l'historique avant d'activer la livraison.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Entrée.</strong> Un espace de projets défini, une fenêtre de temps et la liste des personnes autorisées. Les conversations privées et les dossiers sans rapport restent hors périmètre.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Exécution.</strong> L'agent relève les décisions, blocages, échéances et personnes qui attendent une réponse. Chaque point indique sa source, son état, sa prochaine action et le responsable qui tranche.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Limite et preuve.</strong> Le brief reste une préparation. La réunion valide ou corrige. La version validée remplace le brouillon et devient l'état de reprise.</p>
+          <p><strong className="font-semibold text-[var(--encre)]">Planification.</strong> Lance d'abord le workflow manuellement. Quand il tient, crée une tâche planifiée avec un profil, un dossier, des outils filtrés, une destination de test et un arrêt. Consulte l'historique avant d'activer la livraison.</p>
           <Capitalise><p>Le capital utile tient dans les décisions, leurs raisons, les propriétaires, les échéances, les résultats et les exceptions. Une transcription complète ajouterait du bruit et des données inutiles.</p></Capitalise>
         </Case>
       </section>
@@ -268,7 +268,7 @@ function TregInHermes() {
       <header className="max-w-3xl">
         <div className="mb-3 flex items-center gap-3">
           <Image src="/brand-logos/treg.svg" alt="Treg" width={22} height={22} className="size-[22px]" />
-          <p className="text-[11px] tracking-[0.18em] text-[#e8d5b0] font-semibold">BLOC 03 : CONNECTER SANS TOUT OUVRIR</p>
+          <p className="text-[11px] tracking-[0.18em] text-[var(--em)] font-semibold">BLOC 03 : CONNECTER SANS TOUT OUVRIR</p>
         </div>
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08]">Ajoute un outil externe par MCP.</h1>
         <p className="mt-5 text-base sm:text-[17px] leading-relaxed text-white/60">MCP (Model Context Protocol) est le protocole qui branche un service externe sur l'agent et lui expose des outils. Tu contrôles encore le serveur, l'authentification, les outils visibles, le coût, les actions sensibles et la preuve de l'effet.</p>
@@ -319,7 +319,7 @@ mcp_servers:
             <h3 className="text-lg font-semibold tracking-tight">Limite actuelle de ce parcours</h3>
             <p className="mt-3 text-sm leading-relaxed text-white/55">Aucun appel payant n'a été exécuté pour produire ce contenu. Le solde disponible dans l'environnement de recherche ne permettait pas ce test. Aucun fonds ne doit être ajouté pour le contourner.</p>
             <p className="mt-4 text-sm leading-relaxed text-white/55">Tu peux apprendre la méthode en consultant le catalogue public. Si ton organisation autorise ensuite un appel, lis le coût exact, fixe le total accepté, garde l'identifiant et arrête la boucle avant le plafond.</p>
-            <p className="mt-4 text-sm leading-relaxed text-white/55">Treg distingue aussi le catalogue public des outils enregistrés par ton équipe. L'opération <code className="font-mono text-[#e8d5b0]">my_tools</code> sert à lister ces connexions. Si aucune opération ne répond au besoin, <code className="font-mono text-[#e8d5b0]">catalog_request</code> demande la capacité manquante au lieu de détourner un outil inadapté. Aucune connexion d'équipe active n'a été vérifiée pour ce parcours : contrôle la réponse, les droits et le coût avant tout appel.</p>
+            <p className="mt-4 text-sm leading-relaxed text-white/55">Treg distingue aussi le catalogue public des outils enregistrés par ton équipe. L'opération <code className="font-mono text-[var(--em)]">my_tools</code> sert à lister ces connexions. Si aucune opération ne répond au besoin, <code className="font-mono text-[var(--em)]">catalog_request</code> demande la capacité manquante au lieu de détourner un outil inadapté. Aucune connexion d'équipe active n'a été vérifiée pour ce parcours : contrôle la réponse, les droits et le coût avant tout appel.</p>
           </article>
         </div>
       </section>
@@ -329,7 +329,7 @@ mcp_servers:
         <div className="mt-8 border-y border-white/[0.1] divide-y divide-white/[0.1]">
           {DEPARTMENT_WORKFLOWS.map((workflow) => (
             <article key={workflow.department} className="grid gap-5 py-7 lg:grid-cols-[9rem_minmax(0,1fr)] lg:gap-10">
-              <p className="text-[10px] tracking-[0.18em] font-semibold text-[#e8d5b0]/75 pt-1">{workflow.department}</p>
+              <p className="text-[10px] tracking-[0.18em] font-semibold text-[var(--em)]/75 pt-1">{workflow.department}</p>
               <div>
                 <h3 className="text-lg font-semibold tracking-tight">{workflow.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-white/60">{workflow.body}</p>
@@ -354,7 +354,7 @@ mcp_servers:
             "L'approbation liée à la cible et au contenu.",
             "La reprise après refus, coupure ou effet incertain.",
           ].map((item) => (
-            <p key={item} className="flex gap-3 border-t border-white/[0.1] pt-4 text-sm leading-relaxed text-white/55"><CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#e8d5b0]" />{item}</p>
+            <p key={item} className="flex gap-3 border-t border-white/[0.1] pt-4 text-sm leading-relaxed text-white/55"><CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[var(--em)]" />{item}</p>
           ))}
         </div>
       </section>
@@ -367,11 +367,17 @@ export function HermesLearningBlock({ slug }: { slug: LearningSlug }) {
     <article className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-10">
       <BackToHermes />
       <div className="mt-12">
-        {slug === "faire-travailler-hermes" ? <MakeHermesUseful /> : null}
-        {slug === "trois-projets-reutilisables" ? <ThreeReusableProjects /> : null}
-        {slug === "treg-dans-hermes" ? <TregInHermes /> : null}
+        <HermesLearningContent slug={slug} />
       </div>
       <NextBlock current={slug} />
     </article>
   );
+}
+
+export function HermesLearningContent({ slug }: { slug: LearningSlug }) {
+  return <>
+    {slug === "faire-travailler-hermes" ? <MakeHermesUseful /> : null}
+    {slug === "trois-projets-reutilisables" ? <ThreeReusableProjects /> : null}
+    {slug === "treg-dans-hermes" ? <TregInHermes /> : null}
+  </>;
 }

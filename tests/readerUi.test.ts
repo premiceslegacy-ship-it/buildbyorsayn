@@ -11,6 +11,8 @@ import {
   parseReaderMode,
   readerModeQuery,
   readingProgress,
+  readerImageSource,
+  readerMarkdownHref,
   resolveChapterIndex,
   resolveReaderMode,
   serializeReaderMarkdown,
@@ -59,6 +61,16 @@ test("la copie Markdown conserve tout le texte et ajoute la structure des chapit
   assert.match(markdown, /## 1\. Départ/);
   assert.match(markdown, /Premier paragraphe/);
   assert.match(markdown, /Deuxième paragraphe/);
+});
+
+test("le Markdown du lecteur borne les liens et les images", () => {
+  const options = { allowedLocalPaths: ["suite.md"], localBaseHref: "/videos/tutos" };
+  assert.equal(readerMarkdownHref("suite.md", options), "/videos/tutos/suite");
+  assert.equal(readerMarkdownHref("https://example.com/guide", options), "https://example.com/guide");
+  assert.equal(readerMarkdownHref("javascript:alert(1)", options), undefined);
+  assert.equal(readerMarkdownHref("../suite.md", options), undefined);
+  assert.equal(readerImageSource("/images/schema.png"), "/images/schema.png");
+  assert.equal(readerImageSource("data:image/svg+xml,evil"), undefined);
 });
 
 test("la progression de lecture et les états vides restent bornés", () => {
@@ -128,7 +140,28 @@ test("le style du lecteur garde les marges mobiles et n'ajoute aucune bande lat�
   assert.match(css, /margin-inline: 20px/);
   assert.match(css, /min-width: 44px/);
   assert.match(css, /width: min\(100%, calc\(640px \* var\(--reader-scale\)\)\)/);
-  assert.doesNotMatch(css, /border-left\s*:/);
+  assert.doesNotMatch(css, /\.article\s*\{[^}]*border-left\s*:/s);
+});
+
+test("Protocole et Hermes utilisent le lecteur commun avec leurs libellés", () => {
+  const protocole = read("app/protocole/page.tsx");
+  const hermes = read("app/videos/tutos/[chapterSlug]/page.tsx");
+  const learning = read("app/videos/tutos/learn/[slug]/page.tsx");
+  assert.match(protocole, /<ReaderView/);
+  assert.match(protocole, /backLabel="Protocole"/);
+  assert.match(protocole, /youtubeId="tcFGu_zNsPE"/);
+  for (const source of [hermes, learning]) {
+    assert.match(source, /<ReaderView/);
+    assert.match(source, /backLabel="Hermes Agent"/);
+    assert.ok(source.indexOf("hermesGate()") < source.indexOf("const sections"), "la garde précède la construction des chapitres");
+  }
+});
+
+test("le rendu Markdown couvre titres, listes, code, tableaux, citations, liens et images", () => {
+  const prose = read("components/reader/ReaderProse.tsx");
+  for (const marker of ["heading", "ordered", "CodeBlock", "markdownTable", "blockquote", "readerMarkdownHref", "readerImageSource"]) {
+    assert.match(prose, new RegExp(marker), marker);
+  }
 });
 
 test("le focus DA est émeraude au clavier et reste invisible sur les cibles programmatiques", () => {

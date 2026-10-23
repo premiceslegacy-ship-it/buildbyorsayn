@@ -51,7 +51,8 @@ export default function ReaderClient({ bloc, tier, identity, initialMode, initia
     <NavBar {...identity} tier={tier} />
     <ReaderView
       title={bloc.titre}
-      displayNumber={bloc.displayNumber}
+      toolbarTitle={`Bloc ${bloc.displayNumber}`}
+      backLabel={`Bloc ${bloc.displayNumber}`}
       sections={bloc.sections}
       totalSections={catalogBloc?.sections.length ?? bloc.sections.length}
       completedIds={checkedItems}
@@ -61,6 +62,8 @@ export default function ReaderClient({ bloc, tier, identity, initialMode, initia
       onValidateBloc={validateBloc}
       nextBloc={nextBloc ? { href: `/blocs/${nextBloc.id}`, label: nextBloc.titre } : undefined}
       backHref={`/blocs/${bloc.id}`}
+      showUpcomingVideo
+      finishTitle="Ce bloc est terminé."
     />
   </DaRoot>;
 }

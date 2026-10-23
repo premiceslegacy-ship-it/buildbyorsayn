@@ -1,12 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { createElement, useRef, useState, type ReactNode } from "react";
 import { Check, Copy, Download, FileText } from "lucide-react";
-import { LinkifiedText } from "@/components/ui/linkified-text";
-import type { BlocSection } from "@/lib/blocCatalog";
 import { animateAppElement } from "@/lib/ui/motion";
 import { playAppSound } from "@/lib/ui/sound";
+import { readerImageSource, readerMarkdownHref } from "./readerModel";
 import styles from "./reader.module.css";
+
+type ReaderSkillFile = { slug: string; title: string; description: string };
+
+export type ReaderProseSection = {
+  content: string;
+  skillFiles?: readonly ReaderSkillFile[];
+};
+
+type MarkdownOptions = {
+  allowedLocalPaths?: readonly string[];
+  localBaseHref?: string;
+};
 
 function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
@@ -30,37 +41,124 @@ function CodeBlock({ code }: { code: string }) {
     }
   };
 
-  return <div className={styles.codeBlock}><pre>{code}</pre><button ref={button} className={styles.iconButton} type="button" data-sfx="none" aria-label="Copier ce code" onClick={() => void copy()}>{copied ? <Check /> : <Copy />}</button></div>;
+  return <div className={styles.codeBlock}><pre><code>{code}</code></pre><button ref={button} className={styles.iconButton} type="button" data-sfx="none" aria-label="Copier ce code" onClick={() => void copy()}>{copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}</button></div>;
 }
 
-function TextSegment({ segment, segmentIndex }: { segment: string; segmentIndex: number }) {
-  return <>{segment.trim().split("\n\n").filter(Boolean).map((paragraph, paragraphIndex) => {
-    const key = `${segmentIndex}-${paragraphIndex}`;
-    if (paragraph.startsWith("## ")) return <h3 key={key}><LinkifiedText text={paragraph.slice(3)} /></h3>;
-
-    const lines = paragraph.split("\n").map((line) => line.trim()).filter(Boolean);
-    if (lines.length > 0 && lines.every((line) => line.startsWith("- "))) {
-      return <ul key={key}>{lines.map((line, lineIndex) => <li key={`${key}-${lineIndex}`}><LinkifiedText text={line.slice(2)} /></li>)}</ul>;
+function inline(text: string, options: MarkdownOptions): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  const tokens = /(!\[[^\]\n]*\]\([^\s)]+(?:\s+"[^"]*")?\)|\[[^\]\n]+\]\([^\s)]+\)|`[^`\n]+`|\*\*[^*\n]+\*\*|__[^_\n]+__|\*[^*\n]+\*|_[^_\n]+_)/g;
+  let offset = 0;
+  for (const match of text.matchAll(tokens)) {
+    nodes.push(text.slice(offset, match.index));
+    const token = match[0];
+    const image = token.match(/^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)$/);
+    const link = token.match(/^\[([^\]]+)\]\(([^\s)]+)\)$/);
+    if (image) {
+      const src = readerImageSource(image[2]);
+      nodes.push(src ? <span className={styles.markdownImage} key={match.index}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={image[1]} title={image[3]} loading="lazy" />
+      </span> : image[1]);
+    } else if (link) {
+      const href = readerMarkdownHref(link[2], options);
+      nodes.push(href ? <a key={match.index} href={href} rel={href.startsWith("http") ? "noreferrer noopener" : undefined}>{inline(link[1], options)}</a> : link[1]);
+    } else if (token.startsWith("`")) {
+      nodes.push(<code key={match.index}>{token.slice(1, -1)}</code>);
+    } else {
+      const strong = token.startsWith("**") || token.startsWith("__");
+      nodes.push(createElement(strong ? "strong" : "em", { key: match.index }, token.slice(strong ? 2 : 1, strong ? -2 : -1)));
     }
-    if (lines.length > 0 && lines.every((line) => /^\d+\)\s/.test(line))) {
-      return <ol key={key}>{lines.map((line, lineIndex) => <li key={`${key}-${lineIndex}`}><LinkifiedText text={line.replace(/^\d+\)\s/, "")} /></li>)}</ol>;
-    }
-    return <p key={key}><LinkifiedText text={paragraph} /></p>;
-  })}</>;
+    offset = match.index! + token.length;
+  }
+  nodes.push(text.slice(offset));
+  return nodes;
 }
 
-export function ReaderProse({ section }: { section: BlocSection }) {
-  const segments = section.content.split(/(```[\s\S]*?```)/g);
-  return <>
-    {segments.map((segment, index) => {
-      if (segment.startsWith("```") && segment.endsWith("```")) {
-        const inner = segment.slice(3, -3);
-        const firstNewline = inner.indexOf("\n");
-        const code = firstNewline === -1 ? inner.trim() : inner.slice(firstNewline + 1).trim();
-        return <CodeBlock key={index} code={code} />;
+function stripFrontmatter(content: string): string {
+  const normalized = content.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+  if (!normalized.startsWith("---\n")) return normalized;
+  const end = normalized.slice(4).search(/^(?:---|\.\.\.)\s*$/m);
+  return end < 0 ? "" : normalized.slice(4 + end).replace(/^[^\n]*(?:\n|$)/, "");
+}
+
+function Markdown({ content, options }: { content: string; options: MarkdownOptions }) {
+  const lines = stripFrontmatter(content).split("\n");
+  const blocks: ReactNode[] = [];
+  for (let index = 0; index < lines.length;) {
+    const line = lines[index];
+    if (!line.trim()) { index += 1; continue; }
+
+    const fence = line.match(/^\s*(`{3,}|~{3,})[^`]*$/);
+    if (fence) {
+      const key = index;
+      const code: string[] = [];
+      index += 1;
+      const close = new RegExp(`^\\s*${fence[1][0]}{${fence[1].length},}\\s*$`);
+      while (index < lines.length && !close.test(lines[index])) code.push(lines[index++]);
+      if (index < lines.length) index += 1;
+      blocks.push(<CodeBlock key={key} code={code.join("\n")} />);
+      continue;
+    }
+
+    if (/^\s*\|/.test(line) && /^\s*\|(?:\s*:?-{3,}:?\s*\|)+\s*$/.test(lines[index + 1] || "")) {
+      const key = index;
+      const cells = (row: string) => row.trim().replace(/^\||\|$/g, "").split("|").map((cell) => cell.trim());
+      const headers = cells(line);
+      index += 2;
+      const rows: ReactNode[] = [];
+      while (index < lines.length && /^\s*\|/.test(lines[index])) {
+        const values = cells(lines[index]);
+        rows.push(<tr key={index++}>{headers.map((header, cellIndex) => <td key={header || cellIndex} data-l={header}>{inline(values[cellIndex] || "", options)}</td>)}</tr>);
       }
-      return <TextSegment key={index} segment={segment} segmentIndex={index} />;
-    })}
+      blocks.push(<div className={styles.markdownTable} key={key} role="region" aria-label={`Tableau : ${headers.join(", ")}`} tabIndex={0}><table><thead><tr>{headers.map((header, cellIndex) => <th key={header || cellIndex} scope="col">{inline(header, options)}</th>)}</tr></thead><tbody>{rows}</tbody></table></div>);
+      continue;
+    }
+
+    const heading = line.match(/^(#{1,6})\s+(.+?)\s*#*$/);
+    if (heading) {
+      blocks.push(createElement(`h${Math.min(6, heading[1].length + 1)}`, { key: index }, inline(heading[2], options)));
+      index += 1;
+      continue;
+    }
+
+    if (/^\s*>\s?/.test(line)) {
+      const key = index;
+      const quote: string[] = [];
+      while (index < lines.length && /^\s*>\s?/.test(lines[index])) quote.push(lines[index++].replace(/^\s*>\s?/, ""));
+      blocks.push(<blockquote key={key}>{inline(quote.join(" "), options)}</blockquote>);
+      continue;
+    }
+
+    const list = line.match(/^\s*(?:([-+*])|(\d+)[.)])\s+(.+)$/);
+    if (list) {
+      const ordered = Boolean(list[2]);
+      const key = index;
+      const items: ReactNode[] = [];
+      while (index < lines.length) {
+        const item = lines[index].match(/^\s*(?:([-+*])|(\d+)[.)])\s+(.+)$/);
+        if (!item || Boolean(item[2]) !== ordered) break;
+        items.push(<li key={index++}>{inline(item[3], options)}</li>);
+      }
+      blocks.push(createElement(ordered ? "ol" : "ul", { key, ...(ordered ? { start: Number(list[2]) } : {}) }, items));
+      continue;
+    }
+
+    if (/^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
+      blocks.push(<hr key={index++} />);
+      continue;
+    }
+
+    const paragraph = [line];
+    const key = index++;
+    while (index < lines.length && lines[index].trim() && !/^(?:#{1,6}\s|\s*>\s?|\s*(?:[-+*]|\d+[.)])\s|\s*(?:`{3,}|~{3,}))/.test(lines[index])) paragraph.push(lines[index++]);
+    blocks.push(<p key={key}>{inline(paragraph.join(" "), options)}</p>);
+  }
+  return <>{blocks}</>;
+}
+
+export function ReaderProse({ section, allowedLocalPaths, localBaseHref }: { section: ReaderProseSection; allowedLocalPaths?: readonly string[]; localBaseHref?: string }) {
+  return <>
+    <Markdown content={section.content} options={{ allowedLocalPaths, localBaseHref }} />
     {section.skillFiles?.map((skill) => <article className={styles.skillFile} key={skill.slug}>
       <span className={styles.skillIcon}><FileText aria-hidden="true" /></span>
       <span className={styles.skillCopy}><strong>{skill.title}</strong><span>{skill.description}</span></span>

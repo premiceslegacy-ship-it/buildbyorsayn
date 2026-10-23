@@ -8,6 +8,11 @@ export type ReaderMarkdownSection = {
   content: string;
 };
 
+export type ReaderLinkOptions = {
+  allowedLocalPaths?: readonly string[];
+  localBaseHref?: string;
+};
+
 export function parseReaderMode(value: string | null | undefined): ReaderMode | null {
   if (value === "video") return "video";
   if (value === "texte" || value === "text") return "texte";
@@ -63,6 +68,44 @@ export function serializeReaderMarkdown(
     .map((section, index) => `## ${index + 1}. ${section.title}\n\n${section.content.trim()}`)
     .join("\n\n");
   return `# ${title.trim()}\n\n${body}`.trim();
+}
+
+export function readerMarkdownHref(
+  destination: string,
+  { allowedLocalPaths = [], localBaseHref }: ReaderLinkOptions = {},
+): string | undefined {
+  if (!destination || /[\s\\\u0000-\u001f\u007f]/u.test(destination)) return undefined;
+  if (destination.startsWith("/")) return destination.startsWith("//") ? undefined : destination;
+  if (destination.startsWith("#")) return /^#[a-zA-Z0-9_-]+$/.test(destination) ? destination : undefined;
+  if (/^https?:\/\//i.test(destination)) {
+    try {
+      const url = new URL(destination);
+      return url.hostname && !url.username && !url.password ? destination : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+  if (!localBaseHref) return undefined;
+  let path: string;
+  try {
+    path = decodeURIComponent(destination.split("#")[0]).replace(/^\.\//, "");
+  } catch {
+    return undefined;
+  }
+  if (!allowedLocalPaths.includes(path)) return undefined;
+  const slug = path.replace(/\.md$/i, "").toLowerCase();
+  return `${localBaseHref.replace(/\/$/, "")}/${slug}`;
+}
+
+export function readerImageSource(source: string): string | undefined {
+  if (source.startsWith("/") && !source.startsWith("//")) return source;
+  if (!/^https:\/\//i.test(source)) return undefined;
+  try {
+    const url = new URL(source);
+    return url.hostname && !url.username && !url.password ? source : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function readingProgress(

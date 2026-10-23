@@ -1,7 +1,7 @@
 "use client";
 
-import { Ui4RouteError } from "@/components/ui4/Ui4RouteError";
+import { ReaderError } from "@/components/reader/ReaderState";
 
-export default function ProtocoleError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  return <Ui4RouteError error={error} reset={reset} title="Le protocole ne s’affiche pas." />;
+export default function ProtocoleError({ reset }: { reset: () => void }) {
+  return <ReaderError reset={reset} backHref="/programme" />;
 }

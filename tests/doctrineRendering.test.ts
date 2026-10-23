@@ -30,7 +30,8 @@ test("Hermes chapter pages link internal references to real chapter routes", () 
   assert.doesNotMatch(html, /href="#chapitre-/);
 
   const page = readFileSync(new URL("../app/videos/tutos/[chapterSlug]/page.tsx", import.meta.url), "utf8");
-  assert.match(page, /localLinks="chapter-routes"/);
+  assert.match(page, /markdownBaseHref="\/videos\/tutos"/);
+  assert.match(page, /markdownLocalPaths=\{curriculumFiles\.map/);
 });
 
 test("renders corpus tables with accessible headers and fenced code as literal text", () => {
