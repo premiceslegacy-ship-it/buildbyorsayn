@@ -25,9 +25,12 @@ export async function POST(request: Request) {
     const context = await authenticateAgentRequest(request);
     const bounded = await readBoundedBody(request, AGENT_MAX_BODY_BYTES);
     if (bounded.ok === false) return jsonError(bounded.reason === "too_large" ? "payload_too_large" : "invalid_request", bounded.reason === "too_large" ? 413 : 400);
+    const replayHeaders = new Headers(request.headers);
+    replayHeaders.delete("authorization");
+    replayHeaders.delete("cookie");
     const replay = new Request(request.url, {
       method: "POST",
-      headers: request.headers,
+      headers: replayHeaders,
       body: bounded.text,
       signal: request.signal,
     });
@@ -40,6 +43,9 @@ export async function POST(request: Request) {
       await server.connect(transport);
       const response = await transport.handleRequest(replay);
       const responseHeaders = new Headers(response.headers);
+      responseHeaders.delete("authorization");
+      responseHeaders.delete("proxy-authenticate");
+      responseHeaders.delete("set-cookie");
       for (const [name, value] of Object.entries(headers)) responseHeaders.set(name, value);
       return new Response(response.body, { status: response.status, statusText: response.statusText, headers: responseHeaders });
     } finally {

@@ -7,6 +7,11 @@ import { fileURLToPath } from "node:url";
 export const CONFIG_PATH = process.env.BUILD_ADMIN_CONFIG_PATH
   || join(process.env.XDG_CONFIG_HOME || join(homedir(), ".config"), "build-admin", "config.json");
 const REPOSITORY_ROOT = resolve(fileURLToPath(new URL("../../", import.meta.url)));
+const AGENT_TOKEN_RE = /btv_agt_[A-Za-z0-9_-]{43}/g;
+
+export function redactAgentToken(value) {
+  return String(value).replace(AGENT_TOKEN_RE, "[jeton masqué]");
+}
 
 function assertConfigOutsideRepository(path) {
   const relation = relative(REPOSITORY_ROOT, resolve(path));
@@ -91,12 +96,13 @@ export async function callTool(tool, input, options = {}) {
     headers: {
       authorization: `Bearer ${config.token}`,
       "content-type": "application/json",
-      "x-vercel-forwarded-for": "127.0.0.1",
     },
     body: JSON.stringify({ tool, input }),
   }, options);
   const body = await response.json().catch(() => ({}));
-  if (!response.ok || body.ok !== true) throw new Error(typeof body.error === "string" ? body.error : "La commande a échoué.");
+  if (!response.ok || body.ok !== true) {
+    throw new Error(typeof body.error === "string" ? redactAgentToken(body.error) : "La commande a échoué.");
+  }
   return body.result?.structuredContent || body.result;
 }
 

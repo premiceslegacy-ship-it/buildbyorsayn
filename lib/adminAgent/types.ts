@@ -28,3 +28,12 @@ export type AgentToolResult = {
 };
 
 export type AgentRequestDecision = "approve" | "refuse";
+
+export class AgentToolError extends Error {
+  readonly isAgentToolError = true;
+
+  constructor(message: string) {
+    super(message);
+    this.name = "AgentToolError";
+  }
+}

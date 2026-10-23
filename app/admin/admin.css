@@ -67,10 +67,12 @@
 .adm-root :is(.adm-primary-button, .adm-ghost-button, .adm-danger-button, .adm-link-button) svg { width: 17px; height: 17px; }
 .adm-root .adm-segment-button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; border-radius: var(--r-s); color: var(--t3); font: 500 14px/1.25 var(--font); white-space: nowrap; box-shadow: inset 0 0 0 1px var(--trait); }
 .adm-root .adm-segment-button[aria-selected="true"], .adm-root .adm-segment-button[aria-pressed="true"] { background: rgba(241, 245, 242, .12); color: var(--encre); box-shadow: inset 0 0 0 1px rgba(241, 245, 242, .26); font-weight: 600; }
-.adm-root .adm-switch { position: relative; width: 52px; height: 44px; flex: none; border-radius: 999px; background: rgba(241, 245, 242, .08); box-shadow: inset 0 0 0 1px var(--trait-f); transition: background .2s var(--ease-c), box-shadow .2s var(--ease-c); }
-.adm-root .adm-switch[data-checked] { background: rgba(34, 217, 110, .22); box-shadow: inset 0 0 0 1px rgba(185, 245, 207, .42); }
-.adm-root .adm-switch span { position: absolute; left: 4px; top: 50%; width: 20px; height: 20px; border-radius: 50%; background: var(--encre); transform: translateY(-50%); transition: transform var(--sp-vif-d, .42s) var(--sp-vif, var(--ease)); }
-.adm-root .adm-switch[data-checked] span { transform: translate(24px, -50%); }
+.adm-root .adm-switch { display: grid; width: 52px; min-width: 52px; height: 44px; flex: none; place-items: center; border-radius: 999px; }
+.adm-root .adm-switch-track { position: relative; width: 36px; height: 22px; border-radius: 999px; background: rgba(241, 245, 242, .22); box-shadow: inset 0 0 0 1px rgba(241, 245, 242, .16); transition: background .2s var(--ease-c), box-shadow .2s var(--ease-c); }
+.adm-root .adm-switch-track::after { content: ""; position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--encre); box-shadow: 0 1px 3px rgba(0, 0, 0, .36); transition: transform var(--sp-vif-d, .42s) var(--sp-vif, var(--ease)), background .2s var(--ease-c); }
+.adm-root .adm-switch[aria-checked="true"] .adm-switch-track { background: var(--em); box-shadow: none; }
+.adm-root .adm-switch[aria-checked="true"] .adm-switch-track::after { background: var(--sur-em); transform: translateX(14px); }
+@media (hover: hover) { .adm-root .adm-switch:hover .adm-switch-track { box-shadow: inset 0 0 0 1px rgba(241, 245, 242, .36); } }
 
 /* Les utilitaires de gris d'Agent et Nouveautés étaient sous 4,5:1 sur le fond admin. */
 .adm-root :is(.text-white\/35, .text-white\/45, .text-white\/50, .text-white\/55) { color: var(--t3); }

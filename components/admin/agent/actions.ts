@@ -73,7 +73,7 @@ export async function loadAgentViewAction(): Promise<AgentActionResult<AgentView
 
 export async function createAgentTokenAction(input: {
   name: string;
-  permissions: AgentPermission[];
+  permissions?: AgentPermission[];
   expiresInDays: number;
 }): Promise<AgentActionResult<{ token: string }>> {
   try {

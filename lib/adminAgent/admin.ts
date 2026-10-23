@@ -16,6 +16,12 @@ const uuidSchema = z.string().uuid();
 const permissionsSchema = z.array(z.enum(AGENT_PERMISSION_VALUES)).max(AGENT_PERMISSION_VALUES.length)
   .refine((values) => new Set(values).size === values.length);
 
+export const DEFAULT_AGENT_PERMISSIONS = [
+  "liste_blocs",
+  "statut_video",
+  "journal",
+] as const satisfies readonly AgentPermission[];
+
 async function requireHumanAdmin() {
   const user = await getVerifiedAdmin();
   if (!user) throw new Error("Accès refusé.");
@@ -35,13 +41,13 @@ export async function listAgentTokens() {
 
 export async function createAgentToken(input: {
   name: string;
-  permissions: AgentPermission[];
+  permissions?: AgentPermission[];
   expiresInDays?: number;
 }) {
   const user = await requireHumanAdmin();
   const parsed = z.object({
     name: z.string().trim().min(1).max(80),
-    permissions: permissionsSchema,
+    permissions: permissionsSchema.default(() => [...DEFAULT_AGENT_PERMISSIONS]),
     expiresInDays: z.number().int().min(1).max(365).default(DEFAULT_AGENT_TOKEN_DAYS),
   }).strict().parse(input);
   const token = generateAgentToken();

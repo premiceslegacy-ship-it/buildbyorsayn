@@ -13,9 +13,19 @@ import {
   videoChapterSchema,
 } from "@/lib/mux/adminLessons";
 import { createMuxAdminClient, recordAdminAction } from "@/lib/mux/adminServer";
-import { executeAgentPublication, preparedMailSchema } from "./execution";
+import {
+  executeAgentPublication,
+  preparedMailSchema,
+  validateAgentPublicationTarget,
+  validatePreparedMailForExecution,
+} from "./execution";
 import { AgentAuthError, requireAgentPermission } from "./security";
-import type { AgentPermission, AgentTokenContext, AgentToolResult } from "./types";
+import {
+  AgentToolError,
+  type AgentPermission,
+  type AgentTokenContext,
+  type AgentToolResult,
+} from "./types";
 
 const uuid = z.string().uuid();
 const videoIdInput = z.object({ videoId: uuid }).strict();
@@ -55,8 +65,31 @@ function asResult(value: Record<string, unknown>): AgentToolResult {
 async function assertSectionExists(sectionId: string) {
   const { BLOCS_DATA } = await import("@/lib/mockData");
   const section = BLOCS_DATA.flatMap((bloc) => bloc.sections).find((candidate) => candidate.id === sectionId);
-  if (!section) throw new Error("Chapitre inconnu.");
+  if (!section) throw new AgentToolError("Ce chapitre n'existe pas.");
   return section;
+}
+
+function requestCreationError(error: unknown): AgentToolError | null {
+  const message = typeof error === "object" && error && "message" in error
+    ? String(error.message)
+    : "";
+  const messages: Record<string, string> = {
+    agent_token_inactive: "Jeton invalide.",
+    agent_video_missing: "Cette vidéo n'existe pas.",
+    agent_video_published: "La vidéo est déjà publiée.",
+    agent_video_not_ready: "La vidéo n'est pas prête.",
+    agent_video_missing_transcript: "La transcription manque.",
+    agent_video_missing_summary: "Le résumé manque.",
+    agent_video_missing_chapters: "Les chapitres manquent ou sont invalides.",
+    agent_video_missing_thumbnail: "La miniature manque.",
+    agent_mail_invalid_segment: "Ce segment n'est pas autorisé.",
+    agent_mail_no_recipients: "Ce segment ne contient aucun compte actif autorisé.",
+    agent_mail_too_many_recipients: "Ce segment contient trop de destinataires pour un envoi sûr.",
+    agent_pending_token_limit: "Ce jeton a déjà 20 demandes en attente.",
+    agent_pending_global_limit: "La file contient déjà 100 demandes en attente.",
+  };
+  const key = Object.keys(messages).find((candidate) => message.includes(candidate));
+  return key ? new AgentToolError(messages[key]) : null;
 }
 
 async function auditTool(context: AgentTokenContext, tool: AgentPermission, targetId: string, details: Record<string, string | number | boolean | null> = {}) {
@@ -77,15 +110,17 @@ async function createRequest(
   payload: Record<string, unknown>,
 ) {
   const id = randomUUID();
-  const { error } = await createAdminSupabase().from("admin_agent_requests").insert({
-    id,
-    token_id: context.id,
-    kind,
-    target_id: targetId,
-    payload,
-    idempotency_key: id,
+  const { data, error } = await createAdminSupabase().rpc("create_admin_agent_request", {
+    p_token_id: context.id,
+    p_kind: kind,
+    p_target_id: targetId,
+    p_payload: payload,
+    p_idempotency_key: id,
   });
-  if (error) throw new Error("La demande n'a pas pu être créée.");
+  if (error) throw requestCreationError(error) ?? new Error("La demande n'a pas pu être créée.");
+  if (!Array.isArray(data) || data.length !== 1 || data[0]?.request_id !== id) {
+    throw new Error("La demande n'a pas pu être créée.");
+  }
   await recordAdminAction({
     actorUserId: context.createdBy,
     action: "agent.request_create",
@@ -95,6 +130,22 @@ async function createRequest(
     details: { tokenId: context.id, kind, targetId },
   });
   return { requestId: id, status: "pending", expiresInDays: 7 };
+}
+
+async function requireWritableVideo(videoId: string, options: { ready?: boolean; playback?: boolean } = {}) {
+  const { data, error } = await createAdminSupabase().from("video_lessons")
+    .select("id,status,published_at,duration_seconds,playback_id")
+    .eq("id", videoId)
+    .maybeSingle();
+  if (error) throw new Error("La vidéo ne peut pas être vérifiée.");
+  if (!data) throw new AgentToolError("Cette vidéo n'existe pas.");
+  if (data.published_at) throw new AgentToolError("La vidéo est déjà publiée.");
+  if (["errored", "cancelled"].includes(data.status)) {
+    throw new AgentToolError("Cette vidéo ne peut plus être modifiée.");
+  }
+  if (options.ready && data.status !== "ready") throw new AgentToolError("La vidéo n'est pas prête.");
+  if (options.playback && !data.playback_id) throw new AgentToolError("La vidéo n'est pas prête.");
+  return data;
 }
 
 export const ADMIN_AGENT_TOOLS = {
@@ -172,12 +223,11 @@ export const ADMIN_AGENT_TOOLS = {
     schema: writeChaptersInput,
     async run(input, context) {
       const admin = createAdminSupabase();
-      const { data, error } = await admin.from("video_lessons").select("duration_seconds").eq("id", input.videoId).maybeSingle();
-      if (error || !data) throw new Error("Vidéo introuvable.");
+      const data = await requireWritableVideo(input.videoId, { ready: true });
       const timelineError = validateChapterTimeline(input.chapters, data.duration_seconds);
-      if (timelineError) throw new Error(timelineError);
+      if (timelineError) throw new AgentToolError("Les chapitres sont invalides.");
       const updated = await admin.from("video_lessons").update({ chapters: input.chapters, updated_at: new Date().toISOString() })
-        .eq("id", input.videoId).is("published_at", null).select("id").maybeSingle();
+        .eq("id", input.videoId).eq("status", "ready").is("published_at", null).select("id").maybeSingle();
       if (updated.error || !updated.data) throw new Error("Les chapitres n'ont pas pu être enregistrés.");
       await auditTool(context, "ecrire_chapitres", input.videoId, { chapterCount: input.chapters.length });
       return { videoId: input.videoId, chapterCount: input.chapters.length };
@@ -189,6 +239,7 @@ export const ADMIN_AGENT_TOOLS = {
     permission: "ecrire_resume",
     schema: writeSummaryInput,
     async run(input, context) {
+      await requireWritableVideo(input.videoId);
       const { data, error } = await createAdminSupabase().from("video_lessons")
         .update({ summary: input.summary, updated_at: new Date().toISOString() })
         .eq("id", input.videoId).is("published_at", null).select("id").maybeSingle();
@@ -204,12 +255,13 @@ export const ADMIN_AGENT_TOOLS = {
     schema: chooseThumbnailInput,
     async run(input, context) {
       const admin = createAdminSupabase();
-      const { data, error } = await admin.from("video_lessons").select("duration_seconds").eq("id", input.videoId).maybeSingle();
-      if (error || !data) throw new Error("Vidéo introuvable.");
-      if (!data.duration_seconds || input.timeSeconds >= data.duration_seconds) throw new Error("Le temps dépasse la vidéo.");
+      const data = await requireWritableVideo(input.videoId, { ready: true, playback: true });
+      if (!data.duration_seconds || input.timeSeconds >= data.duration_seconds) {
+        throw new AgentToolError("Le temps choisi dépasse la durée de la vidéo.");
+      }
       const updated = await admin.from("video_lessons")
         .update({ thumbnail: `mux:${input.timeSeconds}`, updated_at: new Date().toISOString() })
-        .eq("id", input.videoId).is("published_at", null).select("id").maybeSingle();
+        .eq("id", input.videoId).eq("status", "ready").is("published_at", null).select("id").maybeSingle();
       if (updated.error || !updated.data) throw new Error("La miniature n'a pas pu être enregistrée.");
       await auditTool(context, "choisir_miniature", input.videoId, { timeSeconds: input.timeSeconds });
       return { videoId: input.videoId, timeSeconds: input.timeSeconds };
@@ -221,6 +273,8 @@ export const ADMIN_AGENT_TOOLS = {
     permission: "demander_publication",
     schema: videoIdInput,
     async run(input, context) {
+      const video = await validateAgentPublicationTarget(input.videoId);
+      await assertSectionExists(video.section_id);
       const { data } = await createAdminSupabase().from("admin_agent_settings").select("mode").eq("singleton", true).maybeSingle();
       if (data?.mode === "autopublish") {
         const result = await executeAgentPublication(input.videoId, context.createdBy);
@@ -237,7 +291,8 @@ export const ADMIN_AGENT_TOOLS = {
     schema: prepareMailInput,
     async run(input, context) {
       const campaignId = randomUUID();
-      return createRequest(context, "mail", campaignId, { ...input, campaignId });
+      const payload = validatePreparedMailForExecution({ ...input, campaignId });
+      return createRequest(context, "mail", campaignId, payload);
     },
   },
   statut_video: {
@@ -295,10 +350,34 @@ export async function invokeAdminAgentTool(
   const tool = ADMIN_AGENT_TOOLS[name as AdminAgentToolName];
   requireAgentPermission(context, tool.permission);
   const parsed = tool.schema.safeParse(rawInput);
-  if (!parsed.success) throw new AgentAuthError(400, "Arguments invalides.");
+  if (!parsed.success) {
+    if (name === "preparer_mail" && rawInput && typeof rawInput === "object" && "audience" in rawInput) {
+      const audience = (rawInput as { audience?: unknown }).audience;
+      if (!preparedMailSchema.shape.audience.safeParse(audience).success) {
+        throw new AgentAuthError(400, "Le segment du mail n'est pas autorisé.");
+      }
+    }
+    throw new AgentAuthError(400, "Arguments invalides.");
+  }
   try {
     return asResult(await tool.run(parsed.data, context));
-  } catch {
+  } catch (error) {
+    if (
+      error instanceof AgentToolError
+      || (
+        typeof error === "object"
+        && error !== null
+        && "isAgentToolError" in error
+        && error.isAgentToolError === true
+        && "message" in error
+        && typeof error.message === "string"
+      )
+    ) {
+      return {
+        content: [{ type: "text", text: error.message }],
+        isError: true,
+      };
+    }
     return {
       content: [{ type: "text", text: "L'outil n'a pas pu terminer cette action." }],
       isError: true,

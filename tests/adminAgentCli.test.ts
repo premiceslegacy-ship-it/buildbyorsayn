@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -47,4 +48,49 @@ test("le login refuse de stocker le jeton dans le dépôt", async () => {
     /hors du dépôt/,
   );
   delete process.env.BUILD_ADMIN_CONFIG_PATH;
+});
+
+test("la CLI envoie uniquement les en-têtes attendus à la route et masque un jeton renvoyé par erreur", async () => {
+  const { callTool } = await import("../scripts/build-admin/client.mjs");
+  const token = `btv_agt_${"b".repeat(43)}`;
+  let observedUrl = "";
+  let observedHeaders = new Headers();
+  const fakeFetch = async (input: URL | RequestInfo, init?: RequestInit) => {
+    observedUrl = String(input);
+    observedHeaders = new Headers(init?.headers);
+    return Response.json({ ok: false, error: `Jeton refusé : ${token}` }, { status: 401 });
+  };
+  await assert.rejects(
+    () => callTool("journal", { limit: 1 }, {
+      config: { origin: "https://build.example", token },
+      fetch: fakeFetch,
+    }),
+    (error: Error) => !error.message.includes(token) && error.message.includes("jeton masqué"),
+  );
+  assert.equal(observedUrl, "https://build.example/api/agent/tools");
+  assert.equal(observedHeaders.get("authorization"), `Bearer ${token}`);
+  assert.equal(observedHeaders.get("content-type"), "application/json");
+  assert.equal(observedHeaders.has("x-vercel-forwarded-for"), false);
+});
+
+test("le login n'affiche jamais le jeton et les commandes statut et journal sont câblées", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "build-admin-login-"));
+  const configPath = join(directory, "config.json");
+  const token = `btv_agt_${"c".repeat(43)}`;
+  const result = spawnSync(process.execPath, [
+    "scripts/build-admin/build-admin.mjs",
+    "login",
+    "--origin", "https://build.example",
+    "--token", token,
+    "--json",
+  ], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    env: { ...process.env, BUILD_ADMIN_CONFIG_PATH: configPath },
+  });
+  assert.equal(result.status, 0, result.stderr);
+  assert.doesNotMatch(`${result.stdout}${result.stderr}`, new RegExp(token));
+  const source = await readFile("scripts/build-admin/build-admin.mjs", "utf8");
+  assert.match(source, /command === "statut"[\s\S]*callTool\("statut_video"/);
+  assert.match(source, /command === "journal"[\s\S]*callTool\("journal"/);
 });

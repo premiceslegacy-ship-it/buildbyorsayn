@@ -69,10 +69,13 @@ export async function authenticateAgentRequest(
     .eq("token_hash", hash)
     .maybeSingle();
   const parsed = storedTokenSchema.safeParse(data);
-  if (error || !parsed.success || !constantTimeHashMatches(parsed.data.token_hash, hash)) {
+  const storedHash = parsed.success ? parsed.data.token_hash : "0".repeat(64);
+  const hashMatches = constantTimeHashMatches(storedHash, hash);
+  if (error || !parsed.success || !hashMatches) {
     throw new AgentAuthError(401, "Jeton invalide.");
   }
-  if (parsed.data.revoked_at || new Date(parsed.data.expires_at).getTime() <= Date.now()) {
+  const expiresAt = new Date(parsed.data.expires_at).getTime();
+  if (parsed.data.revoked_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
     throw new AgentAuthError(401, "Jeton invalide.");
   }
 

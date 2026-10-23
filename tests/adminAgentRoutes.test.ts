@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import test, { mock } from "node:test";
+import type { AgentPermission, AgentTokenContext } from "../lib/adminAgent/types";
 
 if (process.env.ADMIN_AGENT_INNER !== "1") {
   test("agent admin : sécurité, approbation et idempotence avec frontières simulées", () => {
@@ -35,6 +36,10 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
   let videoRow: Record<string, unknown> | null = null;
   let requestStatus = "pending";
   let publicationCalls = 0;
+  let requestCreationCalls = 0;
+  let requestCreationFailure: string | null = null;
+  let claimCalls = 0;
+  const auditEntries: unknown[] = [];
 
   const validTokenRow = () => ({
     id: TOKEN_ID,
@@ -64,7 +69,8 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
       maybeSingle() {
         if (name === "admin_agent_tokens" && state.op === "select") return Promise.resolve({ data: tokenRow, error: null });
         if (name === "video_lessons" && state.op === "select") return Promise.resolve({ data: videoRow, error: null });
-        return Promise.resolve({ data: state.op === "update" ? { id: TOKEN_ID } : null, error: null });
+        if (name === "admin_agent_settings" && state.op === "select") return Promise.resolve({ data: { mode: "prepare" }, error: null });
+        return Promise.resolve({ data: state.op === "update" ? { id: VIDEO_ID } : null, error: null });
       },
       single() {
         if (name === "admin_agent_tokens" && state.op === "insert") {
@@ -84,20 +90,33 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
     namedExports: {
       createAdminSupabase: () => ({
         from: table,
-        rpc: async (name: string) => {
+        rpc: async (name: string, args?: Record<string, unknown>) => {
           if (name === "is_platform_admin") return { data: true, error: null };
           if (name === "check_admin_agent_rate_limit") return { data: rateAllowed, error: null };
-          if (name === "claim_admin_agent_request") return {
-            data: [{
-              request_id: REQUEST_ID,
-              request_kind: "publication",
-              request_target_id: VIDEO_ID,
-              request_payload: { videoId: VIDEO_ID },
-              request_status: requestStatus === "pending" ? "executing" : requestStatus,
-              request_claimed: requestStatus === "pending",
-            }],
-            error: null,
-          };
+          if (name === "create_admin_agent_request") {
+            requestCreationCalls += 1;
+            if (requestCreationFailure) return { data: null, error: { message: requestCreationFailure } };
+            return {
+              data: [{ request_id: args?.p_idempotency_key, request_status: "pending", request_expires_at: new Date().toISOString() }],
+              error: null,
+            };
+          }
+          if (name === "claim_admin_agent_request") {
+            claimCalls += 1;
+            const claimed = requestStatus === "pending";
+            if (claimed) requestStatus = "executing";
+            return {
+              data: [{
+                request_id: REQUEST_ID,
+                request_kind: "publication",
+                request_target_id: VIDEO_ID,
+                request_payload: { videoId: VIDEO_ID },
+                request_status: requestStatus,
+                request_claimed: claimed,
+              }],
+              error: null,
+            };
+          }
           if (name === "publish_video_lesson") {
             publicationCalls += 1;
             return { data: [{ section_id: "b2-s1", previous_mux_asset_id: null }], error: null };
@@ -111,19 +130,45 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
   mock.module(file("lib/mux/adminServer.ts"), {
     namedExports: {
       getVerifiedAdmin: async () => currentUser?.app_metadata.role === "admin" ? currentUser : null,
-      recordAdminAction: async () => "audit-id",
+      createMuxAdminClient: () => ({ video: { uploads: {} } }),
+      recordAdminAction: async (input: unknown) => {
+        auditEntries.push(input);
+        return "audit-id";
+      },
     },
   });
 
   const security = await import("../lib/adminAgent/security");
   const execution = await import("../lib/adminAgent/execution");
   const admin = await import("../lib/adminAgent/admin");
+  const tools = await import("../lib/adminAgent/tools");
+  const toolsRoute = await import("../app/api/agent/tools/route");
+  const mcpRoute = await import("../app/api/agent/mcp/route");
 
   const request = (token = RAW_TOKEN) => new Request("https://build.example/api/agent/tools", {
     method: "POST",
     headers: { authorization: `Bearer ${token}`, "x-vercel-forwarded-for": "203.0.113.7" },
   });
   process.env.AGENT_RATE_LIMIT_PEPPER = "pepper-for-tests-long-enough";
+
+  const toolContext = (permissions: AgentPermission[] = [
+    "liste_blocs", "envoyer_video", "ecrire_chapitres", "ecrire_resume",
+    "choisir_miniature", "demander_publication", "preparer_mail", "statut_video", "journal",
+  ]): AgentTokenContext => ({ id: TOKEN_ID, name: "Hermes", lastFour: "aaaa", permissions, createdBy: ADMIN_ID });
+
+  const publishableVideo = () => ({
+    id: VIDEO_ID,
+    section_id: "b2-s1",
+    summary: "Résumé",
+    transcript: "Une transcription suffisamment longue.",
+    chapters: [{ index: 1, title: "Départ", startSeconds: 0 }],
+    thumbnail: "mux:0",
+    status: "ready",
+    mux_asset_id: "asset",
+    playback_id: "playback",
+    duration_seconds: 120,
+    published_at: null,
+  });
 
   test("jeton absent, révoqué et expiré refusés", async () => {
     await assert.rejects(() => security.authenticateAgentRequest(new Request("https://build.example")), /Jeton requis/);
@@ -132,6 +177,19 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
     tokenRow = { ...validTokenRow(), expires_at: new Date(Date.now() - 1).toISOString() };
     await assert.rejects(() => security.authenticateAgentRequest(request()), /Jeton invalide/);
     tokenRow = validTokenRow();
+  });
+
+  test("la révocation est relue à chaque requête sans cache", async () => {
+    tokenRow = validTokenRow();
+    await security.authenticateAgentRequest(request());
+    tokenRow = { ...validTokenRow(), revoked_at: new Date().toISOString() };
+    await assert.rejects(() => security.authenticateAgentRequest(request()), /Jeton invalide/);
+    tokenRow = validTokenRow();
+  });
+
+  test("la comparaison de hash utilise une comparaison à temps constant", () => {
+    assert.equal(security.constantTimeHashMatches(TOKEN_HASH, TOKEN_HASH), true);
+    assert.equal(security.constantTimeHashMatches(TOKEN_HASH, "0".repeat(64)), false);
   });
 
   test("droit manquant et débit limité refusés", async () => {
@@ -154,30 +212,228 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
   test("un non admin ne crée pas de jeton et l'agent ne possède aucune approbation", async () => {
     currentUser = { id: ADMIN_ID, app_metadata: {} };
     await assert.rejects(() => admin.createAgentToken({ name: "Refusé", permissions: [] }), /Accès refusé/);
+    claimCalls = 0;
+    await assert.rejects(() => admin.decideRequest(REQUEST_ID, "approve"), /Accès refusé/);
+    assert.equal(claimCalls, 0);
     currentUser = { id: ADMIN_ID, app_metadata: { role: "admin" } };
+  });
+
+  test("la demande de publication refuse chaque cible invalide avant la file", async () => {
+    const cases: Array<[Record<string, unknown> | null, RegExp]> = [
+      [null, /n'existe pas/],
+      [{ ...publishableVideo(), status: "preparing" }, /n'est pas prête/],
+      [{ ...publishableVideo(), published_at: new Date().toISOString() }, /déjà publiée/],
+      [{ ...publishableVideo(), transcript: "" }, /manque la transcription/],
+      [{ ...publishableVideo(), summary: "" }, /manque le résumé/],
+      [{ ...publishableVideo(), chapters: [] }, /manque les chapitres/],
+      [{ ...publishableVideo(), thumbnail: null }, /manque la miniature/],
+      [{ ...publishableVideo(), transcript: "", summary: "", chapters: [], thumbnail: null }, /transcription, le résumé, la miniature et les chapitres/],
+    ];
+    for (const [row, expected] of cases) {
+      videoRow = row;
+      requestCreationCalls = 0;
+      const result = await tools.invokeAdminAgentTool("demander_publication", { videoId: VIDEO_ID }, toolContext());
+      assert.equal(result.isError, true);
+      assert.match(result.content[0].text, expected);
+      assert.equal(requestCreationCalls, 0);
+    }
+  });
+
+  test("une publication prête entre dans la file et les deux plafonds renvoient un message clair", async () => {
+    videoRow = publishableVideo();
+    requestCreationFailure = null;
+    requestCreationCalls = 0;
+    const created = await tools.invokeAdminAgentTool("demander_publication", { videoId: VIDEO_ID }, toolContext());
+    assert.equal(created.isError, undefined);
+    assert.equal(created.structuredContent?.status, "pending");
+    assert.equal(requestCreationCalls, 1);
+
+    for (const [failure, expected] of [
+      ["agent_pending_token_limit", /20 demandes/],
+      ["agent_pending_global_limit", /100 demandes/],
+    ] as const) {
+      requestCreationFailure = failure;
+      const result = await tools.invokeAdminAgentTool("demander_publication", { videoId: VIDEO_ID }, toolContext());
+      assert.equal(result.isError, true);
+      assert.match(result.content[0].text, expected);
+    }
+    requestCreationFailure = null;
+    requestCreationCalls = 0;
+    assert.throws(() => execution.validatePreparedMailForExecution({
+      campaignId: REQUEST_ID,
+      audience: "free",
+      subject: "Sujet",
+      body: "🙂".repeat(7_000),
+    }), /trop long/);
+    const tooLarge = await tools.invokeAdminAgentTool("preparer_mail", {
+      audience: "free",
+      subject: "Sujet",
+      body: "🙂".repeat(7_000),
+    }, toolContext());
+    assert.equal(tooLarge.isError, true);
+    assert.match(tooLarge.content[0].text, /trop long/);
+    assert.equal(requestCreationCalls, 0);
+  });
+
+  test("le mail refuse un segment inconnu et une audience sans compte actif", async () => {
+    await assert.rejects(
+      () => tools.invokeAdminAgentTool("preparer_mail", {
+        audience: "selected",
+        subject: "Sujet",
+        body: "Corps",
+      }, toolContext()),
+      /segment du mail n'est pas autorisé/,
+    );
+    for (const [failure, expected] of [
+      ["agent_mail_no_recipients", /aucun compte actif autorisé/],
+      ["agent_mail_too_many_recipients", /trop de destinataires/],
+    ] as const) {
+      requestCreationFailure = failure;
+      await assert.rejects(
+        () => tools.ADMIN_AGENT_TOOLS.preparer_mail.run({
+          audience: "free",
+          subject: "Sujet",
+          body: "Corps",
+        }, toolContext()),
+        expected,
+      );
+      const result = await tools.invokeAdminAgentTool("preparer_mail", {
+        audience: "free",
+        subject: "Sujet",
+        body: "Corps",
+      }, toolContext());
+      assert.equal(result.isError, true);
+      assert.match(result.content[0].text, expected);
+    }
+    requestCreationFailure = null;
+  });
+
+  test("les autres écritures refusent une vidéo absente, publiée ou non prête", async () => {
+    videoRow = null;
+    let result = await tools.invokeAdminAgentTool("ecrire_resume", { videoId: VIDEO_ID, summary: "Résumé" }, toolContext());
+    assert.match(result.content[0].text, /n'existe pas/);
+    videoRow = { ...publishableVideo(), published_at: new Date().toISOString() };
+    result = await tools.invokeAdminAgentTool("ecrire_chapitres", {
+      videoId: VIDEO_ID,
+      chapters: [{ index: 1, title: "Départ", startSeconds: 0 }],
+    }, toolContext());
+    assert.match(result.content[0].text, /déjà publiée/);
+    videoRow = { ...publishableVideo(), status: "preparing" };
+    result = await tools.invokeAdminAgentTool("choisir_miniature", { videoId: VIDEO_ID, timeSeconds: 1 }, toolContext());
+    assert.match(result.content[0].text, /n'est pas prête/);
   });
 
   test("la publication sans transcription est refusée", async () => {
     videoRow = {
       id: VIDEO_ID, section_id: "b2-s1", summary: "Résumé", transcript: "",
       chapters: [{ index: 1, title: "Départ", startSeconds: 0 }], thumbnail: "mux:0",
-      status: "ready", mux_asset_id: "asset", playback_id: "playback", duration_seconds: 120,
+      status: "ready", mux_asset_id: "asset", playback_id: "playback", duration_seconds: 120, published_at: null,
     };
-    await assert.rejects(() => execution.executeAgentPublication(VIDEO_ID, ADMIN_ID), /transcription/);
+    await assert.rejects(() => execution.executeAgentPublication(VIDEO_ID, ADMIN_ID), /manque la transcription/);
     assert.equal(publicationCalls, 0);
   });
 
   test("une approbation publie une fois et son rejeu reste idempotent", async () => {
     requestStatus = "pending";
     publicationCalls = 0;
-    videoRow = {
-      id: VIDEO_ID, section_id: "b2-s1", summary: "Résumé", transcript: "Une transcription suffisamment longue.",
-      chapters: [{ index: 1, title: "Départ", startSeconds: 0 }], thumbnail: "mux:0",
-      status: "ready", mux_asset_id: "asset", playback_id: "playback", duration_seconds: 120,
-    };
+    videoRow = publishableVideo();
     assert.equal((await admin.decideRequest(REQUEST_ID, "approve")).status, "approved");
     assert.equal(publicationCalls, 1);
     assert.deepEqual(await admin.decideRequest(REQUEST_ID, "approve"), { status: "approved", replayed: true });
     assert.equal(publicationCalls, 1);
+  });
+
+  test("deux approbations concurrentes ne déclenchent qu'une exécution", async () => {
+    requestStatus = "pending";
+    publicationCalls = 0;
+    videoRow = publishableVideo();
+    const results = await Promise.all([
+      admin.decideRequest(REQUEST_ID, "approve"),
+      admin.decideRequest(REQUEST_ID, "approve"),
+    ]);
+    assert.equal(publicationCalls, 1);
+    assert.equal(results.filter((result) => result.status === "approved").length, 1);
+    assert.equal(results.filter((result) => result.replayed === true).length, 1);
+  });
+
+  test("les routes bornent leurs corps JSON et n'acceptent pas un cookie admin seul", async () => {
+    tokenRow = validTokenRow();
+    const cookieOnly = new Request("https://build.example/api/agent/tools", {
+      method: "POST",
+      headers: { "content-type": "application/json", cookie: "session=admin" },
+      body: "{}",
+    });
+    assert.equal((await toolsRoute.POST(cookieOnly)).status, 401);
+
+    const oversized = (url: string) => new Request(url, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${RAW_TOKEN}`,
+        "content-type": "application/json",
+        "content-length": String(64 * 1024 + 1),
+        "x-vercel-forwarded-for": "203.0.113.7",
+      },
+      body: "{}",
+    });
+    assert.equal((await toolsRoute.POST(oversized("https://build.example/api/agent/tools"))).status, 413);
+    assert.equal((await mcpRoute.POST(oversized("https://build.example/api/agent/mcp"))).status, 413);
+  });
+
+  test("jeton inconnu et jeton révoqué donnent la même réponse extérieure", async () => {
+    const authRequest = () => new Request("https://build.example/api/agent/tools", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${RAW_TOKEN}`,
+        "content-type": "application/json",
+        "x-vercel-forwarded-for": "203.0.113.7",
+      },
+      body: JSON.stringify({ tool: "liste_blocs", input: {} }),
+    });
+    tokenRow = null;
+    const unknown = await toolsRoute.POST(authRequest());
+    tokenRow = { ...validTokenRow(), revoked_at: new Date().toISOString() };
+    const revoked = await toolsRoute.POST(authRequest());
+    assert.equal(unknown.status, 401);
+    assert.equal(revoked.status, 401);
+    assert.deepEqual(await unknown.json(), await revoked.json());
+    tokenRow = validTokenRow();
+  });
+
+  test("aucune réponse agent ne contient le jeton", async () => {
+    tokenRow = { ...validTokenRow(), permissions: ["liste_blocs"] };
+    const response = await toolsRoute.POST(new Request("https://build.example/api/agent/tools", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${RAW_TOKEN}`,
+        "content-type": "application/json",
+        "x-vercel-forwarded-for": "203.0.113.7",
+      },
+      body: JSON.stringify({ tool: "liste_blocs", input: {} }),
+    }));
+    const serializedHeaders = JSON.stringify(Object.fromEntries(response.headers));
+    const serializedBody = await response.text();
+    assert.equal(response.status, 200);
+    assert.doesNotMatch(`${serializedHeaders}${serializedBody}`, new RegExp(RAW_TOKEN));
+    assert.doesNotMatch(JSON.stringify(auditEntries), new RegExp(RAW_TOKEN));
+  });
+
+  test("l'adaptateur MCP retire le porteur avant le SDK et ne le renvoie jamais", async () => {
+    tokenRow = { ...validTokenRow(), permissions: ["liste_blocs"] };
+    const response = await mcpRoute.POST(new Request("https://build.example/api/agent/mcp", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${RAW_TOKEN}`,
+        accept: "application/json, text/event-stream",
+        "content-type": "application/json",
+        "x-vercel-forwarded-for": "203.0.113.7",
+      },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
+    }));
+    const serializedHeaders = JSON.stringify(Object.fromEntries(response.headers));
+    const serializedBody = await response.text();
+    assert.equal(response.status, 200);
+    assert.doesNotMatch(`${serializedHeaders}${serializedBody}`, new RegExp(RAW_TOKEN));
+    assert.equal(response.headers.has("authorization"), false);
+    assert.equal(response.headers.has("set-cookie"), false);
   });
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { callTool, removeConfig, saveConfig, uploadVideo } from "./client.mjs";
+import { callTool, redactAgentToken, removeConfig, saveConfig, uploadVideo } from "./client.mjs";
 
 function option(args, name, fallback) {
   const index = args.indexOf(name);
@@ -78,6 +78,6 @@ async function main(argv) {
 }
 
 main(process.argv.slice(2)).catch((error) => {
-  console.error(error instanceof Error ? error.message : "La commande a échoué.");
+  console.error(redactAgentToken(error instanceof Error ? error.message : "La commande a échoué."));
   process.exitCode = 1;
 });
