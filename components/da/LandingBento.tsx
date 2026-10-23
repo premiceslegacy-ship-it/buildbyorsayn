@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ToolLogo } from "@/components/ToolLogo";
 import { DaIcon } from "./DaIcon";
 import { Tile } from "./Tile";
 
@@ -105,8 +106,7 @@ export function LandingBento() {
                 <p className="bulle bulle--moi">Quel prix pour mon offre&nbsp;?</p>
                 <div className="bulle bulle--ia"><s /><s /><s /></div>
                 <span className="source">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/da/logos/build.svg" alt="" width={20} height={20} />
+                  <ToolLogo name="BUILD" size={40} />
                   Bloc 3, chapitre 2
                 </span>
               </div>

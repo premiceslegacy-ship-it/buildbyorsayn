@@ -23,7 +23,7 @@ function Step({
   return (
     <li className="flex flex-col gap-4 text-sm leading-6 text-[var(--t2)]">
       <div className="flex gap-3">
-        <span className="flex h-7 w-8 flex-none items-center justify-center rounded-full border border-[var(--em)] text-xs font-bold text-[var(--menthe)]">
+        <span className="flex h-7 w-8 flex-none items-center justify-start text-xs font-semibold text-[var(--t3)]">
           {number})
         </span>
         <div className="min-w-0 flex-1">{children}</div>
@@ -119,8 +119,7 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
 
   return (
     <section aria-labelledby="mcp-setup-guide-title" className="mt-12 border-t border-[var(--trait)] pt-10">
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--menthe)]">Pas à pas</p>
-      <h2 id="mcp-setup-guide-title" className="mt-3 text-2xl font-semibold tracking-tight">
+      <h2 id="mcp-setup-guide-title" className="text-2xl font-semibold tracking-tight">
         Configure ton assistant en quelques minutes
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--t2)]">
@@ -323,7 +322,7 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
       </div>
 
       <div className="mt-8">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--t2)]">Adresse MCP BUILD</p>
+        <h3 className="text-base font-semibold text-[var(--encre)]">Adresse MCP BUILD</h3>
         <code className="mt-3 block select-all break-all rounded-[var(--r-s)] border border-[var(--trait)] bg-[var(--nuit)] px-4 py-3 text-sm text-[var(--menthe)]">
           {mcpUrl}
         </code>

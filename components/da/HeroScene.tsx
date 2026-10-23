@@ -1,12 +1,12 @@
-/* eslint-disable @next/next/no-img-element -- icônes SVG décoratives de petite taille, aucune optimisation utile */
 import type { CSSProperties } from "react";
+import { ToolLogo } from "@/components/ToolLogo";
 import { DaIcon } from "./DaIcon";
 
 const STEPS = [
-  { logo: "claude", title: "Offre", note: "Claire et prête", doing: false },
-  { logo: "cursor", title: "Site", note: "En ligne", doing: false },
-  { logo: "stripe", title: "Vente", note: "Paiement prêt", doing: false },
-  { logo: "notion", title: "Livraison", note: "En cours", doing: true },
+  { logo: "Claude", title: "Offre", note: "Claire et prête", doing: false },
+  { logo: "Cursor", title: "Site", note: "En ligne", doing: false },
+  { logo: "Stripe", title: "Vente", note: "Paiement prêt", doing: false },
+  { logo: "Notion", title: "Livraison", note: "En cours", doing: true },
 ] as const;
 
 /**
@@ -28,7 +28,7 @@ export function HeroScene() {
             <ul className="fen__etapes">
               {STEPS.map((step) => (
                 <li key={step.title} className={step.doing ? "on" : undefined}>
-                  <div className="tuile"><img src={`/da/logos/${step.logo}.svg`} alt="" width={64} height={64} /></div>
+                  <div className="tuile tuile--rendered"><ToolLogo name={step.logo} size={128} /></div>
                   <div><b>{step.title}</b><small>{step.note}</small></div>
                   {step.doing
                     ? <span className="fen__etat fen__etat--cours" />
@@ -83,14 +83,14 @@ export function HeroScene() {
             <div className="notifs">
               <div className="grp">
                 <div className="ntf" style={{ "--d": ".4s" } as CSSProperties}>
-                  <span className="app"><img src="/da/logos/stripe-blanc.svg" alt="" width={21} height={21} /></span>
+                  <span className="app app--rendered"><ToolLogo name="Stripe" size={80} /></span>
                   <div><header>Stripe<span>maintenant</span></header><p>Paiement reçu : 1&nbsp;500,00&nbsp;€<small>de Camille Roux</small></p></div>
                 </div>
                 <i className="pile p1" /><i className="pile p2" />
               </div>
               <div className="grp">
                 <div className="ntf" style={{ "--d": ".9s" } as CSSProperties}>
-                  <span className="app app--mail"><img src="/da/logos/gmail.svg" alt="" width={24} height={24} /></span>
+                  <span className="app app--mail app--rendered"><ToolLogo name="Gmail" size={80} /></span>
                   <div><header>Gmail<span>il y a 2 min</span></header><p>Camille Roux<small>Parfait, on démarre quand ?</small></p></div>
                 </div>
               </div>

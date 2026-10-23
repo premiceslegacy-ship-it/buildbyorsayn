@@ -20,6 +20,9 @@ export default function BlocClient({ bloc, tier, checkoutUserId, identity }: { b
   const router = useRouter();
   const { checkedItems, setLastVisitedBloc } = useProgress();
   const catalogBloc = BLOCS_DATA.find((item) => item.id === bloc.id);
+  const catalogIndex = BLOCS_DATA.findIndex((item) => item.id === bloc.id);
+  const previousBloc = catalogIndex > 0 ? BLOCS_DATA[catalogIndex - 1] : undefined;
+  const nextBloc = catalogIndex >= 0 ? BLOCS_DATA[catalogIndex + 1] : undefined;
   const checkoutHref = withClientReferenceId(STRIPE_FULL_CHECKOUT_LINK, checkoutUserId) ?? STRIPE_FULL_CHECKOUT_LINK;
 
   useEffect(() => {
@@ -40,11 +43,14 @@ export default function BlocClient({ bloc, tier, checkoutUserId, identity }: { b
       title={bloc.titre}
       displayNumber={bloc.displayNumber}
       sections={bloc.sections}
+      previewSections={catalogBloc?.sections ?? []}
       totalSections={catalogBloc?.sections.length ?? bloc.sections.length}
       completedIds={checkedItems}
       checkoutHref={checkoutHref}
       checkoutLabel={COFFRE_LABEL}
       checkoutPrice={formatEuro(COFFRE_PRICE)}
+      previousBloc={previousBloc ? { id: previousBloc.id, title: previousBloc.titre, displayNumber: previousBloc.displayNumber } : undefined}
+      nextBloc={nextBloc ? { id: nextBloc.id, title: nextBloc.titre, displayNumber: nextBloc.displayNumber } : undefined}
     />
   </DaRoot>;
 }

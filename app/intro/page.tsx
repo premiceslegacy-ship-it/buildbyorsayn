@@ -1,7 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Brain, Shield, Target, Zap } from "lucide-react";
-import { Ui4Header, Ui4SectionHeading, Ui4Shell, ui4Styles as styles } from "@/components/ui4/Ui4Shell";
+import { Ui4Shell } from "@/components/ui4/Ui4Shell";
 import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
+import styles from "./intro.module.css";
 
 const PHASES = [
   {
@@ -34,10 +35,10 @@ const MANIFESTO_POINTS = [
 ];
 
 const CORE_SKILLS = [
-  { icon: Target, title: "L’exécution", description: "L’idée ne vaut rien. Seule l’exécution compte. Déploie vite et itère." },
-  { icon: Brain, title: "La curiosité", description: "Comprends les modèles, teste les limites et cherche l’optimisation en continu." },
-  { icon: Shield, title: "La résilience", description: "Accepte l’échec comme une donnée. Corrige le tir et recommence sans relâche." },
-  { icon: Zap, title: "La vélocité", description: "Livre vite, mesure et corrige. La vitesse est ton meilleur levier." },
+  { image: "/da/objets/livraison.png", title: "L’exécution", description: "L’idée ne vaut rien. Seule l’exécution compte. Déploie vite et itère." },
+  { image: "/da/objets/bloc.png", title: "La curiosité", description: "Comprends les modèles, teste les limites et cherche l’optimisation en continu." },
+  { image: "/da/objets/offre.png", title: "La résilience", description: "Accepte l’échec comme une donnée. Corrige le tir et recommence sans relâche." },
+  { image: "/da/objets/vente.png", title: "La vélocité", description: "Livre vite, mesure et corrige. La vitesse est ton meilleur levier." },
 ];
 
 export const dynamic = "force-dynamic";
@@ -48,18 +49,18 @@ export default async function IntroPage() {
 
   return (
     <Ui4Shell identity={identity}>
-      <div className={`${styles.content} ${styles.introOpening}`}>
+      <header className={styles.header}>
+        <h1>Avant de commencer</h1>
+        <p>Ce système vient de projets livrés et d’erreurs corrigées. Tout ce que tu trouves ici doit finir dans le réel.</p>
+      </header>
+
+      <div className={styles.content}>
         <section className={styles.section} aria-labelledby="intro-phases">
-          <Ui4SectionHeading
-            eyebrow="Le Protocole Zéro"
-            id="intro-phases"
-            title="Tu es sur quelle phase ?"
-            lead="Les blocs BUILD correspondent à chaque étape du chemin."
-          />
-          <div className={styles.rowList}>
+          <div className={styles.sectionHead}><h2 id="intro-phases">Tu es sur quelle phase ?</h2><p>Les blocs BUILD correspondent à chaque étape du chemin.</p></div>
+          <div className={styles.rows}>
             {PHASES.map((phase) => (
               <article className={styles.row} key={phase.number}>
-                <span className={styles.rowNumber}>{phase.number}</span>
+                <span className={styles.number}>{phase.number}</span>
                 <div className={styles.rowBody}>
                   <h3>{phase.title}</h3>
                   <p>{phase.label}. {phase.description} {phase.blocs}.</p>
@@ -68,21 +69,12 @@ export default async function IntroPage() {
             ))}
           </div>
         </section>
-      </div>
-
-      <Ui4Header
-        eyebrow="Le Protocole Zéro"
-        title={<>Avant de <span className="mot">commencer.</span></>}
-        lead="Ce système a été construit à partir d’une pratique réelle, des projets livrés, des erreurs corrigées. Tout ce qui est ici est actionnable."
-      />
-
-      <div className={styles.content}>
         <section className={styles.section} aria-labelledby="intro-rules">
-          <Ui4SectionHeading eyebrow="Les règles du jeu" id="intro-rules" title="Construire pour durer, déployer pour itérer." />
-          <div className={styles.rowList}>
+          <div className={styles.sectionHead}><h2 id="intro-rules">Construire pour durer, déployer pour itérer</h2></div>
+          <div className={styles.rows}>
             {MANIFESTO_POINTS.map((point, index) => (
               <article className={styles.row} key={point.title}>
-                <span className={styles.rowNumber}>{String(index + 1).padStart(2, "0")}</span>
+                <span className={styles.number}>{String(index + 1).padStart(2, "0")}</span>
                 <div className={styles.rowBody}><h3>{point.title}</h3><p>{point.description}</p></div>
               </article>
             ))}
@@ -90,22 +82,20 @@ export default async function IntroPage() {
         </section>
 
         <section className={styles.section} aria-labelledby="intro-mindset">
-          <Ui4SectionHeading eyebrow="Mindset" id="intro-mindset" title="L’état d’esprit pour réussir." />
-          <div className={styles.cardGrid}>
-            {CORE_SKILLS.map(({ icon: Icon, title, description }) => (
-              <article className={styles.card} key={title}>
-                <span className={styles.cardIcon}><Icon aria-hidden="true" /></span>
-                <h3>{title}</h3>
-                <p>{description}</p>
+          <div className={styles.sectionHead}><h2 id="intro-mindset">L’état d’esprit pour réussir</h2><p>Quatre repères à garder pendant tout le parcours.</p></div>
+          <div className={styles.skills}>
+            {CORE_SKILLS.map(({ image, title, description }) => (
+              <article className={styles.skill} key={title}>
+                <Image src={image} alt="" width={224} height={224} />
+                <div className={styles.skillCopy}><h3>{title}</h3><p>{description}</p></div>
               </article>
             ))}
           </div>
         </section>
 
-        <section className={styles.cta} aria-labelledby="intro-progress">
-          <h2 className="t-2" id="intro-progress">Ta progression globale.</h2>
-          <p>Coche chaque bloc au fur et à mesure que tu avances. Sois honnête avec toi-même : cocher sans avoir appliqué ne sert à rien.</p>
-          <Link className="btn btn--p" href="/dashboard">Accéder au dashboard</Link>
+        <section className={styles.action} aria-labelledby="intro-action">
+          <div className={styles.actionCopy}><h2 id="intro-action">Passe au premier bloc</h2><p>Avance dans l’ordre, applique, puis reviens corriger ce qui doit l’être.</p></div>
+          <Link className="btn btn--p" href="/programme">Voir le programme</Link>
         </section>
       </div>
     </Ui4Shell>

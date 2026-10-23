@@ -14,6 +14,7 @@ const nextConfig = {
       { pathname: "/brand-logos/**" },
       { pathname: "/da/**" },
       { pathname: "/logos/**" },
+      { pathname: "/logos3d/**" },
     ],
   },
 

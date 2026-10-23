@@ -1,0 +1,84 @@
+.card {
+  position: relative;
+}
+
+.lockedImage {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.accessLabel {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(9, 14, 11, 0.78);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(14px);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.accessLabel svg {
+  width: 13px;
+  height: 13px;
+}
+
+.progress {
+  display: block;
+  height: 3px;
+  margin: 0 14px 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(241, 245, 242, 0.12);
+}
+
+.progress > i {
+  display: block;
+  width: var(--card-progress, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--em);
+}
+
+.rowProgress {
+  display: grid;
+  grid-template-columns: repeat(var(--row-count), minmax(0, 1fr));
+  gap: 6px;
+  width: min(100%, 430px);
+  margin-top: 14px;
+}
+
+.rowProgress > i {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(241, 245, 242, 0.13);
+}
+
+.rowProgress > i::after {
+  content: "";
+  display: block;
+  width: var(--segment-progress, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--em);
+}
+
+@media (max-width: 734px) {
+  .accessLabel {
+    right: 8px;
+    bottom: 8px;
+    min-height: 28px;
+    padding-inline: 9px;
+  }
+}

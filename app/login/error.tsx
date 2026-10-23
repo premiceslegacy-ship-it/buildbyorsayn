@@ -1,7 +1,6 @@
 "use client";
+import { RouteErrorState } from "@/components/ui/RouteErrorState";
 
-import { AuthRouteError } from "@/components/account/AuthRouteError";
-
-export default function LoginError(props: { error: Error & { digest?: string }; reset: () => void }) {
-  return <AuthRouteError {...props} title="La connexion ne répond pas" />;
+export default function LoginError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  return <RouteErrorState error={error} reset={reset} chrome={false} title="La connexion ne répond pas." detail="Tes informations sont toujours là. Réessaie." object="offre" />;
 }

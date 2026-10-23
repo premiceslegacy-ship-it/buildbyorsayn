@@ -42,8 +42,10 @@ test("Skills couvre téléchargement, mise à jour, échec, vide et BUILD Sync",
   assert.match(client, /Mettre à jour/);
   assert.match(client, /Aucun skill n’est disponible/);
   assert.match(client, /Le téléchargement a échoué/);
-  assert.doesNotMatch(client, /ui3-skill-action[\s\S]{0,300}className="btn btn--p"/);
-  assert.match(loading, /aria-busy="true"/);
+  assert.match(client, /canDownload \? <button className="btn btn--p"/);
+  assert.match(client, /lockedHref \? <a className="btn btn--g"/);
+  assert.doesNotMatch(client, /ui3-skill-badge/);
+  assert.match(loading, /PageLoading/);
   assert.match(error, /reset/);
 });
 
@@ -74,7 +76,7 @@ test("Compte garde les contrôles de session et les confirmations", async () => 
   assert.match(client, /ui3-setting-label/);
   assert.match(client, /<footer className="foot">/);
   assert.doesNotMatch(client, /deleteUser|Supprimer mon compte/);
-  assert.match(loading, /aria-busy="true"/);
+  assert.match(loading, /PageLoading/);
   assert.match(error, /reset/);
 });
 
@@ -96,9 +98,9 @@ test("connexion et récupération exposent chargement, réussite et erreur", asy
   assert.match(update, /Les deux mots de passe ne correspondent pas/);
   assert.match(update, /Mot de passe changé/);
   for (const source of [login, forgot, update]) assert.match(source, /playAppSound\("(confirm|error)/);
-  assert.match(loginLoading, /AuthRouteLoading/);
-  assert.match(forgotError, /AuthRouteError/);
-  assert.match(updateError, /AuthRouteError/);
+  assert.match(loginLoading, /PageLoading/);
+  assert.match(forgotError, /RouteErrorState/);
+  assert.match(updateError, /RouteErrorState/);
 });
 
 test("les écrans d’accès MCP ferment la porte avant de charger les instructions", async () => {
@@ -113,7 +115,7 @@ test("les écrans d’accès MCP ferment la porte avant de charger les instructi
 test("Accompagnement et Hermes ont leurs états de chargement et d’erreur", async () => {
   for (const route of ["accompagnement", "videos/tutos"]) {
     const [loading, error] = await Promise.all([readFile(`app/${route}/loading.tsx`, "utf8"), readFile(`app/${route}/error.tsx`, "utf8")]);
-    assert.match(loading, /aria-busy="true"/, route);
+    assert.match(loading, /PageLoading/, route);
     assert.match(error, /reset/, route);
   }
   const hermes = await readFile("app/videos/tutos/page.tsx", "utf8");

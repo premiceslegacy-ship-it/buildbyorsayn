@@ -1,5 +1,5 @@
-import { Ui4Loading } from "@/components/ui4/Ui4Shell";
+import { PageLoading } from "@/components/ui/PageLoading";
 
 export default function IntroLoading() {
-  return <Ui4Loading label="Chargement de l’introduction" />;
+  return <PageLoading kind="collection" message="On prépare ton point de départ." />;
 }

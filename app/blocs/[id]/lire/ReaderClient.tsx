@@ -64,6 +64,7 @@ export default function ReaderClient({ bloc, diagrams, tier, identity, initialMo
       backHref={`/blocs/${bloc.id}`}
       showUpcomingVideo
       finishTitle="Ce bloc est terminé."
+      thumbnailSrc={`/da/mini/b${bloc.displayNumber}.jpg`}
     />
   </DaRoot>;
 }

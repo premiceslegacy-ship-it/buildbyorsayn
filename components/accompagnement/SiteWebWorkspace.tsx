@@ -294,7 +294,7 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
     return (
       <main className="min-h-screen bg-[var(--nuit)] px-5 py-16 text-[var(--encre)] sm:px-8">
         <div className="mx-auto max-w-3xl rounded-[var(--r-m)] border border-[var(--trait)] bg-[var(--carte)] p-8">
-          <p className="text-xs uppercase tracking-[0.18em] text-[var(--menthe)]">Accès membre</p>
+          <p className="text-sm font-medium text-[var(--t3)]">Accès membre</p>
           <h1 className="mt-4 text-3xl font-medium">Ton parcours doit encore être préparé.</h1>
           <p className="mt-4 max-w-xl text-[var(--t2)]">
             Le formateur doit associer au moins un thème avant d'ouvrir cet espace.
@@ -320,7 +320,7 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
               ←
             </Link>
             <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-[var(--menthe)]">Espace membre</p>
+              <p className="text-sm font-medium text-[var(--t3)]">Espace membre</p>
               <p className="mt-1 text-sm text-[var(--t2)]">Accompagnement activité</p>
             </div>
           </div>
@@ -371,7 +371,7 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
           ) : null}
           {assignment.notes ? (
             <div className="mt-6 max-w-3xl rounded-[var(--r-s)] bg-[var(--carte)] px-4 py-3">
-              <p className="text-xs uppercase tracking-[0.14em] text-[var(--menthe)]">Note du formateur</p>
+              <p className="text-sm font-medium text-[var(--t3)]">Note du formateur</p>
               <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[var(--t2)]">{assignment.notes}</p>
             </div>
           ) : null}
@@ -381,7 +381,7 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[280px_minmax(0,1fr)] lg:py-12">
         <aside className="min-w-0">
           <div className="border-b border-[var(--trait)] pb-3">
-            <p className="text-xs uppercase tracking-[0.16em] text-[var(--t3)]">Ton parcours</p>
+            <p className="text-sm font-medium text-[var(--t3)]">Ton parcours</p>
             <p className="mt-2 text-sm text-[var(--t2)]">{completedCount} thème{completedCount > 1 ? "s" : ""} compris</p>
           </div>
           <nav className="mt-3 flex flex-col gap-1" aria-label="Thèmes de l'accompagnement">
@@ -399,7 +399,7 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
                   }`}
                   aria-current={isActive ? "step" : undefined}
                 >
-                  <span className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs ${isDone ? "border-[var(--em)] text-[var(--menthe)]" : "border-[var(--trait-f)] text-[var(--t3)]"}`}>
+                  <span className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs ${isDone ? "border-[var(--trait-f)] text-[var(--menthe)]" : "border-[var(--trait-f)] text-[var(--t3)]"}`}>
                     {isDone ? "✓" : String(index + 1).padStart(2, "0")}
                   </span>
                   <span className="min-w-0 flex-1 text-sm leading-5 text-[var(--t2)]">{theme.title}</span>
@@ -411,7 +411,7 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
 
         <section className="min-w-0" aria-labelledby="active-theme-title">
           <div className="rounded-[var(--r-m)] border border-[var(--trait)] bg-[var(--carte)] p-5 sm:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.16em] text-[var(--t3)]">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-sm font-medium text-[var(--t3)]">
               <span>Thème {String(activeThemeIndex + 1).padStart(2, "0")}</span>
               <span>{activeTheme.marker}</span>
             </div>
@@ -422,17 +422,17 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
 
             <div className="mt-8 grid gap-px overflow-hidden rounded-[var(--r-s)] border border-[var(--trait)] bg-[var(--trait)] sm:grid-cols-2">
               <div className="bg-[var(--carte-2)] p-5">
-                <p className="text-xs uppercase tracking-[0.14em] text-[var(--t3)]">Compétence gagnée</p>
+                <p className="text-sm font-medium text-[var(--t3)]">Compétence gagnée</p>
                 <p className="mt-3 text-sm leading-6 text-[var(--encre)]">{activeGuidance.competency}</p>
               </div>
               <div className="bg-[var(--carte-2)] p-5">
-                <p className="text-xs uppercase tracking-[0.14em] text-[var(--t3)]">Étape franchie</p>
+                <p className="text-sm font-medium text-[var(--t3)]">Étape franchie</p>
                 <p className="mt-3 text-sm leading-6 text-[var(--encre)]">{activeGuidance.milestone}</p>
               </div>
             </div>
 
             <div className="mt-8 rounded-[var(--r-s)] bg-[rgba(34,217,110,.08)] px-4 py-3">
-              <p className="text-xs uppercase tracking-[0.14em] text-[var(--menthe)]">Repère pour la suite</p>
+              <p className="text-sm font-medium text-[var(--t3)]">Repère pour la suite</p>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--t2)]">{activeGuidance.autonomyTip}</p>
             </div>
 

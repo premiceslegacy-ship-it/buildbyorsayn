@@ -1,4 +1,4 @@
 "use client";
-import { DaRoot } from "@/components/da/DaRoot";
-import "@/app/ui3.css";
-export default function HermesError({ reset }: { error: Error & { digest?: string }; reset: () => void }) { return <DaRoot><main className="ui3-state"><div><h1 className="t-2">Le parcours Hermes ne répond pas</h1><p>Aucun contenu non vérifié n’est affiché.</p><button className="btn btn--p" onClick={reset}>Réessayer</button></div></main></DaRoot>; }
+import { RouteErrorState } from "@/components/ui/RouteErrorState";
+
+export default function HermesError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) { return <RouteErrorState error={error} reset={reset} title="Le parcours Hermes ne répond pas." detail="Aucun contenu incertain n’est affiché. Réessaie." />; }

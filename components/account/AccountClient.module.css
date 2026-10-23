@@ -1,0 +1,11 @@
+.head { gap: 10px !important; margin-bottom: clamp(34px, 5vw, 58px) !important; }
+.head p { color: var(--t2); line-height: 1.4; }
+.pane { max-width: 38rem !important; }
+.pane h2 { font-size: clamp(28px, 3vw, 34px) !important; line-height: 1.12 !important; }
+.logos { gap: 10px !important; }
+.logos > span { width: 52px !important; height: 52px !important; background: transparent !important; }
+.logos :global(.tlg), .logos :global(.tlg img) { width: 52px !important; height: 52px !important; }
+
+@media (max-width: 899px) {
+  .pane { max-width: none !important; }
+}

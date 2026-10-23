@@ -111,8 +111,8 @@ export function SkillsCatalogClient({ skills, categoryLabels, tier, beginnerHref
           const hasUpdate = Boolean(artifact && records[skill.slug] && artifact.sha256 !== records[skill.slug].sha256);
           const state = download?.slug === skill.slug ? download.status : null;
           const lockedHref = skill.access === "beginner" ? beginnerHref : fullHref;
-          return <li className="ui3-skill-card" data-locked={!canDownload} key={skill.slug} style={{ animationDelay: `${index * 60}ms` }} aria-label={`${skill.title}, ${categoryLabels[skill.category]}`}>
-            <div className="ui3-skill-image"><Image src={`/da/skills/${skill.slug}.jpg`} alt="" width={640} height={360} /><span className="ui3-skill-badge">{skill.access === "beginner" ? "Fondations" : skill.access === "full" ? "LE\u00a0COFFRE" : "Gratuit"}</span></div>
+          return <li className="ui3-skill-card" key={skill.slug} style={{ animationDelay: `${index * 60}ms` }} aria-label={`${skill.title}, ${categoryLabels[skill.category]}`}>
+            <div className="ui3-skill-image"><Image src={`/da/skills/${skill.slug}.jpg`} alt="" width={640} height={360} /></div>
             <div className="ui3-skill-body">
               <h3>{skill.title}</h3>
               <p>{skill.description}</p>
@@ -120,7 +120,7 @@ export function SkillsCatalogClient({ skills, categoryLabels, tier, beginnerHref
               <div className="ui3-prompt"><p>{presentation?.prompt ?? `Utilise le skill ${skill.title} pour m’aider sur mon projet.`}</p><button type="button" onClick={(event) => void copyPrompt(presentation?.prompt ?? `Utilise le skill ${skill.title}.`, event.currentTarget)}>Copier</button></div>
               <p className="ui3-skill-adapt"><strong>Adapte-le à toi.</strong> {presentation?.adapt ?? "Ajoute ton contexte, tes contraintes et tes références."}</p>
               <div className="ui3-skill-action">
-                {canDownload ? <button className="btn btn--g" type="button" disabled={state === "loading"} onClick={() => void downloadSkill(skill)}>{state === "loading" ? "Téléchargement" : state === "done" ? "Téléchargé" : hasUpdate ? "Mettre à jour" : "Télécharger"}</button> : lockedHref ? <a className="btn btn--g" href={lockedHref}>{lockedSkillCta(tier, skill.access)}</a> : <p className="ui3-skill-status" data-error="true">Paiement momentanément indisponible.</p>}
+                {canDownload ? <button className="btn btn--p" type="button" disabled={state === "loading"} onClick={() => void downloadSkill(skill)}>{state === "loading" ? "Téléchargement" : state === "done" ? "Téléchargé" : hasUpdate ? "Mettre à jour" : "Télécharger"}</button> : lockedHref ? <a className="btn btn--g" href={lockedHref}>{lockedSkillCta(tier, skill.access)}</a> : <p className="ui3-skill-status" data-error="true">Paiement momentanément indisponible.</p>}
                 {hasUpdate ? <p className="ui3-skill-status">Une nouvelle version est prête. Compare-la à ta copie locale avant de remplacer tes adaptations.</p> : null}
                 {state === "error" ? <p className="ui3-skill-status" data-error="true" role="alert">Le téléchargement a échoué. Réessaie.</p> : null}
               </div>

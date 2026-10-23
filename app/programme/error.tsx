@@ -1,7 +1,6 @@
 "use client";
+import { RouteErrorState } from "@/components/ui/RouteErrorState";
 
-import { DaRoot } from "@/components/da/DaRoot";
-
-export default function ProgrammeError({ reset }: { reset: () => void }) {
-  return <DaRoot className="da-app"><main className="page-state"><div className="page-state__in"><h1 className="t-1">Le programme ne s'affiche pas.</h1><p>Réessaie dans un instant.</p><button className="btn btn--p" type="button" onClick={reset}>Réessayer</button></div></main></DaRoot>;
+export default function ProgrammeError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  return <RouteErrorState error={error} reset={reset} title="Le programme ne répond pas." detail="Rien n’a bougé dans ta progression. Réessaie." />;
 }

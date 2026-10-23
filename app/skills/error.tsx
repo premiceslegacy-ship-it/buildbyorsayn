@@ -1,8 +1,6 @@
 "use client";
+import { RouteErrorState } from "@/components/ui/RouteErrorState";
 
-import { DaRoot } from "@/components/da/DaRoot";
-import "@/app/ui3.css";
-
-export default function SkillsError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  return <DaRoot><main className="ui3-state"><div><h1 className="t-2">Les skills ne répondent pas</h1><p>Ton accès n’a pas été modifié. Réessaie dans un instant.</p><button className="btn btn--p" type="button" onClick={reset}>Réessayer</button></div></main></DaRoot>;
+export default function SkillsError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  return <RouteErrorState error={error} reset={reset} title="Les skills ne répondent pas." detail="Ton accès n’a pas changé. Réessaie dans un instant." object="livraison" />;
 }

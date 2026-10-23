@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import styles from "@/components/ui4/ui4.module.css";
 import { filterSourceEntries } from "./filter";
+import styles from "./sources.module.css";
 
 type SourceEntry = {
   id: number;
@@ -37,7 +37,7 @@ export function SourceCategoryFilter({
       </div>
 
       {visibleEntries.length > 0 ? (
-        <div className={styles.sourceGrid} aria-live="polite">
+        <div className={styles.grid} aria-live="polite">
           {visibleEntries.map((entry) => (
             <div key={entry.id}>{entry.content}</div>
           ))}

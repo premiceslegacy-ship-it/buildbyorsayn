@@ -1,5 +1,5 @@
-import { ReaderLoading } from "@/components/reader/ReaderState";
+import { PageLoading } from "@/components/ui/PageLoading";
 
 export default function BeginnerLoading() {
-  return <ReaderLoading />;
+  return <PageLoading kind="programme" message="On prépare tes fondations." />;
 }

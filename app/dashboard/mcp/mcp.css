@@ -1,0 +1,8 @@
+.da .mcp-page .ui3-page-head { padding-bottom: clamp(46px, 6vw, 78px); }
+.da .mcp-page .ui3-page-head > div { gap: 24px; }
+.da .mcp-page .ui3-tool-logos { gap: 14px; margin-bottom: 8px; }
+.da .mcp-page .ui3-tool-logos > span { width: clamp(64px, 7vw, 84px); height: clamp(64px, 7vw, 84px); background: transparent; }
+.da .mcp-page .ui3-tool-logos .tlg,
+.da .mcp-page .ui3-tool-logos .tlg img { width: 100%; height: 100%; object-fit: contain; }
+.da .mcp-page .mcp-access { width: min(100%, 68rem); max-width: none; margin-inline: auto; }
+.da .mcp-state-card { width: min(100%, 46rem) !important; max-width: none; }

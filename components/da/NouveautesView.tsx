@@ -3,11 +3,12 @@
 
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
+import { AppState } from "@/components/ui/AppState";
 import { NewVideoMarker } from "@/components/nouveautes/NouveautesGrid";
 import type { NouveautesFeed } from "@/lib/nouveautes/loadVideos";
 import { formatVideoDate, groupNouveautesByMonth, type NouveautesItem } from "@/lib/nouveautes/videos";
 import { playAppSound } from "@/lib/ui/sound";
-import { animateAppElement } from "@/lib/ui/motion";
+import { animateEntryCascade } from "@/lib/ui/motion";
 
 type Filter = "all" | "youtube" | "build";
 
@@ -16,6 +17,7 @@ export function NouveautesView({ feed }: { feed: NouveautesFeed }) {
   const tabs = useRef<HTMLDivElement>(null);
   const slider = useRef<HTMLElement>(null);
   const content = useRef<HTMLDivElement>(null);
+  const didCascade = useRef(false);
   const moveSlider = useCallback(() => {
     const host = tabs.current;
     const pill = slider.current;
@@ -42,7 +44,10 @@ export function NouveautesView({ feed }: { feed: NouveautesFeed }) {
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       moveSlider();
-      content.current?.querySelectorAll(":scope > .nw__m").forEach((element, index) => animateAppElement(element, [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], "doux", Math.min(index * 40, 300)));
+      if (!didCascade.current) {
+        didCascade.current = true;
+        animateEntryCascade(content.current?.querySelectorAll(".nw__e") ?? []);
+      }
     });
     return () => cancelAnimationFrame(frame);
   }, [filter, moveSlider]);
@@ -67,8 +72,8 @@ export function NouveautesView({ feed }: { feed: NouveautesFeed }) {
     <header className="hero--app"><div className="hero__in"><h1 className="t-1">Nouveautés</h1><p className="t-lede">Les nouvelles vidéos de la chaîne YouTube, et celles qui arrivent dans BUILD.</p><div ref={tabs} className="seg has-slider" role="tablist" aria-label="Filtrer les nouveautés"><i ref={slider} className="slider" /><button role="tab" tabIndex={filter === "all" ? 0 : -1} aria-selected={filter === "all"} data-sfx="none" onKeyDown={keyFilter} onClick={() => select("all")}>Tout</button><button role="tab" tabIndex={filter === "youtube" ? 0 : -1} aria-selected={filter === "youtube"} data-sfx="none" onKeyDown={keyFilter} onClick={() => select("youtube")}>YouTube</button><button role="tab" tabIndex={filter === "build" ? 0 : -1} aria-selected={filter === "build"} data-sfx="none" onKeyDown={keyFilter} onClick={() => select("build")}>Sur BUILD</button></div></div></header>
     <p className="sr" role="status">{resultCount} nouveauté{resultCount > 1 ? "s" : ""}, filtre {filterLabel}</p>
     <div className="nw" ref={content}>
-      {hasError && <p className="nw__empty" role="alert">Les nouveautés de cette catégorie ne peuvent pas être chargées. Réessaie plus tard.</p>}
-      {!hasError && groups.length === 0 && <p className="nw__empty" data-testid="nouveautes-empty">Aucune nouveauté dans cette catégorie pour le moment.</p>}
+      {hasError && <AppState compact headingLevel={2} tone="alert" object="livraison" title="Ce fil ne répond pas." detail="Réessaie maintenant, ou retourne à Aujourd’hui." action={{ label: "Réessayer", onClick: () => window.location.reload() }} />}
+      {!hasError && groups.length === 0 && <AppState compact headingLevel={2} object="livraison" title="Rien de neuf pour l’instant." detail="Reviens bientôt, ou relis un chapitre." action={{ label: "Voir le programme", href: "/programme" }} testId="nouveautes-empty" />}
       {groups.map((group) => <section className="nw__m" key={group.key}><h2 className="t-h2">{group.label}</h2><ul>{group.items.map((item) => <NewsEntry key={item.id} item={item} />)}</ul></section>)}
     </div>
   </>;

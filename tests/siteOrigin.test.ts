@@ -66,7 +66,6 @@ test("no source file reads NEXT_PUBLIC_APP_URL directly outside the shared helpe
     "lib/siteOrigin.ts", // la source unique
     "lib/mcp/config.ts", // issuer MCP : variable propre, repli sur le site
     "lib/buildSync/config.ts", // issuer BUILD Sync : idem
-    "components/BuildSyncInstall.tsx", // composant client : lecture littérale obligatoire pour Next
     "components/AdminMailComposer.tsx", // composant client : idem
   ]);
   const files = [

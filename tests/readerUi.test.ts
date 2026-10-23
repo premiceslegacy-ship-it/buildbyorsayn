@@ -8,10 +8,13 @@ import {
   chapterIndexForKey,
   chapterProgressLabel,
   chapterSummary,
+  estimateReadingMinutes,
   hasChapterNavigation,
   parseReaderMode,
   readerModeQuery,
   readingProgress,
+  readerWordCount,
+  remainingReadingLabel,
   readerImageSource,
   readerMarkdownHref,
   resolveChapterIndex,
@@ -91,6 +94,15 @@ test("la progression de lecture et les états vides restent bornés", () => {
   assert.equal(chapterProgressLabel(1, 3), "1 chapitre sur 3 vu");
   assert.equal(chapterProgressLabel(3, 3), "3 chapitres sur 3 vus");
   assert.equal(chapterSummary("## Titre\n\nLa première phrase est entière. La seconde reste dans le texte."), "Titre La première phrase est entière.");
+});
+
+test("le temps de lecture restant vient du texte et suit la progression", () => {
+  const content = `# Titre\n\n${"mot ".repeat(221)}\n\n[[schema:ParcoursClair]]`;
+  assert.equal(readerWordCount(content), 222);
+  assert.equal(estimateReadingMinutes(content), 2);
+  assert.equal(remainingReadingLabel(2, 0), "2 min restantes");
+  assert.equal(remainingReadingLabel(2, 0.6), "1 min restante");
+  assert.equal(remainingReadingLabel(2, 1), "Lecture terminée");
 });
 
 test("les trois paliers ne reçoivent que les chapitres autorisés", () => {

@@ -185,7 +185,7 @@ export function AssignmentEditor({
             {themes.map((theme) => {
               const checked = themeIds.includes(theme.id);
               return (
-                <label key={theme.id} className={`flex cursor-pointer items-start gap-3 rounded-[var(--r-s)] border px-3 py-3 text-sm transition ${checked ? "border-[var(--em)] bg-[rgba(34,217,110,.1)] text-[var(--encre)]" : "border-[var(--trait)] text-[var(--t2)] hover:border-[var(--trait-f)]"}`}>
+                <label key={theme.id} className={`flex cursor-pointer items-start gap-3 rounded-[var(--r-s)] border px-3 py-3 text-sm transition ${checked ? "border-[var(--trait-f)] bg-[rgba(241,245,242,.08)] text-[var(--encre)]" : "border-[var(--trait)] text-[var(--t2)] hover:border-[var(--trait-f)]"}`}>
                   <input
                     type="checkbox"
                     name="theme_id"

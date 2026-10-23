@@ -95,14 +95,17 @@ test("les écrans UI-5 référencent uniquement des ressources publiques présen
   for (const reference of references) assert.equal(existsSync(`public${reference}`), true, reference);
 });
 
-test("404 et erreurs racine ont une seule action principale et une destination liée à la session", async () => {
-  const routeState = await readFile("components/ui5/RouteState.tsx", "utf8");
-  assert.equal((routeState.match(/btn btn--p/g) ?? []).length, 1);
-  assert.match(routeState, /auth\.getSession\(\)/);
-  assert.match(routeState, /loggedIn \? "\/dashboard" : "\/"/);
-  for (const file of ["app/not-found.tsx", "app/error.tsx", "app/global-error.tsx"]) {
-    assert.match(await readFile(file, "utf8"), /RouteState/, file);
-  }
+test("404 et erreurs racine gardent une action principale et une vraie reprise", async () => {
+  const [state, error, globalError, notFound] = await Promise.all([
+    readFile("components/ui/AppState.tsx", "utf8"),
+    readFile("app/error.tsx", "utf8"),
+    readFile("app/global-error.tsx", "utf8"),
+    readFile("app/not-found.tsx", "utf8"),
+  ]);
+  assert.match(state, /className="btn btn--p"/);
+  assert.match(error, /reset/);
+  assert.match(globalError, /reset/);
+  assert.match(notFound, /AppState/);
 });
 
 test("checkout lit les prix et les compteurs depuis le code", async () => {

@@ -1,5 +1,5 @@
-import { Ui4Loading } from "@/components/ui4/Ui4Shell";
+import { PageLoading } from "@/components/ui/PageLoading";
 
 export default function DoctrineLoading() {
-  return <Ui4Loading label="Chargement de la doctrine" />;
+  return <PageLoading kind="collection" message="On ouvre la doctrine." />;
 }

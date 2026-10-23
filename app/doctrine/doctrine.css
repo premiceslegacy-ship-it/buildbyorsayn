@@ -65,10 +65,21 @@
   background: rgba(241, 245, 242, .06);
 }
 
+.doctrine-toc a[aria-current="page"] {
+  color: var(--encre);
+  background: rgba(241, 245, 242, .08);
+}
+
 .doctrine-chapter {
   padding-block: clamp(44px, 7vw, 76px);
   box-shadow: 0 -.5px 0 var(--trait);
   scroll-margin-top: calc(var(--bar) + 20px);
+}
+
+.doctrine-position {
+  margin-bottom: 16px;
+  color: var(--t3);
+  font: 500 14px/1.3 var(--font);
 }
 
 .doctrine-markdown {
@@ -193,13 +204,30 @@
   background: rgba(241, 245, 242, .05);
 }
 
-.doctrine-back {
-  min-height: 44px;
-  display: inline-flex;
+.doctrine-pagination {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: clamp(48px, 7vw, 76px);
+  padding-top: 24px;
+  border-top: 1px solid var(--trait);
+}
+
+.doctrine-pagination a {
+  min-height: 48px;
+  display: flex;
   align-items: center;
-  margin-top: 1.7rem;
-  color: var(--menthe);
+  padding: 0 16px;
+  border-radius: var(--r-s);
+  color: var(--t1);
+  background: var(--carte);
   font: 600 14px/1.2 var(--font);
+  text-decoration: none;
+}
+
+.doctrine-pagination a:last-child {
+  justify-content: flex-end;
+  text-align: right;
 }
 
 .doctrine-empty {
@@ -216,4 +244,35 @@
   .doctrine-markdown { font-size: 17px; }
   .doctrine-table th,
   .doctrine-table td { padding: 13px 14px; }
+  .doctrine-pagination { grid-template-columns: 1fr; }
+  .doctrine-pagination span { display: none; }
+  .doctrine-pagination a:last-child { justify-content: flex-start; text-align: left; }
+}
+.doctrine-wrap {
+  width: min(100% - 2 * var(--gutter), 64rem);
+  margin-inline: auto;
+  padding: calc(var(--bar) + clamp(48px, 7vw, 88px)) 0 clamp(72px, 8vw, 112px);
+}
+
+.doctrine-return {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--menthe);
+  font: 600 15px/1.2 var(--font);
+}
+
+.doctrine-return svg { width: 18px; height: 18px; }
+
+.doctrine-head {
+  display: grid;
+  gap: 18px;
+  margin: 36px 0 18px;
+}
+
+.doctrine-head p {
+  max-width: 38rem;
+  color: var(--t2);
+  font: 400 18px/1.5 var(--font);
 }

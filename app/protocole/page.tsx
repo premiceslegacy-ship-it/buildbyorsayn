@@ -98,9 +98,6 @@ export default async function ProtocolePage({ searchParams }: { searchParams: Pr
           video: <VideoCard title="Le protocole zéro" youtubeId="tcFGu_zNsPE" description="La méthode complète, de l’absorption à la distillation." />,
           content: <div className="flex flex-col gap-20 sm:gap-28">
           <header id="introduction" className="scroll-mt-24 flex flex-col gap-5 max-w-3xl">
-            <p className="text-xs font-semibold tracking-[0.18em] text-[var(--em)]">
-              LE PROTOCOLE ZÉRO
-            </p>
             <h1 className="text-3xl sm:text-5xl font-bold leading-[1.08] text-[var(--encre)]">
               Pendant que les autres louent leur intelligence, tu la distilles.
             </h1>
@@ -120,14 +117,14 @@ export default async function ProtocolePage({ searchParams }: { searchParams: Pr
               </h2>
             </div>
 
-            <div className="grid sm:grid-cols-2 border-y border-white/[0.1]">
-              <article className="py-6 sm:pr-8 sm:border-r border-white/[0.1]">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <article className="rounded-[28px] bg-[var(--carte)] p-6 sm:p-8">
                 <p className="text-sm font-semibold text-white/65 mb-3">LE LOCATAIRE NUMÉRIQUE</p>
                 <p className="text-sm text-[var(--t2)] leading-relaxed">
                   Il utilise des outils puissants sans garder ce qu&apos;ils lui ont appris. Quand l&apos;outil disparaît, son savoir-faire disparaît avec lui. Comme quelqu&apos;un qui loue tout son atelier et ne possède aucune de ses machines.
                 </p>
               </article>
-              <article className="py-6 sm:pl-8">
+              <article className="rounded-[28px] bg-[var(--carte)] p-6 sm:p-8">
                 <p className="text-sm font-semibold text-[var(--em)] mb-3">LE CAPITAL ORGANIQUE</p>
                 <p className="text-sm text-[var(--t1)] leading-relaxed">
                   Il transforme chaque session en méthode, chaque vente en expérience et chaque expérience en système. Les outils peuvent changer, mais ce qui a été appris reste disponible et continue de s&apos;accumuler.
@@ -272,6 +269,7 @@ export default async function ProtocolePage({ searchParams }: { searchParams: Pr
           </section>
           </div>,
         }]}
+        thumbnailSrc="/da/mini/protocole.jpg"
       />
     </DaRoot>
   );

@@ -1,5 +1,5 @@
-import { Ui4Loading } from "@/components/ui4/Ui4Shell";
+import { PageLoading } from "@/components/ui/PageLoading";
 
 export default function SourcesLoading() {
-  return <Ui4Loading label="Chargement des sources" />;
+  return <PageLoading kind="collection" message="On rassemble tes sources." />;
 }

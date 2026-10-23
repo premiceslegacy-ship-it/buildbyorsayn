@@ -1,2 +1,3 @@
-import { Ui5Loading } from "@/components/ui5/Ui5Loading";
-export default function Loading() { return <Ui5Loading label="Vérification du paiement…" />; }
+import { PageLoading } from "@/components/ui/PageLoading";
+
+export default function Loading() { return <PageLoading kind="auth" chrome={false} message="On vérifie ton accès." />; }

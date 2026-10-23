@@ -5,9 +5,12 @@ import {
   CreditCard, Mail, Bug, BarChart2, FileText, LayoutList, Shield,
   BookMarked, Globe, Monitor, Plug,
 } from "lucide-react";
-import { Ui4Header, Ui4Shell, ui4Styles as styles } from "@/components/ui4/Ui4Shell";
+import { ToolLogo } from "@/components/ToolLogo";
+import { Ui4Shell } from "@/components/ui4/Ui4Shell";
 import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
+import { TOOL_LOGOS } from "@/lib/tools/registry";
 import { SourceCategoryFilter } from "./SourceCategoryFilter";
+import styles from "./sources.module.css";
 
 const CATEGORIES = ["Tous", "IA & Automatisation", "Design & UI", "Outils & Infra", "Vente & Business"];
 
@@ -301,23 +304,20 @@ export default async function SourcesPage() {
 
   return (
     <Ui4Shell identity={identity} activeLink="sources">
-      <Ui4Header
-        eyebrow="Tes références"
-        title={<>La Stack du <span className="mot">Builder.</span></>}
-        lead="Les outils et les cerveaux qui font tourner le système."
-      />
+      <header className={styles.header}><h1>La stack du builder</h1><p>Les outils et les cerveaux qui font tourner le système.</p></header>
       <div className={styles.content}>
         <SourceCategoryFilter
           categories={CATEGORIES}
           entries={SOURCES.map((source) => {
           const Icon = source.icon;
+          const hasRenderedLogo = Boolean(TOOL_LOGOS[source.name]);
           const card = (
             <>
-              <span className={styles.sourceTop}>
-                <span className={styles.cardIcon}><Icon aria-hidden="true" /></span>
+              <span className={styles.top}>
+                {hasRenderedLogo ? <span className={styles.brand}><ToolLogo name={source.name} size={168} /></span> : <span className={styles.lineIcon}><Icon aria-hidden="true" /></span>}
                 {source.url ? <ExternalLink aria-hidden="true" /> : null}
               </span>
-              <span className={styles.sourceCopy}>
+              <span className={styles.copy}>
                 <h3>{source.name}</h3>
                 <p>{source.description}</p>
               </span>
@@ -327,11 +327,11 @@ export default async function SourcesPage() {
             id: source.id,
             category: source.type,
             content: source.url ? (
-              <a href={source.url} target="_blank" rel="noopener noreferrer" className={styles.sourceCard}>
+              <a href={source.url} target="_blank" rel="noopener noreferrer" className={styles.card}>
                 {card}
               </a>
             ) : (
-              <article className={styles.sourceCard}>{card}</article>
+              <article className={styles.card}>{card}</article>
             ),
           };
         })}

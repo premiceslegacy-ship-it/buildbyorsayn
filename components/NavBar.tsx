@@ -8,6 +8,7 @@ import { DaIcon } from "@/components/da/DaIcon";
 import { SearchDialog } from "@/components/da/SearchDialog";
 import { useNouveautesUnseenCount } from "@/components/nouveautes/useNouveautesUnseenCount";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
+import { finishPressFeedback, pulsePressFeedback, startPressFeedback, type PressSound } from "@/lib/ui/feedback";
 import { formatNouveautesBadge } from "@/lib/nouveautes/seen";
 import { animateAppElement, installAppMotionTokens, motionAllowed } from "@/lib/ui/motion";
 import { playAppSound, useAppSound } from "@/lib/ui/sound";
@@ -71,29 +72,37 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
 
   useEffect(() => {
     const selector = '[data-sfx], a[href], button, [role="tab"], summary, .chip';
-    let pressed = false;
-    const kindOf = (target: HTMLElement) => target.dataset.sfx || (target.closest('[role="tablist"], .tabs, .seg') ? "select" : "click");
+    let pressed: HTMLElement | null = null;
+    const kindOf = (target: HTMLElement): PressSound => {
+      const kind = target.dataset.sfx;
+      if (kind === "none" || kind === "click" || kind === "select" || kind === "open" || kind === "confirm" || kind === "error") return kind;
+      return target.closest('[role="tablist"], .tabs, .seg') ? "select" : "click";
+    };
     const pointer = (event: PointerEvent) => {
       const target = (event.target as Element | null)?.closest<HTMLElement>(selector);
-      pressed = false;
+      pressed = null;
       if (!target || target.matches(":disabled") || target.getAttribute("aria-disabled") === "true") return;
       const kind = kindOf(target);
-      if (kind === "none") return;
-      pressed = true;
-      void playAppSound(kind as "click" | "select" | "open" | "confirm" | "error");
+      pressed = target;
+      startPressFeedback(target, kind);
     };
+    const release = () => { if (pressed) finishPressFeedback(pressed); pressed = null; };
     const click = (event: MouseEvent) => {
       const target = (event.target as Element | null)?.closest<HTMLElement>(selector);
       if (!target || target.matches(":disabled")) return;
-      if (!pressed && event.detail === 0) {
-        const kind = kindOf(target);
-        if (kind !== "none") void playAppSound(kind as "click" | "select" | "open" | "confirm" | "error");
-      }
-      pressed = false;
+      if (!pressed && event.detail === 0) pulsePressFeedback(target, kindOf(target));
+      release();
     };
     document.addEventListener("pointerdown", pointer, true);
+    document.addEventListener("pointerup", release, true);
+    document.addEventListener("pointercancel", release, true);
     document.addEventListener("click", click);
-    return () => { document.removeEventListener("pointerdown", pointer, true); document.removeEventListener("click", click); };
+    return () => {
+      document.removeEventListener("pointerdown", pointer, true);
+      document.removeEventListener("pointerup", release, true);
+      document.removeEventListener("pointercancel", release, true);
+      document.removeEventListener("click", click);
+    };
   }, []);
 
   const closeMenu = useCallback((focusBack = false) => {

@@ -21,6 +21,16 @@
 }
 .da.da-app.nav-shell { min-height: 0; position: static; padding: 0; }
 
+/* R2 lecteur : le mode Texte possède sa propre barre immersive. */
+html.r2-reader-open .da.da-app.nav-shell,
+html.r2-reader-open .da.da-app .tabbar {
+  display: none;
+}
+
+html.r2-reader-open .da.da-app.has-tabbar {
+  padding-bottom: 0;
+}
+
 .da.da-app .t-aff { font: 700 40px/1.05 var(--font-t); letter-spacing: -.035em; }
 .da.da-app .t-1 { font: 700 32px/1.1 var(--font-t); letter-spacing: -.032em; }
 .da.da-app .t-h2 { font: 600 19px/1.2 var(--font-t); letter-spacing: -.02em; color: var(--encre); }

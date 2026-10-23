@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { DaRoot } from "@/components/da/DaRoot";
 import { NavBar } from "@/components/NavBar";
-import { ProgrammeRows } from "@/components/da/ProgrammeRows";
+import { ProgrammeRows } from "@/components/dashboard/ProgrammeRows";
 import { requirePageAccess } from "@/lib/auth/paidPageAccess.server";
 import { programmeForTier } from "@/lib/programme";
 import { CHAPTER_META } from "@/app/videos/tutos/chapters";

@@ -30,7 +30,7 @@ Les cinq décisions à prendre avant le jour J. Note la réponse dans ce fichier
 
 4) **L'ancien domaine est-il redirigé ou gardé vivant ?** Pendant la double période, il sert exactement la même application. Après, tu peux rediriger les pages publiques (accueil, offres, pages légales) vers le nouveau domaine, mais jamais les chemins listés en section 4 : ils doivent répondre directement, sans redirection.
 
-5) **Que montre la commande d'installation de BUILD Sync ?** `components/BuildSyncInstall.tsx` affiche l'hôte de `NEXT_PUBLIC_APP_URL`. Les scripts `install.sh`, `install.ps1` et `build.mjs` ont, eux, l'ancien domaine écrit en dur, parce qu'ils ne peuvent pas lire l'environnement (constante `BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN` dans `lib/buildSync/installCommands.ts`). Si les deux hôtes diffèrent, le script téléchargé via le nouveau domaine installera quand même depuis l'ancien. Quand tu choisis l'option A pour BUILD Sync, c'est voulu : le script téléchargé via le nouveau domaine configure l'ordinateur sur l'ancien, ce qui reste cohérent avec l'issuer. Le contrôle de production du test (voir plus bas) échouera alors : assouplis-le dans le même commit, en écrivant la raison. Quand tu choisis l'option B, il faut changer la constante et les trois scripts ensemble, dans le même commit.
+5) **Que montre la commande d'installation de BUILD Sync ?** `app/skills/SkillsSyncCard.tsx` affiche l'hôte de `NEXT_PUBLIC_APP_URL`. Les scripts `install.sh`, `install.ps1` et `build.mjs` ont, eux, l'ancien domaine écrit en dur, parce qu'ils ne peuvent pas lire l'environnement (constante `BUILD_SYNC_SCRIPT_DEFAULT_ORIGIN` dans `lib/buildSync/installCommands.ts`). Si les deux hôtes diffèrent, le script téléchargé via le nouveau domaine installera quand même depuis l'ancien. Quand tu choisis l'option A pour BUILD Sync, c'est voulu : le script téléchargé via le nouveau domaine configure l'ordinateur sur l'ancien, ce qui reste cohérent avec l'issuer. Le contrôle de production du test (voir plus bas) échouera alors : assouplis-le dans le même commit, en écrivant la raison. Quand tu choisis l'option B, il faut changer la constante et les trois scripts ensemble, dans le même commit.
 
 Deux garde-fous existent déjà dans le code :
 - `npm run domain:check` liste tous les hôtes écrits en dur dans le dépôt et échoue si un hôte n'est pas déclaré dans `scripts/check-domain-references.ts` ;
@@ -53,7 +53,7 @@ Une seule variable décide de l'hôte du site : `NEXT_PUBLIC_APP_URL`, lue par `
 | `app/api/webhooks/stripe/route.ts` | 313 | lien d'invitation envoyé après paiement (`/update-password`) | Rien. Échoue en 500 si la variable manque (Stripe réessaie) |
 | `lib/youtube/feed.ts` | 115 | adresse de rappel WebSub de YouTube | Rien dans le code, mais il faut réabonner (section 3, étape 7) |
 | `components/AdminMailComposer.tsx` | 58 | bouton « Voir la mise à jour » des e-mails | Rien |
-| `components/BuildSyncInstall.tsx` | 12 | commande d'installation affichée sur `/skills` | Rien (voir la décision 5) |
+| `app/skills/SkillsSyncCard.tsx` | 3 | commande d'installation affichée sur `/skills` | Rien (voir la décision 5) |
 | `lib/mcp/config.ts` | 41 | issuer et adresse du serveur MCP, repli sur `NEXT_PUBLIC_APP_URL` | Fixer `MCP_OAUTH_ISSUER` (décision 2) |
 | `lib/buildSync/config.ts` | 14 | issuer de BUILD Sync, repli sur `MCP_OAUTH_ISSUER` puis `NEXT_PUBLIC_APP_URL` | Fixer `BUILD_SYNC_OAUTH_ISSUER` (décision 3) |
 

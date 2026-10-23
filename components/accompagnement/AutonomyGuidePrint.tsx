@@ -44,7 +44,7 @@ export function AutonomyGuidePrint({ memberName, track, themes, understoodThemeI
 
         <article className="mx-auto max-w-4xl px-5 pb-20 pt-8 sm:px-8 sm:pt-14">
           <header className="border-b-2 border-[#151515] pb-8">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#6a6a63]">BUILD · autonomie</p>
+            <p className="text-sm font-medium text-[#6a6a63]">Guide autonomie BUILD</p>
             <h1 className="mt-5 max-w-3xl text-4xl font-medium tracking-[-0.04em] sm:text-6xl">
               Guide d'autonomie
             </h1>
@@ -59,7 +59,7 @@ export function AutonomyGuidePrint({ memberName, track, themes, understoodThemeI
           </header>
 
           <section className="guide-section border-b guide-line py-10">
-            <p className="text-xs uppercase tracking-[0.16em] text-[#6a6a63]">La méthode</p>
+            <p className="text-sm font-medium text-[#6a6a63]">La méthode</p>
             <h2 className="mt-3 text-2xl font-medium">Donner le contexte avant de demander.</h2>
             <ol className="mt-6 grid gap-5 sm:grid-cols-2">
               {[
@@ -77,7 +77,7 @@ export function AutonomyGuidePrint({ memberName, track, themes, understoodThemeI
           </section>
 
           <section className="guide-section border-b guide-line py-10">
-            <p className="text-xs uppercase tracking-[0.16em] text-[#6a6a63]">Tes repères</p>
+            <p className="text-sm font-medium text-[#6a6a63]">Tes repères</p>
             <h2 className="mt-3 text-2xl font-medium">Ce que chaque thème te permet de faire.</h2>
             <div className="mt-7 divide-y divide-[#d8d8d2] border-y border-[#d8d8d2]">
               {themes.map((theme) => {
@@ -86,7 +86,7 @@ export function AutonomyGuidePrint({ memberName, track, themes, understoodThemeI
                 return (
                   <section key={theme.id} className="grid gap-4 py-6 sm:grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)]">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.14em] text-[#6a6a63]">{theme.marker}</p>
+                      <p className="text-sm font-medium text-[#6a6a63]">{theme.marker}</p>
                       <h3 className="mt-2 text-base font-medium">{theme.title}</h3>
                       <p className="mt-2 text-xs text-[#6a6a63]">{understood ? "Compris" : "À travailler"}</p>
                     </div>
@@ -99,14 +99,14 @@ export function AutonomyGuidePrint({ memberName, track, themes, understoodThemeI
           </section>
 
           <section className="guide-section border-b guide-line py-10">
-            <p className="text-xs uppercase tracking-[0.16em] text-[#6a6a63]">Quand tu bloques</p>
+            <p className="text-sm font-medium text-[#6a6a63]">Quand tu bloques</p>
             <p className="mt-4 max-w-2xl text-base leading-7">
               Reviens au dernier résultat vérifiable. Décris ce qui devait se passer, ce qui s'est réellement passé et la dernière modification. Demande à l'agent de chercher la cause avant de proposer une correction. Ne change pas plusieurs variables à la fois.
             </p>
           </section>
 
           <section className="guide-section border-b guide-line py-10">
-            <p className="text-xs uppercase tracking-[0.16em] text-[#6a6a63]">Après les premières ventes ou livraisons</p>
+            <p className="text-sm font-medium text-[#6a6a63]">Après les premières ventes ou livraisons</p>
             <div className="mt-5 grid gap-6 sm:grid-cols-3">
               <p className="text-sm leading-6"><strong>À 30 jours</strong><br />Observe une première réaction réelle et note ce qui mérite d&apos;être amélioré.</p>
               <p className="text-sm leading-6"><strong>À 60 jours</strong><br />Compare les demandes, les objections et les assets réellement utilisés.</p>

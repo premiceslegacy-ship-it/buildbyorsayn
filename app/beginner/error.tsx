@@ -1,7 +1,6 @@
 "use client";
+import { RouteErrorState } from "@/components/ui/RouteErrorState";
 
-import { ReaderError } from "@/components/reader/ReaderState";
-
-export default function BeginnerError({ reset }: { reset: () => void }) {
-  return <ReaderError reset={reset} backHref="/programme" />;
+export default function BeginnerError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  return <RouteErrorState error={error} reset={reset} title="Fondations ne répond pas." detail="Ta progression est intacte. Réessaie, ou retourne au programme." backHref="/programme" />;
 }

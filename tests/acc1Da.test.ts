@@ -13,7 +13,6 @@ const ACC1_UI_FILES = [
   "components/CopyBuildSyncCommand.tsx",
   "components/nouveautes/NouveautesGrid.tsx",
   "components/ui/markdown-file-preview.tsx",
-  "components/ui/linkified-text.tsx",
 ] as const;
 
 const LEGACY_PALETTE = /#(?:e8d5b0|c4bfb7|d9d5cf|f0ede8|c9a96e|c9b48a|0e0e0f)\b|rgba\(232,\s*213,\s*176/iu;

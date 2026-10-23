@@ -7,6 +7,7 @@ import { SKILLS_CATALOG, SKILL_CATEGORY_LABELS } from "@/lib/skillsCatalog";
 import { SkillsCatalogClient } from "./SkillsCatalogClient";
 import { SkillsSyncCard } from "./SkillsSyncCard";
 import "@/app/ui3.css";
+import "./skills.css";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Skills | BUILD", robots: { index: false, follow: false } };
@@ -23,7 +24,7 @@ export default async function SkillsPage() {
   const fullHref = identity.tier === "beginner" ? UPGRADE_PATH : withClientReferenceId(urls.full, identity.user.id);
   const beginnerHref = withClientReferenceId(urls.beginner, identity.user.id);
 
-  return <DaRoot className="da-app has-tabbar"><NavBar tier={identity.tier} isAdmin={identity.isAdmin} displayName={identity.displayName} displayEmail={identity.displayEmail} initials={identity.initials} /><main className="ui3-page">
+  return <DaRoot className="da-app has-tabbar"><NavBar tier={identity.tier} isAdmin={identity.isAdmin} displayName={identity.displayName} displayEmail={identity.displayEmail} initials={identity.initials} /><main className="ui3-page skills-page">
     <header className="ui3-page-head"><div><h1 className="t-aff">Tes skills BUILD</h1><p className="t-lede">Un skill est une méthode que ton IA sait suivre. Installe-le, donne ton contexte, puis vérifie le résultat.</p><p className="t-meta">BUILD Sync n'écrase jamais tes adaptations. Fondations commence à {formatEuro(FONDATIONS_PRICE)}. {COFFRE_LABEL} ouvre le catalogue complet.</p></div></header>
     <div className="ui3-page-body">
       <section className="ui3-section" aria-labelledby="skills-how"><div className="ui3-section-head"><h2 id="skills-how">Comment t’en servir</h2></div><ol className="ui3-steps">{steps.map(([title, body], index) => <li className="ui3-step" data-step={index + 1} key={title}><b>{title}</b><span>{body}</span></li>)}</ol></section>

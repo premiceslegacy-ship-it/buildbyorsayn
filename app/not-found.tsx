@@ -1,6 +1,6 @@
 import { DaRoot } from "@/components/da/DaRoot";
-import { RouteState } from "@/components/ui5/RouteState";
+import { AppState } from "@/components/ui/AppState";
 
 export default function NotFound() {
-  return <DaRoot className="da-app"><RouteState code="404" title="Cette page n’existe pas." message="Le lien est peut-être ancien ou incomplet." /></DaRoot>;
+  return <DaRoot className="da-app"><main><AppState object="offre" title="Cette page n’existe pas." detail="Le lien est peut-être ancien ou incomplet. Retourne à Aujourd’hui pour continuer." action={{ label: "Retour à Aujourd’hui", href: "/dashboard" }} secondary={{ label: "Retour à l’accueil", href: "/" }} /></main></DaRoot>;
 }

@@ -1,9 +1,6 @@
 "use client";
+import { RouteErrorState } from "@/components/ui/RouteErrorState";
 
-import { DaRoot } from "@/components/da/DaRoot";
-import { RouteState } from "@/components/ui5/RouteState";
-
-export default function ErrorPage({ error }: { error: Error & { digest?: string }; retry: () => void }) {
-  void error;
-  return <DaRoot className="da-app"><RouteState code="Erreur" title="BUILD ne répond pas." message="Rien n’a été modifié. Tu peux revenir à ton point de départ." /></DaRoot>;
+export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  return <RouteErrorState error={error} reset={reset} title="BUILD ne répond pas." detail="Rien n’a été modifié. Réessaie pour reprendre là où tu étais." />;
 }

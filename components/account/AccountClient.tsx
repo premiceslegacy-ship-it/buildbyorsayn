@@ -5,9 +5,11 @@ import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { playAppSound } from "@/lib/ui/sound";
+import { ToolLogo } from "@/components/ToolLogo";
 import { AccountIcon } from "./AccountIcon";
 import { UpgradeCard } from "./UpgradeCard";
 import { accountIncludedItems, accountTierLabel } from "./accountPresentation";
+import styles from "./AccountClient.module.css";
 
 type Section = "profile" | "email" | "password" | "subscription" | "connections" | "devices";
 type Notice = { tone: "success" | "error"; text: string } | null;
@@ -121,7 +123,7 @@ export function AccountClient({
 
   return (
     <main className="ui3-account">
-      <header className="ui3-account-head"><h1 className="t-1">Compte</h1><p className="t-meta">{email}</p></header>
+      <header className={`ui3-account-head ${styles.head}`}><h1 className="t-1">Compte</h1><p className="t-meta">{email}</p></header>
       <div className="ui3-account-grid" data-section={section ?? ""}>
         <nav className="ui3-settings" aria-label="Réglages du compte">
           <div className="ui3-settings-group">
@@ -136,7 +138,7 @@ export function AccountClient({
           </div>
         </nav>
 
-        <section className="ui3-account-pane" aria-live="polite">
+        <section className={`ui3-account-pane ${styles.pane}`} aria-live="polite">
           <button className="ui3-back" type="button" onClick={() => { setSection(null); setNotice(null); window.history.pushState(null, "", window.location.pathname); void playAppSound("select"); }}>Compte</button>
           {notice ? <p className={`ui3-notice ui3-notice-${notice.tone}`} role={notice.tone === "error" ? "alert" : "status"}>{notice.text}</p> : null}
 
@@ -148,7 +150,7 @@ export function AccountClient({
 
           {activeSection === "subscription" ? <div className="ui3-pane-section"><h2>Abonnement</h2><article className="ui3-subscription"><h3>{accountTierLabel(tier)}</h3><ul>{included.map((item) => <li key={item}><AccountIcon name="check" />{item}</li>)}</ul><Link className="btn btn--g" href="/checkout">Voir ce qui est inclus</Link></article><UpgradeCard tier={tier} /></div> : null}
 
-          {activeSection === "connections" ? <div className="ui3-pane-section"><h2>Connexions</h2><p>Relie ton assistant à BUILD pour retrouver uniquement les contenus inclus dans ton accès.</p><div className="ui3-connection"><span className="ui3-logo-row" aria-label="Claude, ChatGPT, Hermes, Oh My Pi et Cursor">{["claude", "openai", "hermes", "omp", "cursor"].map((logo) => <span key={logo}><Image src={`/da/logos/${logo}.svg`} alt="" width={26} height={26} /></span>)}</span><strong>{connectionStatus === "connected" ? "Connexion active" : connectionStatus === "disconnected" ? "À configurer" : "Vérification indisponible"}</strong></div><Link className="btn btn--p" href="/dashboard/mcp">Gérer la connexion</Link></div> : null}
+          {activeSection === "connections" ? <div className="ui3-pane-section"><h2>Connexions</h2><p>Relie ton assistant à BUILD pour retrouver uniquement les contenus inclus dans ton accès.</p><div className="ui3-connection"><span className={`ui3-logo-row ${styles.logos}`} aria-label="Claude, ChatGPT, Hermes, Oh My Pi et Cursor">{["Claude", "ChatGPT", "Hermes Agent", "Oh My Pi", "Cursor"].map((tool) => <span key={tool}><ToolLogo name={tool} size={104} /></span>)}</span><strong>{connectionStatus === "connected" ? "Connexion active" : connectionStatus === "disconnected" ? "À configurer" : "Vérification indisponible"}</strong></div><Link className="btn btn--p" href="/dashboard/mcp">Gérer la connexion</Link></div> : null}
 
           {activeSection === "devices" ? <div className="ui3-pane-section"><h2>Appareils</h2><p>Supabase ne fournit pas la liste fiable des appareils dans ce produit. Tu peux toutefois couper toutes les autres sessions.</p><div className="ui3-device"><span className="ui3-setting-icon"><AccountIcon name="devices" /></span><span><strong>Cette session</strong><small>L’appareil que tu utilises maintenant</small></span></div><button className={confirmEverywhere ? "btn ui3-danger-button" : "btn btn--g"} type="button" disabled={busy} onClick={signOutEverywhere}>{busy ? "Déconnexion" : confirmEverywhere ? "Confirmer la déconnexion partout" : "Se déconnecter partout"}</button>{confirmEverywhere ? <button className="ui3-text-link" type="button" onClick={() => setConfirmEverywhere(false)}>Annuler</button> : null}</div> : null}
         </section>

@@ -35,8 +35,9 @@ test("les pages de lecture restantes exposent un chargement et une reprise aprè
       readFile(`${route}/loading.tsx`, "utf8"),
       readFile(`${route}/error.tsx`, "utf8"),
     ]);
-    assert.match(loading, route === "app/doctrine" || route === "app/intro" || route === "app/sources" ? /Ui4Loading/ : /ReaderLoading/, route);
+    assert.match(loading, /PageLoading/, route);
     assert.match(error, /reset/, route);
+    assert.match(error, /RouteErrorState/, route);
   }
 });
 

@@ -1,4 +1,4 @@
 "use client";
-import { DaRoot } from "@/components/da/DaRoot";
-import "@/app/ui3.css";
-export default function McpError({ reset }: { error: Error & { digest?: string }; reset: () => void }) { return <DaRoot><main className="ui3-state"><div><h1 className="t-2">La connexion ne répond pas</h1><p>Aucun réglage n’a été modifié.</p><button className="btn btn--p" onClick={reset}>Réessayer</button></div></main></DaRoot>; }
+import { RouteErrorState } from "@/components/ui/RouteErrorState";
+
+export default function McpError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) { return <RouteErrorState error={error} reset={reset} title="La connexion ne répond pas." detail="Aucun réglage n’a été modifié. Réessaie." object="offre" />; }

@@ -1,0 +1,19 @@
+.page {
+  display: contents;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .page :global(:is(a[href], button, [role="button"], [data-pressable]):not(:disabled)) {
+    transition: filter 180ms ease, box-shadow 180ms ease;
+  }
+
+  .page :global(:is(a[href], button, [role="button"], [data-pressable]):not(:disabled):hover) {
+    filter: brightness(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page :global(:is(a[href], button, [role="button"], [data-pressable])) {
+    transition-duration: 120ms;
+  }
+}

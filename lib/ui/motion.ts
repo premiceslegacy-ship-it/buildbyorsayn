@@ -32,6 +32,15 @@ export const APP_SPRINGS = {
   rebond: spring(0.5, 0.3),
 } as const;
 
+export const MOTION_SPRINGS = {
+  doux: { type: "spring", stiffness: 157.9, damping: 25.13, mass: 1 },
+  vif: { type: "spring", stiffness: 157.9, damping: 21.36, mass: 1 },
+  rebond: { type: "spring", stiffness: 157.9, damping: 17.59, mass: 1 },
+} as const;
+
+export const CASCADE_GAP_MS = 60;
+export const REDUCED_MOTION_DURATION_MS = 120;
+
 export function installAppMotionTokens(root: HTMLElement = document.documentElement) {
   root.style.setProperty("--sp-doux", APP_SPRINGS.doux.easing);
   root.style.setProperty("--sp-doux-d", `${APP_SPRINGS.doux.duration}ms`);
@@ -46,7 +55,21 @@ export function motionAllowed() {
 }
 
 export function animateAppElement(element: Element, keyframes: Keyframe[], springName: keyof typeof APP_SPRINGS = "vif", delay = 0) {
-  if (!motionAllowed()) return null;
+  if (!motionAllowed()) {
+    return element.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: REDUCED_MOTION_DURATION_MS,
+      fill: "both",
+    });
+  }
   const curve = APP_SPRINGS[springName];
   return element.animate(keyframes, { duration: curve.duration, easing: curve.easing, delay, fill: "both" });
+}
+
+export function animateEntryCascade(elements: Iterable<Element>, gap = CASCADE_GAP_MS) {
+  return [...elements].map((element, index) => animateAppElement(
+    element,
+    [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }],
+    "doux",
+    motionAllowed() ? index * gap : 0,
+  ));
 }

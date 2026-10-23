@@ -54,7 +54,7 @@ function formatDate(value: string | null) {
 
 function statusClass(status: string) {
   if (status === "Validé") return "border-[rgba(34,217,110,.35)] bg-[rgba(34,217,110,.1)] text-[var(--menthe)]";
-  if (status === "À valider") return "border-[var(--em)] bg-[rgba(34,217,110,.12)] text-[var(--menthe)]";
+  if (status === "À valider") return "border-[var(--trait-f)] bg-[rgba(241,245,242,.08)] text-[var(--menthe)]";
   if (status === "Accès retiré") return "border-[rgba(255,69,58,.45)] bg-[rgba(255,69,58,.12)] text-[#ffb1ac]";
   return "border-[var(--trait-f)] bg-[rgba(241,245,242,.06)] text-[var(--t2)]";
 }
@@ -87,7 +87,7 @@ export function TrainerWorkspace({ clients, people, dataWarning = null }: Props)
       <div className="mx-auto max-w-7xl">
         <header className="flex flex-wrap items-end justify-between gap-6 border-b border-[var(--trait)] pb-8">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-[var(--menthe)]">BUILD · formateur</p>
+            <p className="text-sm font-medium text-[var(--t3)]">Espace formateur BUILD</p>
             <h1 className="mt-4 max-w-3xl text-4xl font-medium tracking-[-0.04em] sm:text-6xl">Piloter les accompagnements.</h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--t2)]">
               Inscris les bonnes personnes, choisis ce qu'elles doivent apprendre, ouvre l'accès au bon moment et valide ce qui est réellement acquis.
@@ -110,7 +110,7 @@ export function TrainerWorkspace({ clients, people, dataWarning = null }: Props)
             ["Formés", String(completedCount)],
           ].map(([label, value]) => (
             <div key={label} className="bg-[var(--carte)] p-5">
-              <p className="text-xs uppercase tracking-[0.14em] text-[var(--t3)]">{label}</p>
+              <p className="text-sm font-medium text-[var(--t3)]">{label}</p>
               <p className="mt-3 text-3xl font-medium text-[var(--encre)]">{value}</p>
             </div>
           ))}
@@ -119,7 +119,7 @@ export function TrainerWorkspace({ clients, people, dataWarning = null }: Props)
         <section className="mt-8 rounded-[var(--r-m)] border border-[var(--trait)] bg-[var(--carte)] p-5 sm:p-7" aria-labelledby="assignment-title">
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[var(--trait)] pb-5">
             <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-[var(--menthe)]">Accès et programme</p>
+              <p className="text-sm font-medium text-[var(--t3)]">Accès et programme</p>
               <h2 id="assignment-title" className="mt-2 text-2xl font-medium">{selectedClient ? "Modifier un accompagnement" : "Associer un accompagnement"}</h2>
             </div>
             <p className="max-w-sm text-sm leading-6 text-[var(--t3)]">Un compte ne voit l'espace membre que lorsque son statut est en cours ou formé et que la période est active.</p>
@@ -137,7 +137,7 @@ export function TrainerWorkspace({ clients, people, dataWarning = null }: Props)
         <section className="mt-8" aria-labelledby="clients-title">
           <div className="flex flex-wrap items-end justify-between gap-5 border-b border-[var(--trait)] pb-5">
             <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-[var(--menthe)]">Suivi réel</p>
+              <p className="text-sm font-medium text-[var(--t3)]">Suivi réel</p>
               <h2 id="clients-title" className="mt-2 text-2xl font-medium">Personnes inscrites</h2>
             </div>
             <div className="flex w-full flex-wrap gap-2 sm:w-auto">
@@ -188,15 +188,15 @@ export function TrainerWorkspace({ clients, people, dataWarning = null }: Props)
               <article className="min-w-0 rounded-[var(--r-m)] border border-[var(--trait)] bg-[var(--carte)] p-5 sm:p-7">
                 <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--trait)] pb-5">
                   <div className="min-w-0">
-                    <p className="break-all text-xs uppercase tracking-[0.14em] text-[var(--t3)]">{selectedClient.email}</p>
+                    <p className="break-all text-sm text-[var(--t3)]">{selectedClient.email}</p>
                     <h3 className="mt-2 truncate text-2xl font-medium">{selectedClient.displayName || "Membre sans nom affiché"}</h3>
                   </div>
                   <span className={`rounded-full border px-2 py-1 text-xs ${statusClass(selectedClient.statusLabel)}`}>{selectedClient.statusLabel}</span>
                 </div>
                 <div className="mt-5 grid gap-4 text-sm sm:grid-cols-3">
-                  <p><span className="block text-xs uppercase tracking-[0.12em] text-[var(--t3)]">Période</span><span className="mt-2 block text-[var(--t2)]">{formatDate(selectedClient.assignment.startsOn)}{selectedClient.assignment.endsOn ? ` → ${formatDate(selectedClient.assignment.endsOn)}` : " → sans date de fin"}</span></p>
-                  <p><span className="block text-xs uppercase tracking-[0.12em] text-[var(--t3)]">Progression</span><span className="mt-2 block text-[var(--t2)]">{selectedClient.completedCount}/{selectedClient.themes.length} thèmes compris</span></p>
-                  <p><span className="block text-xs uppercase tracking-[0.12em] text-[var(--t3)]">Dernière activité</span><span className="mt-2 block text-[var(--t2)]">{formatDate(selectedClient.lastActivity)}</span></p>
+                  <p><span className="block text-sm font-medium text-[var(--t3)]">Période</span><span className="mt-2 block text-[var(--t2)]">{formatDate(selectedClient.assignment.startsOn)}{selectedClient.assignment.endsOn ? ` → ${formatDate(selectedClient.assignment.endsOn)}` : " → sans date de fin"}</span></p>
+                  <p><span className="block text-sm font-medium text-[var(--t3)]">Progression</span><span className="mt-2 block text-[var(--t2)]">{selectedClient.completedCount}/{selectedClient.themes.length} thèmes compris</span></p>
+                  <p><span className="block text-sm font-medium text-[var(--t3)]">Dernière activité</span><span className="mt-2 block text-[var(--t2)]">{formatDate(selectedClient.lastActivity)}</span></p>
                 </div>
                 <SharedContextEditor
                   assignmentId={selectedClient.assignment.id}
@@ -210,7 +210,7 @@ export function TrainerWorkspace({ clients, people, dataWarning = null }: Props)
                   <div className="mt-2 divide-y divide-[var(--trait)]">
                     {selectedClient.themes.map((theme) => (
                       <div key={theme.id} className="flex items-center gap-3 py-3 text-sm">
-                        <span className={`flex size-6 shrink-0 items-center justify-center rounded-full border text-xs ${theme.understood ? "border-[var(--em)] text-[var(--menthe)]" : "border-[var(--trait-f)] text-[var(--t3)]"}`}>{theme.understood ? "✓" : ""}</span>
+                        <span className={`flex size-6 shrink-0 items-center justify-center rounded-full border text-xs ${theme.understood ? "border-[var(--trait-f)] text-[var(--menthe)]" : "border-[var(--trait-f)] text-[var(--t3)]"}`}>{theme.understood ? "✓" : ""}</span>
                         <span className="min-w-0 flex-1 text-[var(--t2)]">{theme.title}</span>
                         <span className="text-xs text-[var(--t3)]">{theme.understood ? "Compris" : "À voir"}</span>
                       </div>

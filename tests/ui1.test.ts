@@ -130,10 +130,12 @@ test("la navigation anonyme ne propose que des destinations publiques réelles",
 });
 
 test("chaque page portée a un état de chargement, d'erreur et de reprise", async () => {
+  const sharedLoading = await readFile("components/ui/PageLoading.tsx", "utf8");
+  assert.match(sharedLoading, /aria-busy="true"/);
   for (const route of ["dashboard", "programme", "nouveautes"]) {
     const [loading, error] = await Promise.all([readFile(`app/${route}/loading.tsx`, "utf8"), readFile(`app/${route}/error.tsx`, "utf8")]);
-    assert.match(loading, /aria-busy="true"/, route);
+    assert.match(loading, /PageLoading/, route);
     assert.match(error, /reset/, route);
-    assert.match(error, /Réessayer/, route);
+    assert.match(error, /RouteErrorState/, route);
   }
 });

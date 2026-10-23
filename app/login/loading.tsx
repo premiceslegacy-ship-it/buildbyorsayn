@@ -1,5 +1,5 @@
-import { AuthRouteLoading } from "@/components/account/AuthRouteLoading";
+import { PageLoading } from "@/components/ui/PageLoading";
 
 export default function LoginLoading() {
-  return <AuthRouteLoading title="Chargement de la connexion" />;
+  return <PageLoading kind="auth" chrome={false} message="On prépare la connexion." />;
 }

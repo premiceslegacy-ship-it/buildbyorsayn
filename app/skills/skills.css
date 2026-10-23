@@ -1,0 +1,23 @@
+.da .skills-page .ui3-step::before {
+  width: auto;
+  height: auto;
+  display: block;
+  place-items: initial;
+  border-radius: 0;
+  color: var(--t3);
+  background: transparent;
+  font: 600 16px/1.3 var(--font-t);
+}
+
+.da .skills-sync {
+  width: 100%;
+  max-width: none;
+  gap: clamp(24px, 4vw, 38px);
+  padding: clamp(28px, 5vw, 56px);
+  box-shadow: none;
+}
+
+.da .skills-sync > div:first-child {
+  display: grid;
+  gap: 10px;
+}

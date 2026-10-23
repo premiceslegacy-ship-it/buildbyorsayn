@@ -3,12 +3,12 @@ import { test, expect, hasE2eAccount } from "./fixtures/auth";
 test.describe("Bloc lessons (member)", () => {
   test.skip(!hasE2eAccount, "E2E_TEST_EMAIL/E2E_TEST_PASSWORD not configured");
 
-  test("the block page is separate from the reader", async ({ authedPage: page }) => {
+  test("the block page presents the video, chapters and reader entry", async ({ authedPage: page }) => {
     for (const id of ["1", "2", "3"]) {
       await page.goto(`/blocs/${id}`);
       await expect(page.getByRole("heading", { name: "Chapitres" })).toBeVisible({ timeout: 10_000 });
       await expect(page.getByRole("radiogroup", { name: "Mode de lecture" })).toHaveCount(0);
-      await expect(page.getByTestId("lesson-player")).toHaveCount(0);
+      await expect(page.getByTestId("bloc-overview-media")).toBeVisible();
       await expect(page.locator(`a[href^="/blocs/${id}/lire?chapter="]`).first()).toBeVisible();
       await expect(page.getByText("Vidéos liées à ce bloc")).toHaveCount(0);
       await expect(page.locator('a[href^="/videos#"]')).toHaveCount(0);
@@ -20,7 +20,7 @@ test.describe("Bloc lessons (member)", () => {
     await expect(page.getByRole("radiogroup", { name: "Mode de lecture" })).toBeVisible({ timeout: 10_000 });
     const hasLesson = await page.getByTestId("lesson-player").or(page.getByTestId("lesson-unavailable")).or(page.getByTestId("lesson-loading")).count();
     if (hasLesson === 0) {
-      await expect(page.getByRole("heading", { name: "Vidéo à venir", exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "La vidéo arrive bientôt.", exact: true })).toBeVisible();
       await page.getByRole("radio", { name: "Texte" }).click();
       await expect(page.getByRole("button", { name: "Marquer comme lu" })).toBeVisible();
     }
@@ -87,5 +87,21 @@ test.describe("Bloc lessons (member)", () => {
     expect(writes).toBeLessThan(10);
     await page.keyboard.press("ArrowRight");
     await expect(page).toHaveURL(/chapter=b1-s2/);
+  });
+
+  test("text mode is immersive and Escape closes the mobile outline before leaving", async ({ authedPage: page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript(() => localStorage.setItem("btv-reader-outline", "0"));
+    await page.goto("/blocs/1/lire?mode=text&chapter=b1-s0");
+    await expect(page.getByRole("navigation", { name: "Principal" })).toBeHidden();
+    const outlineButton = page.getByRole("button", { name: "Ouvrir le sommaire" });
+    await expect(outlineButton).toBeVisible();
+    await outlineButton.click();
+    await expect(page.getByRole("complementary", { name: "Sommaire" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("complementary", { name: "Sommaire" })).toHaveCount(0);
+    await expect(page).toHaveURL(/\/blocs\/1\/lire/);
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\/blocs\/1$/);
   });
 });

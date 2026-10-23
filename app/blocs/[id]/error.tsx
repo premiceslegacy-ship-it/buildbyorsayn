@@ -1,7 +1,6 @@
 "use client";
+import { RouteErrorState } from "@/components/ui/RouteErrorState";
 
-import { ReaderError } from "@/components/reader/ReaderState";
-
-export default function BlocError({ reset }: { reset: () => void }) {
-  return <ReaderError reset={reset} backHref="/programme" />;
+export default function BlocError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  return <RouteErrorState error={error} reset={reset} title="Ce bloc ne s’ouvre pas." detail="Ta progression est intacte. Réessaie, ou retourne au programme." backHref="/programme" />;
 }

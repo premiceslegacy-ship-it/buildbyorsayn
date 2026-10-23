@@ -29,9 +29,11 @@ test("the account menu keeps the existing MCP connection route", async () => {
 test("the MCP setup page gates instructions by paid access and uses a focused layout", async () => {
   const page = await readFile("app/dashboard/mcp/page.tsx", "utf8");
 
-  for (const logo of ["claude", "openai", "hermes", "omp", "cursor"]) {
-    assert.ok(page.includes(`["${logo}",`) || page.includes(`"${logo}"`), logo);
+  for (const tool of ["Claude", "ChatGPT", "Hermes Agent", "Oh My Pi", "Cursor"]) {
+    assert.ok(page.includes(`"${tool}"`), tool);
   }
+  assert.match(page, /<ToolLogo name=\{tool\}/);
+  assert.doesNotMatch(page, /\/da\/logos\//);
   // 390 px : la rangée est flexible et le style UI-3 lui permet de revenir à la ligne.
   assert.match(page, /className="ui3-tool-logos"/);
   assert.match(page, /Connecte BUILD à ton assistant/);

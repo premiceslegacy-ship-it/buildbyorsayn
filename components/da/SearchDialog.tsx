@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
+import { AppState } from "@/components/ui/AppState";
 import type { SearchItem } from "@/lib/search/catalog";
-import { animateAppElement } from "@/lib/ui/motion";
+import { animateAppElement, animateEntryCascade } from "@/lib/ui/motion";
 import { playAppSound } from "@/lib/ui/sound";
 
 const SUBJECTS = [["Vendre", "vente"], ["Prix", "prix"], ["Skills", "skills"], ["Site web", "site web"]] as const;
@@ -16,6 +17,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
   const [results, setResults] = useState<SearchItem[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [selected, setSelected] = useState(0);
+  const [retryKey, setRetryKey] = useState(0);
   const displayedResults = useMemo(() => KINDS.flatMap((kind) => results.filter((result) => result.kind === kind)), [results]);
   const input = useRef<HTMLInputElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -36,7 +38,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
       searchInput.focus({ preventScroll: true });
     }
     document.documentElement.style.overflow = "hidden";
-    scrim.current?.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+    if (scrim.current) animateAppElement(scrim.current, [{ opacity: 0 }, { opacity: 1 }], "doux");
     if (panel.current) {
       const compact = window.matchMedia("(max-width: 734px)").matches;
       animateAppElement(panel.current, compact
@@ -89,13 +91,12 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
       }
     }, 140);
     return () => { window.clearTimeout(timeout); controller.abort(); };
-  }, [open, query]);
+  }, [open, query, retryKey]);
 
   useEffect(() => {
     if (status !== "ready") return;
-    list.current?.querySelectorAll<HTMLElement>(".srch__r").forEach((element, index) => {
-      if (index < 8) animateAppElement(element, [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], "doux", Math.min(index * 40, 300));
-    });
+    const elements = [...(list.current?.querySelectorAll<HTMLElement>(".srch__r") ?? [])].slice(0, 8);
+    animateEntryCascade(elements);
   }, [displayedResults, status]);
 
   const updateQuery = (next: string) => {
@@ -111,10 +112,10 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
         <label className="srch__in"><DaIcon name="search" /><span className="sr">Rechercher</span><input ref={input} type="search" value={query} onChange={(event) => updateQuery(event.target.value)} placeholder="Vendre, prix, skills, site…" autoComplete="off" aria-label="Rechercher une vidéo, un bloc ou un sujet" aria-controls="build-search-results" aria-activedescendant={displayedResults[selected] ? `search-${displayedResults[selected].id}` : undefined} /><kbd>Esc</kbd></label>
         <div className="srch__chips">{SUBJECTS.map(([label, value]) => <button className="chip" type="button" key={value} data-sfx="none" onClick={() => { updateQuery(value); void playAppSound("select"); }}>{label}</button>)}</div>
         <div ref={list} className="srch__list" id="build-search-results" role="listbox" aria-busy={status === "loading"} aria-label={status === "ready" ? `${displayedResults.length} résultats` : "Résultats de recherche"}>
-          {status === "loading" && <p className="srch__empty">Recherche en cours…</p>}
-          {status === "error" && <p className="srch__empty">La recherche est indisponible. Réessaie.</p>}
-          {status === "ready" && results.length === 0 && <p className="srch__empty">Aucun résultat pour cette recherche.</p>}
-          {status === "idle" && <p className="srch__empty">Cherche une vidéo, un chapitre ou un skill.</p>}
+          {status === "loading" && <p className="srch__empty">On cherche dans BUILD.</p>}
+          {status === "error" && <AppState compact headingLevel={2} tone="alert" object="bloc" title="La recherche ne répond pas." detail="Rien n’est perdu. Réessaie dans un instant." action={{ label: "Réessayer", onClick: () => setRetryKey((value) => value + 1) }} />}
+          {status === "ready" && results.length === 0 && <AppState compact headingLevel={2} object="offre" title="Rien avec ces mots." detail="Essaie un sujet plus simple, comme prix, vendre ou skill." action={{ label: "Effacer", onClick: () => updateQuery("") }} />}
+          {status === "idle" && <p className="srch__empty">Écris un sujet, un chapitre ou le nom d’un skill.</p>}
           {KINDS.map((kind) => {
             const group = displayedResults.filter((result) => result.kind === kind);
             if (!group.length) return null;

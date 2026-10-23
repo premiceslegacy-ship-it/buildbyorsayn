@@ -52,11 +52,13 @@ export default async function HermesChapterPage({ params }: { params: Promise<{ 
       backHref="/videos/tutos"
       sections={sections}
       initialMode="texte"
+      showUpcomingVideo
       initialChapter={currentId}
       syncAddress={false}
       copyMarkdown={`# ${displayTitle}\n\n${body}`}
       markdownLocalPaths={curriculumFiles.map((entry) => entry.path)}
       markdownBaseHref="/videos/tutos"
+      thumbnailSrc="/da/mini/hermes.jpg"
     />
   </DaRoot>;
 }

@@ -1,33 +1,28 @@
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getMcpConnectionStatus, revokeMcpConnections } from "@/app/actions/mcpConnections";
 import { DaRoot } from "@/components/da/DaRoot";
 import { McpSetupGuide } from "@/components/McpSetupGuide";
 import { NavBar } from "@/components/NavBar";
+import { ToolLogo } from "@/components/ToolLogo";
 import { navIdentity } from "@/lib/auth/navIdentity.server";
 import { getMcpResourceUrl } from "@/lib/mcp/config";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { COFFRE_LABEL, FONDATIONS_LABEL } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
 import "@/app/ui3.css";
+import "./mcp.css";
 
 export const metadata = { title: "Connexion aux assistants | BUILD", robots: { index: false, follow: false } };
 
-const clients = [
-  ["claude", "Claude"],
-  ["openai", "ChatGPT"],
-  ["hermes", "Hermes"],
-  ["omp", "Oh My Pi"],
-  ["cursor", "Cursor"],
-] as const;
+const clients = ["Claude", "ChatGPT", "Hermes Agent", "Oh My Pi", "Cursor"] as const;
 
 function ClientLogos() {
-  return <div className="ui3-tool-logos" aria-label={clients.map((client) => client[1]).join(", ")}>{clients.map(([file, label]) => <span key={file}><Image src={`/da/logos/${file}.svg`} alt={label} width={28} height={28} /></span>)}</div>;
+  return <div className="ui3-tool-logos" aria-label={clients.join(", ")}>{clients.map((tool) => <span key={tool}><ToolLogo name={tool} size={168} /></span>)}</div>;
 }
 
 function Shell({ children, identity }: { children: React.ReactNode; identity: NonNullable<Awaited<ReturnType<typeof navIdentity>>> }) {
-  return <DaRoot className="da-app has-tabbar"><NavBar tier={identity.tier} isAdmin={identity.isAdmin} displayName={identity.displayName} displayEmail={identity.displayEmail} initials={identity.initials} /><main className="ui3-state"><div className="ui3-access-card">{children}</div></main></DaRoot>;
+  return <DaRoot className="da-app has-tabbar"><NavBar tier={identity.tier} isAdmin={identity.isAdmin} displayName={identity.displayName} displayEmail={identity.displayEmail} initials={identity.initials} /><main className="ui3-state mcp-page"><div className="ui3-access-card mcp-state-card">{children}</div></main></DaRoot>;
 }
 
 export default async function McpDashboardPage({ searchParams }: { searchParams: Promise<{ revocation?: string }> }) {
@@ -45,7 +40,7 @@ export default async function McpDashboardPage({ searchParams }: { searchParams:
   const { data: profile, error: profileError } = await supabase.from("profiles").select("tier").eq("id", user.id).single();
   const tier = normalizeProfileTier(profile?.tier ?? null);
   if (profileError || tier === null) return <Shell identity={identity}><ClientLogos /><div><h1 className="t-2">Impossible de vérifier ton accès BUILD</h1><p>Réessaie dans un instant. Aucun lien de connexion n’est affiché tant que ton accès reste indéterminé.</p></div><Link className="btn btn--p" href="/dashboard/mcp">Réessayer</Link></Shell>;
-  if (tier !== "beginner" && tier !== "full") return <Shell identity={identity}><ClientLogos /><div><p className="pastille"><b />Inclus dans les offres BUILD</p><h1 className="t-2">Connecte BUILD à ton assistant</h1><p>Fondations donne accès à l’essentiel. LE\u00a0COFFRE ouvre toute la méthode.</p></div><Link className="btn btn--p" href="/checkout?from=mcp">Choisir mon accès</Link></Shell>;
+  if (tier !== "beginner" && tier !== "full") return <Shell identity={identity}><ClientLogos /><div><h1 className="t-2">Connecte BUILD à ton assistant</h1><p>Fondations donne accès à l’essentiel. LE\u00a0COFFRE ouvre toute la méthode.</p></div><Link className="btn btn--p" href="/checkout?from=mcp">Choisir mon accès</Link></Shell>;
 
   const connectionStatus = await getMcpConnectionStatus();
   const connected = connectionStatus === "connected";
@@ -53,7 +48,7 @@ export default async function McpDashboardPage({ searchParams }: { searchParams:
   const unknown = connectionStatus === "unknown";
   const tierLabel = tier === "full" ? COFFRE_LABEL : FONDATIONS_LABEL;
 
-  return <DaRoot className="da-app has-tabbar"><NavBar tier={identity.tier} isAdmin={identity.isAdmin} displayName={identity.displayName} displayEmail={identity.displayEmail} initials={identity.initials} /><main className="ui3-page"><header className="ui3-page-head"><div><ClientLogos /><p className="pastille"><b />{connectorLaunched ? "Connexion disponible" : "Connexion bêta"}</p><h1 className="t-1">Connecte BUILD à ton assistant</h1><p className="t-lede">Pose une question, retrouve le bon contenu et reprends ta progression au bon endroit.</p></div></header><div className="ui3-page-body"><section className="ui3-section ui3-access-card"><dl className="ui3-access-row"><div><dt>Ton accès</dt><dd>{tierLabel}</dd></div><div><dt>État</dt><dd className={connected ? "ui3-status-ok" : undefined}>{connected ? "Connexion active" : disconnected ? "À configurer" : "Vérification indisponible"}</dd></div></dl>
+  return <DaRoot className="da-app has-tabbar"><NavBar tier={identity.tier} isAdmin={identity.isAdmin} displayName={identity.displayName} displayEmail={identity.displayEmail} initials={identity.initials} /><main className="ui3-page mcp-page"><header className="ui3-page-head"><div><ClientLogos /><h1 className="t-1">Connecte BUILD à ton assistant</h1><p className="t-lede">Pose une question, retrouve le bon contenu et reprends ta progression au bon endroit.</p>{!connectorLaunched ? <p className="t-meta">Connexion en bêta</p> : null}</div></header><div className="ui3-page-body"><section className="ui3-section ui3-access-card mcp-access"><dl className="ui3-access-row"><div><dt>Ton accès</dt><dd>{tierLabel}</dd></div><div><dt>État</dt><dd className={connected ? "ui3-status-ok" : undefined}>{connected ? "Connexion active" : disconnected ? "À configurer" : "Vérification indisponible"}</dd></div></dl>
     {unknown ? <div><h2 className="t-3">Impossible de vérifier la connexion</h2><p className="t-meta">Actualise cette page dans un instant. BUILD ne te demande pas de recommencer tant que le statut reste indéterminé.</p></div> : null}
     {disconnected ? <div><h2 className="t-3">Une seule adresse</h2><p className="t-meta">Utilise cette même adresse dans l’assistant de ton choix. Choisis ensuite son guide.</p><McpSetupGuide mcpUrl={getMcpResourceUrl()} /></div> : null}
     {connected ? <div><h2 className="t-3">BUILD est prêt dans ton assistant</h2><p className="t-meta">Les réponses restent limitées aux contenus de ton offre.</p></div> : null}

@@ -42,7 +42,7 @@ export function SharedContextEditor({ assignmentId, context }: Props) {
       <input type="hidden" name="assignment_id" value={assignmentId} />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.14em] text-[var(--menthe)]">Contexte partagé</p>
+          <p className="text-sm font-medium text-[var(--t3)]">Contexte partagé</p>
           <h4 className="mt-2 text-lg font-medium text-[var(--encre)]">Informations visibles des deux côtés</h4>
         </div>
         {context?.updatedAt ? (

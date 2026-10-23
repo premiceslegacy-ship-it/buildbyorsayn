@@ -1,5 +1,5 @@
-import { AuthRouteLoading } from "@/components/account/AuthRouteLoading";
+import { PageLoading } from "@/components/ui/PageLoading";
 
 export default function UpdatePasswordLoading() {
-  return <AuthRouteLoading title="Chargement de la réinitialisation" />;
+  return <PageLoading kind="auth" chrome={false} message="On prépare ton nouveau mot de passe." />;
 }

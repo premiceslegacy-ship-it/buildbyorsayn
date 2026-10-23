@@ -11,10 +11,9 @@
 .da .ui3-hermes-start { width: min(100%, 62rem); margin-inline: auto; }
 .da .ui3-hermes-start > ul { display: grid; gap: 20px; }
 .da .ui3-hermes-start li { min-width: 0; animation: ui3-hermes-enter var(--sp-doux-d, .5s) var(--sp-doux, var(--ease)) both; }
-.da .ui3-hermes-start a { height: 100%; display: grid; align-content: start; gap: 8px; padding: clamp(18px, 1.8vw, 24px); border-radius: var(--r-m); background: var(--carte); transition: background .32s var(--ease-c), transform .1s linear; }
+.da .ui3-hermes-start a { height: 100%; display: grid; align-content: start; gap: 10px; padding: clamp(22px, 2.2vw, 30px); border-radius: var(--r-m); background: var(--carte); transition: background .32s var(--ease-c), transform .1s linear; }
 .da .ui3-hermes-start a:hover { background: var(--carte-2); }
 .da .ui3-hermes-start a:active { transform: scale(.985); }
-.da .ui3-hermes-start small { color: var(--t3); font: 600 12px/1.25 var(--font); }
 .da .ui3-hermes-start strong { color: var(--encre); font: 600 19px/1.25 var(--font-t); letter-spacing: -.02em; text-wrap: balance; }
 .da .ui3-hermes-start span { color: var(--t2); font: 400 14px/1.45 var(--font); text-wrap: pretty; }
 .da .ui3-hermes-start b { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; color: var(--menthe); font: 600 14px/1 var(--font); }

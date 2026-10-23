@@ -33,6 +33,6 @@ export default async function AccompagnementPage({ searchParams }: { searchParam
       <p className="ui3-rdv-note">Gratuit, en tête à tête. Tu choisis ton créneau.</p>
       {(hasMemberAccess || isAdmin) ? <div className="ui3-auth-switch">{hasMemberAccess ? <Link href="/accompagnement/espace">Ouvrir mon espace</Link> : null}{isAdmin ? <Link href="/accompagnement/formateur">Espace formateur</Link> : null}</div> : null}
     </section>
-    <aside className="ui3-rdv-soon" aria-label="À venir"><strong>Bientôt disponible</strong><span>D’autres accompagnements arrivent.</span></aside>
+    <p className="ui3-rdv-note">D’autres accompagnements arriveront ici.</p>
   </main><footer className="foot foot--public"><Image src="/da/logo-sombre.svg" alt="BUILD" width={96} height={24} /></footer></DaRoot>;
 }

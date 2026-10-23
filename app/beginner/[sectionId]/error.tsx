@@ -1,7 +1,6 @@
 "use client";
+import { RouteErrorState } from "@/components/ui/RouteErrorState";
 
-import { ReaderError } from "@/components/reader/ReaderState";
-
-export default function BeginnerChapterError({ reset }: { reset: () => void }) {
-  return <ReaderError reset={reset} backHref="/beginner" />;
+export default function BeginnerChapterError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  return <RouteErrorState error={error} reset={reset} title="Le chapitre ne s’ouvre pas." detail="Ta progression est intacte. Réessaie, ou retourne à Fondations." backHref="/beginner" backLabel="Retour à Fondations" />;
 }
