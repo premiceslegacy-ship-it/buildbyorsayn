@@ -152,6 +152,17 @@ export async function setAgentMode(mode: AgentMode, confirmation?: string) {
   return parsed;
 }
 
+export async function getAgentMode(): Promise<AgentMode> {
+  await requireHumanAdmin();
+  const { data, error } = await createAdminSupabase()
+    .from("admin_agent_settings")
+    .select("mode")
+    .eq("singleton", true)
+    .maybeSingle();
+  if (error || !data) throw new Error("Le mode de l'agent est indisponible.");
+  return z.enum(["prepare", "autopublish"]).parse(data.mode);
+}
+
 export async function listPendingRequests() {
   const user = await requireHumanAdmin();
   const admin = createAdminSupabase();

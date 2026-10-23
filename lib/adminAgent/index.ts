@@ -1,6 +1,7 @@
 export {
   createAgentToken,
   decideRequest,
+  getAgentMode,
   getAgentPermissions,
   listAgentJournal,
   listAgentTokens,

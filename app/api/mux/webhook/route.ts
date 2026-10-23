@@ -4,6 +4,7 @@ import { createAdminSupabase } from "@/lib/supabase/admin";
 import { pickSignedPlaybackId } from "@/lib/mux/lessons";
 import { parseMuxPassthrough } from "@/lib/mux/adminLessons";
 import { createMuxAdminClient } from "@/lib/mux/adminServer";
+import { syncMuxTranscriptForReadyAsset } from "@/lib/mux/transcript.server";
 
 const MAX_MUX_WEBHOOK_BYTES = 256 * 1024;
 
@@ -24,15 +25,59 @@ export async function POST(request: NextRequest) {
     "video.asset.created",
     "video.asset.ready",
     "video.asset.errored",
+    "video.asset.track.ready",
+    "video.asset.track.errored",
   ].includes(event.type)) {
     return NextResponse.json({ ok: true });
   }
 
   const asset = event.data;
+  const admin = createAdminSupabase({ signal: request.signal });
+
+  if (event.type === "video.asset.track.ready" || event.type === "video.asset.track.errored") {
+    const isGeneratedSubtitle = asset.type === "text"
+      && asset.text_type === "subtitles"
+      && (asset.passthrough === "build-fr-auto" || asset.text_source === "generated_vod");
+    if (!isGeneratedSubtitle || !asset.asset_id) return NextResponse.json({ ok: true });
+    const { data: video, error: videoError } = await admin.from("video_lessons")
+      .select("id,playback_id")
+      .eq("mux_asset_id", asset.asset_id)
+      .is("published_at", null)
+      .maybeSingle();
+    if (videoError) return NextResponse.json({ ok: false }, { status: 503 });
+    if (!video?.playback_id) return NextResponse.json({ ok: true });
+    if (event.type === "video.asset.track.errored") {
+      await admin.from("video_lessons").update({
+        error_code: "mux_transcript_errored",
+        updated_at: new Date().toISOString(),
+      }).eq("id", video.id).is("published_at", null);
+      return NextResponse.json({ ok: true });
+    }
+    try {
+      await syncMuxTranscriptForReadyAsset({
+        videoId: video.id,
+        assetId: asset.asset_id,
+        playbackId: video.playback_id,
+        signal: request.signal,
+      });
+    } catch {
+      await admin.from("video_lessons").update({
+        error_code: "mux_transcript_fetch_failed",
+        updated_at: new Date().toISOString(),
+      }).eq("id", video.id).is("published_at", null);
+      console.error("mux.webhook.transcript_fetch_failed");
+      return NextResponse.json({ ok: false, error: "mux_transcript_fetch_failed" }, { status: 503 });
+    }
+    await admin.from("video_lessons").update({
+      error_code: null,
+      updated_at: new Date().toISOString(),
+    }).eq("id", video.id).is("published_at", null);
+    return NextResponse.json({ ok: true });
+  }
+
   const videoId = parseMuxPassthrough(asset.passthrough);
   if (!videoId || !asset.upload_id) return NextResponse.json({ ok: true });
 
-  const admin = createAdminSupabase({ signal: request.signal });
   let update: Record<string, unknown>;
   if (event.type === "video.asset.ready") {
     const playbackId = pickSignedPlaybackId(asset.playback_ids);

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "re
 import { DaIcon } from "@/components/da/DaIcon";
 import { NewVideoMarker } from "@/components/nouveautes/NouveautesGrid";
 import type { NouveautesFeed } from "@/lib/nouveautes/loadVideos";
-import { formatVideoDate, groupVideosByMonth, youtubeThumbnailUrl, youtubeWatchUrl } from "@/lib/nouveautes/videos";
+import { formatVideoDate, groupNouveautesByMonth, type NouveautesItem } from "@/lib/nouveautes/videos";
 import { playAppSound } from "@/lib/ui/sound";
 import { animateAppElement } from "@/lib/ui/motion";
 
@@ -56,16 +56,25 @@ export function NouveautesView({ feed }: { feed: NouveautesFeed }) {
     select(next);
     tabs.current?.querySelectorAll<HTMLButtonElement>('button[role="tab"]')[filters.indexOf(next)]?.focus();
   };
-  const groups = filter === "build" ? [] : groupVideosByMonth(feed.videos);
+  const visibleItems = feed.items.filter((item) => filter === "all" || item.source === filter);
+  const groups = groupNouveautesByMonth(visibleItems);
   const filterLabel = filter === "all" ? "Tout" : filter === "youtube" ? "YouTube" : "Sur BUILD";
-  const resultCount = groups.reduce((count, group) => count + group.videos.length, 0);
+  const resultCount = groups.reduce((count, group) => count + group.items.length, 0);
+  const hasError = filter === "all"
+    ? feed.status === "error"
+    : filter === "youtube" ? feed.sources.youtube === "error" : feed.sources.build === "error";
   return <>
     <header className="hero--app"><div className="hero__in"><h1 className="t-1">Nouveautés</h1><p className="t-lede">Les nouvelles vidéos de la chaîne YouTube, et celles qui arrivent dans BUILD.</p><div ref={tabs} className="seg has-slider" role="tablist" aria-label="Filtrer les nouveautés"><i ref={slider} className="slider" /><button role="tab" tabIndex={filter === "all" ? 0 : -1} aria-selected={filter === "all"} data-sfx="none" onKeyDown={keyFilter} onClick={() => select("all")}>Tout</button><button role="tab" tabIndex={filter === "youtube" ? 0 : -1} aria-selected={filter === "youtube"} data-sfx="none" onKeyDown={keyFilter} onClick={() => select("youtube")}>YouTube</button><button role="tab" tabIndex={filter === "build" ? 0 : -1} aria-selected={filter === "build"} data-sfx="none" onKeyDown={keyFilter} onClick={() => select("build")}>Sur BUILD</button></div></div></header>
-    <p className="sr" role="status">{resultCount} {resultCount > 1 ? "vidéos" : "vidéo"}, filtre {filterLabel}</p>
+    <p className="sr" role="status">{resultCount} nouveauté{resultCount > 1 ? "s" : ""}, filtre {filterLabel}</p>
     <div className="nw" ref={content}>
-      {feed.status === "error" && <p className="nw__empty" role="alert">Les nouveautés ne peuvent pas être chargées. Réessaie plus tard.</p>}
-      {feed.status !== "error" && groups.length === 0 && <p className="nw__empty" data-testid="nouveautes-empty">Aucune nouveauté dans cette catégorie pour le moment.</p>}
-      {groups.map((group) => <section className="nw__m" key={group.key}><h2 className="t-h2">{group.label}</h2><ul>{group.videos.map((video) => <li key={video.video_id} data-video-card data-published-at={video.published_at}><a className="nw__e" href={youtubeWatchUrl(video.video_id)} target="_blank" rel="noopener"><span className="nw__img"><img src={youtubeThumbnailUrl(video.video_id)} alt="" loading="lazy" /></span><span className="nw__b"><span className="nw__tag"><DaIcon name="external" />YouTube</span><NewVideoMarker /><span className="nw__t">{video.title}</span><time className="nw__d" dateTime={video.published_at}>{formatVideoDate(video.published_at)}</time></span></a></li>)}</ul></section>)}
+      {hasError && <p className="nw__empty" role="alert">Les nouveautés de cette catégorie ne peuvent pas être chargées. Réessaie plus tard.</p>}
+      {!hasError && groups.length === 0 && <p className="nw__empty" data-testid="nouveautes-empty">Aucune nouveauté dans cette catégorie pour le moment.</p>}
+      {groups.map((group) => <section className="nw__m" key={group.key}><h2 className="t-h2">{group.label}</h2><ul>{group.items.map((item) => <NewsEntry key={item.id} item={item} />)}</ul></section>)}
     </div>
   </>;
+}
+
+function NewsEntry({ item }: { item: NouveautesItem }) {
+  const body = <><span className="nw__img"><img src={item.thumbnail} alt="" loading="lazy" /></span><span className="nw__b"><span className="nw__tag">{item.source === "youtube" && <DaIcon name="external" />}{item.source === "youtube" ? "YouTube" : item.blocLabel ?? "Sur BUILD"}</span><NewVideoMarker /><span className="nw__t">{item.title}</span>{item.sentence && <span className="row__d">{item.sentence}</span>}<time className="nw__d" dateTime={item.publishedAt}>{formatVideoDate(item.publishedAt)}</time></span></>;
+  return <li data-video-card data-published-at={item.publishedAt}>{item.href ? <a className="nw__e" href={item.href} {...(item.source === "youtube" ? { target: "_blank", rel: "noopener" } : {})}>{body}</a> : <div className="nw__e">{body}</div>}</li>;
 }

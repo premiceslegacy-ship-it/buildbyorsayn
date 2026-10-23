@@ -1,8 +1,14 @@
-import { NOUVEAUTES_LIMIT, type FeedVideo } from "./videos";
+import { mergeNouveautesItems, NOUVEAUTES_LIMIT, type FeedVideo, type NouveautesItem } from "./videos";
 
 export const YOUTUBE_VIDEOS_CACHE_TAG = "youtube-videos";
 const REVALIDATE_SECONDS = 300;
-export type NouveautesFeed = { status: "ready"; videos: FeedVideo[] } | { status: "empty"; videos: [] } | { status: "error"; videos: [] };
+export type NouveautesSourceStatus = "ready" | "empty" | "error";
+export type NouveautesFeed = {
+  status: NouveautesSourceStatus;
+  videos: FeedVideo[];
+  items: NouveautesItem[];
+  sources: { youtube: NouveautesSourceStatus; build: NouveautesSourceStatus };
+};
 
 /**
  * Public list of channel videos. Reads PostgREST with the anon key and no
@@ -18,7 +24,7 @@ export async function loadNouveautesVideos(fetchImpl: typeof fetch = fetch): Pro
 export async function loadNouveautesFeed(fetchImpl: typeof fetch = fetch): Promise<NouveautesFeed> {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!base || !anonKey) return { status: "empty", videos: [] };
+  if (!base || !anonKey) return { status: "empty", videos: [], items: [], sources: { youtube: "empty", build: "empty" } };
   try {
     const query = new URLSearchParams({ select: "video_id,title,published_at", order: "published_at.desc", limit: String(NOUVEAUTES_LIMIT) });
     const response = await fetchImpl(`${base}/rest/v1/youtube_videos?${query}`, {
@@ -27,9 +33,10 @@ export async function loadNouveautesFeed(fetchImpl: typeof fetch = fetch): Promi
     });
     if (!response.ok) throw new Error(`PostgREST responded ${response.status}`);
     const videos = (await response.json()) as FeedVideo[];
-    return videos.length ? { status: "ready", videos } : { status: "empty", videos: [] };
+    const status = videos.length ? "ready" : "empty";
+    return { status, videos, items: mergeNouveautesItems(videos, []), sources: { youtube: status, build: "empty" } };
   } catch (error) {
     console.error("nouveautes.load.failed", error instanceof Error ? error.message : error);
-    return { status: "error", videos: [] };
+    return { status: "error", videos: [], items: [], sources: { youtube: "error", build: "empty" } };
   }
 }
