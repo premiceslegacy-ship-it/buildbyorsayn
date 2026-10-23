@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine06 = [
+  { name: "SignalVersDossier", kind: "schema", chapter: "04-evenements-inbox-execution.md", template: "workflow", title: "Le signal ouvre un dossier", description: "L'événement est qualifié avant de recevoir un identifiant et un état de travail.", ariaLabel: "Un événement passe par qualifier avant de devenir un dossier identifié.", labels: ["Événement", "Qualifier", "Dossier"], accentIndex: 2 },
+  { name: "ComptoirInbox", kind: "schema", chapter: "04-evenements-inbox-execution.md", template: "fork", title: "L'Inbox montre ce qui attend", description: "Trois bacs séparent les décisions, les réponses et les reprises sans déverser tous les journaux.", ariaLabel: "Un comptoir sépare décider, répondre et reprendre, avec le bac urgent mis en avant.", labels: ["Inbox", "Décider", "Répondre", "Reprendre"], accentIndex: 1 },
+  { name: "TroisProtections", kind: "schema", chapter: "04-evenements-inbox-execution.md", template: "rings", title: "Trois protections différentes", description: "Le doublon, la concurrence et la répétition entourent l'effet extérieur à protéger.", ariaLabel: "Trois verrous protègent un effet extérieur contre doublon, concurrence et répétition.", labels: ["Doublon", "Concurrence", "Répétition", "Effet protégé"], accentIndex: 3 },
+] as const satisfies readonly CourseVisualDefinition[];

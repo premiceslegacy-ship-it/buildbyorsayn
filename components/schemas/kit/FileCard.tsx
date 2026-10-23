@@ -34,8 +34,10 @@ export function FileCard({ filename, lines, annotations, tool, ...frame }: FileC
           </li>;
         })}</ol>
       </section>
-      <ol className={styles.fileNotes}>{annotations.map((annotation, index) => <li key={`${annotation.line}-${annotation.label}`}><span>{index + 1}</span><p>{annotation.label}</p></li>)}</ol>
+      <ol className={styles.fileNotes}>{annotations.map((annotation, index) => <li
+        style={{ "--kit-note-line": annotation.line } as React.CSSProperties}
+        key={`${annotation.line}-${annotation.label}`}
+      ><span>{index + 1}</span><p>{annotation.label}</p></li>)}</ol>
     </div>
   </KitFrame>;
 }
-

@@ -4,6 +4,7 @@ import { READER_VISUAL_CATALOG, type ReaderVisualCourse } from "@/components/sch
 import styles from "./schemas.module.css";
 
 const courseLabels: Record<ReaderVisualCourse, string> = {
+  coffre: "LE COFFRE",
   fondations: "Fondations",
   general: "Général",
   hermes: "Hermes Agent",

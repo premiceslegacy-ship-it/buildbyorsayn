@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine15 = [
+  { name: "ChaqueObjetSaMaison", kind: "schema", chapter: "entreprise-formats.md", template: "tool-map", title: "Chaque objet garde son adresse", description: "La méthode, l'état, l'original et la recherche vivent dans des maisons différentes.", ariaLabel: "Notion et Supabase illustrent des adresses séparées pour méthode, état, original et recherche.", labels: ["Méthode", "État", "Original", "Recherche"], tools: ["Notion", "Supabase"], accentIndex: 1 },
+  { name: "DeuxHorloges", kind: "schema", chapter: "entreprise-formats.md", template: "big-number", title: "Deux dates, deux questions", description: "La date de lecture ne dit pas combien de temps l'information reste valable.", ariaLabel: "Vu le est comparé à valable jusqu'à, cette seconde date étant mise en avant.", labels: ["Vu le", "Date de lecture", "Valable jusqu'à", "Date de validité"], accentIndex: 2 },
+  { name: "BibliothequeEtPorte", kind: "schema", chapter: "entreprise-formats.md", template: "workflow", title: "Retrouver ne donne pas le droit", description: "La bibliothèque retrouve, la porte reçoit la demande et la serrure décide de l'autoriser.", ariaLabel: "Retrouver, demander et autoriser sont trois étapes séparées.", labels: ["Retrouver", "Demander", "Autoriser"], tools: ["Hermes Agent"], accentIndex: 2 },
+] as const satisfies readonly CourseVisualDefinition[];

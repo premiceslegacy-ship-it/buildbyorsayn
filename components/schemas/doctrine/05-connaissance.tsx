@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine05 = [
+  { name: "ManuelDossierBoite", kind: "schema", chapter: "03-connaissance-memoire-contexte.md", template: "compare", title: "Trois maisons séparées", description: "La méthode, le cas du jour et les outils restent distincts pour savoir ce qui fait foi.", ariaLabel: "Méthode, cas et outils occupent trois espaces séparés, avec le cas mis en avant.", labels: ["Méthode", "Manuel", "Cas", "Dossier du jour", "Outils", "Boîte"], accentIndex: 2 },
+  { name: "DeuxSourcesQuiSeContredisent", kind: "schema", chapter: "03-connaissance-memoire-contexte.md", template: "fork", title: "Le désaccord reste visible", description: "Deux sources tirent la décision dans des directions opposées jusqu'à l'arbitrage.", ariaLabel: "Source A et Source B se contredisent et imposent un arbitrage.", labels: ["Décision", "Source A", "Source B", "Arbitrer"], accentIndex: 3 },
+  { name: "ContexteDansUneValise", kind: "schema", chapter: "03-connaissance-memoire-contexte.md", template: "file-card", title: "Une petite valise de contexte", description: "La mission emporte l'essentiel et laisse les archives massives derrière elle.", ariaLabel: "Une valise contient objectif, faits, sources, état et fin.", labels: ["Objectif", "Faits", "Sources", "État", "Fin"], accentIndex: 0 },
+] as const satisfies readonly CourseVisualDefinition[];

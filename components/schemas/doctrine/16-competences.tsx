@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine16 = [
+  { name: "BriquesDuSavoirFaire", kind: "schema", chapter: "entreprise-04-competences-skills-sop.md", template: "steps", title: "Les briques du savoir-faire", description: "La responsabilité, la compétence, la route, les choix et l'exécution restent emboîtés sans se confondre.", ariaLabel: "Métier, compétence, SOP, skill et agent s'emboîtent, avec le skill amovible mis en avant.", labels: ["Métier", "Compétence", "SOP", "Skill", "Agent"], accentIndex: 3 },
+  { name: "ProcedureAvecSortiesDeSecours", kind: "schema", chapter: "entreprise-04-competences-skills-sop.md", template: "fork", title: "La procédure prévoit ses sorties", description: "Le rail principal vérifie le résultat et ouvre un arrêt ou une reprise quand le cas l'exige.", ariaLabel: "Faire et vérifier mènent à arrêter ou reprendre par un aiguillage visible.", labels: ["Faire", "Vérifier", "Arrêter", "Reprendre"], accentIndex: 1 },
+  { name: "CandidatPuisPromotion", kind: "schema", chapter: "entreprise-04-competences-skills-sop.md", template: "cycle", title: "Une répétition reste candidate", description: "L'observation passe par test et revue avant d'être gardée comme méthode.", ariaLabel: "Observer, tester, revoir et garder forment une boucle de promotion.", labels: ["Observer", "Tester", "Revoir", "Garder"], accentIndex: 1 },
+] as const satisfies readonly CourseVisualDefinition[];

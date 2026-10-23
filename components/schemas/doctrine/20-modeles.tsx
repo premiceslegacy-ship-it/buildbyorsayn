@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine20 = [
+  { name: "KitDuPremierDossier", kind: "schema", chapter: "entreprise-08-templates-et-exercices.md", template: "file-card", title: "Le kit du premier dossier", description: "La mallette rassemble seulement les compartiments nécessaires pour reprendre le pilote.", ariaLabel: "Une mallette organise métier, données, mission et tests, avec la mission mise en avant.", labels: ["Métier", "Données", "Mission", "Tests"], accentIndex: 2 },
+  { name: "MatriceQuiNeMentPas", kind: "schema", chapter: "entreprise-08-templates-et-exercices.md", template: "compare", title: "Une case vide dit non testé", description: "La matrice sépare ce qui est prévu, ce qui a été exécuté et ce qui est réellement prouvé.", ariaLabel: "Prévu, exécuté et prouvé restent trois états distincts.", labels: ["Prévu", "Non testé", "Exécuté", "Preuve gardée", "Prouvé", "Relu"], accentIndex: 4 },
+  { name: "EtiquetteCandidate", kind: "schema", chapter: "entreprise-08-templates-et-exercices.md", template: "fork", title: "Candidate avant d'être gardée", description: "Une observation reste provisoire jusqu'à la revue et conserve une condition de retrait.", ariaLabel: "Une méthode candidate passe par revue et peut encore être retirée.", labels: ["Méthode", "Candidat", "Revue", "Retrait"], accentIndex: 1 },
+] as const satisfies readonly CourseVisualDefinition[];

@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine03 = [
+  { name: "RadiographieDuDernierCas", kind: "schema", chapter: "01-diagnostic-et-offre.md", template: "workflow", title: "Rejouer le dernier cas", description: "Le trajet réel révèle où le dossier attend, se copie, se décide et se corrige.", ariaLabel: "Un dossier traverse attente, copie, décision et correction, avec la vraie attente mise en avant.", labels: ["Attente", "Copie", "Décision", "Correction"], accentIndex: 0 },
+  { name: "EscalierDesReponses", kind: "schema", chapter: "01-diagnostic-et-offre.md", template: "ladder", title: "La réponse la plus simple d'abord", description: "Chaque marche ajoute du coût et du risque, donc on s'arrête dès qu'une réponse suffit.", ariaLabel: "Un escalier monte de clarifier à adapter en passant par régler, relier et automatiser.", labels: ["Clarifier", "Régler", "Relier", "Automatiser", "Adapter"], accentIndex: 0 },
+  { name: "PhotoAvantApres", kind: "schema", chapter: "01-diagnostic-et-offre.md", template: "big-number", title: "Une photo avant l'essai", description: "La comparaison garde la mesure de départ et regarde seulement un résultat accepté.", ariaLabel: "La photo compare avant et essai pour aboutir au résultat accepté.", labels: ["Avant", "Photo de départ", "Essai", "Résultat accepté"], accentIndex: 3 },
+] as const satisfies readonly CourseVisualDefinition[];

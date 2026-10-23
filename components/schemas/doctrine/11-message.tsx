@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine11 = [
+  { name: "SceneAvantSlogan", kind: "schema", chapter: "09-message-decision-preuve.md", template: "compare", title: "La scène avant le slogan", description: "Le brouillard vague disparaît quand le message montre un moment et un progrès concrets.", ariaLabel: "Un message vague est comparé à une scène montrant le moment et le progrès.", labels: ["Vague", "Slogan", "Le moment", "Le progrès"], accentIndex: 2 },
+  { name: "EchelleDePromesse", kind: "schema", chapter: "09-message-decision-preuve.md", template: "ladder", title: "La promesse s'arrête à la preuve", description: "Chaque marche exige une preuve plus forte, du problème observé au résultat mesuré.", ariaLabel: "Une échelle monte de problème à mécanisme, compétence puis résultat.", labels: ["Problème", "Mécanisme", "Compétence", "Résultat"], accentIndex: 2 },
+  { name: "PageQuiAideAChoisir", kind: "maquette", chapter: "09-message-decision-preuve.md", template: "web-compare", title: "Une page qui aide à choisir", description: "La page forte montre la scène, le mécanisme, la preuve, la limite et un geste volontaire.", ariaLabel: "Une page vague est comparée à une page qui repère la pièce manquante avant le chantier.", labels: ["Gagne du temps", "Une solution pour les PME", "Repère la pièce manquante", "Nous préparons, tu valides", "Démo sur dossier fictif", "Montrer un dossier"], accentIndex: 5 },
+] as const satisfies readonly CourseVisualDefinition[];

@@ -17,7 +17,7 @@ export function ToastViewport() {
             key={toast.id}
             role="status"
             className={`${styles.toast} ${styles[toast.tone]}`}
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16, scale: .96 }}
+            initial={{ opacity: 0, y: 16, scale: .96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={reduce ? { duration: .12 } : MOTION_SPRINGS.doux}

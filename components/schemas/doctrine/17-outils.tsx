@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine17 = [
+  { name: "QuatrePortesUnCoffre", kind: "schema", chapter: "entreprise-05-outils-api-cli-mcp.md", template: "tool-map", title: "Quatre portes, la même serrure", description: "API, CLI, MCP et interface changent la route technique sans changer la permission.", ariaLabel: "Quatre portes API, CLI, MCP et interface conduisent au même coffre protégé.", labels: ["API", "CLI", "MCP", "Interface"], tools: ["Hermes Agent", "Treg"], accentIndex: 2 },
+  { name: "BarriereDevantAction", kind: "schema", chapter: "entreprise-05-outils-api-cli-mcp.md", template: "steps", title: "La barrière vient avant l'appel", description: "La règle explique, le contrôle bloque et le test provoque réellement le refus.", ariaLabel: "Dire, bloquer et tester se suivent, avec la barrière de blocage mise en avant.", labels: ["Dire", "Bloquer", "Tester"], accentIndex: 1 },
+  { name: "TroisFiletsSousAction", kind: "schema", chapter: "entreprise-05-outils-api-cli-mcp.md", template: "rings", title: "Trois filets sous l'effet", description: "Doublon, concurrence et rejeu protègent différemment une même action extérieure.", ariaLabel: "Trois filets protègent l'action contre doublon, concurrence et rejeu.", labels: ["Doublon", "Concurrence", "Rejeu", "Action"], accentIndex: 2 },
+] as const satisfies readonly CourseVisualDefinition[];

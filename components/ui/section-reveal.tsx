@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
+import styles from "./section-reveal.module.css";
 
 /**
  * Fades/slides a block in as it scrolls into view, once. Used to break a
@@ -21,7 +22,7 @@ export function SectionReveal({
 
   return (
     <motion.div
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{
@@ -29,7 +30,7 @@ export function SectionReveal({
         delay: shouldReduceMotion ? 0 : delay,
         ease: [0.16, 1, 0.3, 1],
       }}
-      className={className}
+      className={`${styles.root} ${className ?? ""}`.trim()}
     >
       {children}
     </motion.div>

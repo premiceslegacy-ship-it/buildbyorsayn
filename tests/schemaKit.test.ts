@@ -33,6 +33,7 @@ test("le kit publie les quinze gabarits et deux exemples pour chacun", () => {
   assert.equal([...board.matchAll(/examples:\s*\[/g)].length, templates.length);
   assert.match(board, /entry\.examples\.map/, "chaque entrée rend toute sa paire d'exemples");
   assert.match(board, /\{example\.node\}/, "chaque exemple rend son instance de gabarit");
+  assert.match(board, /PREVIEW_WIDTHS = \[960, 650, 350\]/, "la planche exerce les trois largeurs de conteneur");
 });
 
 test("le socle du kit garde le contrat responsive, animé et accessible", () => {

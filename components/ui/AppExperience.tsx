@@ -1,6 +1,6 @@
 "use client";
 
-import { animate, useReducedMotion } from "motion/react";
+import { animate, MotionConfig, useReducedMotion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { finishPressFeedback, pulsePressFeedback, startPressFeedback, type PressSound } from "@/lib/ui/feedback";
@@ -89,10 +89,10 @@ export function AppExperience({ children }: { children: ReactNode }) {
   }, [reduce, returning]);
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <div className={styles.page} ref={content}>{children}</div>
       <ToastViewport />
-    </>
+    </MotionConfig>
   );
 }
 

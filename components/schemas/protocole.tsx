@@ -1,5 +1,3 @@
-import "server-only";
-
 import { Diagram, Edge, FixedLine, Label, Node } from "./primitives";
 
 export function ProtocolePipelineDiagram() {

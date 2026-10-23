@@ -1,4 +1,8 @@
 import { createElement, type ComponentType, type ReactElement } from "react";
+import { COFFRE_VISUAL_CATALOG } from "./coffre";
+import { DOCTRINE_VISUAL_CATALOG } from "./doctrine";
+import { INTRO_VISUAL_CATALOG } from "./intro";
+import { PROTOCOLE_VISUAL_CATALOG } from "./protocole/index";
 import {
   CarteDuMessageDiagram,
   MecanismeVisibleDiagram,
@@ -86,12 +90,23 @@ import { AuthorityLayersDiagram, CompteurDeMissionDiagram, MainAvantLeMondeExter
 import { FicheMissionRemplieMockup, QuatreCartesQuiCassentDiagram, TroisPortesDuPiloteDiagram, WorkshopDiagram } from "./hermes/09-preparer-un-pilote";
 import { DeuxCouloirsMemeTestDiagram, ErreurVersNouveauTestDiagram, ProofLayersDiagram, TableauDeTestSkillMockup } from "./hermes/10-tester-avant-de-garder";
 import { CarteConditionDeRetraitDiagram, CinqTiroirsDuSavoirDiagram, TransmissionDiagram, ValiseClientBoiteMethodeDiagram } from "./hermes/11-garder-le-savoir-faire";
+import { OffreCRMAvantApresMockup, PreuveAuMemeNiveauDiagram, SceneTravailPreuveChoixDiagram } from "./hermes/12-expliquer-loffre";
+import { FicheProspectQualifieMockup, MessageVersFicheCRMDiagram, QuestionsQuiOuvrentUneRouteDiagram, RelanceDansWhatsAppMockup } from "./hermes/13-qualifier-et-livrer";
+import { AgentsParTravailDiagram, DesaccordVisibleDiagram, FederatedBrainDiagramV2, QuatreMetiersUneVueDiagram } from "./hermes/14-relier-lequipe";
+import { CinqParcoursMetierDiagram, PasseportDuDossierDiagram, RefusQuiAideDiagram, RelaisDuDossierDiagram } from "./hermes/15-suivre-les-passages";
+import { DataFormatsDiagramV2, QuatreFormatsQuatreUsagesDiagram, SourceEtCopiesDateesDiagram, ValeurQuiChangeDiagram } from "./hermes/16-ranger-les-informations";
+import { BriquesDeCompetenceDiagram, DossierSkillReelMockup, SkillCommeDossierOuvertDiagram, SkillsSopDiagramV2 } from "./hermes/17-transformer-en-skill";
+import { CarteOutilsParRoleDiagram, LireAgirRelireDiagram, ToolAccessDiagramV2, TroisPortesUnServiceDiagram } from "./hermes/18-connecter-les-outils";
+import { ParcoursProspectCompletDiagram, WorkflowAdsDiagram, WorkflowCRMDevisSupportDiagram, WorkflowCrossPoleDiagramV2, WorkflowMarketingDiagram } from "./hermes/19-faire-passer-le-dossier";
+import { AdoptionLaddersDiagramV2, EscalierDesDroitsDiagram, SortieDeSecoursDiagram, TableauAvantApresPiloteMockup } from "./hermes/20-commencer-petit";
+import { ArborescencePiloteTerminalMockup, ContratMissionLisibleMockup, PassationEnSixCartesDiagram, TemplateTreeDiagram } from "./hermes/21-laisser-un-dossier";
+import { CalendrierTachePlanifieeMockup, ManuelPuisPlanifieDiagram, PauseNarretePasLeTrainDiagram, TerminalCronEtHistoriqueMockup, VeillePlanifieeAvecFreinDiagram } from "./hermes/22-planifier-sans-perdre-la-main";
 import { FlowDiagram } from "./layouts";
 import { AnnotatedMockup } from "./mockup";
 
 export type ReaderVisualKind = "maquette" | "schema";
 export type ReaderVisualComponent = ComponentType;
-export type ReaderVisualCourse = "fondations" | "general" | "hermes";
+export type ReaderVisualCourse = "coffre" | "fondations" | "general" | "hermes";
 export type ReaderVisualCatalogEntry = {
   name: string;
   kind: ReaderVisualKind;
@@ -147,6 +162,10 @@ function registry(entries: ReadonlyArray<readonly [string, ReaderVisualComponent
 }
 
 export const READER_VISUAL_CATALOG: readonly ReaderVisualCatalogEntry[] = [
+  ...COFFRE_VISUAL_CATALOG.map(({ name, kind, component }) => ({ name, kind, course: "coffre" as const, component })),
+  ...DOCTRINE_VISUAL_CATALOG.map(({ name, kind, component }) => ({ name, kind, course: "general" as const, component })),
+  ...INTRO_VISUAL_CATALOG.map(({ name, kind, component }) => ({ name, kind, course: "general" as const, component })),
+  ...PROTOCOLE_VISUAL_CATALOG.map(({ name, kind, component }) => ({ name, kind, course: "general" as const, component })),
   { name: "LeCheminDuMessage", kind: "schema", course: "fondations", component: LeCheminDuMessageDiagram },
   { name: "CroyanceVersQuestion", kind: "schema", course: "fondations", component: CroyanceVersQuestionDiagram },
   { name: "PetitTestTroisSorties", kind: "schema", course: "fondations", component: PetitTestTroisSortiesDiagram },
@@ -240,6 +259,51 @@ export const READER_VISUAL_CATALOG: readonly ReaderVisualCatalogEntry[] = [
   { name: "ValiseClientBoiteMethode", kind: "schema", course: "hermes", component: ValiseClientBoiteMethodeDiagram },
   { name: "CinqTiroirsDuSavoir", kind: "schema", course: "hermes", component: CinqTiroirsDuSavoirDiagram },
   { name: "CarteConditionDeRetrait", kind: "schema", course: "hermes", component: CarteConditionDeRetraitDiagram },
+  { name: "SceneTravailPreuveChoix", kind: "schema", course: "hermes", component: SceneTravailPreuveChoixDiagram },
+  { name: "OffreCRMAvantApres", kind: "maquette", course: "hermes", component: OffreCRMAvantApresMockup },
+  { name: "PreuveAuMemeNiveau", kind: "schema", course: "hermes", component: PreuveAuMemeNiveauDiagram },
+  { name: "FicheProspectQualifie", kind: "maquette", course: "hermes", component: FicheProspectQualifieMockup },
+  { name: "QuestionsQuiOuvrentUneRoute", kind: "schema", course: "hermes", component: QuestionsQuiOuvrentUneRouteDiagram },
+  { name: "MessageVersFicheCRM", kind: "schema", course: "hermes", component: MessageVersFicheCRMDiagram },
+  { name: "RelanceDansWhatsApp", kind: "maquette", course: "hermes", component: RelanceDansWhatsAppMockup },
+  { name: "FederatedBrainDiagram", kind: "schema", course: "hermes", component: FederatedBrainDiagramV2 },
+  { name: "QuatreMetiersUneVue", kind: "schema", course: "hermes", component: QuatreMetiersUneVueDiagram },
+  { name: "AgentsParTravail", kind: "schema", course: "hermes", component: AgentsParTravailDiagram },
+  { name: "DesaccordVisible", kind: "schema", course: "hermes", component: DesaccordVisibleDiagram },
+  { name: "RelaisDuDossier", kind: "schema", course: "hermes", component: RelaisDuDossierDiagram },
+  { name: "PasseportDuDossier", kind: "schema", course: "hermes", component: PasseportDuDossierDiagram },
+  { name: "CinqParcoursMetier", kind: "schema", course: "hermes", component: CinqParcoursMetierDiagram },
+  { name: "RefusQuiAide", kind: "schema", course: "hermes", component: RefusQuiAideDiagram },
+  { name: "DataFormatsDiagram", kind: "schema", course: "hermes", component: DataFormatsDiagramV2 },
+  { name: "SourceEtCopiesDatees", kind: "schema", course: "hermes", component: SourceEtCopiesDateesDiagram },
+  { name: "QuatreFormatsQuatreUsages", kind: "schema", course: "hermes", component: QuatreFormatsQuatreUsagesDiagram },
+  { name: "ValeurQuiChange", kind: "schema", course: "hermes", component: ValeurQuiChangeDiagram },
+  { name: "SkillCommeDossierOuvert", kind: "schema", course: "hermes", component: SkillCommeDossierOuvertDiagram },
+  { name: "SkillsSopDiagram", kind: "schema", course: "hermes", component: SkillsSopDiagramV2 },
+  { name: "DossierSkillReel", kind: "maquette", course: "hermes", component: DossierSkillReelMockup },
+  { name: "BriquesDeCompetence", kind: "schema", course: "hermes", component: BriquesDeCompetenceDiagram },
+  { name: "TroisPortesUnService", kind: "schema", course: "hermes", component: TroisPortesUnServiceDiagram },
+  { name: "ToolAccessDiagram", kind: "schema", course: "hermes", component: ToolAccessDiagramV2 },
+  { name: "CarteOutilsParRole", kind: "schema", course: "hermes", component: CarteOutilsParRoleDiagram },
+  { name: "LireAgirRelire", kind: "schema", course: "hermes", component: LireAgirRelireDiagram },
+  { name: "ParcoursProspectComplet", kind: "schema", course: "hermes", component: ParcoursProspectCompletDiagram },
+  { name: "WorkflowMarketing", kind: "schema", course: "hermes", component: WorkflowMarketingDiagram },
+  { name: "WorkflowAds", kind: "schema", course: "hermes", component: WorkflowAdsDiagram },
+  { name: "WorkflowCRMDevisSupport", kind: "schema", course: "hermes", component: WorkflowCRMDevisSupportDiagram },
+  { name: "WorkflowCrossPoleDiagram", kind: "schema", course: "hermes", component: WorkflowCrossPoleDiagramV2 },
+  { name: "AdoptionLaddersDiagram", kind: "schema", course: "hermes", component: AdoptionLaddersDiagramV2 },
+  { name: "EscalierDesDroits", kind: "schema", course: "hermes", component: EscalierDesDroitsDiagram },
+  { name: "TableauAvantApresPilote", kind: "maquette", course: "hermes", component: TableauAvantApresPiloteMockup },
+  { name: "SortieDeSecours", kind: "schema", course: "hermes", component: SortieDeSecoursDiagram },
+  { name: "TemplateTreeDiagram", kind: "schema", course: "hermes", component: TemplateTreeDiagram },
+  { name: "ArborescencePiloteTerminal", kind: "maquette", course: "hermes", component: ArborescencePiloteTerminalMockup },
+  { name: "ContratMissionLisible", kind: "maquette", course: "hermes", component: ContratMissionLisibleMockup },
+  { name: "PassationEnSixCartes", kind: "schema", course: "hermes", component: PassationEnSixCartesDiagram },
+  { name: "CalendrierTachePlanifiee", kind: "maquette", course: "hermes", component: CalendrierTachePlanifieeMockup },
+  { name: "ManuelPuisPlanifie", kind: "schema", course: "hermes", component: ManuelPuisPlanifieDiagram },
+  { name: "TerminalCronEtHistorique", kind: "maquette", course: "hermes", component: TerminalCronEtHistoriqueMockup },
+  { name: "VeillePlanifieeAvecFrein", kind: "schema", course: "hermes", component: VeillePlanifieeAvecFreinDiagram },
+  { name: "PauseNarretePasLeTrain", kind: "schema", course: "hermes", component: PauseNarretePasLeTrainDiagram },
   { name: "ParcoursClair", kind: "schema", course: "general", component: ProjectStepsSchema },
   { name: "PageOffreAnnotée", kind: "maquette", course: "general", component: OfferPageMockup },
 ] as const;

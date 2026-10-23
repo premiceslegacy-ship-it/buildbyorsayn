@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine13 = [
+  { name: "EntrepriseSansSuperAgent", kind: "schema", chapter: "entreprise-01-cerveau-federe.md", template: "rings", title: "Une vue commune sans clé universelle", description: "Les métiers restent responsables de leurs objets tandis que les liens rendent l'ensemble lisible.", ariaLabel: "Direction, vente, opérations et finance restent séparées autour de liens communs.", labels: ["Direction", "Vente", "Opérations", "Finance", "Liens"], accentIndex: 4 },
+  { name: "ArchipelDesAutorites", kind: "schema", chapter: "entreprise-01-cerveau-federe.md", template: "tool-map", title: "Chaque île garde son autorité", description: "Le CRM, le planning et la comptabilité restent sources de vérité pour des états différents.", ariaLabel: "HubSpot porte l'état, Notion la charge et Stripe le paiement, reliés par des ponts.", labels: ["État", "Charge", "Paiement"], tools: ["HubSpot", "Notion", "Stripe"], accentIndex: 1 },
+  { name: "ProjectionSansDossierComplet", kind: "schema", chapter: "entreprise-01-cerveau-federe.md", template: "big-number", title: "Voir le blocage, pas le dossier", description: "La supervision montre un voyant, une raison et un responsable sans exposer les pièces sensibles.", ariaLabel: "Une projection montre bloqué, pourquoi et qui tout en laissant le dossier fermé.", labels: ["Dossier fermé", "Détails protégés", "Bloqué", "Pourquoi et qui"], accentIndex: 2 },
+] as const satisfies readonly CourseVisualDefinition[];

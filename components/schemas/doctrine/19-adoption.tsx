@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine19 = [
+  { name: "PhotoCompleteDuTravail", kind: "schema", chapter: "entreprise-07-adoption-preuves-promotion.md", template: "cycle", title: "Mesurer tout le travail", description: "Le chronomètre inclut la préparation, l'action, la correction et la reprise jusqu'au résultat accepté.", ariaLabel: "Préparer, faire, corriger et reprendre entourent le temps total.", labels: ["Préparer", "Faire", "Corriger", "Reprendre", "Total"], accentIndex: 4 },
+  { name: "EscalierDAutonomie", kind: "schema", chapter: "entreprise-07-adoption-preuves-promotion.md", template: "ladder", title: "L'autonomie monte par paliers", description: "Chaque marche exige sa preuve et conserve une sortie latérale avant d'élargir.", ariaLabel: "Six marches montent de voir à suivre en passant par simuler, assister, piloter et étendre.", labels: ["Voir", "Simuler", "Assister", "Piloter", "Étendre", "Suivre"], accentIndex: 2 },
+  { name: "VictoireAvecContrepoids", kind: "schema", chapter: "entreprise-07-adoption-preuves-promotion.md", template: "big-number", title: "Une victoire garde son contrepoids", description: "La vitesse n'est favorable que si les erreurs, le contrôle et le coût restent acceptables.", ariaLabel: "Plus vite est mis en balance avec mais à quel coût.", labels: ["Plus vite", "Délai réduit", "Mais à quel coût ?", "Erreurs et contrôle"], accentIndex: 2 },
+] as const satisfies readonly CourseVisualDefinition[];

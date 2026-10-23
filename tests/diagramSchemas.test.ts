@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -10,14 +8,12 @@ const schemaSources = [
   "components/schemas/primitives.tsx",
   "components/schemas/layouts.tsx",
   "components/schemas/foundations.tsx",
-  "components/schemas/fondations/shared.tsx",
   "components/schemas/fondations/intro.tsx",
   "components/schemas/fondations/etat-esprit.tsx",
   "components/schemas/fondations/comprendre.tsx",
   "components/schemas/fondations/vendre.tsx",
   "components/schemas/fondations/ecrire.tsx",
   "components/schemas/fondations/attention.tsx",
-  "components/schemas/fondations/shared-b.tsx",
   "components/schemas/fondations/intro-url.tsx",
   "components/schemas/fondations/penser.tsx",
   "components/schemas/fondations/environnement.tsx",
@@ -25,7 +21,6 @@ const schemaSources = [
   "components/schemas/fondations/site-web.tsx",
   "components/schemas/fondations/url.tsx",
   "components/schemas/fondations/seuil.tsx",
-  "components/schemas/hermes/shared.tsx",
   "components/schemas/hermes/01-intro.tsx",
   "components/schemas/hermes/02-installer-et-essayer.tsx",
   "components/schemas/hermes/03-choisir-le-travail.tsx",
@@ -37,9 +32,19 @@ const schemaSources = [
   "components/schemas/hermes/09-preparer-un-pilote.tsx",
   "components/schemas/hermes/10-tester-avant-de-garder.tsx",
   "components/schemas/hermes/11-garder-le-savoir-faire.tsx",
+  "components/schemas/hermes/12-expliquer-loffre.tsx",
+  "components/schemas/hermes/13-qualifier-et-livrer.tsx",
+  "components/schemas/hermes/14-relier-lequipe.tsx",
+  "components/schemas/hermes/15-suivre-les-passages.tsx",
+  "components/schemas/hermes/16-ranger-les-informations.tsx",
+  "components/schemas/hermes/17-transformer-en-skill.tsx",
+  "components/schemas/hermes/18-connecter-les-outils.tsx",
+  "components/schemas/hermes/19-faire-passer-le-dossier.tsx",
+  "components/schemas/hermes/20-commencer-petit.tsx",
+  "components/schemas/hermes/21-laisser-un-dossier.tsx",
+  "components/schemas/hermes/22-planifier-sans-perdre-la-main.tsx",
   "components/schemas/protocole.tsx",
   "components/schemas/hermes.tsx",
-  "components/schemas/blocks.server.tsx",
   "components/schemas/schema.module.css",
 ].map(read).join("\n");
 
@@ -66,7 +71,6 @@ test("chaque figure et chaque SVG ont un nom, un titre et une description", () =
 test("chaque schéma du registre expose un seul rendu selon la largeur de son conteneur", () => {
   const primitives = read("components/schemas/primitives.tsx");
   const motion = read("components/schemas/DiagramMotion.tsx");
-  const registry = read("components/schemas/blocks.server.tsx");
   assert.match(primitives, /width: 680 \| 328/);
   assert.match(primitives, /layout="wide" width=\{680\}/);
   assert.match(primitives, /layout="compact" width=\{328\}/);
@@ -82,9 +86,6 @@ test("chaque schéma du registre expose un seul rendu selon la largeur de son co
   assert.match(switchRule[2], /\.figure \.wide\s*\{\s*display: block;/s);
   assert.match(switchRule[2], /\.figure \.compact\s*\{\s*display: none;/s);
 
-  const registryIds = [...registry.matchAll(/\{ id: "([^"]+)"/g)].map((match) => match[1]);
-  assert.ok(registryIds.length > 0, "le registre contient des schémas");
-  assert.equal(new Set(registryIds).size, registryIds.length, "les identifiants du registre sont uniques");
   const historicalComponents = ["foundations.tsx", "protocole.tsx", "hermes.tsx"]
     .flatMap((path) => [...read(`components/schemas/${path}`).matchAll(/export function (\w+Diagram)\(/g)].map((match) => match[1]));
   assert.equal(historicalComponents.length, 23, "les 23 schémas historiques passent par le même sélecteur");
@@ -94,7 +95,7 @@ test("chaque schéma du registre expose un seul rendu selon la largeur de son co
     { viewport: 1440, container: 640, expected: "wide" },
     { viewport: 1920, container: 640, expected: "wide" },
   ] as const;
-  for (const id of [...registryIds, ...historicalComponents]) {
+  for (const id of historicalComponents) {
     for (const { viewport, container, expected } of cases) {
       const visibleLayouts = container >= threshold ? ["wide"] : ["compact"];
       assert.deepEqual(visibleLayouts, [expected], `${id} dans ${container}px à ${viewport}px`);
@@ -113,34 +114,15 @@ test("le mouvement joue une fois et disparaît en mouvement réduit", () => {
   assert.match(read("components/schemas/schema.module.css"), /prefers-reduced-motion: reduce/);
 });
 
-test("les schémas privés des blocs restent derrière la projection serveur", () => {
-  const registry = read("components/schemas/blocks.server.tsx");
+test("les blocs rendent leurs schémas depuis les marqueurs publiés", () => {
   const page = read("app/blocs/[id]/lire/page.tsx");
   const client = read("app/blocs/[id]/lire/ReaderClient.tsx");
-  assert.ok(registry.startsWith('import "server-only";'));
-  assert.doesNotMatch(registry, /use client/);
-  assert.match(page, /result\.bloc\.sections\.flatMap/);
-  assert.match(page, /blockDiagramsForSection\(section\.id\)/);
-  assert.match(client, /diagram: diagrams\[section\.id\]/);
-  assert.doesNotMatch(client, /blocks\.server|SCHEMAS_BY_SECTION/);
+  assert.doesNotMatch(page, /blocks\.server|blockDiagramsForSection|diagrams=/);
+  assert.match(client, /sections=\{bloc\.sections\}/);
+  assert.doesNotMatch(client, /diagrams|blocks\.server|SCHEMAS_BY_SECTION/);
   for (const definition of ["foundations.tsx", "protocole.tsx", "hermes.tsx"]) {
     assert.ok(read(`components/schemas/${definition}`).startsWith('import "server-only";'), definition);
   }
-});
-
-test("chaque chapitre réel des sept blocs a son association de schéma", () => {
-  const registry = read("components/schemas/blocks.server.tsx");
-  const expected = [
-    "b1-s0", "b1-s1", "b1-s2", "b1-s3", "b1-s4b", "b1-s4",
-    "b2-s1", "b2-s2", "b2-s3",
-    "b5-s1", "b5-s2", "b5-s3", "b5-s4",
-    "b3-s1", "b3-s2", "b3-s3",
-    "b6-s1", "b6-s2", "b6-s3", "b6-s4", "b6-s5",
-    "b4-s1", "b4-s1b", "b4-s2", "b4-s3",
-    "b7-s1", "b7-s2", "b7-s3", "b7-s4",
-  ];
-  for (const sectionId of expected) assert.match(registry, new RegExp(`"${sectionId}"\\s*:`), sectionId);
-  assert.equal((registry.match(/^\s+"b[1-7]-s[^" ]+": \[/gm) ?? []).length, expected.length);
 });
 
 test("les 23 schémas historiques restent exportés depuis les chemins attendus", () => {
@@ -162,27 +144,16 @@ test("le schéma du chapitre Fondations 10 suit la donnée réelle", () => {
   assert.doesNotMatch(reader, /use client/);
 });
 
-test("chaque marqueur de la vidéo Ce qui ne change pas est enregistré", (context) => {
-  const fallbackRoot = fileURLToPath(new URL("../../../Business%20Orsyan/ORSAYN%20AI/", import.meta.url));
-  const orsaynRoot = process.env.ORSAYN_AI_ROOT || fallbackRoot;
-  const contentRoot = resolve(
-    orsaynRoot,
-    "Identité Visuelle/Identité BUILD/plan-implementation/fiches-internes/redaction/fondations",
-  );
+test("chaque marqueur publié de la première vidéo Fondations est enregistré", () => {
   const files = [
-    "01-intro-ce-qui-ne-change-pas.md",
-    "02-chapitre-01-etat-d-esprit.md",
-    "03-chapitre-02-comprendre-les-gens.md",
-    "04-chapitre-03-vendre.md",
-    "05-chapitre-04-ecrire-pour-vendre.md",
-    "06-chapitre-05-capter-l-attention.md",
+    "content/fondations/intro-ce-qui-ne-change-pas.md",
+    "content/fondations/mindset.md",
+    "content/fondations/psychologie.md",
+    "content/fondations/vente.md",
+    "content/fondations/copywriting.md",
+    "content/fondations/marketing.md",
   ];
-  if (!files.every((file) => existsSync(resolve(contentRoot, file)))) {
-    context.skip("les fiches internes ne sont pas présentes dans cet environnement");
-    return;
-  }
-
-  const markers = files.flatMap((file) => [...readFileSync(resolve(contentRoot, file), "utf8")
+  const markers = files.flatMap((file) => [...read(file)
     .matchAll(/\[\[(?:schema|maquette):([^\]\n]+)\]\]/g)]
     .map((match) => match[1].trim()));
   const registry = read("components/schemas/registry.ts");
@@ -194,39 +165,17 @@ test("chaque marqueur de la vidéo Ce qui ne change pas est enregistré", (conte
   assert.deepEqual([...registered].filter((name) => markers.includes(name)).sort(), [...markers].sort());
 });
 
-test("chaque marqueur des onze premiers chapitres Hermes est enregistré", (context) => {
-  const fallbackRoot = fileURLToPath(new URL("../../../Business%20Orsyan/ORSAYN%20AI/", import.meta.url));
-  const orsaynRoot = process.env.ORSAYN_AI_ROOT || fallbackRoot;
-  const contentRoot = resolve(
-    orsaynRoot,
-    "Identité Visuelle/Identité BUILD/plan-implementation/fiches-internes/redaction/hermes",
-  );
-  const files = [
-    "01-intro.md",
-    "02-installer-et-essayer.md",
-    "03-choisir-le-travail.md",
-    "04-regarder-le-vrai-travail.md",
-    "05-decouper-le-travail.md",
-    "06-identite-memoire-contexte.md",
-    "07-du-message-au-dossier.md",
-    "08-droits-outils-couts.md",
-    "09-preparer-un-pilote.md",
-    "10-tester-avant-de-garder.md",
-    "11-garder-le-savoir-faire.md",
-  ];
-  if (!files.every((file) => existsSync(resolve(contentRoot, file)))) {
-    context.skip("les fiches internes Hermes ne sont pas présentes dans cet environnement");
-    return;
-  }
-
-  const markers = files.flatMap((file) => [...readFileSync(resolve(contentRoot, file), "utf8")
-    .matchAll(/\[\[(?:schema|maquette):([^\]\n]+)\]\]/g)]
-    .map((match) => match[1].trim()));
+test("chaque marqueur publié Hermes est enregistré avec son type", () => {
+  const files = readdirSync(new URL("../content/hermes/", import.meta.url))
+    .filter((file) => file.endsWith(".md"));
+  const markers = files.flatMap((file) => [...read(`content/hermes/${file}`)
+    .matchAll(/\[\[(schema|maquette):([^\]\n]+)\]\]/g)]
+    .map((match) => `${match[1]}:${match[2].trim()}`));
   const registry = read("components/schemas/registry.ts");
-  const registered = [...registry.matchAll(/\{ name: "([^"]+)", kind: "(?:schema|maquette)", course: "hermes"/g)]
-    .map((match) => match[1]);
+  const registered = [...registry.matchAll(/\{ name: "([^"]+)", kind: "(schema|maquette)", course: "hermes"/g)]
+    .map((match) => `${match[2]}:${match[1]}`);
 
-  assert.equal(markers.length, 39, "les onze fiches contiennent 39 marqueurs");
+  assert.equal(markers.length, 84, "le corpus publié contient 84 marqueurs");
   assert.equal(new Set(markers).size, markers.length, "les marqueurs Hermes sont uniques");
   assert.deepEqual([...registered].sort(), [...markers].sort());
 });

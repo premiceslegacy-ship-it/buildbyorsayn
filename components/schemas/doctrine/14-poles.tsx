@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine14 = [
+  { name: "TroisScenesUneCarte", kind: "schema", chapter: "entreprise-02-cartographie-poles.md", template: "funnel", title: "Trois scènes révèlent la même carte", description: "La demande, la livraison et le cas difficile convergent vers leurs passages communs.", ariaLabel: "Trois scènes convergent vers une carte commune.", labels: ["Demande", "Livraison", "Cas difficile", "Points communs"], accentIndex: 3 },
+  { name: "FlecheAvecContenu", kind: "schema", chapter: "entreprise-02-cartographie-poles.md", template: "workflow", title: "Chaque passage porte un contrat", description: "La flèche transporte l'objet, sa version, son critère d'acceptation et la reprise.", ariaLabel: "Objet, version, accepter et reprendre voyagent dans la même passation.", labels: ["Objet", "Version", "Accepter", "Reprendre"], accentIndex: 2 },
+  { name: "CarteAvecTrousAssumes", kind: "schema", chapter: "entreprise-02-cartographie-poles.md", template: "compare", title: "Les trous deviennent des enquêtes", description: "La carte distingue ce qui est connu, ce qui doit être enquêté et ce qui ne s'applique pas.", ariaLabel: "Une carte sépare connu, à enquêter et non applicable.", labels: ["Connu", "Documenté", "À enquêter", "Non applicable"], accentIndex: 2 },
+] as const satisfies readonly CourseVisualDefinition[];

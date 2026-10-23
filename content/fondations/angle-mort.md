@@ -62,9 +62,7 @@ La vérité, c'est que la seconde porte demande du travail. Tu dois relire, trie
 
 Aucun cours ne remplace la vente, la livraison et les retours du terrain, mais il peut mieux organiser ce que ces expériences t'apprennent.
 
-`{COFFRE_LABEL}` approfondit ce travail. Le prix complet et le prix de passage viennent directement de `lib/pricing.ts` lors de l'intégration.
-
-Le bouton public doit conserver les variables `{COFFRE_PRICE}` et `{UPGRADE_PRICE}`. Aucun montant n'est écrit dans ce texte.
+`{COFFRE_LABEL}` approfondit ce travail. Son accès complet coûte {COFFRE_PRICE}. Si tu as déjà les Fondations, tu peux passer au programme complet pour {UPGRADE_PRICE}.
 
 ## Prends Hugo, vidéaste à Montpellier
 

@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine09 = [
+  { name: "TerrainAvantBibliotheque", kind: "schema", chapter: "07-methode-offre-transmission.md", template: "fork", title: "Juste assez avant le terrain", description: "Une petite base de savoir ouvre la porte du chantier, tandis que l'accumulation infinie reste barrée.", ariaLabel: "Juste assez de lecture mène à livrer puis apprendre sur le terrain.", labels: ["Apprendre", "Juste assez", "Livrer", "Apprendre"], accentIndex: 2 },
+  { name: "BoucleAcquisitionLivraison", kind: "schema", chapter: "07-methode-offre-transmission.md", template: "cycle", title: "Les retours circulent", description: "Une objection devient correction, preuve puis meilleure explication autour du client.", ariaLabel: "Objection, corriger, prouver et expliquer forment une boucle.", labels: ["Objection", "Corriger", "Prouver", "Expliquer"], accentIndex: 2 },
+  { name: "LivrablePlusRegard", kind: "schema", chapter: "07-methode-offre-transmission.md", template: "compare", title: "Remets le résultat et le regard", description: "La personne reçoit le livrable mais aussi la méthode qui permet de l'évaluer et de le reprendre.", ariaLabel: "Deux mains remettent le résultat et la méthode, cette dernière étant mise en avant.", labels: ["Le résultat", "La boîte", "La méthode", "Le regard"], accentIndex: 3 },
+] as const satisfies readonly CourseVisualDefinition[];

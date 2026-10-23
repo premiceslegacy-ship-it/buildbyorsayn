@@ -98,7 +98,7 @@ export function BusyButton({
       <span className={styles.stack}>
         {slot("idle", children)}
         {slot("busy", <><span className={styles.spinner} aria-hidden="true" /><span className="sr">{pendingText}</span></>)}
-        {slot("success", <><svg className={styles.check} viewBox="0 0 24 24" aria-hidden="true"><motion.path d="m5 12.5 4.5 4.5L19 7.5" initial={reduce ? { pathLength: 1 } : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: reduce ? 0 : .38, ease: [.3, .9, .3, 1] }} /></svg><span>{successText}</span></>)}
+        {slot("success", <><svg className={styles.check} viewBox="0 0 24 24" aria-hidden="true"><motion.path d="m5 12.5 4.5 4.5L19 7.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: reduce ? 0 : .38, ease: [.3, .9, .3, 1] }} /></svg><span>{successText}</span></>)}
         {slot("error", <><svg className={styles.errorIcon} viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5m0 3.5v.01M10.3 3.9 2.5 17.5a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /></svg><span>{errorText}</span></>)}
       </span>
     </button>

@@ -1,7 +1,9 @@
 "use client";
 
 import { createElement, useRef, useState, type ReactNode } from "react";
-import { Check, Copy, Download, FileText } from "lucide-react";
+import { Check, Copy, Download, FileText, X } from "lucide-react";
+import { AdCard } from "@/components/schemas/kit/AdCard";
+import { WebPageCompare } from "@/components/schemas/kit/WebPage";
 import { readerVisualElement, type ReaderVisualKind } from "@/components/schemas/registry";
 import { animateAppElement } from "@/lib/ui/motion";
 import { playAppSound } from "@/lib/ui/sound";
@@ -11,6 +13,7 @@ import {
   parseDirectiveOpening,
   parseReaderDirective,
   splitExampleContent,
+  type BeforeAfterPair,
 } from "./readerRichMarkdown";
 import styles from "./reader.module.css";
 
@@ -89,13 +92,102 @@ function ReaderVisual({ kind, name }: { kind: ReaderVisualKind; name: string }) 
   return <div className={styles.richVisual} data-reader-visual={kind} data-reader-visual-name={name}>{visual}</div>;
 }
 
+function contextSubject(pair: BeforeAfterPair): string {
+  const subject = pair.contextLabel?.split(" · ").slice(1).join(" · ").trim();
+  if (!subject) return "Ton activité";
+  return `${subject.charAt(0).toLocaleUpperCase("fr")}${subject.slice(1)}`;
+}
+
+function PairLabel({ after }: { after?: boolean }) {
+  return <span className={after ? styles.afterLabel : styles.beforeLabel}>
+    {after ? <Check aria-hidden="true" /> : <X aria-hidden="true" />}
+    {after ? "Après" : "Avant"}
+  </span>;
+}
+
+function SimpleComparison({ pair, children }: { pair: BeforeAfterPair; children: (text: string, after: boolean) => ReactNode }) {
+  return <div className={styles.typedComparison}>
+    <section className={styles.typedBefore}><PairLabel />{children(pair.before.text, false)}</section>
+    <section className={styles.typedAfter}><PairLabel after />{children(pair.after.text, true)}</section>
+  </div>;
+}
+
+function WebPair({ pair }: { pair: BeforeAfterPair }) {
+  const subtitle = pair.context?.toLocaleLowerCase("fr").includes("sous-titre") ?? false;
+  const subject = contextSubject(pair);
+  const page = (text: string) => ({
+    nav: subject,
+    heading: subtitle ? subject : text,
+    subtitle: subtitle ? text : "Une phrase simple précise la suite.",
+    button: "Découvrir",
+    imageLabel: subject,
+  });
+  return <div className={styles.typedKit}>
+    <WebPageCompare
+      title="Comparaison de page"
+      description="Le même emplacement avant et après la réécriture."
+      ariaLabel="Comparaison du titre de page avant et après"
+      beforeTitle="Avant"
+      afterTitle="Après"
+      before={page(pair.before.text)}
+      after={page(pair.after.text)}
+    />
+  </div>;
+}
+
+function AdPair({ pair }: { pair: BeforeAfterPair }) {
+  const subject = contextSubject(pair);
+  const ad = (text: string) => ({ account: subject, text, visual: `${subject} en situation`, action: "En savoir plus" });
+  return <div className={styles.typedKit}>
+    <AdCard
+      title="Comparaison de publicité"
+      description="La même publicité avant et après la réécriture."
+      ariaLabel="Comparaison de la publicité avant et après"
+      variant="social"
+      beforeTitle="Avant"
+      afterTitle="Après"
+      before={ad(pair.before.text)}
+      after={ad(pair.after.text)}
+    />
+  </div>;
+}
+
+function TypedPair({ pair, options }: { pair: BeforeAfterPair; options: MarkdownOptions }) {
+  if (pair.kind === "web-page") return <WebPair pair={pair} />;
+  if (pair.kind === "ad") return <AdPair pair={pair} />;
+  if (pair.kind === "button") return <SimpleComparison pair={pair}>{(text, after) => <div className={styles.buttonPreview}><button className={after ? styles.afterButton : styles.beforeButton} type="button" tabIndex={-1}>{text}</button></div>}</SimpleComparison>;
+  if (pair.kind === "email") {
+    const subject = contextSubject(pair);
+    return <SimpleComparison pair={pair}>{(text) => <div className={styles.emailPreview}>
+      <span className={styles.emailAvatar}>{subject.charAt(0)}</span>
+      <div><span>{subject}</span><strong>{text}</strong><small>Le début du message apparaît ici.</small></div>
+      <time>09:41</time>
+    </div>}</SimpleComparison>;
+  }
+  if (pair.kind === "message") {
+    const subject = contextSubject(pair);
+    return <SimpleComparison pair={pair}>{(text) => <div className={styles.messagePreview}>
+      <header><span>{subject.charAt(0)}</span><strong>{subject}</strong></header>
+      <div className={styles.messageBubble}>{inline(text, options)}<time>09:41</time></div>
+    </div>}</SimpleComparison>;
+  }
+  if (pair.kind === "video") return <SimpleComparison pair={pair}>{(text) => <div className={styles.videoPreview}>
+    <span className={styles.videoTop}><i /><i /><i /></span>
+    <span className={styles.videoPerson} aria-hidden="true" />
+    <strong>{inline(text, options)}</strong>
+    <small>Vidéo courte</small>
+  </div>}</SimpleComparison>;
+  return <SimpleComparison pair={pair}>{(text) => <div className={styles.textPreview}>{inline(text, options)}</div>}</SimpleComparison>;
+}
+
 function BeforeAfterGallery({ content, options }: { content: string; options: MarkdownOptions }) {
   const pairs = parseBeforeAfterPairs(content);
   if (pairs.length === 0) return <aside className={styles.richCard} data-reader-card="avant-apres"><Markdown content={content} options={options} /></aside>;
-  return <section className={styles.beforeAfterGallery} data-reader-before-after="true" aria-label="Comparaison avant et après">
-    {pairs.map((pair, index) => <article className={styles.beforeAfterPair} key={`${pair.before}-${index}`}>
-      <div className={styles.beforeColumn}><span>Avant</span><p><del>{inline(pair.before, options)}</del></p></div>
-      <div className={styles.afterColumn}><span><Check aria-hidden="true" />Après</span><p>{inline(pair.after, options)}</p></div>
+  const galleryKind = pairs.every((pair) => pair.kind === pairs[0].kind) ? pairs[0].kind : "mixed";
+  return <section className={styles.beforeAfterGallery} data-reader-before-after="true" data-before-after-kind={galleryKind} aria-label="Comparaison avant et après">
+    {pairs.map((pair, index) => <article className={styles.beforeAfterPair} data-before-after-kind={pair.kind} key={`${pair.before.text}-${index}`}>
+      {pair.contextLabel ? <header className={styles.pairContext}>{pair.contextLabel}</header> : null}
+      <TypedPair pair={pair} options={options} />
       {pair.why ? <p className={styles.whyLine}><strong>Pourquoi</strong>{inline(pair.why, options)}</p> : null}
     </article>)}
   </section>;
@@ -151,6 +243,26 @@ function Markdown({ content, options }: { content: string; options: MarkdownOpti
       const directive = parseReaderDirective(lines, index);
       if (!directive) {
         index += 1;
+        continue;
+      }
+      if (directive.kind === "avant-apres") {
+        const groupedContent = [directive.content];
+        const firstKinds = new Set(parseBeforeAfterPairs(directive.content).map((pair) => pair.kind));
+        const groupKind = firstKinds.size === 1 ? [...firstKinds][0] : undefined;
+        let cursor = directive.endIndex + 1;
+        while (groupKind) {
+          let candidateIndex = cursor;
+          while (candidateIndex < lines.length && !lines[candidateIndex].trim()) candidateIndex += 1;
+          if (parseDirectiveOpening(lines[candidateIndex] ?? "")?.kind !== "avant-apres") break;
+          const candidate = parseReaderDirective(lines, candidateIndex);
+          if (!candidate) break;
+          const candidatePairs = parseBeforeAfterPairs(candidate.content);
+          if (candidatePairs.length === 0 || candidatePairs.some((pair) => pair.kind !== groupKind)) break;
+          groupedContent.push(candidate.content);
+          cursor = candidate.endIndex + 1;
+        }
+        blocks.push(<BeforeAfterGallery key={key} content={groupedContent.join("\n\n")} options={options} />);
+        index = cursor;
         continue;
       }
       blocks.push(<RichDirective key={key} kind={directive.kind} title={directive.title} content={directive.content} options={options} />);

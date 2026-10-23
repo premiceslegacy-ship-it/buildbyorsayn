@@ -408,13 +408,13 @@ export function ReaderView({
         <AnimatePresence initial={false}>
           {outlineOpen ? <>
             <motion.button className={styles.outlineBackdrop} type="button" aria-label="Fermer le sommaire" onClick={toggleOutline} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : .2 }} />
-            <motion.aside id="reader-outline" className={styles.outline} aria-label="Sommaire" initial={reduceMotion ? false : { opacity: 0, scale: .98 }} animate={{ opacity: 1, scale: 1 }} exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: .98 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 30 }}>
+            <motion.aside id="reader-outline" className={styles.outline} aria-label="Sommaire" initial={{ opacity: 0, scale: .98 }} animate={{ opacity: 1, scale: 1 }} exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: .98 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 30 }}>
               <div className={styles.outlineHeader}><strong>Chapitres</strong><button className={styles.iconButton} type="button" aria-label="Fermer le sommaire" data-sfx="none" onClick={toggleOutline}><X aria-hidden="true" /></button></div>
               <ChapterRows sections={sections} selected={selected} completedIds={completedIds} showUpcomingVideo={showUpcomingVideo} onSelect={chooseChapter} compact />
             </motion.aside>
           </> : null}
         </AnimatePresence>
-        <motion.article key={current.id} ref={article} className={styles.article} data-size={size} data-focus-ring="none" tabIndex={-1} aria-label={`Lecture de ${current.title}`} initial={reduceMotion ? false : { opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 30 }}>
+        <motion.article key={current.id} ref={article} className={styles.article} data-size={size} data-focus-ring="none" tabIndex={-1} aria-label={`Lecture de ${current.title}`} initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 30 }}>
           <header className={`${styles.articleHeader} ${current.hideArticleHeader ? styles.articleHeaderLabelOnly : ""}`}><span>Chapitre {selected + 1}</span>{!current.hideArticleHeader ? <><h1>{current.title}</h1>{current.summary ? <p>{current.summary}</p> : null}</> : null}</header>
           <div className={styles.prose}>
             {currentMarkdown ? <ReaderProse section={{ content: currentMarkdown, skillFiles: current.skillFiles }} allowedLocalPaths={markdownLocalPaths} localBaseHref={markdownBaseHref} /> : current.content}

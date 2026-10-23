@@ -199,10 +199,10 @@ test("la ligne active garde exactement la grille et les métriques des autres ch
   assert.doesNotMatch(css, /\.diagramSlot\s*\{[^}]*100vw/s);
 });
 
-test("la barre mobile garde le segment centré sans titre dans la rangée", () => {
+test("la barre mobile garde le segment centré avec deux libellés espacés", () => {
   const css = read("components/reader/reader.module.css");
-  assert.match(css, /grid-template-columns: minmax\(96px, 1fr\) auto minmax\(96px, 1fr\)/);
-  assert.match(css, /\.modeSwitch button \{[\s\S]*?min-width: 46px/);
+  assert.match(css, /grid-template-columns: minmax\(82px, 1fr\) auto minmax\(82px, 1fr\)/);
+  assert.match(css, /\.modeSwitch button \{[\s\S]*?min-width: 62px;[\s\S]*?padding-inline: 12px/);
   assert.match(css, /\.toolbarTitle,[\s\S]{0,80}\.toolButton span[\s\S]{0,80}display: none/);
   assert.doesNotMatch(css, /\.toolbarSide:last-child > \.iconButton:not\(\.mobileOutlineButton\)/);
 });

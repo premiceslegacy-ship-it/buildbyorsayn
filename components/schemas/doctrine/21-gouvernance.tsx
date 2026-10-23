@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine21 = [
+  { name: "TableauDeBordHuitCases", kind: "schema", chapter: "entreprise-09-gouvernance-capacites-et-reprise.md", template: "file-card", title: "Le contrat tient sur huit voyants", description: "Le panneau garde résultat, humain, source, entrées, sortie, droits, reprise et date de revue.", ariaLabel: "Huit voyants décrivent le contrat, avec reprise mise en avant.", labels: ["Résultat", "Humain", "Source", "Entrées", "Sortie", "Droits", "Reprise", "Revoir"], accentIndex: 6 },
+  { name: "TroisCerclesDAutorite", kind: "schema", chapter: "entreprise-09-gouvernance-capacites-et-reprise.md", template: "rings", title: "L'accord grandit avec l'effet", description: "Préparer, modifier et engager occupent des cercles de plus en plus exigeants.", ariaLabel: "Trois cercles croissants représentent préparer, modifier et engager.", labels: ["Préparer", "Modifier", "Engager"], accentIndex: 2 },
+  { name: "ManuelAvantAutomatique", kind: "schema", chapter: "entreprise-09-gouvernance-capacites-et-reprise.md", template: "steps", title: "Le manuel précède l'automatique", description: "Le travail est compris puis testé et limité avant toute planification.", ariaLabel: "Comprendre, tester, limiter puis planifier forment l'ordre de mise en automatique.", labels: ["Comprendre", "Tester", "Limiter", "Planifier"], tools: ["Hermes Agent", "Hermes Agent", "Hermes Agent", "Google Agenda"], accentIndex: 1 },
+] as const satisfies readonly CourseVisualDefinition[];

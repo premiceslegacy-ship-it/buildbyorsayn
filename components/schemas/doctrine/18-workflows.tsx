@@ -1,0 +1,7 @@
+import type { CourseVisualDefinition } from "../protocole/kit-instance";
+
+export const doctrine18 = [
+  { name: "DossierQuiTraverse", kind: "schema", chapter: "entreprise-06-workflows-interpoles.md", template: "workflow", title: "Le dossier garde sa version", description: "Le même objet passe de la vente aux opérations puis à la finance avec ses preuves.", ariaLabel: "Un dossier traverse qualifier, valider, livrer et facturer avec des tampons de version.", labels: ["Qualifier", "Valider", "Livrer", "Facturer"], tools: ["HubSpot", "Notion", "Notion", "Stripe"], accentIndex: 1 },
+  { name: "PreuvesParMetier", kind: "schema", chapter: "entreprise-06-workflows-interpoles.md", template: "compare", title: "Chaque métier regarde une preuve", description: "Le même dossier ne prouve pas l'engagement, la livraison et le paiement de la même façon.", ariaLabel: "Trois regards distincts examinent engagement, livraison et paiement.", labels: ["Engagement", "Commercial", "Livraison", "Opérations", "Paiement", "Finance"], accentIndex: 2 },
+  { name: "CarteDePassation", kind: "schema", chapter: "entreprise-06-workflows-interpoles.md", template: "file-card", title: "La passation tient sur une carte", description: "La carte montre l'état, la preuve, l'inconnu et la personne qui reprend.", ariaLabel: "Une carte de passation contient état, preuve, inconnu et suivant.", labels: ["État", "Preuve", "Inconnu", "Suivant"], accentIndex: 3 },
+] as const satisfies readonly CourseVisualDefinition[];

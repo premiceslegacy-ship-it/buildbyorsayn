@@ -39,5 +39,9 @@
 .neutral .icon { stroke: rgba(241, 245, 242, .72); }
 
 @media (prefers-reduced-motion: reduce) {
-  .toast { backdrop-filter: none; }
+  .toast {
+    opacity: 1 !important;
+    transform: none !important;
+    backdrop-filter: none;
+  }
 }

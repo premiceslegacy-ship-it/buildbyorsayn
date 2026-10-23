@@ -21,6 +21,7 @@ import {
 import styles from "./kit-board.module.css";
 
 const EM = "#22d96e";
+const PREVIEW_WIDTHS = [960, 650, 350] as const;
 
 type KitExample = {
   label: string;
@@ -712,7 +713,10 @@ export function KitBoard({ only }: { only?: string }) {
           <header><div><h2>{entry.name}</h2><p>{entry.summary}</p></div><span>2 exemples</span></header>
           <div className={styles.examples}>{entry.examples.map((example) => <article className={styles.example} key={example.label}>
             <div className={styles.exampleMeta}><h3>{example.label}</h3><p>{example.source}</p></div>
-            {example.node}
+            <div className={styles.previewList}>{PREVIEW_WIDTHS.map((width) => <section className={styles.preview} key={width}>
+              <p>{width} px</p>
+              <div className={styles.previewViewport} style={{ "--kit-preview-width": `${width}px` } as React.CSSProperties}>{example.node}</div>
+            </section>)}</div>
           </article>)}</div>
         </section>)}
       </div>

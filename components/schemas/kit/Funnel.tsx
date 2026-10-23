@@ -23,11 +23,13 @@ export function Funnel({ stages, leakIndex, leakLabel, tool, ...frame }: FunnelP
     <div className={styles.funnel}>
       {stages.map((stage, index) => {
         const width = Math.max(46, (stage.value / maximum) * 100);
-        return <div className={styles.funnelRow} key={`${stage.label}-${stage.value}`}>
-          <div className={styles.funnelStage} style={{
-            width: `${width}%`,
-            "--kit-funnel-compact-width": `${72 + width * .28}%`,
-          } as React.CSSProperties}>
+        const rowStyle = {
+          "--kit-funnel-width": `${width}%`,
+          "--kit-funnel-edge": `${50 + width / 2}%`,
+          "--kit-funnel-compact-width": `${72 + width * .28}%`,
+        } as React.CSSProperties;
+        return <div className={styles.funnelRow} style={rowStyle} key={`${stage.label}-${stage.value}`}>
+          <div className={styles.funnelStage}>
             <span><strong>{stage.label}</strong>{stage.detail ? <small>{stage.detail}</small> : null}</span>
             <b>{stage.valueLabel ?? stage.value}</b>
           </div>

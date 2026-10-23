@@ -107,9 +107,9 @@
 .examples {
   min-width: 0;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
-  gap: 24px;
+  gap: 32px;
 }
 
 .example {
@@ -139,6 +139,37 @@
   text-align: right;
 }
 
+.previewList {
+  min-width: 0;
+  display: grid;
+  gap: 30px;
+}
+
+.preview {
+  min-width: 0;
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  margin: 0;
+}
+
+.preview > p {
+  margin: 0;
+  color: var(--t3);
+  font: 600 13px/1.2 var(--font);
+  font-variant-numeric: tabular-nums;
+}
+
+.previewViewport {
+  width: min(100%, var(--kit-preview-width));
+  min-width: 0;
+}
+
+.previewViewport > figure {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 @media (max-width: 1000px) {
   .examples { grid-template-columns: minmax(0, 1fr); }
 }
@@ -157,4 +188,3 @@
   .exampleMeta { align-items: start; flex-direction: column; gap: 4px; margin-bottom: 16px; }
   .exampleMeta p { max-width: none; text-align: left; }
 }
-
