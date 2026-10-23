@@ -12,7 +12,6 @@ test("la porte de release contrôle le contenu privé après le build", () => {
 test("les pages protégées gardent leur contenu dans des Server Components", () => {
   const requirements: Record<string, string> = {
     "app/intro/page.tsx": 'requirePageAccess("full", "/intro")',
-    "app/fin/page.tsx": 'requirePageAccess("full", "/fin")',
     "app/sources/page.tsx": 'requirePageAccess("beginner", "/sources")',
     "app/beginner/page.tsx": 'requirePageAccess("beginner", "/beginner")',
     "app/skills/page.tsx": 'requirePageAccess("authenticated", "/skills")',
@@ -24,4 +23,11 @@ test("les pages protégées gardent leur contenu dans des Server Components", ()
     assert.doesNotMatch(source, /^["']use client["'];/m, path);
     assert.ok(source.includes(accessCheck), `${path} doit vérifier son accès côté serveur`);
   }
+
+  const purchaseConfirmation = readFileSync("app/fin/page.tsx", "utf8");
+  assert.doesNotMatch(purchaseConfirmation, /^["']use client["'];/m);
+  assert.match(purchaseConfirmation, /auth\.getUser\(\)/);
+  assert.match(purchaseConfirmation, /from\("profiles"\)/);
+  assert.match(purchaseConfirmation, /normalizeProfileTier/);
+  assert.doesNotMatch(purchaseConfirmation, /searchParams|params\.niveau|params\.etat/);
 });

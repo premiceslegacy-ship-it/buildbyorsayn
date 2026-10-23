@@ -2,10 +2,11 @@ import { createClient } from "@/lib/supabase/server";
 import { DaRoot } from "@/components/da/DaRoot";
 import { DaNav } from "@/components/da/DaNav";
 import { DaFooter } from "@/components/da/DaFooter";
-import { PricingSection } from "@/components/da/PricingSection";
+import { CheckoutView } from "@/components/ui5/CheckoutView";
 import { getCheckoutLinks } from "@/lib/checkoutLinks";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { selectPricingView } from "@/lib/pricingView";
+import "./checkout.css";
 
 export const metadata = {
     title: "Choisir mon niveau | BUILD by Orsayn",
@@ -44,19 +45,9 @@ export default async function CheckoutPage({
               : undefined;
 
     return (
-        <DaRoot>
+        <DaRoot className="checkout-page">
             <DaNav loggedIn={Boolean(user)} homeBase="/" />
-            <main className="px-page">
-                <PricingSection
-                    tier={tier}
-                    links={links}
-                    headingLevel="h1"
-                    compact
-                    unverified={accessUnverified}
-                    notice={notice}
-                    lede={fromMcp && showsBothOffers ? "Ton compte est prêt. Choisis ton niveau pour connecter ton assistant à BUILD." : undefined}
-                />
-            </main>
+            <CheckoutView blocks={blocks} links={links} loggedIn={Boolean(user)} notice={notice} lede={fromMcp && showsBothOffers ? "Ton compte est prêt. Choisis ton niveau pour connecter ton assistant à BUILD." : undefined} />
             <DaFooter homeBase="/" />
         </DaRoot>
     );

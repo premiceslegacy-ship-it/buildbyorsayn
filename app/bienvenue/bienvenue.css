@@ -1,0 +1,39 @@
+.da.welcome-page { min-height: 100svh; }
+.da .welcome-shell { min-height: 100svh; display: grid; place-items: center; padding: 96px var(--gutter) 72px; background: radial-gradient(44% 36% at 50% 9%, rgba(34,217,110,.13), transparent 74%); }
+.da .welcome-logo { position: absolute; top: 24px; left: var(--gutter); }
+.da .welcome-logo img { width: 104px; }
+.da .welcome-column { width: min(100%, 680px); display: grid; justify-items: center; gap: 18px; text-align: center; }
+.da .welcome-column > .t-lede { max-width: 31em; }
+.da .welcome-progress { width: min(100%, 330px); display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 12px; }
+.da .welcome-progress li { height: 5px; border-radius: 4px; background: rgba(241,245,242,.17); transition: background var(--sp-doux-d, .5s) var(--sp-doux, var(--ease)), transform var(--sp-vif-d, .5s) var(--sp-vif, var(--ease)); }
+.da .welcome-progress li[data-state="done"] { background: var(--em); transform: scaleY(1.12); }
+.da .welcome-panel { width: 100%; display: grid; gap: 24px; margin-top: 18px; padding: clamp(22px, 4vw, 34px); border-radius: var(--r-l); text-align: left; background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait), 0 34px 90px -50px rgba(34,217,110,.48); }
+.da .welcome-status, .da .welcome-ready { display: inline-flex; align-items: center; gap: 9px; justify-self: start; font: 600 15px/1.3 var(--font); color: var(--menthe); }
+.da .welcome-status .ic, .da .welcome-ready .ic { width: 21px; color: var(--em); }
+.da .welcome-facts { display: grid; gap: 0; border-block: 1px solid var(--trait); }
+.da .welcome-facts div { display: flex; justify-content: space-between; gap: 24px; padding: 17px 0; }
+.da .welcome-facts div + div { border-top: 1px solid var(--trait); }
+.da .welcome-facts dt { color: var(--t2); }
+.da .welcome-facts dd { font-weight: 600; color: var(--encre); text-align: right; }
+.da .welcome-actions { display: flex; align-items: center; justify-content: center; gap: 8px 18px; flex-wrap: wrap; text-align: center; }
+.da .welcome-actions .btn--l { min-height: 36px; padding-inline: 6px; }
+.da .welcome-choices { display: grid; gap: 12px; min-width: 0; }
+.da .welcome-choice { width: 100%; display: grid; grid-template-columns: 116px minmax(0, 1fr) 28px; gap: 16px; align-items: center; padding: 12px; border-radius: var(--r-m); text-align: left; background: rgba(241,245,242,.05); box-shadow: inset 0 0 0 1px var(--trait); transition: transform .1s linear, background .32s var(--ease-c), box-shadow var(--sp-vif-d, .5s) var(--sp-vif, var(--ease)); }
+.da .welcome-choice:hover { background: rgba(241,245,242,.09); }
+.da .welcome-choice:active { transform: scale(.985); }
+.da .welcome-choice[data-selected="true"] { background: rgba(34,217,110,.09); box-shadow: inset 0 0 0 2px var(--em); }
+.da .welcome-choice > img { width: 116px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 11px; }
+.da .welcome-choice > span { min-width: 0; display: grid; gap: 3px; }
+.da .welcome-choice b { font: 600 18px/1.25 var(--font-t); color: var(--encre); }
+.da .welcome-choice small { font: 500 13px/1.3 var(--font); color: var(--menthe); }
+.da .welcome-choice em { font: 400 14px/1.4 var(--font); color: var(--t2); font-style: normal; }
+.da .welcome-choice > i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; color: transparent; box-shadow: inset 0 0 0 1px var(--trait-f); }
+.da .welcome-choice[data-selected="true"] > i { color: var(--sur-em); background: var(--em); box-shadow: none; }
+.da .welcome-choice > i .ic { width: 17px; }
+.da .welcome-first { overflow: hidden; border-radius: var(--r-m); background: rgba(241,245,242,.05); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .welcome-first > img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.da .welcome-first > div { display: grid; gap: 6px; padding: 20px; }
+.da .welcome-first span { font: 600 13px/1.3 var(--font); color: var(--menthe); }
+.da .welcome-first h2 { font: 650 24px/1.15 var(--font-t); color: var(--encre); }
+.da .welcome-first p { color: var(--t2); }
+@media (max-width: 560px) { .da .welcome-shell { padding-top: 94px; } .da .welcome-panel { padding: 20px; } .da .welcome-choice { grid-template-columns: 88px minmax(0, 1fr) 24px; gap: 12px; } .da .welcome-choice > img { width: 88px; } .da .welcome-choice em { display: none; } .da .welcome-actions { display: grid; justify-items: center; } .da .welcome-actions .btn--p { width: 100%; } }

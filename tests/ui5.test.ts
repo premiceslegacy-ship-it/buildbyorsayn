@@ -1,0 +1,88 @@
+import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+import { BLOCS_DATA } from "../lib/blocCatalog";
+import { programmeForTier } from "../lib/programme";
+import { purchaseState } from "../components/ui5/purchaseModel";
+import { welcomeChoices } from "../components/ui5/welcomeModel";
+
+test("bienvenue ne propose que de vraies destinations autorisées", () => {
+  for (const tier of ["preview", "beginner", "full"] as const) {
+    const cards = programmeForTier(tier).flatMap((section) => section.cards);
+    const choices = welcomeChoices(tier, cards);
+    assert.ok(choices.length > 0, tier);
+    for (const choice of choices) {
+      const source = cards.find((card) => card.id === choice.id);
+      assert.ok(source && !source.locked, `${tier}/${choice.id}`);
+      assert.equal(choice.href, source.href);
+    }
+  }
+  const freeCards = programmeForTier("free").flatMap((section) => section.cards);
+  assert.deepEqual(welcomeChoices("free", freeCards).map(({ id, href }) => ({ id, href })), [{ id: "programme", href: "/programme" }]);
+});
+
+test("fin confirme seulement les paliers payants lus côté serveur", () => {
+  for (const tier of [null, "free", "preview"] as const) assert.equal(purchaseState({ tier, authenticated: true, unverified: false }).kind, "pending");
+  assert.equal(purchaseState({ tier: "full", authenticated: true, unverified: true }).kind, "error");
+  const beginner = purchaseState({ tier: "beginner", authenticated: true, unverified: false });
+  assert.equal(beginner.kind, "confirmed");
+  if (beginner.kind === "confirmed") assert.ok(beginner.entries.length > 0);
+  const full = purchaseState({ tier: "full", authenticated: true, unverified: false });
+  assert.equal(full.kind, "confirmed");
+  if (full.kind === "confirmed") assert.equal(full.entries.length, BLOCS_DATA.length - 1);
+});
+
+test("fin ne fait confiance ni au niveau ni à un état reçu dans l'URL", async () => {
+  const source = await readFile("app/fin/page.tsx", "utf8");
+  assert.doesNotMatch(source, /searchParams|params\.niveau|params\.etat/);
+  assert.match(source, /from\("profiles"\)/);
+  assert.match(source, /normalizeProfileTier/);
+});
+
+test("le consentement BUILD Sync garde toutes ses protections serveur", async () => {
+  const source = await readFile("app/build-sync/consent/page.tsx", "utf8");
+  for (const invariant of [
+    /\^\[A-Za-z0-9_\-\]\{43\}\$/,
+    /hashToken\(requestHandle\)/,
+    /\.eq\("user_id", user\.id\)/,
+    /\.is\("consumed_at", null\)/,
+    /\.gt\("expires_at", new Date\(\)\.toISOString\(\)\)/,
+    /approveBuildSyncConsent/,
+    /denyBuildSyncConsent/,
+  ]) assert.match(source, invariant);
+});
+
+test("les écrans UI-5 référencent uniquement des ressources publiques présentes", async () => {
+  const files = [
+    "components/ui5/WelcomeJourney.tsx",
+    "components/ui5/welcomeModel.ts",
+    "components/ui5/CheckoutView.tsx",
+    "components/ui5/purchaseModel.ts",
+    "components/da/BuildSyncConsentCard.tsx",
+    "app/checkout/checkout.css",
+  ];
+  const references = new Set<string>();
+  for (const file of files) {
+    const source = await readFile(file, "utf8");
+    for (const match of source.matchAll(/["(]((?:\/da|\/fonts|\/sfx)\/[^"')$]+)["')]/g)) references.add(match[1]);
+  }
+  assert.ok(references.size > 0);
+  for (const reference of references) assert.equal(existsSync(`public${reference}`), true, reference);
+});
+
+test("404 et erreurs racine ont une seule action principale et une destination liée à la session", async () => {
+  const routeState = await readFile("components/ui5/RouteState.tsx", "utf8");
+  assert.equal((routeState.match(/btn btn--p/g) ?? []).length, 1);
+  assert.match(routeState, /auth\.getSession\(\)/);
+  assert.match(routeState, /loggedIn \? "\/dashboard" : "\/"/);
+  for (const file of ["app/not-found.tsx", "app/error.tsx", "app/global-error.tsx"]) {
+    assert.match(await readFile(file, "utf8"), /RouteState/, file);
+  }
+});
+
+test("checkout lit les prix et les compteurs depuis le code", async () => {
+  const source = await readFile("components/ui5/CheckoutView.tsx", "utf8");
+  for (const name of ["FONDATIONS_PRICE", "COFFRE_PRICE", "UPGRADE_PRICE", "getOfferFacts"]) assert.match(source, new RegExp(name));
+  assert.doesNotMatch(source, /https:\/\/buy\.stripe\.com/);
+});
