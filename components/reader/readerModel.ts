@@ -60,6 +60,10 @@ export function chapterIndexForKey(
   return next >= 0 && next < total ? next : null;
 }
 
+export function hasChapterNavigation(total: number): boolean {
+  return total > 1;
+}
+
 export function serializeReaderMarkdown(
   title: string,
   sections: readonly ReaderMarkdownSection[],

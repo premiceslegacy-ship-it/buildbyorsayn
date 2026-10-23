@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { DaRoot } from "@/components/da/DaRoot";
 import { WelcomeJourney } from "@/components/ui5/WelcomeJourney";
-import { welcomeChoices } from "@/components/ui5/welcomeModel";
+import { welcomeChoices, welcomeDisplayName } from "@/components/ui5/welcomeModel";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { programmeForTier } from "@/lib/programme";
 import { createClient } from "@/lib/supabase/server";
@@ -20,6 +20,6 @@ export default async function BienvenuePage() {
 
   const tier = normalizeProfileTier(profile?.tier ?? null) ?? "free";
   const cards = programmeForTier(tier).flatMap((section) => section.cards);
-  const displayName = (user.user_metadata?.first_name as string | undefined) || (user.user_metadata?.full_name as string | undefined)?.split(" ")[0] || user.email?.split("@")[0] || "";
+  const displayName = welcomeDisplayName(user.user_metadata);
   return <DaRoot className="da-app welcome-page"><WelcomeJourney displayName={displayName} tier={tier} choices={welcomeChoices(tier, cards)} /></DaRoot>;
 }

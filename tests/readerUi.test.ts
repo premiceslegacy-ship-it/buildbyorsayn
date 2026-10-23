@@ -8,6 +8,7 @@ import {
   chapterIndexForKey,
   chapterProgressLabel,
   chapterSummary,
+  hasChapterNavigation,
   parseReaderMode,
   readerModeQuery,
   readingProgress,
@@ -51,6 +52,13 @@ test("Origine et Fin ciblent les bornes des blocs de trois et six chapitres", ()
   assert.equal(six[chapterIndexForKey("End", 3, six.length)!], six.at(-1));
   assert.equal(chapterIndexForKey("ArrowLeft", 0, six.length), null);
   assert.equal(chapterIndexForKey("ArrowUp", 0, three.length, true), 2);
+});
+
+test("la navigation précédent et suivant disparaît avec un seul chapitre", () => {
+  assert.equal(hasChapterNavigation(0), false);
+  assert.equal(hasChapterNavigation(1), false);
+  assert.equal(hasChapterNavigation(2), true);
+  assert.match(read("components/reader/ReaderView.tsx"), /showChapterNavigation \? <div className=\{styles\.neighbors\}/);
 });
 
 test("la copie Markdown conserve tout le texte et ajoute la structure des chapitres", () => {

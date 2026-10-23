@@ -253,6 +253,21 @@ export function chapterSlug(path: string): string {
   return path.replace(/\.md$/, "").toLowerCase();
 }
 
+const HERMES_START_PATHS = [
+  { intent: "Commencer au début", path: "README.md" },
+  { intent: "Obtenir un premier résultat", path: "10-qualification-experimentation-premiere-valeur.md" },
+  { intent: "Hermes est déjà installé", path: "01-diagnostic-et-offre.md" },
+] as const;
+
+export function hermesStartPoints<T extends { path: string }>(files: readonly T[]) {
+  const available = new Map(files.map((file) => [file.path, file]));
+  return HERMES_START_PATHS.flatMap(({ intent, path }) => {
+    const file = available.get(path);
+    const meta = CHAPTER_META[path];
+    return file && meta ? [{ intent, file, meta }] : [];
+  });
+}
+
 export function chapterPathFromSlug(slug: string): string | undefined {
   return Object.keys(CHAPTER_META).find((path) => chapterSlug(path) === slug);
 }

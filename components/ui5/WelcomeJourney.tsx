@@ -7,7 +7,7 @@ import { DaIcon } from "@/components/da/DaIcon";
 import type { McpTier } from "@/lib/mcpAccess";
 import { animateAppElement, installAppMotionTokens } from "@/lib/ui/motion";
 import { playAppSound } from "@/lib/ui/sound";
-import { welcomeTierLabel, type WelcomeChoice } from "./welcomeModel";
+import { nonBreakingWelcomeName, welcomeTierLabel, type WelcomeChoice } from "./welcomeModel";
 
 export function WelcomeJourney({ displayName, tier, choices }: { displayName: string; tier: McpTier; choices: readonly WelcomeChoice[] }) {
   const [step, setStep] = useState(0);
@@ -37,7 +37,7 @@ export function WelcomeJourney({ displayName, tier, choices }: { displayName: st
     void playAppSound("select");
   }
 
-  const title = step === 0 ? `Bienvenue${displayName ? `, ${displayName}` : ""}.` : step === 1 ? "Choisis ton premier pas." : "Ton parcours est prêt.";
+  const title = step === 1 ? "Choisis ton premier pas." : "Ton parcours est prêt.";
   const lede = step === 0
     ? "On vérifie ton accès, puis tu choisis où commencer."
     : step === 1
@@ -48,7 +48,7 @@ export function WelcomeJourney({ displayName, tier, choices }: { displayName: st
     <header className="welcome-logo"><Link href="/" aria-label="BUILD, accueil"><Image src="/da/logo-sombre.svg" alt="BUILD" width={104} height={30} priority /></Link></header>
     <div className="welcome-column">
       <ol className="welcome-progress" aria-label={`Étape ${step + 1} sur 3`}>{[0, 1, 2].map((index) => <li key={index} data-state={index <= step ? "done" : "todo"} />)}</ol>
-      <h1 className="t-1" tabIndex={-1}>{title}</h1>
+      <h1 className="t-1 welcome-title" tabIndex={-1}>{step === 0 ? <>Bienvenue{displayName ? <>, <span className="welcome-name">{nonBreakingWelcomeName(displayName)}</span></> : null}.</> : title}</h1>
       <p className="t-lede">{lede}</p>
 
       {step === 0 ? <section ref={panelRef} className="welcome-panel" aria-label="Ton compte BUILD">

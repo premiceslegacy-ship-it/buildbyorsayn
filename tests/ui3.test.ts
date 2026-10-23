@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { SKILLS_CATALOG } from "../lib/skillsCatalog";
 import { accessibleSkillCount, canDownloadSkill, lockedSkillCta } from "../app/skills/access";
+import { CHAPTER_META, hermesStartPoints } from "../app/videos/tutos/chapters";
 import { accountIncludedItems, accountTierLabel, accountUpgradeTarget } from "../components/account/accountPresentation";
 
 test("Compte présente chaque palier sans offrir une montée inutile", () => {
@@ -41,8 +42,19 @@ test("Skills couvre téléchargement, mise à jour, échec, vide et BUILD Sync",
   assert.match(client, /Mettre à jour/);
   assert.match(client, /Aucun skill n’est disponible/);
   assert.match(client, /Le téléchargement a échoué/);
+  assert.doesNotMatch(client, /ui3-skill-action[\s\S]{0,300}className="btn btn--p"/);
   assert.match(loading, /aria-busy="true"/);
   assert.match(error, /reset/);
+});
+
+test("Hermes propose trois vrais points de départ et la structure de la maquette", async () => {
+  const files = Object.keys(CHAPTER_META).map((path) => ({ path }));
+  const points = hermesStartPoints(files);
+  assert.equal(points.length, 3);
+  assert.deepEqual(points.map((point) => point.intent), ["Commencer au début", "Obtenir un premier résultat", "Hermes est déjà installé"]);
+  assert.ok(points.every((point) => point.meta === CHAPTER_META[point.file.path]));
+  const page = await readFile("app/videos/tutos/page.tsx", "utf8");
+  for (const marker of ["Par où commencer", "Lire depuis le début", "Voir les chapitres", "le texte est complet", '<footer className="foot">', "/da/hermes-3d.png"]) assert.match(page, new RegExp(marker));
 });
 
 test("Compte garde les contrôles de session et les confirmations", async () => {

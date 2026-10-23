@@ -17,6 +17,7 @@ import {
   READER_MODE_STORAGE_KEY,
   chapterIndexForKey,
   chapterSummary,
+  hasChapterNavigation,
   readerModeQuery,
   readingProgress,
   resolveChapterIndex,
@@ -174,6 +175,7 @@ export function ReaderView({
   const completedCount = sections.filter((section) => completedIds.includes(section.id)).length;
   const allDeliveredComplete = sections.length > 0 && completedCount === sections.length;
   const hasLockedChapters = sections.length < totalSections;
+  const showChapterNavigation = hasChapterNavigation(sections.length);
 
   const markdown = useMemo(() => {
     if (copyMarkdown) return copyMarkdown;
@@ -294,14 +296,14 @@ export function ReaderView({
           {mode === "texte" ? <>
             <button className={styles.iconButton} type="button" aria-label="Changer la taille du texte" onClick={cycleSize}><span aria-hidden="true">Aa</span></button>
             <button ref={copyButton} className={styles.toolButton} type="button" data-sfx="none" onClick={() => void copyAll()}><Copy aria-hidden="true" /><span>{copyState === "done" ? "Copié" : copyState === "error" ? "Réessayer" : "Envoyer à mon IA"}</span></button>
-          </> : <>
+          </> : showChapterNavigation ? <>
             {sections[selected - 1]?.href
               ? <Link className={styles.iconButton} href={withMode(sections[selected - 1].href!, mode)} data-sfx="none" aria-label="Chapitre précédent" onClick={() => void playAppSound("select")}><ArrowLeft aria-hidden="true" /></Link>
               : <button className={styles.iconButton} type="button" data-sfx="none" aria-label="Chapitre précédent" disabled={selected === 0} onClick={() => chooseChapter(selected - 1)}><ArrowLeft aria-hidden="true" /></button>}
             {sections[selected + 1]?.href
               ? <Link className={styles.iconButton} href={withMode(sections[selected + 1].href!, mode)} data-sfx="none" aria-label="Chapitre suivant" onClick={() => void playAppSound("select")}><ArrowRight aria-hidden="true" /></Link>
               : <button className={styles.iconButton} type="button" data-sfx="none" aria-label="Chapitre suivant" disabled={selected === sections.length - 1} onClick={() => chooseChapter(selected + 1)}><ArrowRight aria-hidden="true" /></button>}
-          </>}
+          </> : null}
         </div>
         {mode === "texte" ? <span className={styles.readingBar} aria-hidden="true"><i style={{ "--reader-progress": readProgress } as CSSProperties} /></span> : null}
       </div>
@@ -316,10 +318,10 @@ export function ReaderView({
         {current.lesson ? <div className={styles.lessonMeta}><LessonMeta lesson={current.lesson} /></div> : null}
         <div className={styles.chapterHeading}><h2>Chapitres</h2><span>{sections.length} chapitre{sections.length > 1 ? "s" : ""}</span></div>
         <ChapterRows sections={sections} selected={selected} completedIds={completedIds} mode={mode} showUpcomingVideo={showUpcomingVideo} onSelect={chooseChapter} />
-        <div className={styles.neighbors}>
+        {showChapterNavigation ? <div className={styles.neighbors}>
           {selected > 0 ? <button className={styles.neighborCard} type="button" data-sfx="none" onClick={() => chooseChapter(selected - 1)}><small>Chapitre précédent</small><strong>{sections[selected - 1].title}</strong></button> : <span className={styles.neighborCard} aria-disabled="true"><small>Tu es sur le premier chapitre</small></span>}
           {selected < sections.length - 1 ? <button className={styles.neighborCard} type="button" data-sfx="none" onClick={() => chooseChapter(selected + 1)}><small>Chapitre suivant</small><strong>{sections[selected + 1].title}</strong></button> : <span className={styles.neighborCard} aria-disabled="true"><small>Tu es sur le dernier chapitre</small></span>}
-        </div>
+        </div> : null}
       </div> : <div className={styles.textLayout}>
         <ChapterRows sections={sections} selected={selected} completedIds={completedIds} mode={mode} showUpcomingVideo={showUpcomingVideo} onSelect={chooseChapter} compact />
         <article ref={article} className={styles.article} data-size={size} data-focus-ring="none" tabIndex={-1} aria-label={`Lecture de ${current.title}`}>

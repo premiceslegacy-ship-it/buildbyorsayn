@@ -16,6 +16,19 @@ export function welcomeTierLabel(tier: McpTier) {
   return TIER_LABELS[tier];
 }
 
+export function welcomeDisplayName(metadata: unknown): string {
+  if (!metadata || typeof metadata !== "object") return "";
+  const values = metadata as { first_name?: unknown; full_name?: unknown };
+  const firstName = typeof values.first_name === "string" ? values.first_name.trim() : "";
+  if (firstName) return firstName;
+  const fullName = typeof values.full_name === "string" ? values.full_name.trim() : "";
+  return fullName.split(/\s+/)[0] ?? "";
+}
+
+export function nonBreakingWelcomeName(name: string): string {
+  return name.replaceAll("-", "\u2011");
+}
+
 export function welcomeChoices(tier: McpTier, cards: readonly ProgrammeCard[]): WelcomeChoice[] {
   const unlocked = cards.filter((card) => !card.locked);
   if (unlocked.length === 0) {

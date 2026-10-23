@@ -2,12 +2,18 @@ import { test, expect, hasE2eAccount } from "./fixtures/auth";
 import { test as publicTest, expect as publicExpect } from "@playwright/test";
 
 publicTest.describe("Nouveautés (public)", () => {
-  publicTest("is reachable without an account and never shows a member badge", async ({ page }) => {
-    const response = await page.goto("/nouveautes");
-    publicExpect(response?.status()).toBe(200);
-    await publicExpect(page.getByRole("heading", { level: 1, name: "Nouveautés" })).toBeVisible();
-    // Either the empty state (table empty or not migrated yet) or the real feed.
-    await publicExpect(page.getByTestId("nouveautes-empty").or(page.locator("[data-video-card]").first())).toBeVisible();
+  publicTest("redirects visitors without an account to login without rendering member content", async ({ page, request }) => {
+    const response = await request.get("/nouveautes", { maxRedirects: 0 });
+    publicExpect([301, 302, 303, 307, 308]).toContain(response.status());
+    const destination = new URL(response.headers()["location"], "http://build.local");
+    publicExpect(destination.pathname).toBe("/login");
+    publicExpect(destination.searchParams.get("next")).toBe("/nouveautes");
+    publicExpect(await response.text()).not.toMatch(/data-video-card|nouveautes-empty|youtube-nocookie\.com\/embed/);
+
+    await page.goto("/nouveautes");
+    await publicExpect(page).toHaveURL((url) => url.pathname === "/login" && url.searchParams.get("next") === "/nouveautes");
+    await publicExpect(page.getByRole("heading", { level: 1, name: "Nouveautés" })).toHaveCount(0);
+    await publicExpect(page.locator("[data-video-card]")).toHaveCount(0);
     await publicExpect(page.getByTestId("nouveautes-badge")).toHaveCount(0);
   });
 
@@ -18,15 +24,6 @@ publicTest.describe("Nouveautés (public)", () => {
       await publicExpect(link).toHaveAttribute("target", "_blank");
       await publicExpect(link).toHaveAttribute("rel", /noopener/);
     }
-  });
-
-  publicTest("the main navigation offers Nouveautés instead of Vidéos", async ({ page }) => {
-    await page.goto("/nouveautes");
-    const nav = page.getByRole("navigation", { name: "Navigation secondaire" });
-    await publicExpect(nav.or(page.getByRole("navigation", { name: "Navigation principale" })).first()).toBeVisible();
-    await publicExpect(page.locator('a[href="/nouveautes"]').first()).toBeAttached();
-    await publicExpect(page.locator('a[href="/videos"]')).toHaveCount(0);
-    await publicExpect(page.locator('a[href="/videos/tutos"]').first()).toBeAttached();
   });
 
   publicTest("/videos permanently redirects to /nouveautes without touching /videos/tutos", async ({ request }) => {
@@ -56,6 +53,23 @@ publicTest.describe("Nouveautés (public)", () => {
     publicExpect([202, 500]).toContain(forged.status());
     const probe = await request.get("/api/youtube/websub?hub.mode=subscribe&hub.topic=https://evil.example/&hub.challenge=x");
     publicExpect(probe.status()).toBe(404);
+  });
+});
+
+test.describe("Nouveautés navigation (member)", () => {
+  test.skip(!hasE2eAccount, "E2E_TEST_EMAIL/E2E_TEST_PASSWORD not configured");
+
+  test("the authenticated navigation offers Nouveautés instead of Vidéos and keeps Hermes at /videos/tutos", async ({ authedPage: page }) => {
+    await page.goto("/dashboard");
+    const nav = page.getByRole("navigation", { name: /^(Principal|Navigation mobile)$/ });
+    await expect(nav).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Nouveautés", exact: true })).toHaveAttribute("href", "/nouveautes");
+    await expect(nav.locator('a[href="/videos"]')).toHaveCount(0);
+
+    const hermes = page.locator("#hermes");
+    await expect(hermes).toBeVisible();
+    await expect(hermes.locator('a[href="/videos/tutos"]').first()).toBeVisible();
+    await expect(hermes.locator('a[href="/videos"]')).toHaveCount(0);
   });
 });
 

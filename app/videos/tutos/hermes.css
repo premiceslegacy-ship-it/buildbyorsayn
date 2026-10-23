@@ -1,0 +1,36 @@
+.da .ui3-hermes-head { padding-top: calc(68px + clamp(8px, 2vw, 28px)); }
+.da .ui3-hermes-head > div { max-width: 56rem; }
+.da .ui3-hermes-head h1 { max-width: 16em; }
+.da .ui3-hermes-tile { width: clamp(200px, 24vw, 320px); height: auto; aspect-ratio: 1; object-fit: contain; margin-block: clamp(-32px, -2.4vw, -18px) clamp(-44px, -3vw, -28px); user-select: none; }
+.da .ui3-hermes-progress { width: min(100%, 32rem); display: grid; justify-items: center; gap: 10px; }
+.da .ui3-hermes-segments { width: 100%; display: grid; grid-template-columns: repeat(var(--hermes-chapter-count, 1), minmax(0, 1fr)); gap: 4px; }
+.da .ui3-hermes-segments i { height: 6px; border-radius: 3px; background: rgba(241,245,242,.18); }
+.da .ui3-hermes-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 20px; }
+.da .ui3-hermes-actions .btn--p { min-width: 220px; }
+.da .ui3-hermes-actions .ic { width: 18px; height: 18px; }
+.da .ui3-hermes-start { width: min(100%, 62rem); margin-inline: auto; }
+.da .ui3-hermes-start > ul { display: grid; gap: 20px; }
+.da .ui3-hermes-start li { min-width: 0; animation: ui3-hermes-enter var(--sp-doux-d, .5s) var(--sp-doux, var(--ease)) both; }
+.da .ui3-hermes-start a { height: 100%; display: grid; align-content: start; gap: 8px; padding: clamp(18px, 1.8vw, 24px); border-radius: var(--r-m); background: var(--carte); transition: background .32s var(--ease-c), transform .1s linear; }
+.da .ui3-hermes-start a:hover { background: var(--carte-2); }
+.da .ui3-hermes-start a:active { transform: scale(.985); }
+.da .ui3-hermes-start small { color: var(--t3); font: 600 12px/1.25 var(--font); }
+.da .ui3-hermes-start strong { color: var(--encre); font: 600 19px/1.25 var(--font-t); letter-spacing: -.02em; text-wrap: balance; }
+.da .ui3-hermes-start span { color: var(--t2); font: 400 14px/1.45 var(--font); text-wrap: pretty; }
+.da .ui3-hermes-start b { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; color: var(--menthe); font: 600 14px/1 var(--font); }
+.da .ui3-hermes-start b .ic { width: 16px; height: 16px; }
+.da .ui3-hermes-row { animation: ui3-hermes-enter var(--sp-doux-d, .5s) var(--sp-doux, var(--ease)) both; }
+@keyframes ui3-hermes-enter { from { opacity: 0; transform: translateY(6px); } }
+@media (min-width: 735px) {
+  .da .ui3-hermes-head h1 { font-size: 56px; }
+  .da .ui3-hermes-start > ul { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1069px) { .da .ui3-hermes-head h1 { font-size: 64px; } }
+@media (max-width: 734px) {
+  .da .ui3-hermes-actions { width: 100%; display: grid; }
+  .da .ui3-hermes-actions .btn { width: 100%; }
+  .da .ui3-hermes-segments { gap: 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .da .ui3-hermes-start li, .da .ui3-hermes-row { animation-duration: .12s; animation-delay: 0s !important; }
+}

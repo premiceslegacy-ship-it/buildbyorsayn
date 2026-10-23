@@ -3,6 +3,8 @@
 .da .welcome-logo { position: absolute; top: 24px; left: var(--gutter); }
 .da .welcome-logo img { width: 104px; }
 .da .welcome-column { width: min(100%, 680px); display: grid; justify-items: center; gap: 18px; text-align: center; }
+.da .welcome-title { max-width: 100%; overflow-wrap: anywhere; word-break: normal; text-wrap: balance; }
+.da .welcome-name { unicode-bidi: plaintext; }
 .da .welcome-column > .t-lede { max-width: 31em; }
 .da .welcome-progress { width: min(100%, 330px); display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 12px; }
 .da .welcome-progress li { height: 5px; border-radius: 4px; background: rgba(241,245,242,.17); transition: background var(--sp-doux-d, .5s) var(--sp-doux, var(--ease)), transform var(--sp-vif-d, .5s) var(--sp-vif, var(--ease)); }

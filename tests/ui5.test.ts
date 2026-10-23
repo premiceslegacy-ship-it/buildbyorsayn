@@ -4,8 +4,16 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { BLOCS_DATA } from "../lib/blocCatalog";
 import { programmeForTier } from "../lib/programme";
-import { purchaseState } from "../components/ui5/purchaseModel";
-import { welcomeChoices } from "../components/ui5/welcomeModel";
+import { purchaseRevealSchedule, purchaseState } from "../components/ui5/purchaseModel";
+import { nonBreakingWelcomeName, welcomeChoices, welcomeDisplayName } from "../components/ui5/welcomeModel";
+
+test("bienvenue n’utilise jamais l’adresse e-mail comme prénom", () => {
+  assert.equal(welcomeDisplayName({}), "");
+  assert.equal(welcomeDisplayName({ email: "build-e2e-full-1790536899862@example.com" }), "");
+  assert.equal(welcomeDisplayName({ first_name: "  Samuel-Paul  " }), "Samuel-Paul");
+  assert.equal(welcomeDisplayName({ full_name: "Samuel Paul Orsayn" }), "Samuel");
+  assert.equal(nonBreakingWelcomeName("Samuel-Paul"), "Samuel\u2011Paul");
+});
 
 test("bienvenue ne propose que de vraies destinations autorisées", () => {
   for (const tier of ["preview", "beginner", "full"] as const) {
@@ -27,10 +35,17 @@ test("fin confirme seulement les paliers payants lus côté serveur", () => {
   assert.equal(purchaseState({ tier: "full", authenticated: true, unverified: true }).kind, "error");
   const beginner = purchaseState({ tier: "beginner", authenticated: true, unverified: false });
   assert.equal(beginner.kind, "confirmed");
-  if (beginner.kind === "confirmed") assert.ok(beginner.entries.length > 0);
+  if (beginner.kind === "confirmed") assert.deepEqual(beginner.entries.map((entry) => entry.label), ["Fondations 1", "Fondations 2", "LA DISTILLATION"]);
   const full = purchaseState({ tier: "full", authenticated: true, unverified: false });
   assert.equal(full.kind, "confirmed");
-  if (full.kind === "confirmed") assert.equal(full.entries.length, BLOCS_DATA.length - 1);
+  if (full.kind === "confirmed") {
+    assert.equal(full.entries.length, BLOCS_DATA.length - 1);
+    assert.deepEqual(full.entries.map((entry) => entry.label), BLOCS_DATA.slice(1).map((bloc) => `Bloc ${bloc.displayNumber}`));
+    const schedule = purchaseRevealSchedule(full.entries.length);
+    assert.equal(schedule.rows.length, full.entries.length);
+    assert.ok(schedule.actionAt < 5_000);
+    assert.ok(schedule.rows.every((row) => row.openAt > row.revealAt));
+  }
 });
 
 test("fin ne fait confiance ni au niveau ni à un état reçu dans l'URL", async () => {
@@ -38,6 +53,8 @@ test("fin ne fait confiance ni au niveau ni à un état reçu dans l'URL", async
   assert.doesNotMatch(source, /searchParams|params\.niveau|params\.etat/);
   assert.match(source, /from\("profiles"\)/);
   assert.match(source, /normalizeProfileTier/);
+  assert.match(source, /<NavBar/);
+  assert.doesNotMatch(await readFile("components/ui5/PurchaseConfirmation.tsx", "utf8"), /Voir mes accès/);
 });
 
 test("le consentement BUILD Sync garde toutes ses protections serveur", async () => {

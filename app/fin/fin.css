@@ -1,28 +1,41 @@
 .da.purchase-page { min-height: 100svh; }
-.da .purchase-state { min-height: 100svh; display: grid; place-items: center; padding: clamp(72px, 10vw, 132px) var(--gutter); overflow: hidden; background: radial-gradient(40% 32% at 50% 18%, rgba(34,217,110,.16), transparent 74%); }
+.da .purchase-state { min-height: 100svh; display: grid; place-items: start center; padding: calc(var(--bar) + clamp(28px, 7vh, 88px)) var(--gutter) clamp(120px, 14vw, 160px); overflow: hidden; background: radial-gradient(52% 40% at 50% 0%, rgba(34,217,110,.12), transparent 70%), var(--nuit); }
 .da .purchase-state__in, .da .purchase-confirmed { width: min(100%, 720px); display: grid; justify-items: center; gap: 20px; text-align: center; }
 .da .purchase-state__in .t-lede, .da .purchase-confirmed .t-lede { margin-inline: auto; }
 .da .purchase-state__in small { max-width: 38em; font: 500 13px/1.45 var(--font); color: var(--t3); }
-.da .purchase-badge { width: 76px; height: 76px; display: grid; place-items: center; border-radius: 50%; color: var(--t3); background: rgba(241,245,242,.07); box-shadow: inset 0 0 0 1px var(--trait-f), 0 22px 70px -24px rgba(34,217,110,.45); transition: color var(--sp-vif-d, .5s) var(--sp-vif, var(--ease)), background var(--sp-vif-d, .5s) var(--sp-vif, var(--ease)), transform var(--sp-rebond-d, .7s) var(--sp-rebond, var(--ease)); }
+.da .purchase-badge { width: 112px; height: 112px; display: grid; place-items: center; border-radius: 50%; color: var(--t3); }
 .da .purchase-badge .ic { width: 34px; height: 34px; }
-.da .purchase-badge.is-confirmed { color: var(--sur-em); background: var(--em); transform: scale(1.08); }
 .da .purchase-badge--error { color: #ff8c84; }
+.da .purchase-badge--error, .da .purchase-badge--pending { width: 76px; height: 76px; background: rgba(241,245,242,.07); box-shadow: inset 0 0 0 1px var(--trait-f), 0 22px 70px -24px rgba(34,217,110,.45); }
 .da .purchase-badge--pending { grid-template-columns: repeat(3, 8px); gap: 6px; }
 .da .purchase-badge--pending i { width: 8px; height: 8px; border-radius: 50%; background: var(--em); animation: purchase-wait 1.2s ease-in-out infinite; }
 .da .purchase-badge--pending i:nth-child(2) { animation-delay: .15s; }
 .da .purchase-badge--pending i:nth-child(3) { animation-delay: .3s; }
 @keyframes purchase-wait { 0%, 70%, 100% { opacity: .28; transform: translateY(0); } 35% { opacity: 1; transform: translateY(-5px); } }
+.da .purchase-badge--confirmed svg { width: 100%; height: 100%; overflow: visible; fill: none; stroke: var(--em); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 14px rgba(34,217,110,.3)); }
+.da .purchase-badge--confirmed circle { stroke-dasharray: 315; stroke-dashoffset: 315; }
+.da .purchase-badge--confirmed path { stroke-dasharray: 72; stroke-dashoffset: 72; transform-origin: center; }
+.da .purchase-confirmed > h1, .da .purchase-confirmed > .t-lede, .da .purchase-action { opacity: 0; visibility: hidden; }
+.da .purchase-confirmed > h1[data-visible="true"], .da .purchase-confirmed > .t-lede[data-visible="true"], .da .purchase-action[data-visible="true"] { visibility: visible; animation: purchase-enter var(--sp-doux-d, .5s) var(--sp-doux, var(--ease)) both; }
+@keyframes purchase-enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .da .purchase-list { width: 100%; display: grid; gap: 8px; margin-top: 12px; }
-.da .purchase-list li { display: grid; grid-template-columns: 96px minmax(0, 1fr) 36px; gap: 16px; align-items: center; padding: 10px; border-radius: var(--r-m); text-align: left; opacity: .54; background: rgba(241,245,242,.045); box-shadow: inset 0 0 0 1px var(--trait); transition: opacity var(--sp-doux-d, .5s) var(--sp-doux, var(--ease)), transform var(--sp-rebond-d, .7s) var(--sp-rebond, var(--ease)), background .32s var(--ease-c); }
-.da .purchase-list li[data-open="true"] { opacity: 1; transform: translateY(-2px); background: rgba(34,217,110,.08); }
-.da .purchase-list img { width: 96px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px; filter: saturate(.45) brightness(.62); transition: filter .45s var(--ease-c); }
+.da .purchase-list li { display: grid; grid-template-columns: 112px minmax(0, 1fr) 44px; gap: 14px; align-items: center; padding: 10px 14px 10px 10px; border-radius: var(--r-m); text-align: left; opacity: 0; visibility: hidden; background: var(--carte); transition: opacity .32s var(--ease-c); }
+.da .purchase-list li[data-visible="true"] { opacity: .62; visibility: visible; animation: purchase-row-enter var(--sp-doux-d, .5s) var(--sp-doux, var(--ease)) both; }
+.da .purchase-list li[data-open="true"] { opacity: 1; }
+@keyframes purchase-row-enter { from { transform: translateY(10px) scale(.98); } to { transform: none; } }
+.da .purchase-list img { width: 112px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-s); opacity: .55; transition: opacity .32s var(--ease-c); }
 .da .purchase-list li[data-open="true"] img { filter: none; }
 .da .purchase-list span { min-width: 0; display: grid; gap: 3px; }
-.da .purchase-list b { font: 600 17px/1.25 var(--font-t); color: var(--encre); }
-.da .purchase-list small { font: 500 13px/1.3 var(--font); color: var(--t3); }
-.da .purchase-list > li > i { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: var(--t3); background: rgba(241,245,242,.07); }
-.da .purchase-list li[data-open="true"] > i { color: var(--sur-em); background: var(--em); }
-.da .purchase-list .ic { width: 18px; }
+.da .purchase-list b { font: 600 17px/1.25 var(--font-t); color: var(--t2); transition: color .32s var(--ease-c); }
+.da .purchase-list small { font: 500 14px/1.3 var(--font); color: var(--t3); }
+.da .purchase-list > li > i { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: var(--t2); background: rgba(241,245,242,.1); transition: color .32s var(--ease-c), background .32s var(--ease-c), transform var(--sp-vif-d, .5s) var(--sp-vif, var(--ease)); }
+.da .purchase-list li[data-open="true"] > i { color: var(--em); background: rgba(34,217,110,.16); transform: scale(1.04); }
+.da .purchase-list li[data-open="true"] b { color: var(--encre); }
+.da .purchase-list li[data-open="true"] img { opacity: 1; }
+.da .purchase-lock { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.da .purchase-lock path { transform-origin: 8px 10.5px; transition: transform var(--sp-vif-d, .5s) var(--sp-vif, var(--ease)); }
+.da .purchase-list li[data-open="true"] .purchase-lock path { transform: translate(7px, -3px) rotate(34deg); }
 .da .purchase-action { min-height: 76px; display: grid; justify-items: center; gap: 8px; align-content: start; margin-top: 12px; }
 .da .purchase-action span { font: 500 13px/1.3 var(--font); color: var(--menthe); }
-@media (max-width: 560px) { .da .purchase-state { padding-inline: 20px; } .da .purchase-list li { grid-template-columns: 76px minmax(0, 1fr) 32px; gap: 11px; } .da .purchase-list img { width: 76px; } .da .purchase-list b { font-size: 15px; } }
+@media (max-width: 734px) { .da .purchase-state { padding-inline: 20px; } .da .purchase-list li { grid-template-columns: 88px minmax(0, 1fr) 40px; gap: 12px; padding-right: 10px; } .da .purchase-list img { width: 88px; } .da .purchase-list > li > i { width: 40px; height: 40px; } .da .purchase-list b { font-size: 15px; } }
+@media (prefers-reduced-motion: reduce) { .da .purchase-badge--confirmed circle, .da .purchase-badge--confirmed path { stroke-dashoffset: 0; } .da .purchase-confirmed > h1[data-visible="true"], .da .purchase-confirmed > .t-lede[data-visible="true"], .da .purchase-list li[data-visible="true"], .da .purchase-action[data-visible="true"] { animation-duration: .12s; animation-delay: 0s; } }

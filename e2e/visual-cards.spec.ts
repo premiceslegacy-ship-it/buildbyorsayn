@@ -45,7 +45,7 @@ test.describe("IllustratedCard visual regression (accompagnement, public page)",
   test("accompagnement card grid renders on mobile width", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 800 });
     await page.goto("/accompagnement");
-    const grid = page.locator("#accompagnements");
+    const grid = page.getByRole("main").filter({ has: page.getByRole("complementary", { name: "À venir" }) });
     await grid.scrollIntoViewIfNeeded();
     await expect(grid).toHaveScreenshot("accompagnement-grid-mobile.png");
   });
