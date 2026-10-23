@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
-import { resolveUpgradeRedirect } from "@/lib/checkoutUpgrade";
+import { isTrustedUpgradeNavigation, resolveUpgradeRedirect } from "@/lib/checkoutUpgrade";
 import {
   buildUpgradeCheckoutParams,
   safeStripeCheckoutUrl,
@@ -21,7 +21,14 @@ const upgradeUrlCache = createUpgradeCheckoutCache(UPGRADE_CHECKOUT_WINDOW_MS);
  * Porte du complément Fondations vers LE COFFRE. Pour un compte Fondations, le serveur
  * crée une Checkout Session dont les métadonnées lient le paiement au compte authentifié.
  */
-export async function GET() {
+export async function GET(request: Request) {
+  if (!isTrustedUpgradeNavigation(request.headers)) {
+    return new NextResponse(null, {
+      status: 303,
+      headers: { Location: "/checkout", "Cache-Control": "no-store" },
+    });
+  }
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

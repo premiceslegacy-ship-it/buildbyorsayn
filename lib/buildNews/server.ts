@@ -20,6 +20,19 @@ export async function listBuildNews(): Promise<BuildNewsRow[]> {
   return (data ?? []) as BuildNewsRow[];
 }
 
+export async function listAdminBuildNews(): Promise<BuildNewsRow[]> {
+  const user = await getVerifiedAdmin();
+  if (!user) throw new Error("Accès refusé.");
+  const { data, error } = await createAdminSupabase()
+    .from("build_news")
+    .select(buildNewsColumns)
+    .order("published_at", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(100);
+  if (error) throw new Error("Les nouveautés BUILD sont indisponibles.");
+  return (data ?? []) as BuildNewsRow[];
+}
+
 export async function createBuildNews(input: BuildNewsInput): Promise<BuildNewsRow> {
   const user = await getVerifiedAdmin();
   if (!user) throw new Error("Accès refusé.");

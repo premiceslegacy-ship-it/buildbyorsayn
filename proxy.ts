@@ -166,7 +166,7 @@ export async function proxy(request: NextRequest) {
 
     // Routes réservées aux membres full (497€)
     const requiresFull =
-        pathname === "/fin" ||
+        // /fin reste ouverte à toute session : la page lit le palier côté serveur et affiche « paiement en cours » ou la confirmation.
         pathname === "/intro" ||
         pathname === "/videos/tutos" ||
         pathname.startsWith("/videos/tutos/") ||

@@ -31,12 +31,19 @@ test("bienvenue ne propose que de vraies destinations autorisées", () => {
 });
 
 test("fin confirme seulement les paliers payants lus côté serveur", () => {
-  for (const tier of [null, "free", "preview"] as const) assert.equal(purchaseState({ tier, authenticated: true, unverified: false }).kind, "pending");
-  assert.equal(purchaseState({ tier: "full", authenticated: true, unverified: true }).kind, "error");
-  const beginner = purchaseState({ tier: "beginner", authenticated: true, unverified: false });
+  for (const tier of [null, "free", "preview"] as const) assert.equal(purchaseState({ tier, authenticated: true, unverified: false, entries: [] }).kind, "pending");
+  assert.equal(purchaseState({ tier: "full", authenticated: true, unverified: true, entries: [] }).kind, "error");
+  const beginnerEntries = programmeForTier("beginner")[0].cards.map((card) => ({
+    id: card.id,
+    label: card.id === "fondations-1" ? "Fondations 1" : card.id === "fondations-2" ? "Fondations 2" : "LA DISTILLATION",
+    title: card.title,
+    image: card.image,
+  }));
+  const beginner = purchaseState({ tier: "beginner", authenticated: true, unverified: false, entries: beginnerEntries });
   assert.equal(beginner.kind, "confirmed");
   if (beginner.kind === "confirmed") assert.deepEqual(beginner.entries.map((entry) => entry.label), ["Fondations 1", "Fondations 2", "LA DISTILLATION"]);
-  const full = purchaseState({ tier: "full", authenticated: true, unverified: false });
+  const fullEntries = BLOCS_DATA.slice(1).map((bloc) => ({ id: bloc.id, label: `Bloc ${bloc.displayNumber}`, title: bloc.titre, image: `/da/mini/b${bloc.displayNumber}.jpg` }));
+  const full = purchaseState({ tier: "full", authenticated: true, unverified: false, entries: fullEntries });
   assert.equal(full.kind, "confirmed");
   if (full.kind === "confirmed") {
     assert.equal(full.entries.length, BLOCS_DATA.length - 1);

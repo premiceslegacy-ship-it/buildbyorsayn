@@ -24,6 +24,7 @@ if (process.env.BUILD_NEWS_INNER !== "1") {
   const NEWS_ID = "223e4567-e89b-42d3-a456-426614174000";
   let isAdmin = false;
   let adminDatabaseCalls = 0;
+  let memberDatabaseCalls = 0;
   const audits: Array<Record<string, unknown>> = [];
   type MockChain = {
     insert: () => MockChain;
@@ -64,7 +65,19 @@ if (process.env.BUILD_NEWS_INNER !== "1") {
     },
   });
   mock.module(file("lib/supabase/server.ts"), {
-    namedExports: { createClient: async () => ({ from: () => ({}) }) },
+    namedExports: {
+      createClient: async () => ({
+        from: () => {
+          memberDatabaseCalls += 1;
+          const query = {
+            select() { return query; },
+            order() { return query; },
+            limit: async () => ({ data: [row], error: null }),
+          };
+          return query;
+        },
+      }),
+    },
   });
   mock.module(file("lib/mux/adminServer.ts"), {
     namedExports: {
@@ -74,6 +87,7 @@ if (process.env.BUILD_NEWS_INNER !== "1") {
   });
 
   const buildNews = await import("../lib/buildNews/server");
+  const actions = await import("../components/admin/news/actions");
   const input = {
     title: row.title,
     publishedAt: row.published_at,
@@ -87,6 +101,13 @@ if (process.env.BUILD_NEWS_INNER !== "1") {
     await assert.rejects(() => buildNews.createBuildNews(input), /Accès refusé/);
     await assert.rejects(() => buildNews.deleteBuildNews(NEWS_ID), /Accès refusé/);
     assert.equal(adminDatabaseCalls, 0);
+  });
+
+  test("l'action de lecture admin refuse aussi un membre non admin", async () => {
+    isAdmin = false;
+    const result = await actions.loadBuildNewsAction();
+    assert.deepEqual(result, { ok: false, error: "Accès refusé." });
+    assert.equal(memberDatabaseCalls, 0);
   });
 
   test("un admin crée et supprime avec une trace d'audit", async () => {

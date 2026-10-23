@@ -1,6 +1,6 @@
 "use server";
 
-import { createBuildNews, deleteBuildNews, listBuildNews } from "@/lib/buildNews/server";
+import { createBuildNews, deleteBuildNews, listAdminBuildNews } from "@/lib/buildNews/server";
 import type { BuildNewsInput } from "@/lib/buildNews/model";
 import type { NewsActionResult } from "./types";
 
@@ -9,9 +9,9 @@ function safeError(error: unknown, fallback: string) {
   return fallback;
 }
 
-export async function loadBuildNewsAction(): Promise<NewsActionResult<Awaited<ReturnType<typeof listBuildNews>>>> {
+export async function loadBuildNewsAction(): Promise<NewsActionResult<Awaited<ReturnType<typeof listAdminBuildNews>>>> {
   try {
-    return { ok: true, data: await listBuildNews() };
+    return { ok: true, data: await listAdminBuildNews() };
   } catch (error) {
     return { ok: false, error: safeError(error, "Les nouveautés BUILD sont indisponibles.") };
   }

@@ -15,6 +15,7 @@ import {
   MAX_INACTIVE_ACCOUNT_BATCH,
   type InactiveAccountInput,
 } from "./inactiveAccounts";
+import { hasStripeHistory } from "./stripeHistory";
 import { extractYoutubeVideoId } from "./youtube";
 
 type InactiveActionResult = {
@@ -31,28 +32,6 @@ const deleteInputSchema = z.object({
   expectedCount: z.number().int().min(1).max(MAX_INACTIVE_ACCOUNT_BATCH),
   confirmation: z.string().max(32),
 }).strict();
-
-async function hasStripeHistory(stripe: Stripe, email: string) {
-  const escapedEmail = email.replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
-  const [customers, receiptPayments] = await Promise.all([
-    stripe.customers.list({ email, limit: 10 }),
-    stripe.paymentIntents.search({ query: `receipt_email:\"${escapedEmail}\"`, limit: 1 }),
-  ]);
-  if (receiptPayments.data.some((payment) => payment.status !== "canceled")) {
-    return { hasPayment: true, hasSubscription: false };
-  }
-
-  for (const customer of customers.data) {
-    const [payments, subscriptions] = await Promise.all([
-      stripe.paymentIntents.list({ customer: customer.id, limit: 1 }),
-      stripe.subscriptions.list({ customer: customer.id, status: "all", limit: 1 }),
-    ]);
-    if (payments.data.some((payment) => payment.status !== "canceled") || subscriptions.data.length > 0) {
-      return { hasPayment: payments.data.length > 0, hasSubscription: subscriptions.data.length > 0 };
-    }
-  }
-  return { hasPayment: false, hasSubscription: false };
-}
 
 async function mapWithConcurrency<T, R>(items: T[], concurrency: number, worker: (item: T) => Promise<R>) {
   const results = new Array<R>(items.length);

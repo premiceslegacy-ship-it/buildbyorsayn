@@ -88,7 +88,12 @@ test.describe("Offres pour un compte Fondations", () => {
     await page.goto("/checkout");
     await expectOnlyUpgradeCard(page, "main");
   });
-
+  test("la confirmation /fin reste atteignable après l'achat de Fondations", async ({ beginnerPage: page }) => {
+    await page.goto("/fin");
+    await expect(page).toHaveURL(/\/fin$/);
+    await expect(page.getByRole("heading", { name: "C'est débloqué." })).toBeVisible();
+    await expect(page.getByText(/Fondations est activé sur ton compte/)).toBeVisible();
+  });
 
   test("le HTML de l'accueil et de /checkout ne contient pas le lien du complément", async ({ beginnerPage: page }) => {
     await expectNoUpgradeStripeLink(page, "/");

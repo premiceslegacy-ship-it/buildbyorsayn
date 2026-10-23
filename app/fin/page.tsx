@@ -4,6 +4,7 @@ import { PurchaseConfirmation } from "@/components/ui5/PurchaseConfirmation";
 import { purchaseState } from "@/components/ui5/purchaseModel";
 import { navIdentity } from "@/lib/auth/navIdentity.server";
 import { normalizeProfileTier, type McpTier } from "@/lib/mcpAccess";
+import { purchaseEntriesForTier } from "@/lib/purchaseEntries.server";
 import { createClient } from "@/lib/supabase/server";
 import "./fin.css";
 
@@ -20,7 +21,7 @@ export default async function FinPage() {
     unverified = Boolean(error);
     tier = normalizeProfileTier(profile?.tier ?? null);
   }
-  const state = purchaseState({ tier, authenticated: Boolean(user), unverified });
+  const state = purchaseState({ tier, authenticated: Boolean(user), unverified, entries: purchaseEntriesForTier(tier) });
   const identity = await navIdentity(user);
   return <DaRoot className="da-app purchase-page"><NavBar {...identity} /><PurchaseConfirmation state={state} /></DaRoot>;
 }

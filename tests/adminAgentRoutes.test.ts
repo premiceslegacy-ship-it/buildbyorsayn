@@ -32,6 +32,7 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
   let currentUser: { id: string; app_metadata: { role?: string } } | null = { id: ADMIN_ID, app_metadata: { role: "admin" } };
   let tokenRow: Record<string, unknown> | null;
   let rateAllowed = true;
+  let platformAdminAllowed = true;
   let insertedToken: Record<string, unknown> | null = null;
   let videoRow: Record<string, unknown> | null = null;
   let requestStatus = "pending";
@@ -91,7 +92,7 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
       createAdminSupabase: () => ({
         from: table,
         rpc: async (name: string, args?: Record<string, unknown>) => {
-          if (name === "is_platform_admin") return { data: true, error: null };
+          if (name === "is_platform_admin") return { data: platformAdminAllowed, error: null };
           if (name === "check_admin_agent_rate_limit") return { data: rateAllowed, error: null };
           if (name === "create_admin_agent_request") {
             requestCreationCalls += 1;
@@ -185,6 +186,26 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
     tokenRow = { ...validTokenRow(), revoked_at: new Date().toISOString() };
     await assert.rejects(() => security.authenticateAgentRequest(request()), /Jeton invalide/);
     tokenRow = validTokenRow();
+  });
+
+  test("le jeton est refusé dès que son créateur n'est plus administrateur", async () => {
+    tokenRow = validTokenRow();
+    platformAdminAllowed = false;
+    await assert.rejects(() => security.authenticateAgentRequest(request()), /Jeton invalide/);
+    platformAdminAllowed = true;
+  });
+
+  test("la limitation de débit échoue fermée sans poivre ou sans adresse fiable", async () => {
+    tokenRow = validTokenRow();
+    const validPepper = process.env.AGENT_RATE_LIMIT_PEPPER;
+    delete process.env.AGENT_RATE_LIMIT_PEPPER;
+    await assert.rejects(() => security.authenticateAgentRequest(request()), /temporairement indisponible/);
+    process.env.AGENT_RATE_LIMIT_PEPPER = validPepper;
+    const withoutAddress = new Request("https://build.example/api/agent/tools", {
+      method: "POST",
+      headers: { authorization: `Bearer ${RAW_TOKEN}` },
+    });
+    await assert.rejects(() => security.authenticateAgentRequest(withoutAddress), /temporairement indisponible/);
   });
 
   test("la comparaison de hash utilise une comparaison à temps constant", () => {

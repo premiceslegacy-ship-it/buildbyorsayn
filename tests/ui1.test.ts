@@ -32,7 +32,7 @@ test("la recherche ne renvoie que les vidéos, chapitres et skills du catalogue 
   assert.equal(catalog.some((item) => /EXEMPLE|fichier/i.test(item.title)), false);
   assert.ok(searchCatalog(catalog, "stack").some((item) => item.href === "/blocs/2"));
   assert.ok(searchCatalog(catalog, "oracle").some((item) => item.kind === "Skill"));
-  assert.equal(buildSearchCatalog("free").find((item) => item.id === "video-hermes")?.locked, true);
+  assert.equal(buildSearchCatalog("free").some((item) => item.id === "video-hermes"), false);
 });
 
 test("sons et ressorts reprennent les réglages de la maquette", () => {
