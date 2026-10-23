@@ -168,13 +168,13 @@ export function Label({ x, y, text, anchor = "middle", kind = "text", tone, maxC
   text: string;
   anchor?: TextAnchor;
   kind?: "note" | "text" | "title" | "muted-title";
-  tone?: "accent" | "error";
+  tone?: "accent" | "error" | "on-accent";
   maxChars?: number;
   step?: number;
 }) {
   const lines = maxChars ? wrapDiagramText(text, maxChars) : text.split("|");
   const kindClass = kind === "title" ? styles.labelTitle : kind === "muted-title" ? styles.labelMutedTitle : kind === "note" ? `${styles.labelText} ${styles.labelNote}` : styles.labelText;
-  const toneClass = tone === "accent" ? styles.labelAccent : tone === "error" ? styles.labelError : "";
+  const toneClass = tone === "accent" ? styles.labelAccent : tone === "error" ? styles.labelError : tone === "on-accent" ? styles.labelOnAccent : "";
   return <g data-schema-node="true" data-schema-step={Math.min(step, 12)}>
     {lines.map((line, index) => <text key={`${line}-${index}`} className={`${kindClass} ${toneClass}`} x={x} y={y + index * (kind.includes("title") ? 24 : 20)} textAnchor={anchor}>{line}</text>)}
   </g>;

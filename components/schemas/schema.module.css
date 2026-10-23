@@ -67,11 +67,12 @@
 
 .nodeRect {
   fill: var(--carte);
-  stroke: none;
+  stroke: rgba(241, 245, 242, .14);
+  stroke-width: 1;
 }
 
 .nodeMuted .nodeRect {
-  fill: color-mix(in srgb, var(--encre) 8%, transparent);
+  fill: #1d211f;
 }
 
 .nodeHollow .nodeRect {
@@ -111,7 +112,7 @@
 .nodeSmall {
   fill: var(--encre);
   stroke: none;
-  font: 500 14px/20px var(--font);
+  font: 500 15px/20px var(--font);
   dominant-baseline: central;
 }
 
@@ -120,7 +121,7 @@
 .labelText {
   fill: var(--t2);
   stroke: none;
-  font: 400 14px/20px var(--font);
+  font: 450 15px/20px var(--font);
   dominant-baseline: central;
 }
 
@@ -134,6 +135,10 @@
 
 .labelError {
   fill: var(--err);
+}
+
+.labelOnAccent {
+  fill: #052116;
 }
 
 .nodeAccent :is(.nodeTitle, .nodeSmall) {
@@ -178,6 +183,75 @@
 .fixedDashed {
   stroke: var(--t3);
   stroke-dasharray: 2 6;
+}
+
+.motifSurface,
+.motifPaper,
+.motifAccent,
+.motifInk,
+.motifGradientSurface,
+.motifTopLight,
+.motifStroke,
+.motifAccentStroke,
+.motifSoftStroke {
+  vector-effect: non-scaling-stroke;
+}
+
+.motifSurface {
+  fill: var(--carte);
+  stroke: rgba(241, 245, 242, .14);
+  stroke-width: 1;
+}
+
+.motifPaper {
+  fill: #262b28;
+  stroke: rgba(241, 245, 242, .18);
+  stroke-width: 1;
+}
+
+.motifGradientSurface {
+  stroke: rgba(241, 245, 242, .16);
+  stroke-width: 1;
+}
+
+.motifTopLight {
+  fill: none;
+  stroke: rgba(255, 255, 255, .24);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.motifAccent {
+  fill: var(--em);
+  stroke: none;
+}
+
+.motifInk {
+  fill: rgba(241, 245, 242, .72);
+  stroke: none;
+}
+
+.motifStroke,
+.motifAccentStroke,
+.motifSoftStroke {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.motifStroke {
+  stroke: rgba(241, 245, 242, .72);
+  stroke-width: 1.75;
+}
+
+.motifSoftStroke {
+  stroke: rgba(241, 245, 242, .32);
+  stroke-width: 1.5;
+}
+
+.motifAccentStroke {
+  stroke: var(--em);
+  stroke-width: 2;
 }
 
 .prepared [data-schema-node] {

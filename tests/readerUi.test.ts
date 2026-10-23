@@ -170,6 +170,7 @@ test("le texte riche garde un rythme lisible et borne ses visuels dans la voie d
   assert.match(css, /@media \(max-width: 734px\)[\s\S]*?\.prose h2 \{[\s\S]*?font-size: calc\(22px \* var\(--reader-font-scale\)\) !important;/);
   assert.match(css, /\.textLayout\[data-outline-open="true"\] \{\s*--reader-wide-width: min\(960px,/);
   assert.match(css, /\.textLayout \{\s*--reader-wide-width: calc\(100vw - 40px\);\s*width: auto;/);
+  assert.match(css, /\.codeBlock pre \{\s*padding-top: 64px;/);
   assert.match(css, /box-decoration-break: clone/);
   assert.match(css, /-webkit-box-decoration-break: clone/);
 });

@@ -161,7 +161,19 @@
   top: 0;
   margin-bottom: 0;
   border-radius: 0 0 18px 18px;
-  box-shadow: inset 0 -.5px 0 var(--trait), 0 24px 34px 10px var(--nuit);
+  box-shadow: inset 0 -.5px 0 var(--trait), 0 22px 28px 22px var(--nuit);
+}
+
+.readerPage[data-reader-mode="texte"] .toolbar::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 68px;
+  background: linear-gradient(to bottom, var(--nuit) 0 52px, transparent 100%);
+  pointer-events: none;
 }
 
 .toolbarWithoutModes {
@@ -175,7 +187,7 @@
   min-width: 0;
 }
 
-.toolbarSide:last-child {
+.toolbarSide:last-of-type {
   justify-content: flex-end;
 }
 
@@ -540,6 +552,16 @@
   text-wrap: pretty;
 }
 
+.videoIntroduction {
+  max-width: 48rem;
+  margin-top: 24px;
+  font-size: 17px;
+}
+
+.videoIntroduction h2:first-child {
+  margin-top: 24px;
+}
+
 .chapterHeading {
   display: flex;
   align-items: baseline;
@@ -729,6 +751,7 @@
 }
 
 .textLayout {
+  --reader-wide-width: min(960px, calc(100vw - 40px));
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -817,7 +840,7 @@
   min-width: 0;
   width: min(100%, calc(640px * var(--reader-scale)));
   justify-self: center;
-  padding: clamp(34px, 6vw, 76px) 0 48px;
+  padding: clamp(68px, 6vw, 76px) 0 48px;
 }
 
 .article[data-size="small"] {
@@ -862,10 +885,6 @@
   font: 400 calc(19px * var(--reader-font-scale))/1.7 var(--font);
 }
 
-.prose > * + * {
-  margin-top: 1em;
-}
-
 .prose p,
 .prose li {
   color: #e6ebe7 !important;
@@ -886,7 +905,9 @@
   margin-top: 64px;
   margin-bottom: 16px;
   font-size: calc(28px * var(--reader-font-scale)) !important;
+  font-weight: 600 !important;
   line-height: 1.16 !important;
+  letter-spacing: -.025em;
 }
 
 .prose h3,
@@ -894,7 +915,24 @@
   margin-top: 52px;
   margin-bottom: 14px;
   font-size: calc(23px * var(--reader-font-scale)) !important;
+  font-weight: 600 !important;
   line-height: 1.22 !important;
+}
+
+.prose > p + p {
+  margin-top: .95em !important;
+}
+
+.prose > :is(p, ul, ol, blockquote, .richCard, .beforeAfterGallery, .richVisual, .codeBlock, .markdownTable, .aiVersion) + :is(ul, ol, blockquote, .richCard, .beforeAfterGallery, .richVisual, .codeBlock, .markdownTable, .aiVersion) {
+  margin-top: clamp(32px, 5vw, 52px) !important;
+}
+
+.prose > :is(h2, h3, h4) + :is(p, ul, ol, blockquote, .richCard, .beforeAfterGallery, .richVisual, .codeBlock, .markdownTable, .aiVersion) {
+  margin-top: 0 !important;
+}
+
+.prose > :is(p, ul, ol, blockquote, .richCard, .beforeAfterGallery, .richVisual, .codeBlock, .markdownTable, .aiVersion) + :is(h2, h3, h4) {
+  margin-top: 64px !important;
 }
 
 .prose strong {
@@ -1083,7 +1121,7 @@
 
 .beforeAfterGallery,
 .richVisual {
-  --reader-rich-width: min(960px, calc(100vw - 40px));
+  --reader-rich-width: var(--reader-wide-width);
   box-sizing: border-box;
   width: var(--reader-rich-width);
   max-width: none;
@@ -1174,7 +1212,7 @@
 
 .prose :global([data-schema-container="true"]),
 .diagramSlot :global([data-schema-container="true"]) {
-  --reader-schema-width: min(960px, calc(100vw - 40px));
+  --reader-schema-width: var(--reader-wide-width, min(960px, calc(100vw - 40px)));
   box-sizing: border-box;
   width: var(--reader-schema-width);
   max-width: none;
@@ -1202,6 +1240,10 @@
 
 .codeBlock {
   position: relative;
+}
+
+.codeBlock pre {
+  padding-top: 64px;
 }
 
 .codeBlock button {
@@ -1824,6 +1866,7 @@
 
 @media (min-width: 1280px) {
   .textLayout[data-outline-open="true"] {
+    --reader-wide-width: min(960px, calc(min(calc(100vw - 2 * var(--gutter)), 74rem) - 330px - clamp(40px, 5vw, 72px)));
     grid-template-columns: 330px minmax(0, 1fr);
     gap: clamp(40px, 5vw, 72px);
   }
@@ -1914,7 +1957,7 @@
     gap: 6px;
   }
 
-  .toolbarSide:last-child > .toolButton,
+  .readerPage .toolbarSide:last-of-type > .toolButton,
   .desktopOutlineButton {
     display: none;
   }
@@ -1950,8 +1993,7 @@
     max-width: none;
   }
 
-  .videoLayout,
-  .textLayout {
+  .videoLayout {
     width: 100%;
   }
 
@@ -1964,6 +2006,11 @@
   .neighbors,
   .textLayout {
     margin-inline: 20px;
+  }
+
+  .textLayout {
+    --reader-wide-width: calc(100vw - 40px);
+    width: auto;
   }
 
   .outline {
@@ -2077,7 +2124,7 @@
 
   .article {
     width: 100%;
-    padding-top: 30px;
+    padding-top: 68px;
   }
 
   .articleHeader h1,
@@ -2090,9 +2137,25 @@
     line-height: 1.7;
   }
 
+  .prose h2 {
+    margin-top: 52px;
+    margin-bottom: 12px;
+    font-size: calc(22px * var(--reader-font-scale)) !important;
+  }
+
+  .prose h3,
+  .prose h4 {
+    margin-top: 44px;
+    margin-bottom: 10px;
+    font-size: calc(20px * var(--reader-font-scale)) !important;
+  }
+
+  .prose > :is(p, ul, ol, blockquote, .richCard, .beforeAfterGallery, .richVisual, .codeBlock, .markdownTable, .aiVersion) + :is(h2, h3, h4) {
+    margin-top: 52px !important;
+  }
+
   .prose :global([data-schema-container="true"]),
   .diagramSlot :global([data-schema-container="true"]) {
-    --reader-schema-width: calc(100vw - 20px);
     padding: 20px;
   }
 
@@ -2102,7 +2165,7 @@
 
   .beforeAfterGallery,
   .richVisual {
-    --reader-rich-width: calc(100vw - 20px);
+    --reader-rich-width: var(--reader-wide-width);
   }
 
   .beforeAfterPair {

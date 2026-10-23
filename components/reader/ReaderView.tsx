@@ -45,6 +45,7 @@ export type ReaderChapter = {
   hideArticleHeader?: boolean;
   lesson?: BlocSection["lesson"];
   skillFiles?: BlocSection["skillFiles"];
+  afterContent?: ReactNode;
 };
 
 type ReaderViewProps = {
@@ -69,6 +70,7 @@ type ReaderViewProps = {
   finishDetail?: string;
   finishActionLabel?: string;
   thumbnailSrc?: string;
+  videoIntroductionMarkdown?: string;
 };
 
 type ReaderSize = "small" | "normal" | "large";
@@ -175,6 +177,7 @@ export function ReaderView({
   finishDetail = "Valide ta progression pour continuer dans le programme.",
   finishActionLabel,
   thumbnailSrc,
+  videoIntroductionMarkdown,
 }: ReaderViewProps) {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
@@ -391,6 +394,7 @@ export function ReaderView({
           <h1>{title.replace(/^Bloc \d+\s*:\s*/, "")}</h1>
           <p className={styles.videoMeta}>{toolbarTitle}{totalDuration > 0 ? `, ${formatLessonDuration(totalDuration)}` : ""} en {sections.length} chapitre{sections.length > 1 ? "s" : ""}</p>
           {current.summary ? <p className={styles.videoSummary}>{current.summary}</p> : null}
+          {videoIntroductionMarkdown ? <div className={`${styles.prose} ${styles.videoIntroduction}`}><ReaderProse section={{ content: videoIntroductionMarkdown }} /></div> : null}
         </header>
         {current.lesson ? <div className={styles.lessonMeta}><LessonMeta lesson={current.lesson} /></div> : null}
         <div className={styles.chapterHeading}><h2>Chapitres</h2><span>{sections.length} chapitre{sections.length > 1 ? "s" : ""}</span></div>
@@ -415,6 +419,7 @@ export function ReaderView({
           <div className={styles.prose}>
             {currentMarkdown ? <ReaderProse section={{ content: currentMarkdown, skillFiles: current.skillFiles }} allowedLocalPaths={markdownLocalPaths} localBaseHref={markdownBaseHref} /> : current.content}
             {current.diagram ? <div className={styles.diagramSlot}>{current.diagram}</div> : null}
+            {current.afterContent}
           </div>
           <footer className={styles.articleEnd}>
             {onToggleChapter ? <button className={`${styles.toolButton} ${styles.completeButton}`} type="button" aria-pressed={completedIds.includes(current.id)} data-sfx="none" onClick={() => complete(current.id)}>{completedIds.includes(current.id) ? <Check aria-hidden="true" /> : null}{completedIds.includes(current.id) ? "Chapitre lu" : "Marquer comme lu"}</button> : null}
