@@ -5,16 +5,18 @@ import MuxPlayer from "@mux/mux-player-react/lazy";
 import type MuxPlayerElement from "@mux/mux-player";
 import { getLessonPlayback, type LessonPlayback } from "@/app/actions/lessonPlayback";
 import { useLessonPosition } from "@/hooks/useLessonPosition";
+import styles from "@/components/reader/reader.module.css";
 
 type LessonPlayerProps = {
   sectionId: string;
   title: string;
   onCompleted: () => void;
+  onEnded?: () => void;
 };
 
 type PlayerState = { status: "loading" } | { status: "unavailable" } | { status: "ready"; playback: Extract<LessonPlayback, { ok: true }> };
 
-export function LessonPlayer({ sectionId, title, onCompleted }: LessonPlayerProps) {
+export function LessonPlayer({ sectionId, title, onCompleted, onEnded }: LessonPlayerProps) {
   const [state, setState] = useState<PlayerState>({ status: "loading" });
   const tokenRefreshed = useRef(false);
   const { report } = useLessonPosition(sectionId, onCompleted);
@@ -26,7 +28,6 @@ export function LessonPlayer({ sectionId, title, onCompleted }: LessonPlayerProp
 
   useEffect(() => {
     tokenRefreshed.current = false;
-    setState({ status: "loading" });
     let cancelled = false;
     getLessonPlayback(sectionId).then((playback) => {
       if (!cancelled) setState(playback.ok ? { status: "ready", playback } : { status: "unavailable" });
@@ -48,13 +49,14 @@ export function LessonPlayer({ sectionId, title, onCompleted }: LessonPlayerProp
   }, [load]);
 
   if (state.status === "loading") {
-    return <div data-testid="lesson-loading" className="aspect-video w-full animate-pulse rounded-xl border border-white/10 bg-white/[0.04]" />;
+    return <div data-testid="lesson-loading" aria-label="Chargement de la vidéo" className={styles.lessonLoading} />;
   }
 
   if (state.status === "unavailable") {
     return (
-      <div data-testid="lesson-unavailable" role="status" className="flex aspect-video w-full items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 text-center text-sm text-white/50">
-        Vidéo indisponible pour le moment.
+      <div data-testid="lesson-unavailable" role="status" className={styles.lessonUnavailable}>
+        <p>La vidéo ne peut pas être chargée pour le moment.</p>
+        <button type="button" className={styles.toolButton} onClick={() => void load()}>Réessayer</button>
       </div>
     );
   }
@@ -66,7 +68,7 @@ export function LessonPlayer({ sectionId, title, onCompleted }: LessonPlayerProp
   };
 
   return (
-    <div data-testid="lesson-player" className="relative aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-black">
+    <div data-testid="lesson-player" className={styles.lessonPlayer}>
       <MuxPlayer
         key={playback.tokens.playback}
         playbackId={playback.playbackId}
@@ -78,10 +80,10 @@ export function LessonPlayer({ sectionId, title, onCompleted }: LessonPlayerProp
         style={{ width: "100%", height: "100%" }}
         onTimeUpdate={(event) => { const { time, duration } = readTime(event); report(time, duration); }}
         onPause={(event) => { const { time, duration } = readTime(event); report(time, duration, true); }}
-        onEnded={(event) => { const { duration } = readTime(event); report(duration, duration, true); }}
+        onEnded={(event) => { const { duration } = readTime(event); report(duration, duration, true); onEnded?.(); }}
         onError={handleError}
       />
-      <div data-testid="lesson-watermark" className="pointer-events-none absolute bottom-3 right-3 select-none text-[11px] text-white/25">
+      <div data-testid="lesson-watermark" className={styles.watermark}>
         {playback.viewerEmail}
       </div>
     </div>

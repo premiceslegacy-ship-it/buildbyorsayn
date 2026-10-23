@@ -73,7 +73,7 @@ export const SECTIONS = [
 
 export const ANGLE_MORT = {
   id: "angle-mort",
-  num: "11",
+  num: "12",
   label: "Le seuil",
   summary: "Tu as les Fondations entre les mains. Regarde maintenant ce qui te fait sortir de la dépendance pour de bon.",
   illustrationId: "fondations-tech-foundation",

@@ -1,440 +1,102 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Check, Copy, Lock, ArrowRight, Download, FileText } from "lucide-react";
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BLOCS_DATA, type DeliveredBloc } from "@/lib/blocCatalog";
-import { useProgress } from "@/hooks/useProgress";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
-import { LiquidCard } from "@/components/ui/liquid-glass-card";
-import { LinkifiedText } from "@/components/ui/linkified-text";
-import { ScrollProgress } from "@/components/ui/scroll-progress";
-import { ScrollToTop } from "@/components/ui/scroll-to-top";
-import { SectionPager } from "@/components/ui/section-pager";
-import { LessonPlayer } from "@/components/lessons/LessonPlayer";
-import { LessonMeta } from "@/components/lessons/LessonMeta";
-import { VideoComingBanner } from "@/components/VideoComingBanner";
-
-import { toggleBlocCompletion } from "@/app/actions/progress";
-import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, withClientReferenceId } from "@/lib/pricing";
-import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { McpStudyCallout } from "@/components/McpStudyCallout";
+import { NavBar } from "@/components/NavBar";
+import { DaRoot } from "@/components/da/DaRoot";
+import { ReaderView } from "@/components/reader/ReaderView";
+import type { ReaderMode } from "@/components/reader/readerModel";
+import { toggleBlocCompletion } from "@/app/actions/progress";
 import { getMcpConnectionStatus } from "@/app/actions/mcpConnections";
+import { useProgress } from "@/hooks/useProgress";
+import { BLOCS_DATA, type DeliveredBloc } from "@/lib/blocCatalog";
+import { normalizeProfileTier } from "@/lib/mcpAccess";
 import type { McpConnectionStatus } from "@/lib/mcp/connectionStatus";
+import { COFFRE_LABEL, COFFRE_PRICE, STRIPE_FULL_CHECKOUT_LINK, formatEuro, withClientReferenceId } from "@/lib/pricing";
 
 const MCP_CONNECTOR_LAUNCHED = process.env.NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED === "true";
 const MCP_CONNECTOR_BETA_VISIBLE = process.env.NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE === "true";
 const MCP_CONNECTOR_VISIBLE = MCP_CONNECTOR_BETA_VISIBLE || MCP_CONNECTOR_LAUNCHED;
 
-function CodeBlock({ code }: { code: string }) {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-  return (
-    <div className="relative group">
-      <pre className="bg-black/40 border border-white/10 rounded-xl p-5 text-[13px] font-mono text-[rgba(240,237,232,0.75)] overflow-x-auto whitespace-pre-wrap leading-relaxed">
-        {code}
-      </pre>
-      <button
-        onClick={handleCopy}
-        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg p-1.5 text-white/60 hover:text-[#e8d5b0] cursor-pointer"
-        title="Copier"
-      >
-        {copied
-          ? <Check className="w-3.5 h-3.5 text-[#e8d5b0]" strokeWidth={2.5} />
-          : <Copy className="w-3.5 h-3.5" />
-        }
-      </button>
-    </div>
-  );
-}
+type BlocIdentity = {
+  displayName: string;
+  displayEmail: string;
+  initials: string;
+  isAdmin: boolean;
+};
 
-export default function BlocClient({ bloc, tier, checkoutUserId }: { bloc: DeliveredBloc; tier: string | null; checkoutUserId: string }) {
+export default function BlocClient({
+  bloc,
+  tier,
+  checkoutUserId,
+  identity,
+  initialMode,
+  initialChapter,
+}: {
+  bloc: DeliveredBloc;
+  tier: string | null;
+  checkoutUserId: string;
+  identity: BlocIdentity;
+  initialMode?: ReaderMode | null;
+  initialChapter?: string | null;
+}) {
   const router = useRouter();
-  const blocId = bloc.id;
-
   const { checkedItems, toggleItem, globalProgress, isLoaded, setLastVisitedBloc } = useProgress();
   const normalizedTier = normalizeProfileTier(tier);
-  const hasMcpAccess = normalizedTier !== null;
   const [mcpConnectionStatus, setMcpConnectionStatus] = useState<McpConnectionStatus>("unknown");
+  const previousGlobalProgress = useRef<number | null>(null);
+  const catalogIndex = BLOCS_DATA.findIndex((item) => item.id === bloc.id);
+  const catalogBloc = BLOCS_DATA[catalogIndex];
+  const previousBloc = catalogIndex > 0 ? BLOCS_DATA[catalogIndex - 1] : undefined;
+  const nextBloc = catalogIndex >= 0 ? BLOCS_DATA[catalogIndex + 1] : undefined;
+  const checkoutHref = withClientReferenceId(STRIPE_FULL_CHECKOUT_LINK, checkoutUserId) ?? STRIPE_FULL_CHECKOUT_LINK;
 
   useEffect(() => {
-    if (blocId) {
-      setLastVisitedBloc(blocId);
+    setLastVisitedBloc(bloc.id);
+  }, [bloc.id, setLastVisitedBloc]);
+
+  useEffect(() => {
+    if (!MCP_CONNECTOR_VISIBLE || normalizedTier === null || bloc.sections.length === 0) return;
+    getMcpConnectionStatus().then(setMcpConnectionStatus).catch(() => setMcpConnectionStatus("unknown"));
+  }, [bloc.sections.length, normalizedTier]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (previousGlobalProgress.current !== null && previousGlobalProgress.current < 100 && globalProgress === 100) {
+      const timer = window.setTimeout(() => router.push("/fin"), 800);
+      return () => window.clearTimeout(timer);
     }
-  }, [blocId, setLastVisitedBloc]);
-
-
-  useEffect(() => {
-    if (!MCP_CONNECTOR_VISIBLE || !hasMcpAccess) return;
-    getMcpConnectionStatus()
-      .then(setMcpConnectionStatus)
-      .catch(() => setMcpConnectionStatus("unknown"));
-  }, [hasMcpAccess]);
-
-  const prevProgress = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (isLoaded) {
-      if (prevProgress.current !== null && prevProgress.current < 100 && globalProgress === 100) {
-        const timer = setTimeout(() => {
-          router.push("/fin");
-        }, 800);
-        return () => clearTimeout(timer);
-      }
-      prevProgress.current = globalProgress;
-    }
+    previousGlobalProgress.current = globalProgress;
   }, [globalProgress, isLoaded, router]);
 
-  if (!bloc) {
-    return (
-      <div className="min-h-screen bg-[#0e0e0f] text-white flex items-center justify-center">
-        Bloc introuvable.
-      </div>
-    );
-  }
-
-  const completedSectionsInBloc = bloc.sections.filter((s) =>
-    checkedItems.includes(s.id)
-  );
-  const isBlocCompleted = completedSectionsInBloc.length ===
-    BLOCS_DATA.find(item => item.id === blocId)?.sections.length;
-
-  const currentBlocIndex = BLOCS_DATA.findIndex((item) => item.id === blocId);
-  const prevBloc = currentBlocIndex > 0 ? BLOCS_DATA[currentBlocIndex - 1] : undefined;
-  const nextBloc = currentBlocIndex >= 0 ? BLOCS_DATA[currentBlocIndex + 1] : undefined;
-  const nextBlocId = nextBloc?.id;
-  const nextBlocLabel = nextBloc?.titre.replace(/^Bloc \d+\s*:\s*/, "") ?? "la suite";
-  const hasNextBloc = Boolean(nextBlocId);
-
-  const checkoutUrl = withClientReferenceId(STRIPE_FULL_CHECKOUT_LINK, checkoutUserId) ?? STRIPE_FULL_CHECKOUT_LINK;
-  const totalSections = BLOCS_DATA[currentBlocIndex]?.sections.length ?? 0;
-  const showPaywall = bloc.sections.length < totalSections;
-  const showContent = bloc.sections.length > 0;
-  const markSessionAdvance = () => {
-    const current = Number(sessionStorage.getItem("build_session_advances") ?? "0");
-    sessionStorage.setItem("build_session_advances", String(current + 1));
+  const validateBloc = async () => {
+    const advances = Number(sessionStorage.getItem("build_session_advances") ?? "0");
+    sessionStorage.setItem("build_session_advances", String(advances + 1));
+    const result = await toggleBlocCompletion(Number(bloc.id));
+    if (!result.success) return;
+    router.refresh();
+    if (nextBloc) router.push(`/blocs/${nextBloc.id}`);
   };
 
-  const renderSectionContent = (section: DeliveredBloc["sections"][number]) => {
-    const segments = section.content.split(/(```[\s\S]*?```)/g);
-    return segments.map((segment, segIdx) => {
-      if (segment.startsWith("```") && segment.endsWith("```")) {
-        const inner = segment.slice(3, -3);
-        const firstNewline = inner.indexOf("\n");
-        const code = firstNewline === -1 ? inner.trim() : inner.slice(firstNewline + 1);
-        return <CodeBlock key={segIdx} code={code} />;
-      }
-      return segment.trim().split("\n\n").filter(Boolean).map((paragraph, paraIdx) => {
-        const key = `${segIdx}-${paraIdx}`;
-        if (paragraph.startsWith("## ")) {
-          return (
-            <h3 key={key} className="pt-2 text-lg font-semibold tracking-tight text-[#f0ede8]">
-              <LinkifiedText text={paragraph.slice(3)} />
-            </h3>
-          );
-        }
-
-        const lines = paragraph.split("\n").map((line) => line.trim()).filter(Boolean);
-        if (lines.length > 0 && lines.every((line) => line.startsWith("- "))) {
-          return (
-            <ul key={key} className="space-y-2 pl-5">
-              {lines.map((line, lineIdx) => (
-                <li key={`${key}-${lineIdx}`} className="list-disc pl-1">
-                  <LinkifiedText text={line.slice(2)} />
-                </li>
-              ))}
-            </ul>
-          );
-        }
-        if (lines.length > 0 && lines.every((line) => /^\d+\)\s/.test(line))) {
-          return (
-            <ol key={key} className="space-y-2 pl-5">
-              {lines.map((line, lineIdx) => (
-                <li key={`${key}-${lineIdx}`} className="list-decimal pl-1">
-                  <LinkifiedText text={line.replace(/^\d+\)\s/, "")} />
-                </li>
-              ))}
-            </ol>
-          );
-        }
-        return (
-          <p key={key} className="whitespace-pre-line">
-            <LinkifiedText text={paragraph} />
-          </p>
-        );
-      });
-    });
-  };
-
-  return (
-    <main className="min-h-screen bg-[#0e0e0f] text-[#f0ede8] font-sans relative selection:bg-[#e8d5b0]/30 selection:text-[#e8d5b0]">
-      {/* Background Halos */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-[#e8d5b0] opacity-5 blur-[120px] w-[600px] h-[300px] rounded-full pointer-events-none" />
-      <div className="fixed bottom-0 right-0 bg-blue-500 opacity-5 blur-[120px] w-[400px] h-[400px] rounded-full pointer-events-none" />
-
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-12 py-6 sm:py-8 relative z-10">
-        <div className="mb-12">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-white/50 hover:text-white/90 transition-colors text-sm font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Retour au système
-          </Link>
-        </div>
-
-        {(prevBloc || nextBloc) && (
-          <div className="mb-10">
-            <SectionPager
-              prev={prevBloc ? { href: `/blocs/${prevBloc.id}`, label: prevBloc.titre } : undefined}
-              next={nextBloc ? { href: `/blocs/${nextBloc.id}`, label: nextBloc.titre } : undefined}
-            />
-          </div>
-        )}
-
-        <div className="flex flex-col items-start">
-          <div className={showPaywall ? "w-full max-w-3xl mx-auto" : "w-full max-w-3xl mx-auto"}>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 md:mb-8 tracking-tight text-[#f0ede8]">
-              {bloc.titre}
-            </h1>
-
-            <VideoComingBanner />
-
-            {MCP_CONNECTOR_VISIBLE && hasMcpAccess && showContent && mcpConnectionStatus === "disconnected" ? (
-              <McpStudyCallout />
-            ) : null}
-
-
-            {/* Paywall : blocs 2-7 pour non-payants */}
-            {showPaywall && (
-              <div className="mt-8">
-                {/* Aperçu flouté */}
-                <div className="relative overflow-hidden rounded-2xl max-h-[300px]">
-                  <div className="blur-sm opacity-30 pointer-events-none select-none space-y-10 p-2">
-                    {BLOCS_DATA[currentBlocIndex].sections.slice(0, 3).map((section) => (
-                      <div key={section.id} className="space-y-3">
-                        <h2 className="text-xl font-semibold text-[#f0ede8]">{section.title}</h2>
-                        <p className="text-[rgba(240,237,232,0.7)] text-[17px] leading-relaxed">
-                          Contenu réservé aux membres.
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0e0e0f]/60 to-[#0e0e0f]" />
-                </div>
-
-                {/* CTA */}
-                <div className="mt-10 max-w-md mx-auto">
-                  <div className="bg-white/[0.04] backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-10 text-center shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
-                    <div className="w-16 h-16 bg-[#e8d5b0]/10 border border-[#e8d5b0]/20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(232,213,176,0.1)]">
-                      <Lock className="w-7 h-7 text-[#e8d5b0]" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-[#f0ede8] mb-3 tracking-tight">
-                      Le système pour construire ton business
-                    </h2>
-                    <p className="text-white/50 text-sm mb-6 leading-relaxed">
-                      Accède au système complet, à ses ressources et aux mises à jour prévues pour les membres.
-                    </p>
-                    <div className="flex items-baseline justify-center gap-2 mb-8">
-                      <span className="text-3xl font-bold text-[#e8d5b0]">{COFFRE_PRICE}€</span>
-                      <span className="text-white/40 text-sm">· accès à vie</span>
-                    </div>
-                    <a
-                      href={checkoutUrl}
-                      className="group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-[#0e0e0f] bg-[#e8d5b0] hover:bg-[#f0dfc0] transition-all duration-200 shadow-[0_0_24px_rgba(232,213,176,0.25)] hover:shadow-[0_0_32px_rgba(232,213,176,0.4)]"
-                    >
-                      Je veux {COFFRE_LABEL}
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                    </a>
-                    <p className="text-center text-xs text-white/25 mt-4">
-                      Paiement sécurisé via Stripe, paiement unique, accès à vie
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Contenu normal */}
-            {showContent && (
-            <>
-            <div className="space-y-20 text-[rgba(240,237,232,0.7)] leading-relaxed text-[17px]">
-              {bloc.sections.map((section) => (
-                <section key={section.id} id={section.id} className="space-y-6 scroll-mt-24">
-                  <h2 className="text-2xl font-semibold text-[#f0ede8] tracking-tight">
-                    {section.title}
-                  </h2>
-                  {section.lesson ? (
-                    <>
-                      <LessonPlayer
-                        sectionId={section.id}
-                        title={section.title}
-                        onCompleted={() => { if (!checkedItems.includes(section.id)) toggleItem(section.id); }}
-                      />
-                      <LessonMeta lesson={section.lesson} />
-                      <details className="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
-                        <summary className="cursor-pointer text-[15px] font-medium text-white/70">Texte du chapitre</summary>
-                        <div className="mt-4 space-y-6">{renderSectionContent(section)}</div>
-                      </details>
-                    </>
-                  ) : renderSectionContent(section)}
-                  {"skillFiles" in section && Array.isArray((section as { skillFiles?: { slug: string; title: string; description: string }[] }).skillFiles) &&
-                    (section as { skillFiles: { slug: string; title: string; description: string }[] }).skillFiles.map((skill) => (
-                      <div key={skill.slug} className="pt-2">
-                        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6">
-                          <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/5 to-transparent pointer-events-none" />
-                          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-5">
-                            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 shadow-[0_4px_16px_rgba(0,0,0,0.2)]">
-                              <FileText className="w-6 h-6 text-[#e8d5b0]" strokeWidth={1.5} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-lg font-semibold tracking-tight text-[#f0ede8]">
-                                {skill.title}
-                              </p>
-                              <p className="text-sm text-white/45 leading-relaxed mt-1">
-                                {skill.description}
-                              </p>
-                            </div>
-                            <a
-                              href={`/api/skills/${skill.slug}`}
-                              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] transition-all duration-200 hover:bg-[#f0dfc0] shadow-[0_0_24px_rgba(232,213,176,0.18)]"
-                            >
-                              <Download className="w-4 h-4" />
-                              Télécharger
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  }
-
-                  <div className="pt-6 mt-6 border-t border-white/5">
-                    <button
-                      onClick={() => toggleItem(section.id)}
-                      className="group flex items-center gap-4 text-left cursor-pointer w-fit"
-                    >
-                      <div
-                        className={`flex-shrink-0 w-5 h-5 rounded-[4px] border flex items-center justify-center transition-all duration-300 ${checkedItems.includes(section.id)
-                            ? "bg-[#e8d5b0] border-[#e8d5b0] shadow-[0_0_12px_rgba(232,213,176,0.3)]"
-                            : "border-white/20 bg-black/20 group-hover:border-white/40"
-                          }`}
-                      >
-                        {checkedItems.includes(section.id) && (
-                          <Check
-                            className="w-3 h-3 text-[#0e0e0f]"
-                            strokeWidth={3.5}
-                          />
-                        )}
-                      </div>
-                      <span
-                        className={`text-[15px] transition-colors duration-300 font-medium ${checkedItems.includes(section.id)
-                            ? "text-[#e8d5b0]"
-                            : "text-white/50 group-hover:text-white/80"
-                          }`}
-                      >
-                        J'ai assimilé cette partie
-                      </span>
-                    </button>
-                  </div>
-                </section>
-              ))}
-            </div>
-
-            {blocId === "1" ? (
-              <section className="mt-16 border-y border-[#e8d5b0]/20 py-8 sm:py-10">
-                <p className="text-[11px] tracking-[0.18em] font-semibold text-[#e8d5b0]">PROCHAINE DÉCISION</p>
-                <h2 className="mt-3 max-w-2xl text-2xl font-semibold tracking-tight text-[#f0ede8]">Choisis les outils qui servent ta ligne, pas ceux qui font le plus de bruit.</h2>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/55">Maintenant que ta ligne est claire, compose une stack simple pour rechercher, produire, construire et garder ce qui apprend de ton terrain.</p>
-                {nextBloc ? (
-                  <Link
-                    href={`/blocs/${nextBloc.id}`}
-                    className="mt-6 inline-flex items-center gap-2 rounded-[4px] border border-[#e8d5b0]/75 bg-[#e8d5b0] px-5 py-3 text-sm font-semibold text-[#0e0e0f] shadow-[0_3px_0_rgba(147,123,80,0.9)] transition-all hover:bg-[#f0dfc0] active:translate-y-px active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f0ede8]"
-                  >
-                    Continuer avec {nextBlocLabel.toLowerCase()}
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                ) : null}
-              </section>
-            ) : null}
-
-            <LiquidCard className="p-6 md:p-10 mt-16 sm:mt-24 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-              <div className="flex items-center justify-between mb-8 relative z-10">
-                <p className="text-white/60 text-[15px]">Progression du bloc</p>
-                <span className="text-[#e8d5b0] font-medium text-[15px]">
-                  {completedSectionsInBloc.length} / {totalSections}
-                </span>
-              </div>
-
-              <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden mb-8 relative z-10">
-                <div
-                  className="h-full bg-gradient-to-r from-[#e8d5b0]/40 to-[#e8d5b0] rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(232,213,176,0.3)]"
-                  style={{
-                    width: `${(completedSectionsInBloc.length / totalSections) *
-                      100
-                      }%`,
-                  }}
-                />
-              </div>
-
-              <div
-                className={`transition-all duration-500 ease-out relative z-10 ${isBlocCompleted
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-4 pointer-events-none absolute"
-                  }`}
-              >
-                {hasNextBloc ? (
-                  <LiquidButton
-                    className="w-full sm:w-auto"
-                    size="xl"
-                    onClick={async () => {
-                      markSessionAdvance();
-                      await toggleBlocCompletion(Number(blocId));
-                      router.refresh();
-                      router.push(`/blocs/${nextBlocId}`);
-                    }}
-                  >
-                    Valider le bloc et passer à la suite
-                  </LiquidButton>
-                ) : (
-                  <LiquidButton
-                    disabled={globalProgress === 100}
-                    className="w-full sm:w-auto"
-                    size="xl"
-                    onClick={async () => {
-                      if (globalProgress !== 100) {
-                        markSessionAdvance();
-                        await toggleBlocCompletion(Number(blocId));
-                        router.refresh();
-                      }
-                    }}
-                  >
-                    {globalProgress === 100 ? "Redirection en cours..." : "Terminer le système"}
-                  </LiquidButton>
-                )}
-              </div>
-
-              {!isBlocCompleted && (
-                <p className="text-sm text-white/40 italic relative z-10">
-                  Assimilez toutes les parties ci-dessus pour débloquer la suite.
-                </p>
-              )}
-            </LiquidCard>
-            </>)}
-          </div>
-
-        </div>
-      </div>
-
-      {showContent && bloc.sections.length > 0 && (
-        <ScrollProgress
-          sections={bloc.sections.map((section) => ({ id: section.id, label: section.title }))}
-        />
-      )}
-      <ScrollToTop />
-    </main>
-  );
+  return <DaRoot className="da-app has-tabbar">
+    <NavBar {...identity} tier={tier} />
+    <ReaderView
+      title={bloc.titre}
+      displayNumber={bloc.displayNumber}
+      sections={bloc.sections}
+      totalSections={catalogBloc?.sections.length ?? 0}
+      completedIds={checkedItems}
+      initialMode={initialMode}
+      initialChapter={initialChapter}
+      onToggleChapter={toggleItem}
+      onValidateBloc={validateBloc}
+      checkoutHref={checkoutHref}
+      checkoutLabel={COFFRE_LABEL}
+      checkoutPrice={formatEuro(COFFRE_PRICE)}
+      previousBloc={previousBloc ? { href: `/blocs/${previousBloc.id}`, label: previousBloc.titre } : undefined}
+      nextBloc={nextBloc ? { href: `/blocs/${nextBloc.id}`, label: nextBloc.titre } : undefined}
+      headerExtra={MCP_CONNECTOR_VISIBLE && normalizedTier !== null && bloc.sections.length > 0 && mcpConnectionStatus === "disconnected" ? <McpStudyCallout /> : null}
+    />
+  </DaRoot>;
 }

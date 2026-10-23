@@ -15,9 +15,20 @@ export async function getBlocForCurrentUser(id: string) {
   const tier = resolveMcpProfileTier(profile, profileError);
   const { BLOCS_DATA } = await import("@/lib/mockData");
   const bloc = BLOCS_DATA.find(item => item.id === id);
-  if (!bloc) return { userId: user.id, tier, bloc: null };
+  const email = user.email ?? "";
+  const displayName =
+    (user.user_metadata?.first_name as string | undefined) ||
+    (user.user_metadata?.full_name as string | undefined)?.split(" ")[0] ||
+    email.split("@")[0];
+  const identity = {
+    displayName,
+    displayEmail: email,
+    initials: displayName.substring(0, 2).toUpperCase(),
+    isAdmin: user.app_metadata?.role === "admin",
+  };
+  if (!bloc) return { userId: user.id, tier, bloc: null, identity };
   const projected = projectBlocForTier(bloc, tier);
-  if (projected.sections.length === 0) return { userId: user.id, tier, bloc: projected };
+  if (projected.sections.length === 0) return { userId: user.id, tier, bloc: projected, identity };
 
   try {
     const admin = createAdminSupabase();
@@ -27,7 +38,7 @@ export async function getBlocForCurrentUser(id: string) {
       .in("section_id", projected.sections.map((section) => section.id))
       .eq("status", "ready")
       .not("published_at", "is", null);
-    if (videoError) return { userId: user.id, tier, bloc: projected };
+    if (videoError) return { userId: user.id, tier, bloc: projected, identity };
 
     const lessons = new Map((data ?? []).map((row) => [row.section_id, row]));
     const withPublishedVideos = {
@@ -49,8 +60,8 @@ export async function getBlocForCurrentUser(id: string) {
         };
       }),
     };
-    return { userId: user.id, tier, bloc: withPublishedVideos };
+    return { userId: user.id, tier, bloc: withPublishedVideos, identity };
   } catch {
-    return { userId: user.id, tier, bloc: projected };
+    return { userId: user.id, tier, bloc: projected, identity };
   }
 }
