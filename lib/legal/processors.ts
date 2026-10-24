@@ -40,7 +40,7 @@ export const PROCESSORS: readonly Processor[] = [
     seat: "États-Unis",
     address: "440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
     role: "Il héberge le site et l'application, et lance les tâches planifiées (nettoyage des connexions du connecteur, mise à jour des vidéos de la chaîne YouTube).",
-    data: "Les requêtes qui arrivent sur le site : adresse réseau, navigateur, pages demandées, et le contenu de ce que tu envoies au site.",
+    data: "Les requêtes qui arrivent sur le site : adresse réseau, navigateur, pages demandées, et le contenu de ce que tu envoies au site.",
     hosts: ["vercel.com", "vercel.app"],
     evidence: [
       { file: "vercel.json", needle: "crons" },
@@ -67,7 +67,7 @@ export const PROCESSORS: readonly Processor[] = [
     name: "Stripe",
     company: "Stripe Payments Europe, Limited",
     seat: "Irlande",
-    role: "Il encaisse les paiements. Tu paies sur une page Stripe : BUILD ne voit jamais ton numéro de carte.",
+    role: "Il encaisse les paiements. Tu paies sur une page Stripe : BUILD ne voit jamais ton numéro de carte.",
     data: "Ton adresse e-mail, les informations de paiement que tu saisis chez Stripe, le montant et l'offre achetée, et un identifiant de compte BUILD si tu étais connecté au moment de payer.",
     hosts: ["stripe.com", "buy.stripe.com", "js.stripe.com", "api.stripe.com"],
     evidence: [
@@ -93,7 +93,7 @@ export const PROCESSORS: readonly Processor[] = [
     name: "Resend",
     company: "Resend, Inc.",
     seat: "États-Unis",
-    role: "Il envoie les e-mails de BUILD : le message qui active ton compte après un paiement et les informations envoyées aux membres.",
+    role: "Il envoie les e-mails de BUILD : le message qui active ton compte après un paiement et les informations envoyées aux membres.",
     data: "Ton adresse e-mail et le contenu du message envoyé.",
     hosts: ["resend.com", "api.resend.com"],
     evidence: [
@@ -137,7 +137,7 @@ export const PROCESSORS: readonly Processor[] = [
 export const NON_PERSONAL_HOSTS: Readonly<Record<string, string>> = {
   "fonts.googleapis.com": "Autorisation de feuille de style dans la politique de sécurité. Les polices du site sont servies par le site lui-même.",
   "fonts.gstatic.com": "Autorisation de polices dans la politique de sécurité. Les polices du site sont servies par le site lui-même.",
-  "cal.com": "Lien vers le service de réservation des accompagnements. BUILD ne lui envoie aucune donnée : la personne quitte le site.",
+  "cal.com": "Lien vers le service de réservation des accompagnements. BUILD ne lui envoie aucune donnée : la personne quitte le site.",
   "hermes-agent.nousresearch.com": "Lien de téléchargement affiché dans un guide. BUILD ne lui envoie aucune donnée.",
 };
 

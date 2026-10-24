@@ -9,7 +9,7 @@ import { McpConsentCard } from "@/components/da/McpConsentCard";
 import { approveMcpConsent, denyMcpConsent } from "@/app/actions/mcpConsent";
 import "@/app/da-mcp.css";
 
-export const metadata = { title: "Connecter un assistant à BUILD" };
+export const metadata = { title: "Connecter un assistant | BUILD" };
 
 export default async function McpConsentPage({
   searchParams,

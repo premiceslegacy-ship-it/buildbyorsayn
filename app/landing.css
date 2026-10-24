@@ -8,10 +8,8 @@
 .da .hero__txt { display: grid; gap: 26px; justify-items: center; }
 .da .hero__txt .t-aff { max-width: 11em; }
 .da .hero__act { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 6px; }
-.da .preuve { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; font: 500 19px/1 var(--font); color: var(--t2); }
-.da .preuve b { color: var(--encre); font-weight: 650; }
 
-/* premier écran : la même scène que les réels (agent qui construit, site de l'artisan, écran verrouillé avec le paiement).
+/* premier écran : la même scène que les réels (agent qui construit, site de l'artisan, téléphone de suivi).
    La scène est dessinée à taille fixe (1000 x 640) puis réduite par zoom selon la largeur. */
 .da .hs-wrap { position: relative; display: flex; justify-content: center; margin: clamp(28px, 4vw, 56px) auto 0; }
 .da .hs-wrap::before { content: ""; position: absolute; left: 50%; top: 46%; width: min(1100px, 120%); aspect-ratio: 1.8; translate: -50% -50%; border-radius: 50%; background: radial-gradient(closest-side, rgba(34,217,110,.3), rgba(34,217,110,0)); filter: blur(30px); pointer-events: none; }

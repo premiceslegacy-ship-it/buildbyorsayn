@@ -29,15 +29,15 @@ export function FormulaireQuatreMetiersMockup() {
     ariaLabel="Une page de demande de devis. Le titre Décris ton besoin vient du copy. L'ordre des champs Besoin, Date souhaitée et Photos vient de l'UX. Le bouton Envoyer ma demande dépend du code. La phrase sur les coordonnées privées relève de la sécurité."
     accent={EM}
     page={{
-      url: "tonsite.fr/devis",
+      url: "atelier-batiment.fr/devis",
       nav: "Demande de devis",
-      heading: "Décris ton chantier, reçois un devis sous 48 h",
+      heading: "Décris ton chantier, reçois un devis détaillé",
       subtitle: "Tes coordonnées restent privées",
       button: "Envoyer ma demande",
       fields: [{ label: "Besoin", value: "Cloison de 12 m²" }, { label: "Date souhaitée", value: "Mars", kind: "select" }, { label: "Photos du projet", kind: "file" }],
     }}
     annotations={[
-      { number: 1, target: "heading", label: "Copy : les mots du libellé", why: "Le titre dit la tâche (décrire) et la suite (un devis sous 48 h) : on sait pourquoi on remplit.", alt: "Une question : De quoi as-tu besoin ?" },
+      { number: 1, target: "heading", label: "Copy : les mots du libellé", why: "Le titre dit la tâche (décrire) et la suite (un devis détaillé) : on sait pourquoi on remplit.", alt: "Une question : De quoi as-tu besoin ?" },
       { number: 2, target: "image", label: "UX : l'ordre des champs", why: "Le besoin d'abord, puis la date, puis les photos : du plus simple au plus lourd.", alt: "Les photos en option, après l'envoi." },
       { number: 3, target: "button", label: "Code : l'envoi, une seule fois", why: "Le bouton se désactive après le clic, pour éviter deux demandes identiques.", alt: "Un écran de confirmation avec un numéro de demande." },
       { number: 4, target: "subtitle", label: "Sécurité : secrets hors du navigateur", why: "La phrase promet la confidentialité : les clés restent sur le serveur, jamais dans la page.", alt: "Un lien vers la politique de confidentialité." },

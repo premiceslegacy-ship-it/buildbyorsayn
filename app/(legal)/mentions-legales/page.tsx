@@ -66,7 +66,7 @@ export default function MentionsLegalesPage() {
       id: "liens",
       title: "Liens vers d'autres sites",
       children: (
-        <p>BUILD renvoie parfois vers des sites qui ne sont pas les siens. Nous ne contrôlons pas leur contenu et ne répondons pas de ce qu&apos;ils publient. Nous faisons le maximum pour que les informations de BUILD soient justes ; si tu vois une erreur, dis-le-nous.</p>
+        <p>BUILD renvoie parfois vers des sites qui ne sont pas les siens. Nous ne contrôlons pas leur contenu et ne répondons pas de ce qu&apos;ils publient. Nous faisons le maximum pour que les informations de BUILD soient justes ; si tu vois une erreur, dis-le-nous.</p>
       ),
     },
     {
@@ -81,7 +81,7 @@ export default function MentionsLegalesPage() {
   return (
     <LegalPage
       href="/mentions-legales"
-      intro="Les informations que la loi demande d'afficher sur un site : qui édite BUILD, qui l'héberge, comment nous joindre."
+      intro="Les informations que la loi demande d'afficher sur un site : qui édite BUILD, qui l'héberge, comment nous joindre."
       sections={sections}
     />
   );

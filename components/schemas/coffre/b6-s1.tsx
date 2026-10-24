@@ -84,13 +84,11 @@ export function IADansLeProduitDiagram() {
       subtitle: "Bail expiré, relevé absent. Rien ne part au client sans toi.",
       button: "Relire et valider",
       screen: { title: "Dossier Martin", rows: [{ left: "Avis d'impôt", right: "reçu", state: "ok" }, { left: "Bail", right: "expiré", state: "warn" }, { left: "Relevé", right: "absent", state: "warn" }], footer: "Rien ne part au client sans ton accord" },
-      proofs: ["Impôts", "Bail", "Relevé"],
     }}
     annotations={[
       { number: 1, target: "heading", label: "Le résultat préparé", why: "Le dossier annonce son résultat avant tout détail.", alt: "Un indicateur de complétude : quatre pièces sur six." },
       { number: 2, target: "subtitle", label: "La limite visible", why: "La phrase dit ce qui manque et ce qui ne part pas sans toi.", alt: "Une pastille Brouillon à côté du titre." },
       { number: 3, target: "button", label: "Ta validation", why: "L'action humaine est le bouton principal, pas l'automatisme.", alt: "Valider et Corriger côte à côte." },
-      { number: 4, target: "proofs", label: "Les sources citées", why: "Chaque affirmation renvoie à un document que tu peux ouvrir.", alt: "Un lien direct vers la ligne du document." },
     ]}
   />;
 }

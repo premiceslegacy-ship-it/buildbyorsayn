@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 import {
   determineStripeTier,
   escapeIlikePattern,
@@ -26,4 +27,19 @@ test("Stripe price mapping fails closed for missing or unknown prices", () => {
   assert.equal(determineStripeTier("price_beginner", "price_beginner", "price_full", "price_upgrade"), "beginner");
   assert.equal(determineStripeTier("price_full", "price_beginner", "price_full", "price_upgrade"), "full");
   assert.equal(determineStripeTier("price_upgrade", "price_beginner", "price_full", "price_upgrade"), "full");
+});
+
+test("le backfill ne rattache une référence qu'avec un e-mail Auth confirmé identique à Stripe", async () => {
+  const source = await readFile("scripts/backfill-stripe-ledger.ts", "utf8");
+  assert.match(source, /user\?\.email_confirmed_at/);
+  assert.match(source, /user\.email\?\.trim\(\)\.toLowerCase\(\) === normalizedEmail/);
+  assert.match(source, /candidate\.email_confirmed_at/);
+});
+
+test("le ledger expose une transaction de backfill, les marqueurs terminaux et le fallback upgrade", async () => {
+  const sql = await readFile("supabase/migrations/20261024101000_stripe_purchase_ledger.sql", "utf8");
+  assert.match(sql, /create or replace function public\.backfill_stripe_purchase_ledger\(p_rows jsonb\)/);
+  assert.match(sql, /record_stripe_checkout_terminal/);
+  assert.match(sql, /status in \('refunded', 'revoked'\)/);
+  assert.match(sql, /existing_status = 'granted'[\s\S]*fallback_tier[\s\S]*'beginner'/);
 });

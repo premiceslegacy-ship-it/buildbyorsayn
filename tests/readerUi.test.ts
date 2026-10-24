@@ -117,7 +117,7 @@ test("les trois paliers ne reçoivent que les chapitres autorisés", () => {
   assert.equal(canReadBlocSection("full", "7", "b7-s4"), true);
 });
 
-test("le lecteur expose les états chargement, erreur, vide et les interactions clavier", () => {
+test("le lecteur expose son état vide et les interactions clavier", () => {
   const view = read("components/reader/ReaderView.tsx");
   const overview = read("components/reader/BlocOverview.tsx");
   const blocPage = read("app/blocs/[id]/page.tsx");
@@ -142,7 +142,6 @@ test("le lecteur expose les états chargement, erreur, vide et les interactions 
   assert.match(player, /lesson-unavailable/);
   assert.match(player, /Réessayer/);
   assert.match(state, /Aucun chapitre disponible/);
-  assert.match(state, /aria-busy="true"/);
   assert.match(read("components/reader/ModeSwitch.tsx"), /tabIndex=\{mode === "video" \? 0 : -1\}/);
   assert.match(read("components/reader/ModeSwitch.tsx"), /requestAnimationFrame[\s\S]{0,180}\.focus\(\)/);
 });

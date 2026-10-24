@@ -12,7 +12,7 @@ type LegalDocumentMeta = {
 
 const DOCUMENTS: Record<LegalHref, LegalDocumentMeta> = {
   "/cgv": {
-    description: "Les règles qui s'appliquent quand tu achètes Fondations ou LE\u00a0COFFRE : prix, accès immédiat, droit de rétractation, licence d'utilisation, médiation.",
+    description: "Les règles qui s'appliquent quand tu achètes Fondations ou LE\u00a0COFFRE : prix, accès immédiat, droit de rétractation, licence d'utilisation, médiation.",
     updatedAt: "2026-10-22",
   },
   "/mentions-legales": {
@@ -24,7 +24,7 @@ const DOCUMENTS: Record<LegalHref, LegalDocumentMeta> = {
     updatedAt: "2026-10-22",
   },
   "/cookies": {
-    description: "Ce que BUILD enregistre dans ton navigateur : uniquement ce qui sert à te connecter et à faire fonctionner le site.",
+    description: "Ce que BUILD enregistre dans ton navigateur : uniquement ce qui sert à te connecter et à faire fonctionner le site.",
     updatedAt: "2026-10-22",
   },
 };

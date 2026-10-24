@@ -1,6 +1,5 @@
 import "@/app/landing.css";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { DaRoot } from "@/components/da/DaRoot";
 import { DaNav } from "@/components/da/DaNav";
@@ -15,7 +14,7 @@ import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { getCheckoutLinks } from "@/lib/checkoutLinks";
 import { getSiteOrigin } from "@/lib/siteOrigin";
 
-const PAGE_TITLE = "Ton business avec l'IA, sans prise de tête | BUILD by Orsayn";
+const PAGE_TITLE = "Ton business avec l'IA, sans prise de tête | BUILD";
 const PAGE_DESCRIPTION = "Choisis une piste, construis le dossier et le site qui la présentent avec les skills d'une agence. Sans être ingénieur.";
 const SITE_URL = getSiteOrigin();
 
@@ -41,7 +40,6 @@ export const metadata: Metadata = {
   },
 };
 
-const FACES = ["femme", "homme", "mamie", "souriant"] as const;
 
 const BEFORE = [
   "Tu testes des outils d'IA sans savoir quoi en faire.",
@@ -61,7 +59,7 @@ export default async function HomePage() {
   let tier: string | null = null;
   let accessUnverified = false;
   if (user?.id) {
-    // maybeSingle : un profil absent n'est pas une erreur ; une vraie erreur de lecture ne doit jamais ouvrir de carte d'achat.
+    // maybeSingle : un profil absent n'est pas une erreur ; une vraie erreur de lecture ne doit jamais ouvrir de carte d'achat.
     const { data: profile, error } = await supabase.from("profiles").select("tier").eq("id", user.id).maybeSingle();
     accessUnverified = Boolean(error);
     tier = normalizeProfileTier(profile?.tier ?? null);
@@ -90,16 +88,6 @@ export default async function HomePage() {
               <Link className="btn btn--p" href={start.href}>{start.label}</Link>
               <a className="btn btn--g" href="#prix">Voir les prix</a>
             </div>
-            <p className="preuve">
-              <b>Une communauté de builders</b>
-              <span className="visages" aria-hidden="true">
-                {FACES.map((face) => (
-                  <span className="visage" key={face}>
-                    <Image src={`/da/memoji/${face}.png`} alt="" width={120} height={120} sizes="34px" loading="eager" />
-                  </span>
-                ))}
-              </span>
-            </p>
           </div>
 
           <HeroScene />
@@ -147,7 +135,7 @@ export default async function HomePage() {
         </section>
       </main>
 
-      <DaFooter />
+      <DaFooter loggedIn={loggedIn} />
     </DaRoot>
   );
 }

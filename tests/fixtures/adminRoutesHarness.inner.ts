@@ -9,6 +9,7 @@ type Call = { kind: string; payload?: unknown };
 const calls: Call[] = [];
 const muxCalls: Call[] = [];
 const processedMuxEvents = new Set<string>();
+let muxTrackReservation = "new";
 let muxVideoStatus = "waiting";
 let muxProcessError: { message: string } | null = null;
 let currentUser: { id: string; app_metadata: Record<string, unknown> } | null = null;
@@ -51,6 +52,8 @@ mock.module(file("lib/supabase/admin.ts"), {
       from: table,
       rpc: async (name: string, args: unknown) => {
         calls.push({ kind: `rpc:${name}`, payload: args });
+        if (name === "reserve_mux_webhook_event") return { data: muxTrackReservation, error: null };
+        if (name === "complete_mux_webhook_event") return { data: true, error: null };
         if (name === "process_mux_asset_webhook") {
           if (muxProcessError) return { data: null, error: muxProcessError };
           const payload = args && typeof args === "object" ? args : {};
@@ -113,7 +116,15 @@ const create = (sectionId: string) => new NextRequest("http://localhost/api/admi
     file: { name: "a.mp4", size: 1000, type: "video/mp4" },
   }),
 });
-const reset = () => { calls.length = 0; muxCalls.length = 0; processedMuxEvents.clear(); muxVideoStatus = "waiting"; muxProcessError = null; videoRow = null; };
+const reset = () => {
+  calls.length = 0;
+  muxCalls.length = 0;
+  processedMuxEvents.clear();
+  muxTrackReservation = "new";
+  muxVideoStatus = "waiting";
+  muxProcessError = null;
+  videoRow = null;
+};
 
 test("un non admin (palier COFFRE, rôle absent ou autre) est refusé partout avant Mux et la base", async () => {
   for (const user of [null, { id: "u1", app_metadata: {} }, { id: "u1", app_metadata: { role: "trainer" } }, { id: "u1", app_metadata: { tier: "full" } }]) {
@@ -228,6 +239,31 @@ test("le traitement Mux est monotone, idempotent et reprend après une erreur tr
   assert.equal((await postEvent("evt-audit-error", "video.asset.ready")).status, 503);
   muxProcessError = null;
   assert.equal((await postEvent("evt-audit-error", "video.asset.ready")).status, 200);
+});
+
+test("un concurrent transcript Mux reçoit in_progress sans refaire le fetch Mux", async () => {
+  const body = JSON.stringify({
+    type: "video.asset.track.ready",
+    id: "evt-track-in-progress",
+    data: {
+      asset_id: "asset-1",
+      type: "text",
+      text_type: "subtitles",
+      passthrough: "build-fr-auto",
+    },
+  });
+  const timestamp = Math.floor(Date.now() / 1000);
+  const signature = createHmac("sha256", "whsec-test").update(`${timestamp}.${body}`).digest("hex");
+  reset();
+  muxTrackReservation = "in_progress";
+  const response = await webhookRoute.POST(new NextRequest("http://localhost/api/mux/webhook", {
+    method: "POST",
+    headers: { "content-type": "application/json", "mux-signature": `t=${timestamp},v1=${signature}` },
+    body,
+  }));
+  assert.equal(response.status, 200);
+  assert.deepEqual(calls.map((call) => call.kind), ["rpc:reserve_mux_webhook_event"]);
+  assert.deepEqual(muxCalls, []);
 });
 
 test("le changement de palier refuse un non admin et passe par la RPC journalisée pour un admin", async () => {

@@ -16,6 +16,18 @@ create table if not exists public.stripe_purchase_ledger (
   fallback_tier text check (fallback_tier is null or fallback_tier in ('beginner', 'full'))
 );
 
+create table if not exists public.stripe_checkout_terminal_events (
+  checkout_session_id text primary key check (char_length(checkout_session_id) between 3 and 255),
+  payment_intent_id text unique,
+  reason text not null check (reason in ('missing_customer_identity', 'missing_terms_consent', 'unknown_price', 'upgrade_refused')),
+  created_at timestamptz not null default now()
+);
+
+alter table public.stripe_checkout_terminal_events enable row level security;
+alter table public.stripe_checkout_terminal_events force row level security;
+revoke all on table public.stripe_checkout_terminal_events from public, anon, authenticated;
+grant all on table public.stripe_checkout_terminal_events to service_role;
+
 alter table if exists public.profiles add column if not exists email text;
 
 create index if not exists stripe_purchase_ledger_user_idx
@@ -94,6 +106,37 @@ revoke all on function public.record_stripe_purchase(text, text, uuid, text, tex
   from public, anon, authenticated;
 grant execute on function public.record_stripe_purchase(text, text, uuid, text, text, bigint, text, text)
   to service_role;
+
+create or replace function public.record_stripe_checkout_terminal(
+  p_checkout_session_id text,
+  p_payment_intent_id text,
+  p_reason text
+)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if p_checkout_session_id is null
+    or char_length(p_checkout_session_id) not between 3 and 255
+    or p_reason not in ('missing_customer_identity', 'missing_terms_consent', 'unknown_price', 'upgrade_refused')
+  then
+    raise exception 'invalid terminal stripe checkout';
+  end if;
+
+  insert into public.stripe_checkout_terminal_events (checkout_session_id, payment_intent_id, reason)
+  values (p_checkout_session_id, nullif(p_payment_intent_id, ''), p_reason)
+  on conflict (checkout_session_id) do update
+  set payment_intent_id = coalesce(public.stripe_checkout_terminal_events.payment_intent_id, excluded.payment_intent_id),
+      reason = excluded.reason;
+  return 'recorded';
+end;
+$$;
+
+revoke all on function public.record_stripe_checkout_terminal(text, text, text)
+  from public, anon, authenticated;
+grant execute on function public.record_stripe_checkout_terminal(text, text, text) to service_role;
 
 drop function if exists public.recalculate_stripe_entitlement(uuid);
 
@@ -199,6 +242,10 @@ begin
     select status into resulting_status
     from public.stripe_purchase_ledger
     where payment_intent_id = p_payment_intent_id;
+    if exists (
+      select 1 from public.stripe_checkout_terminal_events
+      where payment_intent_id = p_payment_intent_id
+    ) then return 'terminal'; end if;
     if resulting_status is null then return 'not_found'; end if;
     return resulting_status;
   end if;
@@ -247,7 +294,13 @@ begin
   where payment_intent_id = p_payment_intent_id
   returning user_id, status into affected_user, resulting_status;
 
-  if not found then return 'not_found'; end if;
+  if not found then
+    if exists (
+      select 1 from public.stripe_checkout_terminal_events
+      where payment_intent_id = p_payment_intent_id
+    ) then return 'terminal'; end if;
+    return 'not_found';
+  end if;
   perform public.recalculate_stripe_entitlement(affected_user);
   return resulting_status;
 end;
@@ -303,6 +356,97 @@ revoke all on function public.claim_stripe_purchase_for_verified_email(uuid, tex
   from public, anon, authenticated;
 grant execute on function public.claim_stripe_purchase_for_verified_email(uuid, text) to service_role;
 
+create or replace function public.backfill_stripe_purchase_ledger(p_rows jsonb)
+returns integer
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  row_data jsonb;
+  row_count integer := 0;
+  row_user_id uuid;
+  row_status text;
+  row_tier text;
+begin
+  if p_rows is null or pg_catalog.jsonb_typeof(p_rows) <> 'array' then
+    raise exception 'invalid stripe backfill rows';
+  end if;
+
+  for row_data in select value from pg_catalog.jsonb_array_elements(p_rows) loop
+    if nullif(row_data->>'checkout_session_id', '') is null
+      or char_length(row_data->>'checkout_session_id') not between 3 and 255
+      or nullif(row_data->>'payment_intent_id', '') is null
+      or coalesce(row_data->>'currency', '') <> 'eur'
+      or coalesce(row_data->>'tier', '') not in ('beginner', 'full')
+      or coalesce(row_data->>'status', '') not in ('pending', 'active', 'refunded', 'disputed', 'revoked')
+    then
+      raise exception 'invalid stripe backfill row';
+    end if;
+
+    row_user_id := nullif(row_data->>'user_id', '')::uuid;
+    row_status := row_data->>'status';
+    row_tier := row_data->>'tier';
+    insert into public.stripe_purchase_ledger (
+      checkout_session_id, payment_intent_id, user_id, tier, status,
+      amount_total, currency, customer_email, fallback_tier, revoked_at, revoke_reason
+    ) values (
+      row_data->>'checkout_session_id',
+      nullif(row_data->>'payment_intent_id', ''),
+      row_user_id,
+      row_tier,
+      row_status,
+      nullif(row_data->>'amount_total', '')::bigint,
+      'eur',
+      nullif(pg_catalog.lower(row_data->>'customer_email'), ''),
+      nullif(row_data->>'fallback_tier', ''),
+      case when row_status in ('refunded', 'disputed', 'revoked') then pg_catalog.now() else null end,
+      nullif(row_data->>'revoke_reason', '')
+    )
+    on conflict (checkout_session_id) do update
+    set payment_intent_id = excluded.payment_intent_id,
+        user_id = excluded.user_id,
+        tier = excluded.tier,
+        status = case
+          when public.stripe_purchase_ledger.status in ('refunded', 'revoked')
+            then public.stripe_purchase_ledger.status
+          else excluded.status
+        end,
+        amount_total = excluded.amount_total,
+        currency = excluded.currency,
+        customer_email = excluded.customer_email,
+        fallback_tier = coalesce(excluded.fallback_tier, public.stripe_purchase_ledger.fallback_tier),
+        revoked_at = case
+          when public.stripe_purchase_ledger.status in ('refunded', 'revoked')
+            then public.stripe_purchase_ledger.revoked_at
+          when excluded.status in ('refunded', 'disputed', 'revoked')
+            then pg_catalog.now()
+          else null
+        end,
+        revoke_reason = case
+          when public.stripe_purchase_ledger.status in ('refunded', 'revoked')
+            then public.stripe_purchase_ledger.revoke_reason
+          else excluded.revoke_reason
+        end,
+        updated_at = pg_catalog.now();
+    row_count := row_count + 1;
+  end loop;
+
+  for row_user_id in
+    select distinct nullif(value->>'user_id', '')::uuid
+    from pg_catalog.jsonb_array_elements(p_rows)
+    where nullif(value->>'user_id', '') is not null
+  loop
+    perform public.recalculate_stripe_entitlement(row_user_id);
+  end loop;
+  return row_count;
+end;
+$$;
+
+revoke all on function public.backfill_stripe_purchase_ledger(jsonb)
+  from public, anon, authenticated;
+grant execute on function public.backfill_stripe_purchase_ledger(jsonb) to service_role;
+
 -- Replace the legacy two-argument function so every upgrade ledger row keeps its
 -- PaymentIntent for later refund or dispute webhooks.
 drop function if exists public.apply_stripe_upgrade(uuid, text);
@@ -340,9 +484,9 @@ begin
     if existing_user_id is distinct from p_user_id then return 'conflict'; end if;
     if existing_status = 'granted' then
       insert into public.stripe_purchase_ledger (
-        checkout_session_id, payment_intent_id, user_id, tier, status
+        checkout_session_id, payment_intent_id, user_id, tier, status, fallback_tier
       ) values (
-        p_checkout_session_id, nullif(p_payment_intent_id, ''), p_user_id, 'full', 'active'
+        p_checkout_session_id, nullif(p_payment_intent_id, ''), p_user_id, 'full', 'active', 'beginner'
       )
       on conflict (checkout_session_id) do update
         set payment_intent_id = coalesce(public.stripe_purchase_ledger.payment_intent_id, excluded.payment_intent_id),

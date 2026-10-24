@@ -24,7 +24,7 @@ function BuyButton({ href, tone, describedBy, children }: { href: string | null;
     <>
       <button type="button" className={`btn ${tone}`} disabled aria-disabled="true" aria-describedby={describedBy}>{children}</button>
       <p className="px-note" id={describedBy} role="status">
-        Ce paiement n&apos;est pas disponible pour le moment. Écris-nous : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        Ce paiement n&apos;est pas disponible pour le moment. Écris-nous : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       </p>
     </>
   );

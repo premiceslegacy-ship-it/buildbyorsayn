@@ -4,6 +4,7 @@ import { getBlocForCurrentUser } from "@/lib/blocData.server";
 import BlocClient from "./BlocClient";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Bloc | BUILD", robots: { index: false, follow: false } };
 
 export default async function BlocPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mode?: string; chapter?: string }> }) {
   const { id } = await params;

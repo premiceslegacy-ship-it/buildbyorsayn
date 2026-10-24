@@ -5,11 +5,10 @@
  *   npm run copy:check -- --strict transforme aussi les alertes en échecs
  *
  * Bloquant : tiret long ou moyen, puce typographique, « leçon », prix ou compteur écrit en dur,
- *            phrase de plus de 70 mots.
+ *            phrase de plus de 70 mots, espace simple avant la ponctuation française ou dans les guillemets.
  * Alerte   : phrase de plus de 45 mots, trait d'union espacé utilisé comme un tiret.
  *
  * Le script lit le texte visible des fichiers de contenu (texte entre balises, chaînes de caractères
- * assez longues pour être une phrase). Il ne remplace pas la relecture ; il évite les erreurs mécaniques.
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
@@ -44,7 +43,7 @@ const FORBIDDEN: Rule[] = [
   { name: "chaine-point-median", pattern: /\S \u00B7 \S.* \u00B7 \S/, message: "chaîne de fragments séparés par des points médians" },
   { name: "lecon", pattern: /\ble[cç]ons?\b/i, message: "« leçon » : écrire « chapitre »" },
   { name: "prix-en-dur", pattern: /(?<![\w.])(?:97|267|170)\s?(?:€|euros?)(?!\w)/i, message: "prix écrit en dur : le lire depuis lib/pricing.ts" },
-  { name: "compteur-en-dur", pattern: /\b233\b(?=\s+(?:builders?|membres?))/i, message: "nombre de builders écrit en dur : lire lib/siteFacts.ts" },
+  { name: "compteur-en-dur", pattern: /\b233\b(?=\s+(?:builders?|membres?))/i, message: "nombre de communauté écrit en dur : aucune preuve disponible" },
   { name: "promesse-revenu", pattern: /\b(?:tu|vous)\s+(?:vas|allez)\s+(?:gagner|obtenir)\s+(?:\d|un revenu|des revenus)/i, message: "promesse de revenu ou de gain chiffré : aucune garantie commerciale" },
   { name: "delai-garanti", pattern: /\b(?:d[eé]lai|r[eé]sultat|premi[eè]re vente|premier client)\s+(?:est\s+)?garanti(?:e|s)?\b/i, message: "délai ou résultat garanti : formuler une limite vérifiable" },
   { name: "fausse-preuve", pattern: /\b(?:faux|fausse|invent[eé])\s+(?:r[eé]sultat|preuve|t[eé]moignage|avis|chiffre)\b/i, message: "fausse preuve ou résultat inventé : ne jamais présenter une preuve fabriquée" },
@@ -53,7 +52,6 @@ const FORBIDDEN: Rule[] = [
 /** Fichiers où un prix ou un compteur « en dur » est la source ou un exemple fictif assumé. */
 const HARDCODED_NUMBER_EXEMPT = [
   /^lib\/pricing\.ts$/,
-  /^lib\/siteFacts\.ts$/,
   /^lib\/legal\//,
   /^app\/\(legal\)\//,
   /^components\/da\/HeroScene\.tsx$/,
@@ -86,13 +84,13 @@ export function extractVisibleText(source: string): { text: string; line: number
   const lineAt = (index: number) => source.slice(0, index).split("\n").length;
 
   for (const match of source.matchAll(/>([^<>{}]{25,})</g)) {
-    pieces.push({ text: match[1].replace(/\s+/g, " ").trim(), line: lineAt(match.index ?? 0) });
+    pieces.push({ text: match[1].replace(/[ \t\r\n\f\v]+/g, " ").trim(), line: lineAt(match.index ?? 0) });
   }
   for (const match of source.matchAll(/(["'`])((?:(?!\1)[^\\\n]|\\.){40,}?)\1/g)) {
     const text = match[2];
     // Ignore classes, chemins, URL, sélecteurs et imports.
     if (/^[\w./:#@\-[\]()=,%\s]+$/.test(text) && !/[.!?]\s/.test(text)) continue;
-    pieces.push({ text: text.replace(/\\n/g, "\n").replace(/[^\S\n]+/g, " ").trim(), line: lineAt(match.index ?? 0) });
+    pieces.push({ text: text.replace(/\\n/g, "\n").replace(/[ \t\r\n\f\v]+/g, " ").trim(), line: lineAt(match.index ?? 0) });
   }
   return pieces;
 }
@@ -125,9 +123,14 @@ export function checkFile(file: string, source: string): Finding[] {
     }
   });
 
-  for (const piece of extractVisibleText(source)) {
+  const visiblePieces = /\.(?:md|mdx)$/.test(file) ? [] : extractVisibleText(source);
+  for (const piece of visiblePieces) {
+    if (/(?:^|[\s])(?:const|return|className|href|src|aria-[\w-]+|style|key|router|window|encodeURIComponent|CSSProperties|ReactNode)(?:[\s=:{])/u.test(piece.text) || /=>|\/\/|\/\*|\*\/|[{}<>]/u.test(piece.text)) continue;
     if (/[\p{L}.,;:!?)»] - [\p{L}«(]/u.test(piece.text)) {
       findings.push({ file, line: piece.line, level: "alerte", rule: "tiret-espace", detail: `trait d'union espacé utilisé comme tiret : ${piece.text.slice(0, 70)}…` });
+    }
+    if (/(?:[\p{L}\p{N}]) [?!:;]/u.test(piece.text) || /« (?!\u00a0)|(?<!\u00a0) »/u.test(piece.text)) {
+      findings.push({ file, line: piece.line, level: "échec", rule: "espaces-ponctuation-francaise", detail: "espace insécable requise avant ? ! : ; et dans les guillemets français" });
     }
     for (const { sentence, words } of sentenceLengths(piece.text)) {
       if (words > MAX_SENTENCE_FAIL) {

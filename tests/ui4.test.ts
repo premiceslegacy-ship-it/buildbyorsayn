@@ -24,7 +24,7 @@ test("la liste des sources annonce aussi son état vide", async () => {
 test("les cartes Sources gardent de vraies tuiles et des segments défilants", async () => {
   const css = await readFile("app/sources/sources.module.css", "utf8");
   assert.match(css, /width: 64px !important/);
-  assert.match(css, /height: 36px/);
+  assert.match(css, /height: 44px/);
   assert.match(css, /padding: 0 16px/);
   assert.match(css, /overflow-x: auto/);
   assert.match(css, /\.card \{[^}]*gap: 16px/s);

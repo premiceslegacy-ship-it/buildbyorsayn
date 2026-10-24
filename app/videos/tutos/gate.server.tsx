@@ -21,7 +21,7 @@ function LockedGate() {
     <GateShell>
       <div>
         <Lock aria-hidden="true" />
-        <h1 className="t-2">Hermes Agent : organiser le travail avec l&apos;IA</h1>
+        <h1 className="t-2">Hermes Agent : organiser le travail avec l&apos;IA</h1>
         <p>
           Comment partir d&apos;un vrai problème, répartir les rôles, ranger les bonnes informations et donner à chaque outil seulement les accès dont il a besoin. Ce contenu est réservé à {COFFRE_LABEL}.
         </p>

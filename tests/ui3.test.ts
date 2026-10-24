@@ -83,7 +83,7 @@ test("Compte garde les contrôles de session et les confirmations", async () => 
 test("connexion et récupération exposent chargement, réussite et erreur", async () => {
   const [login, forgot, update, loginLoading, forgotError, updateError] = await Promise.all([
     readFile("components/LoginForm.tsx", "utf8"),
-    readFile("app/forgot-password/page.tsx", "utf8"),
+    readFile("components/ForgotPasswordForm.tsx", "utf8"),
     readFile("app/update-password/page.tsx", "utf8"),
     readFile("app/login/loading.tsx", "utf8"),
     readFile("app/forgot-password/error.tsx", "utf8"),

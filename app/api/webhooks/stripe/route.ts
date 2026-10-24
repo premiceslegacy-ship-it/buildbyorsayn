@@ -166,8 +166,8 @@ async function sendUpgradeRefusalEmail(email: string, checkoutSessionId: string)
 }
 
 /**
- * Confirmation d'achat sur support durable (contrat, prix, accès immédiat, renonciation au droit de rétractation).
- * Ne fait jamais échouer le webhook : un client qui a payé ne doit pas recevoir une erreur parce que l'e-mail n'est pas parti.
+ * Confirmation d'achat sur support durable. L'absence de configuration reste
+ * non bloquante, mais une erreur de transport doit être rejouée par Stripe.
  */
 async function sendPurchaseConfirmationEmail(
     email: string,
@@ -175,12 +175,12 @@ async function sendPurchaseConfirmationEmail(
     amountCents: number | null,
     createdSeconds: number,
     checkoutSessionId: string,
-) {
+): Promise<"sent" | "not_configured" | "failed"> {
     try {
         const baseUrl = optionalSiteOrigin();
-        if (!baseUrl || !amountCents || amountCents <= 0) {
+        if (!baseUrl || !amountCents || amountCents <= 0 || !process.env.RESEND_API_KEY || !process.env.RESEND_FROM_EMAIL) {
             console.error("[Webhook] Purchase confirmation skipped (missing configuration or amount)");
-            return false;
+            return "not_configured";
         }
         const entity = getLegalEntity();
         const { subject, text, html } = buildPurchaseConfirmation({
@@ -197,7 +197,7 @@ async function sendPurchaseConfirmationEmail(
                 vatMention: entity.vatMention,
             },
         });
-        return sendResendMessage({
+        return await sendResendMessage({
             apiKey: process.env.RESEND_API_KEY,
             from: process.env.RESEND_FROM_EMAIL,
             to: email,
@@ -205,10 +205,10 @@ async function sendPurchaseConfirmationEmail(
             html,
             text,
             idempotencyKey: stripeEmailIdempotencyKey("purchase-confirmation", checkoutSessionId),
-        });
+        }) ? "sent" : "failed";
     } catch {
         console.error("[Webhook] Purchase confirmation failed");
-        return false;
+        return "failed";
     }
 }
 
@@ -302,6 +302,19 @@ async function revokeStripePurchase(
     if (error) return error.message;
     if (data === "not_found") return "Stripe purchase ledger entry not found";
     return null;
+}
+
+async function recordTerminalCheckout(
+    supabase: SupabaseClient,
+    session: Stripe.Checkout.Session,
+    reason: "missing_customer_identity" | "missing_terms_consent" | "unknown_price" | "upgrade_refused",
+): Promise<string | null> {
+    const { error } = await supabase.rpc("record_stripe_checkout_terminal", {
+        p_checkout_session_id: session.id,
+        p_payment_intent_id: stripePaymentIntent(session.payment_intent),
+        p_reason: reason,
+    });
+    return error?.message ?? null;
 }
 
 export async function POST(req: NextRequest) {
@@ -416,6 +429,8 @@ export async function POST(req: NextRequest) {
             if (refund.outcome !== "refunded") {
                 return NextResponse.json({ error: "Processing failed" }, { status: 500 });
             }
+            const terminalError = await recordTerminalCheckout(supabase, session, "unknown_price");
+            if (terminalError) return NextResponse.json({ error: "Processing failed" }, { status: 500 });
             return NextResponse.json({ received: true }, { status: 200 });
         }
 
@@ -425,6 +440,8 @@ export async function POST(req: NextRequest) {
             if (refund.outcome !== "refunded") {
                 return NextResponse.json({ error: "Processing failed" }, { status: 500 });
             }
+            const terminalError = await recordTerminalCheckout(supabase, session, "missing_terms_consent");
+            if (terminalError) return NextResponse.json({ error: "Processing failed" }, { status: 500 });
             return NextResponse.json({ received: true }, { status: 200 });
         }
 
@@ -445,6 +462,8 @@ export async function POST(req: NextRequest) {
                 if (refused.outcome === "refund_failed" || refused.outcome === "refund_pending") {
                     return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                 }
+                const terminalError = await recordTerminalCheckout(supabase, session, "upgrade_refused");
+                if (terminalError) return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                 return NextResponse.json({ received: true }, { status: 200 });
             }
 
@@ -514,6 +533,8 @@ export async function POST(req: NextRequest) {
             if (refund.outcome !== "refunded") {
                 return NextResponse.json({ error: "Processing failed" }, { status: 500 });
             }
+            const terminalError = await recordTerminalCheckout(supabase, session, "missing_customer_identity");
+            if (terminalError) return NextResponse.json({ error: "Processing failed" }, { status: 500 });
             return NextResponse.json({ received: true }, { status: 200 });
         }
 
@@ -535,11 +556,20 @@ export async function POST(req: NextRequest) {
                 }
                 revalidatePath("/", "layout");
             }
+            if (["active", "pending"].includes(existingPurchase.status) && customerEmail) {
+                const emailResult = await sendPurchaseConfirmationEmail(
+                    customerEmail,
+                    tier === "beginner" ? FONDATIONS_LABEL : COFFRE_LABEL,
+                    session.amount_total ?? null,
+                    event.created,
+                    session.id,
+                );
+                if (emailResult === "failed") {
+                    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                }
+            }
             return NextResponse.json({ received: true }, { status: 200 });
         }
-
-        // Une référence venant d'un Payment Link ne prouve pas que la personne qui paie contrôle
-        // le compte. Elle n'est acceptée que si l'adresse du compte Auth est déjà vérifiée.
         if (referenceId) {
             if (!isUuid(referenceId)) {
                 console.warn("[Webhook] Ignoring an unbound client reference");

@@ -415,15 +415,15 @@ const entries: readonly KitEntry[] = [
             url: "karim-plaquiste.fr",
             nav: "Karim",
             eyebrow: "Plaquiste à Lyon",
-            heading: "Cloisons et faux plafonds à Lyon, posés en une semaine",
-            subtitle: "Envoie ton plan et trois photos. Karim te rappelle sous 48 h avec un prix.",
+            heading: "Cloisons et faux plafonds à Lyon, selon ton chantier",
+            subtitle: "Envoie ton plan et trois photos. Karim te rappelle après étude avec un prix.",
             button: "Recevoir mon prix",
             photo: "plaquiste",
             offer: "Tes photos restent jointes au projet",
           }}
           annotations={[
-            { number: 1, target: "heading", label: "Pour qui et quel changement ?", why: "Le métier, la ville et le délai sont dans le titre : le bon client se reconnaît tout de suite.", alt: "Le type de chantier dans le titre." },
-            { number: 2, target: "subtitle", label: "Comment ça se passe ?", why: "Deux gestes pour le client, un rappel sous 48 h : le fonctionnement tient en deux phrases.", alt: "Trois pastilles : plan, photos, rappel." },
+            { number: 1, target: "heading", label: "Pour qui et quel changement ?", why: "Le métier, la ville et la situation du chantier sont dans le titre : le bon client se reconnaît tout de suite.", alt: "Le type de chantier dans le titre." },
+            { number: 2, target: "subtitle", label: "Comment ça se passe ?", why: "Deux gestes pour le client, un rappel après étude : le fonctionnement tient en deux phrases.", alt: "Trois pastilles : plan, photos, rappel." },
             { number: 3, target: "button", label: "Quel geste maintenant ?", why: "Un verbe précis, un seul bouton : il n'y a pas d'autre chemin.", alt: "Un numéro de téléphone en simple lien." },
             { number: 4, target: "image", label: "Une preuve du métier réel", why: "La photo montre l'outil et la matière : c'est du vrai chantier.", alt: "Un avant et après." },
           ]}
@@ -445,7 +445,6 @@ const entries: readonly KitEntry[] = [
             heading: "Sublimez chaque instant",
             subtitle: "Des créations uniques",
             button: "Découvrir ou commencer",
-            proofs: ["Avis", "Carte", "Blog"],
           }}
           after={{
             nav: "Maison Lila",
@@ -476,7 +475,7 @@ const entries: readonly KitEntry[] = [
           beforeTitle="Avant"
           afterTitle="Après"
           before={{ account: "Atelier Vélo", text: "Redécouvre le plaisir de rouler.", image: "/schemas/ads/velo-neuf-studio.jpg", visual: "Un vélo neuf sur fond blanc", headline: "Le plaisir de rouler", domain: "ATELIERVELO.FR", action: "En savoir plus", pins: { text: 1, image: 2, headline: 3, action: 4 } }}
-          after={{ account: "Atelier Vélo", text: "Ton vélo grince seulement quand tu montes une côte ?", image: "/schemas/sites/atelier-velo-reparation.jpg", visual: "Un mécanicien à l'atelier", headline: "Diagnostic sous 48 h à l'atelier", domain: "ATELIERVELO.FR", action: "Décrire le bruit", pins: { text: 1, image: 2, headline: 3, action: 4 } }}
+          after={{ account: "Atelier Vélo", text: "Ton vélo grince seulement quand tu montes une côte ?", image: "/schemas/sites/atelier-velo-reparation.jpg", visual: "Un mécanicien à l'atelier", headline: "Diagnostic au bon moment", domain: "ATELIERVELO.FR", action: "Décrire le bruit", pins: { text: 1, image: 2, headline: 3, action: 4 } }}
           beforeNotes={[
             { pin: 1, role: "Un slogan", why: "« Le plaisir de rouler » pourrait venir de n'importe quelle marque de vélo.", alt: "Un bruit, une panne, un moment que le client a vécu." },
             { pin: 2, role: "Une photo de catalogue", why: "Un vélo neuf sur fond blanc ne prouve aucun savoir-faire d'atelier.", alt: "L'atelier réel, avec le mécanicien au travail." },
@@ -486,7 +485,7 @@ const entries: readonly KitEntry[] = [
           afterNotes={[
             { pin: 1, role: "Une question reconnue", why: "Le grincement en côte : le cycliste l'a déjà entendu, il s'arrête.", alt: "Un bruit différent pour chaque saison." },
             { pin: 2, role: "Le vrai atelier", why: "Un mécanicien et ses outils : la preuve est dans la photo.", alt: "La fiche de diagnostic remise au client." },
-            { pin: 3, role: "Un délai tenu", why: "Le titre promet un diagnostic sous 48 h : un bénéfice qu'on peut vérifier.", alt: "Un prix de diagnostic, si l'atelier l'affiche." },
+            { pin: 3, role: "Un intitulé concret", why: "Le titre indique ce que l'atelier regarde, sans annoncer un délai non documenté.", alt: "Le contenu du diagnostic, si l'atelier le décrit." },
             { pin: 4, role: "Un geste facile", why: "Décrire le bruit demande un message, pas un rendez-vous.", alt: "Un numéro de téléphone en simple lien." },
           ]}
         />,
@@ -748,15 +747,13 @@ const entries: readonly KitEntry[] = [
             theme: "chaux",
             nav: { brand: "Karim Placo", links: ["Chantiers", "Tarifs", "Contact"] },
             sections: [
-              { kind: "hero", variant: "editorial", title: "Cloisons et faux plafonds à Lyon, posés en une semaine", text: "Envoie ton plan et trois photos : Karim te rappelle sous 48 h avec un prix.", cta: "Préparer ma demande", image: "/schemas/sites/plaquiste-platre-truelles.jpg", imageAlt: "Truelles et plâtre sur un chantier", pins: { title: 1, cta: 2, image: 3 } },
-              { kind: "proof", quote: { text: "Le plafond de la cuisine était fini le vendredi, comme prévu.", author: "Sophie", role: "Villeurbanne" }, pins: { quote: 4 } },
+              { kind: "hero", variant: "editorial", title: "Cloisons et faux plafonds à Lyon, selon ton chantier", text: "Envoie ton plan et trois photos : Karim te rappelle après étude avec un prix.", cta: "Préparer ma demande", image: "/schemas/sites/plaquiste-platre-truelles.jpg", imageAlt: "Truelles et plâtre sur un chantier", pins: { title: 1, cta: 2, image: 3 } },
             ],
           }}
           premiumNotes={[
-            { pin: 1, role: "Titre concret", why: "Métier, ville et délai en une phrase.", alt: "Une question du client, mot pour mot." },
+            { pin: 1, role: "Titre concret", why: "Métier, ville et situation du chantier en une phrase.", alt: "Une question du client, mot pour mot." },
             { pin: 2, role: "Un seul geste", why: "Le bouton dit ce qui se passe ensuite.", alt: "Un lien d'appel sur mobile." },
             { pin: 3, role: "Photo du vrai métier", why: "On reconnaît le chantier, pas une ambiance.", alt: "Avant et après d'une pièce." },
-            { pin: 4, role: "Preuve proche", why: "Un avis précis, juste sous la promesse.", alt: "Une photo de chantier daté." },
           ]}
         />,
       },

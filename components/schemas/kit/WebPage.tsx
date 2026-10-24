@@ -97,9 +97,9 @@ function buildSite(page: WebPageData, quality: Quality, pinOf: (slot: SiteSlot) 
 
   if (!slop && page.fields?.length) {
     return {
-      url: page.url ?? "tonsite.fr",
+      url: page.url ?? (slop ? "exemple-site.fr" : "atelier-lumen.fr"),
       theme: page.theme ?? "chaux",
-      nav: { brand: page.nav ?? "Ton entreprise" },
+      nav: { brand: page.nav ?? (slop ? "Atelier exemple" : "Atelier Lumen") },
       sections: [{ kind: "form", title: page.heading, text: page.subtitle, fields: page.fields, button: page.button, note: page.offer ?? page.proofs?.join(". "), pins: pin("title", "text", "fields", "cta", "note") }],
     };
   }
@@ -129,9 +129,9 @@ function buildSite(page: WebPageData, quality: Quality, pinOf: (slot: SiteSlot) 
   if (slop && page.offer) sections.push({ kind: "faq", title: "En savoir plus", items: [{ q: page.offer }], pins: pin("note") });
 
   return {
-    url: page.url ?? "tonsite.fr",
+    url: page.url ?? (slop ? "exemple-site.fr" : "atelier-lumen.fr"),
     theme: slop ? "slopNuit" : page.theme ?? "chaux",
-    nav: { brand: page.nav ?? "Ton entreprise", cta: slop ? "Contact" : undefined },
+    nav: { brand: page.nav ?? (slop ? "Atelier exemple" : "Atelier Lumen"), cta: slop ? "Contact" : undefined },
     sections,
   };
 }
@@ -198,7 +198,7 @@ function buildNotes(page: WebPageData, quality: Quality, annotations?: readonly 
     };
   }
 
-  const order: SiteSlot[] = ["eyebrow", "title", "text", "cta", "cta2", "image", "screen", "items", "note", "logos", "faq"];
+  const order: SiteSlot[] = ["eyebrow", "title", "text", "cta", "image", "cta2", "screen", "items", "note", "logos", "faq"];
   const numbered = new Map<SiteSlot, number>();
   for (const slot of order) {
     if (numbered.size < 5 && defaults[slot] && present(slot)) numbered.set(slot, numbered.size + 1);

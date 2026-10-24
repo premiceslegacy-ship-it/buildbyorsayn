@@ -8,11 +8,11 @@ import RealStripe from "stripe";
 const SECRET = "whsec_signature_test";
 const UPGRADE_USER = "11111111-1111-4111-8111-111111111111";
 const OTHER_USER = "22222222-2222-4222-8222-222222222222";
-
 const refundKeys: string[] = [];
-const rpcCalls: Array<{ fn: string; args: Record<string, string> }> = [];
+const rpcCalls: Array<{ fn: string; args: Record<string, unknown> }> = [];
 let rpcResult = "granted";
 let touchedProfiles = 0;
+let existingPurchase: { status: string; user_id: string | null } | null = null;
 let priceForSession: Record<string, string> = {};
 
 class StubbedStripe extends RealStripe {
@@ -35,8 +35,22 @@ mock.module("@supabase/supabase-js", {
   namedExports: {
     createClient: () => ({
       auth: { admin: {} },
-      from() { touchedProfiles += 1; throw new Error("profiles must not be touched"); },
-      rpc(fn: string, args: Record<string, string>) { rpcCalls.push({ fn, args }); return Promise.resolve({ data: rpcResult, error: null }); },
+      from(name: string) {
+        touchedProfiles += 1;
+        if (name !== "stripe_purchase_ledger" || !existingPurchase) {
+          throw new Error("unexpected Supabase table access");
+        }
+        const query = {
+          select: () => query,
+          eq: () => query,
+          maybeSingle: async () => ({ data: existingPurchase, error: null }),
+        };
+        return query;
+      },
+      rpc(fn: string, args: Record<string, unknown>) {
+        rpcCalls.push({ fn, args });
+        return Promise.resolve({ data: rpcResult, error: null });
+      },
     }),
   },
 });
@@ -118,6 +132,7 @@ function reset() {
   rpcCalls.length = 0;
   touchedProfiles = 0;
   rpcResult = "granted";
+  existingPurchase = null;
   priceForSession = {};
 }
 
@@ -182,6 +197,25 @@ test("livraison en double : la base répond duplicate, aucun remboursement ni se
   assert.equal(refundKeys.length, 0);
 });
 
+test("une livraison checkout déjà au ledger rejoue l'e-mail et renvoie 500 si Resend échoue", async () => {
+  reset();
+  priceForSession.cs_repeat = "price_beginner";
+  existingPurchase = { status: "active", user_id: UPGRADE_USER };
+  process.env.RESEND_API_KEY = "re_test";
+  process.env.RESEND_FROM_EMAIL = "BUILD <test@example.test>";
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = (async () => new Response("provider failure", { status: 500 })) as typeof fetch;
+  try {
+    const response = await POST(signed(eventBody("cs_repeat", { client_reference_id: null })));
+    assert.equal(response.status, 500);
+    assert.equal(rpcCalls[0]?.fn, "recalculate_stripe_entitlement");
+  } finally {
+    globalThis.fetch = previousFetch;
+    delete process.env.RESEND_API_KEY;
+    delete process.env.RESEND_FROM_EMAIL;
+  }
+});
+
 test("compte sans Fondations (la base refuse) : remboursement avec clé d'idempotence stable, rejeu identique", async () => {
   reset();
   priceForSession.cs_free = "price_upgrade";
@@ -191,7 +225,7 @@ test("compte sans Fondations (la base refuse) : remboursement avec clé d'idempo
   assert.deepEqual(refundKeys, ["upgrade-refused-cs_free", "upgrade-refused-cs_free"]);
 });
 
-test("identité du complément incohérente ou absente : remboursé sans jamais interroger la base", async () => {
+test("identité du complément incohérente ou absente : remboursé sans accès, avec marqueur terminal", async () => {
   const cases: Array<[string, SessionOverrides]> = [
     ["cs_mismatch", { client_reference_id: OTHER_USER }],
     ["cs_noreference", { client_reference_id: null }],
@@ -203,12 +237,13 @@ test("identité du complément incohérente ou absente : remboursé sans jamais 
     reset();
     priceForSession[id] = "price_upgrade";
     assert.equal((await POST(signed(eventBody(id, overrides)))).status, 200, id);
-    assert.deepEqual(rpcCalls, [], id);
+    assert.equal(rpcCalls.some(({ fn }) => fn === "apply_stripe_upgrade"), false, id);
+    assert.equal(rpcCalls.some(({ fn }) => fn === "record_stripe_checkout_terminal"), true, id);
     assert.deepEqual(refundKeys, [`upgrade-refused-${id}`], id);
   }
 });
 
-test("consentement CGV absent ou prix inconnu : remboursé, jamais d'accès", async () => {
+test("consentement CGV absent ou prix inconnu : remboursé avec marqueur terminal, jamais d'accès", async () => {
   reset();
   priceForSession.cs_terms = "price_upgrade";
   assert.equal((await POST(signed(eventBody("cs_terms", { consent: null })))).status, 200);
@@ -216,7 +251,8 @@ test("consentement CGV absent ou prix inconnu : remboursé, jamais d'accès", as
   assert.equal((await POST(signed(eventBody("cs_price")))).status, 200);
   assert.equal((await POST(signed(eventBody("cs_noprice")))).status, 200);
   assert.deepEqual(refundKeys, ["missing_terms_consent-cs_terms", "unknown_price-cs_price", "unknown_price-cs_noprice"]);
-  assert.deepEqual({ rpc: rpcCalls.length, profiles: touchedProfiles }, { rpc: 0, profiles: 0 });
+  assert.equal(rpcCalls.filter(({ fn }) => fn === "record_stripe_checkout_terminal").length, 3);
+  assert.equal(touchedProfiles, 0);
 });
 
 test("session non payée : ignorée sans appel Stripe ni base", async () => {

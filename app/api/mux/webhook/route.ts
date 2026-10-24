@@ -8,12 +8,19 @@ import { createMuxAdminClient } from "@/lib/mux/adminServer";
 import { syncMuxTranscriptForReadyAsset } from "@/lib/mux/transcript.server";
 
 const MAX_MUX_WEBHOOK_BYTES = 256 * 1024;
-async function reserveTrackEvent(admin: SupabaseClient, eventId: string, eventType: string) {
-  return admin.rpc("reserve_mux_webhook_event", { p_event_id: eventId, p_event_type: eventType });
+async function reserveTrackEvent(admin: SupabaseClient, eventId: string, eventType: string, lockOwner: string) {
+  return admin.rpc("reserve_mux_webhook_event", {
+    p_event_id: eventId,
+    p_event_type: eventType,
+    p_lock_owner: lockOwner,
+  });
 }
 
-async function completeTrackEvent(admin: SupabaseClient, eventId: string): Promise<boolean> {
-  const { data, error } = await admin.rpc("complete_mux_webhook_event", { p_event_id: eventId });
+async function completeTrackEvent(admin: SupabaseClient, eventId: string, lockOwner: string): Promise<boolean> {
+  const { data, error } = await admin.rpc("complete_mux_webhook_event", {
+    p_event_id: eventId,
+    p_lock_owner: lockOwner,
+  });
   return !error && data === true;
 }
 export async function POST(request: NextRequest) {
@@ -46,11 +53,17 @@ export async function POST(request: NextRequest) {
       && asset.text_type === "subtitles"
       && (asset.passthrough === "build-fr-auto" || asset.text_source === "generated_vod");
     if (!isGeneratedSubtitle || !asset.asset_id) return NextResponse.json({ ok: true });
-    const { data: reservation, error: reservationError } = await reserveTrackEvent(admin, event.id, event.type);
-    if (reservationError || !["new", "retry", "duplicate"].includes(String(reservation))) {
+    const lockOwner = crypto.randomUUID();
+    const { data: reservation, error: reservationError } = await reserveTrackEvent(
+      admin,
+      event.id,
+      event.type,
+      lockOwner,
+    );
+    if (reservationError || !["new", "retry", "duplicate", "in_progress"].includes(String(reservation))) {
       return NextResponse.json({ ok: false }, { status: 503 });
     }
-    if (reservation === "duplicate") return NextResponse.json({ ok: true });
+    if (reservation === "duplicate" || reservation === "in_progress") return NextResponse.json({ ok: true });
     const { data: video, error: videoError } = await admin.from("video_lessons")
       .select("id,playback_id")
       .eq("mux_asset_id", asset.asset_id)
@@ -60,7 +73,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false }, { status: 503 });
     }
     if (!video?.playback_id) {
-      if (!await completeTrackEvent(admin, event.id)) return NextResponse.json({ ok: false }, { status: 503 });
+      if (!await completeTrackEvent(admin, event.id, lockOwner)) return NextResponse.json({ ok: false }, { status: 503 });
       return NextResponse.json({ ok: true });
     }
     if (event.type === "video.asset.track.errored") {
@@ -72,7 +85,7 @@ export async function POST(request: NextRequest) {
         console.error("mux.webhook.transcript_error_update_failed");
         return NextResponse.json({ ok: false }, { status: 503 });
       }
-      if (!await completeTrackEvent(admin, event.id)) return NextResponse.json({ ok: false }, { status: 503 });
+      if (!await completeTrackEvent(admin, event.id, lockOwner)) return NextResponse.json({ ok: false }, { status: 503 });
       return NextResponse.json({ ok: true });
     }
     try {
@@ -99,7 +112,7 @@ export async function POST(request: NextRequest) {
       console.error("mux.webhook.transcript_clear_failed");
       return NextResponse.json({ ok: false }, { status: 503 });
     }
-    if (!await completeTrackEvent(admin, event.id)) return NextResponse.json({ ok: false }, { status: 503 });
+    if (!await completeTrackEvent(admin, event.id, lockOwner)) return NextResponse.json({ ok: false }, { status: 503 });
     return NextResponse.json({ ok: true });
   }
 

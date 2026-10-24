@@ -9,9 +9,9 @@ type RefundCall = {
 };
 
 const refundCalls: RefundCall[] = [];
+const terminalCalls: Array<{ name: string; args: Record<string, unknown> }> = [];
 let refundStatus = "succeeded";
 let supabaseDataTouched = false;
-
 class FakeStripe {
   webhooks = {
     constructEvent: () => ({
@@ -51,7 +51,11 @@ mock.module("@supabase/supabase-js", {
     createClient: () => ({
       get auth() { supabaseDataTouched = true; return {}; },
       from() { supabaseDataTouched = true; return {}; },
-      rpc() { supabaseDataTouched = true; return {}; },
+      rpc(name: string, args: Record<string, unknown>) {
+        supabaseDataTouched = true;
+        terminalCalls.push({ name, args });
+        return Promise.resolve({ data: "recorded", error: null });
+      },
     }),
   },
 });
@@ -79,11 +83,19 @@ function request() {
 test("email nul et référence invalide remboursent sans attribuer d'accès", async () => {
   refundStatus = "succeeded";
   refundCalls.length = 0;
+  terminalCalls.length = 0;
   supabaseDataTouched = false;
   const response = await POST(request());
   assert.equal(response.status, 200);
-  assert.equal(supabaseDataTouched, false);
-  assert.equal(refundCalls.length, 1);
+  assert.equal(supabaseDataTouched, true);
+  assert.deepEqual(terminalCalls, [{
+    name: "record_stripe_checkout_terminal",
+    args: {
+      p_checkout_session_id: "cs_missing_identity",
+      p_payment_intent_id: "pi_missing_identity",
+      p_reason: "missing_customer_identity",
+    },
+  }]);
   assert.equal(refundCalls[0].params.payment_intent, "pi_missing_identity");
   assert.equal(refundCalls[0].params.metadata.refused_reason, "missing_customer_identity");
   assert.equal(refundCalls[0].options.idempotencyKey, "missing_customer_identity-cs_missing_identity");
@@ -92,6 +104,7 @@ test("email nul et référence invalide remboursent sans attribuer d'accès", as
 test("le webhook répond 500 tant que le remboursement d'identité manquante n'est pas confirmé", async () => {
   refundStatus = "pending";
   refundCalls.length = 0;
+  terminalCalls.length = 0;
   supabaseDataTouched = false;
   const response = await POST(request());
   assert.equal(response.status, 500);

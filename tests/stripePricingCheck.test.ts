@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 import { CHECKOUT_CONSENT_TEXT } from "../lib/legal/consent";
 
 import {
@@ -98,4 +99,10 @@ test("Stripe pricing verification rejects an absent or inactive configured Payme
     }),
     /absent or inactive/,
   );
+});
+
+test("la désactivation des anciens liens exige une référence explicite du lien upgrade", async () => {
+  const source = await readFile("scripts/update-stripe-pricing.ts", "utf8");
+  assert.match(source, /RETIRE && !PUBLIC_UPGRADE_LINK_URL/);
+  assert.match(source, /STRIPE_UPGRADE_CHECKOUT_LINK is required with --retire-old/);
 });

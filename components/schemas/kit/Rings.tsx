@@ -18,7 +18,7 @@ export function Rings({ core, rings, accentIndex, ...frame }: RingsProps) {
 
   return <KitFrame {...frame} kind="rings" keys={rings[accentIndex] ? [{ swatch: "accent", label: "En vert : la couche qui compte ici" }] : undefined}>
     <div className={styles.ringsLayout}>
-    <div className={styles.ringsWide}>
+    <div className={styles.ringsWide} data-count={rings.length}>
       {rings.slice().reverse().map((ring, reverseIndex) => {
         const index = rings.length - reverseIndex - 1;
         return <div

@@ -36,7 +36,7 @@ Aucune liste magique de sections ne marche pour tout le monde. L'ordre de ta pag
 
 [[maquette:LandingRateeLandingUtile]]
 
-À gauche, la page ratée commence par l'histoire de l'entreprise, empile des promesses et répète trois boutons différents. À droite, la page utile commence par une scène que le visiteur reconnaît : « Tes demandes de devis arrivent par trois canaux et tu en oublies une par semaine. »
+À gauche, la page florale ratée empile « Des fleurs uniques », « Des créations uniques », le bouton « Découvrir » et les repères « Avis », « Carte », « Blog ». À droite, Maison Lila montre un bouquet, demande l'occasion et le budget, puis propose « Commander un bouquet » avec un rappel pendant les horaires d'ouverture.
 
 Dans les premières secondes, le premier écran répond à quatre questions : est-ce pour moi, qu'est-ce qui change, comment, et que dois-je faire maintenant ?
 

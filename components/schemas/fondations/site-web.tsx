@@ -15,7 +15,6 @@ export function LandingRateeLandingUtileMockup() {
       heading: "Des fleurs uniques",
       subtitle: "Des créations uniques",
       button: "Découvrir",
-      proofs: ["Commencer", "Trois cartes", "Faux compteur"],
     }}
     after={{
       nav: "Maison Lila",
@@ -23,7 +22,6 @@ export function LandingRateeLandingUtileMockup() {
       subtitle: "Dis-nous l'occasion et le budget. Maison Lila te rappelle avant de composer.",
       button: "Commander un bouquet",
       photo: "fleuriste",
-      proofs: ["Trois bouquets réels"],
       offer: "Rappel pendant les horaires d'ouverture",
       faq: "Comment ça se passe ?",
     }}
@@ -38,16 +36,16 @@ export function AnatomiePremierEcranMockup() {
     accent={EM}
     page={{
       eyebrow: "Plaquiste à Lyon",
-      heading: "Cloisons et faux plafonds à Lyon, posés en une semaine",
-      subtitle: "Envoie ton plan et trois photos. Karim te rappelle sous 48 h avec un prix.",
+      heading: "Cloisons et faux plafonds à Lyon, selon ton chantier",
+      subtitle: "Envoie ton plan et trois photos. Karim te rappelle après étude avec un prix.",
       button: "Recevoir mon prix",
       photo: "plaquiste",
       offer: "Tes photos restent jointes au projet",
     }}
     annotations={[
-      { number: 1, target: "heading", label: "Pour qui ?", why: "Le métier, la ville et le délai sont dans le titre : le bon client se reconnaît tout de suite.", alt: "Le type de chantier dans le titre." },
+      { number: 1, target: "heading", label: "Pour qui ?", why: "Le métier, la ville et la situation du chantier sont dans le titre : le bon client se reconnaît tout de suite.", alt: "Le type de chantier dans le titre." },
       { number: 2, target: "image", label: "Quel changement ?", why: "La photo montre l'outil et la matière : c'est du vrai chantier.", alt: "Un avant et après." },
-      { number: 3, target: "subtitle", label: "Comment ?", why: "Deux gestes pour le client, un rappel sous 48 h : le fonctionnement tient en deux phrases.", alt: "Trois pastilles : plan, photos, rappel." },
+      { number: 3, target: "subtitle", label: "Comment ?", why: "Deux gestes pour le client, un rappel après étude : le fonctionnement tient en deux phrases.", alt: "Trois pastilles : plan, photos, rappel." },
       { number: 4, target: "button", label: "Quel geste ?", why: "Un verbe précis, un seul bouton : il n'y a pas d'autre chemin.", alt: "Un numéro de téléphone en simple lien." },
     ]}
   />;

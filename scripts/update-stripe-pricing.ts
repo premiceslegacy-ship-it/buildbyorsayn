@@ -73,6 +73,9 @@ const isCompliant = (link: Stripe.PaymentLink) => hasRequiredPaymentLinkConsent(
 async function main() {
   const beginnerUrl = process.env.STRIPE_BEGINNER_CHECKOUT_LINK;
   if (!beginnerUrl) throw new Error("STRIPE_BEGINNER_CHECKOUT_LINK is required.");
+  if (RETIRE && !PUBLIC_UPGRADE_LINK_URL) {
+    throw new Error("STRIPE_UPGRADE_CHECKOUT_LINK is required with --retire-old.");
+  }
   await verifyConfiguredStripePrices(stripe);
   const links = await activeLinks();
   const configured = [

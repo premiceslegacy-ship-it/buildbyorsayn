@@ -11,9 +11,9 @@ const STEPS = [
 
 /**
  * Premier écran : la scène des réels BUILD. Une fenêtre de travail (les étapes de la personne avec l'outil de chacune, et la page qui se construit : une vraie photo, un titre, un bouton)
- * et un iPhone dont l'écran verrouillé montre un paiement Stripe et un message. Décoratif : le titre de la page dit déjà tout.
+ * et un iPhone dont l'écran verrouillé montre une validation de dossier et un message. Décoratif : le titre de la page dit déjà tout.
  * La scène est dessinée à taille fixe (1000 x 620) puis réduite par `zoom` selon la largeur (voir landing.css).
- * Les noms, la somme et l'adresse sont des exemples : aucune donnée réelle.
+ * Les noms sont des exemples : aucune donnée réelle.
  */
 export function HeroScene() {
   return (
@@ -83,19 +83,19 @@ export function HeroScene() {
             <div className="notifs">
               <div className="grp">
                 <div className="ntf" style={{ "--d": ".4s" } as CSSProperties}>
-                  <span className="app app--rendered"><ToolLogo name="Stripe" size={80} /></span>
-                  <div><header>Stripe<span>maintenant</span></header><p>Paiement reçu : 1&nbsp;500,00&nbsp;€<small>de Camille Roux</small></p></div>
+                  <span className="app app--rendered"><ToolLogo name="Notion" size={80} /></span>
+                  <div><header>Notion<span>maintenant</span></header><p>Dossier validé<small>pour Camille Roux</small></p></div>
                 </div>
                 <i className="pile p1" /><i className="pile p2" />
               </div>
               <div className="grp">
                 <div className="ntf" style={{ "--d": ".9s" } as CSSProperties}>
                   <span className="app app--mail app--rendered"><ToolLogo name="Gmail" size={80} /></span>
-                  <div><header>Gmail<span>il y a 2 min</span></header><p>Camille Roux<small>Parfait, on démarre quand ?</small></p></div>
+                  <div><header>Gmail<span>il y a 2 min</span></header><p>Camille Roux<small>Parfait, on démarre quand ?</small></p></div>
                 </div>
               </div>
             </div>
-            <p className="hs__fiction">Illustration : identités et montants fictifs</p>
+            <p className="hs__fiction">Illustration : identités fictives</p>
           </div>
         </div>
       </div>

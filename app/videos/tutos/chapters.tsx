@@ -45,7 +45,7 @@ export const CHAPTER_META: Record<string, ChapterMeta> = {
     group: "socle",
     section: "start",
     order: 1,
-    summary: "Tu vérifies le terminal avant de connecter une boîte mail ou un compte client. Tu apprends les mots simples : tâche, workflow, skill, outil et validation.",
+    summary: "Tu vérifies le terminal avant de connecter une boîte mail ou un compte client. Tu apprends les mots simples : tâche, workflow, skill, outil et validation.",
   },
   "01-diagnostic-et-offre.md": {
     path: "01-diagnostic-et-offre.md",

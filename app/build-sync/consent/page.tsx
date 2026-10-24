@@ -10,7 +10,7 @@ import {
 } from "@/app/actions/buildSyncConsent";
 import "@/app/da-mcp.css";
 
-export const metadata = { title: "Installer BUILD Sync" };
+export const metadata = { title: "Installer BUILD Sync | BUILD" };
 
 export default async function BuildSyncConsentPage({
   searchParams,

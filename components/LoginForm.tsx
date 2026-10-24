@@ -115,6 +115,7 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
         </label>
         <div className="ui3-auth-actions"><button className="btn btn--p" type="submit" disabled={isLoading}>{isLoading ? (isSignup ? "Création" : "Connexion") : (isSignup ? "Créer mon compte" : "Se connecter")}</button></div>
       </form>
+      {isSignup ? <p className="ui3-auth-legal">En créant ton compte, tu acceptes les <Link href="/cgv">conditions générales de vente</Link> et la <Link href="/confidentialite">politique de confidentialité</Link>.</p> : null}
       <p className="ui3-auth-switch">{isSignup ? "Tu as déjà un compte ?" : "Tu n’as pas encore de compte ?"}<button type="button" onClick={switchMode}>{isSignup ? "Se connecter" : "Créer un compte"}</button></p>
     </>
   );

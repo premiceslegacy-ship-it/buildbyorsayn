@@ -9,7 +9,7 @@ import { protocoleIntroductionMarkdown, protocoleMarkdown } from "@/lib/protocol
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 
 export const metadata = {
-  title: "Le protocole zéro : BUILD by Orsayn",
+  title: "Le protocole zéro | BUILD",
   description: "Tu apprends une tâche précise. Tu la confrontes au terrain. Puis tu gardes ce que le terrain t'a vraiment appris.",
 };
 

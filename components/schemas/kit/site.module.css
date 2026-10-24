@@ -219,6 +219,7 @@
 
 .heroProduct { display: grid; justify-items: center; gap: clamp(26px, 6cqi, 48px); padding-bottom: 0; text-align: center; overflow: hidden; }
 .heroProduct .heroCopy { justify-items: center; }
+.heroProduct .ctaRow { justify-content: center; }
 .heroProduct > .pinned, .heroProduct > .screen { width: min(100%, 760px); }
 .heroProduct .screen { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 0; }
 

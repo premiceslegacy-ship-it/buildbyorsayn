@@ -18,13 +18,11 @@ export function AnatomieOffreClaireDiagram() {
       subtitle: "Chaque matin, les pièces manquantes et qui les relance. La rédaction reste chez toi.",
       button: "Voir un dossier rejoué",
       screen: { title: "Dossier rejoué : cabinet Durand", rows: [{ left: "Pièces reçues", right: "4 sur 6", state: "ok" }, { left: "Avis d'impôt", right: "manquant", state: "warn" }, { left: "Relance", right: "à valider", state: "todo" }] },
-      proofs: ["Pièces", "Relances", "Tableau"],
     }}
     annotations={[
       { number: 1, target: "heading", label: "Pour qui et quel résultat", why: "Le prospect se reconnaît (cabinet de courtage) et voit un résultat, sans mot technique.", alt: "Un chiffre de son quotidien, comme les dossiers en retard chaque semaine." },
       { number: 2, target: "subtitle", label: "La scène et la limite", why: "Elle décrit un matin réel et annonce ce que tu ne fais pas : la rédaction reste chez lui.", alt: "La limite en plus petit, sous le bouton." },
       { number: 3, target: "image", label: "La preuve disponible", why: "Un vrai dossier rejoué convainc plus qu'une promesse, et il se vérifie.", alt: "Une vidéo de quinze secondes sur le même dossier." },
-      { number: 4, target: "proofs", label: "Ce que tu livres", why: "Trois livrables nommés : il sait exactement ce qu'il reçoit.", alt: "Une vignette d'exemple pour chaque livrable." },
     ]}
   />;
 }

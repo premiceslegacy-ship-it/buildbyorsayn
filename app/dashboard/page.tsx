@@ -17,6 +17,7 @@ import { CHAPTER_META } from "@/app/videos/tutos/chapters";
 /* eslint-disable @next/next/no-img-element */
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Aujourd'hui | BUILD", robots: { index: false, follow: false } };
 
 export default async function DashboardPage() {
   const identity = await requirePageAccess("authenticated", "/dashboard");

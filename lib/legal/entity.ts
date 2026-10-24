@@ -152,7 +152,7 @@ const entitySchema = z.object({
 }).superRefine((value, ctx) => {
   if ((value.mediatorName === undefined) !== (value.mediatorUrl === undefined)) {
     const missing = value.mediatorName === undefined ? "mediatorName" : "mediatorUrl";
-    ctx.addIssue({ code: "custom", path: [missing], message: "Le nom et l'adresse web du médiateur vont ensemble : renseigne les deux ou aucun." });
+    ctx.addIssue({ code: "custom", path: [missing], message: "Le nom et l'adresse web du médiateur vont ensemble : renseigne les deux ou aucun." });
   }
 });
 

@@ -100,15 +100,25 @@ try {
     create role authenticated nologin;
     create role service_role nologin bypassrls;
     create schema auth;
-    create table auth.users (id uuid primary key);
+    create table auth.users (id uuid primary key, email text, email_confirmed_at timestamptz);
     create table public.profiles (id uuid primary key references auth.users(id), tier text);
+    create table public.admin_action_audit (
+      id bigint generated always as identity primary key,
+      actor_user_id uuid,
+      action text,
+      target_type text,
+      target_id uuid,
+      result text,
+      details jsonb
+    );
   `);
   sql(readFileSync("supabase/migrations/20261022130000_stripe_upgrade_idempotency.sql", "utf8"));
+  sql(readFileSync("supabase/migrations/20261024101000_stripe_purchase_ledger.sql", "utf8"));
 
   assert.equal(sql("select relrowsecurity::int from pg_class where oid='public.stripe_upgrade_claims'::regclass;"), "1");
   assert.equal(sql("select has_table_privilege('anon','public.stripe_upgrade_claims','select')::int || ':' || has_table_privilege('authenticated','public.stripe_upgrade_claims','select')::int;"), "0:0");
-  assert.equal(sql("select has_function_privilege('anon','public.apply_stripe_upgrade(uuid,text)','execute')::int || ':' || has_function_privilege('authenticated','public.apply_stripe_upgrade(uuid,text)','execute')::int || ':' || has_function_privilege('service_role','public.apply_stripe_upgrade(uuid,text)','execute')::int;"), "0:0:1");
-  assert.equal(sql("select coalesce(array_to_string(proconfig, ','), '') from pg_proc where oid='public.apply_stripe_upgrade(uuid,text)'::regprocedure;"), "search_path=\"\"");
+  assert.equal(sql("select has_function_privilege('anon','public.apply_stripe_upgrade(uuid,text,text)','execute')::int || ':' || has_function_privilege('authenticated','public.apply_stripe_upgrade(uuid,text,text)','execute')::int || ':' || has_function_privilege('service_role','public.apply_stripe_upgrade(uuid,text,text)','execute')::int;"), "0:0:1");
+  assert.equal(sql("select coalesce(array_to_string(proconfig, ','), '') from pg_proc where oid='public.apply_stripe_upgrade(uuid,text,text)'::regprocedure;"), "search_path=\"\"");
 
   const replayUser = "11111111-1111-4111-8111-111111111111";
   const conflictUser = "22222222-2222-4222-8222-222222222222";
@@ -120,6 +130,21 @@ try {
   assert.equal(sql(`select public.apply_stripe_upgrade('${replayUser}','cs_second_payment');`), "refuse");
   assert.equal(sql(`select public.apply_stripe_upgrade('${conflictUser}','cs_replay');`), "conflict");
   assert.equal(sql(`select tier from public.profiles where id='${conflictUser}';`), "beginner");
+
+  const legacyGrantedUser = "55555555-5555-4555-8555-555555555555";
+  createUser(legacyGrantedUser);
+  sql(`insert into public.stripe_upgrade_claims(checkout_session_id,user_id,status) values ('cs_legacy_granted','${legacyGrantedUser}','granted');`);
+  assert.equal(sql(`select public.apply_stripe_upgrade('${legacyGrantedUser}','cs_legacy_granted','pi_legacy_granted');`), "duplicate");
+  assert.equal(sql(`select fallback_tier from public.stripe_purchase_ledger where checkout_session_id='cs_legacy_granted';`), "beginner");
+
+  const backfillUser = "66666666-6666-4666-8666-666666666666";
+  createUser(backfillUser);
+  assert.equal(sql(`select public.backfill_stripe_purchase_ledger('[{"checkout_session_id":"cs_backfill_active","payment_intent_id":"pi_backfill_active","user_id":"${backfillUser}","tier":"beginner","status":"active","amount_total":9700,"currency":"eur","customer_email":"buyer@example.test"},{"checkout_session_id":"cs_backfill_refunded","payment_intent_id":"pi_backfill_refunded","user_id":"${backfillUser}","tier":"full","status":"refunded","amount_total":26700,"currency":"eur","customer_email":"buyer@example.test","revoke_reason":"stripe_backfill"}]'::jsonb);`), "2");
+  assert.equal(sql(`select string_agg(status, ',' order by status) from public.stripe_purchase_ledger where user_id='${backfillUser}';`), "active,refunded");
+  assert.equal(sql(`select tier from public.profiles where id='${backfillUser}';`), "beginner");
+
+  assert.equal(sql("select public.record_stripe_checkout_terminal('cs_terminal','pi_terminal','unknown_price');"), "recorded");
+  assert.equal(sql("select public.revoke_stripe_purchase('pi_terminal','refunded','charge.refunded');"), "terminal");
 
   const sameSessionUser = "33333333-3333-4333-8333-333333333333";
   createUser(sameSessionUser);

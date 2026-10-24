@@ -8,7 +8,7 @@ import { getSiteOrigin } from "@/lib/siteOrigin";
 // preload:false : les pages publiques (accueil, offres, légales) utilisent General Sans et Geist (da.css) ; Inter n'y est plus préchargé. Il se charge quand une page l'utilise.
 const inter = Inter({ subsets: ["latin"], preload: false });
 
-const SITE_TITLE = "Construire, vendre et livrer avec l'IA | BUILD by Orsayn";
+const SITE_TITLE = "Construire, vendre et livrer avec l'IA | BUILD";
 const SITE_DESCRIPTION = "BUILD t'aide à passer d'idées et d'outils dispersés à une offre claire, un livrable montrable et une méthode réutilisable.";
 // The host that really serves the app (Vercel sets it per environment); localhost when unset in dev.
 const SITE_URL = getSiteOrigin();

@@ -59,11 +59,9 @@ export function DemoEtroiteDiagram() {
       subtitle: "Essaie sur un dossier fictif : l'IA prépare la liste et les relances, tu valides chacune avant l'envoi.",
       button: "Essayer sur un dossier fictif",
       screen: { title: "Dossier Martin", rows: [{ left: "Pièce d'identité", right: "expirée", state: "warn" }, { left: "Avis d'impôt", right: "absent", state: "warn" }, { left: "Bulletin de salaire", right: "reçu", state: "ok" }], footer: "Données fictives" },
-      proofs: ["Ne relance jamais seule", "Tu relis avant l'envoi"],
     }}
     annotations={[
       { number: 1, target: "image", label: "Son travail : la liste préparée", why: "La démo fait une seule chose et la montre en résultat, pas en promesse.", alt: "Une capture du vrai dossier, floutée." },
-      { number: 2, target: "proofs", label: "Ses limites, dites clairement", why: "Dire ce qu'elle ne fait pas rassure plus que cacher les trous.", alt: "Une ligne de limites en bas de l'écran." },
       { number: 3, target: "button", label: "Un essai sans risque", why: "Le bouton invite à essayer sur des données fictives, et la validation reste un clic humain : rien ne part chez un vrai client.", alt: "Un lien vers une capture du vrai dossier, floutée." },
     ]}
   />;

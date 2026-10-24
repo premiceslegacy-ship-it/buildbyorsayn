@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import "./bienvenue.css";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Bienvenue dans BUILD" };
+export const metadata = { title: "Bienvenue dans BUILD | BUILD" };
 
 export default async function BienvenuePage() {
   const supabase = await createClient();

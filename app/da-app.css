@@ -71,11 +71,11 @@ html.r2-reader-open .da.da-app.has-tabbar {
 .da.da-app .navbar__nav a:hover { color: var(--encre); }
 .da.da-app .navbar__nav a.on { color: var(--encre); font-weight: 600; box-shadow: 0 2px 0 var(--em); }
 .da.da-app .navbar__r { margin-left: auto; display: flex; align-items: center; gap: clamp(10px, 1.2vw, 18px); }
-.da.da-app .navbar__ib { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; color: var(--t1); transition: background .32s var(--ease-c), transform .1s linear; }
+.da.da-app .navbar__ib { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: var(--t1); transition: background .32s var(--ease-c), transform .1s linear; }
 .da.da-app .navbar__ib:hover { background: rgba(241, 245, 242, .12); }
 .da.da-app .navbar__ib:active { transform: scale(.94); }
 .da.da-app .navbar__ib .ic { width: 21px; height: 21px; }
-.da.da-app .avatar { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--carte-2); font: 600 12px/1 var(--font); color: var(--encre); cursor: pointer; transition: background .32s var(--ease-c), transform .1s linear, box-shadow .32s var(--ease-c); }
+.da.da-app .avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--carte-2); font: 600 12px/1 var(--font); color: var(--encre); cursor: pointer; transition: background .32s var(--ease-c), transform .1s linear, box-shadow .32s var(--ease-c); }
 .da.da-app .avatar:hover { background: #3a3f3c; }
 .da.da-app .avatar:active { transform: scale(.94); }
 .da.da-app .avatar[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--em); }

@@ -87,7 +87,7 @@ export function LandingProduitAnnoteeDiagram() {
     title="Une page qui guide vers l'action"
     description="Exemple : la page du tableau de demandes d'Amine, où chaque bloc répond à une question précise."
     legend="Un bloc qui ne fait avancer aucune décision peut partir."
-    ariaLabel="Une page de produit annotée. Le titre dit pour qui et ce que le produit aide à faire. L'image montre l'écran principal du tableau. Les preuves répondent aux doutes. La question fréquente montre une limite : pas de planning des équipes. Le bouton Voir le tableau donne l'action suivante."
+    ariaLabel="Une page de produit annotée. Le titre dit pour qui et ce que le produit aide à faire. L'écran montre le tableau principal avec des demandes concrètes. La question fréquente montre une limite : pas de planning des équipes. Le bouton Voir le tableau donne l'action suivante."
     accent={EM}
     page={{
       url: "tableau-demandes.fr",
@@ -97,15 +97,13 @@ export function LandingProduitAnnoteeDiagram() {
       subtitle: "Le formulaire remplit le tableau. Tu prépares la relance, puis tu la valides.",
       button: "Voir le tableau",
       screen: { title: "Tableau des demandes", rows: [{ left: "Mme Roux, bureaux", right: "devis à relancer", state: "warn" }, { left: "Copropriété Les Tilleuls", right: "visite jeudi", state: "ok" }, { left: "M. Lopez, vitres", right: "nouvelle demande", state: "todo" }] },
-      proofs: ["Capture de l'écran réel", "Relance validée par toi"],
       faq: "Le tableau planifie-t-il mes équipes ?",
     }}
     annotations={[
       { number: 1, target: "heading", label: "Pour qui, et ce qu'il aide à faire", why: "Le titre nomme le métier et promet un seul endroit pour toutes les demandes.", alt: "Un chiffre : combien de demandes se perdent chaque mois." },
       { number: 2, target: "image", label: "La démonstration de l'écran", why: "L'écran réel montre le produit tel qu'il sera utilisé, avec de vraies lignes.", alt: "Une courte vidéo de l'écran." },
-      { number: 3, target: "proofs", label: "Les preuves répondent aux doutes", why: "Chaque preuve répond à un doute : est-ce réel, et qui garde la main.", alt: "L'avis d'un vrai client." },
-      { number: 4, target: "faq", label: "La limite, dite avant l'achat", why: "Dire que le tableau ne planifie pas les équipes évite une déception après l'achat.", alt: "La réponse ouverte directement sous la question." },
-      { number: 5, target: "button", label: "L'action qui vient ensuite", why: "Un seul geste, placé après les preuves et la limite.", alt: "Un lien Voir un exemple à côté." },
+      { number: 3, target: "faq", label: "La limite, dite avant l'achat", why: "Dire que le tableau ne planifie pas les équipes évite une déception après l'achat.", alt: "La réponse ouverte directement sous la question." },
+      { number: 4, target: "button", label: "L'action qui vient ensuite", why: "Un seul geste, placé dans le premier écran avant la limite.", alt: "Le bouton Voir le tableau dans le premier écran." },
     ]}
   />;
 }

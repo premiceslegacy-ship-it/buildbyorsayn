@@ -6,7 +6,7 @@ export const LEARNING_BLOCKS = [
     chapterPath: "README.md",
     number: "01",
     title: "Installe ton agent et fais un premier essai sans risque",
-    description: "Tu vérifies le terminal avant de connecter une boîte mail ou un compte client. Tu apprends les mots simples : tâche, workflow, skill, outil et validation.",
+    description: "Tu vérifies le terminal avant de connecter une boîte mail ou un compte client. Tu apprends les mots simples : tâche, workflow, skill, outil et validation.",
     duration: "Texte complet",
   },
   {

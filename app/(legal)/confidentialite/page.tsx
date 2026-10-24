@@ -59,7 +59,7 @@ export default function ConfidentialitePage() {
 
           <Traitement
             titre="Ton achat"
-            donnees={`Ton adresse e-mail, l'offre achetée (${fondations} ou ${coffre}), le montant, la date, et les références de ton paiement chez Stripe. Ton numéro de carte reste chez Stripe : nous ne le voyons pas.`}
+            donnees={`Ton adresse e-mail, l'offre achetée (${fondations} ou ${coffre}), le montant, la date, et les références de ton paiement chez Stripe. Ton numéro de carte reste chez Stripe : nous ne le voyons pas.`}
             pourquoi="Ouvrir ton accès, garder la preuve de la vente et de ton accord sur l'accès immédiat, tenir notre comptabilité, répondre à un litige."
             base="L'exécution du contrat, et notre obligation légale de conserver les pièces comptables."
             duree="Dix ans pour les pièces comptables (article L123-22 du Code de commerce)."
@@ -91,7 +91,7 @@ export default function ConfidentialitePage() {
 
           <Traitement
             titre="Les skills et la synchronisation"
-            donnees="Ton niveau d'accès, vérifié à chaque téléchargement. Quand tu connectes la commande de synchronisation à ton compte : une autorisation, avec des jetons que nous ne gardons que sous une forme qui ne peut pas être relue. La liste des skills que tu as téléchargés reste dans ton navigateur, pas chez nous."
+            donnees="Ton niveau d'accès, vérifié à chaque téléchargement. Quand tu connectes la commande de synchronisation à ton compte : une autorisation, avec des jetons que nous ne gardons que sous une forme qui ne peut pas être relue. La liste des skills que tu as téléchargés reste dans ton navigateur, pas chez nous."
             pourquoi="Te donner les skills de ton offre et garder ton ordinateur à jour."
             base="L'exécution du contrat."
             duree="Les autorisations expirées ou retirées sont supprimées automatiquement chaque jour, quelques jours après leur fin."
@@ -99,7 +99,7 @@ export default function ConfidentialitePage() {
 
           <Traitement
             titre="Le connecteur pour ton assistant IA"
-            donnees="L'autorisation que tu donnes à ton assistant : le nom de l'application, son adresse de retour, ton niveau d'accès, des jetons gardés sous une forme qui ne peut pas être relue. Un compteur anti-abus rattaché à une empreinte de ton adresse réseau, qui ne permet pas de la retrouver. Le texte de la question que tu poses à la recherche BUILD : il est envoyé à OpenRouter pour le comparer au contenu, sans ton nom ni ton e-mail, et nous ne le gardons pas."
+            donnees="L'autorisation que tu donnes à ton assistant : le nom de l'application, son adresse de retour, ton niveau d'accès, des jetons gardés sous une forme qui ne peut pas être relue. Un compteur anti-abus rattaché à une empreinte de ton adresse réseau, qui ne permet pas de la retrouver. Le texte de la question que tu poses à la recherche BUILD : il est envoyé à OpenRouter pour le comparer au contenu, sans ton nom ni ton e-mail, et nous ne le gardons pas."
             pourquoi="Permettre à ton assistant de s'appuyer sur le contenu BUILD auquel ton offre te donne accès, et protéger le service contre les abus."
             base="L'exécution du contrat, et notre intérêt légitime pour la sécurité du service."
             duree="Les autorisations expirées ou retirées sont supprimées automatiquement chaque jour, quelques jours après leur fin. Les compteurs anti-abus sont supprimés après une journée."
@@ -107,7 +107,7 @@ export default function ConfidentialitePage() {
 
           <Traitement
             titre="Les accompagnements"
-            donnees="Si tu suis un accompagnement : sa période et son parcours, le nom de ton entreprise, ton projet, l'adresse de ton site et les notes partagées avec ton accompagnateur."
+            donnees="Si tu suis un accompagnement : sa période et son parcours, le nom de ton entreprise, ton projet, l'adresse de ton site et les notes partagées avec ton accompagnateur."
             pourquoi="Te suivre pendant l'accompagnement."
             base="L'exécution du contrat."
             duree="Tant que ton compte existe. Ces données sont supprimées avec lui."
@@ -115,18 +115,18 @@ export default function ConfidentialitePage() {
 
           <Traitement
             titre="Les e-mails"
-            donnees="Ton adresse e-mail et le contenu des messages. Il y a trois sortes de messages : l'e-mail d'activation de ton compte après un paiement, les e-mails liés à ton compte (confirmation d'inscription, mot de passe oublié), et les informations sur BUILD (nouvelles vidéos, nouveautés du programme)."
+            donnees="Ton adresse e-mail et le contenu des messages. Il y a trois sortes de messages : l'e-mail d'activation de ton compte après un paiement, les e-mails liés à ton compte (confirmation d'inscription, mot de passe oublié), et les informations sur BUILD (nouvelles vidéos, nouveautés du programme)."
             pourquoi="T'ouvrir ton accès, sécuriser ton compte, te tenir au courant de BUILD."
-            base="L'exécution du contrat pour les deux premières sortes. Notre intérêt légitime à informer nos membres pour la troisième : tu peux t'y opposer à tout moment."
-            duree={<>Tant que tu es membre. Pour ne plus recevoir les informations sur BUILD, écris à {contact} : nous te retirons de ces envois.</>}
+            base="L'exécution du contrat pour les deux premières sortes. Notre intérêt légitime à informer nos membres pour la troisième : tu peux t'y opposer à tout moment."
+            duree={<>Tant que tu es membre. Pour ne plus recevoir les informations sur BUILD, écris à {contact} : nous te retirons de ces envois.</>}
           />
 
           <Traitement
             titre="Tes messages et le fonctionnement du site"
-            donnees="Les messages que tu nous écris. Les journaux techniques de l'hébergeur : adresse réseau, navigateur, pages demandées, erreurs."
+            donnees="Les messages que tu nous écris. Les journaux techniques de l'hébergeur : adresse réseau, navigateur, pages demandées, erreurs."
             pourquoi="Répondre à ta demande. Faire fonctionner le site et le protéger contre les attaques."
             base="L'exécution du contrat pour tes demandes, notre intérêt légitime pour la sécurité et le bon fonctionnement."
-            duree="Tes messages : le temps de traiter ta demande et de suivre un éventuel litige. Les journaux techniques : la durée définie par l'hébergeur."
+            duree="Tes messages : le temps de traiter ta demande et de suivre un éventuel litige. Les journaux techniques : la durée définie par l'hébergeur."
           />
         </>
       ),
@@ -181,14 +181,14 @@ export default function ConfidentialitePage() {
       title: "Tes droits",
       children: (
         <>
-          <p>Tu peux à tout moment :</p>
+          <p>Tu peux à tout moment :</p>
           <ul className="tiret">
-            <li>savoir quelles données nous avons sur toi et en recevoir une copie (accès) ;</li>
-            <li>faire corriger une donnée fausse (rectification) ;</li>
-            <li>demander la suppression de tes données (effacement), dans les limites de nos obligations légales ;</li>
-            <li>demander que nous arrêtions temporairement de les utiliser (limitation) ;</li>
-            <li>t&apos;opposer à un usage fondé sur notre intérêt légitime, comme le suivi d&apos;activité ou les informations sur BUILD (opposition) ;</li>
-            <li>récupérer les données que tu nous as données, dans un format lisible par une machine (portabilité) ;</li>
+            <li>savoir quelles données nous avons sur toi et en recevoir une copie (accès) ;</li>
+            <li>faire corriger une donnée fausse (rectification) ;</li>
+            <li>demander la suppression de tes données (effacement), dans les limites de nos obligations légales ;</li>
+            <li>demander que nous arrêtions temporairement de les utiliser (limitation) ;</li>
+            <li>t&apos;opposer à un usage fondé sur notre intérêt légitime, comme le suivi d&apos;activité ou les informations sur BUILD (opposition) ;</li>
+            <li>récupérer les données que tu nous as données, dans un format lisible par une machine (portabilité) ;</li>
             <li>donner des instructions sur le sort de tes données après ton décès.</li>
           </ul>
           <p>Pour exercer un droit, écris à {contact}. Nous te répondons dans un délai d&apos;un mois, que nous pouvons prolonger de deux mois si ta demande est complexe, en te prévenant. Si nous avons un doute raisonnable sur ton identité, nous te demandons de la confirmer.</p>

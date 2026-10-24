@@ -33,7 +33,8 @@ function ProgrammeCardView({ card, progress, showProgress }: { card: ProgrammeSe
 function Row({ section, progressByCard }: { section: ProgrammeSection; progressByCard?: ProgressByCard }) {
   const list = useRef<HTMLUListElement>(null);
   const move = (direction: number) => {
-    list.current?.scrollBy({ left: direction * list.current.clientWidth * 0.8, behavior: "smooth" });
+    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    list.current?.scrollBy({ left: direction * list.current.clientWidth * 0.8, behavior });
     void playAppSound("click");
   };
   const visibleProgress = section.cards.filter((card) => !card.locked);

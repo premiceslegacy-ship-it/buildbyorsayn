@@ -21,24 +21,23 @@ export type FileCardProps = KitBaseProps & {
 };
 
 export function FileCard({ filename, lines, annotations, tool, ...frame }: FileCardProps) {
-  const notesByLine = new Map(annotations.map((annotation, index) => [annotation.line, index + 1]));
+  const annotationsByLine = new Map(annotations.map((annotation, index) => [annotation.line, { annotation, number: index + 1 }]));
   return <KitFrame {...frame} kind="file-card" keys={annotations.length ? [{ swatch: "accent", label: "Chaque pastille renvoie à la ligne surlignée" }] : undefined}>
     <div className={styles.fileLayout}>
       <section className={styles.editor}>
         <header><span>{filename}</span>{tool ? <ToolMark name={tool} size={28} /> : null}</header>
-        <ol>{lines.map((line, index) => {
+        <ol className={styles.fileGrid}>{lines.map((line, index) => {
           const lineNumber = index + 1;
-          const noteNumber = notesByLine.get(lineNumber);
+          const note = annotationsByLine.get(lineNumber);
           const tone = line.tone === "heading" ? styles.fileHeading : line.tone === "muted" ? styles.fileMuted : "";
-          return <li className={`${tone} ${noteNumber ? styles.fileNoted : ""}`.trim() || undefined} key={`${line.text}-${lineNumber}`}>
-            <span>{lineNumber}</span><code>{line.text || " "}</code>
+          return <li className={`${styles.fileRow} ${tone} ${note ? styles.fileNoted : ""}`.trim()} key={`${line.text}-${lineNumber}`}>
+            <div className={styles.fileCode}><span>{lineNumber}</span><code>{line.text || " "}</code></div>
+            {note
+              ? <div className={styles.fileNote}><span>{note.number}</span><p>{note.annotation.label}</p></div>
+              : <span className={styles.fileNoteSpacer} aria-hidden="true" />}
           </li>;
         })}</ol>
       </section>
-      <ol className={styles.fileNotes}>{annotations.map((annotation, index) => <li
-        style={{ "--kit-note-line": annotation.line } as React.CSSProperties}
-        key={`${annotation.line}-${annotation.label}`}
-      ><span>{index + 1}</span><p>{annotation.label}</p></li>)}</ol>
     </div>
   </KitFrame>;
 }

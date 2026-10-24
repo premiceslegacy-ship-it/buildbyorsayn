@@ -71,16 +71,15 @@ export function PageRenovationAnnoteeDiagram() {
       nav: "Rénovation Grenoble",
       eyebrow: "Grenoble et alentours",
       heading: "Rénove à Grenoble sans chercher cinq artisans",
-      subtitle: "Un seul interlocuteur du devis à la réception, avec un devis détaillé sous 5 jours.",
+      subtitle: "Un seul interlocuteur du devis à la réception, avec un devis détaillé avant tout engagement.",
       button: "Décrire mon chantier",
       photo: "piece",
-      proofs: ["Cuisine", "Salle de bain", "Maison entière"],
-      offer: "Devis détaillé sous 5 jours, avant tout engagement",
+      offer: "Devis détaillé avant tout engagement",
     }}
     annotations={[
-      { number: 1, target: "heading", label: "La zone et le type de chantier", why: "On voit tout de suite si la page parle de soi : la zone et le chantier sont dans le titre.", alt: "Le délai moyen d'un chantier." },
-      { number: 2, target: "image", label: "Des réalisations autorisées", why: "Des photos de chantiers que les clients ont acceptées : la preuve se voit avant toute parole.", alt: "Un curseur avant et après." },
-      { number: 3, target: "offer", label: "La précision avant le clic", why: "Le délai et l'absence d'engagement répondent à « et ensuite ? » avant que la question ne bloque le clic.", alt: "Une frise du déroulé en quatre étapes." },
+      { number: 1, target: "heading", label: "La zone et le type de chantier", why: "On voit tout de suite si la page parle de soi : la zone et le chantier sont dans le titre.", alt: "La zone et le type de chantier dans le titre." },
+      { number: 2, target: "image", label: "Une scène de chantier", why: "La pièce en rénovation rend le chantier concret avant toute parole.", alt: "Une pièce en cours de rénovation." },
+      { number: 3, target: "offer", label: "La précision avant le clic", why: "Le devis détaillé et l'absence d'engagement répondent à « et ensuite ? » avant que la question ne bloque le clic.", alt: "Une frise du déroulé en quatre étapes." },
       { number: 4, target: "button", label: "Un formulaire court, utile au rappel", why: "Juste de quoi te rappeler et préparer le rendez-vous : le reste vient à l'appel.", alt: "Un numéro de téléphone pour ceux qui préfèrent appeler." },
     ]}
   />;

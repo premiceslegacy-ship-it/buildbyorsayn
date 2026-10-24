@@ -11,7 +11,7 @@
 .da .ui3-auth-form, .da .ui3-form { display: grid; gap: 20px; }
 .da .ui3-field, .da .ui3-form label { display: grid; gap: 8px; min-width: 0; font: 600 17px/1.3 var(--font-t); color: var(--encre); }
 .da .ui3-field-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.da .ui3-field-head a { font: 500 14px/1.3 var(--font); color: var(--menthe); }
+.da .ui3-field-head a { display: inline-flex; min-height: 44px; align-items: center; font: 500 14px/1.3 var(--font); color: var(--menthe); }
 .da .ui3-field input, .da .ui3-form input { width: 100%; height: 52px; padding: 0 16px; border: 0; border-radius: var(--r-s); background: var(--carte-2); color: var(--encre); font: 400 17px/1.25 var(--font); box-shadow: inset 0 0 0 1px rgba(241,245,242,.22); transition: box-shadow .32s var(--ease-c), background .32s var(--ease-c); }
 .da .ui3-field input::placeholder, .da .ui3-form input::placeholder { color: var(--t3); }
 .da .ui3-field input:hover, .da .ui3-form input:hover { box-shadow: inset 0 0 0 1px rgba(241,245,242,.4); }
@@ -24,7 +24,9 @@
 .da .ui3-auth-actions { display: grid; gap: 8px; justify-items: center; }
 .da .ui3-auth-actions .btn--p { width: 100%; height: 52px; font-size: 17px; }
 .da .ui3-auth-switch { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; text-align: center; font: 400 17px/1.4 var(--font); color: var(--t2); }
-.da .ui3-auth-switch button, .da .ui3-auth-switch a, .da .ui3-text-link { color: var(--menthe); font-weight: 500; }
+.da .ui3-auth-legal { margin: -8px 0 0; color: var(--t3); font: 400 13px/1.45 var(--font); text-align: center; }
+.da .ui3-auth-legal a { display: inline-flex; min-height: 44px; align-items: center; color: var(--menthe); text-decoration: underline; text-underline-offset: 3px; }
+.da .ui3-auth-switch button, .da .ui3-auth-switch a, .da .ui3-text-link { display: inline-flex; min-height: 44px; align-items: center; color: var(--menthe); font-weight: 500; }
 .da .ui3-auth-progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .da .ui3-auth-progress i { height: 4px; border-radius: 2px; background: rgba(241,245,242,.18); overflow: hidden; }
 .da .ui3-auth-progress i::after { content: ""; display: block; width: 100%; height: 100%; transform: scaleX(0); transform-origin: left; background: var(--em); transition: transform var(--sp-doux-d, .6s) var(--sp-doux, var(--ease)); }
@@ -123,7 +125,7 @@
 .da .ui3-skill-label { font: 600 14px/1.2 var(--font); color: var(--menthe); }
 .da .ui3-prompt { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 12px 12px 12px 14px; border-radius: var(--r-s); background: var(--nuit); }
 .da .ui3-prompt p { font: 400 14px/1.45 var(--font); color: var(--t1); overflow-wrap: anywhere; }
-.da .ui3-prompt button { min-height: 36px; padding: 0 14px; border-radius: 999px; background: rgba(241,245,242,.12); font: 600 14px/1 var(--font); }
+.da .ui3-prompt button { min-height: 44px; padding: 0 14px; border-radius: 999px; background: rgba(241,245,242,.12); font: 600 14px/1 var(--font); }
 .da .ui3-skill-adapt { font-size: 14px !important; }
 .da .ui3-skill-adapt strong { color: var(--t1); }
 .da .ui3-skill-action { align-self: end; display: grid; gap: 8px; }
@@ -131,7 +133,7 @@
 .da .ui3-skill-status { font: 500 14px/1.4 var(--font); color: var(--menthe); }
 .da .ui3-skill-status[data-error="true"] { color: #ff9a95; }
 .da .ui3-filter { display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: var(--carte); width: max-content; max-width: 100%; overflow-x: auto; }
-.da .ui3-filter button { flex: none; min-height: 36px; padding: 0 14px; border-radius: 999px; font: 600 14px/1 var(--font); color: var(--t2); }
+.da .ui3-filter button { flex: none; min-height: 44px; padding: 0 14px; border-radius: 999px; font: 600 14px/1 var(--font); color: var(--t2); }
 .da .ui3-filter button[aria-pressed="true"] { color: var(--encre); background: var(--carte-2); }
 .da .ui3-state { min-height: 70svh; display: grid; place-items: center; padding: calc(68px + 56px) var(--gutter) 110px; text-align: center; }
 .da .ui3-state > div { display: grid; justify-items: center; gap: 16px; max-width: 38rem; }
@@ -219,6 +221,15 @@
   .da .ui3-hermes-row { grid-template-columns: 32px minmax(0,1fr); padding-inline: 10px; }
   .da .ui3-hermes-open { grid-column: 2; }
   .da .ui3-theme-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 699px) {
+  .da .ui3-auth .ui3-text-link,
+  .da .ui3-auth .ui3-auth-switch button,
+  .da .ui3-auth .ui3-field-head a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .da .ui3-auth-progress i::after, .da .ui3-notice, .da .ui3-auth-success-mark { animation: none; transition-duration: .12s; }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CONTACT_EMAIL, LEGAL_LINKS } from "@/lib/legal/links";
 
 /** Pied de page commun à l'accueil, aux offres et aux pages légales. */
-export function DaFooter({ homeBase = "" }: { homeBase?: string }) {
+export function DaFooter({ homeBase = "", loggedIn = false }: { homeBase?: string; loggedIn?: boolean }) {
   return (
     <footer className="pied">
       <div className="wrap">
@@ -24,8 +24,7 @@ export function DaFooter({ homeBase = "" }: { homeBase?: string }) {
           <nav aria-label="Compte">
             <h3>Compte</h3>
             <ul>
-              <li><Link href="/login">Se connecter</Link></li>
-              <li><Link href="/login?mode=signup">Créer un compte</Link></li>
+              {loggedIn ? <><li><Link href="/dashboard">Aujourd&apos;hui</Link></li><li><Link href="/compte">Mon compte</Link></li></> : <><li><Link href="/login">Se connecter</Link></li><li><Link href="/login?mode=signup">Créer un compte</Link></li></>}
               <li><a href={`mailto:${CONTACT_EMAIL}`}>Nous écrire</a></li>
             </ul>
           </nav>

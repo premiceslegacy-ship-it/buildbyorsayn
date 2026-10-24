@@ -62,19 +62,19 @@ export function PreuveAuBonEndroitDiagram() {
     title="Chaque doute trouve sa preuve"
     description="Exemple : la page de Mehdi. Chaque preuve est posée juste à côté de la question qu'elle règle."
     legend="Pas de bloc « avis » à part : la preuve vit près de la phrase qu'elle soutient."
-    ariaLabel="La page d'un atelier vélo place une fiche de diagnostic réelle sur l'image pour répondre à ton travail, une scène précise dans le titre pour répondre à mon cas, et le devis avant réparation dans le sous-titre pour répondre à pour moi."
+    ariaLabel="La page d'un atelier vélo place un mécanicien au travail sur l'image pour répondre à ton travail, une scène précise dans le titre pour répondre à mon cas, et le devis avant réparation dans le sous-titre pour répondre à pour moi."
     accent={EM}
     page={{
       nav: "Atelier de Mehdi",
-      heading: "Le bruit de ton vélo, diagnostiqué sous 48 h",
+      heading: "Le bruit de ton vélo, diagnostiqué à l'atelier",
       subtitle: "Dépose-le. Je vérifie, tu valides le devis avant que je touche à quoi que ce soit.",
       button: "Demander un diagnostic",
       photo: "velo",
     }}
     annotations={[
-      { number: 1, target: "image", label: "Ton travail ? Une vraie fiche remise", why: "Une photo de l'atelier répond à « est‑ce du vrai travail ? » avant toute phrase.", alt: "Une photo de la fiche de diagnostic remise au client." },
+      { number: 1, target: "image", label: "Ton travail ? Un geste d'atelier réel", why: "Le mécanicien, ses outils et le vélo répondent à « est‑ce du vrai travail ? » avant toute phrase.", alt: "Le geste de diagnostic réalisé à l'atelier." },
       { number: 2, target: "heading", label: "Mon cas ? Sa scène exacte", why: "Le bruit que le client a déjà entendu : il se reconnaît en une ligne.", alt: "Le nom du vélo ou du modèle." },
-      { number: 3, target: "subtitle", label: "Pour moi ? Ce qui se passe ensuite", why: "Déposer, vérifier, valider le devis, réparer : les quatre gestes dans l'ordre.", alt: "Un délai : réponse sous 48 h." },
+      { number: 3, target: "subtitle", label: "Pour moi ? Ce qui se passe ensuite", why: "Déposer, vérifier, valider le devis, réparer : les quatre gestes dans l'ordre.", alt: "Le devis après le diagnostic." },
     ]}
   />;
 }

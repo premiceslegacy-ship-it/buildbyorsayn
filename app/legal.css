@@ -1,7 +1,7 @@
 /* BUILD, pages légales (CGV, mentions légales, confidentialité, cookies).
    Tout est sous .da et préfixé lg- ; les styles de lecture (.texte) viennent de da.css. */
 
-.da .lg-barre__retour { display: inline-flex; align-items: center; height: 40px; padding: 0 18px; border-radius: 999px; font: 500 15px/1 var(--font); color: var(--t1); white-space: nowrap; transition: color .32s var(--ease-c), background .32s var(--ease-c); }
+.da .lg-barre__retour { display: inline-flex; align-items: center; min-height: 44px; height: 44px; padding: 0 18px; border-radius: 999px; font: 500 15px/1 var(--font); color: var(--t1); white-space: nowrap; transition: color .32s var(--ease-c), background .32s var(--ease-c); }
 .da .lg-barre__retour:hover { color: var(--encre); background: rgba(241,245,242,.1); }
 
 .da .lg-main { padding: 140px 0 var(--air); }

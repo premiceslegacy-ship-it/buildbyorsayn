@@ -17,7 +17,7 @@ function lessonFor(sectionId: string): SectionLesson | undefined {
 const BLOCS_DATA_SOURCE = [
   {
     id: "1",
-    titre: "Bloc 1 : Lire l'opportunité et choisir une ligne",
+    titre: "Bloc 1 : Lire l'opportunité et choisir une ligne",
     introduction: coffreIntroductionMarkdown("1"),
     sections: [
       { id: "b1-s0", title: "Le décalage se creuse déjà", content: coffreChapterMarkdown("b1-s0") },
@@ -85,12 +85,12 @@ const BLOCS_DATA_SOURCE = [
           {
             slug: "ux-ui-design",
             title: "UX/UI Design Premium",
-            description: "Dossier complet du sous-skill visuel : SKILL.md, références, quality gates, agent YAML et assets de direction artistique.",
+            description: "Dossier complet du sous-skill visuel : SKILL.md, références, quality gates, agent YAML et assets de direction artistique.",
           },
           {
             slug: "backend-orsayn",
             title: "Backend Orsayn",
-            description: "Dossier backend complet du système : skill maître audit + construction, 7 sous-skills (auth/RLS, API, agents IA, webhooks, performance, conformité, migration) et mapping OWASP.",
+            description: "Dossier backend complet du système : skill maître audit + construction, 7 sous-skills (auth/RLS, API, agents IA, webhooks, performance, conformité, migration) et mapping OWASP.",
           },
         ],
       },

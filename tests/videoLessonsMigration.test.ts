@@ -16,6 +16,16 @@ test("video lessons and admin audit stay service-role only", async () => {
   assert.doesNotMatch(sql, /grant .* to (anon|authenticated)/i);
 });
 
+test("Mux webhook leases expire before a retry and never regress a terminal lesson state", async () => {
+  const sql = await readFile("supabase/migrations/20261024100000_mux_webhook_idempotency.sql", "utf8");
+  assert.match(sql, /lock_owner text/);
+  assert.match(sql, /locked_until timestamptz/);
+  assert.match(sql, /existing_lock_until > pg_catalog\.now\(\)[\s\S]*return 'in_progress'/);
+  assert.match(sql, /locked_until = pg_catalog\.now\(\) \+ interval '2 minutes'/);
+  assert.match(sql, /status in \('waiting', 'preparing', 'ready'\)/);
+  assert.match(sql, /status in \('waiting', 'preparing', 'errored'\)/);
+});
+
 test("tier changes and email sends use an approval-aware audit path", async () => {
   const tierAction = await readFile("app/actions/setUserTier.ts", "utf8");
   const emailRoute = await readFile("app/api/admin/send-email/route.ts", "utf8");

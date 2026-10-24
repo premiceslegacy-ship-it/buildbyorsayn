@@ -7,7 +7,7 @@ import { describeSeller, getLegalEntity } from "@/lib/legal/entity";
 export const metadata = legalMetadata("/cgv");
 
 export default function CgvPage() {
-  // L'identité de l'éditeur est lue au moment de la requête : un serveur de production sans elle refuse d'afficher la page.
+  // L'identité de l'éditeur est lue au moment de la requête : un serveur de production sans elle refuse d'afficher la page.
   const entity = getLegalEntity();
   const { fondations, coffre } = TIER_NAMES;
 
@@ -18,10 +18,10 @@ export default function CgvPage() {
       children: (
         <>
           <p>
-            Ces conditions s&apos;appliquent à tout achat d&apos;un accès à BUILD sur ce site. BUILD est un programme en ligne : des vidéos, des textes, des skills (des fichiers que tu télécharges pour ton assistant IA), un connecteur pour ton assistant IA et une commande de synchronisation des skills. Il t&apos;aide à construire, proposer et livrer avec l&apos;IA.
+            Ces conditions s&apos;appliquent à tout achat d&apos;un accès à BUILD sur ce site. BUILD est un programme en ligne : des vidéos, des textes, des skills (des fichiers que tu télécharges pour ton assistant IA), un connecteur pour ton assistant IA et une commande de synchronisation des skills. Il t&apos;aide à construire, proposer et livrer avec l&apos;IA.
           </p>
           <p>
-            Créer un compte gratuit n&apos;est pas un achat : il te donne accès au premier bloc, sans paiement. Les présentes conditions s&apos;appliquent dès que tu paies une offre.
+            Créer un compte gratuit n&apos;est pas un achat : il te donne accès au premier bloc, sans paiement. Les présentes conditions s&apos;appliquent dès que tu paies une offre.
           </p>
           <p>BUILD est une formation conçue pour des professionnels.</p>
         </>
@@ -73,12 +73,12 @@ export default function CgvPage() {
       children: (
         <>
           <p>Tu commandes en cliquant sur le bouton de l&apos;offre, puis en payant sur la page de paiement sécurisée de Stripe. Le contrat est conclu quand Stripe nous confirme ton paiement.</p>
-          <p>L&apos;accès s&apos;ouvre dès cet instant, sans attendre. Il est rattaché à ton compte BUILD :</p>
+          <p>L&apos;accès s&apos;ouvre dès cet instant, sans attendre. Il est rattaché à ton compte BUILD :</p>
           <ul className="tiret">
-            <li>si tu as déjà un compte avec l&apos;adresse e-mail utilisée pour payer, l&apos;accès est ajouté à ce compte ;</li>
+            <li>si tu as déjà un compte avec l&apos;adresse e-mail utilisée pour payer, l&apos;accès est ajouté à ce compte ;</li>
             <li>sinon, nous t&apos;envoyons un e-mail pour activer ton compte et choisir ton mot de passe.</li>
           </ul>
-          <p>Utilise donc la même adresse e-mail pour ton compte et pour le paiement. Un compte est personnel : tu ne le partages pas.</p>
+          <p>Utilise donc la même adresse e-mail pour ton compte et pour le paiement. Un compte est personnel : tu ne le partages pas.</p>
         </>
       ),
     },
@@ -87,7 +87,7 @@ export default function CgvPage() {
       title: "Paiement",
       children: (
         <>
-          <p>Le paiement se fait en une fois, par les moyens proposés sur la page de paiement Stripe. Stripe traite ton paiement : nous ne voyons ni ne gardons ton numéro de carte.</p>
+          <p>Le paiement se fait en une fois, par les moyens proposés sur la page de paiement Stripe. Stripe traite ton paiement : nous ne voyons ni ne gardons ton numéro de carte.</p>
           <p>Si le paiement échoue ou est refusé, aucun accès n&apos;est ouvert et aucune somme n&apos;est due.</p>
         </>
       ),
@@ -100,7 +100,7 @@ export default function CgvPage() {
           <p>
             En principe, quand tu achètes à distance, tu as 14 jours pour changer d&apos;avis. Pour un contenu numérique fourni sans support matériel, la loi prévoit une exception : tu n&apos;as plus ce droit dans deux cas cumulés. L&apos;exécution a commencé avec ton accord préalable exprès. Tu as aussi reconnu expressément que tu perdais ton droit de rétractation (article L221-28, 13° du Code de la consommation).
           </p>
-          <p>BUILD est un contenu numérique, ouvert immédiatement. Avant de payer, la page de paiement Stripe te demande donc de cocher une case obligatoire, avec ce texte :</p>
+          <p>BUILD est un contenu numérique, ouvert immédiatement. Avant de payer, la page de paiement Stripe te demande donc de cocher une case obligatoire, avec ce texte :</p>
           <p className="lg-citation">{quote(CHECKOUT_CONSENT_TEXT)}</p>
           <p>Sans cette case cochée, tu ne peux pas payer. Une fois que tu l&apos;as cochée et que l&apos;accès est ouvert, tu ne peux plus te rétracter.</p>
           <p>Si l&apos;accès n&apos;a pas pu s&apos;ouvrir (par exemple à cause d&apos;un incident de notre côté), l&apos;exécution n&apos;a pas commencé et tu gardes ton droit de te rétracter pendant 14 jours à compter de ton achat.</p>
@@ -123,11 +123,11 @@ export default function CgvPage() {
       title: "Licence d'utilisation",
       children: (
         <>
-          <p>En achetant, tu reçois un droit d&apos;utiliser les contenus pour toi : personnel, non exclusif, non transférable, et sans limite de durée tant que ton accès existe.</p>
-          <p>Tu peux regarder les vidéos, lire les textes, télécharger les skills et les utiliser pour ton propre travail. Tu ne peux pas :</p>
+          <p>En achetant, tu reçois un droit d&apos;utiliser les contenus pour toi : personnel, non exclusif, non transférable, et sans limite de durée tant que ton accès existe.</p>
+          <p>Tu peux regarder les vidéos, lire les textes, télécharger les skills et les utiliser pour ton propre travail. Tu ne peux pas :</p>
           <ul className="tiret">
-            <li>revendre, louer, prêter ou donner accès à tes contenus BUILD, ni à ton compte ;</li>
-            <li>publier, partager ou redistribuer les vidéos, les textes ou les skills, en entier ou en grande partie ;</li>
+            <li>revendre, louer, prêter ou donner accès à tes contenus BUILD, ni à ton compte ;</li>
+            <li>publier, partager ou redistribuer les vidéos, les textes ou les skills, en entier ou en grande partie ;</li>
             <li>enregistrer les vidéos ou contourner leur protection. Ton adresse e-mail apparaît en filigrane sur les vidéos.</li>
           </ul>
           <p>BUILD, ses vidéos, ses textes, ses skills et ses marques restent la propriété de {entity.fullName} et de ses auteurs.</p>
@@ -139,7 +139,7 @@ export default function CgvPage() {
       title: "Mises à jour et disponibilité",
       children: (
         <>
-          <p>BUILD évolue : chapitres corrigés ou ajoutés, skills mis à jour. Ces changements ne retirent pas ce que ton offre incluait quand tu l&apos;as achetée, sauf si la loi, une contrainte technique ou un service tiers nous y oblige.</p>
+          <p>BUILD évolue : chapitres corrigés ou ajoutés, skills mis à jour. Ces changements ne retirent pas ce que ton offre incluait quand tu l&apos;as achetée, sauf si la loi, une contrainte technique ou un service tiers nous y oblige.</p>
           <p>Le site peut être indisponible pendant une maintenance ou un incident. Nous faisons le nécessaire pour le rétablir au plus vite.</p>
           <p>Le connecteur et la commande de synchronisation fonctionnent avec ton assistant IA (Claude, ChatGPT ou un autre) et avec ton ordinateur. Ces services appartiennent à d&apos;autres sociétés, avec leurs propres conditions et parfois leur propre abonnement. Nous ne garantissons ni leur disponibilité ni leurs réponses. Le connecteur peut aussi être proposé d&apos;abord en version d&apos;essai.</p>
         </>
@@ -150,8 +150,8 @@ export default function CgvPage() {
       title: "Garanties légales",
       children: (
         <>
-          <p>Tu bénéficies de la garantie légale de conformité des contenus numériques (articles L224-25-1 et suivants du Code de la consommation). Si le contenu ne correspond pas à ce qui était annoncé, écris-nous : nous le mettons en conformité. À défaut, tu peux demander une réduction du prix ou la fin du contrat avec remboursement.</p>
-          <p>La garantie des vices cachés prévue par les articles 1641 et suivants du Code civil s&apos;applique aussi. Ces garanties ne dépendent pas de ces conditions : rien ici ne les limite.</p>
+          <p>Tu bénéficies de la garantie légale de conformité des contenus numériques (articles L224-25-1 et suivants du Code de la consommation). Si le contenu ne correspond pas à ce qui était annoncé, écris-nous : nous le mettons en conformité. À défaut, tu peux demander une réduction du prix ou la fin du contrat avec remboursement.</p>
+          <p>La garantie des vices cachés prévue par les articles 1641 et suivants du Code civil s&apos;applique aussi. Ces garanties ne dépendent pas de ces conditions : rien ici ne les limite.</p>
         </>
       ),
     },

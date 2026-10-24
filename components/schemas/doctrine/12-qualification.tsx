@@ -28,7 +28,7 @@ function FormulaireQuiRendQuelqueChoseMockup() {
     ariaLabel="Une page de diagnostic pose trois questions, dernier cas, ce qui bloque et qui décide, puis le bouton Voir ma carte rend une scène observée, un point de perte et une prochaine décision."
     accent={EM}
     page={{
-      url: "tonsite.fr/diagnostic",
+      url: "atelier-devis.fr/diagnostic",
       nav: "Atelier devis",
       eyebrow: "Diagnostic en trois questions",
       heading: "Trouve où ton dernier devis a bloqué",

@@ -9,7 +9,7 @@ import { selectPricingView } from "@/lib/pricingView";
 import "./checkout.css";
 
 export const metadata = {
-    title: "Choisir mon niveau | BUILD by Orsayn",
+    title: "Choisir mon niveau | BUILD",
 };
 
 export default async function CheckoutPage({
@@ -48,7 +48,7 @@ export default async function CheckoutPage({
         <DaRoot className="checkout-page">
             <DaNav loggedIn={Boolean(user)} homeBase="/" />
             <CheckoutView blocks={blocks} links={links} loggedIn={Boolean(user)} notice={notice} lede={fromMcp && showsBothOffers ? "Ton compte est prêt. Choisis ton niveau pour connecter ton assistant à BUILD." : undefined} />
-            <DaFooter homeBase="/" />
+            <DaFooter homeBase="/" loggedIn={Boolean(user)} />
         </DaRoot>
     );
 }

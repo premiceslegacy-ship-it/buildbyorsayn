@@ -14,7 +14,7 @@
   box-shadow: 0 .5px 0 rgba(241, 245, 242, .12);
 }
 
-.logo { width: 112px; height: auto; }
+.logo { height: clamp(21px, 1.8vw, 28px); width: auto; }
 
 .links {
   position: absolute;

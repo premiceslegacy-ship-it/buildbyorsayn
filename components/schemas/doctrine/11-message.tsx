@@ -73,23 +73,21 @@ function PageQuiAideAChoisirDiagram() {
     title="Une page qui aide à choisir"
     description="Le premier écran porte une idée : la scène, le mécanisme, la preuve et un geste volontaire."
     legend="Retire toute urgence ou fonction que tu ne peux pas montrer."
-    ariaLabel="Une page web annotée. Titre : repère la pièce qui manque avant le chantier, il ouvre la porte. Sous-titre : nous préparons le dossier, tu valides chaque envoi, il montre le mécanisme. Bouton : montre-moi un dossier bloqué, un geste volontaire. Preuves : démo sur un dossier fictif, aucun envoi sans toi, elles réduisent le doute."
+    ariaLabel="Une page web annotée. Le titre repère la pièce qui manque avant le chantier. Le sous-titre montre le mécanisme : le dossier est préparé et chaque envoi est validé. Le bouton ouvre un dossier bloqué. L'écran montre le devis signé, la pièce manquante et le chantier bloqué."
     accent={EM}
     page={{
-      url: "tonsite.fr",
-      nav: "Ton entreprise",
+      url: "atelier-dupont.fr",
+      nav: "Atelier Dupont",
       eyebrow: "Pour les artisans du bâtiment",
       heading: "Repère la pièce qui manque avant que le chantier s'arrête",
       subtitle: "Nous préparons le dossier, tu valides chaque envoi.",
       button: "Montre-moi un dossier bloqué",
       screen: { title: "Devis signé, pièce manquante", rows: [{ left: "Devis 2024-118", right: "signé", state: "ok" }, { left: "Attestation d'assurance", right: "manquante", state: "warn" }, { left: "Chantier", right: "bloqué", state: "warn" }] },
-      proofs: ["Démo sur un dossier fictif", "Aucun envoi sans toi"],
     }}
     annotations={[
       { number: 1, target: "heading", label: "Le titre ouvre la porte", why: "Il nomme une peur précise du métier, pas une fonction du produit.", alt: "Une scène datée : Mardi, le chantier s'arrête." },
       { number: 2, target: "subtitle", label: "Le sous-titre montre le mécanisme", why: "Qui prépare, qui valide : le fonctionnement tient en une phrase.", alt: "Trois étapes sous le bouton." },
       { number: 3, target: "button", label: "Un geste volontaire", why: "Le bouton demande de voir, pas d'acheter : l'engagement est minimal.", alt: "Un lien vers une démo de deux minutes." },
-      { number: 4, target: "proofs", label: "La preuve réduit le doute", why: "Deux phrases honnêtes : c'est une démo, et rien ne part sans toi.", alt: "L'avis d'un vrai artisan." },
     ]}
   />;
 }

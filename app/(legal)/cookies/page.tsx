@@ -14,7 +14,7 @@ export default function CookiesPage() {
       title: "En bref",
       children: (
         <>
-          <p>BUILD n&apos;enregistre dans ton navigateur que ce qui sert à te connecter et à faire fonctionner le site. Il n&apos;y a pas de cookie publicitaire et pas de cookie de statistiques de visite. C&apos;est pour cela que tu ne vois pas de bandeau de consentement : la loi n&apos;en demande pas pour ce qui est strictement nécessaire.</p>
+          <p>BUILD n&apos;enregistre dans ton navigateur que ce qui sert à te connecter et à faire fonctionner le site. Il n&apos;y a pas de cookie publicitaire et pas de cookie de statistiques de visite. C&apos;est pour cela que tu ne vois pas de bandeau de consentement : la loi n&apos;en demande pas pour ce qui est strictement nécessaire.</p>
           <p>Un cookie est un petit fichier que le site dépose dans ton navigateur. Le stockage local du navigateur joue un rôle voisin, et nous le traitons avec les mêmes règles.</p>
         </>
       ),
@@ -27,7 +27,7 @@ export default function CookiesPage() {
           <tbody>
             <tr>
               <th scope="row">Cookies de connexion</th>
-              <td>Leur nom commence par <strong>sb-</strong>. Ils gardent ta session ouverte et prouvent à nos serveurs que c&apos;est bien toi. Ils sont déposés quand tu te connectes et retirés quand tu te déconnectes. Durée maximale : 400 jours.</td>
+              <td>Leur nom commence par <strong>sb-</strong>. Ils gardent ta session ouverte et prouvent à nos serveurs que c&apos;est bien toi. Ils sont déposés quand tu te connectes et retirés quand tu te déconnectes. Durée maximale : 400 jours.</td>
             </tr>
             <tr>
               <th scope="row">Liste de skills téléchargés</th>
@@ -50,7 +50,7 @@ export default function CookiesPage() {
       title: "Pourquoi il n'y a pas de bandeau",
       children: (
         <>
-          <p>Les cookies de connexion sont indispensables : sans eux, tu ne pourrais pas rester connecté. Les éléments du stockage local répondent à une action que tu fais toi-même et ne quittent pas ton appareil. Ces usages sont dispensés de consentement.</p>
+          <p>Les cookies de connexion sont indispensables : sans eux, tu ne pourrais pas rester connecté. Les éléments du stockage local répondent à une action que tu fais toi-même et ne quittent pas ton appareil. Ces usages sont dispensés de consentement.</p>
           <p>Si un jour BUILD ajoute un cookie qui n&apos;est pas indispensable, par exemple pour mesurer l&apos;audience, nous te demanderons ton accord avant de le déposer et nous mettrons cette page à jour.</p>
         </>
       ),

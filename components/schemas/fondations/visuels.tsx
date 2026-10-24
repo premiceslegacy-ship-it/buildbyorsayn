@@ -15,7 +15,6 @@ export function LandingGeneriqueContreMarqueMockup() {
       heading: "Réinventez votre expérience",
       subtitle: "Des solutions innovantes pour vos besoins",
       button: "Commencer",
-      proofs: ["Carte vide", "Faux chiffre"],
     }}
     after={{
       nav: "Maison Lila",
@@ -23,7 +22,6 @@ export function LandingGeneriqueContreMarqueMockup() {
       subtitle: "Choisis l'occasion. Maison Lila te rappelle avant la composition.",
       button: "Commander un bouquet",
       photo: "fleuriste",
-      proofs: ["Métier visible", "Sans faux chiffre"],
     }}
   />;
 }

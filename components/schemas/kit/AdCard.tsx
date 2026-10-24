@@ -41,7 +41,8 @@ export type AdCardProps = KitBaseProps & {
   afterNotes?: readonly SiteNote[];
 };
 
-const AD_DISCLAIMER = "Publicité d'illustration : regarde la scène, les mots et le geste demandé. Le style visuel n'est pas un modèle de design à copier.";
+const SOCIAL_DISCLAIMER = "Publicité d'illustration : regarde la scène, les mots et le geste demandé. Le style visuel n'est pas un modèle de design à copier.";
+const EMAIL_DISCLAIMER = "E-mail d'illustration : regarde l'objet, le contexte et la question posée. Le message n'est pas une preuve de résultat.";
 
 type Quality = "slop" | "premium";
 
@@ -98,8 +99,8 @@ export function AdCard({ variant, beforeTitle, afterTitle, before, after, before
   return <KitFrame
     {...frame}
     kind="ad-card"
-    keys={hasNotes ? [{ swatch: "accent", label: "Chaque pastille renvoie à une décision de la publicité" }] : undefined}
-    disclaimer={hasNotes ? AD_DISCLAIMER : undefined}
+    keys={hasNotes ? [{ swatch: "accent", label: variant === "email" ? "Chaque pastille renvoie à une décision de l'e-mail" : "Chaque pastille renvoie à une décision de la publicité" }] : undefined}
+    disclaimer={hasNotes ? (variant === "email" ? EMAIL_DISCLAIMER : SOCIAL_DISCLAIMER) : undefined}
   >
     <div className={styles.compare}>
       <section>

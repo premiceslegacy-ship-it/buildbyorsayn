@@ -101,10 +101,9 @@ export function TroisCalquesUnePageDiagram() {
       url: "interieur-lille.fr",
       nav: "Atelier intérieur",
       heading: "Ta pièce planifiée avant le premier achat",
-      subtitle: "Une visite à Lille, un budget chiffré, un plan coté. Réponse sous 48 h.",
+      subtitle: "Une visite à Lille, un budget chiffré, un plan coté. Réponse après étude.",
       button: "Préparer ma visite",
       photo: "piece",
-      proofs: ["Plan", "Budget", "Matières"],
     }}
     beforeNotes={[
       { pin: 1, role: "Le titre promet deux minutes", why: "Il annonce une démarche rapide, sur laquelle la suite de la page ne tient pas.", alt: "Promettre ce que la page tient vraiment : une visite et un budget clair." },

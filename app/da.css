@@ -49,17 +49,18 @@
 /* ───────── boutons : un seul plein par écran ───────── */
 .da .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 24px; border-radius: 999px; font: 600 16px/1 var(--font); white-space: nowrap; transition: transform .1s linear, background .32s var(--ease-c), color .32s var(--ease-c), box-shadow .32s var(--ease-c); }
 .da .btn:active { transform: scale(.97); }
-.da .btn--s { height: 40px; padding: 0 18px; font-size: 14px; }
+.da .btn--s { min-height: 44px; height: 44px; padding: 0 18px; font-size: 14px; }
 .da .btn--p { background: var(--encre); color: var(--sur-em); box-shadow: 0 14px 44px -12px rgba(34,217,110,.6); }
 .da .btn--p:hover { background: #fff; }
 .da .btn--g { background: rgba(241,245,242,.12); color: var(--encre); box-shadow: inset 0 0 0 1px rgba(241,245,242,.14); }
 .da .btn--g:hover { background: rgba(241,245,242,.2); }
+.da .barre > .btn--p { background: rgba(241,245,242,.12); color: var(--encre); box-shadow: inset 0 0 0 1px rgba(241,245,242,.14); }
 .da .btn--em { background: var(--em); color: var(--sur-em); box-shadow: 0 14px 44px -12px rgba(34,217,110,.7); }
 .da .btn--em:hover { background: #3bea84; }
 .da .btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
 
 /* ───────── verre liquide : seulement ce qui flotte au-dessus du contenu ───────── */
-.da .verre { background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.05) 55%, rgba(255,255,255,.09)); -webkit-backdrop-filter: blur(22px) saturate(1.7); backdrop-filter: blur(22px) saturate(1.7);
+.da .verre { background: linear-gradient(160deg, rgba(8,12,10,.78), rgba(8,12,10,.62) 55%, rgba(8,12,10,.72)); -webkit-backdrop-filter: blur(22px) saturate(1.7); backdrop-filter: blur(22px) saturate(1.7);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.34), inset 0 -1px 0 rgba(255,255,255,.06), inset 0 0 0 1px rgba(255,255,255,.1), 0 18px 40px -16px rgba(0,0,0,.7); }
 .da .pastille { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 14px; border-radius: 999px; font: 600 13px/1 var(--font); color: var(--t1); }
 .da .pastille b { width: 7px; height: 7px; border-radius: 50%; background: var(--em); box-shadow: 0 0 12px var(--em); }

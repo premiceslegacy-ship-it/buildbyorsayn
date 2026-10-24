@@ -713,8 +713,8 @@
 
 .messages p { margin: 0; color: var(--kit-ink); font: 500 14px/1.38 var(--font, sans-serif); }
 .messages time { justify-self: end; color: var(--kit-muted); font: 500 13px/1 var(--font, sans-serif); }
-.messages .agentBubble { align-self: flex-start; border-bottom-left-radius: 5px; }
-.messages .personBubble { align-self: flex-end; border-bottom-right-radius: 5px; background: #313833; }
+.messages .agentBubble { align-self: flex-end; border-bottom-right-radius: 5px; }
+.messages .personBubble { align-self: flex-start; border-bottom-left-radius: 5px; background: #313833; }
 
 .backstage { min-width: 0; }
 .backstage h4 { margin: 0 0 14px; color: var(--kit-ink); font: 600 17px/1.2 var(--font-t, sans-serif); }
@@ -741,7 +741,7 @@
 /* File card */
 .fileLayout {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(220px, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
   gap: 24px;
 }
@@ -771,46 +771,37 @@
   font: 600 14px/1 var(--font, sans-serif);
 }
 
-.editor ol { margin: 0; padding: 12px 0 16px; list-style: none; counter-reset: line; }
-.editor li {
+.editor ol.fileGrid { margin: 0; padding: 12px 0 16px; list-style: none; counter-reset: line; }
+.fileRow {
   min-width: 0;
-  min-height: 30px;
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(190px, 1fr);
+  align-items: start;
+  gap: 18px;
+  padding: 5px 10px 5px 0;
+}
+.fileCode {
+  min-width: 0;
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr);
   align-items: start;
   gap: 10px;
-  padding: 5px 10px 5px 0;
 }
-.editor li > span { color: #748078; font: 500 13px/1.55 var(--font, sans-serif); text-align: right; font-variant-numeric: tabular-nums; }
-.editor code { min-width: 0; color: #c9d1cc; font: 500 13px/1.55 "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
-.editor li.fileHeading code { color: var(--kit-ink); font-weight: 700; }
-.editor li.fileMuted code { color: #8d9991; }
-.editor li.fileNoted { background: linear-gradient(90deg, color-mix(in srgb, var(--kit-em) 9%, transparent), transparent 85%); }
-
-.fileNotes {
-  display: grid;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.fileNotes {
-  min-height: 100%;
+.fileCode > span { color: #748078; font: 500 13px/1.55 var(--font, sans-serif); text-align: right; font-variant-numeric: tabular-nums; }
+.fileCode code { min-width: 0; color: #c9d1cc; font: 500 13px/1.55 "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
+.fileRow.fileHeading .fileCode code { color: var(--kit-ink); font-weight: 700; }
+.fileRow.fileMuted .fileCode code { color: #8d9991; }
+.fileRow.fileNoted { background: linear-gradient(90deg, color-mix(in srgb, var(--kit-em) 9%, transparent), transparent 85%); }
+.fileNote {
+  min-width: 0;
   position: relative;
-  display: block;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
 }
-
-.fileNotes li {
-  position: absolute;
-  top: calc(58px + (var(--kit-note-line) - 1) * 30px);
-  left: 0;
-  width: 100%;
-  transform: translateY(-2px);
-}
-
-.fileNotes li::before {
+.fileNote::before {
   content: "";
   position: absolute;
   top: 14px;
@@ -819,16 +810,7 @@
   height: 1px;
   background: rgba(241,245,242,.35);
 }
-
-.fileNotes li {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  align-items: start;
-  gap: 10px;
-}
-
-.fileNotes li > span {
+.fileNote > span {
   width: 28px;
   height: 28px;
   display: grid;
@@ -838,7 +820,8 @@
   color: #06110a;
   font: 700 13px/1 var(--font, sans-serif);
 }
-.fileNotes p { margin: 3px 0 0; color: var(--kit-copy); font: 500 14px/1.38 var(--font, sans-serif); }
+.fileNote p { margin: 3px 0 0; color: var(--kit-copy); font: 500 14px/1.38 var(--font, sans-serif); }
+.fileNoteSpacer { min-height: 1px; }
 
 
 /* Ads */
@@ -881,6 +864,7 @@
 .ring.isAccent { border-color: var(--kit-em); box-shadow: 0 0 30px color-mix(in srgb, var(--kit-em) 8%, transparent), inset 0 1px 0 color-mix(in srgb, var(--kit-em) 38%, transparent); }
 .ring.isAccent > span { color: var(--kit-em); }
 .ringCore { z-index: 4; width: 84px; height: 84px; display: grid; place-items: center; padding: 10px; border-radius: 50%; background: linear-gradient(150deg, #303632, #1b1f1d); color: var(--kit-ink); font: 650 14px/1.2 var(--font-t, sans-serif); text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
+.ringsWide[data-count="5"] .ring:last-of-type > span { transform: translateY(28px); }
 .ringsLayout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: 32px; }
 .ringsList { display: grid; gap: 12px; }
 .ringsList > strong { display: none; }
@@ -982,12 +966,11 @@
   .backstage h4 { margin-top: 4px; }
 
   .fileLayout { gap: 18px; }
-  .editor li { grid-template-columns: 30px minmax(0, 1fr); gap: 7px; }
-  .editor code { font-size: 13px; }
-  .fileNotes { grid-template-columns: minmax(0, 1fr); }
-  .fileNotes { min-height: 0; display: grid; }
-  .fileNotes li { position: relative; top: auto; left: auto; width: auto; transform: none; }
-  .fileNotes li::before { display: none; }
+  .fileRow { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .fileCode { grid-template-columns: 30px minmax(0, 1fr); gap: 7px; }
+  .fileCode code { font-size: 13px; }
+  .fileNote { margin-left: 37px; }
+  .fileNote::before { display: none; }
 
 
   .cycleReturn { height: auto; margin: 6px 0 0; border: 0; }

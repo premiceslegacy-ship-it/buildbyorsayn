@@ -40,25 +40,25 @@ export function buildPurchaseConfirmation(input: PurchaseConfirmationInput): Pur
   const date = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(purchasedAt);
   const price = `${formatAmount(amountCents)} (prix net, ${seller.vatMention})`;
   const cgv = `${baseUrl}/cgv`;
-  const subject = `Ton achat BUILD est confirmé : ${offerName}`;
+  const subject = `Ton achat BUILD est confirmé : ${offerName}`;
 
   const lines = [
     "Bonjour,",
     "",
     `Ton paiement est bien arrivé. Voici la confirmation de ton achat, à garder.`,
     "",
-    `Offre : ${offerName}`,
-    `Prix payé : ${price}`,
-    `Date : ${date}`,
-    `Vendeur : ${seller.fullName}, entrepreneur individuel exerçant sous le nom commercial ${seller.tradeName}, SIRET ${seller.siret}, ${seller.address}`,
+    `Offre : ${offerName}`,
+    `Prix payé : ${price}`,
+    `Date : ${date}`,
+    `Vendeur : ${seller.fullName}, entrepreneur individuel exerçant sous le nom commercial ${seller.tradeName}, SIRET ${seller.siret}, ${seller.address}`,
     "",
-    "Ton accès est ouvert dès maintenant, sans délai. C'est un paiement unique : pas d'abonnement.",
+    "Ton accès est ouvert dès maintenant, sans délai. C'est un paiement unique : pas d'abonnement.",
     "",
-    "Ce que tu as demandé et reconnu au moment de payer :",
+    "Ce que tu as demandé et reconnu au moment de payer :",
     `${CHECKOUT_CONSENT_TEXT}`,
     "",
-    `Conditions générales de vente : ${cgv}`,
-    `Une question ? Écris à ${seller.contactEmail}, nous répondons.`,
+    `Conditions générales de vente : ${cgv}`,
+    `Une question ? Écris à ${seller.contactEmail}, nous répondons.`,
     "",
     "BUILD by Orsayn",
   ];
@@ -76,11 +76,11 @@ export function buildPurchaseConfirmation(input: PurchaseConfirmationInput): Pur
         <tr><td style="padding:8px 12px 8px 0;color:#b9b6b0;">Date</td><td style="padding:8px 0;">${escapeHtml(date)}</td></tr>
         <tr><td style="padding:8px 12px 8px 0;color:#b9b6b0;vertical-align:top;">Vendeur</td><td style="padding:8px 0;">${escapeHtml(`${seller.fullName}, entrepreneur individuel exerçant sous le nom commercial ${seller.tradeName}, SIRET ${seller.siret}, ${seller.address}`)}</td></tr>
       </table>
-      <p>Ton accès est ouvert dès maintenant, sans délai. C'est un paiement unique : pas d'abonnement.</p>
-      <p>Ce que tu as demandé et reconnu au moment de payer :</p>
+      <p>Ton accès est ouvert dès maintenant, sans délai. C'est un paiement unique : pas d'abonnement.</p>
+      <p>Ce que tu as demandé et reconnu au moment de payer :</p>
       <p style="padding:14px 16px;border:1px solid #3a3a3c;border-radius:12px;">${escapeHtml(CHECKOUT_CONSENT_TEXT)}</p>
       <p><a href="${escapeHtml(cgv)}" style="color:#b9f5cf;">Conditions générales de vente</a></p>
-      <p>Une question ? Écris à <a href="mailto:${escapeHtml(seller.contactEmail)}" style="color:#b9f5cf;">${escapeHtml(seller.contactEmail)}</a>, nous répondons.</p>
+      <p>Une question ? Écris à <a href="mailto:${escapeHtml(seller.contactEmail)}" style="color:#b9f5cf;">${escapeHtml(seller.contactEmail)}</a>, nous répondons.</p>
       <p style="color:#b9b6b0;">BUILD by Orsayn</p>
     </main>
   </body>

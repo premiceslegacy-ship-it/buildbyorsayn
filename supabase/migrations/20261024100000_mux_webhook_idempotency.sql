@@ -5,14 +5,23 @@ create table if not exists public.mux_webhook_events (
   event_type text not null check (event_type ~ '^[a-z0-9_.-]{3,120}$'),
   received_at timestamptz not null default now(),
   processing_status text not null default 'processing' check (processing_status in ('processing', 'processed')),
+  lock_owner text,
+  locked_until timestamptz,
   processed_at timestamptz
 );
 
 alter table public.mux_webhook_events
   add column if not exists processing_status text not null default 'processing';
 alter table public.mux_webhook_events
+  add column if not exists lock_owner text;
+alter table public.mux_webhook_events
+  add column if not exists locked_until timestamptz;
+alter table public.mux_webhook_events
   add column if not exists processed_at timestamptz;
 
+create index if not exists mux_webhook_events_lease_idx
+  on public.mux_webhook_events (processing_status, locked_until)
+  where processing_status = 'processing';
 alter table public.mux_webhook_events enable row level security;
 alter table public.mux_webhook_events force row level security;
 revoke all on table public.mux_webhook_events from public, anon, authenticated;
@@ -88,7 +97,10 @@ begin
   end if;
 
   update public.mux_webhook_events
-  set processing_status = 'processed', processed_at = pg_catalog.now()
+  set processing_status = 'processed',
+      processed_at = pg_catalog.now(),
+      lock_owner = null,
+      locked_until = null
   where event_id = p_event_id;
   return case when updated_video_id is null then 'noop' else 'processed' end;
 end;
@@ -101,9 +113,13 @@ grant execute on function public.process_mux_asset_webhook(text, text, uuid, tex
 
 comment on table public.mux_webhook_events is
   'Transactional idempotency ledger for verified Mux asset events. Failed transactions leave no processed reservation.';
+drop function if exists public.reserve_mux_webhook_event(text, text);
+drop function if exists public.complete_mux_webhook_event(text);
+
 create or replace function public.reserve_mux_webhook_event(
   p_event_id text,
-  p_event_type text
+  p_event_type text,
+  p_lock_owner text default null
 )
 returns text
 language plpgsql
@@ -112,25 +128,49 @@ set search_path = ''
 as $$
 declare
   existing_status text;
+  existing_lock_until timestamptz;
 begin
-  insert into public.mux_webhook_events (event_id, event_type, processing_status)
-  values (p_event_id, p_event_type, 'processing')
+  if p_event_id is null
+    or char_length(p_event_id) not between 3 and 255
+    or p_event_type is null
+    or char_length(p_event_type) not between 3 and 120
+  then
+    raise exception 'invalid mux webhook lease';
+  end if;
+
+  insert into public.mux_webhook_events (
+    event_id, event_type, processing_status, lock_owner, locked_until
+  )
+  values (
+    p_event_id, p_event_type, 'processing', nullif(p_lock_owner, ''), pg_catalog.now() + interval '2 minutes'
+  )
   on conflict (event_id) do nothing;
   if found then return 'new'; end if;
 
-  select processing_status into existing_status
+  select processing_status, locked_until
+  into existing_status, existing_lock_until
   from public.mux_webhook_events
   where event_id = p_event_id
   for update;
   if existing_status = 'processed' then return 'duplicate'; end if;
+  if existing_lock_until is not null and existing_lock_until > pg_catalog.now() then
+    return 'in_progress';
+  end if;
   update public.mux_webhook_events
-  set processing_status = 'processing', received_at = pg_catalog.now(), processed_at = null
+  set processing_status = 'processing',
+      received_at = pg_catalog.now(),
+      lock_owner = nullif(p_lock_owner, ''),
+      locked_until = pg_catalog.now() + interval '2 minutes',
+      processed_at = null
   where event_id = p_event_id;
   return 'retry';
 end;
 $$;
 
-create or replace function public.complete_mux_webhook_event(p_event_id text)
+create or replace function public.complete_mux_webhook_event(
+  p_event_id text,
+  p_lock_owner text default null
+)
 returns boolean
 language plpgsql
 security definer
@@ -138,18 +178,23 @@ set search_path = ''
 as $$
 begin
   update public.mux_webhook_events
-  set processing_status = 'processed', processed_at = pg_catalog.now()
-  where event_id = p_event_id;
+  set processing_status = 'processed',
+      processed_at = pg_catalog.now(),
+      lock_owner = null,
+      locked_until = null
+  where event_id = p_event_id
+    and processing_status = 'processing'
+    and (p_lock_owner is null or lock_owner = p_lock_owner);
   return found;
 end;
 $$;
 
-revoke all on function public.reserve_mux_webhook_event(text, text)
+revoke all on function public.reserve_mux_webhook_event(text, text, text)
   from public, anon, authenticated;
-grant execute on function public.reserve_mux_webhook_event(text, text)
+grant execute on function public.reserve_mux_webhook_event(text, text, text)
   to service_role;
-revoke all on function public.complete_mux_webhook_event(text)
+revoke all on function public.complete_mux_webhook_event(text, text)
   from public, anon, authenticated;
-grant execute on function public.complete_mux_webhook_event(text)
+grant execute on function public.complete_mux_webhook_event(text, text)
   to service_role;
 commit;
