@@ -1,8 +1,53 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { startPressFeedback } from "../lib/ui/feedback";
+import { soundKindFor, startPressFeedback } from "../lib/ui/feedback";
 import { APP_SPRINGS, CASCADE_GAP_MS, MOTION_SPRINGS, REDUCED_MOTION_DURATION_MS } from "../lib/ui/motion";
+
+function fakeElement({ matches = [], ancestors = [], attributes = {} }: {
+  matches?: readonly string[];
+  ancestors?: readonly string[];
+  attributes?: Readonly<Record<string, string>>;
+} = {}): Element {
+  const matching = new Set(matches);
+  const containing = new Set(ancestors);
+  return {
+    getAttribute: (name: string) => attributes[name] ?? null,
+    matches: (selector: string) => selector.split(", ").some((part) => matching.has(part)),
+    closest: (selector: string) => selector.split(", ").some((part) => containing.has(part)) ? {} : null,
+  } as unknown as Element;
+}
+
+test("le classifieur de sons couvre les contrôles de sélection et les actions", () => {
+  const selectionControls = [
+    '[role="tab"]',
+    '[role="radio"]',
+    '[role="option"]',
+    '[role="menuitemradio"]',
+    '[role="switch"]',
+    '[role="menuitemcheckbox"]',
+    "[aria-pressed]",
+    "[aria-selected]",
+    "[aria-current]",
+    'input[type="radio"]',
+    'input[type="checkbox"]',
+    "select",
+    ".chip",
+    ".tabbar a",
+    ".navbar__nav a",
+    ".adm-nav-item",
+    ".adm-filterbar button",
+  ];
+  for (const selector of selectionControls) assert.equal(soundKindFor(fakeElement({ matches: [selector] })), "select", selector);
+  for (const selector of ['[role="tablist"]', ".tabs", ".seg", ".tabbar", ".navbar__nav", ".adm-nav-item", ".adm-filterbar", ".adm-template-tabs", ".adm-audience-tabs"]) {
+    assert.equal(soundKindFor(fakeElement({ ancestors: [selector] })), "select", selector);
+  }
+  assert.equal(soundKindFor(fakeElement({ matches: ["button"] })), "click");
+  assert.equal(soundKindFor(fakeElement({ matches: ['a[href]'] })), "click");
+  assert.equal(soundKindFor(fakeElement({ matches: ['[role="tab"]'], attributes: { "data-sfx": "click" } })), "click");
+  assert.equal(soundKindFor(fakeElement({ attributes: { "data-sfx": "none" } })), "none");
+  assert.equal(soundKindFor(fakeElement({ matches: ["button"], attributes: { "data-sfx": "error" } })), "error");
+});
 
 test("le son et le début de l'appui partent du même gestionnaire", () => {
   startPressFeedback({} as HTMLElement, "click", { animate: () => null, play: () => undefined });

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
 import { AppState } from "@/components/ui/AppState";
 import type { SearchItem } from "@/lib/search/catalog";
@@ -10,7 +10,6 @@ import { animateAppElement, animateEntryCascade } from "@/lib/ui/motion";
 import { playAppSound } from "@/lib/ui/sound";
 
 const SUBJECTS = [["Vendre", "vente"], ["Prix", "prix"], ["Skills", "skills"], ["Site web", "site web"]] as const;
-const KINDS = ["Vidéo", "Chapitre", "Skill"] as const;
 
 export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
@@ -18,7 +17,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [selected, setSelected] = useState(0);
   const [retryKey, setRetryKey] = useState(0);
-  const displayedResults = useMemo(() => KINDS.flatMap((kind) => results.filter((result) => result.kind === kind)), [results]);
+  const displayedResults = results;
   const input = useRef<HTMLInputElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const scrim = useRef<HTMLButtonElement>(null);
@@ -42,7 +41,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
     if (panel.current) {
       const compact = window.matchMedia("(max-width: 734px)").matches;
       animateAppElement(panel.current, compact
-        ? [{ transform: "translateY(100%)" }, { transform: "none" }]
+        ? [{ opacity: 0, transform: "translateY(-16px)" }, { opacity: 1, transform: "none" }]
         : [{ opacity: 0, transform: "translateX(-50%) translateY(-10px) scale(.98)" }, { opacity: 1, transform: "translateX(-50%)" }], "doux");
     }
     const key = (event: KeyboardEvent) => {
@@ -110,17 +109,13 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
       <button ref={scrim} className="srch__scrim" type="button" aria-label="Fermer la recherche" data-sfx="none" onClick={onClose} />
       <div className="srch__panel" ref={panel}>
         <label className="srch__in"><DaIcon name="search" /><span className="sr">Rechercher</span><input ref={input} type="search" value={query} onChange={(event) => updateQuery(event.target.value)} placeholder="Vendre, prix, skills, site…" autoComplete="off" aria-label="Rechercher une vidéo, un bloc ou un sujet" aria-controls="build-search-results" aria-activedescendant={displayedResults[selected] ? `search-${displayedResults[selected].id}` : undefined} /><kbd>Esc</kbd></label>
-        <div className="srch__chips">{SUBJECTS.map(([label, value]) => <button className="chip" type="button" key={value} data-sfx="none" onClick={() => { updateQuery(value); void playAppSound("select"); }}>{label}</button>)}</div>
+        <div className="srch__chips">{SUBJECTS.map(([label, value]) => <button className="chip" type="button" key={value} onClick={() => updateQuery(value)}>{label}</button>)}</div>
         <div ref={list} className="srch__list" id="build-search-results" role="listbox" aria-busy={status === "loading"} aria-label={status === "ready" ? `${displayedResults.length} résultats` : "Résultats de recherche"}>
           {status === "loading" && <p className="srch__empty">On cherche dans BUILD.</p>}
           {status === "error" && <AppState compact headingLevel={2} tone="alert" object="bloc" title="La recherche ne répond pas." detail="Rien n’est perdu. Réessaie dans un instant." action={{ label: "Réessayer", onClick: () => setRetryKey((value) => value + 1) }} />}
           {status === "ready" && results.length === 0 && <AppState compact headingLevel={2} object="offre" title="Rien avec ces mots." detail="Essaie un sujet plus simple, comme prix, vendre ou skill." action={{ label: "Effacer", onClick: () => updateQuery("") }} />}
           {status === "idle" && <p className="srch__empty">Écris un sujet, un chapitre ou le nom d’un skill.</p>}
-          {KINDS.map((kind) => {
-            const group = displayedResults.filter((result) => result.kind === kind);
-            if (!group.length) return null;
-            return <div className="srch__group" role="presentation" key={kind}><p className="srch__g">{kind}</p>{group.map((result) => { const index = displayedResults.indexOf(result); return <Link id={`search-${result.id}`} key={result.id} href={result.locked ? "/checkout" : result.href} className="srch__r" role="option" aria-selected={selected === index} data-sfx="none" onMouseEnter={() => setSelected(index)} onClick={() => { void playAppSound(result.locked ? "error" : "click"); onClose(); }}><Image src={result.image} alt="" width={96} height={54} /><span><span className="srch__t">{result.title}</span><span className="srch__s">{result.context}</span></span><span className="srch__k">{result.locked ? "Accès requis" : kind}</span></Link>; })}</div>;
-          })}
+          {displayedResults.map((result, index) => <Link id={`search-${result.id}`} key={result.id} href={result.locked ? "/checkout" : result.href} className="srch__r" role="option" aria-selected={selected === index} data-sfx={result.locked ? "error" : undefined} onMouseEnter={() => setSelected(index)} onClick={onClose}><Image src={result.image} alt="" width={96} height={54} /><span><span className="srch__k">{result.locked ? `${result.kind}, accès requis` : result.kind}</span><span className="srch__t">{result.title}</span><span className="srch__s">{result.context}</span></span></Link>)}
         </div>
       </div>
     </div>

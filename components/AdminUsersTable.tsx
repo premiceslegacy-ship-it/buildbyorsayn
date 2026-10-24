@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { setUserTier } from "@/app/actions/setUserTier";
 import { InactiveAccountsCard } from "@/components/admin/InactiveAccountsCard";
 import { COFFRE_LABEL } from "@/lib/pricing";
-import { playAppSound } from "@/lib/ui/sound";
 
 export type AdminUserRow = {
   id: string;
@@ -114,7 +113,6 @@ export function AdminUsersTable({
   const changeFilter = (nextFilter: FilterKey) => {
     setFilter(nextFilter);
     setPage(1);
-    void playAppSound("select");
   };
 
   return (

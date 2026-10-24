@@ -114,7 +114,6 @@ export function AdminShell({ userLabel, counts, views }: Props) {
     setActiveView(view);
     setMenuOpen(false);
     window.history.replaceState(null, "", `#/` + VIEW_TO_HASH[view]);
-    void playAppSound("select");
   };
 
   const toggleMenu = () => {

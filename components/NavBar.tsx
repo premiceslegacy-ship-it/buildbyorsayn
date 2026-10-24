@@ -6,9 +6,10 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
 import { SearchDialog } from "@/components/da/SearchDialog";
+import { LiquidGlassNav } from "@/components/ui/LiquidGlass";
 import { useNouveautesUnseenCount } from "@/components/nouveautes/useNouveautesUnseenCount";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
-import { finishPressFeedback, pulsePressFeedback, startPressFeedback, type PressSound } from "@/lib/ui/feedback";
+import { finishPressFeedback, pulsePressFeedback, soundKindFor, startPressFeedback } from "@/lib/ui/feedback";
 import { formatNouveautesBadge } from "@/lib/nouveautes/seen";
 import { animateAppElement, installAppMotionTokens, motionAllowed } from "@/lib/ui/motion";
 import { playAppSound, useAppSound } from "@/lib/ui/sound";
@@ -71,18 +72,13 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
   }, []);
 
   useEffect(() => {
-    const selector = '[data-sfx], a[href], button, [role="tab"], summary, .chip';
+    const selector = '[data-sfx], a[href], button, select, input[type="radio"], input[type="checkbox"], [role="tab"], [role="radio"], [role="option"], [role="menuitemradio"], [role="switch"], [role="menuitemcheckbox"], [aria-pressed], [aria-selected], [aria-current], summary, .chip';
     let pressed: HTMLElement | null = null;
-    const kindOf = (target: HTMLElement): PressSound => {
-      const kind = target.dataset.sfx;
-      if (kind === "none" || kind === "click" || kind === "select" || kind === "open" || kind === "confirm" || kind === "error") return kind;
-      return target.closest('[role="tablist"], .tabs, .seg') ? "select" : "click";
-    };
     const pointer = (event: PointerEvent) => {
       const target = (event.target as Element | null)?.closest<HTMLElement>(selector);
       pressed = null;
       if (!target || target.matches(":disabled") || target.getAttribute("aria-disabled") === "true") return;
-      const kind = kindOf(target);
+      const kind = soundKindFor(target);
       pressed = target;
       startPressFeedback(target, kind);
     };
@@ -90,7 +86,7 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
     const click = (event: MouseEvent) => {
       const target = (event.target as Element | null)?.closest<HTMLElement>(selector);
       if (!target || target.matches(":disabled")) return;
-      if (!pressed && event.detail === 0) pulsePressFeedback(target, kindOf(target));
+      if (!pressed && event.detail === 0) pulsePressFeedback(target, soundKindFor(target));
       release();
     };
     document.addEventListener("pointerdown", pointer, true);
@@ -179,7 +175,7 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
         <nav className="navbar__nav" aria-label="Principal">{navItems.map((item) => <Link key={`${item.label}-${item.href}`} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</nav>
         <div className="navbar__r">
           {signedIn && <button className="navbar__ib" type="button" aria-label="Rechercher" data-sfx="none" onClick={openSearch}><DaIcon name="search" /></button>}
-          {signedIn && <button className="navbar__ib" type="button" aria-label="Sons de l'interface" aria-pressed={enabled} data-sfx="none" onClick={() => { setEnabled(!enabled); void playAppSound("select"); }}><DaIcon name={enabled ? "volume" : "mute"} /></button>}
+          {signedIn && <button className="navbar__ib" type="button" aria-label="Sons de l'interface" aria-pressed={enabled} onClick={() => setEnabled(!enabled)}><DaIcon name={enabled ? "volume" : "mute"} /></button>}
           {signedIn ? <button ref={avatar} className="avatar" type="button" aria-label="Compte" aria-haspopup="menu" aria-expanded={menuOpen && !menuClosing} data-sfx="none" onClick={openMenu}>{initials || displayName?.slice(0, 2).toUpperCase() || "?"}</button> : <Link className="btn btn--g btn--s" href="/login">Se connecter</Link>}
         </div>
       </header>
@@ -190,11 +186,11 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
           <Link role="menuitem" href="/checkout"><DaIcon name="creditCard" />Abonnement</Link>
           <Link role="menuitem" href="/dashboard/mcp"><DaIcon name="plug" />Connexion IA</Link>
           {isAdmin && <Link role="menuitem" href="/admin"><DaIcon name="grid" />Administration</Link>}
-          <button role="menuitemcheckbox" aria-checked={enabled} type="button" data-sfx="none" onClick={() => { setEnabled(!enabled); void playAppSound("select"); }}><DaIcon name={enabled ? "volume" : "mute"} />Sons<span className="amenu__sw" /></button>
+          <button role="menuitemcheckbox" aria-checked={enabled} type="button" onClick={() => setEnabled(!enabled)}><DaIcon name={enabled ? "volume" : "mute"} />Sons<span className="amenu__sw" /></button>
         </div>
         <div className="amenu__l amenu__l--b"><form action="/api/signout" method="post"><button role="menuitem" type="submit"><DaIcon name="logout" />Se déconnecter</button></form></div>
       </div>}
-      {signedIn && <nav className="tabbar" aria-label="Navigation mobile">{MEMBER_NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}><DaIcon name={item.icon} /><span className="tabbar__label">{item.label}</span>{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen nav-unseen--mobile" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</nav>}
+      {signedIn && <LiquidGlassNav className="tabbar" aria-label="Navigation mobile" glass={{ teinte: "rgba(0,0,0,.42)" }}>{MEMBER_NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}><DaIcon name={item.icon} /><span className="tabbar__label">{item.label}</span>{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen nav-unseen--mobile" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</LiquidGlassNav>}
       {signedIn && <SearchDialog open={searchOpen} onClose={closeSearch} />}
     </div>
   );

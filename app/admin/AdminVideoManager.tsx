@@ -143,7 +143,6 @@ export function AdminVideoManager({
       setTitle(next.title);
       setChapters(`0:00 ${next.title}`);
     }
-    void playAppSound("select");
   };
 
   const chooseFile = (nextFile: File | null) => {

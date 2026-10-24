@@ -82,7 +82,6 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
     setCtaUrl(next.ctaUrl);
     setConfirmation("");
     setResult(null);
-    void playAppSound("select");
   };
   const refreshTemplate = () => applyTemplate(activeTemplate);
 
@@ -90,7 +89,6 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
     setSelectedIds((current) => current.includes(id)
       ? current.filter((item) => item !== id)
       : current.length < MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS ? [...current, id] : current);
-    void playAppSound("select");
   };
 
   const sendEmail = async () => {
@@ -176,7 +174,7 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
         <aside className="adm-mail-audience" aria-labelledby="mail-audience-title">
           <h3 id="mail-audience-title">Destinataires</h3>
           <div className="adm-audience-tabs" role="group" aria-label="Choisir l'audience">
-            {(Object.keys(AUDIENCE_LABELS) as Audience[]).map((item) => <button type="button" key={item} aria-pressed={audience === item} onClick={() => { setAudience(item); setConfirmation(""); void playAppSound("select"); }}>{AUDIENCE_LABELS[item]}</button>)}
+            {(Object.keys(AUDIENCE_LABELS) as Audience[]).map((item) => <button type="button" key={item} aria-pressed={audience === item} onClick={() => { setAudience(item); setConfirmation(""); }}>{AUDIENCE_LABELS[item]}</button>)}
           </div>
           <p>{excludedInactiveCount} compte{excludedInactiveCount > 1 ? "s" : ""} gratuit{excludedInactiveCount > 1 ? "s" : ""} inactif{excludedInactiveCount > 1 ? "s" : ""} depuis plus de trois mois ne reçoivent jamais d'e-mail.</p>
           <div className="adm-recipient-list">

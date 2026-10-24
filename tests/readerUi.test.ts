@@ -147,8 +147,7 @@ test("le lecteur expose son état vide et les interactions clavier", () => {
 });
 
 test("les sons du lecteur partent dans les mêmes gestionnaires que leurs animations", () => {
-  const source = `${read("components/reader/ModeSwitch.tsx")}\n${read("components/reader/ReaderView.tsx")}\n${read("components/reader/ReaderProse.tsx")}`;
-  assert.match(source, /playAppSound\("select"\)[\s\S]{0,260}animateAppElement/);
+  const source = `${read("components/reader/ReaderView.tsx")}\n${read("components/reader/ReaderProse.tsx")}`;
   assert.match(source, /playAppSound\("confirm"\)[\s\S]{0,260}animateAppElement/);
   assert.match(source, /playAppSound\("error"\)[\s\S]{0,300}animateAppElement/);
 });

@@ -3,6 +3,48 @@ import { playAppSound, type AppSound } from "@/lib/ui/sound";
 
 export type PressSound = AppSound | "none";
 
+const EXPLICIT_SOUNDS: Record<PressSound, true> = { none: true, click: true, select: true, open: true, confirm: true, error: true };
+const SELECTION_CONTROL = [
+  '[role="tab"]',
+  '[role="radio"]',
+  '[role="option"]',
+  '[role="menuitemradio"]',
+  '[role="switch"]',
+  '[role="menuitemcheckbox"]',
+  '[aria-pressed]',
+  '[aria-selected]',
+  '[aria-current]',
+  'input[type="radio"]',
+  'input[type="checkbox"]',
+  "select",
+  ".chip",
+  ".tabbar a",
+  ".navbar__nav a",
+  ".adm-nav-item",
+  ".adm-filterbar button",
+  ".adm-template-tabs",
+  ".adm-audience-tabs",
+].join(", ");
+
+const SELECTION_CONTAINER = [
+  '[role="tablist"]',
+  ".tabs",
+  ".seg",
+  ".tabbar",
+  ".navbar__nav",
+  ".adm-nav-item",
+  ".adm-filterbar",
+  ".adm-template-tabs",
+  ".adm-audience-tabs",
+].join(", ");
+
+export function soundKindFor(element: Element): PressSound {
+  const explicit = element.getAttribute("data-sfx");
+  if (explicit && EXPLICIT_SOUNDS[explicit as PressSound]) return explicit as PressSound;
+  if (element.matches(SELECTION_CONTROL) || element.closest(SELECTION_CONTAINER)) return "select";
+  return "click";
+}
+
 type PressDependencies = {
   animate: (element: HTMLElement) => Animation | null;
   play: (sound: AppSound) => void | Promise<void>;

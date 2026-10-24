@@ -66,7 +66,6 @@ export function AccountClient({
     setSection(id);
     setNotice(null);
     window.history.pushState(null, "", `#${id}`);
-    void playAppSound("select");
   };
 
   const finish = (next: Notice) => {
@@ -139,7 +138,7 @@ export function AccountClient({
         </nav>
 
         <section className={`ui3-account-pane ${styles.pane}`} aria-live="polite">
-          <button className="ui3-back" type="button" onClick={() => { setSection(null); setNotice(null); window.history.pushState(null, "", window.location.pathname); void playAppSound("select"); }}>Compte</button>
+          <button className="ui3-back" type="button" data-sfx="select" onClick={() => { setSection(null); setNotice(null); window.history.pushState(null, "", window.location.pathname); }}>Compte</button>
           {notice ? <p className={`ui3-notice ui3-notice-${notice.tone}`} role={notice.tone === "error" ? "alert" : "status"}>{notice.text}</p> : null}
 
           {activeSection === "profile" ? <div className="ui3-pane-section"><h2>Profil</h2><form className="ui3-form" onSubmit={saveProfile}><label>Prénom<input name="name" value={name} onChange={(event) => setName(event.target.value)} maxLength={40} autoComplete="given-name" /></label><p className="ui3-hint">C’est le prénom affiché dans BUILD et dans les e‑mails que tu reçois.</p><button className="btn btn--p" disabled={busy}>{busy ? "Enregistrement" : "Enregistrer"}</button></form></div> : null}

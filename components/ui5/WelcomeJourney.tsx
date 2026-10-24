@@ -25,16 +25,13 @@ export function WelcomeJourney({ displayName, tier, choices }: { displayName: st
   }, [step]);
 
   function advance() {
-    void playAppSound(step === 1 ? "select" : "click");
     setStep((current) => Math.min(2, current + 1));
   }
   function back() {
-    void playAppSound("click");
     setStep((current) => Math.max(0, current - 1));
   }
   function choose(id: string) {
     setSelectedId(id);
-    void playAppSound("select");
   }
 
   const title = step === 1 ? "Choisis ton premier pas." : "Ton parcours est prêt.";
@@ -54,14 +51,14 @@ export function WelcomeJourney({ displayName, tier, choices }: { displayName: st
       {step === 0 ? <section ref={panelRef} className="welcome-panel" aria-label="Ton compte BUILD">
         <span className="welcome-status"><DaIcon name="check" />Compte reconnu</span>
         <dl className="welcome-facts"><div><dt>Ton accès</dt><dd>{welcomeTierLabel(tier)}</dd></div><div><dt>Étape suivante</dt><dd>Choisir un point de départ</dd></div></dl>
-        <div className="welcome-actions"><button className="btn btn--p" type="button" onClick={advance}>Continuer</button><Link className="btn btn--l" href="/dashboard">Aller à Aujourd&apos;hui</Link></div>
+        <div className="welcome-actions"><button className="btn btn--p" type="button" data-sfx="click" onClick={advance}>Continuer</button><Link className="btn btn--l" href="/dashboard">Aller à Aujourd&apos;hui</Link></div>
       </section> : null}
 
       {step === 1 ? <section ref={panelRef} className="welcome-panel" aria-label="Choisir ton point de départ">
         <fieldset className="welcome-choices"><legend className="sr">Point de départ</legend>{choices.map((choice) => <button key={choice.id} className="welcome-choice" data-selected={selectedId === choice.id} type="button" aria-pressed={selectedId === choice.id} onClick={() => choose(choice.id)}>
           <Image src={choice.image} alt="" width={320} height={180} /><span><b>{choice.title}</b><small>{choice.meta}</small><em>{choice.description}</em></span><i aria-hidden="true"><DaIcon name="check" /></i>
         </button>)}</fieldset>
-        <div className="welcome-actions"><button className="btn btn--p" type="button" onClick={advance}>Continuer</button><button className="btn btn--l" type="button" onClick={back}>Retour</button></div>
+        <div className="welcome-actions"><button className="btn btn--p" type="button" data-sfx="select" onClick={advance}>Continuer</button><button className="btn btn--l" type="button" onClick={back}>Retour</button></div>
       </section> : null}
 
       {step === 2 && selected ? <section ref={panelRef} className="welcome-panel welcome-final" aria-label="Premier contenu">

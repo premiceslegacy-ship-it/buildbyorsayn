@@ -65,7 +65,7 @@ export function ForgotPasswordForm() {
             <form className="ui3-auth-form" onSubmit={verifyCode} noValidate>
               <label className="ui3-field ui3-code" data-invalid={Boolean(error)}><span>Code de vérification</span><input type="text" inputMode="numeric" pattern="[0-9]*" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(event) => { setOtp(event.target.value.replace(/\D/g, "")); setError(""); }} placeholder="000000" aria-invalid={Boolean(error)} /></label>
               <p className="ui3-hint">Regarde aussi dans tes courriers indésirables.</p>
-              <div className="ui3-auth-actions"><button className="btn btn--p" disabled={isLoading}>{isLoading ? "Vérification" : "Vérifier le code"}</button><button className="ui3-text-link" type="button" onClick={() => { setStep("email"); setOtp(""); setError(""); void playAppSound("select"); }}>Changer l’adresse</button></div>
+              <div className="ui3-auth-actions"><button className="btn btn--p" disabled={isLoading}>{isLoading ? "Vérification" : "Vérifier le code"}</button><button className="ui3-text-link" type="button" data-sfx="select" onClick={() => { setStep("email"); setOtp(""); setError(""); }}>Changer l’adresse</button></div>
             </form>
           </>}
         </section>

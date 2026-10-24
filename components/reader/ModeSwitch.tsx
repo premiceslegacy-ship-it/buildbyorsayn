@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { animateAppElement } from "@/lib/ui/motion";
-import { playAppSound } from "@/lib/ui/sound";
 import type { ReaderMode } from "./readerModel";
 import styles from "./reader.module.css";
 
@@ -11,7 +10,6 @@ export function ModeSwitch({ mode, onChange }: { mode: ReaderMode; onChange: (mo
 
   const select = (next: ReaderMode) => {
     if (next === mode) return;
-    void playAppSound("select");
     if (root.current) {
       animateAppElement(root.current, [
         { transform: "scale(.985)" },
@@ -38,8 +36,8 @@ export function ModeSwitch({ mode, onChange }: { mode: ReaderMode; onChange: (mo
       }}
     >
       <span className={styles.modePill} aria-hidden="true" />
-      <button type="button" role="radio" aria-checked={mode === "video"} tabIndex={mode === "video" ? 0 : -1} data-mode-value="video" data-sfx="none" onClick={() => select("video")}>Vidéo</button>
-      <button type="button" role="radio" aria-checked={mode === "texte"} tabIndex={mode === "texte" ? 0 : -1} data-mode-value="texte" data-sfx="none" onClick={() => select("texte")}>Texte</button>
+      <button type="button" role="radio" aria-checked={mode === "video"} tabIndex={mode === "video" ? 0 : -1} data-mode-value="video" onClick={() => select("video")}>Vidéo</button>
+      <button type="button" role="radio" aria-checked={mode === "texte"} tabIndex={mode === "texte" ? 0 : -1} data-mode-value="texte" onClick={() => select("texte")}>Texte</button>
     </div>
   );
 }

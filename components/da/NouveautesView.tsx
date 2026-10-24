@@ -51,7 +51,7 @@ export function NouveautesView({ feed }: { feed: NouveautesFeed }) {
     });
     return () => cancelAnimationFrame(frame);
   }, [filter, moveSlider]);
-  const select = (next: Filter) => { if (next === filter) return; setFilter(next); window.history.replaceState(null, "", next === "all" ? location.pathname : `#${next}`); void playAppSound("select"); };
+  const select = (next: Filter) => { if (next === filter) return; setFilter(next); window.history.replaceState(null, "", next === "all" ? location.pathname : `#${next}`); };
   const keyFilter = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
     const filters: Filter[] = ["all", "youtube", "build"];
@@ -59,6 +59,7 @@ export function NouveautesView({ feed }: { feed: NouveautesFeed }) {
     const next = filters[(index + (event.key === "ArrowRight" ? 1 : filters.length - 1)) % filters.length];
     event.preventDefault();
     select(next);
+    void playAppSound("select");
     tabs.current?.querySelectorAll<HTMLButtonElement>('button[role="tab"]')[filters.indexOf(next)]?.focus();
   };
   const visibleItems = feed.items.filter((item) => filter === "all" || item.source === filter);
@@ -69,7 +70,7 @@ export function NouveautesView({ feed }: { feed: NouveautesFeed }) {
     ? feed.status === "error"
     : filter === "youtube" ? feed.sources.youtube === "error" : feed.sources.build === "error";
   return <>
-    <header className="hero--app"><div className="hero__in"><h1 className="t-1">Nouveautés</h1><p className="t-lede">Les nouvelles vidéos de la chaîne YouTube, et celles qui arrivent dans BUILD.</p><div ref={tabs} className="seg has-slider" role="tablist" aria-label="Filtrer les nouveautés"><i ref={slider} className="slider" /><button role="tab" tabIndex={filter === "all" ? 0 : -1} aria-selected={filter === "all"} data-sfx="none" onKeyDown={keyFilter} onClick={() => select("all")}>Tout</button><button role="tab" tabIndex={filter === "youtube" ? 0 : -1} aria-selected={filter === "youtube"} data-sfx="none" onKeyDown={keyFilter} onClick={() => select("youtube")}>YouTube</button><button role="tab" tabIndex={filter === "build" ? 0 : -1} aria-selected={filter === "build"} data-sfx="none" onKeyDown={keyFilter} onClick={() => select("build")}>Sur BUILD</button></div></div></header>
+    <header className="hero--app"><div className="hero__in"><h1 className="t-1">Nouveautés</h1><p className="t-lede">Les nouvelles vidéos de la chaîne YouTube, et celles qui arrivent dans BUILD.</p><div ref={tabs} className="seg has-slider" role="tablist" aria-label="Filtrer les nouveautés"><i ref={slider} className="slider" /><button role="tab" tabIndex={filter === "all" ? 0 : -1} aria-selected={filter === "all"} onKeyDown={keyFilter} onClick={() => select("all")}>Tout</button><button role="tab" tabIndex={filter === "youtube" ? 0 : -1} aria-selected={filter === "youtube"} onKeyDown={keyFilter} onClick={() => select("youtube")}>YouTube</button><button role="tab" tabIndex={filter === "build" ? 0 : -1} aria-selected={filter === "build"} onKeyDown={keyFilter} onClick={() => select("build")}>Sur BUILD</button></div></div></header>
     <p className="sr" role="status">{resultCount} nouveauté{resultCount > 1 ? "s" : ""}, filtre {filterLabel}</p>
     <div className="nw" ref={content}>
       {hasError && <AppState compact headingLevel={2} tone="alert" object="livraison" title="Ce fil ne répond pas." detail="Réessaie maintenant, ou retourne à Aujourd’hui." action={{ label: "Réessayer", onClick: () => window.location.reload() }} />}
