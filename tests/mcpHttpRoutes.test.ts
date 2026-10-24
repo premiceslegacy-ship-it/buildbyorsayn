@@ -18,6 +18,7 @@ import { parseDcrClientMetadata } from "../lib/mcp/oauthSchemas";
 import { POST as issueToken } from "../app/api/mcp/oauth/token/route";
 
 process.env.MCP_OAUTH_ISSUER ??= "https://buildbyorsayn.com";
+process.env.MCP_CONNECTOR_LAUNCHED ??= "true";
 
 const allowedOrigin = "https://claude.ai";
 const deniedOrigin = "https://attacker.example";

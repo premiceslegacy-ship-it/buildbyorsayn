@@ -128,9 +128,8 @@ export async function renewYoutubeWebSub(fetchImpl: typeof fetch = fetch): Promi
   const channelId = requireChannelId();
   const secret = process.env.YOUTUBE_WEBSUB_SECRET;
   const verifyToken = process.env.YOUTUBE_WEBSUB_VERIFY_TOKEN;
-  if (!secret) throw new Error("YOUTUBE_WEBSUB_SECRET is not configured.");
+  if (!secret || secret.length < 32) throw new Error("YOUTUBE_WEBSUB_SECRET must contain at least 32 characters.");
   if (!verifyToken) throw new Error("YOUTUBE_WEBSUB_VERIFY_TOKEN is not configured.");
-  // The hub verifies this public callback before it starts sending signed notifications.
   const siteUrl = requireSiteOrigin();
   const response = await fetchImpl(HUB_URL, {
     method: "POST",
@@ -156,7 +155,7 @@ export function verifyWebSubIntent(received: string | null, expected: string): b
   return left.length === right.length && timingSafeEqual(left, right);
 }
 export function verifyWebSubSignature(body: string, header: string | null, secret: string): boolean {
-  if (!header || !secret) return false;
+  if (!header || secret.length < 32) return false;
   const expected = `sha1=${createHmac("sha1", secret).update(body).digest("hex")}`;
   const left = Buffer.from(header);
   const right = Buffer.from(expected);

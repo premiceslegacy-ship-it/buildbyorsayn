@@ -126,6 +126,7 @@ export function TrainerWorkspace({ clients, people, dataWarning = null }: Props)
           </div>
           <div className="mt-6">
             <AssignmentEditor
+              key={selectedClient?.assignment.id ?? "new-assignment"}
               people={people}
               themes={THEMES}
               userId={selectedClient?.id ?? ""}
@@ -199,6 +200,7 @@ export function TrainerWorkspace({ clients, people, dataWarning = null }: Props)
                   <p><span className="block text-sm font-medium text-[var(--t3)]">Dernière activité</span><span className="mt-2 block text-[var(--t2)]">{formatDate(selectedClient.lastActivity)}</span></p>
                 </div>
                 <SharedContextEditor
+                  key={`${selectedClient.assignment.id}:${selectedClient.workspaceContext?.updatedAt ?? ""}`}
                   assignmentId={selectedClient.assignment.id}
                   context={selectedClient.workspaceContext}
                 />

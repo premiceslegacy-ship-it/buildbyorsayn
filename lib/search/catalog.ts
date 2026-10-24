@@ -1,5 +1,5 @@
 import { ANGLE_MORT, SECTIONS } from "@/app/beginner/sections.data";
-import { CHAPTER_META } from "@/app/videos/tutos/chapters";
+import { CHAPTER_META, chapterSlug } from "@/app/videos/tutos/chapters";
 import { BLOCS_DATA } from "@/lib/mockData";
 import { canReadBlocSection } from "@/lib/blocAccess";
 import { foundationIntroductionMarkdown, foundationMarkdown } from "@/lib/fondations/content";
@@ -43,7 +43,7 @@ export function buildSearchCatalog(rawTier: string | null): SearchItem[] {
   const hermesAllowed = tier === "full";
   if (hermesAllowed) {
     items.push({ id: "video-hermes", kind: "Vidéo", title: "Hermes Agent : de zéro à ton premier workflow", context: `${Object.keys(CHAPTER_META).length} chapitres`, href: "/videos/tutos", image: "/da/mini/hermes.jpg", locked: false, searchText: `Hermes Agent workflow ${Object.values(CHAPTER_META).map((chapter) => `${chapter.displayTitle} ${chapter.summary}`).join(" ")}` });
-    Object.values(CHAPTER_META).forEach((chapter) => items.push({ id: `hermes-${chapter.path}`, kind: "Chapitre", title: chapter.displayTitle, context: "Hermes Agent", href: `/videos/tutos/${chapter.path.replace(/\.md$/, "")}`, image: "/da/mini/hermes.jpg", locked: false, searchText: `${chapter.displayTitle} ${chapter.summary} Hermes Agent` }));
+    Object.values(CHAPTER_META).forEach((chapter) => items.push({ id: `hermes-${chapter.path}`, kind: "Chapitre", title: chapter.displayTitle, context: "Hermes Agent", href: `/videos/tutos/${chapterSlug(chapter.path)}`, image: "/da/mini/hermes.jpg", locked: false, searchText: `${chapter.displayTitle} ${chapter.summary} Hermes Agent` }));
   }
   SKILLS_CATALOG.filter((skill) => skillAllowed(tier, skill.access)).forEach((skill) => items.push({ id: `skill-${skill.slug}`, kind: "Skill", title: skill.title, context: SKILL_CATEGORY_LABELS[skill.category], href: `/skills#${skill.slug}`, image: `/da/skills/${skill.slug}.jpg`, locked: false, searchText: `${skill.title} ${skill.description} ${skill.category}` }));
   return items;

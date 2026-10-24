@@ -14,6 +14,7 @@ import {
   hashToken,
   verifyCodeChallenge,
 } from "@/lib/mcp/oauth";
+import { hasMcpConnectorAllowlist, isMcpConnectorAccountAllowed, isMcpConnectorLaunched } from "@/lib/mcp/launch";
 import { parseTokenRequest, type TokenRequest } from "@/lib/mcp/oauthSchemas";
 import { observeMcpRoute } from "@/lib/mcp/observability";
 import { buildNetworkRateLimitInput, resolveRateLimitDecision } from "@/lib/mcp/security";
@@ -71,7 +72,7 @@ async function handleAuthorizationCode(params: AuthorizationCodeRequest) {
   const codeHash = hashToken(code);
   const { data: candidate, error: candidateError } = await admin
     .from("mcp_authorization_codes")
-    .select("code_challenge")
+    .select("user_id, code_challenge")
     .eq("code_hash", codeHash)
     .eq("client_id", clientId)
     .eq("redirect_uri", redirectUri)
@@ -85,6 +86,9 @@ async function handleAuthorizationCode(params: AuthorizationCodeRequest) {
   }
   if (!candidate || !verifyCodeChallenge(codeVerifier, candidate.code_challenge)) {
     return oauthError("invalid_grant", "The authorization code is invalid, expired, or already used.");
+  }
+  if (!isMcpConnectorAccountAllowed(candidate.user_id)) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
   }
 
   const accessToken = generateOpaqueToken();
@@ -121,10 +125,23 @@ async function handleAuthorizationCode(params: AuthorizationCodeRequest) {
 
 async function handleRefreshToken(params: RefreshTokenRequest) {
   const { refresh_token: refreshToken, client_id: clientId, resource } = params;
+  const admin = createMcpSupabaseAdmin();
+  const { data: owner, error: ownerError } = await admin
+    .from("mcp_refresh_tokens")
+    .select("user_id")
+    .eq("token_hash", hashToken(refreshToken))
+    .eq("client_id", clientId)
+    .eq("resource", resource)
+    .is("revoked_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .maybeSingle();
+  if (ownerError) return oauthError("server_error", "Could not rotate refresh token.", 500);
+  if (!owner || !isMcpConnectorAccountAllowed(owner.user_id)) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
 
   const newAccessToken = generateOpaqueToken();
   const newRefreshToken = generateOpaqueToken();
-  const admin = createMcpSupabaseAdmin();
   const { data, error } = (await admin
     .rpc("rotate_mcp_refresh_token", {
       p_refresh_token_hash: hashToken(refreshToken),
@@ -156,6 +173,9 @@ async function handleRefreshToken(params: RefreshTokenRequest) {
 }
 
 async function handlePost(request: Request) {
+  if (!isMcpConnectorLaunched() && !hasMcpConnectorAllowlist()) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
   if (!requestOriginAllowed(request.headers.get("origin"), new Set(getMcpAllowedOrigins()))) {
     return oauthError("access_denied", "Request origin is not allowed.", 403);
   }
@@ -207,6 +227,9 @@ export async function POST(request: Request) {
 }
 
 export function OPTIONS(request: Request) {
+  if (!isMcpConnectorLaunched()) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
   return oauthPreflightResponse(
     request.headers.get("origin"),
     new Set(getMcpAllowedOrigins())

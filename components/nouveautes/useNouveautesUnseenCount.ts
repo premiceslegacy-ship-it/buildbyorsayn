@@ -14,13 +14,11 @@ export function useNouveautesUnseenCount(): number | null {
   const pathname = usePathname();
   const { user } = useAuth();
   const [count, setCount] = useState<number | null>(null);
+  const [countForUserId, setCountForUserId] = useState<string | null>(null);
   const userId = user?.id ?? null;
 
   useEffect(() => {
-    if (!user || pathname === "/nouveautes") {
-      setCount(null);
-      return;
-    }
+    if (!user || pathname === "/nouveautes") return;
     let cancelled = false;
     (async () => {
       const supabase = createClient();
@@ -28,12 +26,15 @@ export function useNouveautesUnseenCount(): number | null {
       const { count: unseen, error } = await supabase.from("youtube_videos")
         .select("video_id", { count: "exact", head: true }).gt("published_at", seenAt);
       if (error) throw error;
-      if (!cancelled) setCount(unseen ?? 0);
-    })().catch(() => { if (!cancelled) setCount(null); });
+      if (!cancelled) {
+        setCount(unseen ?? 0);
+        setCountForUserId(user.id);
+      }
+    })().catch(() => { if (!cancelled) { setCount(null); setCountForUserId(null); } });
     return () => { cancelled = true; };
     // `user` is an object that changes identity on token refresh; the id is what matters.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, pathname]);
 
-  return count;
+  return userId && pathname !== "/nouveautes" && countForUserId === userId ? count : null;
 }

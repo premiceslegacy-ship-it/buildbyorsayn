@@ -5,6 +5,7 @@ import {
   getBuildSyncResourceUrl,
   BUILD_SYNC_SCOPE,
 } from "@/lib/buildSync/config";
+import { isMcpConnectorAccountAllowed } from "@/lib/mcp/launch";
 import { resolveMcpProfileTier, type McpTier } from "@/lib/mcpAccess";
 import { stableQuotaPrincipal } from "@/lib/mcp/security";
 
@@ -31,8 +32,8 @@ export async function resolveBuildSyncAuth(
     .maybeSingle();
 
   if (error || !stored || stored.revoked_at) return null;
+  if (!isMcpConnectorAccountAllowed(stored.user_id)) return null;
   if (stored.scope !== BUILD_SYNC_SCOPE || stored.resource !== getBuildSyncResourceUrl()) return null;
-  if (!Number.isFinite(Date.parse(stored.expires_at)) || Date.parse(stored.expires_at) <= Date.now()) return null;
 
   const { data: profile, error: profileError } = await admin
     .from("profiles")

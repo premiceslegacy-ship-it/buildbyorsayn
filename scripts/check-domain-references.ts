@@ -76,6 +76,7 @@ export const HOST_ALLOWLIST: readonly AllowedHost[] = [
   { host: "unpkg.com", kind: "third-party", why: "Provenance des logos dans public/brand-logos/README.md." },
   { host: "cdn.jsdelivr.net", kind: "third-party", why: "Provenance des logos dans public/brand-logos/README.md." },
   { host: "*.gstatic.com", kind: "third-party", why: "Polices et logos Google (politique de sécurité du contenu, README de provenance)." },
+  { host: "*.unsplash.com", kind: "third-party", why: "Provenance des photos de démonstration conservée dans les schémas publics." },
 
   // Liens éditoriaux : outils et références cités dans les contenus de formation ----------------
   { host: "21st.dev", kind: "third-party", why: "Lien éditorial." },

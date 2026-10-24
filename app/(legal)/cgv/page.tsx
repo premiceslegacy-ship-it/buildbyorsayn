@@ -98,7 +98,7 @@ export default function CgvPage() {
       children: (
         <>
           <p>
-            En principe, quand tu achètes à distance, tu as 14 jours pour changer d&apos;avis. Pour un contenu numérique fourni sans support matériel, la loi prévoit une exception : tu n&apos;as plus ce droit si l&apos;exécution a commencé avec ton accord préalable exprès et si tu as reconnu expressément que tu perdais ton droit de rétractation (article L221-28, 13° du Code de la consommation).
+            En principe, quand tu achètes à distance, tu as 14 jours pour changer d&apos;avis. Pour un contenu numérique fourni sans support matériel, la loi prévoit une exception : tu n&apos;as plus ce droit dans deux cas cumulés. L&apos;exécution a commencé avec ton accord préalable exprès. Tu as aussi reconnu expressément que tu perdais ton droit de rétractation (article L221-28, 13° du Code de la consommation).
           </p>
           <p>BUILD est un contenu numérique, ouvert immédiatement. Avant de payer, la page de paiement Stripe te demande donc de cocher une case obligatoire, avec ce texte :</p>
           <p className="lg-citation">{quote(CHECKOUT_CONSENT_TEXT)}</p>

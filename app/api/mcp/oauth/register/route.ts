@@ -9,6 +9,7 @@ import {
   readBoundedBody,
   requestOriginAllowed,
 } from "@/lib/mcp/http";
+import { isMcpConnectorLaunched } from "@/lib/mcp/launch";
 import { sanitizeClientName } from "@/lib/mcp/oauth";
 import { parseDcrClientMetadata } from "@/lib/mcp/oauthSchemas";
 import { observeMcpRoute } from "@/lib/mcp/observability";
@@ -27,6 +28,9 @@ function errorResponse(error: string, description: string, status: number) {
 }
 
 async function handlePost(request: Request) {
+  if (!isMcpConnectorLaunched()) {
+    return errorResponse("temporarily_unavailable", "The MCP connector is not available.", 404);
+  }
   if (!requestOriginAllowed(request.headers.get("origin"), new Set(getMcpAllowedOrigins()))) {
     return errorResponse("access_denied", "Request origin is not allowed.", 403);
   }
@@ -105,6 +109,9 @@ export async function POST(request: Request) {
 }
 
 export function OPTIONS(request: Request) {
+  if (!isMcpConnectorLaunched()) {
+    return new Response(null, { status: 404, headers: NO_STORE });
+  }
   return oauthPreflightResponse(
     request.headers.get("origin"),
     new Set(getMcpAllowedOrigins())

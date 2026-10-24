@@ -3,9 +3,13 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { canUseBuildSync, getBuildSyncResourceUrl } from "@/lib/buildSync/config";
 import { createBuildSyncAuthorizationSchema } from "@/lib/buildSync/oauth";
+import { hasMcpConnectorAllowlist, isMcpConnectorAccountAllowed, isMcpConnectorLaunched } from "@/lib/mcp/launch";
 import { buildValidatedAuthorizationErrorCallback, generateOpaqueToken, hashToken } from "@/lib/mcp/oauth";
 import { resolveMcpProfileTier } from "@/lib/mcpAccess";
-import { reserveAuthorizationRequest } from "@/lib/mcp/authorizationRateLimit";
+import {
+  reserveAuthorizationNetworkRequest,
+  reserveAuthorizationPrincipal,
+} from "@/lib/mcp/authorizationRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -23,13 +27,28 @@ function oauthError(description: string, status = 400) {
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
+  const admin = createAdminSupabase({ signal: request.signal });
+  const networkDecision = await reserveAuthorizationNetworkRequest(admin, {
+    headers: request.headers,
+    product: "build-sync",
+  });
+  if (networkDecision !== "allowed") {
+    return oauthError(
+      networkDecision === "denied" ? "Too many authorization attempts." : "Authorization is temporarily unavailable.",
+      networkDecision === "denied" ? 429 : 503,
+    );
+  }
+  if (!isMcpConnectorLaunched() && !hasMcpConnectorAllowlist()) {
+    return new Response(null, { status: 404, headers: NO_STORE });
+  }
+
   const entries = [...url.searchParams.entries()];
   if (new Set(entries.map(([key]) => key)).size !== entries.length) {
     return oauthError("The authorization request is invalid.");
   }
 
   const parsed = createBuildSyncAuthorizationSchema(getBuildSyncResourceUrl()).safeParse(
-    Object.fromEntries(entries)
+    Object.fromEntries(entries),
   );
   if (!parsed.success) return oauthError("The authorization request is invalid.");
 
@@ -40,8 +59,10 @@ export async function GET(request: Request) {
     loginUrl.searchParams.set("next", `${url.pathname}${url.search}`);
     return NextResponse.redirect(loginUrl, { headers: NO_STORE });
   }
+  if (!isMcpConnectorAccountAllowed(user.id)) {
+    return new Response(null, { status: 404, headers: NO_STORE });
+  }
 
-  const admin = createAdminSupabase({ signal: request.signal });
   const { data: profile, error: profileError } = await admin
     .from("profiles")
     .select("tier")
@@ -56,8 +77,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const rateDecision = await reserveAuthorizationRequest(admin, {
-    headers: request.headers,
+  const rateDecision = await reserveAuthorizationPrincipal(admin, {
     userId: user.id,
     clientId: input.client_id,
     product: "build-sync",

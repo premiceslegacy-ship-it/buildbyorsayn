@@ -9,6 +9,15 @@ test("la porte de release contrôle le contenu privé après le build", () => {
   assert.ok(release.indexOf("npm run test:mcp-e2e") < release.indexOf("npm run content:private-check"));
 });
 
+test("la porte de release ne référence que des sous-commandes déclarées", () => {
+  const manifest = JSON.parse(readFileSync("package.json", "utf8")) as { scripts: Record<string, string> };
+  assert.equal(manifest.scripts["verify:stripe-pricing"], "tsx scripts/verify-stripe-pricing.ts");
+  const release = manifest.scripts["verify:release"];
+  for (const match of release.matchAll(/npm run ([a-z0-9:_-]+)/g)) {
+    assert.ok(manifest.scripts[match[1]], `sous-commande absente: ${match[1]}`);
+  }
+});
+
 test("les pages protégées gardent leur contenu dans des Server Components", () => {
   const requirements: Record<string, string> = {
     "app/intro/page.tsx": 'requirePageAccess("full", "/intro")',

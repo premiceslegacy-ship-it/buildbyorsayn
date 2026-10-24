@@ -41,9 +41,12 @@ if (process.env.REVIEW1_SEARCH_INNER !== "1") {
   const search = async (query: string) => {
     const response = await GET(new Request(`https://build.example/api/search?q=${encodeURIComponent(query)}`));
     assert.equal(response.status, 200);
-    return response.json() as Promise<{ results: Array<{ id: string }> }>;
+    const body = await response.json() as { results: Array<Record<string, unknown>> };
+    for (const result of body.results) {
+      assert.equal("searchText" in result, false);
+    }
+    return body;
   };
-
   test("gratuit ne reçoit pas Hermes et Fondations ne reçoit pas le Bloc 2", async () => {
     tier = "free";
     assert.deepEqual((await search("Hermes")).results, []);
@@ -54,5 +57,10 @@ if (process.env.REVIEW1_SEARCH_INNER !== "1") {
   test("LE COFFRE reçoit bien les résultats auxquels il a droit", async () => {
     tier = "full";
     assert.ok((await search("Hermes")).results.some((result) => result.id === "video-hermes"));
+  });
+  test("Hermes README pointe vers le slug readme", async () => {
+    tier = "full";
+    const results = (await search("Installe ton agent")).results;
+    assert.equal(results.find((result) => result.id === "hermes-README.md")?.href, "/videos/tutos/readme");
   });
 }

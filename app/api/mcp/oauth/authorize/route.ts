@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createMcpSupabaseAdmin } from "@/lib/mcp/supabaseAdmin";
 import { getMcpResourceUrl } from "@/lib/mcp/config";
+import { hasMcpConnectorAllowlist, isMcpConnectorAccountAllowed, isMcpConnectorLaunched } from "@/lib/mcp/launch";
 import {
   buildValidatedAuthorizationErrorCallback,
   generateOpaqueToken,
@@ -10,8 +11,10 @@ import {
 } from "@/lib/mcp/oauth";
 import { createAuthorizationRequestSchema } from "@/lib/mcp/oauthSchemas";
 import { observeMcpRoute } from "@/lib/mcp/observability";
-import { reserveAuthorizationRequest } from "@/lib/mcp/authorizationRateLimit";
-
+import {
+  reserveAuthorizationNetworkRequest,
+  reserveAuthorizationPrincipal,
+} from "@/lib/mcp/authorizationRateLimit";
 export const dynamic = "force-dynamic";
 const NO_STORE = { "Cache-Control": "no-store", Pragma: "no-cache" };
 
@@ -24,18 +27,32 @@ function oauthError(description: string, status = 400) {
 
 async function handleGet(request: Request) {
   const url = new URL(request.url);
+  const admin = createMcpSupabaseAdmin({ signal: request.signal });
+  const networkDecision = await reserveAuthorizationNetworkRequest(admin, {
+    headers: request.headers,
+    product: "mcp",
+  });
+  if (networkDecision !== "allowed") {
+    return oauthError(
+      networkDecision === "denied" ? "Too many authorization attempts." : "Authorization is temporarily unavailable.",
+      networkDecision === "denied" ? 429 : 503,
+    );
+  }
+  if (!isMcpConnectorLaunched() && !hasMcpConnectorAllowlist()) {
+    return new Response(null, { status: 404, headers: NO_STORE });
+  }
+
   const entries = [...url.searchParams.entries()];
   if (new Set(entries.map(([key]) => key)).size !== entries.length) {
     return oauthError("The authorization request is invalid.");
   }
 
   const parsed = createAuthorizationRequestSchema(getMcpResourceUrl()).safeParse(
-    Object.fromEntries(entries)
+    Object.fromEntries(entries),
   );
   if (!parsed.success) return oauthError("The authorization request is invalid.");
   const input = parsed.data;
 
-  const admin = createMcpSupabaseAdmin();
   const { data: client, error: clientError } = await admin
     .from("mcp_oauth_clients")
     .select("client_id, redirect_uris, token_endpoint_auth_method")
@@ -57,9 +74,11 @@ async function handleGet(request: Request) {
     loginUrl.searchParams.set("next", `${url.pathname}${url.search}`);
     return NextResponse.redirect(loginUrl, { headers: NO_STORE });
   }
+  if (!isMcpConnectorAccountAllowed(user.id)) {
+    return new Response(null, { status: 404, headers: NO_STORE });
+  }
 
-  const rateDecision = await reserveAuthorizationRequest(admin, {
-    headers: request.headers,
+  const rateDecision = await reserveAuthorizationPrincipal(admin, {
     userId: user.id,
     clientId: input.client_id,
     product: "mcp",

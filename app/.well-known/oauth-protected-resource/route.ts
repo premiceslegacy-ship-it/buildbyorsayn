@@ -4,11 +4,14 @@ import {
   getMcpIssuer,
   getMcpResourceUrl,
 } from "@/lib/mcp/config";
+import { isMcpConnectorLaunched } from "@/lib/mcp/launch";
 import { corsHeadersForRequest } from "@/lib/mcp/security";
-
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
+  if (!isMcpConnectorLaunched()) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
   const issuer = getMcpIssuer();
   return NextResponse.json(
     {

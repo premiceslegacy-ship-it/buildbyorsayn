@@ -41,8 +41,8 @@ export function HeroScene() {
                 <div className="pg__img" style={{ backgroundImage: "url(/da/site-lumen.jpg)" }} />
                 <div className="pg__nav"><b>◐ Lumen</b><span>Offre</span><span>Méthode</span><span>Avis</span><em>Réserver</em></div>
                 <div className="pg__t">
-                  <h3>Lance ton offre<br /><i>en dix jours.</i></h3>
-                  <p>De l&apos;idée à la page qui vend, sans repartir de zéro.</p>
+                  <h3>Une offre claire<br /><i>à montrer.</i></h3>
+                  <p>De l&apos;idée au dossier et au site qui la présentent, sans repartir de zéro.</p>
                   <span className="pg__bt">Commencer</span>
                 </div>
               </div>
@@ -95,6 +95,7 @@ export function HeroScene() {
                 </div>
               </div>
             </div>
+            <p className="hs__fiction">Illustration : identités et montants fictifs</p>
           </div>
         </div>
       </div>

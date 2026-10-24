@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveTrainerWorkspaceContext } from "@/app/actions/accompaniment";
 import type { AccompanimentWorkspaceContext } from "@/lib/accompanimentTypes";
@@ -18,14 +18,6 @@ export function SharedContextEditor({ assignmentId, context }: Props) {
   const [sharedNotes, setSharedNotes] = useState(context?.sharedNotes ?? "");
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null);
-
-  useEffect(() => {
-    setCompany(context?.company ?? "");
-    setProject(context?.project ?? "");
-    setSiteUrl(context?.siteUrl ?? "");
-    setSharedNotes(context?.sharedNotes ?? "");
-    setFeedback(null);
-  }, [assignmentId, context]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

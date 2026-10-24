@@ -20,6 +20,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 /** Dossiers et fichiers de contenu lus. Tout ce qui s'affiche à la personne qui apprend ou achète. */
 const CONTENT_TARGETS = [
   "content/fondations",
+  "content/hermes",
   "app/beginner",
   "app/blocs",
   "app/videos/tutos",
@@ -44,6 +45,9 @@ const FORBIDDEN: Rule[] = [
   { name: "lecon", pattern: /\ble[cç]ons?\b/i, message: "« leçon » : écrire « chapitre »" },
   { name: "prix-en-dur", pattern: /(?<![\w.])(?:97|267|170)\s?(?:€|euros?)(?!\w)/i, message: "prix écrit en dur : le lire depuis lib/pricing.ts" },
   { name: "compteur-en-dur", pattern: /\b233\b(?=\s+(?:builders?|membres?))/i, message: "nombre de builders écrit en dur : lire lib/siteFacts.ts" },
+  { name: "promesse-revenu", pattern: /\b(?:tu|vous)\s+(?:vas|allez)\s+(?:gagner|obtenir)\s+(?:\d|un revenu|des revenus)/i, message: "promesse de revenu ou de gain chiffré : aucune garantie commerciale" },
+  { name: "delai-garanti", pattern: /\b(?:d[eé]lai|r[eé]sultat|premi[eè]re vente|premier client)\s+(?:est\s+)?garanti(?:e|s)?\b/i, message: "délai ou résultat garanti : formuler une limite vérifiable" },
+  { name: "fausse-preuve", pattern: /\b(?:faux|fausse|invent[eé])\s+(?:r[eé]sultat|preuve|t[eé]moignage|avis|chiffre)\b/i, message: "fausse preuve ou résultat inventé : ne jamais présenter une preuve fabriquée" },
 ];
 
 /** Fichiers où un prix ou un compteur « en dur » est la source ou un exemple fictif assumé. */

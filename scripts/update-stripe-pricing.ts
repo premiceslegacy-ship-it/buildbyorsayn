@@ -14,8 +14,12 @@
  */
 import Stripe from "stripe";
 import { CHECKOUT_CONSENT_TEXT } from "../lib/legal/consent";
-import { STRIPE_FULL_CHECKOUT_LINK } from "../lib/pricing";
-
+import { COFFRE_PRICE, FONDATIONS_PRICE, STRIPE_FULL_CHECKOUT_LINK } from "../lib/pricing";
+import {
+  hasRequiredPaymentLinkConsent,
+  verifyConfiguredStripePrices,
+  verifyPaymentLinkPrice,
+} from "./stripePricingCheck";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const CREATE = process.argv.includes("--create");
 const RETIRE = process.argv.includes("--retire-old");
@@ -32,9 +36,28 @@ async function activeLinks(): Promise<Stripe.PaymentLink[]> {
 async function lineItems(linkId: string): Promise<Stripe.PaymentLinkCreateParams.LineItem[]> {
   const items: Stripe.PaymentLinkCreateParams.LineItem[] = [];
   for await (const item of stripe.paymentLinks.listLineItems(linkId, { limit: 100 })) {
-    items.push({ price: item.price!.id, quantity: item.quantity ?? 1 });
+    if (!item.price?.id) throw new Error(`Payment Link ${linkId} has a line without a Price ID.`);
+    items.push({ price: item.price.id, quantity: item.quantity ?? 1 });
   }
   if (!items.length) throw new Error(`Payment Link ${linkId} has no line items.`);
+  return items;
+}
+
+async function validateOfferLink(
+  link: Stripe.PaymentLink,
+  expectedPriceId: string | undefined,
+  expectedAmount: number,
+  label: string,
+): Promise<Stripe.PaymentLinkCreateParams.LineItem[]> {
+  if (!expectedPriceId?.trim()) throw new Error(`${label}: configured Price ID is required.`);
+  const items = await lineItems(link.id);
+  if (items.length !== 1) throw new Error(`${label}: Payment Link ${link.id} must contain exactly one line item.`);
+  const item = items[0];
+  if (item.quantity !== 1) throw new Error(`${label}: Payment Link ${link.id} must use quantity 1.`);
+  if (item.price !== expectedPriceId.trim()) {
+    throw new Error(`${label}: Payment Link ${link.id} must use Price ${expectedPriceId.trim()}.`);
+  }
+  await verifyPaymentLinkPrice(stripe, item.price, expectedAmount, label);
   return items;
 }
 
@@ -45,27 +68,28 @@ async function sameLineItems(a: string, b: string): Promise<boolean> {
   return key(await lineItems(a)) === key(await lineItems(b));
 }
 
-const isCompliant = (link: Stripe.PaymentLink) => link.consent_collection?.terms_of_service === "required";
+const isCompliant = (link: Stripe.PaymentLink) => hasRequiredPaymentLinkConsent(link);
 
 async function main() {
   const beginnerUrl = process.env.STRIPE_BEGINNER_CHECKOUT_LINK;
   if (!beginnerUrl) throw new Error("STRIPE_BEGINNER_CHECKOUT_LINK is required.");
+  await verifyConfiguredStripePrices(stripe);
   const links = await activeLinks();
   const configured = [
-    { name: "Fondations", url: beginnerUrl, target: "STRIPE_BEGINNER_CHECKOUT_LINK (Vercel)" },
-    { name: "LE COFFRE", url: STRIPE_FULL_CHECKOUT_LINK, target: "STRIPE_FULL_CHECKOUT_LINK (lib/pricing.ts)" },
+    { name: "Fondations", url: beginnerUrl, target: "STRIPE_BEGINNER_CHECKOUT_LINK (Vercel)", priceId: process.env.STRIPE_BEGINNER_PRICE_ID, amount: FONDATIONS_PRICE * 100 },
+    { name: "LE COFFRE", url: STRIPE_FULL_CHECKOUT_LINK, target: "STRIPE_FULL_CHECKOUT_LINK (lib/pricing.ts)", priceId: process.env.STRIPE_FULL_PRICE_ID, amount: COFFRE_PRICE * 100 },
   ];
 
   for (const entry of configured) {
     const link = links.find((candidate) => candidate.url === entry.url);
     if (!link) {
-      console.log(`${entry.name}: aucun lien actif ne correspond à l'URL configurée.`);
-      continue;
+      throw new Error(`${entry.name}: configured Payment Link is absent or inactive.`);
     }
+    const existingItems = await validateOfferLink(link, entry.priceId, entry.amount, entry.name);
     console.log(`${entry.name}: ${link.id} conditions=${isCompliant(link) ? "oui" : "non"}`);
     if (isCompliant(link) || !CREATE) continue;
     const created = await stripe.paymentLinks.create({
-      line_items: await lineItems(link.id),
+      line_items: existingItems,
       after_completion: link.after_completion,
       consent_collection: { terms_of_service: "required" },
       custom_text: { terms_of_service_acceptance: { message: CHECKOUT_CONSENT_TEXT } },

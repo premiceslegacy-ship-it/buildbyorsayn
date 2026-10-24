@@ -13,11 +13,10 @@ import { Faq } from "@/components/da/Faq";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { getCheckoutLinks } from "@/lib/checkoutLinks";
-import { MEMBERS_COUNT } from "@/lib/siteFacts";
 import { getSiteOrigin } from "@/lib/siteOrigin";
 
 const PAGE_TITLE = "Ton business avec l'IA, sans prise de tête | BUILD by Orsayn";
-const PAGE_DESCRIPTION = "Trouve quoi vendre, construis-le avec les skills d'une agence, puis vends-le. Sans être ingénieur.";
+const PAGE_DESCRIPTION = "Choisis une piste, construis le dossier et le site qui la présentent avec les skills d'une agence. Sans être ingénieur.";
 const SITE_URL = getSiteOrigin();
 
 // Une `openGraph` définie ici remplace celle du layout en entier : on remet donc le site, l'image et la langue.
@@ -45,13 +44,13 @@ export const metadata: Metadata = {
 const FACES = ["femme", "homme", "mamie", "souriant"] as const;
 
 const BEFORE = [
-  "Tu testes des outils d'IA sans savoir quoi en vendre.",
-  "Tu vois d'autres en vivre, sans savoir par où commencer.",
+  "Tu testes des outils d'IA sans savoir quoi en faire.",
+  "Tu vois des projets bien présentés, sans savoir par où commencer.",
   "Tu repars de zéro à chaque projet.",
 ];
 const AFTER = [
-  "Tu sais quoi vendre, à qui et à quel prix.",
-  "Tu construis avec les skills d'une agence.",
+  "Tu cadres une offre et le dossier qui l'explique.",
+  "Tu construis le site qui la présente avec les skills d'une agence.",
   "Tu as un projet réel à montrer et une méthode pour le refaire.",
 ];
 
@@ -85,14 +84,14 @@ export default async function HomePage() {
               Ton business avec l&apos;IA, <span className="mot">sans prise de tête.</span>
             </h1>
             <p className="t-lede t-center">
-              Trouve quoi vendre, <span className="whitespace-nowrap">construis-le</span> avec les skills d&apos;une agence, puis <span className="whitespace-nowrap">vends-le</span>. Sans&nbsp;être&nbsp;ingénieur.
+              Choisis une piste, <span className="whitespace-nowrap">construis le dossier</span> et le site qui la présentent avec les skills d&apos;une agence. Sans&nbsp;être&nbsp;ingénieur.
             </p>
             <div className="hero__act">
               <Link className="btn btn--p" href={start.href}>{start.label}</Link>
               <a className="btn btn--g" href="#prix">Voir les prix</a>
             </div>
             <p className="preuve">
-              + de <b>{MEMBERS_COUNT}</b>
+              <b>Une communauté de builders</b>
               <span className="visages" aria-hidden="true">
                 {FACES.map((face) => (
                   <span className="visage" key={face}>
@@ -100,7 +99,6 @@ export default async function HomePage() {
                   </span>
                 ))}
               </span>
-              builders
             </p>
           </div>
 
@@ -110,8 +108,8 @@ export default async function HomePage() {
         <section className="sec" id="pourquoi" aria-labelledby="pourquoi-titre">
           <div className="wrap">
             <div className="sec__tete">
-              <h2 className="t-1" id="pourquoi-titre">Tu utilises l&apos;IA. Elle ne te rapporte pas encore.</h2>
-              <p className="t-lede">Il manque le business autour.</p>
+              <h2 className="t-1" id="pourquoi-titre">Tu utilises l&apos;IA. Il te manque encore un projet concret.</h2>
+              <p className="t-lede">Donne-lui un cadre pour passer de l&apos;idée au livrable.</p>
             </div>
             <div className="cmp">
               <article className="cmp__col">

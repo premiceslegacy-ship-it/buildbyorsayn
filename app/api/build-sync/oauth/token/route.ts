@@ -9,6 +9,7 @@ import {
   parseBuildSyncTokenRequest,
   type BuildSyncTokenRequest,
 } from "@/lib/buildSync/oauth";
+import { hasMcpConnectorAllowlist, isMcpConnectorAccountAllowed, isMcpConnectorLaunched } from "@/lib/mcp/launch";
 import { readBoundedBody } from "@/lib/mcp/http";
 import {
   ACCESS_TOKEN_TTL_SECONDS,
@@ -52,7 +53,7 @@ async function exchangeAuthorizationCode(
   const codeHash = hashToken(params.code);
   const { data: candidate, error: candidateError } = await admin
     .from("build_sync_authorization_codes")
-    .select("code_challenge")
+    .select("user_id, code_challenge")
     .eq("code_hash", codeHash)
     .eq("client_id", BUILD_SYNC_CLIENT_ID)
     .eq("redirect_uri", params.redirect_uri)
@@ -66,6 +67,9 @@ async function exchangeAuthorizationCode(
   }
   if (!candidate || !verifyCodeChallenge(params.code_verifier, candidate.code_challenge)) {
     return oauthError("invalid_grant", "The authorization code is invalid or expired.");
+  }
+  if (!isMcpConnectorAccountAllowed(candidate.user_id)) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
   }
 
   const accessToken = generateOpaqueToken();
@@ -100,9 +104,22 @@ async function exchangeAuthorizationCode(
 async function rotateRefreshToken(
   params: Extract<BuildSyncTokenRequest, { grant_type: "refresh_token" }>
 ) {
+  const admin = createAdminSupabase();
+  const { data: owner, error: ownerError } = await admin
+    .from("build_sync_refresh_tokens")
+    .select("user_id")
+    .eq("token_hash", hashToken(params.refresh_token))
+    .eq("client_id", BUILD_SYNC_CLIENT_ID)
+    .eq("resource", params.resource)
+    .is("revoked_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .maybeSingle();
+  if (ownerError) return oauthError("server_error", "Could not rotate refresh token.", 500);
+  if (!owner || !isMcpConnectorAccountAllowed(owner.user_id)) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
   const accessToken = generateOpaqueToken();
   const refreshToken = generateOpaqueToken();
-  const admin = createAdminSupabase();
   const { data, error } = (await admin
     .rpc("rotate_build_sync_refresh_token", {
       p_refresh_token_hash: hashToken(params.refresh_token),
@@ -133,6 +150,9 @@ async function rotateRefreshToken(
 }
 
 export async function POST(request: Request) {
+  if (!isMcpConnectorLaunched() && !hasMcpConnectorAllowlist()) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
   if (request.headers.has("authorization")) {
     return oauthError("invalid_client", "BUILD Sync uses a public PKCE client.", 401);
   }

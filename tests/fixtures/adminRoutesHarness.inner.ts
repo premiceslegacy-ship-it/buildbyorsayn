@@ -8,9 +8,11 @@ import test, { mock } from "node:test";
 type Call = { kind: string; payload?: unknown };
 const calls: Call[] = [];
 const muxCalls: Call[] = [];
+const processedMuxEvents = new Set<string>();
+let muxVideoStatus = "waiting";
+let muxProcessError: { message: string } | null = null;
 let currentUser: { id: string; app_metadata: Record<string, unknown> } | null = null;
 let videoRow: Record<string, unknown> | null = null;
-
 const file = (path: string) => pathToFileURL(resolve(path)).href;
 
 mock.module("next/cache", { namedExports: { revalidatePath: (path: string) => { calls.push({ kind: "revalidate", payload: path }); } } });
@@ -26,6 +28,7 @@ function table(name: string) {
     limit() { return Promise.resolve({ data: [], error: null }); },
     insert(values: unknown) { calls.push({ kind: `insert:${name}`, payload: values }); return Promise.resolve({ error: null }); },
     update(values: unknown) { state.op = "update"; state.values = values; return chain; },
+    delete() { state.op = "delete"; return chain; },
     eq(column: string, value: unknown) { state.filters.push(`${column}=${String(value)}`); return chain; },
     is(column: string) { state.filters.push(`${column} is null`); return chain; },
     maybeSingle() {
@@ -48,6 +51,21 @@ mock.module(file("lib/supabase/admin.ts"), {
       from: table,
       rpc: async (name: string, args: unknown) => {
         calls.push({ kind: `rpc:${name}`, payload: args });
+        if (name === "process_mux_asset_webhook") {
+          if (muxProcessError) return { data: null, error: muxProcessError };
+          const payload = args && typeof args === "object" ? args : {};
+          const eventId = "p_event_id" in payload && typeof payload.p_event_id === "string" ? payload.p_event_id : "";
+          const eventType = "p_event_type" in payload && typeof payload.p_event_type === "string" ? payload.p_event_type : "";
+          const update = "p_update" in payload && payload.p_update && typeof payload.p_update === "object" ? payload.p_update : {};
+          const nextStatus = "status" in update && typeof update.status === "string" ? update.status : "";
+          if (processedMuxEvents.has(eventId)) return { data: "duplicate", error: null };
+          processedMuxEvents.add(eventId);
+          if (eventType === "video.asset.created" && (muxVideoStatus === "ready" || muxVideoStatus === "errored")) {
+            return { data: "noop", error: null };
+          }
+          if (nextStatus) muxVideoStatus = nextStatus;
+          return { data: "processed", error: null };
+        }
         if (name === "record_admin_action") return { data: "00000000-0000-4000-8000-000000000000", error: null };
         if (name === "publish_video_lesson") return { data: [{ section_id: "b2-s1", previous_mux_asset_id: "old-asset" }], error: null };
         if (name === "set_admin_user_tier") return { data: true, error: null };
@@ -95,7 +113,7 @@ const create = (sectionId: string) => new NextRequest("http://localhost/api/admi
     file: { name: "a.mp4", size: 1000, type: "video/mp4" },
   }),
 });
-const reset = () => { calls.length = 0; muxCalls.length = 0; videoRow = null; };
+const reset = () => { calls.length = 0; muxCalls.length = 0; processedMuxEvents.clear(); muxVideoStatus = "waiting"; muxProcessError = null; videoRow = null; };
 
 test("un non admin (palier COFFRE, rôle absent ou autre) est refusé partout avant Mux et la base", async () => {
   for (const user of [null, { id: "u1", app_metadata: {} }, { id: "u1", app_metadata: { role: "trainer" } }, { id: "u1", app_metadata: { tier: "full" } }]) {
@@ -161,11 +179,55 @@ test("le webhook Mux refuse sans signature valide et met à jour avec une signat
   const t = Math.floor(Date.now() / 1000);
   const signature = createHmac("sha256", "whsec-test").update(`${t}.${body}`).digest("hex");
   assert.equal((await post({ "mux-signature": `t=${t},v1=${signature}` })).status, 200);
-  const update = calls.find((c) => c.kind === "update:video_lessons")?.payload as { values: Record<string, unknown>; filters: string[] };
-  assert.equal(update.values.status, "ready");
-  assert.equal(update.values.playback_id, "pb-signed");
-  assert.equal(update.values.duration_seconds, 120);
-  assert.ok(update.filters.includes("published_at is null"));
+  const transaction = calls.find((c) => c.kind === "rpc:process_mux_asset_webhook")?.payload as {
+    p_update: Record<string, unknown>;
+    p_event_type: string;
+  };
+  assert.equal(transaction.p_event_type, "video.asset.ready");
+  assert.equal(transaction.p_update.status, "ready");
+  assert.equal(transaction.p_update.playback_id, "pb-signed");
+  assert.equal(transaction.p_update.duration_seconds, 120);
+});
+
+test("le traitement Mux est monotone, idempotent et reprend après une erreur transactionnelle", async () => {
+  const postEvent = async (eventId: string, type: "video.asset.created" | "video.asset.ready") => {
+    const body = JSON.stringify({
+      type,
+      id: eventId,
+      data: {
+        id: "asset-1",
+        upload_id: "upload-1",
+        passthrough: `build-video:${VIDEO_ID}`,
+        duration: 120,
+        playback_ids: [{ id: "pb-signed", policy: "signed" }],
+      },
+    });
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = createHmac("sha256", "whsec-test").update(`${timestamp}.${body}`).digest("hex");
+    return webhookRoute.POST(new NextRequest("http://localhost/api/mux/webhook", {
+      method: "POST",
+      headers: { "content-type": "application/json", "mux-signature": `t=${timestamp},v1=${signature}` },
+      body,
+    }));
+  };
+
+  reset();
+  assert.equal((await postEvent("evt-ready", "video.asset.ready")).status, 200);
+  assert.equal((await postEvent("evt-created-after-ready", "video.asset.created")).status, 200);
+  assert.equal(muxVideoStatus, "ready");
+  assert.equal((await postEvent("evt-ready", "video.asset.ready")).status, 200);
+
+  reset();
+  muxProcessError = { message: "video write failed" };
+  assert.equal((await postEvent("evt-write-error", "video.asset.ready")).status, 503);
+  muxProcessError = null;
+  assert.equal((await postEvent("evt-write-error", "video.asset.ready")).status, 200);
+
+  reset();
+  muxProcessError = { message: "audit write failed" };
+  assert.equal((await postEvent("evt-audit-error", "video.asset.ready")).status, 503);
+  muxProcessError = null;
+  assert.equal((await postEvent("evt-audit-error", "video.asset.ready")).status, 200);
 });
 
 test("le changement de palier refuse un non admin et passe par la RPC journalisée pour un admin", async () => {

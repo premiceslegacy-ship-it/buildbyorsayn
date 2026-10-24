@@ -82,7 +82,11 @@ function SocialAd({ copy, q }: { copy: AdCopy; q: Quality }) {
 function EmailAd({ copy, q }: { copy: AdCopy; q: Quality }) {
   const pins = copy.pins ?? {};
   return <article className={styles.email} data-quality={q}>
-    <header><Row n={pins.subject} q={q}><strong>{copy.subject}</strong></Row><span>{copy.preview}</span></header>
+    <header>
+      <small className={styles.sponsored}>Sponsorisé</small>
+      <Row n={pins.subject} q={q}><strong>{copy.subject}</strong></Row>
+      <span>{copy.preview}</span>
+    </header>
     <Row n={pins.text} q={q}><p className={styles.primary}>{copy.text}</p></Row>
     {copy.action ? <span className={styles.button}><Chip n={pins.action} q={q} />{copy.action}<ArrowRight aria-hidden="true" /></span> : null}
   </article>;

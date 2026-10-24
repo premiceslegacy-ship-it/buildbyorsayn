@@ -1,4 +1,9 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import {
+  hasMcpConnectorAllowlist,
+  isMcpConnectorAccountAllowed,
+  isMcpConnectorLaunched,
+} from "@/lib/mcp/launch";
 import { resolveMcpAuth, wwwAuthenticateHeader } from "@/lib/mcp/auth";
 import { createBuildMcpServer } from "@/lib/mcp/server";
 import { createMcpSupabaseAdmin } from "@/lib/mcp/supabaseAdmin";
@@ -46,11 +51,13 @@ function originAllowed(request: Request): boolean {
 }
 
 export async function OPTIONS(request: Request) {
+  if (!isMcpConnectorLaunched()) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
   if (!originAllowed(request)) return jsonError(request, "origin_not_allowed", 403);
   return new Response(null, { status: 204, headers: responseHeaders(request) });
 }
 
 export async function GET(request: Request) {
+  if (!isMcpConnectorLaunched()) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
   return new Response(null, {
     status: 405,
     headers: { Allow: "POST, OPTIONS", ...responseHeaders(request) },
@@ -58,6 +65,7 @@ export async function GET(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  if (!isMcpConnectorLaunched()) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
   return new Response(null, {
     status: 405,
     headers: { Allow: "POST, OPTIONS", ...responseHeaders(request) },
@@ -79,6 +87,9 @@ async function handleMcpPost(request: Request, deadlineAt: number) {
     return response;
   };
 
+  if (!isMcpConnectorLaunched() && !hasMcpConnectorAllowlist()) {
+    return finish(new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } }), "denied");
+  }
   if (!originAllowed(request)) {
     return finish(jsonError(request, "origin_not_allowed", 403), "denied");
   }
@@ -134,6 +145,12 @@ async function handleMcpPost(request: Request, deadlineAt: number) {
     const response = jsonError(request, "unauthorized", 401);
     response.headers.set("WWW-Authenticate", wwwAuthenticateHeader());
     return finish(response, "denied");
+  }
+  if (!isMcpConnectorAccountAllowed(auth.userId)) {
+    return finish(
+      new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } }),
+      "denied",
+    );
   }
 
   const boundedRequest = await readBoundedMcpRequest(request);

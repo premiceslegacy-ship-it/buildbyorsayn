@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import { saveMemberWorkspaceContext } from "@/app/actions/accompaniment";
 import { createClient } from "@/lib/supabase/client";
 import type {
@@ -99,10 +99,7 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
     siteUrl: workspaceContext?.siteUrl ?? "",
     track: assignment.track,
   });
-  const [followUp, setFollowUp] = useState<SiteWebFollowUpValues>({
-    ...DEFAULT_FOLLOW_UP,
-    observations: workspaceContext?.sharedNotes ?? "",
-  });
+  const [followUp, setFollowUp] = useState<SiteWebFollowUpValues>(DEFAULT_FOLLOW_UP);
   const [userId, setUserId] = useState<string | null>(assignment.userId);
   const [pendingThemeIds, setPendingThemeIds] = useState<string[]>([]);
   const [syncMessage, setSyncMessage] = useState("");
@@ -111,15 +108,14 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
   const [contextMessage, setContextMessage] = useState("");
 
   useEffect(() => {
-    const savedProfile = readLocal<Partial<WorkspaceProfile>>(storageKeys.profile, {});
-    const savedNotes = readLocal<Partial<SiteWebFollowUpValues>>(
-      storageKeys.followUp,
-      {}
-    );
+    let cancelled = false;
     const localThemeIds = readLocal<string[]>(storageKeys.progress, []);
-
-    setProfile((current) => ({
-      ...current,
+    const savedProfile = readLocal<Partial<WorkspaceProfile>>(storageKeys.profile, {});
+    const savedNotes = readLocal<Partial<SiteWebFollowUpValues>>(storageKeys.followUp, {});
+    const nextProfile: WorkspaceProfile = {
+      company: workspaceContext?.company ?? "",
+      project: workspaceContext?.project ?? "",
+      siteUrl: workspaceContext?.siteUrl ?? "",
       ...savedProfile,
       ...(workspaceContext
         ? {
@@ -130,17 +126,27 @@ export function SiteWebWorkspace({ memberName, assignment, workspaceContext }: P
         : {}),
       name: memberName ?? "",
       track: assignment.track,
-    }));
-    setFollowUp((current) => ({
-      ...current,
+    };
+    const nextFollowUp: SiteWebFollowUpValues = {
+      ...DEFAULT_FOLLOW_UP,
       ...savedNotes,
       ...(workspaceContext ? { observations: workspaceContext.sharedNotes } : {}),
-    }));
-    setUnderstoodThemeIds([...new Set(localThemeIds)].filter((id) => validThemeIds.includes(id)));
+    };
+    const nextUnderstoodThemeIds = [...new Set(localThemeIds)].filter((id) => validThemeIds.includes(id));
+    const nextActiveThemeId = getThemeFromHash(validThemeIds) ?? initialThemeId;
 
-    const hashThemeId = getThemeFromHash(validThemeIds);
-    if (hashThemeId) setActiveThemeId(hashThemeId);
-  }, [assignment.track, memberName, storageKeys, validThemeIds, workspaceContext]);
+    startTransition(() => {
+      if (cancelled) return;
+      setActiveThemeId(nextActiveThemeId);
+      setUnderstoodThemeIds(nextUnderstoodThemeIds);
+      setProfile(nextProfile);
+      setFollowUp(nextFollowUp);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [assignment.track, initialThemeId, memberName, storageKeys, validThemeIds, workspaceContext]);
 
   useEffect(() => {
     let cancelled = false;

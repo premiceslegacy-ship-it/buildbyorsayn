@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-
+import { isMcpBetaAssetVisible } from "@/lib/mcp/launch";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -12,9 +12,7 @@ const CONNECTOR_ASSET_PATH = path.join(
 );
 
 export async function GET() {
-  const betaVisible = process.env.NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE === "true";
-  const launched = process.env.NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED === "true";
-  if (!betaVisible && !launched) {
+  if (!isMcpBetaAssetVisible()) {
     return new Response(null, {
       status: 404,
       headers: { "Cache-Control": "no-store" },

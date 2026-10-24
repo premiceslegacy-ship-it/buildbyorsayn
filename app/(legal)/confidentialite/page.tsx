@@ -75,7 +75,7 @@ export default function ConfidentialitePage() {
 
           <Traitement
             titre="Le suivi d'activité des membres"
-            donnees="Quand tu es connecté : ton adresse e-mail, la page que tu consultes et son titre, le type d'événement (arrivée sur une page, onglet affiché ou masqué, signal de présence envoyé toutes les 30 secondes tant que l'onglet est ouvert), la date et l'heure, et ton navigateur."
+            donnees="Quand tu es connecté, on enregistre ton adresse e-mail, la page que tu consultes et son titre, la date et l'heure, et ton navigateur. On enregistre aussi le type d'événement (arrivée sur une page, onglet affiché ou masqué) et un signal de présence envoyé toutes les 30 secondes tant que l'onglet est ouvert."
             pourquoi="Voir si BUILD fonctionne et comment il est utilisé, repérer les membres qui n'ont pas ouvert BUILD depuis longtemps, aider les membres que nous suivons en accompagnement."
             base="Notre intérêt légitime à faire fonctionner, améliorer et accompagner BUILD (article 6.1.f du RGPD). Tu peux t'y opposer en nous écrivant. Ce suivi ne dépose aucun cookie et ne sert à aucune publicité."
             duree="Tant que ton compte existe. Ces données sont supprimées avec lui."

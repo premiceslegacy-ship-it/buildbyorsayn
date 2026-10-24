@@ -8,7 +8,6 @@ import {
     emailsMatch,
     isUuid,
     normalizeCustomerEmail,
-    referenceMatchesProfile,
     type PaidTier,
 } from "@/lib/stripeEntitlements";
 import {
@@ -249,55 +248,60 @@ async function refundRejectedCheckout(
     );
 }
 
-async function persistProfileTier(
+
+async function recordStripePurchase(
     supabase: SupabaseClient,
-    userId: string,
-    incomingTier: PaidTier,
-    customerEmail: string | null,
+    input: {
+        checkoutSessionId: string;
+        paymentIntentId: string | null;
+        userId: string | null;
+        tier: PaidTier;
+        status: "pending" | "active";
+        amountTotal: number | null;
+        currency: string | null;
+        customerEmail: string | null;
+    },
 ): Promise<string | null> {
-    const payload = {
-        id: userId,
-        tier: incomingTier,
-        ...(customerEmail ? { email: customerEmail } : {}),
-    };
+    const { data, error } = await supabase.rpc("record_stripe_purchase", {
+        p_checkout_session_id: input.checkoutSessionId,
+        p_payment_intent_id: input.paymentIntentId,
+        p_user_id: input.userId,
+        p_tier: input.tier,
+        p_status: input.status,
+        p_amount_total: input.amountTotal,
+        p_currency: input.currency,
+        p_customer_email: input.customerEmail,
+    });
+    if (error) return error.message;
+    return typeof data === "string" ? null : "Invalid Stripe purchase ledger response";
+}
 
-    let updateQuery = supabase
-        .from("profiles")
-        .update(payload)
-        .eq("id", userId)
-        // PostgREST's `neq` does not match NULL. Keep an unassigned profile
-        // eligible while preserving admin access and paid-tier monotonicity.
-        .or("tier.is.null,tier.neq.admin");
+async function recalculateStripeEntitlement(supabase: SupabaseClient, userId: string): Promise<string | null> {
+    const { data, error } = await supabase.rpc("recalculate_stripe_entitlement", { p_user_id: userId });
+    if (error) return error.message;
+    return typeof data === "string" || data === null ? null : "Invalid Stripe entitlement response";
+}
 
-    if (incomingTier === "beginner") {
-        updateQuery = updateQuery.or("tier.is.null,tier.neq.full");
-    }
+function stripePaymentIntent(value: unknown): string | null {
+    if (typeof value === "string") return value;
+    if (value && typeof value === "object" && "id" in value && typeof value.id === "string") return value.id;
+    return null;
+}
 
-    const { data: updatedProfile, error: updateError } = await updateQuery
-        .select("id")
-        .maybeSingle();
-
-    if (updateError) return updateError.message;
-    if (updatedProfile) return null;
-
-    const { error: insertError } = await supabase.from("profiles").insert(payload);
-    if (!insertError) return null;
-    if (insertError.code !== "23505") return insertError.message;
-
-    // A concurrent webhook inserted the row. Retry the same monotonic update:
-    // a beginner event can never overwrite a full or admin profile.
-    let retryQuery = supabase
-        .from("profiles")
-        .update(payload)
-        .eq("id", userId)
-        .or("tier.is.null,tier.neq.admin");
-
-    if (incomingTier === "beginner") {
-        retryQuery = retryQuery.or("tier.is.null,tier.neq.full");
-    }
-
-    const { error: retryError } = await retryQuery.select("id").maybeSingle();
-    return retryError?.message ?? null;
+async function revokeStripePurchase(
+    supabase: SupabaseClient,
+    paymentIntent: string,
+    status: "refunded" | "disputed" | "revoked",
+    reason: string,
+): Promise<string | null> {
+    const { data, error } = await supabase.rpc("revoke_stripe_purchase", {
+        p_payment_intent_id: paymentIntent,
+        p_status: status,
+        p_reason: reason,
+    });
+    if (error) return error.message;
+    if (data === "not_found") return "Stripe purchase ledger entry not found";
+    return null;
 }
 
 export async function POST(req: NextRequest) {
@@ -324,6 +328,53 @@ export async function POST(req: NextRequest) {
     } catch {
         console.error("Webhook verification failed");
         return NextResponse.json({ error: "Verification failed" }, { status: 400 });
+    }
+
+    if (
+        event.type === "charge.refunded"
+        || event.type === "charge.dispute.created"
+        || event.type === "charge.dispute.closed"
+    ) {
+        const chargeOrDispute = event.data.object as Stripe.Charge | Stripe.Dispute;
+        const paymentIntent = stripePaymentIntent(chargeOrDispute.payment_intent);
+        if (!paymentIntent) return NextResponse.json({ received: true }, { status: 200 });
+
+        if (event.type === "charge.refunded") {
+            const charge = chargeOrDispute as Stripe.Charge;
+            const fullyRefunded = charge.refunded
+                || (typeof charge.amount === "number"
+                    && typeof charge.amount_refunded === "number"
+                    && charge.amount > 0
+                    && charge.amount_refunded >= charge.amount);
+            if (!fullyRefunded) return NextResponse.json({ received: true }, { status: 200 });
+        }
+
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        );
+        let ledgerError: string | null;
+        if (event.type === "charge.dispute.closed") {
+            const dispute = chargeOrDispute as Stripe.Dispute;
+            const { data, error } = await supabase.rpc("resolve_stripe_dispute", {
+                p_payment_intent_id: paymentIntent,
+                p_lost: dispute.status === "lost",
+            });
+            ledgerError = error?.message ?? (data === "not_found" ? "Stripe purchase ledger entry not found" : null);
+        } else {
+            ledgerError = await revokeStripePurchase(
+                supabase,
+                paymentIntent,
+                event.type === "charge.refunded" ? "refunded" : "disputed",
+                event.type,
+            );
+        }
+        if (ledgerError) {
+            console.error("[Webhook] Stripe entitlement revocation failed");
+            return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+        }
+        revalidatePath("/", "layout");
+        return NextResponse.json({ received: true }, { status: 200 });
     }
 
     if (
@@ -403,6 +454,7 @@ export async function POST(req: NextRequest) {
                         const { data, error } = await supabase.rpc("apply_stripe_upgrade", {
                             p_user_id: userId,
                             p_checkout_session_id: checkoutSessionId,
+                            p_payment_intent_id: stripePaymentIntent(session.payment_intent),
                         });
                         if (error) throw new Error("Atomic upgrade RPC failed");
                         if (
@@ -465,9 +517,31 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ received: true }, { status: 200 });
         }
 
-        // Pour les achats initiaux, la référence reste un indice lié à l'e-mail du profil.
+        const { data: existingPurchase, error: existingPurchaseError } = await supabase
+            .from("stripe_purchase_ledger")
+            .select("status, user_id")
+            .eq("checkout_session_id", session.id)
+            .maybeSingle();
+        if (existingPurchaseError) {
+            console.error("[Webhook] Stripe purchase ledger lookup failed");
+            return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+        }
+        if (existingPurchase) {
+            if (existingPurchase.user_id && ["active", "pending"].includes(existingPurchase.status)) {
+                const refreshError = await recalculateStripeEntitlement(supabase, existingPurchase.user_id);
+                if (refreshError) {
+                    console.error("[Webhook] Stripe entitlement retry failed");
+                    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                }
+                revalidatePath("/", "layout");
+            }
+            return NextResponse.json({ received: true }, { status: 200 });
+        }
+
+        // Une référence venant d'un Payment Link ne prouve pas que la personne qui paie contrôle
+        // le compte. Elle n'est acceptée que si l'adresse du compte Auth est déjà vérifiée.
         if (referenceId) {
-            if (!isUuid(referenceId) || !customerEmail) {
+            if (!isUuid(referenceId)) {
                 console.warn("[Webhook] Ignoring an unbound client reference");
             } else {
                 const { data: referencedProfile, error: referenceError } = await supabase
@@ -479,11 +553,17 @@ export async function POST(req: NextRequest) {
                 if (referenceError) {
                     console.error("[Webhook] Reference profile lookup failed");
                     return NextResponse.json({ error: "Processing failed" }, { status: 500 });
-                } else if (
-                    referencedProfile &&
-                    referenceMatchesProfile(referenceId, customerEmail, referencedProfile.email)
-                ) {
-                    userId = referencedProfile.id;
+                } else if (referencedProfile && emailsMatch(referencedProfile.email, customerEmail)) {
+                    const { data: authResult, error: authError } = await supabase.auth.admin.getUserById(referencedProfile.id);
+                    if (authError) {
+                        console.error("[Webhook] Referenced Auth account lookup failed");
+                        return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                    }
+                    if (authResult.user?.email_confirmed_at && emailsMatch(authResult.user.email, customerEmail)) {
+                        userId = referencedProfile.id;
+                    } else {
+                        console.warn("[Webhook] Referenced account email is not verified; purchase remains pending");
+                    }
                 } else {
                     console.warn("[Webhook] Client reference did not match customer email");
                 }
@@ -500,9 +580,11 @@ export async function POST(req: NextRequest) {
             if (profileLookupError) {
                 console.error("[Webhook] Customer profile lookup failed");
                 return NextResponse.json({ error: "Processing failed" }, { status: 500 });
-            } else if (profile && emailsMatch(profile.email, customerEmail)) {
-                userId = profile.id;
-            } else if (!profile) {
+            } else if (profile) {
+                // A matching profile alone is not proof of address control. The authenticated
+                // account can claim this pending ledger row after Supabase verifies its email.
+                console.warn("[Webhook] Existing account found by email; purchase remains pending");
+            } else {
                 let appUrl: string;
                 try {
                     appUrl = requireSiteOrigin();
@@ -558,25 +640,31 @@ export async function POST(req: NextRequest) {
                 }
             }
         }
+        const ledgerError = await recordStripePurchase(supabase, {
+            checkoutSessionId: session.id,
+            paymentIntentId: stripePaymentIntent(session.payment_intent),
+            userId,
+            tier,
+            status: userId ? "active" : "pending",
+            amountTotal: session.amount_total ?? null,
+            currency: session.currency ?? null,
+            customerEmail,
+        });
+        if (ledgerError) {
+            console.error("[Webhook] Stripe purchase ledger update failed");
+            return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+        }
 
-        if (userId) {
-            const persistenceError = await persistProfileTier(supabase, userId, tier, customerEmail);
-            if (persistenceError) {
-                console.error("[Webhook] Profile entitlement update failed");
-                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
-            }
-
-            revalidatePath("/", "layout");
-            if (customerEmail) {
-                const offerName = tier === "beginner" ? FONDATIONS_LABEL : COFFRE_LABEL;
-                await sendPurchaseConfirmationEmail(
-                    customerEmail,
-                    offerName,
-                    session.amount_total ?? null,
-                    event.created,
-                    session.id,
-                );
-            }
+        if (userId) revalidatePath("/", "layout");
+        if (customerEmail) {
+            const offerName = tier === "beginner" ? FONDATIONS_LABEL : COFFRE_LABEL;
+            await sendPurchaseConfirmationEmail(
+                customerEmail,
+                offerName,
+                session.amount_total ?? null,
+                event.created,
+                session.id,
+            );
         }
     }
 

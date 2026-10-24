@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
+import { useReducedMotion } from "motion/react";
 import { DaIcon } from "@/components/da/DaIcon";
 import type { ProgrammeSection } from "@/lib/programme";
 import { playAppSound } from "@/lib/ui/sound";
@@ -26,8 +27,9 @@ function ProgrammeCardView({ card }: { card: ProgrammeSection["cards"][number] }
 
 function Row({ section }: { section: ProgrammeSection }) {
   const list = useRef<HTMLUListElement>(null);
+  const reduceMotion = useReducedMotion();
   const move = (direction: number) => {
-    list.current?.scrollBy({ left: direction * list.current.clientWidth * 0.8, behavior: "smooth" });
+    list.current?.scrollBy({ left: direction * list.current.clientWidth * 0.8, behavior: reduceMotion ? "auto" : "smooth" });
     void playAppSound("click");
   };
   return (

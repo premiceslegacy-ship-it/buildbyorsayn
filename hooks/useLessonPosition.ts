@@ -10,28 +10,30 @@ import { createPositionReporter } from "@/lib/lessons/positionReporter";
  */
 export function useLessonPosition(sectionId: string, onCompleted: () => void) {
   const onCompletedRef = useRef(onCompleted);
-  const userIdRef = useRef<string | null>(null);
-  useEffect(() => { onCompletedRef.current = onCompleted; }, [onCompleted]);
-
-  // A new reporter per lesson: throttle, completion and in-flight state never leak across sections.
+  useEffect(() => {
+    onCompletedRef.current = onCompleted;
+  }, [onCompleted]);
+  const notifyCompletion = useMemo(() => () => {
+    onCompletedRef.current();
+  }, []);
   const report = useMemo(() => {
+    // The reporter stores this callback and only invokes it from `report`, never during render.
+    // eslint-disable-next-line react-hooks/refs
     return createPositionReporter({
-      onCompleted: () => onCompletedRef.current(),
+      onCompleted: notifyCompletion,
       save: async ({ positionSeconds, completed }) => {
         const supabase = createClient();
-        if (!userIdRef.current) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) return;
-          userIdRef.current = user.id;
-        }
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
         const { error } = await supabase.from("lesson_progress").upsert(
-          { user_id: userIdRef.current, section_id: sectionId, position_seconds: positionSeconds, completed, updated_at: new Date().toISOString() },
+          { user_id: user.id, section_id: sectionId, position_seconds: positionSeconds, completed, updated_at: new Date().toISOString() },
           { onConflict: "user_id,section_id" }
         );
         if (error) throw new Error(error.message);
       },
     });
-  }, [sectionId]);
+  }, [sectionId, notifyCompletion]);
 
   return { report };
 }
+

@@ -7,7 +7,8 @@ import {
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { buildContentSecurityPolicy, createCspNonce } from "@/lib/csp";
 import { secureSessionCookie } from "@/lib/supabase/cookieSecurity";
-
+import { createAdminSupabase } from "@/lib/supabase/admin";
+import { claimVerifiedStripePurchases } from "@/lib/stripeClaim";
 // Security headers applied to every middleware response
 const SECURITY_HEADERS: Record<string, string> = {
     "X-Frame-Options": "DENY",
@@ -134,6 +135,18 @@ export async function proxy(request: NextRequest) {
             : "/";
         const redirectUrl = new URL(destination, request.url);
         return createRedirectWithCookies(redirectUrl, supabaseResponse, SECURITY_HEADERS);
+    }
+
+    if (user.email_confirmed_at && user.email) {
+        try {
+            const admin = createAdminSupabase({ signal: request.signal });
+            await claimVerifiedStripePurchases(admin, {
+                userId: user.id,
+                email: user.email,
+            });
+        } catch {
+            // Claim remains available through the explicit endpoint and the Auth callback.
+        }
     }
 
     const requiresAccompaniment = pathname.startsWith("/accompagnement/espace");

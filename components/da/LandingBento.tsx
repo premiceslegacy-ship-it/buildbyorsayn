@@ -5,7 +5,7 @@ import { Tile } from "./Tile";
 
 /**
  * Section « Ce que tu reçois » de l'accueil : cinq vignettes qui montrent chacune un petit morceau d'interface.
- * Le moins de texte possible : un titre court, une ligne (masquée sur mobile). Tout est décoratif sauf les titres.
+ * Le moins de texte possible : un titre court et une phrase utile. Tout est décoratif sauf les titres.
  */
 export function LandingBento() {
   return (
@@ -121,14 +121,14 @@ export function LandingBento() {
             <div className="vig__vis">
               <div className="etapes" aria-hidden="true">
                 <figure><Image src="/da/objets/offre.png" alt="" width={256} height={256} /><em><DaIcon name="check" /></em><figcaption>Offre</figcaption></figure>
-                <figure><Image src="/da/objets/vente.png" alt="" width={256} height={256} /><em><DaIcon name="check" /></em><figcaption>Vente</figcaption></figure>
+                <figure><Image src="/da/objets/vente.png" alt="" width={256} height={256} /><em><DaIcon name="check" /></em><figcaption>Présentation</figcaption></figure>
                 <figure><Image src="/da/objets/bloc.png" alt="" width={256} height={256} /><em><DaIcon name="check" /></em><figcaption>Site</figcaption></figure>
                 <figure><Image src="/da/objets/livraison.png" alt="" width={256} height={256} /><figcaption>Livraison</figcaption></figure>
               </div>
             </div>
             <div className="vig__txt">
               <h3 className="t-2">Un projet de A à Z</h3>
-              <p>De l&apos;idée à ta première vente.</p>
+              <p>De l&apos;idée à ton site et son dossier de livraison.</p>
             </div>
           </article>
         </div>

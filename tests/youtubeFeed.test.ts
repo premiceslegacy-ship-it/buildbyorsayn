@@ -37,6 +37,7 @@ test("verifyWebSubSignature accepts only the exact HMAC-SHA1 of the body", () =>
   assert.equal(verifyWebSubSignature(`${body} `, valid, secret), false);
   assert.equal(verifyWebSubSignature(body, null, secret), false);
   assert.equal(verifyWebSubSignature(body, valid, "t".repeat(32)), false);
+  assert.equal(verifyWebSubSignature(body, valid, "short"), false);
   assert.equal(verifyWebSubSignature(body, "sha1=abcd", secret), false);
   assert.equal(verifyWebSubSignature(body, valid.replace("sha1=", "sha256="), secret), false);
   assert.equal(verifyWebSubSignature(body, valid, ""), false);

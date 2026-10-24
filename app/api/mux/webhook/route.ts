@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readBoundedBody } from "@/lib/mcp/http";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { readBoundedBody } from "@/lib/mcp/http";
 import { pickSignedPlaybackId } from "@/lib/mux/lessons";
 import { parseMuxPassthrough } from "@/lib/mux/adminLessons";
 import { createMuxAdminClient } from "@/lib/mux/adminServer";
 import { syncMuxTranscriptForReadyAsset } from "@/lib/mux/transcript.server";
 
 const MAX_MUX_WEBHOOK_BYTES = 256 * 1024;
+async function reserveTrackEvent(admin: SupabaseClient, eventId: string, eventType: string) {
+  return admin.rpc("reserve_mux_webhook_event", { p_event_id: eventId, p_event_type: eventType });
+}
 
+async function completeTrackEvent(admin: SupabaseClient, eventId: string): Promise<boolean> {
+  const { data, error } = await admin.rpc("complete_mux_webhook_event", { p_event_id: eventId });
+  return !error && data === true;
+}
 export async function POST(request: NextRequest) {
   const bounded = await readBoundedBody(request, MAX_MUX_WEBHOOK_BYTES);
   if (bounded.ok === false) {
@@ -33,24 +41,38 @@ export async function POST(request: NextRequest) {
 
   const asset = event.data;
   const admin = createAdminSupabase({ signal: request.signal });
-
   if (event.type === "video.asset.track.ready" || event.type === "video.asset.track.errored") {
     const isGeneratedSubtitle = asset.type === "text"
       && asset.text_type === "subtitles"
       && (asset.passthrough === "build-fr-auto" || asset.text_source === "generated_vod");
     if (!isGeneratedSubtitle || !asset.asset_id) return NextResponse.json({ ok: true });
+    const { data: reservation, error: reservationError } = await reserveTrackEvent(admin, event.id, event.type);
+    if (reservationError || !["new", "retry", "duplicate"].includes(String(reservation))) {
+      return NextResponse.json({ ok: false }, { status: 503 });
+    }
+    if (reservation === "duplicate") return NextResponse.json({ ok: true });
     const { data: video, error: videoError } = await admin.from("video_lessons")
       .select("id,playback_id")
       .eq("mux_asset_id", asset.asset_id)
       .is("published_at", null)
       .maybeSingle();
-    if (videoError) return NextResponse.json({ ok: false }, { status: 503 });
-    if (!video?.playback_id) return NextResponse.json({ ok: true });
+    if (videoError) {
+      return NextResponse.json({ ok: false }, { status: 503 });
+    }
+    if (!video?.playback_id) {
+      if (!await completeTrackEvent(admin, event.id)) return NextResponse.json({ ok: false }, { status: 503 });
+      return NextResponse.json({ ok: true });
+    }
     if (event.type === "video.asset.track.errored") {
-      await admin.from("video_lessons").update({
+      const { error } = await admin.from("video_lessons").update({
         error_code: "mux_transcript_errored",
         updated_at: new Date().toISOString(),
       }).eq("id", video.id).is("published_at", null);
+      if (error) {
+        console.error("mux.webhook.transcript_error_update_failed");
+        return NextResponse.json({ ok: false }, { status: 503 });
+      }
+      if (!await completeTrackEvent(admin, event.id)) return NextResponse.json({ ok: false }, { status: 503 });
       return NextResponse.json({ ok: true });
     }
     try {
@@ -61,17 +83,23 @@ export async function POST(request: NextRequest) {
         signal: request.signal,
       });
     } catch {
-      await admin.from("video_lessons").update({
+      const { error: updateError } = await admin.from("video_lessons").update({
         error_code: "mux_transcript_fetch_failed",
         updated_at: new Date().toISOString(),
       }).eq("id", video.id).is("published_at", null);
+      if (updateError) console.error("mux.webhook.transcript_error_update_failed");
       console.error("mux.webhook.transcript_fetch_failed");
       return NextResponse.json({ ok: false, error: "mux_transcript_fetch_failed" }, { status: 503 });
     }
-    await admin.from("video_lessons").update({
+    const { error } = await admin.from("video_lessons").update({
       error_code: null,
       updated_at: new Date().toISOString(),
     }).eq("id", video.id).is("published_at", null);
+    if (error) {
+      console.error("mux.webhook.transcript_clear_failed");
+      return NextResponse.json({ ok: false }, { status: 503 });
+    }
+    if (!await completeTrackEvent(admin, event.id)) return NextResponse.json({ ok: false }, { status: 503 });
     return NextResponse.json({ ok: true });
   }
 
@@ -89,55 +117,45 @@ export async function POST(request: NextRequest) {
           playback_id: playbackId,
           duration_seconds: durationSeconds,
           error_code: null,
-          updated_at: new Date().toISOString(),
         }
       : {
           status: "errored",
           mux_asset_id: asset.id,
           error_code: playbackId ? "duration_missing" : "signed_playback_missing",
-          updated_at: new Date().toISOString(),
         };
   } else if (event.type === "video.asset.errored") {
     update = {
       status: "errored",
       mux_asset_id: asset.id,
       error_code: "mux_asset_errored",
-      updated_at: new Date().toISOString(),
     };
   } else {
     update = {
       status: "preparing",
       mux_asset_id: asset.id,
-      updated_at: new Date().toISOString(),
     };
   }
 
-  const { data, error } = await admin
-    .from("video_lessons")
-    .update(update)
-    .eq("id", videoId)
-    .eq("mux_upload_id", asset.upload_id)
-    .is("published_at", null)
-    .select("id")
-    .maybeSingle();
-  if (error) {
-    console.error("mux.webhook.video_update_failed");
-    return NextResponse.json({ ok: false }, { status: 503 });
-  }
-  if (!data) return NextResponse.json({ ok: true });
-
-  const { error: auditError } = await admin.from("admin_action_audit").insert({
-    actor_user_id: null,
-    action: event.type === "video.asset.ready" ? "mux.asset_ready" : event.type === "video.asset.errored" ? "mux.asset_errored" : "mux.asset_created",
-    target_type: "video_lesson",
-    target_id: videoId,
-    result: event.type === "video.asset.errored" ? "failed" : "completed",
-    details: { eventId: event.id },
+  const { data: outcome, error } = await admin.rpc("process_mux_asset_webhook", {
+    p_event_id: event.id,
+    p_event_type: event.type,
+    p_video_id: videoId,
+    p_upload_id: asset.upload_id,
+    p_update: update,
+    p_audit_action: event.type === "video.asset.ready"
+      ? "mux.asset_ready"
+      : event.type === "video.asset.errored"
+        ? "mux.asset_errored"
+        : "mux.asset_created",
+    p_audit_result: event.type === "video.asset.errored" ? "failed" : "completed",
   });
-  if (auditError) {
-    console.error("mux.webhook.audit_failed");
+  if (error) {
+    console.error("mux.webhook.transaction_failed");
     return NextResponse.json({ ok: false }, { status: 503 });
   }
-
+  if (outcome !== "processed" && outcome !== "noop" && outcome !== "duplicate") {
+    console.error("mux.webhook.transaction_invalid_result");
+    return NextResponse.json({ ok: false }, { status: 503 });
+  }
   return NextResponse.json({ ok: true });
 }

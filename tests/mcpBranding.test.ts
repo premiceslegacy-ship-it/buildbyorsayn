@@ -11,6 +11,7 @@ import { buildAssistantInstructions } from "../lib/mcp/assistantInstructions";
 import { createBuildMcpServer } from "../lib/mcp/server";
 
 process.env.MCP_OAUTH_ISSUER ??= "https://buildbyorsayn.com";
+process.env.MCP_CONNECTOR_LAUNCHED ??= "true";
 
 test("OAuth discovery does not expose the MCP icon as an OAuth endpoint", async () => {
   const response = await getAuthorizationMetadata(

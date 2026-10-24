@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   revokeAccompanimentAssignment,
@@ -50,17 +50,6 @@ export function AssignmentEditor({
   const [notes, setNotes] = useState(assignment?.notes ?? "");
   const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    setSelectedUserId(userId);
-    setTrack(assignment?.track ?? DEFAULT_TRACK);
-    setStatus(assignment?.status ?? DEFAULT_STATUS);
-    setStartsOn(assignment?.startsOn ?? new Date().toISOString().slice(0, 10));
-    setEndsOn(assignment?.endsOn ?? "");
-    setThemeIds(assignment?.themeIds ?? themes.map((theme) => theme.id));
-    setNotes(assignment?.notes ?? "");
-    setFeedback(null);
-  }, [assignment, themes, userId]);
 
   function toggleTheme(themeId: string) {
     setThemeIds((current) =>

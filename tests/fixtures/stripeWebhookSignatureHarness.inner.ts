@@ -79,6 +79,31 @@ function eventBody(sessionId: string, overrides: SessionOverrides = {}): string 
   });
 }
 
+function chargeEventBody(
+  eventType: "charge.refunded" | "charge.dispute.created" | "charge.dispute.closed",
+  paymentIntent: string,
+  overrides: Record<string, unknown> = {},
+): string {
+  return JSON.stringify({
+    id: `evt_${eventType}_${paymentIntent}`,
+    object: "event",
+    type: eventType,
+    created: Math.floor(Date.now() / 1000),
+    data: {
+      object: {
+        id: `ch_${paymentIntent}`,
+        object: eventType.startsWith("charge.dispute") ? "dispute" : "charge",
+        payment_intent: paymentIntent,
+        refunded: true,
+        amount: 1000,
+        amount_refunded: 1000,
+        status: eventType === "charge.dispute.closed" ? "lost" : undefined,
+        ...overrides,
+      },
+    },
+  });
+}
+
 function signed(body: string, options: { secret?: string; timestamp?: number } = {}) {
   const header = signer.webhooks.generateTestHeaderString({ payload: body, secret: options.secret ?? SECRET, timestamp: options.timestamp });
   return new NextRequest("http://localhost/api/webhooks/stripe", {
@@ -95,6 +120,28 @@ function reset() {
   rpcResult = "granted";
   priceForSession = {};
 }
+
+test("les remboursements et litiges révoquent par PaymentIntent et tolèrent le rejeu", async () => {
+  reset();
+  for (const [eventType, expectedStatus] of [
+    ["charge.refunded", "refunded"],
+    ["charge.dispute.created", "disputed"],
+    ["charge.dispute.closed", "disputed"],
+  ] as const) {
+    const body = chargeEventBody(eventType, `pi_${eventType}`);
+    assert.equal((await POST(signed(body)).then((response) => response.status)), 200);
+    assert.deepEqual(rpcCalls.at(-1), {
+      fn: eventType === "charge.dispute.closed" ? "resolve_stripe_dispute" : "revoke_stripe_purchase",
+      args: eventType === "charge.dispute.closed"
+        ? { p_payment_intent_id: `pi_${eventType}`, p_lost: true }
+        : {
+          p_payment_intent_id: `pi_${eventType}`,
+          p_status: expectedStatus,
+          p_reason: eventType,
+        },
+    });
+  }
+});
 
 test("signatures refusées : absente, autre secret, corps modifié, trop ancienne : aucun effet de bord", async () => {
   reset();
@@ -120,7 +167,10 @@ test("un événement correctement signé et récent atteint la base une seule fo
   priceForSession.cs_ok = "price_upgrade";
   const response = await POST(signed(eventBody("cs_ok")));
   assert.equal(response.status, 200);
-  assert.deepEqual(rpcCalls, [{ fn: "apply_stripe_upgrade", args: { p_user_id: UPGRADE_USER, p_checkout_session_id: "cs_ok" } }]);
+  assert.deepEqual(rpcCalls, [{
+    fn: "apply_stripe_upgrade",
+    args: { p_user_id: UPGRADE_USER, p_checkout_session_id: "cs_ok", p_payment_intent_id: "pi_cs_ok" },
+  }]);
   assert.equal(refundKeys.length, 0);
 });
 

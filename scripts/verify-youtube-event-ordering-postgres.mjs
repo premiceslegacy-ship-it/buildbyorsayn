@@ -67,7 +67,7 @@ try {
     );
   `);
   sql(readFileSync("supabase/migrations/20261022135000_youtube_event_ordering.sql", "utf8"));
-
+  sql(readFileSync("supabase/migrations/20261024102000_youtube_replay_strict.sql", "utf8"));
   assert.equal(
     sql("select has_function_privilege('anon','public.apply_youtube_feed_events(jsonb,jsonb)','execute')::int || ':' || has_function_privilege('authenticated','public.apply_youtube_feed_events(jsonb,jsonb)','execute')::int || ':' || has_function_privilege('service_role','public.apply_youtube_feed_events(jsonb,jsonb)','execute')::int"),
     "0:0:1",
