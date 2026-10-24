@@ -18,6 +18,7 @@ export type AdminVideoLessonRow = {
   deliverables: string[];
   chapters: unknown;
   thumbnail?: string | null;
+  thumbnailUrl?: string | null;
   tier_required: "preview" | "beginner" | "full";
   status: "waiting" | "preparing" | "ready" | "errored" | "cancelled";
   mux_upload_id: string;

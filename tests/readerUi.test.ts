@@ -10,6 +10,7 @@ import {
   chapterSummary,
   estimateReadingMinutes,
   hasChapterNavigation,
+  nextEpisode,
   parseReaderMode,
   readerModeQuery,
   readingProgress,
@@ -65,6 +66,7 @@ test("la navigation précédent et suivant disparaît avec un seul chapitre", ()
 });
 
 test("la copie Markdown conserve tout le texte et ajoute la structure des chapitres", () => {
+
   const source = "Premier paragraphe.\n\nDeuxième paragraphe.";
   const markdown = serializeReaderMarkdown("Titre", [{ title: "Départ", content: source }]);
   assert.ok(markdown.length > source.length);
@@ -72,6 +74,12 @@ test("la copie Markdown conserve tout le texte et ajoute la structure des chapit
   assert.match(markdown, /## 1\. Départ/);
   assert.match(markdown, /Premier paragraphe/);
   assert.match(markdown, /Deuxième paragraphe/);
+});
+test("la fin d'un épisode propose uniquement le suivant dans l'ordre", () => {
+  const episodes = [{ position: 1 }, { position: 3 }, { position: 6 }];
+  assert.equal(nextEpisode(episodes, 1)?.position, 3);
+  assert.equal(nextEpisode(episodes, 3)?.position, 6);
+  assert.equal(nextEpisode(episodes, 6), null);
 });
 
 test("le Markdown du lecteur borne les liens et les images", () => {

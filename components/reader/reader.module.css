@@ -1820,6 +1820,209 @@
   font: 600 15px/1.3 var(--font);
 }
 
+.episodeEndOverlay {
+  position: absolute;
+  right: clamp(16px, 2.5vw, 28px);
+  bottom: clamp(16px, 2.5vw, 28px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100% - 32px);
+  padding: 10px 14px;
+  border-radius: 18px;
+  color: var(--encre);
+  background: rgba(14, 17, 15, .88);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow: inset 0 0 0 1px rgba(241, 245, 242, .14);
+}
+
+.episodeEndOverlay > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 14px/1.3 var(--font-t);
+}
+
+.episodeEndOverlay .textButton {
+  flex: none;
+}
+
+.episodeList {
+  width: 100%;
+  margin-top: clamp(36px, 5vw, 60px);
+}
+
+.episodeHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.episodeHeading h2 {
+  color: var(--encre);
+  font: 600 21px/1.2 var(--font-t);
+}
+
+.episodeHeading > span {
+  flex: none;
+  color: var(--t3);
+  font: 500 14px/1.3 var(--font);
+}
+
+.episodeRows {
+  margin-top: 14px;
+}
+
+.episodeRow {
+  width: 100%;
+  min-height: 123px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px 176px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 16px;
+  color: inherit;
+  text-align: left;
+  transition: background .28s var(--ease-c), outline-color .28s var(--ease-c);
+}
+
+.episodeRow + .episodeRow::before {
+  position: absolute;
+  top: 0;
+  right: 12px;
+  left: 12px;
+  content: "";
+  border-top: 1px solid var(--trait);
+}
+
+.episodeRow:hover {
+  background: var(--carte-2);
+}
+
+.episodeRowCurrent {
+  outline: 1px solid var(--em);
+  outline-offset: -1px;
+  background: var(--carte);
+}
+
+.episodeRow:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid var(--em);
+  outline-offset: -3px;
+}
+
+.episodeNumber {
+  display: grid;
+  place-items: center;
+  color: var(--t3);
+  font: 500 28px/1 var(--font-t);
+  font-variant-numeric: tabular-nums;
+}
+
+.episodeEqualizer {
+  display: inline-flex;
+  align-items: end;
+  justify-content: center;
+  gap: 2px;
+  width: 26px;
+  height: 24px;
+  padding: 3px;
+  color: var(--em);
+}
+
+.episodeEqualizer i {
+  width: 3px;
+  height: 55%;
+  border-radius: 999px;
+  background: currentColor;
+  animation: reader-equalizer .9s var(--ease-c) infinite alternate;
+}
+
+.episodeEqualizer i:nth-child(2) { height: 100%; animation-delay: -.35s; }
+.episodeEqualizer i:nth-child(3) { height: 72%; animation-delay: -.15s; }
+
+.episodeArtwork {
+  position: relative;
+  display: block;
+  width: 176px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--carte);
+}
+
+.episodeArtwork img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.episodeProgress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 0 0 10px 10px;
+  background: rgba(34, 217, 110, .2);
+}
+
+.episodeProgress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--em);
+}
+
+.episodeCopy {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+}
+
+.episodeCopy strong {
+  display: block;
+  overflow: hidden;
+  color: var(--encre);
+  font: 600 17px/1.25 var(--font-t);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.episodeCopy > span {
+  display: -webkit-box;
+  overflow: hidden;
+  max-width: 58ch;
+  color: var(--t2);
+  font: 400 14px/1.4 var(--font);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.episodeDone {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--t3);
+  font: 500 12px/1.2 var(--font);
+}
+
+.episodeDone svg {
+  width: 14px;
+  height: 14px;
+  color: var(--em);
+}
+
 .videoRail {
   width: 100%;
   margin-top: clamp(36px, 5vw, 60px);
@@ -1885,8 +2088,7 @@
   opacity: .66;
 }
 
-.videoChapterArtwork,
-.blockVideoArtwork {
+.videoChapterArtwork {
   position: relative;
   display: block;
   aspect-ratio: 16 / 9;
@@ -1895,16 +2097,14 @@
   background: var(--carte);
 }
 
-.videoChapterArtwork img,
-.blockVideoArtwork img {
+.videoChapterArtwork img {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
 }
 
-.videoChapterCard strong,
-.blockVideoCopy strong {
+.videoChapterCard strong {
   display: -webkit-box;
   overflow: hidden;
   color: var(--encre);
@@ -1938,40 +2138,15 @@
   background: rgba(5, 8, 6, .82);
 }
 
-.blockVideoCard {
-  flex-basis: min(320px, 82vw);
-  grid-template-columns: minmax(150px, 48%) minmax(0, 1fr);
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 20px;
-  background: var(--carte);
-}
 
-.blockVideoCurrent {
-  box-shadow: none;
-  outline: 2px solid var(--em);
-  outline-offset: -2px;
-}
 
 .videoChapterCard:focus-visible,
-.blockVideoCard:focus-visible,
 .textButton:focus-visible,
 .videoRailControls button:focus-visible {
   outline: 3px solid var(--em);
   outline-offset: 3px;
 }
 
-.blockVideoCopy {
-  min-width: 0;
-  display: grid;
-  gap: 5px;
-}
-
-.blockVideoCopy small {
-  color: var(--t3);
-  font: 500 13px/1.2 var(--font);
-}
 
 @media (hover: hover) and (pointer: fine) {
   .videoRailControls { display: flex; }
@@ -2483,6 +2658,56 @@
     margin-top: 12px;
   }
 
+  .episodeHeading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .episodeRows {
+    margin-top: 12px;
+  }
+
+  .episodeRow {
+    grid-template-columns: 30px 128px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 92px;
+    padding: 10px 12px;
+  }
+
+  .episodeArtwork {
+    width: 128px;
+  }
+
+  .episodeNumber {
+    font-size: 22px;
+  }
+
+  .episodeCopy {
+    gap: 4px;
+  }
+
+  .episodeCopy strong {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 15px;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .episodeCopy > span {
+    font-size: 13px;
+    -webkit-line-clamp: 1;
+  }
+
+  .episodeEndOverlay {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    max-width: none;
+  }
+
   .overviewChapters .chapterHeading,
   .overviewChapters .chapterList {
     margin-inline: 0;
@@ -2713,7 +2938,8 @@
   }
 
 
-  .equalizer i {
+  .equalizer i,
+  .episodeEqualizer i {
     animation: none;
   }
 }

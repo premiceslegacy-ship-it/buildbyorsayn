@@ -1,8 +1,9 @@
 "use client";
 
 import { Check, FileVideo, Image as ImageIcon, RefreshCw, Upload, X } from "lucide-react";
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { setAdminVideoThumbnailAction } from "./actions";
+import { setAdminVideoThumbnailAction, setAdminVideoThumbnailImageAction } from "./actions";
 import {
   ADMIN_VIDEO_CONFIRMATION,
   MAX_ADMIN_VIDEO_BYTES,
@@ -13,7 +14,7 @@ import type { AdminVideoLessonRow } from "@/lib/mux/adminServer";
 import { playAppSound } from "@/lib/ui/sound";
 
 type BlocOption = { id: string; displayNumber: number; title: string };
-type AdminVideoRow = AdminVideoLessonRow & { thumbnail?: string | null };
+type AdminVideoRow = AdminVideoLessonRow & { thumbnail?: string | null; thumbnailUrl?: string | null };
 type ApiResult = { ok: boolean; error?: string; videoId?: string; uploadUrl?: string; previousAssetId?: string | null };
 
 const STATUS_LABELS: Record<AdminVideoLessonRow["status"], string> = {
@@ -119,6 +120,7 @@ export function AdminVideoManager({
       setVideos((current) => payload.videos!.map((video) => ({
         ...video,
         thumbnail: video.thumbnail ?? current.find((item) => item.id === video.id)?.thumbnail ?? null,
+        thumbnailUrl: video.thumbnailUrl ?? current.find((item) => item.id === video.id)?.thumbnailUrl ?? null,
       })));
       previousStatuses.current = new Map(payload.videos.map((video) => [video.id, video.status]));
       if (becameReady) {
@@ -235,12 +237,31 @@ export function AdminVideoManager({
     const timeSeconds = Math.min(video.duration_seconds - 1, Math.max(0, Math.round(video.duration_seconds * ratio)));
     setBusy(true);
     setMessage(null);
-    void setAdminVideoThumbnailAction({ videoId: video.id, timeSeconds }).then((result) => {
+    void setAdminVideoThumbnailAction({ videoId: video.id, timeSeconds }).then(async (result) => {
       if (!result.ok || !result.thumbnail) {
         announce(result.message, true);
         return;
       }
-      setVideos((current) => current.map((item) => item.id === video.id ? { ...item, thumbnail: result.thumbnail } : item));
+      announce(result.message);
+      await refreshVideos();
+    }).finally(() => setBusy(false));
+  };
+
+  const chooseThumbnailFile = (video: AdminVideoRow, file: File | undefined) => {
+    if (!file) return;
+    setBusy(true);
+    setMessage(null);
+    const form = new FormData();
+    form.set("videoId", video.id);
+    form.set("file", file);
+    void setAdminVideoThumbnailImageAction(form).then((result) => {
+      if (!result.ok || !result.thumbnail) {
+        announce(result.message, true);
+        return;
+      }
+      setVideos((current) => current.map((item) => item.id === video.id
+        ? { ...item, thumbnail: result.thumbnail, thumbnailUrl: result.thumbnailUrl ?? null }
+        : item));
       announce(result.message);
     }).finally(() => setBusy(false));
   };
@@ -341,7 +362,7 @@ export function AdminVideoManager({
             return (
               <article className="adm-video-card" key={video.id}>
                 <div className="adm-video-card-head">
-                  <span className="adm-video-thumb"><ImageIcon aria-hidden="true" /></span>
+                  <span className="adm-video-thumb">{video.thumbnailUrl ? <Image src={video.thumbnailUrl} alt="" fill unoptimized sizes="64px" /> : <ImageIcon aria-hidden="true" />}</span>
                   <div><h3>{video.title}</h3><p>Bloc {blocs.find((bloc) => bloc.id === video.bloc_id)?.displayNumber ?? "?"}, Vidéo {video.position}, {formatDuration(video.duration_seconds)}</p></div>
                   <span className="adm-status" data-status={video.status}><i aria-hidden="true" />{STATUS_LABELS[video.status]}</span>
                 </div>
@@ -356,9 +377,10 @@ export function AdminVideoManager({
                   ] as const).map(([label, done], index) => <li key={label} data-done={done || undefined}><span>{done ? <Check aria-hidden="true" /> : index + 1}</span>{label}</li>)}
                 </ol>
 
-                {video.status === "ready" && !video.thumbnail && video.duration_seconds ? (
+                {video.status === "ready" && !video.replaced_at && video.duration_seconds ? (
                   <div className="adm-thumbnail-choice">
-                    <p>Choisis le moment utilisé par Mux pour la miniature.</p>
+                    <p>Choisis une image personnalisée 16:9, ou un instant de la vidéo avec Mux.</p>
+                    <label className="adm-ghost-button">Choisir une image<input type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={busy} onChange={(event) => { chooseThumbnailFile(video, event.target.files?.[0]); event.currentTarget.value = ""; }} /></label>
                     <div>{[0.25, 0.5, 0.75].map((ratio) => {
                       const seconds = Math.round(video.duration_seconds! * ratio);
                       return <button type="button" key={ratio} disabled={busy} onClick={() => chooseThumbnail(video, ratio)}><ImageIcon aria-hidden="true" /><span>{Math.round(ratio * 100)} %</span><small>{formatDuration(seconds)}</small></button>;

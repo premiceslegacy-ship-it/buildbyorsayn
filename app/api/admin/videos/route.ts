@@ -11,12 +11,9 @@ import {
   tierForBloc,
   validateChapterTimeline,
 } from "@/lib/mux/adminLessons";
-import {
-  createMuxAdminClient,
-  getVerifiedAdmin,
-  recordAdminAction,
-  type AdminVideoLessonRow,
-} from "@/lib/mux/adminServer";
+import { getVerifiedAdmin, recordAdminAction, createMuxAdminClient, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
+import { signMuxPlaybackTokens } from "@/lib/mux/transcript.server";
+import { storedVideoThumbnailPath } from "@/lib/mux/thumbnail.server";
 
 const MAX_CREATE_BODY_BYTES = 300 * 1024;
 
@@ -36,7 +33,24 @@ export async function GET() {
     .limit(100);
   if (error) return jsonError("Les vidéos sont indisponibles.", 503);
 
-  return NextResponse.json({ ok: true, videos: (data ?? []) as AdminVideoLessonRow[] });
+  return NextResponse.json({
+    ok: true,
+    videos: await Promise.all((data ?? []).map(async (row) => {
+      const path = storedVideoThumbnailPath(row.thumbnail);
+      let thumbnailUrl = path ? admin.storage.from("video-thumbnails").getPublicUrl(path).data.publicUrl : null;
+      const muxTime = typeof row.thumbnail === "string" && row.thumbnail.startsWith("mux:") ? Number(row.thumbnail.slice(4)) : null;
+      if (!thumbnailUrl && Number.isFinite(muxTime) && typeof row.playback_id === "string") {
+        try {
+          const tokens = await signMuxPlaybackTokens(row.playback_id);
+          const query = new URLSearchParams({ time: String(muxTime), width: "640", token: tokens.thumbnail });
+          thumbnailUrl = `https://image.mux.com/${encodeURIComponent(row.playback_id)}/thumbnail.jpg?${query.toString()}`;
+        } catch {
+          thumbnailUrl = null;
+        }
+      }
+      return { ...row, thumbnailUrl };
+    })) as AdminVideoLessonRow[],
+  });
 }
 
 export async function POST(request: NextRequest) {

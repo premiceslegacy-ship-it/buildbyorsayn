@@ -66,6 +66,13 @@ export function hasChapterNavigation(total: number): boolean {
   return total > 1;
 }
 
+export function nextEpisode<T extends { position: number }>(
+  videos: readonly T[],
+  currentPosition: number,
+): T | null {
+  return videos.find((video) => video.position > currentPosition) ?? null;
+}
+
 export function serializeReaderMarkdown(
   title: string,
   sections: readonly ReaderMarkdownSection[],

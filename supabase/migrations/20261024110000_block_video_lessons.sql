@@ -36,6 +36,14 @@ alter table public.video_lessons
   alter column bloc_id set not null,
   alter column "position" set not null;
 
+alter table public.video_lessons
+  add constraint video_lessons_thumbnail_format_check
+    check (
+      thumbnail is null
+      or thumbnail ~ '^mux:[0-9]+$'
+      or thumbnail ~ '^storage:[0-9a-f-]{36}/[0-9a-f]{12}\.(jpg|png|webp)$'
+    );
+
 create unique index video_lessons_one_current_per_position
   on public.video_lessons (bloc_id, "position")
   where published_at is not null and replaced_at is null;
@@ -47,6 +55,7 @@ create table if not exists public.video_asset_cleanup (
   id uuid primary key default gen_random_uuid(),
   mux_asset_id text not null unique,
   video_id uuid not null references public.video_lessons(id) on delete cascade,
+  storage_path text,
   status text not null default 'pending' check (status in ('pending', 'processing', 'completed', 'failed')),
   attempts integer not null default 0 check (attempts >= 0),
   last_error text,
@@ -59,6 +68,34 @@ alter table public.video_asset_cleanup enable row level security;
 alter table public.video_asset_cleanup force row level security;
 revoke all on table public.video_asset_cleanup from public, anon, authenticated;
 grant all on table public.video_asset_cleanup to service_role;
+
+do $$
+begin
+  if pg_catalog.to_regclass('storage.buckets') is not null
+    and pg_catalog.to_regclass('storage.objects') is not null then
+    insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+    values (
+      'video-thumbnails',
+      'video-thumbnails',
+      true,
+      1500000,
+      array['image/jpeg', 'image/png', 'image/webp']::text[]
+    )
+    on conflict (id) do update set
+      public = excluded.public,
+      file_size_limit = excluded.file_size_limit,
+      allowed_mime_types = excluded.allowed_mime_types;
+    execute 'drop policy if exists video_thumbnails_public_read on storage.objects';
+    execute 'drop policy if exists video_thumbnails_service_insert on storage.objects';
+    execute 'drop policy if exists video_thumbnails_service_update on storage.objects';
+    execute 'drop policy if exists video_thumbnails_service_delete on storage.objects';
+    execute 'create policy video_thumbnails_public_read on storage.objects for select to public using (bucket_id = ''video-thumbnails'')';
+    execute 'create policy video_thumbnails_service_insert on storage.objects for insert to service_role with check (bucket_id = ''video-thumbnails'')';
+    execute 'create policy video_thumbnails_service_update on storage.objects for update to service_role using (bucket_id = ''video-thumbnails'') with check (bucket_id = ''video-thumbnails'')';
+    execute 'create policy video_thumbnails_service_delete on storage.objects for delete to service_role using (bucket_id = ''video-thumbnails'')';
+  end if;
+end;
+$$;
 
 drop function if exists public.publish_video_lesson(uuid, uuid);
 
@@ -75,6 +112,7 @@ declare
   v_video public.video_lessons%rowtype;
   v_previous_video_id uuid;
   v_previous_asset text;
+  v_previous_storage_path text;
 begin
   if not public.is_platform_admin(p_actor_user_id) then
     raise exception 'admin authorization required' using errcode = '42501';
@@ -108,8 +146,13 @@ begin
     raise exception 'video is not publishable';
   end if;
 
-  select previous_video.id, previous_video.mux_asset_id
-    into v_previous_video_id, v_previous_asset
+  select previous_video.id,
+         previous_video.mux_asset_id,
+         case when previous_video.thumbnail like 'storage:%'
+           then pg_catalog.substring(previous_video.thumbnail from 9)
+           else null
+         end
+    into v_previous_video_id, v_previous_asset, v_previous_storage_path
   from public.video_lessons as previous_video
   where previous_video.bloc_id = v_video.bloc_id
     and previous_video."position" = v_video."position"
@@ -130,9 +173,10 @@ begin
     and previous_video.replaced_at is null
     and previous_video.id <> v_video.id;
   if v_previous_asset is not null then
-    insert into public.video_asset_cleanup (mux_asset_id, video_id)
-    values (v_previous_asset, v_previous_video_id)
-    on conflict (mux_asset_id) do nothing;
+    insert into public.video_asset_cleanup (mux_asset_id, video_id, storage_path)
+    values (v_previous_asset, v_previous_video_id, v_previous_storage_path)
+    on conflict (mux_asset_id) do update
+      set storage_path = coalesce(public.video_asset_cleanup.storage_path, excluded.storage_path);
   end if;
 
   update public.video_lessons
@@ -183,11 +227,11 @@ $$;
 
 alter table public.admin_agent_tokens
   add constraint admin_agent_tokens_permissions_cardinality_check
-    check (cardinality(permissions) <= 13),
+    check (cardinality(permissions) <= 14),
   add constraint admin_agent_tokens_permissions_values_check
     check (permissions <@ array[
       'liste_blocs', 'lister_videos', 'envoyer_video', 'lire_transcription',
-      'ecrire_chapitres', 'ecrire_resume', 'choisir_miniature',
+      'ecrire_chapitres', 'ecrire_resume', 'choisir_miniature', 'deposer_miniature',
       'demander_publication', 'synchroniser_video', 'deposer_sous_titres',
       'preparer_mail', 'statut_video', 'journal'
     ]::text[]);

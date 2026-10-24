@@ -89,8 +89,10 @@ function loadServer(path: string, tier: string | null, authenticated = true, pro
     if (name === "@/lib/mcpAccess") return tiers;
     if (name === "@/lib/blocAccess") return access;
     if (name === "@/lib/supabase/admin") return { createAdminSupabase: () => adminSupabase };
-    if (name === "@/lib/mux/adminLessons") return adminLessons;
     if (name === "@/lib/mux/transcript.server") return { signMuxPlaybackId: async (id: string) => id, signMuxPlaybackTokens: async (id: string) => ({ playback: id, thumbnail: id, storyboard: id }) };
+    if (name === "@/lib/mux/adminLessons") return adminLessons;
+    if (name === "@/lib/blocCatalog") return { displayNumberFromBlocId: (id: string) => Number(id) };
+    if (name === "@/lib/mux/thumbnail.server") return { storedVideoThumbnailPath: () => null };
     if (name === "zod") return { z };
     if (name === "@/lib/mockData") { calls.push("corpus"); return { BLOCS_DATA: corpus }; }
     throw new Error(`Unexpected import: ${name}`);

@@ -5,6 +5,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import Stripe from "stripe";
 import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { MAX_VIDEO_THUMBNAIL_BYTES, removeStoredVideoThumbnail, storeVideoThumbnail, storedVideoThumbnailPath } from "@/lib/mux/thumbnail.server";
 import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
 import { syncYoutubeChannel } from "@/lib/youtube/feed";
 import { YOUTUBE_VIDEOS_CACHE_TAG } from "@/lib/nouveautes/loadVideos";
@@ -249,10 +250,11 @@ export async function setAdminVideoThumbnailAction(input: unknown): Promise<{ ok
   const admin = createAdminSupabase();
   const { data: video, error: readError } = await admin
     .from("video_lessons")
-    .select("id,status,duration_seconds")
+    .select("id,status,duration_seconds,replaced_at,thumbnail")
     .eq("id", parsed.data.videoId)
     .maybeSingle();
   if (readError || !video) return { ok: false, message: "La vidéo est introuvable." };
+  if (video.replaced_at) return { ok: false, message: "Cette vidéo a été remplacée." };
   if (video.status !== "ready" || !video.duration_seconds || parsed.data.timeSeconds >= video.duration_seconds) {
     return { ok: false, message: "Attends la fin du traitement avant de choisir la miniature." };
   }
@@ -261,8 +263,11 @@ export async function setAdminVideoThumbnailAction(input: unknown): Promise<{ ok
     .from("video_lessons")
     .update({ thumbnail, updated_at: new Date().toISOString() })
     .eq("id", parsed.data.videoId)
-    .eq("status", "ready");
+    .eq("status", "ready")
+    .is("replaced_at", null);
   if (error) return { ok: false, message: "La miniature n'a pas pu être enregistrée." };
+  const oldPath = storedVideoThumbnailPath(video.thumbnail);
+  if (oldPath) await removeStoredVideoThumbnail(oldPath).catch(() => undefined);
   await recordAdminAction({
     actorUserId: user.id,
     action: "video.thumbnail_select",
@@ -274,4 +279,54 @@ export async function setAdminVideoThumbnailAction(input: unknown): Promise<{ ok
   }).catch(() => undefined);
   revalidatePath("/admin");
   return { ok: true, thumbnail, message: "Miniature choisie." };
+}
+
+export async function setAdminVideoThumbnailImageAction(input: FormData): Promise<{ ok: boolean; thumbnail?: string; thumbnailUrl?: string; message: string }> {
+  const user = await getVerifiedAdmin();
+  if (!user) return { ok: false, message: "Accès administrateur refusé." };
+  const videoId = input.get("videoId");
+  const file = input.get("file");
+  if (typeof videoId !== "string" || !z.string().uuid().safeParse(videoId).success || !(file instanceof File)) {
+    return { ok: false, message: "La miniature est invalide." };
+  }
+  if (file.size > MAX_VIDEO_THUMBNAIL_BYTES) return { ok: false, message: "La miniature dépasse 1,5 Mo." };
+  const admin = createAdminSupabase();
+  const { data: video, error: readError } = await admin
+    .from("video_lessons")
+    .select("id,bloc_id,status,replaced_at,thumbnail")
+    .eq("id", videoId)
+    .maybeSingle();
+  if (readError || !video) return { ok: false, message: "La vidéo est introuvable." };
+  if (video.replaced_at) return { ok: false, message: "Cette vidéo a été remplacée." };
+  if (video.status !== "ready") return { ok: false, message: "Attends que la vidéo soit prête avant de choisir sa miniature." };
+  let stored: Awaited<ReturnType<typeof storeVideoThumbnail>>;
+  try {
+    stored = await storeVideoThumbnail(videoId, new Uint8Array(await file.arrayBuffer()));
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : "La miniature est invalide." };
+  }
+  const thumbnail = `storage:${stored.path}`;
+  const { error: updateError } = await admin.from("video_lessons")
+    .update({ thumbnail, updated_at: new Date().toISOString() })
+    .eq("id", videoId)
+    .eq("status", "ready")
+    .is("replaced_at", null);
+  if (updateError) {
+    await removeStoredVideoThumbnail(stored.path).catch(() => undefined);
+    return { ok: false, message: "La miniature n'a pas pu être enregistrée." };
+  }
+  const oldPath = storedVideoThumbnailPath(video.thumbnail);
+  if (oldPath && oldPath !== stored.path) await removeStoredVideoThumbnail(oldPath).catch(() => undefined);
+  await recordAdminAction({
+    actorUserId: user.id,
+    action: "video.thumbnail_upload",
+    targetType: "video_lesson",
+    targetId: videoId,
+    result: "completed",
+    approved: true,
+    details: { width: stored.width, height: stored.height, contentType: stored.contentType },
+  }).catch(() => undefined);
+  revalidatePath("/admin");
+  revalidatePath(`/blocs/${video.bloc_id ?? ""}`);
+  return { ok: true, thumbnail, thumbnailUrl: stored.publicUrl, message: "Miniature personnalisée enregistrée." };
 }

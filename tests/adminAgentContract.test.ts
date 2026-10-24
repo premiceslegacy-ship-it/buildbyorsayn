@@ -2,12 +2,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("le registre admin expose les treize outils autorisés", async () => {
+test("le registre admin expose les quatorze outils autorisés", async () => {
   const source = await readFile("lib/adminAgent/tools.ts", "utf8");
   for (const name of [
     "liste_blocs", "lister_videos", "envoyer_video", "lire_transcription",
-    "ecrire_chapitres", "ecrire_resume", "choisir_miniature", "demander_publication",
-    "synchroniser_video", "deposer_sous_titres", "preparer_mail", "statut_video", "journal",
+    "ecrire_chapitres", "ecrire_resume", "choisir_miniature", "deposer_miniature",
+    "demander_publication", "synchroniser_video", "deposer_sous_titres",
+    "preparer_mail", "statut_video", "journal",
   ]) {
     assert.match(source, new RegExp(`^  ${name}: \\{`, "m"));
   }

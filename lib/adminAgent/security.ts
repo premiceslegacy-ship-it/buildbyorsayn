@@ -8,7 +8,7 @@ import { AGENT_PERMISSION_VALUES, type AgentPermission, type AgentTokenContext }
 
 const AGENT_TOKEN_PREFIX = "btv_agt_";
 export const DEFAULT_AGENT_TOKEN_DAYS = 90;
-export const AGENT_MAX_BODY_BYTES = 64 * 1024;
+export const AGENT_MAX_BODY_BYTES = 2_200_000;
 const AGENT_TOKEN_PATTERN = /^btv_agt_[A-Za-z0-9_-]{43}$/;
 
 const storedTokenSchema = z.object({

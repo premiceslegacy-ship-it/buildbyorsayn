@@ -99,7 +99,7 @@ function videoCourses(videos: readonly VideoProgressMeta[]): Course[] {
         id: video.id,
         title: video.title,
         partTitle: bloc.titre.replace(/^Bloc \d+\s*:\s*/, ""),
-        image: video.thumbnail ?? `/da/mini/b${bloc.displayNumber}.jpg`,
+        image: video.thumbnail ?? "",
         kind: "video" as const,
         videoPosition: video.position,
       })),

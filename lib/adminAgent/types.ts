@@ -6,6 +6,7 @@ export const AGENT_PERMISSION_VALUES = [
   "ecrire_chapitres",
   "ecrire_resume",
   "choisir_miniature",
+  "deposer_miniature",
   "demander_publication",
   "synchroniser_video",
   "deposer_sous_titres",

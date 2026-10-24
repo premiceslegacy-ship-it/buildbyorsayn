@@ -5,8 +5,9 @@ import { projectBlocForTier } from "@/lib/blocAccess";
 import { tierForBloc, videoChapterSchema } from "@/lib/mux/adminLessons";
 import { signMuxPlaybackTokens, type MuxPlaybackTokens } from "@/lib/mux/transcript.server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { displayNumberFromBlocId } from "@/lib/blocCatalog";
+import { storedVideoThumbnailPath } from "@/lib/mux/thumbnail.server";
 import { z } from "zod";
-
 export type BlocVideoChapter = { startSeconds: number; title: string; thumbnailUrl: string };
 export type BlocVideo = {
   id: string;
@@ -15,9 +16,11 @@ export type BlocVideo = {
   summary: string;
   durationSeconds: number;
   chapters: BlocVideoChapter[];
-  thumbnail: string | null;
+  thumbnailUrl: string;
   playbackId: string;
   tokens: MuxPlaybackTokens;
+  progressPercent?: number;
+  completed?: boolean;
 };
 function muxThumbnailUrl(playbackId: string, thumbnailToken: string, timeSeconds = 0): string {
   const query = new URLSearchParams({
@@ -33,7 +36,8 @@ export async function getBlocVideos(blocId: string, tier: McpTier): Promise<Bloc
   const requiredTier = tierForBloc(blocId);
   if (!canAccess(tier, requiredTier)) return [];
   try {
-    const { data, error } = await createAdminSupabase()
+    const admin = createAdminSupabase();
+    const { data, error } = await admin
       .from("video_lessons")
       .select("id,position,title,summary,chapters,thumbnail,playback_id,duration_seconds,tier_required")
       .eq("bloc_id", blocId)
@@ -57,7 +61,12 @@ export async function getBlocVideos(blocId: string, tier: McpTier): Promise<Bloc
       const fallbackTime = typeof row.thumbnail === "string" && row.thumbnail.startsWith("mux:")
         ? Number(row.thumbnail.slice(4))
         : undefined;
-      const thumbnail = muxThumbnailUrl(row.playback_id, tokens.thumbnail, Number.isFinite(fallbackTime) ? fallbackTime : undefined);
+      const storedPath = storedVideoThumbnailPath(row.thumbnail);
+      const storedUrl = storedPath ? admin.storage.from("video-thumbnails").getPublicUrl(storedPath).data.publicUrl : null;
+      const thumbnailUrl = storedUrl
+        || (Number.isFinite(fallbackTime)
+          ? muxThumbnailUrl(row.playback_id, tokens.thumbnail, fallbackTime)
+          : `/da/mini/b${displayNumberFromBlocId(blocId) ?? 0}.jpg`);
       return {
         id: row.id,
         position: row.position,
@@ -71,7 +80,7 @@ export async function getBlocVideos(blocId: string, tier: McpTier): Promise<Bloc
             thumbnailUrl: muxThumbnailUrl(row.playback_id, tokens.thumbnail, chapter.startSeconds),
           }))
           : [],
-        thumbnail,
+        thumbnailUrl,
         playbackId: row.playback_id,
         tokens,
       };

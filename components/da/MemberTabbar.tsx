@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
 import { LiquidGlassNav } from "@/components/ui/LiquidGlass";
 
@@ -40,6 +40,19 @@ export function MemberTabbar({ unseen }: { unseen?: { label: string; count: numb
   }
   useEffect(() => { pending = null; }, [pathname]);
 
+  // À la disparition de la barre (écran de chargement, puis page), on garde la position VISIBLE de la pastille,
+  // même en plein glissement : la barre suivante repart de là et finit le mouvement, sans saut.
+  useLayoutEffect(() => {
+    const pill = slider.current;
+    const host = pill?.parentElement;
+    return () => {
+      if (!pill || !host) return;
+      const from = pill.getBoundingClientRect();
+      const frame = host.getBoundingClientRect();
+      if (from.width > 0) lastPill = { left: from.left - frame.left, top: from.top - frame.top, width: from.width, height: from.height };
+    };
+  }, []);
+
   useEffect(() => {
     const pill = slider.current;
     const host = pill?.parentElement;
@@ -63,20 +76,18 @@ export function MemberTabbar({ unseen }: { unseen?: { label: string; count: numb
     const frame = requestAnimationFrame(() => {
       pill.dataset.ready = "true";
       place(target);
-      lastPill = target;
     });
     const observer = new ResizeObserver(() => {
       const next = measure();
       if (!next) return;
       place(next);
-      lastPill = next;
     });
     observer.observe(host);
     return () => { cancelAnimationFrame(frame); observer.disconnect(); };
   }, [active]);
 
   return (
-    <LiquidGlassNav className="tabbar" aria-label="Navigation mobile" glass={{ teinte: "rgba(0,0,0,.5)", reflet: 2, bord: 0.44, force: 1.9, dispersion: 0.6, angle: -28, flou: 2.4 }}>
+    <LiquidGlassNav className="tabbar" aria-label="Navigation mobile" glass={{ teinte: "rgba(0,0,0,.5)", reflet: 0.9, bord: 0.44, force: 1.9, dispersion: 0.6, angle: -28, flou: 2.4 }}>
       <span className="slider" ref={slider} aria-hidden="true" />
       {MEMBER_NAV.map((item) => (
         <Link

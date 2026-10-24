@@ -2,9 +2,10 @@ import "server-only";
 
 import { SECTIONS } from "@/app/beginner/sections.data";
 import { buildContinueRail, completedChapterIds, type ProgressRow, type VideoProgressMeta } from "@/lib/dashboard/today";
-import { BLOCS_DATA, displayNumberFromBlocId } from "@/lib/blocCatalog";
+import { BLOCS_DATA } from "@/lib/blocCatalog";
+import { getBlocVideos } from "@/lib/blocData.server";
+import { normalizeProfileTier, canAccess, type McpTier } from "@/lib/mcpAccess";
 import { parseTextPositionKey } from "@/lib/lessons/textPosition";
-import { canAccess, type McpTier } from "@/lib/mcpAccess";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -15,16 +16,23 @@ async function loadVideoMeta(videoIds: string[], tier: string | null): Promise<V
   try {
     const { data, error } = await createAdminSupabase()
       .from("video_lessons")
-      .select("id,bloc_id,position,title,duration_seconds,thumbnail,tier_required")
+      .select("id,bloc_id,position,title,duration_seconds,tier_required")
       .in("id", videoIds)
       .eq("status", "ready")
       .not("published_at", "is", null)
       .is("replaced_at", null);
     if (error) return [];
+    const normalizedTier = normalizeProfileTier(tier);
+    if (!normalizedTier) return [];
+    const videosByBlock = await Promise.all(
+      [...new Set((data ?? []).map((row) => row.bloc_id))].map((blocId) => getBlocVideos(blocId, normalizedTier)),
+    );
+    const thumbnails = new Map(videosByBlock.flat().map((video) => [video.id, video.thumbnailUrl]));
     return (data ?? []).flatMap((row) => {
       const bloc = BLOCS_DATA.find((item) => item.id === row.bloc_id);
-      if (!bloc || !Number.isSafeInteger(row.position) || !Number.isSafeInteger(row.duration_seconds) || row.duration_seconds <= 0 || typeof row.title !== "string" || !canAccess(tier, row.tier_required as McpTier)) return [];
-      return [{ id: row.id, blocId: row.bloc_id, position: row.position, title: row.title, durationSeconds: row.duration_seconds, thumbnail: `/da/mini/b${displayNumberFromBlocId(row.bloc_id) ?? 0}.jpg`, tierRequired: row.tier_required as string }];
+      const thumbnail = thumbnails.get(row.id);
+      if (!bloc || !thumbnail || !Number.isSafeInteger(row.position) || !Number.isSafeInteger(row.duration_seconds) || row.duration_seconds <= 0 || typeof row.title !== "string" || !canAccess(normalizedTier, row.tier_required as McpTier)) return [];
+      return [{ id: row.id, blocId: row.bloc_id, position: row.position, title: row.title, durationSeconds: row.duration_seconds, thumbnail, tierRequired: row.tier_required as string }];
     });
   } catch {
     return [];

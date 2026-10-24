@@ -18,6 +18,12 @@ import {
   validateChapterTimeline,
   videoChapterSchema,
 } from "@/lib/mux/adminLessons";
+import {
+  decodeVideoThumbnailBase64,
+  removeStoredVideoThumbnail,
+  storeVideoThumbnail,
+  storedVideoThumbnailPath,
+} from "@/lib/mux/thumbnail.server";
 import { createMuxAdminClient, recordAdminAction } from "@/lib/mux/adminServer";
 import { syncMuxTranscriptForReadyAsset } from "@/lib/mux/transcript.server";
 import {
@@ -50,6 +56,15 @@ const uploadInput = z.object({
     name: z.string().trim().min(1).max(255),
     size: z.number().int().positive(),
     type: z.enum(VIDEO_MIME_TYPES),
+  }).strict(),
+}).strict();
+const thumbnailInput = z.object({
+  videoId: uuid,
+  file: z.object({
+    name: z.string().trim().min(1).max(255),
+    size: z.number().int().positive(),
+    type: z.string().trim().max(80),
+    bytesBase64: z.string().min(1).max(2_100_000),
   }).strict(),
 }).strict();
 const listVideosInput = z.object({
@@ -405,6 +420,61 @@ export const ADMIN_AGENT_TOOLS = {
       if (updated.error || !updated.data) throw new Error("La miniature n'a pas pu être enregistrée.");
       await auditTool(context, "choisir_miniature", input.videoId, { timeSeconds: input.timeSeconds });
       return { videoId: input.videoId, timeSeconds: input.timeSeconds };
+    },
+  },
+  deposer_miniature: {
+    title: "Déposer une miniature",
+    description: "Dépose une image JPEG, PNG ou WebP validée en 16:9 pour une vidéo.",
+    permission: "deposer_miniature",
+    schema: thumbnailInput,
+    async run(rawInput, context) {
+      const input = thumbnailInput.parse(rawInput);
+      let bytes: Uint8Array;
+      try {
+        bytes = decodeVideoThumbnailBase64(input.file.bytesBase64);
+      } catch (error) {
+        throw new AgentToolError(error instanceof Error ? error.message : "Le fichier de miniature est invalide.");
+      }
+      const { data: video, error } = await createAdminSupabase().from("video_lessons")
+        .select("id,status,replaced_at,thumbnail,published_at")
+        .eq("id", input.videoId)
+        .maybeSingle();
+      if (error || !video) throw new AgentToolError("La vidéo est introuvable.");
+      if (video.replaced_at) throw new AgentToolError("Cette vidéo a été remplacée.");
+      if (video.status !== "ready") throw new AgentToolError("Attends que la vidéo soit prête avant de déposer sa miniature.");
+      let stored: Awaited<ReturnType<typeof storeVideoThumbnail>>;
+      try {
+        stored = await storeVideoThumbnail(input.videoId, bytes);
+      } catch (error) {
+        throw new AgentToolError(error instanceof Error ? error.message : "La miniature est invalide.");
+      }
+      const thumbnail = `storage:${stored.path}`;
+      const updated = await createAdminSupabase().from("video_lessons")
+        .update({ thumbnail, updated_at: new Date().toISOString() })
+        .eq("id", input.videoId)
+        .eq("status", "ready")
+        .is("replaced_at", null)
+        .select("id")
+        .maybeSingle();
+      if (updated.error || !updated.data) {
+        await removeStoredVideoThumbnail(stored.path).catch(() => undefined);
+        throw new Error("La miniature n'a pas pu être enregistrée.");
+      }
+      const oldPath = storedVideoThumbnailPath(video.thumbnail);
+      if (oldPath && oldPath !== stored.path) await removeStoredVideoThumbnail(oldPath).catch(() => undefined);
+      await auditTool(context, "deposer_miniature", input.videoId, {
+        width: stored.width,
+        height: stored.height,
+        contentType: stored.contentType,
+        published: Boolean(video.published_at),
+      });
+      return {
+        videoId: input.videoId,
+        thumbnail,
+        thumbnailUrl: stored.publicUrl,
+        width: stored.width,
+        height: stored.height,
+      };
     },
   },
   demander_publication: {

@@ -2,12 +2,13 @@ import "server-only";
 
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { createMuxAdminClient } from "./adminServer";
+import { removeStoredVideoThumbnail } from "./thumbnail.server";
 
 export async function cleanupMuxAsset(muxAssetId: string, signal?: AbortSignal): Promise<boolean> {
   const admin = createAdminSupabase({ signal });
   const { data: row, error } = await admin
     .from("video_asset_cleanup")
-    .select("id,status,attempts,updated_at")
+    .select("id,status,attempts,updated_at,storage_path")
     .eq("mux_asset_id", muxAssetId)
     .maybeSingle();
   if (error) throw new Error("La file de nettoyage vidéo est indisponible.");
@@ -27,22 +28,29 @@ export async function cleanupMuxAsset(muxAssetId: string, signal?: AbortSignal):
     const status = typeof cause === "object" && cause !== null && "status" in cause
       ? Number((cause as { status?: unknown }).status)
       : 0;
-    if (status === 404) {
-      const { error: missingError } = await admin.from("video_asset_cleanup").update({
-        status: "completed",
-        completed_at: new Date().toISOString(),
+    if (status !== 404) {
+      const message = cause instanceof Error ? cause.message.slice(0, 500) : "Suppression Mux refusée.";
+      const { error: failedError } = await admin.from("video_asset_cleanup").update({
+        status: "failed",
+        last_error: message,
         updated_at: new Date().toISOString(),
       }).eq("id", row.id);
-      if (missingError) throw new Error("Le nettoyage Mux n'a pas pu être confirmé.");
-      return true;
+      if (failedError) throw new Error("Le nettoyage Mux n'a pas pu être journalisé.");
+      return false;
     }
-    const message = cause instanceof Error ? cause.message.slice(0, 500) : "Suppression Mux refusée.";
+  }
+  try {
+    if (typeof row.storage_path === "string" && row.storage_path) {
+      await removeStoredVideoThumbnail(row.storage_path, signal);
+    }
+  } catch (cause) {
+    const message = cause instanceof Error ? cause.message.slice(0, 500) : "Suppression de la miniature refusée.";
     const { error: failedError } = await admin.from("video_asset_cleanup").update({
       status: "failed",
       last_error: message,
       updated_at: new Date().toISOString(),
     }).eq("id", row.id);
-    if (failedError) throw new Error("Le nettoyage Mux n'a pas pu être journalisé.");
+    if (failedError) throw new Error("Le nettoyage de la miniature n'a pas pu être journalisé.");
     return false;
   }
   const { error: completedError } = await admin.from("video_asset_cleanup").update({

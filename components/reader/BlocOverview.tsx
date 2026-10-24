@@ -10,7 +10,7 @@ import type { BlocVideo } from "@/lib/blocData.server";
 import type { BlocSection } from "@/lib/blocCatalog";
 import { animateAppElement, installAppMotionTokens, motionAllowed } from "@/lib/ui/motion";
 import { playAppSound } from "@/lib/ui/sound";
-import { chapterSummary } from "./readerModel";
+import { chapterSummary, nextEpisode } from "./readerModel";
 import styles from "./reader.module.css";
 
 type BlocNeighbor = { id: string; title: string; displayNumber: number };
@@ -26,6 +26,7 @@ type BlocOverviewProps = {
   videos: BlocVideo[];
   initialVideoPosition?: number;
   initialSummaryOpen?: boolean;
+  initialEpisodeListExpanded?: boolean;
   checkoutHref: string;
   checkoutLabel: string;
   checkoutPrice: string;
@@ -77,12 +78,67 @@ function VideoRail({
   </section>;
 }
 
-export function BlocOverview({ blocId, title, displayNumber, sections, previewSections, totalSections, completedIds, videos, initialVideoPosition, initialSummaryOpen, checkoutHref, checkoutLabel, checkoutPrice, previousBloc, nextBloc }: BlocOverviewProps) {
+function EpisodeList({
+  videos,
+  totalDuration,
+  selectedVideoId,
+  expanded,
+  onToggle,
+  onSelect,
+}: {
+  videos: BlocVideo[];
+  totalDuration: number;
+  selectedVideoId: string | null;
+  expanded: boolean;
+  onToggle: () => void;
+  onSelect: (position: number) => void;
+}) {
+  const visibleVideos = expanded ? videos : videos.slice(0, 5);
+  const remaining = Math.max(0, videos.length - 5);
+  return <section className={styles.episodeList} aria-labelledby="block-videos-title" data-testid="block-video-list">
+    <div className={styles.episodeHeading}>
+      <h2 id="block-videos-title">Les vidéos du bloc</h2>
+      <span>{videos.length} vidéo{videos.length > 1 ? "s" : ""}, {formatLessonDuration(totalDuration)}</span>
+    </div>
+    <div className={styles.episodeRows}>
+      {visibleVideos.map((video) => {
+        const selected = video.id === selectedVideoId;
+        const progress = Math.min(100, Math.max(0, video.progressPercent ?? 0));
+        return <button
+          key={video.id}
+          type="button"
+          className={`${styles.episodeRow} ${selected ? styles.episodeRowCurrent : ""}`}
+          aria-current={selected ? "true" : undefined}
+          aria-label={selected ? `${video.title}, En lecture` : `Épisode ${video.position}, ${video.title}`}
+          onClick={() => onSelect(video.position)}
+        >
+          <span className={styles.episodeNumber} aria-hidden={selected ? "true" : undefined}>
+            {selected ? <span className={styles.episodeEqualizer}><i /><i /><i /></span> : video.position}
+          </span>
+          <span className={styles.episodeArtwork}>
+            <Image src={video.thumbnailUrl || "/da/mini/b1.jpg"} alt="" fill unoptimized loading="lazy" sizes="(min-width: 735px) 176px, 128px" />
+            <span className={styles.videoTime}>{formatLessonDuration(video.durationSeconds)}</span>
+            {progress > 0 && !video.completed ? <span className={styles.episodeProgress} aria-label={`${progress} % vu`}><i style={{ width: `${progress}%` }} /></span> : null}
+          </span>
+          <span className={styles.episodeCopy}>
+            <strong title={video.title}>{video.title}</strong>
+            {video.summary ? <span>{video.summary}</span> : null}
+            {video.completed ? <small className={styles.episodeDone}><Check aria-hidden="true" />Vue</small> : null}
+          </span>
+        </button>;
+      })}
+    </div>
+    {videos.length > 5 ? <button type="button" className={styles.textButton} onClick={onToggle}>{expanded ? "Réduire" : remaining === 1 ? "Voir la vidéo suivante" : `Voir les ${remaining} autres vidéos`}</button> : null}
+  </section>;
+}
+
+export function BlocOverview({ blocId, title, displayNumber, sections, previewSections, totalSections, completedIds, videos, initialVideoPosition, initialSummaryOpen, initialEpisodeListExpanded, checkoutHref, checkoutLabel, checkoutPrice, previousBloc, nextBloc }: BlocOverviewProps) {
   const root = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<LessonPlayerHandle>(null);
   const chapterRailRef = useRef<HTMLDivElement>(null);
-  const videoRailRef = useRef<HTMLDivElement>(null);
+  const [episodeListExpanded, setEpisodeListExpanded] = useState(Boolean(initialEpisodeListExpanded));
+  const [endedVideoId, setEndedVideoId] = useState<string | null>(null);
   const nextIndex = sections.findIndex((section) => !completedIds.includes(section.id));
   const resumeIndex = nextIndex >= 0 ? nextIndex : Math.max(0, sections.length - 1);
   const unlocked = sections.length > 0;
@@ -95,6 +151,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
   const selectedVideo = videos.find((video) => video.position === selectedPosition) ?? videos[0] ?? null;
   const selectedPlayableVideo = selectedVideo?.playbackId.trim() && selectedVideo.tokens.playback ? selectedVideo : null;
   const currentChapterIndex = selectedPlayableVideo?.chapters.reduce((current, chapter, index) => chapter.startSeconds <= currentTime ? index : current, -1) ?? -1;
+  const nextVideo = selectedVideo ? nextEpisode(videos, selectedVideo.position) : null;
   const totalVideoDuration = videos.reduce((sum, video) => sum + video.durationSeconds, 0);
   const thumbnail = `/da/mini/b${displayNumber}.jpg`;
 
@@ -109,7 +166,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
   const selectVideo = (position: number) => {
     setSelectedPosition(position);
     setCurrentTime(0);
-    setOpenSummaryFor(null);
+    setEndedVideoId(null);
     window.history.replaceState({}, "", `${window.location.pathname}?video=${position}`);
     window.requestAnimationFrame(() => stageRef.current?.scrollIntoView({ block: "start", behavior: motionAllowed() ? "smooth" : "auto" }));
   };
@@ -132,12 +189,17 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
             progressId={selectedPlayableVideo.id}
             title={selectedPlayableVideo.title}
             onCompleted={() => undefined}
+            onEnded={() => setEndedVideoId(selectedPlayableVideo.id)}
             onTimeUpdate={(time) => setCurrentTime(time)}
           /> : <>
-            <Image src={selectedVideo?.thumbnail || thumbnail} alt="" fill priority sizes="(min-width: 1200px) 1184px, 100vw" />
+            <Image src={selectedVideo?.thumbnailUrl || thumbnail} alt="" fill priority sizes="(min-width: 1200px) 1184px, 100vw" />
             <div className={styles.overviewStageShade} />
             {selectedVideo ? <div className={styles.overviewUpcoming} role="status"><h2>Lecture indisponible pour le moment.</h2></div> : null}
           </>}
+          {selectedPlayableVideo && endedVideoId === selectedPlayableVideo.id && nextVideo ? <div className={styles.episodeEndOverlay} role="status">
+            <span>Vidéo suivante : {nextVideo.title}</span>
+            <button type="button" className={styles.textButton} onClick={() => selectVideo(nextVideo.position)}>Lire</button>
+          </div> : null}
         </div>
         {!selectedVideo ? unlocked ? <div className={styles.overviewUpcoming}><h2>La vidéo arrive bientôt. Le texte est déjà là.</h2><Link className="btn btn--p" href={`/blocs/${blocId}/lire?chapter=${encodeURIComponent(sections[resumeIndex]?.id ?? "")}`} data-sfx="none" onClick={(event) => animateAction(event.currentTarget, "open")}>Lire le texte</Link></div> : <div className={styles.overviewLocked}><p>Cette vidéo est dans LE COFFRE.</p></div> : null}
       </div>
@@ -160,17 +222,19 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
 
       {selectedVideo && selectedVideo.chapters.length > 0 ? <VideoRail title="Dans cette vidéo" labelledBy="video-chapters-title" railRef={chapterRailRef}>
         {selectedVideo.chapters.map((chapter, index) => <button key={`${selectedVideo.id}-${chapter.startSeconds}`} type="button" className={`${styles.videoChapterCard} ${index === currentChapterIndex ? styles.videoChapterCurrent : ""}`} aria-label={`${chapter.title}, à ${formatStart(chapter.startSeconds)}`} aria-current={index === currentChapterIndex ? "true" : undefined} disabled={!selectedPlayableVideo} onClick={() => selectChapter(chapter.startSeconds)}>
-          <span className={styles.videoChapterArtwork}><Image src={chapter.thumbnailUrl || selectedVideo.thumbnail || thumbnail} alt="" fill unoptimized loading="lazy" sizes="(min-width: 900px) 240px, 80vw" /><span className={styles.videoTime}>{formatStart(chapter.startSeconds)}</span>{index === currentChapterIndex ? <span className={styles.equalizer} aria-hidden="true"><i /><i /><i /></span> : null}</span>
+          <span className={styles.videoChapterArtwork}><Image src={chapter.thumbnailUrl || selectedVideo.thumbnailUrl || thumbnail} alt="" fill unoptimized loading="lazy" sizes="(min-width: 900px) 240px, 80vw" /><span className={styles.videoTime}>{formatStart(chapter.startSeconds)}</span>{index === currentChapterIndex ? <span className={styles.equalizer} aria-hidden="true"><i /><i /><i /></span> : null}</span>
           <strong>{chapter.title}</strong>
         </button>)}
       </VideoRail> : null}
 
-      {videos.length > 1 ? <VideoRail title="Les vidéos du bloc" labelledBy="block-videos-title" railRef={videoRailRef}>
-        {videos.map((video) => <button key={video.id} type="button" className={`${styles.blockVideoCard} ${video.id === selectedVideo?.id ? styles.blockVideoCurrent : ""}`} aria-current={video.id === selectedVideo?.id ? "true" : undefined} onClick={() => selectVideo(video.position)}>
-          <span className={styles.blockVideoArtwork}><Image src={video.thumbnail || thumbnail} alt="" fill unoptimized loading="lazy" sizes="(min-width: 900px) 240px, 80vw" /><span className={styles.videoTime}>{formatLessonDuration(video.durationSeconds)}</span></span>
-          <span className={styles.blockVideoCopy}><small>Vidéo {video.position}</small><strong>{video.title}</strong></span>
-        </button>)}
-      </VideoRail> : null}
+      {videos.length > 1 ? <EpisodeList
+        videos={videos}
+        totalDuration={totalVideoDuration}
+        selectedVideoId={selectedVideo?.id ?? null}
+        expanded={episodeListExpanded}
+        onToggle={() => setEpisodeListExpanded((expanded) => !expanded)}
+        onSelect={selectVideo}
+      /> : null}
 
       <section className={styles.overviewChapters} aria-labelledby="bloc-chapters-title">
         <div className={styles.chapterHeading}><h2 id="bloc-chapters-title">À lire</h2><span>{totalSections} chapitre{totalSections > 1 ? "s" : ""}</span></div>

@@ -194,7 +194,6 @@ export function AdminShell({ userLabel, counts, views }: Props) {
             <Menu aria-hidden="true" />
           </button>
           <h1>{activeItem.label}</h1>
-          <span className="adm-live-badge"><i aria-hidden="true" />Données réelles</span>
         </header>
 
         <main id="admin-main" className="adm-main" tabIndex={-1}>

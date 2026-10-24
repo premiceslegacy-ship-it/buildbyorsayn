@@ -45,8 +45,6 @@
 .adm-toolbar { position: sticky; top: 0; z-index: 40; display: flex; height: var(--adm-toolbar); align-items: center; gap: 12px; padding-inline: var(--adm-pad); background: rgba(5, 8, 6, .82); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px); box-shadow: 0 .5px 0 var(--trait); }
 .adm-toolbar h1 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--encre); font: 600 17px/1.2 var(--font-t); letter-spacing: -.01em; }
 .adm-menu-button { display: none; width: 44px; height: 44px; place-items: center; color: var(--t1); }
-.adm-live-badge { display: inline-flex; min-height: 28px; align-items: center; gap: 8px; margin-left: auto; padding-inline: 12px; border-radius: 999px; background: rgba(241, 245, 242, .1); color: var(--t1); font: 600 12px/1 var(--font); white-space: nowrap; }
-.adm-live-badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--em); box-shadow: 0 0 10px rgba(34, 217, 110, .55); }
 .adm-main { min-width: 0; }
 .adm-view { width: min(1240px, 100%); min-height: calc(100vh - var(--adm-toolbar)); margin-inline: auto; padding: 28px var(--adm-pad) max(80px, calc(48px + env(safe-area-inset-bottom))); }
 .adm-view-stack { display: grid; gap: clamp(48px, 5vw, 72px); }
@@ -311,7 +309,6 @@
   .adm-nav-scrim { z-index: 70; visibility: hidden; opacity: 0; transition: opacity .2s var(--ease-c), visibility 0s linear .2s; }
   .adm-nav-scrim[data-open] { visibility: visible; opacity: 1; transition: opacity .2s var(--ease-c), visibility 0s; }
   .adm-view { padding-top: 22px; }
-  .adm-live-badge { padding-inline: 10px; }
   .adm-section-heading { align-items: stretch; flex-direction: column; }
   .adm-section-heading .adm-search-field { width: 100%; }
   .adm-tiles, .adm-tiles-four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -337,8 +334,6 @@
 }
 
 @media (max-width: 430px) {
-  .adm-live-badge { font-size: 11px; gap: 6px; padding-inline: 8px; }
-  .adm-live-badge i { width: 8px; height: 8px; }
   .adm-clean-card { padding: 16px; }
   .adm-clean-actions > button { width: 100%; }
   .adm-tiles, .adm-tiles-four { gap: 12px; }

@@ -112,7 +112,8 @@ test("la taille Mux n'est pas inventée et la durée reste plafonnée", async ()
   assert.match(webhook, /MAX_ADMIN_VIDEO_DURATION_SECONDS/);
   assert.match(docs, /Mux n'impose pas de taille maximale/);
   assert.match(migration, /select \* into v_video[\s\S]*pg_catalog\.pg_advisory_xact_lock[\s\S]*for update/);
-  assert.match(migration, /values \(v_previous_asset, v_previous_video_id\)/);
+  assert.match(migration, /values \(v_previous_asset, v_previous_video_id, v_previous_storage_path\)/);
+  assert.match(migration, /storage_path text/);
 });
 
 test("le nettoyage Mux est borné, protégé par CRON_SECRET et planifié", async () => {

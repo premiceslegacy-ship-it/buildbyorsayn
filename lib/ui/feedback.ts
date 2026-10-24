@@ -52,8 +52,11 @@ type PressDependencies = {
 
 const pressAnimations = new WeakMap<HTMLElement, Animation>();
 
+// Les contrôles posés sur du verre liquide ne se réduisent pas à l'appui : le texte et les icônes y tremblent.
+const NO_PRESS_SCALE = ".tabbar";
+
 function animatePressStart(element: HTMLElement) {
-  if (!motionAllowed()) return null;
+  if (!motionAllowed() || element.closest(NO_PRESS_SCALE)) return null;
   const animation = element.animate([{ scale: "1" }, { scale: ".97" }], {
     duration: 100,
     easing: "linear",
@@ -77,7 +80,7 @@ export function finishPressFeedback(element: HTMLElement) {
   const current = pressAnimations.get(element);
   current?.cancel();
   pressAnimations.delete(element);
-  if (!motionAllowed()) return null;
+  if (!motionAllowed() || element.closest(NO_PRESS_SCALE)) return null;
   return element.animate([{ scale: ".97" }, { scale: "1" }], {
     duration: 100,
     easing: "linear",
@@ -87,7 +90,7 @@ export function finishPressFeedback(element: HTMLElement) {
 
 export function pulsePressFeedback(element: HTMLElement, sound: PressSound) {
   const animation = startPressFeedback(element, sound, {
-    animate: (target) => motionAllowed() ? target.animate(
+    animate: (target) => motionAllowed() && !target.closest(NO_PRESS_SCALE) ? target.animate(
       [{ scale: "1" }, { scale: ".97", offset: .45 }, { scale: "1" }],
       { duration: 200, easing: "linear" },
     ) : null,
