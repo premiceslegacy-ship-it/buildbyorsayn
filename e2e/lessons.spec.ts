@@ -6,10 +6,10 @@ test.describe("Bloc lessons (member)", () => {
   test("the block page presents its video area, video rails when published and text chapters", async ({ authedPage: page }) => {
     for (const id of ["1", "2", "3"]) {
       await page.goto(`/blocs/${id}`);
-      await expect(page.getByRole("heading", { name: "Chapitres" })).toBeVisible({ timeout: 10_000 });
+      await expect(page.getByRole("heading", { name: "À lire" })).toBeVisible({ timeout: 10_000 });
       await expect(page.getByRole("radiogroup", { name: "Mode de lecture" })).toHaveCount(0);
+      await expect(page.getByTestId("bloc-overview-media")).toHaveCount(1);
       await expect(page.getByTestId("bloc-overview-media")).toBeVisible();
-      await expect(page.getByRole("heading", { name: "À lire" })).toBeVisible();
       await expect(page.locator(`a[href^="/blocs/${id}/lire?chapter="]`).first()).toBeVisible();
       await expect(page.getByText("Vidéos liées à ce bloc")).toHaveCount(0);
       await expect(page.locator('a[href^="/videos#"]')).toHaveCount(0);
@@ -25,10 +25,10 @@ test.describe("Bloc lessons (member)", () => {
 
   test("the reader shortcuts change chapter without bringing back a video mode", async ({ authedPage: page }) => {
     await page.goto("/blocs/1/lire?chapter=b1-s0");
-    await expect(page.getByRole("article", { name: "Lecture de Une IA utile commence dans le métier" })).toBeVisible();
+    await expect(page.getByRole("article", { name: "Lecture de Le décalage se creuse déjà" })).toBeVisible();
     await page.keyboard.press("ArrowRight");
     await expect(page).toHaveURL(/\/blocs\/1\/lire\?.*chapter=b1-s1/);
-    await expect(page.getByRole("article", { name: "Lecture de Faire circuler le travail" })).toBeVisible();
+    await expect(page.getByRole("article", { name: "Lecture de Une IA utile commence dans le métier" })).toBeVisible();
     await page.keyboard.press("End");
     await expect(page).toHaveURL(/chapter=b1-s4/);
     await page.keyboard.press("Home");

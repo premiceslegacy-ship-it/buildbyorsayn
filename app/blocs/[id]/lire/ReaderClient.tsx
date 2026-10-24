@@ -57,7 +57,6 @@ export default function ReaderClient({ bloc, tier, identity, initialChapter }: {
       completedIds={checkedItems}
       initialChapter={initialChapter}
       textOnly
-      syncAddress={false}
       onToggleChapter={toggleItem}
       onValidateBloc={validateBloc}
       nextBloc={nextBloc ? { href: `/blocs/${nextBloc.id}`, label: nextBloc.titre, thumbnailSrc: `/da/mini/b${nextBloc.displayNumber}.jpg` } : undefined}
