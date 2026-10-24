@@ -3,6 +3,7 @@ import type { McpTier } from "@/lib/mcpAccess";
 
 export const MAX_ADMIN_VIDEO_BYTES = 10 * 1024 * 1024 * 1024;
 export const MAX_VIDEO_TRANSCRIPT_CHARACTERS = 250_000;
+export const MAX_ADMIN_VIDEO_DURATION_SECONDS = 3 * 60 * 60;
 const MAX_VIDEO_CHAPTERS = 40;
 export const ADMIN_VIDEO_CONFIRMATION = "PUBLIER";
 export const VIDEO_MIME_TYPES = [

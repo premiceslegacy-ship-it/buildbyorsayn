@@ -4,9 +4,8 @@ import { z } from "zod";
 import { isJsonMediaType, readBoundedBody } from "@/lib/mcp/http";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { publishVideoSchema, validateChapterTimeline, videoChapterSchema } from "@/lib/mux/adminLessons";
-import { cleanupMuxAsset } from "@/lib/mux/assetCleanup.server";
+import { cleanupMuxAsset, cleanupQueuedAssetsForSlot } from "@/lib/mux/assetCleanup.server";
 import { getVerifiedAdmin, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
-
 type VideoPublishRouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, context: VideoPublishRouteContext) {
@@ -42,6 +41,18 @@ export async function POST(request: NextRequest, context: VideoPublishRouteConte
   const video = row as AdminVideoLessonRow;
   if (video.replaced_at) {
     return NextResponse.json({ ok: false, error: "Cette vidéo a été remplacée et ne peut plus être publiée." }, { status: 409 });
+  }
+  try {
+    if (!await cleanupQueuedAssetsForSlot(video.bloc_id, video.position, video.id, request.signal)) {
+      return NextResponse.json({ ok: false, error: "L'ancien asset Mux attend son nettoyage." }, { status: 503 });
+    }
+  } catch {
+    return NextResponse.json({ ok: false, error: "La file de nettoyage Mux est indisponible." }, { status: 503 });
+  }
+  if (video.published_at) {
+    revalidatePath("/admin");
+    revalidatePath(`/blocs/${video.bloc_id}`);
+    return NextResponse.json({ ok: true, resumedCleanup: true });
   }
   const chapters = z.array(videoChapterSchema).safeParse(video.chapters);
   const timelineError = chapters.success

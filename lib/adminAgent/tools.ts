@@ -6,7 +6,8 @@ import { createAdminSupabase } from "@/lib/supabase/admin";
 import { blocIdFromDisplayNumber, displayNumberFromBlocId } from "@/lib/blocCatalog";
 import { getSiteOrigin } from "@/lib/siteOrigin";
 import {
-  MAX_ADMIN_VIDEO_BYTES,
+  MAX_ADMIN_VIDEO_DURATION_SECONDS,
+  MAX_VIDEO_TRANSCRIPT_CHARACTERS,
   VIDEO_MIME_TYPES,
   buildMuxPassthrough,
   formatTimecode,
@@ -47,7 +48,7 @@ const uploadInput = z.object({
   title: z.string().trim().min(1).max(200),
   file: z.object({
     name: z.string().trim().min(1).max(255),
-    size: z.number().int().positive().max(MAX_ADMIN_VIDEO_BYTES),
+    size: z.number().int().positive(),
     type: z.enum(VIDEO_MIME_TYPES),
   }).strict(),
 }).strict();
@@ -63,7 +64,7 @@ const readTranscriptInput = z.object({
 }).strict();
 const depositSubtitlesInput = z.object({
   videoId: uuid,
-  content: z.string().trim().min(1).max(MAX_ADMIN_VIDEO_BYTES),
+  content: z.string().trim().min(1).max(MAX_VIDEO_TRANSCRIPT_CHARACTERS),
 }).strict();
 const prepareMailInput = preparedMailSchema.omit({ campaignId: true });
 const journalInput = z.object({ limit: z.number().int().min(1).max(100).default(30) }).strict();
@@ -424,7 +425,6 @@ export const ADMIN_AGENT_TOOLS = {
       }
       return createRequest(context, "publication", input.videoId, {
         videoId: input.videoId,
-        reason: data?.mode === "autopublish" ? "autopublish_requires_same_upload_token" : "human_approval_required",
       });
     },
   },
@@ -456,25 +456,24 @@ export const ADMIN_AGENT_TOOLS = {
       if (!data.mux_asset_id) throw new AgentToolError("L'asset Mux n'est pas encore disponible.");
       const mux = createMuxAdminClient();
       const asset = await mux.video.assets.retrieve(data.mux_asset_id);
-      const sizeBytes = Number((asset as unknown as { filesize?: string | number }).filesize);
-      const tooLarge = Number.isFinite(sizeBytes) && sizeBytes > MAX_ADMIN_VIDEO_BYTES;
       const durationSeconds = Math.round(asset.duration ?? 0);
+      const tooLong = Number.isFinite(durationSeconds) && durationSeconds > MAX_ADMIN_VIDEO_DURATION_SECONDS;
       const playbackId = Array.isArray(asset.playback_ids)
         ? asset.playback_ids.find((playback) => playback.policy === "signed")?.id ?? null
         : null;
-      const status = tooLarge
+      const status = tooLong
         ? "errored"
         : asset.status === "ready"
           ? playbackId && durationSeconds > 0 ? "ready" : "errored"
           : asset.status === "errored" ? "errored" : "preparing";
-      const errorCode = tooLarge
-        ? "asset_too_large"
+      const errorCode = tooLong
+        ? "video_too_long"
         : status === "ready"
           ? null
           : asset.status === "errored"
             ? "mux_asset_errored"
             : playbackId ? "duration_missing" : "signed_playback_missing";
-      if (tooLarge) await mux.video.assets.delete(data.mux_asset_id).catch(() => undefined);
+      if (tooLong) await mux.video.assets.delete(data.mux_asset_id).catch(() => undefined);
       const updated = await createAdminSupabase().from("video_lessons").update({
         status,
         mux_asset_id: data.mux_asset_id,

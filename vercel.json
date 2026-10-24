@@ -2,11 +2,15 @@
   "crons": [
     {
       "path": "/api/cron/mcp-cleanup",
-      "schedule": "* * * * *"
+      "schedule": "17 3 * * *"
     },
     {
       "path": "/api/cron/youtube-sync",
       "schedule": "23 6 * * *"
+    },
+    {
+      "path": "/api/cron/mux-cleanup",
+      "schedule": "47 4 * * *"
     }
   ]
 }

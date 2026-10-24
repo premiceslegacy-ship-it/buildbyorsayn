@@ -73,6 +73,7 @@ set search_path = ''
 as $$
 declare
   v_video public.video_lessons%rowtype;
+  v_previous_video_id uuid;
   v_previous_asset text;
 begin
   if not public.is_platform_admin(p_actor_user_id) then
@@ -80,8 +81,10 @@ begin
   end if;
   select * into v_video
   from public.video_lessons
-  where id = p_video_id
-  for update;
+  where id = p_video_id;
+  if v_video.id is null then
+    raise exception 'video is not publishable';
+  end if;
 
   perform pg_catalog.pg_advisory_xact_lock(
     pg_catalog.hashtextextended(
@@ -89,6 +92,11 @@ begin
       0
     )
   );
+
+  select * into v_video
+  from public.video_lessons
+  where id = p_video_id
+  for update;
   if v_video.id is null
     or v_video.replaced_at is not null
     or v_video.status <> 'ready'
@@ -100,7 +108,8 @@ begin
     raise exception 'video is not publishable';
   end if;
 
-  select previous_video.mux_asset_id into v_previous_asset
+  select previous_video.id, previous_video.mux_asset_id
+    into v_previous_video_id, v_previous_asset
   from public.video_lessons as previous_video
   where previous_video.bloc_id = v_video.bloc_id
     and previous_video."position" = v_video."position"
@@ -122,7 +131,7 @@ begin
     and previous_video.id <> v_video.id;
   if v_previous_asset is not null then
     insert into public.video_asset_cleanup (mux_asset_id, video_id)
-    values (v_previous_asset, v_video.id)
+    values (v_previous_asset, v_previous_video_id)
     on conflict (mux_asset_id) do nothing;
   end if;
 

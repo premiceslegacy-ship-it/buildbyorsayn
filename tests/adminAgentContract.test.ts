@@ -66,8 +66,10 @@ test("publication vidéo refuse les remplacements et conserve le nettoyage durab
 
 test("le mode autonome exige le même jeton que celui de l'envoi", async () => {
   const source = await readFile("lib/adminAgent/tools.ts", "utf8");
-  assert.match(source, /created_by_agent_token_id === context\.id/);
-  assert.match(source, /autopublish_requires_same_upload_token/);
+  const publication = source.slice(source.indexOf("  demander_publication:"), source.indexOf("  preparer_mail:"));
+  assert.match(publication, /created_by_agent_token_id === context\.id/);
+  assert.match(publication, /return createRequest\(context, "publication", input\.videoId, \{\s*videoId: input\.videoId,\s*\}\)/);
+  assert.doesNotMatch(publication, /reason:/);
 });
 
 test("les deux adaptateurs utilisent le même registre sans registre secondaire", async () => {

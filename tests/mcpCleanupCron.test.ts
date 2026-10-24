@@ -175,13 +175,14 @@ test("cleanup route accepts a valid secret and returns the validated structured 
   );
 });
 
-test("cleanup runs every minute with bounded capacity above configured window creation", async () => {
+test("les nettoyages sont planifiés avec une fréquence compatible", async () => {
   const config = JSON.parse(await readFile("vercel.json", "utf8")) as {
     crons?: Array<{ path?: string; schedule?: string }>;
   };
   assert.deepEqual(config.crons, [
-    { path: "/api/cron/mcp-cleanup", schedule: "* * * * *" },
+    { path: "/api/cron/mcp-cleanup", schedule: "17 3 * * *" },
     { path: "/api/cron/youtube-sync", schedule: "23 6 * * *" },
+    { path: "/api/cron/mux-cleanup", schedule: "47 4 * * *" },
   ]);
   assert.equal(MCP_OAUTH_CLEANUP_BATCH_SIZE, 1_000);
   assert.equal(MCP_RATE_LIMIT_CLEANUP_BATCH_SIZE, 5_000);

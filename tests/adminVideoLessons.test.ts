@@ -99,6 +99,34 @@ test("la publication refuse les vidéos remplacées et Mux reçoit le numéro af
   assert.match(adminRoute, /external_id: `\$\{parsed\.data\.blocNumero\}:/);
   assert.match(agent, /external_id: `\$\{input\.blocNumero\}:/);
 });
+test("la taille Mux n'est pas inventée et la durée reste plafonnée", async () => {
+  const [agent, webhook, docs, migration] = await Promise.all([
+    readFile("lib/adminAgent/tools.ts", "utf8"),
+    readFile("app/api/mux/webhook/route.ts", "utf8"),
+    readFile("docs/ADMIN-AGENT.md", "utf8"),
+    readFile("supabase/migrations/20261024110000_block_video_lessons.sql", "utf8"),
+  ]);
+  assert.doesNotMatch(agent, /asset[\s\S]{0,40}filesize/);
+  assert.doesNotMatch(webhook, /asset[\s\S]{0,40}filesize/);
+  assert.match(agent, /MAX_ADMIN_VIDEO_DURATION_SECONDS/);
+  assert.match(webhook, /MAX_ADMIN_VIDEO_DURATION_SECONDS/);
+  assert.match(docs, /Mux n'impose pas de taille maximale/);
+  assert.match(migration, /select \* into v_video[\s\S]*pg_catalog\.pg_advisory_xact_lock[\s\S]*for update/);
+  assert.match(migration, /values \(v_previous_asset, v_previous_video_id\)/);
+});
+
+test("le nettoyage Mux est borné, protégé par CRON_SECRET et planifié", async () => {
+  const [route, schedule] = await Promise.all([
+    readFile("app/api/cron/mux-cleanup/route.ts", "utf8"),
+    readFile("vercel.json", "utf8"),
+  ]);
+  assert.match(route, /verifyMcpCleanupAuthorization/);
+  assert.ok(route.indexOf("verifyMcpCleanupAuthorization") < route.indexOf("cleanupPendingMuxAssets"));
+  assert.match(route, /cleanupPendingMuxAssets/);
+  assert.match(route, /status: 401/);
+  assert.match(route, /maxDuration = 30/);
+  assert.match(schedule, /\/api\/cron\/mux-cleanup/);
+});
 
 test("Mux rejects a missing or forged webhook signature and accepts the exact raw signed body", async () => {
   const secret = "local-webhook-test-secret";
