@@ -228,13 +228,13 @@ $$;
 
 alter table public.admin_agent_tokens
   add constraint admin_agent_tokens_permissions_cardinality_check
-    check (cardinality(permissions) <= 14),
+    check (cardinality(permissions) <= 16),
   add constraint admin_agent_tokens_permissions_values_check
     check (permissions <@ array[
       'liste_blocs', 'lister_videos', 'envoyer_video', 'lire_transcription',
       'ecrire_chapitres', 'ecrire_resume', 'choisir_miniature', 'deposer_miniature',
       'demander_publication', 'synchroniser_video', 'deposer_sous_titres',
-      'preparer_mail', 'statut_video', 'journal'
+      'preparer_mail', 'lister_nouveautes', 'preparer_nouveaute', 'statut_video', 'journal'
     ]::text[]);
 
 create or replace function public.process_mux_asset_webhook(

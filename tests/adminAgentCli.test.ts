@@ -94,6 +94,15 @@ test("le login n'affiche jamais le jeton et les commandes statut et journal sont
   assert.match(source, /command === "statut"[\s\S]*callTool\("statut_video"/);
   assert.match(source, /command === "journal"[\s\S]*callTool\("journal"/);
 });
+test("la CLI expose la préparation et la lecture des nouveautés", () => {
+  const result = spawnSync(process.execPath, ["scripts/build-admin/build-admin.mjs", "help"], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+  });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /nouveaute lister/);
+  assert.match(result.stdout, /nouveaute preparer --video/);
+});
 test("video envoyer transmet le titre et la validation uploadInput au premier appel", async () => {
   const directory = await mkdtemp(join(tmpdir(), "build-admin-video-"));
   const file = join(directory, "cours.mp4");

@@ -28,9 +28,12 @@ import {
 import { replaceVideoThumbnail } from "@/lib/mux/thumbnailMutation.server";
 import { createMuxAdminClient, recordAdminAction } from "@/lib/mux/adminServer";
 import { syncMuxTranscriptForReadyAsset } from "@/lib/mux/transcript.server";
+import { readVideoThumbnail, removeBuildNewsRequestThumbnails, storeBuildNewsThumbnail } from "@/lib/buildNews/thumbnail.server";
+import { buildNewsInputSchema } from "@/lib/buildNews/model";
 import {
   executeAgentPublication,
   preparedMailSchema,
+  preparedNewsSchema,
   validateAgentPublicationTarget,
   validatePreparedMailForExecution,
 } from "./execution";
@@ -84,6 +87,14 @@ const depositSubtitlesInput = z.object({
   content: z.string().trim().min(1).max(MAX_VIDEO_TRANSCRIPT_CHARACTERS),
 }).strict();
 const prepareMailInput = preparedMailSchema.omit({ campaignId: true });
+const prepareNewsInput = z.object({
+  videoId: uuid.optional(),
+  title: z.string().trim().min(1).max(160).optional(),
+  sentence: z.string().trim().min(1).max(500).optional(),
+  blocLabel: z.string().trim().min(1).max(120).nullable().optional(),
+  internalUrl: z.string().trim().min(1).max(2_048).nullable().optional(),
+  miniature: thumbnailInput.shape.file.optional(),
+}).strict();
 const journalInput = z.object({ limit: z.number().int().min(1).max(100).default(30) }).strict();
 
 type ToolDefinition = {
@@ -115,6 +126,7 @@ function requestCreationError(error: unknown): AgentToolError | null {
     : "";
   const messages: Record<string, string> = {
     agent_token_inactive: "Jeton invalide.",
+    agent_request_invalid: "La demande de nouveauté est invalide.",
     agent_video_missing: "Cette vidéo n'existe pas.",
     agent_video_published: "La vidéo est déjà publiée.",
     agent_video_not_ready: "La vidéo n'est pas prête.",
@@ -136,20 +148,30 @@ async function auditTool(context: AgentTokenContext, tool: AgentPermission, targ
   await recordAdminAction({
     actorUserId: context.createdBy,
     action: `agent.${tool}`,
-    targetType: tool === "liste_blocs" || tool === "lister_videos" || tool === "journal" ? "agent_token" : "video_lesson",
+    targetType: tool === "liste_blocs" || tool === "lister_videos" || tool === "lister_nouveautes" || tool === "journal" ? "agent_token" : tool === "preparer_mail" || tool === "preparer_nouveaute" ? "agent_request" : "video_lesson",
     targetId,
     result: "completed",
     details: { tokenId: context.id, ...details },
   });
 }
 
+async function requestStillExists(requestId: string) {
+  const { data, error } = await createAdminSupabase()
+    .from("admin_agent_requests")
+    .select("id")
+    .eq("id", requestId)
+    .maybeSingle();
+  return Boolean(error || data);
+}
+
 async function createRequest(
   context: AgentTokenContext,
-  kind: "publication" | "mail",
+  kind: "publication" | "mail" | "nouveaute",
   targetId: string,
   payload: Record<string, unknown>,
+  requestId = randomUUID(),
 ) {
-  const id = randomUUID();
+  const id = requestId;
   const { data, error } = await createAdminSupabase().rpc("create_admin_agent_request", {
     p_token_id: context.id,
     p_kind: kind,
@@ -188,6 +210,62 @@ async function requireWritableVideo(videoId: string, options: { ready?: boolean;
   if (options.playback && !data.playback_id) throw new AgentToolError("La vidéo n'est pas prête.");
   return data;
 }
+function firstSentence(summary: unknown, fallback: string) {
+  const value = typeof summary === "string" ? summary.trim() : "";
+  const sentence = value.match(/^(.+?[.!?])(?:\s|$)/)?.[1] ?? value;
+  return (sentence || fallback).trim().slice(0, 500);
+}
+
+async function prepareNewsPayload(rawInput: z.infer<typeof prepareNewsInput>, requestId: string) {
+  if (!rawInput.videoId && (!rawInput.title || !rawInput.sentence || !rawInput.internalUrl || !rawInput.miniature)) {
+    throw new AgentToolError("Ajoute une vidéo ou le titre, la phrase, le lien et la miniature.");
+  }
+  let title = rawInput.title;
+  let sentence = rawInput.sentence;
+  let blocLabel = rawInput.blocLabel;
+  let internalUrl = rawInput.internalUrl;
+  let miniature = rawInput.miniature;
+  const sourceVideoId: string | null = rawInput.videoId ?? null;
+
+  if (rawInput.videoId) {
+    const { data, error } = await createAdminSupabase().from("video_lessons")
+      .select("id,bloc_id,title,summary,status,published_at,replaced_at,playback_id,thumbnail")
+      .eq("id", rawInput.videoId)
+      .maybeSingle();
+    if (error) throw new Error("La vidéo ne peut pas être vérifiée.");
+    if (!data) throw new AgentToolError("Cette vidéo n'existe pas.");
+    if (data.replaced_at) throw new AgentToolError("Cette vidéo a été remplacée.");
+    if (!data.published_at && data.status !== "ready") throw new AgentToolError("La vidéo n'est pas publiée ou prête.");
+    const location = displayLocationFromBlocId(data.bloc_id);
+    if (location === null) throw new AgentToolError("Le bloc de la vidéo est invalide.");
+    title ??= data.title;
+    sentence ??= firstSentence(data.summary, data.title);
+    blocLabel ??= location === "protocole" ? "Protocole" : `Bloc ${location}`;
+    internalUrl ??= location === "protocole" ? "/protocole" : `/blocs/${data.bloc_id}`;
+    if (!miniature) miniature = { name: "video-thumbnail", size: 0, type: "image/jpeg", bytesBase64: "" };
+    if (!miniature.bytesBase64) {
+      const bytes = await readVideoThumbnail(data);
+      miniature = { ...miniature, size: bytes.byteLength, bytesBase64: Buffer.from(bytes).toString("base64") };
+    }
+  }
+
+  const bytes = miniature?.bytesBase64 ? decodeVideoThumbnailBase64(miniature.bytesBase64) : null;
+  if (!bytes) throw new AgentToolError("Ajoute une miniature.");
+  const stored = await storeBuildNewsThumbnail(requestId, bytes);
+  const news = buildNewsInputSchema.parse({
+    title,
+    publishedAt: new Date().toISOString(),
+    thumbnail: stored.publicUrl,
+    blocLabel: blocLabel ?? null,
+    internalUrl: internalUrl ?? null,
+    sentence,
+  });
+  return {
+    news,
+    thumbnailStoragePath: stored.path,
+    sourceVideoId,
+  };
+}
 
 export const ADMIN_AGENT_TOOLS = {
   liste_blocs: {
@@ -206,6 +284,27 @@ export const ADMIN_AGENT_TOOLS = {
       ];
       await auditTool(context, "liste_blocs", context.id, { count: blocs.length });
       return { blocs };
+    },
+  },
+  lister_nouveautes: {
+    title: "Lister les nouveautés",
+    description: "Consulte les dernières nouveautés publiées et les brouillons qui attendent ton accord.",
+    permission: "lister_nouveautes",
+    schema: z.object({ limite: z.number().int().min(1).max(100).default(20) }).strict(),
+    async run(rawInput, context) {
+      const input = z.object({ limite: z.number().int().min(1).max(100).default(20) }).strict().parse(rawInput);
+      const admin = createAdminSupabase();
+      const [{ data: news, error: newsError }, { data: requests, error: requestError }] = await Promise.all([
+        admin.from("build_news").select("id,title,published_at,thumbnail,bloc_label,internal_url,sentence,created_at").order("published_at", { ascending: false }).limit(input.limite),
+        admin.from("admin_agent_requests").select("id,payload,created_at,expires_at").eq("kind", "nouveaute").eq("status", "pending").order("created_at", { ascending: false }).limit(input.limite),
+      ]);
+      if (newsError || requestError) throw new Error("Les nouveautés ne peuvent pas être listées.");
+      const brouillons = (requests ?? []).flatMap((request) => {
+        const parsed = preparedNewsSchema.safeParse(request.payload);
+        return parsed.success ? [{ id: request.id, ...parsed.data.news, createdAt: request.created_at, expiresAt: request.expires_at }] : [];
+      });
+      await auditTool(context, "lister_nouveautes", context.id, { count: (news ?? []).length + brouillons.length });
+      return { nouveautes: news ?? [], brouillons };
     },
   },
   lister_videos: {
@@ -470,6 +569,26 @@ export const ADMIN_AGENT_TOOLS = {
         width: stored.width,
         height: stored.height,
       };
+    },
+  },
+  preparer_nouveaute: {
+    title: "Préparer une nouveauté",
+    description: "Prépare une nouveauté et sa miniature stable, toujours soumise à ta validation.",
+    permission: "preparer_nouveaute",
+    schema: prepareNewsInput,
+    async run(rawInput, context) {
+      const input = prepareNewsInput.parse(rawInput);
+      const requestId = randomUUID();
+      let payload: z.infer<typeof preparedNewsSchema>;
+      try {
+        payload = preparedNewsSchema.parse(await prepareNewsPayload(input, requestId));
+        return await createRequest(context, "nouveaute", input.videoId ?? requestId, payload, requestId);
+      } catch (error) {
+        if (!await requestStillExists(requestId)) {
+          await removeBuildNewsRequestThumbnails(requestId).catch(() => undefined);
+        }
+        throw error;
+      }
     },
   },
   demander_publication: {

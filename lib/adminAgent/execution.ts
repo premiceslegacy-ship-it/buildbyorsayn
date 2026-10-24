@@ -4,12 +4,21 @@ import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { assertBuildNewsThumbnail } from "@/lib/buildNews/thumbnail.server";
+import { createBuildNews } from "@/lib/buildNews/server";
+import { buildNewsInputSchema } from "@/lib/buildNews/model";
 import { displayLocationFromBlocId } from "@/lib/blocCatalog";
 import { videoChapterSchema, validateChapterTimeline } from "@/lib/mux/adminLessons";
 import { cleanupMuxAsset } from "@/lib/mux/assetCleanup.server";
 import { AgentToolError } from "./types";
-
 const MAX_ADMIN_EMAIL_BODY_BYTES = 25 * 1024;
+const preparedNewsStoragePath = z.string().regex(/^news\/[0-9a-f-]{36}\/[0-9a-f]{12}\.(?:jpg|png|webp)$/i);
+
+export const preparedNewsSchema = z.object({
+  news: buildNewsInputSchema,
+  thumbnailStoragePath: preparedNewsStoragePath,
+  sourceVideoId: z.string().uuid().nullable(),
+}).strict();
 
 export const preparedMailSchema = z.object({
   campaignId: z.string().uuid(),
@@ -129,6 +138,18 @@ export async function executeAgentPublication(videoId: string, actorUserId: stri
     position: data.position as number,
     previousAssetId,
   };
+}
+
+export function validatePreparedNewsForExecution(payload: unknown) {
+  const parsed = preparedNewsSchema.parse(payload);
+  buildNewsInputSchema.parse(parsed.news);
+  return parsed;
+}
+
+export async function executePreparedNews(payload: unknown, actorUserId: string) {
+  const parsed = validatePreparedNewsForExecution(payload);
+  await assertBuildNewsThumbnail(parsed.thumbnailStoragePath);
+  return createBuildNews(parsed.news, actorUserId, parsed.thumbnailStoragePath);
 }
 
 export async function executePreparedMail(payload: unknown) {

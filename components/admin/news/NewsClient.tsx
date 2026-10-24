@@ -15,7 +15,7 @@ function displayDate(value: string) {
   });
 }
 
-export function NewsClient({ youtubePanel }: { youtubePanel?: ReactNode }) {
+export function NewsClient({ youtubePanel, hasPendingNewsRequest }: { youtubePanel?: ReactNode; hasPendingNewsRequest?: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
   const [news, setNews] = useState<BuildNewsRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +73,7 @@ export function NewsClient({ youtubePanel }: { youtubePanel?: ReactNode }) {
   if (!news) return <section className="rounded-3xl border border-red-400/25 bg-red-500/10 p-6" role="alert"><h2 className="text-lg font-semibold text-white">Les nouveautés ne se sont pas chargées.</h2><p className="mt-2 text-sm text-white/65">{error}</p><button type="button" onClick={() => void load()} className="adm-ghost-button mt-5"><RefreshCw size={16} />Réessayer</button></section>;
 
   return <div ref={root} className="grid gap-12 text-[#f0ede8]">
-    <header><h2 className="text-3xl font-semibold tracking-tight">Nouveautés</h2><p className="mt-3 max-w-3xl text-base leading-7 text-white/60">Ce que tes membres voient dans Nouveautés : les vidéos de ta chaîne YouTube et celles que tu publies dans BUILD.</p></header>
+    {hasPendingNewsRequest}
     {error && <p className="rounded-2xl border border-red-400/25 bg-red-500/10 p-4 text-sm text-red-50" role="alert">{error}</p>}
     {youtubePanel}
     <section className="rounded-3xl bg-white/[.045] p-5 sm:p-6" aria-labelledby="build-news-form-title"><h3 id="build-news-form-title" className="text-xl font-semibold">Ajouter sur BUILD</h3><p className="mt-2 text-sm leading-6 text-white/55">Ajoute une entrée réelle liée à ce qui vient d'être publié dans la plateforme.</p><form onSubmit={create} className="mt-6 grid gap-5"><div className="grid gap-5 md:grid-cols-2"><label className="text-sm text-white/65">Titre<input name="title" required maxLength={160} className="mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-white" /></label><label className="text-sm text-white/65">Date<input name="date" type="date" required className="adm-date-input mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-white" /></label></div><label className="text-sm text-white/65">Miniature<input name="thumbnail" required maxLength={2048} placeholder="/images/miniature.jpg ou https://..." className="mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-white" /></label><div className="grid gap-5 md:grid-cols-2"><label className="text-sm text-white/65">Bloc lié, facultatif<input name="blocLabel" maxLength={120} placeholder="Bloc 3, La logique business" className="mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-white" /></label><label className="text-sm text-white/65">Lien dans BUILD, facultatif<input name="internalUrl" maxLength={2048} placeholder="/blocs/3" className="mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-white" /></label></div><label className="text-sm text-white/65">Phrase<textarea name="sentence" required maxLength={500} rows={4} className="mt-2 w-full rounded-xl border border-white/10 bg-black/25 p-3 text-white" /></label><button type="submit" disabled={busy} className="adm-primary-button w-fit">{busy ? "Ajout en cours" : "Ajouter"}</button></form></section>

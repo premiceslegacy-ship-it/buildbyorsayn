@@ -46,7 +46,15 @@ test("la saisie build_news refuse les liens externes et les contenus trop longs"
     sentence: "Tu peux maintenant regarder le nouveau chapitre.",
   };
   assert.equal(buildNewsInputSchema.safeParse(valid).success, true);
-  assert.equal(buildNewsInputSchema.safeParse({ ...valid, internalUrl: "https://evil.example" }).success, false);
+  for (const internalUrl of [
+    "https://evil.example",
+    "/\\evil.example",
+    "/%5Cevil.example",
+    "/..//evil.example",
+    "/%2e%2e//evil.example",
+  ]) {
+    assert.equal(buildNewsInputSchema.safeParse({ ...valid, internalUrl }).success, false);
+  }
   assert.equal(buildNewsInputSchema.safeParse({ ...valid, title: "x".repeat(161) }).success, false);
   assert.equal(buildNewsInputSchema.safeParse({ ...valid, thumbnail: "http://unsafe.example/image.jpg" }).success, false);
 });

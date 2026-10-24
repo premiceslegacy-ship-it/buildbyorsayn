@@ -36,10 +36,13 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
   let insertedToken: Record<string, unknown> | null = null;
   let videoRow: Record<string, unknown> | null = null;
   let requestStatus = "pending";
-  let publicationCalls = 0;
   let requestCreationCalls = 0;
+  let lastRequestArgs: Record<string, unknown> | null = null;
+  let claimKind: "publication" | "nouveaute" = "publication";
+  let claimPayload: unknown = { videoId: VIDEO_ID };
   let requestCreationFailure: string | null = null;
   let claimCalls = 0;
+  let publicationCalls = 0;
   const auditEntries: unknown[] = [];
 
   const validTokenRow = () => ({
@@ -91,7 +94,16 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
       },
       single() {
         if (name === "admin_agent_tokens" && state.op === "insert") {
-          return Promise.resolve({ data: { id: TOKEN_ID, name: state.values?.name, last_four: state.values?.last_four, permissions: state.values?.permissions, expires_at: state.values?.expires_at, created_at: new Date().toISOString() }, error: null });
+          return Promise.resolve({
+            data: { id: TOKEN_ID, name: state.values?.name, last_four: state.values?.last_four, permissions: state.values?.permissions, expires_at: state.values?.expires_at, created_at: new Date().toISOString() },
+            error: null,
+          });
+        }
+        if (name === "build_news" && state.op === "insert") {
+          return Promise.resolve({
+            data: { id: REQUEST_ID, title: "Une nouveauté", published_at: new Date().toISOString(), thumbnail: "https://storage.example/news.jpg", bloc_label: "Bloc 4", internal_url: "/blocs/3", sentence: "Une phrase courte.", created_at: new Date().toISOString() },
+            error: null,
+          });
         }
         return Promise.resolve({ data: null, error: null });
       },
@@ -112,6 +124,7 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
           if (name === "check_admin_agent_rate_limit") return { data: rateAllowed, error: null };
           if (name === "create_admin_agent_request") {
             requestCreationCalls += 1;
+            lastRequestArgs = args ?? null;
             if (requestCreationFailure) return { data: null, error: { message: requestCreationFailure } };
             return {
               data: [{ request_id: args?.p_idempotency_key, request_status: "pending", request_expires_at: new Date().toISOString() }],
@@ -125,9 +138,9 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
             return {
               data: [{
                 request_id: REQUEST_ID,
-                request_kind: "publication",
-                request_target_id: VIDEO_ID,
-                request_payload: { videoId: VIDEO_ID },
+                request_kind: claimKind,
+                request_target_id: claimKind === "nouveaute" ? REQUEST_ID : VIDEO_ID,
+                request_payload: claimKind === "nouveaute" ? claimPayload : { videoId: VIDEO_ID },
                 request_status: requestStatus,
                 request_claimed: claimed,
               }],
@@ -139,7 +152,9 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
             publicationCalls += 1;
             return { data: [{ section_id: "b2-s1", previous_mux_asset_id: null }], error: null };
           }
-          if (name === "refuse_admin_agent_request") return { data: "refused", error: null };
+          if (name === "refuse_admin_agent_request") {
+            return { data: [{ request_status: "refused", request_payload: null }], error: null };
+          }
           return { data: null, error: null };
         },
       }),
@@ -153,6 +168,15 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
         auditEntries.push(input);
         return "audit-id";
       },
+    },
+  });
+  mock.module(file("lib/buildNews/thumbnail.server.ts"), {
+    namedExports: {
+      readVideoThumbnail: async () => new Uint8Array([1, 2, 3]),
+      storeBuildNewsThumbnail: async (requestId: string) => ({ path: `news/${requestId}/abcdef123456.jpg`, publicUrl: "https://storage.example/news.jpg" }),
+      removeBuildNewsRequestThumbnails: async () => undefined,
+      removeBuildNewsThumbnail: async () => undefined,
+      assertBuildNewsThumbnail: async () => undefined,
     },
   });
 
@@ -171,7 +195,7 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
 
   const toolContext = (permissions: AgentPermission[] = [
     "liste_blocs", "envoyer_video", "ecrire_chapitres", "ecrire_resume",
-    "choisir_miniature", "demander_publication", "preparer_mail", "statut_video", "journal",
+    "choisir_miniature", "demander_publication", "preparer_mail", "lister_nouveautes", "preparer_nouveaute", "statut_video", "journal",
   ]): AgentTokenContext => ({ id: TOKEN_ID, name: "Hermes", lastFour: "aaaa", permissions, createdBy: ADMIN_ID });
 
   const publishableVideo = () => ({
@@ -344,6 +368,40 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
       assert.match(result.content[0].text, expected);
     }
     requestCreationFailure = null;
+  });
+  test("la nouveauté est une demande, copie la miniature et refuse un lien externe", async () => {
+    requestCreationCalls = 0;
+    lastRequestArgs = null;
+    const prepared = await tools.invokeAdminAgentTool("preparer_nouveaute", {
+      title: "Une nouveauté",
+      sentence: "Une phrase courte.",
+      internalUrl: "/blocs/3",
+      blocLabel: "Bloc 4",
+      miniature: { name: "image.jpg", size: 3, type: "image/jpeg", bytesBase64: "AQID" },
+    }, toolContext());
+    assert.equal(prepared.isError, undefined);
+    assert.equal(lastRequestArgs?.p_kind, "nouveaute");
+    const payload = lastRequestArgs?.p_payload as { news?: { thumbnail?: string }; thumbnailStoragePath?: string };
+    assert.equal(payload.news?.thumbnail, "https://storage.example/news.jpg");
+    assert.match(payload.thumbnailStoragePath ?? "", /^news\//);
+    assert.equal(requestCreationCalls, 1);
+    claimKind = "nouveaute";
+    claimPayload = payload;
+    requestStatus = "pending";
+    const approved = await admin.decideRequest(REQUEST_ID, "approve");
+    assert.equal(approved.status, "approved");
+    assert.equal(publicationCalls, 0);
+    claimKind = "publication";
+    for (const internalUrl of ["https://evil.example", "/\\evil.example", "/%5Cevil.example"]) {
+      const rejected = await tools.invokeAdminAgentTool("preparer_nouveaute", {
+        title: "Lien externe",
+        sentence: "Une phrase courte.",
+        internalUrl,
+        miniature: { name: "image.jpg", size: 3, type: "image/jpeg", bytesBase64: "AQID" },
+      }, toolContext());
+      assert.equal(rejected.isError, true);
+    }
+    assert.equal(requestCreationCalls, 1);
   });
 
   test("les autres écritures refusent une vidéo absente, publiée ou non prête", async () => {

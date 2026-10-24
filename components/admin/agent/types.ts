@@ -13,9 +13,17 @@ export type AgentTokenView = {
 
 export type AgentRequestView = {
   id: string;
-  kind: "publication" | "mail";
+  kind: "publication" | "mail" | "nouveaute";
   createdAt: string;
   expiresAt: string;
+  preview?: {
+    title: string;
+    sentence: string;
+    thumbnail: string;
+    internalUrl?: string | null;
+    blocLabel?: string | null;
+    publishedAt: string;
+  } | null;
 };
 
 export type AgentJournalView = {

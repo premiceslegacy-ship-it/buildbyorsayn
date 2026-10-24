@@ -10,7 +10,7 @@ export function createAdminAgentMcpServer(context: AgentTokenContext) {
     title: "Administration BUILD",
     version: "1.0.0",
   }, {
-    instructions: "Tu prépares l'administration de BUILD avec les droits de ce jeton. Un mail exige toujours une approbation humaine.",
+    instructions: "Tu prépares l'administration de BUILD avec les droits de ce jeton. Les mails et les nouveautés exigent toujours une approbation humaine.",
   });
 
   for (const [name, tool] of Object.entries(ADMIN_AGENT_TOOLS)) {

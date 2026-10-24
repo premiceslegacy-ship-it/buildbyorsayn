@@ -4,9 +4,22 @@ import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
+import { removeBuildNewsThumbnail } from "./thumbnail.server";
 import { buildNewsInputSchema, type BuildNewsInput, type BuildNewsRow } from "./model";
 
 const buildNewsColumns = "id,title,published_at,thumbnail,bloc_label,internal_url,sentence,created_at";
+const storagePathSchema = z.string().regex(/^news\/[0-9a-f-]{36}\/[0-9a-f]{12}\.(?:jpg|png|webp)$/i);
+
+async function queueThumbnailCleanup(storagePath: string, cause: unknown) {
+  const admin = createAdminSupabase();
+  const { error } = await admin.from("build_news_storage_cleanup").upsert({
+    storage_path: storagePath,
+    status: "pending",
+    last_error: cause instanceof Error ? cause.message : "La suppression de la miniature a échoué.",
+    updated_at: new Date().toISOString(),
+  }, { onConflict: "storage_path" });
+  if (error) throw new Error("La suppression de la miniature n'a pas pu être planifiée.");
+}
 
 export async function listBuildNews(): Promise<BuildNewsRow[]> {
   const supabase = await createClient();
@@ -33,15 +46,21 @@ export async function listAdminBuildNews(): Promise<BuildNewsRow[]> {
   return (data ?? []) as BuildNewsRow[];
 }
 
-export async function createBuildNews(input: BuildNewsInput): Promise<BuildNewsRow> {
-  const user = await getVerifiedAdmin();
+export async function createBuildNews(
+  input: BuildNewsInput,
+  actorUserId?: string,
+  thumbnailStoragePath?: string,
+): Promise<BuildNewsRow> {
+  const user = actorUserId ? { id: actorUserId } : await getVerifiedAdmin();
   if (!user) throw new Error("Accès refusé.");
   const parsed = buildNewsInputSchema.parse(input);
+  const storagePath = thumbnailStoragePath ? storagePathSchema.parse(thumbnailStoragePath) : null;
   const admin = createAdminSupabase();
   const { data, error } = await admin.from("build_news").insert({
     title: parsed.title,
     published_at: parsed.publishedAt,
     thumbnail: parsed.thumbnail,
+    thumbnail_storage_path: storagePath,
     bloc_label: parsed.blocLabel || null,
     internal_url: parsed.internalUrl || null,
     sentence: parsed.sentence,
@@ -61,6 +80,13 @@ export async function createBuildNews(input: BuildNewsInput): Promise<BuildNewsR
     });
   } catch (auditError) {
     await admin.from("build_news").delete().eq("id", data.id);
+    if (storagePath) {
+      try {
+        await removeBuildNewsThumbnail(storagePath);
+      } catch (storageError) {
+        await queueThumbnailCleanup(storagePath, storageError);
+      }
+    }
     throw auditError;
   }
   return data as BuildNewsRow;
@@ -74,10 +100,20 @@ export async function deleteBuildNews(newsId: string): Promise<{ deleted: boolea
   const { data, error } = await admin.from("build_news")
     .delete()
     .eq("id", id)
-    .select("id")
+    .select("id,thumbnail_storage_path")
     .maybeSingle();
   if (error) throw new Error("La nouveauté n'a pas pu être supprimée.");
   if (!data) return { deleted: false };
+  const storagePath = typeof data.thumbnail_storage_path === "string"
+    ? data.thumbnail_storage_path
+    : null;
+  if (storagePath) {
+    try {
+      await removeBuildNewsThumbnail(storagePath);
+    } catch (storageError) {
+      await queueThumbnailCleanup(storagePath, storageError);
+    }
+  }
   await recordAdminAction({
     actorUserId: user.id,
     action: "build_news.delete",
@@ -85,6 +121,7 @@ export async function deleteBuildNews(newsId: string): Promise<{ deleted: boolea
     targetId: id,
     result: "completed",
     approved: true,
+    details: { thumbnailCleanup: storagePath ? "completed_or_queued" : "none" },
   });
   return { deleted: true };
 }

@@ -11,6 +11,8 @@ export const AGENT_PERMISSION_VALUES = [
   "synchroniser_video",
   "deposer_sous_titres",
   "preparer_mail",
+  "lister_nouveautes",
+  "preparer_nouveaute",
   "statut_video",
   "journal",
 ] as const;

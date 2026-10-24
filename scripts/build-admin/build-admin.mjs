@@ -30,7 +30,7 @@ async function main(argv) {
   const json = args.includes("--json");
   const command = args[0];
   if (command === "help" || args.includes("--help")) {
-    return print("video envoyer <fichier> --bloc <numéro affiché ou protocole> --position <n> --titre <titre>\nvideo miniature <videoId> <fichier.jpg|png|webp>\nvideo lister [--bloc <numéro affiché ou protocole>] [--statut <statut>] [--sans-resume]\nvideo transcription <videoId> [--offset <n>] [--limite <n>]\nvideo synchroniser <videoId>\nvideo sous-titres <videoId> --fichier <fichier.vtt|fichier.srt>", json);
+    return print("video envoyer <fichier> --bloc <numéro affiché ou protocole> --position <n> --titre <titre>\nvideo miniature <videoId> <fichier.jpg|png|webp>\nvideo lister [--bloc <numéro affiché ou protocole>] [--statut <statut>] [--sans-resume]\nvideo transcription <videoId> [--offset <n>] [--limite <n>]\nvideo synchroniser <videoId>\nvideo sous-titres <videoId> --fichier <fichier.vtt|fichier.srt]\nnouveaute lister\nnouveaute preparer --video <id> [--titre \"…\"] [--phrase \"…\"] [--miniature fichier]", json);
   }
   if (command === "login") {
     const origin = required(option(args, "--origin", process.env.BUILD_ADMIN_ORIGIN), "Ajoute --origin.");
@@ -43,6 +43,22 @@ async function main(argv) {
     return print("Session locale supprimée.", json);
   }
   if (command === "blocs") return print(await callTool("liste_blocs", {}), json);
+  if (command === "nouveaute" && args[1] === "lister") {
+    return print(await callTool("lister_nouveautes", { limite: Number(option(args, "--limite", 20)) }), json);
+  }
+  if (command === "nouveaute" && args[1] === "preparer") {
+    const miniaturePath = option(args, "--miniature");
+    const miniature = miniaturePath ? await readFile(miniaturePath) : undefined;
+    const extension = miniaturePath ? extname(miniaturePath).toLowerCase() : "";
+    const types = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp" };
+    if (miniaturePath && !types[extension]) throw new Error("La miniature doit être JPEG, PNG ou WebP.");
+    return print(await callTool("preparer_nouveaute", {
+      videoId: required(option(args, "--video"), "Ajoute --video."),
+      title: option(args, "--titre"),
+      sentence: option(args, "--phrase"),
+      miniature: miniature ? { name: basename(miniaturePath), size: miniature.byteLength, type: types[extension], bytesBase64: miniature.toString("base64") } : undefined,
+    }), json);
+  }
   if (command === "video" && args[1] === "envoyer") {
     const file = required(args[2], "Ajoute le fichier.");
     const blocNumero = videoLocation(required(option(args, "--bloc"), "Ajoute --bloc."));
@@ -121,7 +137,7 @@ async function main(argv) {
   if (command === "journal") {
     return print(await callTool("journal", { limit: Number(option(args, "--limite", 30)) }), json);
   }
-  throw new Error("Commande attendue : login, logout, blocs, video envoyer, video miniature, video lister, video transcription, video synchroniser, video sous-titres, chapitres, resume, miniature, publier, mail, statut ou journal.");
+  throw new Error("Commande attendue : login, logout, blocs, nouveaute lister, nouveaute preparer, video envoyer, video lister, video miniature, video transcription, video synchroniser, video sous-titres, chapitres, resume, publier, mail, statut ou journal.");
 }
 
 main(process.argv.slice(2)).catch((error) => {

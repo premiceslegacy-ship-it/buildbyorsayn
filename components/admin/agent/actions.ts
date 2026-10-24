@@ -13,6 +13,7 @@ import {
   type AgentMode,
   type AgentPermission,
 } from "@/lib/adminAgent";
+import { preparedNewsSchema } from "@/lib/adminAgent/execution";
 import type { AgentActionResult, AgentViewData } from "./types";
 
 function publicError(error: unknown, fallback: string) {
@@ -51,12 +52,16 @@ export async function loadAgentViewAction(): Promise<AgentActionResult<AgentView
           revokedAt: token.revoked_at,
           createdAt: token.created_at,
         })),
-        requests: requests.map((request) => ({
-          id: request.id,
-          kind: request.kind,
-          createdAt: request.created_at,
-          expiresAt: request.expires_at,
-        })),
+        requests: requests.map((request) => {
+          const prepared = request.kind === "nouveaute" ? preparedNewsSchema.safeParse(request.payload) : null;
+          return {
+            id: request.id,
+            kind: request.kind,
+            createdAt: request.created_at,
+            expiresAt: request.expires_at,
+            preview: prepared?.success ? prepared.data.news : null,
+          };
+        }),
         journal: journal.map((entry) => ({
           id: entry.id,
           action: entry.action,
@@ -122,7 +127,8 @@ export async function decideAgentRequestAction(
   try {
     const request = (await listPendingRequests()).find((candidate) => candidate.id === requestId);
     if (!request) return { ok: false, error: "Demande introuvable." };
-    const expected = request.kind === "publication" ? "PUBLIER" : "ENVOYER";
+    let expected = request.kind === "publication" ? "PUBLIER" : "ENVOYER";
+    if (request.kind === "nouveaute") expected = "PUBLIER";
     if (decision === "approve" && confirmation !== expected) {
       return { ok: false, error: `Saisis ${expected} pour valider.` };
     }

@@ -22,17 +22,23 @@ if (process.env.BUILD_NEWS_INNER !== "1") {
   const file = (path: string) => pathToFileURL(resolve(path)).href;
   const ADMIN_ID = "123e4567-e89b-42d3-a456-426614174000";
   const NEWS_ID = "223e4567-e89b-42d3-a456-426614174000";
-  let isAdmin = false;
   let adminDatabaseCalls = 0;
   let memberDatabaseCalls = 0;
+  let isAdmin = false;
   const audits: Array<Record<string, unknown>> = [];
+  let deleteStoragePath: string | null = null;
+  let removedStoragePaths: string[] = [];
+  let storageRemoveError: Error | null = null;
+  let queuedStoragePaths: string[] = [];
+  const NEWS_THUMBNAIL_PATH = "news/123e4567-e89b-42d3-a456-426614174000/aaaaaaaaaaaa.jpg";
   type MockChain = {
     insert: () => MockChain;
     delete: () => MockChain;
     select: () => MockChain;
     eq: () => MockChain;
+    upsert: (values: { storage_path?: string }) => Promise<{ error: null }>;
     single: () => Promise<{ data: typeof row; error: null }>;
-    maybeSingle: () => Promise<{ data: { id: string }; error: null }>;
+    maybeSingle: () => Promise<{ data: { id: string; thumbnail_storage_path: string | null }; error: null }>;
   };
 
   const row = {
@@ -56,11 +62,23 @@ if (process.env.BUILD_NEWS_INNER !== "1") {
             delete: () => chain,
             select: () => chain,
             eq: () => chain,
+            upsert: async (values) => {
+              if (values.storage_path) queuedStoragePaths.push(values.storage_path);
+              return { error: null };
+            },
             single: async () => ({ data: row, error: null }),
-            maybeSingle: async () => ({ data: { id: NEWS_ID }, error: null }),
+            maybeSingle: async () => ({ data: { id: NEWS_ID, thumbnail_storage_path: deleteStoragePath }, error: null }),
           };
           return chain;
         },
+        storage: {
+          from: () => ({
+            remove: async (paths: string[]) => {
+              removedStoragePaths.push(...paths);
+              return { error: storageRemoveError };
+            },
+          }),
+    },
       }),
     },
   });
@@ -113,8 +131,18 @@ if (process.env.BUILD_NEWS_INNER !== "1") {
   test("un admin crée et supprime avec une trace d'audit", async () => {
     isAdmin = true;
     assert.equal((await buildNews.createBuildNews(input)).id, NEWS_ID);
+    deleteStoragePath = NEWS_THUMBNAIL_PATH;
     assert.deepEqual(await buildNews.deleteBuildNews(NEWS_ID), { deleted: true });
+    assert.deepEqual(removedStoragePaths, [NEWS_THUMBNAIL_PATH]);
     assert.deepEqual(audits.map((entry) => entry.action), ["build_news.create", "build_news.delete"]);
     assert.equal(audits.every((entry) => entry.actorUserId === ADMIN_ID && entry.approved === true), true);
+  });
+  test("la suppression planifie le nettoyage si Storage échoue", async () => {
+    isAdmin = true;
+    storageRemoveError = new Error("Storage indisponible");
+    deleteStoragePath = NEWS_THUMBNAIL_PATH;
+    assert.deepEqual(await buildNews.deleteBuildNews(NEWS_ID), { deleted: true });
+    assert.deepEqual(queuedStoragePaths, [NEWS_THUMBNAIL_PATH]);
+    storageRemoveError = null;
   });
 }

@@ -3,8 +3,9 @@ import "server-only";
 import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
-import { executeAgentPublication, executePreparedMail } from "./execution";
 import { DEFAULT_AGENT_TOKEN_DAYS, generateAgentToken, hashAgentToken } from "./security";
+import { removeBuildNewsThumbnail } from "@/lib/buildNews/thumbnail.server";
+import { executeAgentPublication, executePreparedMail, executePreparedNews, preparedNewsSchema } from "./execution";
 import {
   AGENT_PERMISSION_VALUES,
   type AgentMode,
@@ -158,11 +159,20 @@ export async function getAgentMode(): Promise<AgentMode> {
   return z.enum(["prepare", "autopublish"]).parse(data.mode);
 }
 
+async function cleanupNewsPayload(payload: unknown) {
+  const parsed = preparedNewsSchema.safeParse(payload);
+  if (parsed.success) await removeBuildNewsThumbnail(parsed.data.thumbnailStoragePath).catch(() => undefined);
+}
+
 export async function listPendingRequests() {
   const user = await requireHumanAdmin();
   const admin = createAdminSupabase();
   const expired = await admin.rpc("expire_admin_agent_requests", { p_actor_user_id: user.id });
   if (expired.error) throw new Error("Les demandes sont indisponibles.");
+  const expiredRequests = Array.isArray(expired.data) ? expired.data : [];
+  await Promise.all(expiredRequests
+    .filter((request) => request?.request_payload)
+    .map((request) => cleanupNewsPayload(request.request_payload)));
   const { data, error } = await admin.from("admin_agent_requests")
     .select("id,kind,target_id,payload,status,expires_at,created_at")
     .eq("status", "pending")
@@ -187,7 +197,7 @@ export async function listAgentJournal(limit = 100) {
 
 type ClaimedRequest = {
   request_id: string;
-  request_kind: "publication" | "mail";
+  request_kind: "publication" | "mail" | "nouveaute";
   request_target_id: string;
   request_payload: unknown;
   request_status: string;
@@ -205,8 +215,12 @@ export async function decideRequest(requestId: string, decision: AgentRequestDec
       p_request_id: id,
       p_actor_user_id: user.id,
     });
-    if (error || data === "missing") throw new Error("Demande introuvable.");
-    if (data === "refused") await recordAdminAction({
+    if (error || !Array.isArray(data) || data.length !== 1) throw new Error("Demande introuvable.");
+    const refused = data[0] as { request_status?: unknown; request_payload?: unknown };
+    const status = typeof refused.request_status === "string" ? refused.request_status : "missing";
+    if (status === "missing") throw new Error("Demande introuvable.");
+    if (status === "refused" || status === "expired") await cleanupNewsPayload(refused.request_payload);
+    if (status === "refused") await recordAdminAction({
       actorUserId: user.id,
       action: "agent.request_refuse",
       targetType: "agent_request",
@@ -214,7 +228,7 @@ export async function decideRequest(requestId: string, decision: AgentRequestDec
       result: "refused",
       approved: true,
     });
-    return { status: data };
+    return { status };
   }
 
   const { data, error } = await admin.rpc("claim_admin_agent_request", {
@@ -228,10 +242,14 @@ export async function decideRequest(requestId: string, decision: AgentRequestDec
     return { status: claimed.request_status, replayed: true };
   }
 
+  let executed = false;
   try {
     const result = claimed.request_kind === "publication"
       ? await executeAgentPublication(claimed.request_target_id, user.id)
-      : await executePreparedMail(claimed.request_payload);
+      : claimed.request_kind === "nouveaute"
+        ? await executePreparedNews(claimed.request_payload, user.id)
+        : await executePreparedMail(claimed.request_payload);
+    executed = true;
     const completed = await admin.from("admin_agent_requests")
       .update({ status: "approved", executed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq("id", id)
@@ -248,6 +266,7 @@ export async function decideRequest(requestId: string, decision: AgentRequestDec
     });
     return { status: "approved", result };
   } catch (executionError) {
+    if (!executed && claimed.request_kind === "nouveaute") await cleanupNewsPayload(claimed.request_payload);
     await admin.from("admin_agent_requests")
       .update({ status: "failed", error_code: "execution_failed", updated_at: new Date().toISOString() })
       .eq("id", id)

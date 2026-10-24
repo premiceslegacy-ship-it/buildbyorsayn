@@ -1,4 +1,4 @@
-"use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Clipboard, KeyRound, RefreshCw, ShieldAlert, Trash2 } from "lucide-react";
@@ -29,6 +29,8 @@ const permissionCopy: Record<AgentPermission, { label: string; description: stri
   demander_publication: { label: "Préparer une publication", description: "Préparer une demande que tu valides avant sa mise en ligne." },
   synchroniser_video: { label: "Actualiser une vidéo", description: "Récupérer l'état et les sous-titres d'une vidéo." },
   preparer_mail: { label: "Préparer un message", description: "Préparer un message qui attend toujours ton accord." },
+  lister_nouveautes: { label: "Consulter les nouveautés", description: "Voir les publications récentes et les propositions en attente." },
+  preparer_nouveaute: { label: "Préparer une nouveauté", description: "Préparer une publication avec sa miniature, sans la publier." },
   statut_video: { label: "Consulter l'état d'une vidéo", description: "Voir ce qui est prêt ou encore manquant." },
   journal: { label: "Consulter l'historique", description: "Voir les actions réalisées avec ce jeton." },
 };
@@ -39,7 +41,7 @@ const DEFAULT_NEW_TOKEN_PERMISSIONS: AgentPermission[] = [
   "journal",
 ];
 const PREPARE_PERMISSIONS: AgentPermission[] = [...AGENT_PERMISSION_VALUES];
-const READ_ONLY_PERMISSIONS: AgentPermission[] = ["liste_blocs", "lister_videos", "lire_transcription", "statut_video", "journal"];
+const READ_ONLY_PERMISSIONS: AgentPermission[] = ["liste_blocs", "lister_videos", "lire_transcription", "lister_nouveautes", "statut_video", "journal"];
 
 const DEMO_AGENT_DATA: AgentViewData = {
   mode: "prepare",
@@ -76,6 +78,7 @@ const snippets: Record<ClientName, string> = {
 const journalLabels: Record<string, string> = {
   "agent.liste_blocs": "Ton agent a lu la liste des blocs.",
   "agent.lister_videos": "Ton agent a consulté la liste des vidéos.",
+  "agent.lister_nouveautes": "Ton agent a consulté les nouveautés.",
   "agent.envoyer_video": "Ton agent a préparé l'envoi d'une vidéo.",
   "agent.lire_transcription": "Ton agent a lu des extraits de transcription.",
   "agent.ecrire_chapitres": "Ton agent a écrit les chapitres.",
@@ -86,6 +89,7 @@ const journalLabels: Record<string, string> = {
   "agent.synchroniser_video": "Ton agent a synchronisé une vidéo.",
   "agent.deposer_sous_titres": "Ton agent a ajouté des sous-titres.",
   "agent.preparer_mail": "Ton agent a préparé un mail.",
+  "agent.preparer_nouveaute": "Ton agent a préparé une nouveauté.",
   "agent.statut_video": "Ton agent a consulté le statut d'une vidéo.",
   "agent.journal": "Ton agent a consulté son journal.",
   "agent.request_create": "Ton agent a créé une demande.",
@@ -116,9 +120,10 @@ function Toggle({ checked, label, onChange }: { checked: boolean; label: string;
 }
 
 const permissionGroups: Array<{ label: string; permissions: AgentPermission[] }> = [
-  { label: "Lire", permissions: ["liste_blocs", "lister_videos", "lire_transcription", "statut_video", "journal"] },
+  { label: "Lire", permissions: ["liste_blocs", "lister_videos", "lire_transcription", "lister_nouveautes", "statut_video", "journal"] },
   { label: "Vidéos", permissions: ["envoyer_video", "synchroniser_video", "choisir_miniature", "deposer_miniature"] },
   { label: "Texte", permissions: ["ecrire_chapitres", "ecrire_resume", "deposer_sous_titres"] },
+  { label: "Nouveautés", permissions: ["preparer_nouveaute"] },
   { label: "Publication", permissions: ["demander_publication"] },
   { label: "Mails", permissions: ["preparer_mail"] },
 ];
@@ -133,7 +138,7 @@ function PermissionList({ selected, onToggle }: { selected: AgentPermission[]; o
 function Confirmation({ title, description, expected, confirmLabel, danger = false, onCancel, onConfirm }: { title: string; description: string; expected?: string; confirmLabel: string; danger?: boolean; onCancel: () => void; onConfirm: (confirmation?: string) => void }) {
   const [value, setValue] = useState("");
   const allowed = !expected || value === expected;
-  return <div className="ag-confirm-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onCancel(); }}><section role="dialog" aria-modal="true" aria-labelledby="agent-confirm-title" className="ag-confirm"><h3 id="agent-confirm-title">{title}</h3><p>{description}</p>{expected && <label>Saisis <b>{expected}</b><input autoFocus value={value} onChange={(event) => setValue(event.target.value)} /></label>}<div className="ag-actions"><button type="button" onClick={onCancel} className="ag-button ag-button-quiet">Annuler</button><button type="button" disabled={!allowed} onClick={() => onConfirm(value)} className={danger ? "ag-button ag-button-danger" : "ag-button ag-button-primary"}>{confirmLabel}</button></div></section></div>;
+  return <div className="ag-confirm-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onCancel(); }}><section role="dialog" aria-modal="true" aria-labelledby="agent-confirm-title" className="ag-confirm"><h3 id="agent-confirm-title">{title}</h3><p>{description}</p>{expected && <label>Écris <b>{expected}</b> pour confirmer.<input autoFocus value={value} onChange={(event) => setValue(event.target.value)} /></label>}<div className="ag-actions"><button type="button" onClick={onCancel} className="ag-button ag-button-quiet">Annuler</button><button type="button" disabled={!allowed} onClick={() => onConfirm(value)} className={danger ? "ag-button ag-button-danger" : "ag-button ag-button-primary"}>{confirmLabel}</button></div></section></div>;
 }
 
 export function AgentClient() {
@@ -226,7 +231,7 @@ export function AgentClient() {
 
     {requestCount > 0 && <section className="ag-panel ag-requests" aria-labelledby="agent-requests-title">
       <div className="ag-section-heading"><div><h3 id="agent-requests-title">À valider</h3><p>Une action attend ton accord.</p></div></div>
-      <ul className="ag-request-list">{data.requests.map((request) => <li className="ag-request" key={request.id}><div><h4>{request.kind === "publication" ? "Préparer cette publication ?" : "Préparer cet envoi ?"}</h4><p>{request.kind === "publication" ? "Vérifie le contenu, puis autorise la mise en ligne." : "Vérifie le message, puis autorise l'envoi."}</p><time dateTime={request.createdAt}>{dateLabel(request.createdAt)}</time></div><div className="ag-actions"><button type="button" disabled={busy} className="ag-button ag-button-quiet" onClick={() => void mutation(() => decideAgentRequestAction(request.id, "refuse"))}>Refuser</button><button type="button" disabled={busy} className="ag-button ag-button-primary" onClick={() => { setConfirm({ type: "request", request }); void playAppSound("open"); }}>Valider</button></div></li>)}</ul>
+      <ul className="ag-request-list">{data.requests.map((request) => <li className="ag-request" key={request.id}><div className="min-w-0"><h4>{request.kind === "publication" ? "Préparer cette publication ?" : request.kind === "nouveaute" ? "Préparer cette nouveauté ?" : "Préparer cet envoi ?"}</h4><p>{request.kind === "publication" ? "Vérifie le contenu, puis autorise la mise en ligne." : request.kind === "nouveaute" ? "Vérifie l'aperçu membre, puis valide sa publication." : "Vérifie le message, puis autorise l'envoi."}</p>{request.kind === "nouveaute" && request.preview ? <div className="mt-4 grid gap-3 rounded-2xl border border-white/10 bg-black/20 p-3 sm:grid-cols-[180px_minmax(0,1fr)]"><img src={request.preview.thumbnail} alt="" className="aspect-video w-full rounded-xl object-cover" /><div className="min-w-0"><p className="text-xs font-medium uppercase tracking-[.14em] text-white/50">{request.preview.blocLabel ?? "Nouveauté BUILD"}</p><h5 className="mt-1 text-base font-semibold text-white">{request.preview.title}</h5><p className="mt-1 text-sm leading-5 text-white/70">{request.preview.sentence}</p>{request.preview.internalUrl ? <p className="mt-2 truncate text-xs text-white/45">{request.preview.internalUrl}</p> : null}<time className="mt-2 block text-xs text-white/45" dateTime={request.preview.publishedAt}>{dateLabel(request.preview.publishedAt)}</time></div></div> : null}<time dateTime={request.createdAt}>{dateLabel(request.createdAt)}</time></div><div className="ag-actions"><button type="button" disabled={busy} className="ag-button ag-button-quiet" onClick={() => void mutation(() => decideAgentRequestAction(request.id, "refuse"))}>Refuser</button><button type="button" disabled={busy} className="ag-button ag-button-primary" onClick={() => { setConfirm({ type: "request", request }); void playAppSound("open"); }}>Valider</button></div></li>)}</ul>
     </section>}
 
     <div className="ag-grid">
@@ -262,8 +267,8 @@ export function AgentClient() {
     </div>
 
     <section className="ag-panel" aria-labelledby="agent-journal-title"><div className="ag-section-heading"><div><h3 id="agent-journal-title">Ce que ton agent a fait</h3><p>Le journal ne contient ni secret ni contenu de message.</p></div></div>{data.journal.length === 0 ? <p className="ag-empty">Ton agent n'a encore rien fait.</p> : <div className="ag-journal">{journalGroups.map(([day, entries]) => <section className="ag-journal-day" key={day}><h4>{day}</h4><ul>{entries.map((entry) => <li key={entry.id}><time dateTime={entry.createdAt}>{new Date(entry.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</time><span>{journalLabels[entry.action] ?? "Une action de ton agent a été enregistrée."}</span><b>{entry.result === "pending" ? "À valider" : entry.result === "refused" ? "Refusé" : entry.result === "failed" ? "Erreur" : "Fait"}</b></li>)}</ul></section>)}</div>}</section>
-    {confirm?.type === "mode" && <Confirmation title="Laisser ton agent publier seul ?" description="Il pourra publier une vidéo prête sans nouvelle demande. Les messages restent soumis à ton accord." expected="AUTORISER" confirmLabel="Autoriser" danger onCancel={() => setConfirm(null)} onConfirm={(value) => void mutation(() => setAgentModeAction("autopublish", value)).then((ok) => { if (ok) setConfirm(null); })} />}
+    {confirm?.type === "mode" && <Confirmation title="Laisser ton agent publier seul ?" description="Il pourra publier une vidéo prête sans nouvelle demande. Les messages restent soumis à ton accord." expected="AUTORISER" confirmLabel="Autoriser" onCancel={() => setConfirm(null)} onConfirm={(value) => void mutation(() => setAgentModeAction("autopublish", value)).then((ok) => { if (ok) setConfirm(null); })} />}
     {confirm?.type === "revoke" && <Confirmation title="Révoquer cet accès ?" description="Ton agent perd l'accès immédiatement. Ce qu'il a déjà fait reste dans le journal." confirmLabel="Révoquer" danger onCancel={() => setConfirm(null)} onConfirm={() => void mutation(() => revokeAgentTokenAction(confirm.tokenId)).then((ok) => { if (ok) setConfirm(null); })} />}
-    {confirm?.type === "request" && <Confirmation title={confirm.request.kind === "publication" ? "Publier cette vidéo ?" : "Envoyer ce message ?"} description="Cette action sera effectuée maintenant. Vérifie une dernière fois avant de confirmer." expected={confirm.request.kind === "publication" ? "PUBLIER" : "ENVOYER"} confirmLabel={confirm.request.kind === "publication" ? "Publier" : "Envoyer"} onCancel={() => setConfirm(null)} onConfirm={(value) => void mutation(() => decideAgentRequestAction(confirm.request.id, "approve", value)).then((ok) => { if (ok) setConfirm(null); })} />}
+    {confirm?.type === "request" && <Confirmation title={confirm.request.kind === "publication" ? "Publier cette vidéo ?" : confirm.request.kind === "nouveaute" ? "Publier cette nouveauté ?" : "Envoyer ce message ?"} description="Cette action sera effectuée maintenant. Vérifie une dernière fois avant de confirmer." expected={confirm.request.kind === "publication" || confirm.request.kind === "nouveaute" ? "PUBLIER" : "ENVOYER"} confirmLabel={confirm.request.kind === "publication" || confirm.request.kind === "nouveaute" ? "Publier" : "Envoyer"} onCancel={() => setConfirm(null)} onConfirm={(value) => void mutation(() => decideAgentRequestAction(confirm.request.id, "approve", value)).then((ok) => { if (ok) setConfirm(null); })} />}
   </div>;
 }
