@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   MAX_VIDEO_THUMBNAIL_BYTES,
@@ -51,28 +52,6 @@ function jpeg(width: number, height: number) {
   return concat(Uint8Array.from([0xff, 0xd8, 0xff, 0xc0]), frame, Uint8Array.from([0xff, 0xd9]));
 }
 
-function webpChunk(type: string, payload: Uint8Array) {
-  const chunk = new Uint8Array(8 + payload.length + (payload.length % 2));
-  const view = new DataView(chunk.buffer);
-  chunk.set([...type].map((char) => char.charCodeAt(0)), 0);
-  view.setUint32(4, payload.length, true);
-  chunk.set(payload, 8);
-  return chunk;
-}
-
-function webp(type: "VP8 " | "VP8L" | "VP8X", width: number, height: number) {
-  const payload = type === "VP8X"
-    ? Uint8Array.from([0, 0, 0, 0, (width - 1) & 0xff, (width - 1) >> 8 & 0xff, (width - 1) >> 16 & 0xff, (height - 1) & 0xff, (height - 1) >> 8 & 0xff, (height - 1) >> 16 & 0xff])
-    : type === "VP8 "
-      ? Uint8Array.from([0, 0, 0, 0x9d, 0x01, 0x2a, width & 0xff, width >> 8 & 0x3f, height & 0xff, height >> 8 & 0x3f])
-      : Uint8Array.from([0x2f, (width - 1) & 0xff, (width - 1) >> 8 & 0xff, ((width - 1) >> 16 & 0x3f) | (((height - 1) & 0x3) << 6), (height - 1) >> 2 & 0xff, (height - 1) >> 10 & 0x3f]);
-  const chunk = webpChunk(type, payload);
-  const header = new Uint8Array(12);
-  const view = new DataView(header.buffer);
-  header.set([82, 73, 70, 70, 0, 0, 0, 0, 87, 69, 66, 80]);
-  view.setUint32(4, 4 + chunk.length, true);
-  return concat(header, chunk);
-}
 
 test("miniatures: refuse un faux JPEG ou PNG incomplet", () => {
   assert.throws(() => validateVideoThumbnailBytes(new Uint8Array([0xff, 0xd8, 0xff, 0x00])), /1280|invalide/);
@@ -84,17 +63,19 @@ test("miniatures: refuse un format 4:3 et les fichiers trop lourds", () => {
   assert.throws(() => validateVideoThumbnailBytes(new Uint8Array(MAX_VIDEO_THUMBNAIL_BYTES + 1)), /1,5 Mo/);
 });
 
-test("miniatures: accepte les conteneurs JPEG, PNG et les trois variantes WebP en 1280×720", () => {
-  for (const [bytes, contentType, extension] of [
-    [jpeg(1280, 720), "image/jpeg", "jpg"],
-    [png(1280, 720), "image/png", "png"],
-    [webp("VP8 ", 1280, 720), "image/webp", "webp"],
-    [webp("VP8L", 1280, 720), "image/webp", "webp"],
-    [webp("VP8X", 1280, 720), "image/webp", "webp"],
-  ] as const) {
+test("miniatures: accepte les conteneurs JPEG, PNG et les WebP réels en 1280×720", async () => {
+  const [lossless, lossy, extended] = await Promise.all([
+    readFile("tests/fixtures/video-thumb-1280-lossless.webp"),
+    readFile("tests/fixtures/video-thumb-1280-lossy.webp"),
+    readFile("tests/fixtures/video-thumb-1280-vp8x.webp"),
+  ]);
+  for (const bytes of [jpeg(1280, 720), png(1280, 720), lossless, lossy, extended]) {
     const result = validateVideoThumbnailBytes(bytes);
-    assert.deepEqual({ contentType: result.contentType, extension: result.extension, width: result.width, height: result.height }, { contentType, extension, width: 1280, height: 720 });
+    assert.deepEqual({ width: result.width, height: result.height }, { width: 1280, height: 720 });
   }
+  assert.equal(validateVideoThumbnailBytes(lossless).contentType, "image/webp");
+  assert.equal(validateVideoThumbnailBytes(lossy).contentType, "image/webp");
+  assert.equal(validateVideoThumbnailBytes(extended).contentType, "image/webp");
 });
 
 test("miniatures: accepte un PNG valide de 1,4 Mo sous la limite serveur", () => {

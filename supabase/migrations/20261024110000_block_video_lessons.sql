@@ -2,6 +2,7 @@ begin;
 
 -- There are intentionally no existing video_lessons rows. This is a clean cutover:
 -- videos belong to a block and position, never to a written chapter.
+lock table public.video_lessons in access exclusive mode;
 do $$
 begin
   if exists (select 1 from public.video_lessons limit 1) then

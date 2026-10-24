@@ -7,6 +7,7 @@ import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { MAX_VIDEO_THUMBNAIL_BYTES, removeStoredVideoThumbnail, storeVideoThumbnail } from "@/lib/mux/thumbnail.server";
 import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
+import { replaceVideoThumbnail } from "@/lib/mux/thumbnailMutation.server";
 import { parseChapterLines, validateManualTranscript } from "@/lib/mux/videoContent";
 import { syncYoutubeChannel } from "@/lib/youtube/feed";
 import { YOUTUBE_VIDEOS_CACHE_TAG } from "@/lib/nouveautes/loadVideos";
@@ -273,6 +274,7 @@ export async function saveAdminVideoSummaryAction(input: unknown): Promise<{ ok:
     .update({ summary: parsed.data.summary, updated_at: new Date().toISOString() })
     .eq("id", parsed.data.videoId)
     .is("published_at", null)
+    .is("replaced_at", null)
     .select("id")
     .maybeSingle();
   if (error || !updated) return { ok: false, message: "Le résumé n'a pas pu être enregistré." };
@@ -374,16 +376,13 @@ export async function setAdminVideoThumbnailAction(input: unknown): Promise<{ ok
     return { ok: false, message: "Attends la fin du traitement avant de choisir la miniature." };
   }
   const thumbnail = `mux:${parsed.data.timeSeconds}`;
-  const { data: replacement, error } = await admin.rpc("replace_video_thumbnail", {
-    p_video_id: parsed.data.videoId,
-    p_actor_user_id: user.id,
-    p_thumbnail: thumbnail,
-  });
-  if (error || !Array.isArray(replacement) || replacement.length !== 1) {
+  let replacement: { oldStoragePath: string | null };
+  try {
+    replacement = await replaceVideoThumbnail(admin, parsed.data.videoId, user.id, thumbnail, true);
+  } catch {
     return { ok: false, message: "La miniature n'a pas pu être enregistrée." };
   }
-  const oldStoragePath = typeof replacement[0]?.old_storage_path === "string" ? replacement[0].old_storage_path : null;
-  if (oldStoragePath) await removeStoredVideoThumbnail(oldStoragePath).catch(() => undefined);
+  if (replacement.oldStoragePath) await removeStoredVideoThumbnail(replacement.oldStoragePath).catch(() => undefined);
   await recordAdminAction({
     actorUserId: user.id,
     action: "video.thumbnail_select",
@@ -422,17 +421,14 @@ export async function setAdminVideoThumbnailImageAction(input: FormData): Promis
     return { ok: false, message: error instanceof Error ? error.message : "La miniature est invalide." };
   }
   const thumbnail = `storage:${stored.path}`;
-  const { data: replacement, error: updateError } = await admin.rpc("replace_video_thumbnail", {
-    p_video_id: videoId,
-    p_actor_user_id: user.id,
-    p_thumbnail: thumbnail,
-  });
-  if (updateError || !Array.isArray(replacement) || replacement.length !== 1) {
+  let replacement: { oldStoragePath: string | null };
+  try {
+    replacement = await replaceVideoThumbnail(admin, videoId, user.id, thumbnail, true);
+  } catch {
     await removeStoredVideoThumbnail(stored.path).catch(() => undefined);
     return { ok: false, message: "La miniature n'a pas pu être enregistrée." };
   }
-  const oldPath = typeof replacement[0]?.old_storage_path === "string" ? replacement[0].old_storage_path : null;
-  if (oldPath && oldPath !== stored.path) await removeStoredVideoThumbnail(oldPath).catch(() => undefined);
+  if (replacement.oldStoragePath && replacement.oldStoragePath !== stored.path) await removeStoredVideoThumbnail(replacement.oldStoragePath).catch(() => undefined);
   await recordAdminAction({
     actorUserId: user.id,
     action: "video.thumbnail_upload",

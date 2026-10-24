@@ -1,9 +1,12 @@
 begin;
 
+drop function if exists public.replace_video_thumbnail(uuid, uuid, text);
+
 create or replace function public.replace_video_thumbnail(
   p_video_id uuid,
   p_actor_user_id uuid,
-  p_thumbnail text
+  p_thumbnail text,
+  p_allow_published boolean default true
 )
 returns table (old_storage_path text)
 language plpgsql
@@ -28,7 +31,8 @@ begin
   from public.video_lessons
   where id = p_video_id
   for update;
-  if v_video.id is null or v_video.replaced_at is not null or v_video.status <> 'ready' then
+  if v_video.id is null or v_video.replaced_at is not null or v_video.status <> 'ready'
+    or (v_video.published_at is not null and not p_allow_published) then
     raise exception 'video thumbnail is not writable';
   end if;
 
@@ -45,7 +49,7 @@ begin
 end;
 $$;
 
-revoke all on function public.replace_video_thumbnail(uuid, uuid, text) from public, anon, authenticated;
-grant execute on function public.replace_video_thumbnail(uuid, uuid, text) to service_role;
+revoke all on function public.replace_video_thumbnail(uuid, uuid, text, boolean) from public, anon, authenticated;
+grant execute on function public.replace_video_thumbnail(uuid, uuid, text, boolean) to service_role;
 
 commit;

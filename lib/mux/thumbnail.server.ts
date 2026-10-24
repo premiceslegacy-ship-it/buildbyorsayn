@@ -99,9 +99,10 @@ function webpDimensions(bytes: Uint8Array): { width: number; height: number } | 
       dimensions = { width: readUint24(view, payload + 4, true) + 1, height: readUint24(view, payload + 7, true) + 1 };
     } else if (kind === "VP8 " && size >= 10 && bytes[payload + 3] === 0x9d && bytes[payload + 4] === 0x01 && bytes[payload + 5] === 0x2a) {
       dimensions = { width: readUint16(view, payload + 6, true) & 0x3fff, height: readUint16(view, payload + 8, true) & 0x3fff };
-    } else if (kind === "VP8L" && size >= 6 && bytes[payload] === 0x2f) {
-      const width = 1 + (bytes[payload + 1] | (bytes[payload + 2] << 8) | ((bytes[payload + 3] & 0x3f) << 16));
-      const height = 1 + ((bytes[payload + 3] >> 6) | (bytes[payload + 4] << 2) | ((bytes[payload + 5] & 0x3f) << 10));
+    } else if (kind === "VP8L" && size >= 5 && bytes[payload] === 0x2f) {
+      const header = view.getUint32(payload + 1, true);
+      const width = 1 + (header & 0x3fff);
+      const height = 1 + ((header >>> 14) & 0x3fff);
       dimensions = { width, height };
     }
     offset = paddedEnd;

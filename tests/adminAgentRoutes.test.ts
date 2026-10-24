@@ -134,6 +134,7 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
               error: null,
             };
           }
+          if (name === "replace_video_thumbnail") return { data: [{ old_storage_path: null }], error: null };
           if (name === "publish_video_lesson") {
             publicationCalls += 1;
             return { data: [{ section_id: "b2-s1", previous_mux_asset_id: null }], error: null };
@@ -360,6 +361,9 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
       file: { bytesBase64: "not-a-thumbnail" },
     }, toolContext());
     assert.match(result.content[0].text, /déjà publiée/);
+    videoRow = publishableVideo();
+    result = await tools.invokeAdminAgentTool("choisir_miniature", { videoId: VIDEO_ID, timeSeconds: 1 }, toolContext());
+    assert.equal(result.isError, false);
     videoRow = { ...publishableVideo(), status: "preparing" };
     result = await tools.invokeAdminAgentTool("choisir_miniature", { videoId: VIDEO_ID, timeSeconds: 1 }, toolContext());
     assert.match(result.content[0].text, /n'est pas prête/);

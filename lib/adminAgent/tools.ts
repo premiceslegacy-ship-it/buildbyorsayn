@@ -24,8 +24,8 @@ import {
   decodeVideoThumbnailBase64,
   removeStoredVideoThumbnail,
   storeVideoThumbnail,
-  storedVideoThumbnailPath,
 } from "@/lib/mux/thumbnail.server";
+import { replaceVideoThumbnail } from "@/lib/mux/thumbnailMutation.server";
 import { createMuxAdminClient, recordAdminAction } from "@/lib/mux/adminServer";
 import { syncMuxTranscriptForReadyAsset } from "@/lib/mux/transcript.server";
 import {
@@ -419,10 +419,8 @@ export const ADMIN_AGENT_TOOLS = {
       if (!data.duration_seconds || input.timeSeconds >= data.duration_seconds) {
         throw new AgentToolError("Le temps choisi dépasse la durée de la vidéo.");
       }
-      const updated = await admin.from("video_lessons")
-        .update({ thumbnail: `mux:${input.timeSeconds}`, updated_at: new Date().toISOString() })
-        .eq("id", input.videoId).eq("status", "ready").is("published_at", null).is("replaced_at", null).select("id").maybeSingle();
-      if (updated.error || !updated.data) throw new Error("La miniature n'a pas pu être enregistrée.");
+      const replacement = await replaceVideoThumbnail(admin, input.videoId, context.createdBy, `mux:${input.timeSeconds}`);
+      if (replacement.oldStoragePath) await removeStoredVideoThumbnail(replacement.oldStoragePath).catch(() => undefined);
       await auditTool(context, "choisir_miniature", input.videoId, { timeSeconds: input.timeSeconds });
       return { videoId: input.videoId, timeSeconds: input.timeSeconds };
     },
@@ -449,20 +447,16 @@ export const ADMIN_AGENT_TOOLS = {
         throw new AgentToolError(error instanceof Error ? error.message : "La miniature est invalide.");
       }
       const thumbnail = `storage:${stored.path}`;
-      const updated = await admin.from("video_lessons")
-        .update({ thumbnail, updated_at: new Date().toISOString() })
-        .eq("id", input.videoId)
-        .eq("status", "ready")
-        .is("published_at", null)
-        .is("replaced_at", null)
-        .select("id")
-        .maybeSingle();
-      if (updated.error || !updated.data) {
+      let replacement: { oldStoragePath: string | null };
+      try {
+        replacement = await replaceVideoThumbnail(admin, input.videoId, context.createdBy, thumbnail);
+      } catch {
         await removeStoredVideoThumbnail(stored.path).catch(() => undefined);
         throw new Error("La miniature n'a pas pu être enregistrée.");
       }
-      const oldPath = storedVideoThumbnailPath(video.thumbnail);
-      if (oldPath && oldPath !== stored.path) await removeStoredVideoThumbnail(oldPath).catch(() => undefined);
+      if (replacement.oldStoragePath && replacement.oldStoragePath !== stored.path) {
+        await removeStoredVideoThumbnail(replacement.oldStoragePath).catch(() => undefined);
+      }
       await auditTool(context, "deposer_miniature", input.videoId, {
         width: stored.width,
         height: stored.height,
