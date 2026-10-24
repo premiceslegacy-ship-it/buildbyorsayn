@@ -39,8 +39,11 @@ test("le backfill ne rattache une référence qu'avec un e-mail Auth confirmé i
 test("le fallback du backfill vient des claims d'upgrade accordées et non du tier courant", async () => {
   const source = await readFile("scripts/backfill-stripe-ledger.ts", "utf8");
   assert.match(source, /stripe_upgrade_claims/);
-  assert.match(source, /status", "granted"/);
+  assert.match(source, /claim\?\.status === "granted"/);
   assert.match(source, /inferred\?\.priceId === process\.env\.STRIPE_UPGRADE_PRICE_ID/);
+  assert.match(source, /source: "upgrade_claim"/);
+  assert.match(source, /unresolved_upgrade/);
+  assert.match(source, /allow-unresolved/);
   assert.doesNotMatch(source, /loadProfileTiers/);
 });
 
@@ -50,4 +53,12 @@ test("le ledger expose une transaction de backfill, les marqueurs terminaux et l
   assert.match(sql, /record_stripe_checkout_terminal/);
   assert.match(sql, /status in \('refunded', 'revoked'\)/);
   assert.match(sql, /existing_status = 'granted'[\s\S]*fallback_tier[\s\S]*'beginner'/);
+});
+
+test("le chemin upgrade legacy garde le fallback et le même ordre ledger puis profil que le backfill", async () => {
+  const sql = await readFile("supabase/migrations/20261024101000_stripe_purchase_ledger.sql", "utf8");
+  assert.match(sql, /hashtextextended\(p_user_id::text/);
+  assert.match(sql, /fallback_tier = coalesce\(public\.stripe_purchase_ledger\.fallback_tier, excluded\.fallback_tier\)/);
+  assert.match(sql, /insert into public\.stripe_purchase_ledger[\s\S]*perform public\.recalculate_stripe_entitlement/);
+  assert.doesNotMatch(sql, /select tier into current_tier from public\.profiles where id = p_user_id for update/);
 });

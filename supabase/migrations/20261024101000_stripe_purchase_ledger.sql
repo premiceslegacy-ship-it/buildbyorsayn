@@ -491,6 +491,9 @@ begin
     or char_length(p_checkout_session_id) not between 3 and 255 then
     return 'conflict';
   end if;
+  -- Serialize all legacy upgrade attempts before the ledger row, then recalculate
+  -- after the ledger write, matching the backfill ledger->profile lock order.
+  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_user_id::text, 0::bigint));
 
   insert into public.stripe_upgrade_claims (checkout_session_id, user_id, status)
   values (p_checkout_session_id, p_user_id, 'pending')
@@ -517,6 +520,7 @@ begin
                 then public.stripe_purchase_ledger.status
               else 'active'
             end,
+            fallback_tier = coalesce(public.stripe_purchase_ledger.fallback_tier, excluded.fallback_tier),
             updated_at = pg_catalog.now();
       perform public.recalculate_stripe_entitlement(p_user_id);
       return 'duplicate';
@@ -524,7 +528,7 @@ begin
     return 'refuse';
   end if;
 
-  select tier into current_tier from public.profiles where id = p_user_id for update;
+  select tier into current_tier from public.profiles where id = p_user_id;
   if current_tier = 'beginner' then
     insert into public.stripe_purchase_ledger (
       checkout_session_id, payment_intent_id, user_id, tier, status, fallback_tier

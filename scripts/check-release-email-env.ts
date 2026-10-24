@@ -1,5 +1,6 @@
 import { config as loadEnv } from "dotenv";
 
+// Local/CI preflight only. This does not inspect or confirm Vercel environment variables.
 loadEnv({ path: ".env.local", quiet: true });
 
 const requiredProductionVariables = ["RESEND_API_KEY", "RESEND_FROM_EMAIL"] as const;

@@ -3,10 +3,11 @@ import Stripe from "stripe";
 import { createAdminSupabase } from "../lib/supabase/admin";
 
 const APPLY = process.argv.includes("--apply");
+const ALLOW_UNRESOLVED = process.argv.includes("--allow-unresolved");
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
 
 type LedgerStatus = "active" | "pending" | "refunded" | "disputed" | "revoked";
-type UserMatch = { id: string; email: string | null; source: "client_reference_id" | "email" };
+type UserMatch = { id: string; email: string | null; source: "client_reference_id" | "email" | "upgrade_claim" };
 type BackfillRecord = {
   checkoutSessionId: string;
   paymentIntentId: string | null;
@@ -47,13 +48,12 @@ async function loadAuthUsers(admin: ReturnType<typeof createAdminSupabase>): Pro
 
 type UpgradeClaim = { checkout_session_id: string; user_id: string; status: string };
 
-async function loadGrantedUpgradeClaims(
+async function loadUpgradeClaims(
   admin: ReturnType<typeof createAdminSupabase>,
 ): Promise<Map<string, UpgradeClaim>> {
   const { data, error } = await admin
     .from("stripe_upgrade_claims")
-    .select("checkout_session_id,user_id,status")
-    .eq("status", "granted");
+    .select("checkout_session_id,user_id,status");
   if (error) throw new Error(`Upgrade claim lookup failed: ${error.message}`);
   return new Map((data as UpgradeClaim[]).map((claim) => [claim.checkout_session_id, claim]));
 }
@@ -112,7 +112,7 @@ async function currentPaymentStatus(paymentIntent: string | null): Promise<{ sta
 
 async function collectRecords(
   authUsers: AuthUser[],
-  grantedUpgradeClaims: Map<string, UpgradeClaim>,
+  upgradeClaims: Map<string, UpgradeClaim>,
 ): Promise<BackfillRecord[]> {
   const records: BackfillRecord[] = [];
   for await (const session of stripe.checkout.sessions.list({ status: "complete", limit: 100 })) {
@@ -121,15 +121,43 @@ async function collectRecords(
     const paymentIntent = paymentIntentId(session.payment_intent);
     const inferred = await inferTier(session.id);
     const payment = await currentPaymentStatus(paymentIntent);
-    const user = await resolveUser(authUsers, session, customerEmail);
+    const claim = upgradeClaims.get(session.id);
+    const isUpgrade = inferred?.priceId === process.env.STRIPE_UPGRADE_PRICE_ID;
+    let user = await resolveUser(authUsers, session, customerEmail);
+    let reason: string | null = !inferred
+      ? "unknown_price"
+      : !paymentIntent
+        ? "missing_payment_intent"
+        : user
+          ? null
+          : "no_verified_account_match";
+    let fallbackTier: "beginner" | null = null;
+
+    if (isUpgrade) {
+      // A granted server claim is authoritative, including when the customer's
+      // Stripe email changed after the upgrade was granted.
+      if (claim?.status === "granted" && isUuid(claim.user_id)) {
+        const claimedAuthUser = authUsers.find((candidate) => candidate.id === claim.user_id);
+        if (claimedAuthUser) {
+          user = {
+            id: claim.user_id,
+            email: claimedAuthUser.email ?? null,
+            source: "upgrade_claim",
+          };
+          fallbackTier = "beginner";
+          reason = paymentIntent ? null : "missing_payment_intent";
+        } else {
+          user = null;
+          reason = "unresolved_upgrade_claim_user";
+        }
+      } else {
+        user = null;
+        reason = "unresolved_upgrade";
+      }
+    }
+
     const finalStatus: LedgerStatus | null = inferred && paymentIntent
       ? payment.status === "active" && !user ? "pending" : payment.status
-      : null;
-    const claim = grantedUpgradeClaims.get(session.id);
-    const fallbackTier = inferred?.priceId === process.env.STRIPE_UPGRADE_PRICE_ID
-      && claim?.status === "granted"
-      && claim.user_id === user?.id
-      ? "beginner"
       : null;
     records.push({
       checkoutSessionId: session.id,
@@ -146,7 +174,7 @@ async function collectRecords(
         tier: inferred?.tier ?? null,
         status: finalStatus,
       },
-      reason: !inferred ? "unknown_price" : !paymentIntent ? "missing_payment_intent" : user ? null : "no_verified_account_match",
+      reason,
     });
   }
   return records;
@@ -180,12 +208,18 @@ async function main() {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is required.");
   const admin = createAdminSupabase();
   const authUsers = await loadAuthUsers(admin);
-  const grantedUpgradeClaims = await loadGrantedUpgradeClaims(admin);
-  const records = await collectRecords(authUsers, grantedUpgradeClaims);
+  const upgradeClaims = await loadUpgradeClaims(admin);
+  const records = await collectRecords(authUsers, upgradeClaims);
   const unmatched = records.filter((record) => !record.user);
-  console.log(JSON.stringify({ mode: APPLY ? "apply" : "dry-run", records, unmatched }, null, 2));
+  const unresolvedUpgrades = records.filter((record) => record.reason?.startsWith("unresolved_upgrade"));
+  console.log(JSON.stringify({ mode: APPLY ? "apply" : "dry-run", records, unmatched, unresolvedUpgrades }, null, 2));
+  if (APPLY && unresolvedUpgrades.length && !ALLOW_UNRESOLVED) {
+    throw new Error(
+      `${unresolvedUpgrades.length} upgrade checkout(s) have no granted server claim; pass --allow-unresolved to keep them pending.`,
+    );
+  }
   if (APPLY) await applyRecords(admin, records);
-  else console.log("DRY-RUN only. Pass --apply to write the ledger; this script did not write Supabase.");
+  else console.log("DRY-RUN only. Pass --apply to write the ledger; unresolved upgrades remain pending.");
 }
 
 main().catch((error) => {

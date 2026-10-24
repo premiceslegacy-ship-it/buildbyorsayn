@@ -19,20 +19,20 @@ test("la porte de release ne référence que des sous-commandes déclarées", ()
   }
 });
 
-test("la porte de release vérifie les identifiants Resend en mode production", () => {
+test("la porte de release vérifie les identifiants Resend du préflight local/CI", () => {
   const manifest = JSON.parse(readFileSync("package.json", "utf8")) as { scripts: Record<string, string> };
-  const preflight = readFileSync("scripts/verify-production-env.ts", "utf8");
-  assert.equal(manifest.scripts["verify:production-env"], "tsx scripts/verify-production-env.ts --production");
-  assert.match(manifest.scripts["verify:release"], /npm run verify:production-env/);
+  const preflight = readFileSync("scripts/check-release-email-env.ts", "utf8");
+  assert.equal(manifest.scripts["check:release-email-env"], "tsx scripts/check-release-email-env.ts --production");
+  assert.match(manifest.scripts["verify:release"], /npm run check:release-email-env/);
   assert.match(preflight, /RESEND_API_KEY/);
   assert.match(preflight, /RESEND_FROM_EMAIL/);
-  assert.match(preflight, /process\.argv\.includes\("--production"\)/);
+  assert.match(preflight, /does not inspect or confirm Vercel/);
 });
 
 test("le préflight production accepte une configuration Resend complète", () => {
   const result = spawnSync(
     process.execPath,
-    ["--import", "tsx", "scripts/verify-production-env.ts", "--production"],
+    ["--import", "tsx", "scripts/check-release-email-env.ts", "--production"],
     {
       encoding: "utf8",
       env: {
@@ -49,7 +49,7 @@ test("le préflight production accepte une configuration Resend complète", () =
 test("le préflight production refuse une configuration Resend absente", () => {
   const result = spawnSync(
     process.execPath,
-    ["--import", "tsx", "scripts/verify-production-env.ts", "--production"],
+    ["--import", "tsx", "scripts/check-release-email-env.ts", "--production"],
     {
       encoding: "utf8",
       env: { ...process.env, RESEND_API_KEY: "", RESEND_FROM_EMAIL: "" },
