@@ -37,6 +37,8 @@ authedTest.describe("IllustratedCard visual regression (skills, requires a sessi
     const grid = page.getByRole("region", { name: "Catalogue" }).getByRole("list");
     await authedExpect(grid).toBeVisible({ timeout: 10_000 });
     await waitForStableCardGrid(page, grid);
+    // La barre fixe se recolle à l'endroit du défilement : elle masque la grille selon la hauteur.
+    await page.addStyleTag({ content: ".navbar { visibility: hidden !important; }" });
     await authedExpect(grid).toHaveScreenshot("skills-card-grid.png");
   });
 });
