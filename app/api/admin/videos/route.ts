@@ -12,8 +12,7 @@ import {
   validateChapterTimeline,
 } from "@/lib/mux/adminLessons";
 import { getVerifiedAdmin, recordAdminAction, createMuxAdminClient, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
-import { signMuxThumbnailUrl } from "@/lib/mux/transcript.server";
-import { storedVideoThumbnailPath } from "@/lib/mux/thumbnail.server";
+import { withAdminThumbnailUrls } from "@/lib/mux/adminThumbnails.server";
 
 const MAX_CREATE_BODY_BYTES = 300 * 1024;
 
@@ -35,19 +34,7 @@ export async function GET() {
 
   return NextResponse.json({
     ok: true,
-    videos: await Promise.all((data ?? []).map(async (row) => {
-      const path = storedVideoThumbnailPath(row.thumbnail);
-      let thumbnailUrl = path ? admin.storage.from("video-thumbnails").getPublicUrl(path).data.publicUrl : null;
-      const muxTime = typeof row.thumbnail === "string" && row.thumbnail.startsWith("mux:") ? Number(row.thumbnail.slice(4)) : null;
-      if (!thumbnailUrl && Number.isFinite(muxTime) && typeof row.playback_id === "string") {
-        try {
-          thumbnailUrl = await signMuxThumbnailUrl(row.playback_id, { time: muxTime, width: 640 });
-        } catch {
-          thumbnailUrl = null;
-        }
-      }
-      return { ...row, thumbnailUrl };
-    })) as AdminVideoLessonRow[],
+    videos: await withAdminThumbnailUrls(admin, (data ?? []) as AdminVideoLessonRow[]),
   });
 }
 

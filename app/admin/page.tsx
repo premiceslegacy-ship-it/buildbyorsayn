@@ -13,6 +13,7 @@ import { YoutubeNewsPanel } from "@/components/admin/YoutubeNewsPanel";
 import { DaRoot } from "@/components/da/DaRoot";
 import { BLOCS_DATA } from "@/lib/mockData";
 import type { AdminVideoLessonRow } from "@/lib/mux/adminServer";
+import { withAdminThumbnailUrls } from "@/lib/mux/adminThumbnails.server";
 import { createClient } from "@/lib/supabase/server";
 import { AdminVideoManager } from "./AdminVideoManager";
 import "./videos.css";
@@ -229,7 +230,7 @@ export default async function AdminPage() {
           videos: (
             <AdminVideoManager
               blocs={[...BLOCS_DATA.map((bloc) => ({ id: bloc.id, displayNumber: bloc.displayNumber, title: bloc.titre })), { id: "protocole", displayNumber: "protocole" as const, title: "Protocole zéro" }]}
-              initialVideos={(videoData ?? []) as AdminVideoLessonRow[]}
+              initialVideos={await withAdminThumbnailUrls(supabaseAdmin, (videoData ?? []) as AdminVideoLessonRow[])}
               setupMissing={Boolean(videoError)}
             />
           ),
