@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, readFile, stat } from "node:fs/promises";
+import { mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -93,4 +93,34 @@ test("le login n'affiche jamais le jeton et les commandes statut et journal sont
   const source = await readFile("scripts/build-admin/build-admin.mjs", "utf8");
   assert.match(source, /command === "statut"[\s\S]*callTool\("statut_video"/);
   assert.match(source, /command === "journal"[\s\S]*callTool\("journal"/);
+});
+test("video envoyer transmet le titre et la validation uploadInput au premier appel", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "build-admin-video-"));
+  const file = join(directory, "cours.mp4");
+  await writeFile(file, "video");
+  const { uploadVideo } = await import(`../scripts/build-admin/client.mjs?upload=${Date.now()}`);
+  const calls: Array<{ tool: string; input: Record<string, unknown> }> = [];
+  const fakeFetch = async (input: URL | RequestInfo, init?: RequestInit) => {
+    const url = String(input);
+    if (url === "https://build.example/api/agent/tools") {
+      const payload = JSON.parse(String(init?.body)) as { tool: string; input: Record<string, unknown> };
+      calls.push(payload);
+      if (payload.tool === "envoyer_video") {
+        assert.equal(payload.input.title, "Chapitre test");
+        return Response.json({ ok: true, result: { structuredContent: { videoId: "123e4567-e89b-42d3-a456-426614174000", uploadUrl: "https://mux.example/upload" } } });
+      }
+      assert.equal(payload.tool, "statut_video");
+      return Response.json({ ok: true, result: { structuredContent: { status: "ready" } } });
+    }
+    assert.equal(url, "https://mux.example/upload");
+    return new Response(null, { status: 200 });
+  };
+  const result = await uploadVideo(file, 3, 1, "Chapitre test", {
+    config: { origin: "https://build.example", token: `btv_agt_${"d".repeat(43)}` },
+    fetch: fakeFetch,
+    timeoutMs: 1_000,
+    pollIntervalMs: 1,
+  });
+  assert.deepEqual(result, { videoId: "123e4567-e89b-42d3-a456-426614174000", status: "ready" });
+  assert.deepEqual(calls.map((call) => call.tool), ["envoyer_video", "statut_video"]);
 });

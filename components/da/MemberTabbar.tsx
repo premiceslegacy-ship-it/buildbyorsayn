@@ -18,7 +18,8 @@ type Rect = { left: number; top: number; width: number; height: number };
 // La barre est remontée à chaque changement de page (écran de chargement, puis page). Ces deux mémoires
 // de module survivent aux remontages : la pastille part de l'onglet quitté et glisse vers l'onglet touché,
 // sans repartir de zéro.
-let pending: { href: string; from: string } | null = null;
+let pending: { href: string; from: string; at: number } | null = null;
+const PENDING_MS = 4000;
 let lastPill: Rect | null = null;
 
 function isCurrent(pathname: string, href: string) {
@@ -27,10 +28,17 @@ function isCurrent(pathname: string, href: string) {
 
 export function MemberTabbar({ unseen }: { unseen?: { label: string; count: number } | null }) {
   const pathname = usePathname();
-  const [, rerender] = useState(0);
+  const [pendingHref, setPendingHref] = useState<string | null>(() => (pending && pending.from === pathname && Date.now() - pending.at <= PENDING_MS ? pending.href : null));
   const slider = useRef<HTMLSpanElement>(null);
-  const inTransit = pending && pending.from === pathname ? pending.href : null;
-  const active = inTransit ?? MEMBER_NAV.find((item) => isCurrent(pathname, item.href))?.href ?? null;
+  const active = pendingHref ?? MEMBER_NAV.find((item) => isCurrent(pathname, item.href))?.href ?? null;
+
+  // La page a changé (ou l'on revient en arrière) : l'onglet touché n'est plus en attente.
+  const [seenPath, setSeenPath] = useState(pathname);
+  if (seenPath !== pathname) {
+    setSeenPath(pathname);
+    setPendingHref(null);
+  }
+  useEffect(() => { pending = null; }, [pathname]);
 
   useEffect(() => {
     const pill = slider.current;
@@ -68,7 +76,7 @@ export function MemberTabbar({ unseen }: { unseen?: { label: string; count: numb
   }, [active]);
 
   return (
-    <LiquidGlassNav className="tabbar" aria-label="Navigation mobile" glass={{ teinte: "rgba(0,0,0,.34)", reflet: 2, bord: 0.44, force: 1.9, dispersion: 1.5, angle: -28 }}>
+    <LiquidGlassNav className="tabbar" aria-label="Navigation mobile" glass={{ teinte: "rgba(0,0,0,.5)", reflet: 2, bord: 0.44, force: 1.9, dispersion: 0.6, angle: -28, flou: 2.4 }}>
       <span className="slider" ref={slider} aria-hidden="true" />
       {MEMBER_NAV.map((item) => (
         <Link
@@ -77,7 +85,7 @@ export function MemberTabbar({ unseen }: { unseen?: { label: string; count: numb
           className={active === item.href ? "on" : undefined}
           data-active={active === item.href ? "true" : undefined}
           aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
-          onClick={() => { pending = { href: item.href, from: pathname }; rerender((value) => value + 1); }}
+          onClick={() => { pending = { href: item.href, from: pathname, at: Date.now() }; setPendingHref(item.href); }}
         >
           <DaIcon name={item.icon} />
           <span className="tabbar__label">{item.label}</span>

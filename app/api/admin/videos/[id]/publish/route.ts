@@ -4,7 +4,8 @@ import { z } from "zod";
 import { isJsonMediaType, readBoundedBody } from "@/lib/mcp/http";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { publishVideoSchema, validateChapterTimeline, videoChapterSchema } from "@/lib/mux/adminLessons";
-import { createMuxAdminClient, getVerifiedAdmin, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
+import { cleanupMuxAsset } from "@/lib/mux/assetCleanup.server";
+import { getVerifiedAdmin, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
 
 type VideoPublishRouteContext = { params: Promise<{ id: string }> };
 
@@ -39,6 +40,9 @@ export async function POST(request: NextRequest, context: VideoPublishRouteConte
   if (readError || !row) return NextResponse.json({ ok: false, error: "Vidéo introuvable." }, { status: 404 });
 
   const video = row as AdminVideoLessonRow;
+  if (video.replaced_at) {
+    return NextResponse.json({ ok: false, error: "Cette vidéo a été remplacée et ne peut plus être publiée." }, { status: 409 });
+  }
   const chapters = z.array(videoChapterSchema).safeParse(video.chapters);
   const timelineError = chapters.success
     ? validateChapterTimeline(chapters.data, video.duration_seconds)
@@ -59,10 +63,12 @@ export async function POST(request: NextRequest, context: VideoPublishRouteConte
     : null;
   if (previousAssetId) {
     try {
-      await createMuxAdminClient().video.assets.delete(previousAssetId);
+      if (!await cleanupMuxAsset(previousAssetId, request.signal)) {
+        return NextResponse.json({ ok: false, error: "La vidéo est publiée mais l'ancien asset Mux attend son nettoyage." }, { status: 503 });
+      }
     } catch {
       console.error("admin.video.previous_asset_cleanup_failed");
-      return NextResponse.json({ ok: false, error: "La vidéo est publiée mais l'ancien asset Mux n'a pas pu être supprimé." }, { status: 503 });
+      return NextResponse.json({ ok: false, error: "La vidéo est publiée mais l'ancien asset Mux attend son nettoyage." }, { status: 503 });
     }
   }
 

@@ -2,15 +2,26 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("le registre admin expose exactement les neuf outils prévus", async () => {
+test("le registre admin expose les treize outils autorisés", async () => {
   const source = await readFile("lib/adminAgent/tools.ts", "utf8");
   for (const name of [
-    "liste_blocs", "envoyer_video", "ecrire_chapitres", "ecrire_resume",
-    "choisir_miniature", "demander_publication", "preparer_mail", "statut_video", "journal",
+    "liste_blocs", "lister_videos", "envoyer_video", "lire_transcription",
+    "ecrire_chapitres", "ecrire_resume", "choisir_miniature", "demander_publication",
+    "synchroniser_video", "deposer_sous_titres", "preparer_mail", "statut_video", "journal",
   ]) {
     assert.match(source, new RegExp(`^  ${name}: \\{`, "m"));
   }
   assert.doesNotMatch(source, /changer_palier|supprimer_compte|approuver_demande/);
+});
+
+test("la transcription agent reste paginée, avertie et accessible avant publication", async () => {
+  const source = await readFile("lib/adminAgent/tools.ts", "utf8");
+  const section = source.slice(source.indexOf("  lire_transcription:"), source.indexOf("  deposer_sous_titres:"));
+  assert.doesNotMatch(section, /published_at\) throw/);
+  assert.match(section, /avertissement:/);
+  assert.match(section, /delimiteurDebut:/);
+  assert.match(section, /delimiteurFin:/);
+  assert.match(section, /offset/);
 });
 
 test("la migration garde les jetons hachés, les demandes bornées et les rôles fermés", async () => {
@@ -44,6 +55,19 @@ test("la migration de durcissement crée atomiquement les demandes et plafonne l
   assert.match(sql, /v_audience not in \('all', 'free', 'beginner', 'full'\)/);
   assert.match(sql, /on conflict \(idempotency_key\) do nothing/);
   assert.match(sql, /revoke all on function public\.create_admin_agent_request[\s\S]*from public, anon, authenticated/);
+});
+test("publication vidéo refuse les remplacements et conserve le nettoyage durable", async () => {
+  const sql = await readFile("supabase/migrations/20261024110000_block_video_lessons.sql", "utf8");
+  assert.match(sql, /v_video\.replaced_at is not null/);
+  assert.match(sql, /video_asset_cleanup/);
+  assert.match(sql, /pg_advisory_xact_lock/);
+  assert.match(sql, /created_by_agent_token_id/);
+});
+
+test("le mode autonome exige le même jeton que celui de l'envoi", async () => {
+  const source = await readFile("lib/adminAgent/tools.ts", "utf8");
+  assert.match(source, /created_by_agent_token_id === context\.id/);
+  assert.match(source, /autopublish_requires_same_upload_token/);
 });
 
 test("les deux adaptateurs utilisent le même registre sans registre secondaire", async () => {

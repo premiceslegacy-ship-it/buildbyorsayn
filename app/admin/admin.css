@@ -337,8 +337,8 @@
 }
 
 @media (max-width: 430px) {
-  .adm-live-badge { font-size: 0; }
-  .adm-live-badge i { width: 9px; height: 9px; }
+  .adm-live-badge { font-size: 11px; gap: 6px; padding-inline: 8px; }
+  .adm-live-badge i { width: 8px; height: 8px; }
   .adm-clean-card { padding: 16px; }
   .adm-clean-actions > button { width: 100%; }
   .adm-tiles, .adm-tiles-four { gap: 12px; }

@@ -13,7 +13,7 @@ function one(value: string | string[] | undefined) {
   return typeof value === "string" ? value : undefined;
 }
 
-function demoVideos(bloc: (typeof BLOCS_DATA)[number], count: number, withoutSummary: boolean, withoutChapters: boolean): BlocVideo[] {
+function demoVideos(bloc: (typeof BLOCS_DATA)[number], count: number, withoutSummary: boolean, withoutChapters: boolean, lectureUnavailable: boolean): BlocVideo[] {
   const titles = [
     "Voir le problème avant de choisir l'outil",
     "Transformer le signal en décision concrète",
@@ -37,7 +37,7 @@ function demoVideos(bloc: (typeof BLOCS_DATA)[number], count: number, withoutSum
       durationSeconds,
       chapters,
       thumbnail: `/da/mini/b${bloc.displayNumber}.jpg`,
-      playbackId: "",
+      playbackId: lectureUnavailable ? "" : "fixture-invalid",
       tokens: { playback: "", thumbnail: "", storyboard: "" },
     };
   });
@@ -55,7 +55,8 @@ export default async function DevBlocVideosPage({ searchParams }: { searchParams
   const requestedVideo = Number(one(query.video) ?? "1");
   const initialVideoPosition = Number.isInteger(requestedVideo) && requestedVideo >= 1 && requestedVideo <= count ? requestedVideo : undefined;
   const initialSummaryOpen = one(query.summary) === "ouvert";
-  const videos = demoVideos(bloc, count, without === "resume", without === "chapitres");
+  const lectureUnavailable = one(query.lecture) === "absente";
+  const videos = demoVideos(bloc, count, without === "resume", without === "chapitres", lectureUnavailable);
   const previousBloc = BLOCS_DATA[bloc.displayNumber - 2];
   const nextBloc = BLOCS_DATA[bloc.displayNumber];
   return <DaRoot className="da-app has-tabbar">

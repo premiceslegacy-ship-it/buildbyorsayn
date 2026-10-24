@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         playback_policies: ["signed"],
         video_quality: "basic",
         passthrough: buildMuxPassthrough(videoId),
-        meta: { external_id: `${blocId}:${parsed.data.position}`, title: parsed.data.title },
+        meta: { external_id: `${parsed.data.blocNumero}:${parsed.data.position}`, title: parsed.data.title },
         inputs: [{
           generated_subtitles: [{ language_code: "fr", name: "Français", passthrough: "build-fr-auto" }],
         }],

@@ -49,13 +49,34 @@ export function buildSearchCatalog(rawTier: string | null): SearchItem[] {
   return items;
 }
 
+function normalizeSearchText(value: string) {
+  return value.toLocaleLowerCase("fr-FR").normalize("NFD").replace(/\p{Diacritic}/gu, "");
+}
+
 export function searchCatalog(items: SearchItem[], query: string) {
-  const normalizedQuery = query.toLocaleLowerCase("fr-FR").normalize("NFD").replace(/\p{Diacritic}/gu, "").trim();
+  const normalizedQuery = normalizeSearchText(query).trim();
   const terms = normalizedQuery.split(/\s+/).filter(Boolean);
   if (!terms.length) return [];
-  return items.filter((item) => {
-    const haystack = `${item.title} ${item.context} ${item.searchText}`.toLocaleLowerCase("fr-FR").normalize("NFD").replace(/\p{Diacritic}/gu, "");
-    const numericExpressionMatches = !terms.some((term) => /^\d+$/.test(term)) || haystack.includes(normalizedQuery);
-    return numericExpressionMatches && terms.every((term) => haystack.includes(term));
-  }).slice(0, 24);
+  return items
+    .map((item, index) => {
+      const title = normalizeSearchText(item.title);
+      const context = normalizeSearchText(item.context);
+      const text = normalizeSearchText(item.searchText);
+      const haystack = `${title} ${context} ${text}`;
+      const numericExpressionMatches = !terms.some((term) => /^\d+$/.test(term)) || haystack.includes(normalizedQuery);
+      if (!numericExpressionMatches || !terms.every((term) => haystack.includes(term))) return null;
+      const titleTerms = terms.every((term) => title.includes(term));
+      const contextTerms = terms.every((term) => context.includes(term));
+      const textTerms = terms.every((term) => text.includes(term));
+      const score = title === normalizedQuery ? 500
+        : title.startsWith(normalizedQuery) ? 400
+          : title.includes(normalizedQuery) || titleTerms ? 300
+            : context.includes(normalizedQuery) || contextTerms ? 200
+              : textTerms ? 100 : 0;
+      return { item, index, score };
+    })
+    .filter((entry): entry is { item: SearchItem; index: number; score: number } => entry !== null)
+    .sort((left, right) => right.score - left.score || left.index - right.index)
+    .slice(0, 24)
+    .map(({ item }) => item);
 }

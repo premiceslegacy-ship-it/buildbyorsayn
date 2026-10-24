@@ -90,6 +90,15 @@ test("video admin routes authorize before Mux and the webhook unwraps the raw si
   assert.match(webhookRoute, /syncMuxTranscriptForReadyAsset/);
   assert.doesNotMatch(webhookRoute, /request\.json\(\)/);
 });
+test("la publication refuse les vidéos remplacées et Mux reçoit le numéro affiché", async () => {
+  const migration = await readFile("supabase/migrations/20261024110000_block_video_lessons.sql", "utf8");
+  const adminRoute = await readFile("app/api/admin/videos/route.ts", "utf8");
+  const agent = await readFile("lib/adminAgent/tools.ts", "utf8");
+  assert.match(migration, /v_video\.replaced_at is not null/);
+  assert.match(migration, /pg_advisory_xact_lock/);
+  assert.match(adminRoute, /external_id: `\$\{parsed\.data\.blocNumero\}:/);
+  assert.match(agent, /external_id: `\$\{input\.blocNumero\}:/);
+});
 
 test("Mux rejects a missing or forged webhook signature and accepts the exact raw signed body", async () => {
   const secret = "local-webhook-test-secret";

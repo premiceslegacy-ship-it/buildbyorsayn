@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { displayNumberFromBlocId } from "@/lib/blocCatalog";
 import { videoChapterSchema, validateChapterTimeline } from "@/lib/mux/adminLessons";
+import { cleanupMuxAsset } from "@/lib/mux/assetCleanup.server";
 import { AgentToolError } from "./types";
 
 const MAX_ADMIN_EMAIL_BODY_BYTES = 25 * 1024;
@@ -55,8 +56,9 @@ type PublishableVideo = {
   playback_id: unknown;
   duration_seconds: unknown;
   published_at: unknown;
+  replaced_at: unknown;
+  created_by_agent_token_id: unknown;
 };
-
 function assertPublishableVideo(data: PublishableVideo) {
   if (data.published_at) throw new AgentToolError("La vidéo est déjà publiée.");
   if (data.status !== "ready" || !data.mux_asset_id || !data.playback_id || !data.duration_seconds) {
@@ -88,21 +90,25 @@ function assertPublishableVideo(data: PublishableVideo) {
   }
 }
 
-export async function validateAgentPublicationTarget(videoId: string, signal?: AbortSignal) {
+export async function validateAgentPublicationTarget(videoId: string, signal?: AbortSignal, expectedTokenId?: string) {
   const admin = createAdminSupabase({ signal });
   const { data, error } = await admin
     .from("video_lessons")
-    .select("id,bloc_id,position,summary,transcript,transcript_segments,chapters,thumbnail,status,mux_asset_id,playback_id,duration_seconds,published_at")
+    .select("id,bloc_id,position,summary,transcript,transcript_segments,chapters,thumbnail,status,mux_asset_id,playback_id,duration_seconds,published_at,replaced_at,created_by_agent_token_id")
     .eq("id", videoId)
     .maybeSingle();
   if (error) throw new Error("La vidéo ne peut pas être vérifiée.");
   if (!data) throw new AgentToolError("Cette vidéo n'existe pas.");
+  if (data.replaced_at) throw new AgentToolError("Cette vidéo a été remplacée et ne peut plus être publiée.");
+  if (expectedTokenId && data.created_by_agent_token_id !== expectedTokenId) {
+    throw new AgentToolError("Ce jeton ne peut pas publier une vidéo créée par un autre jeton.");
+  }
   assertPublishableVideo(data as PublishableVideo);
-  return data as PublishableVideo;
+  return data as PublishableVideo & { replaced_at?: string | null; created_by_agent_token_id?: string | null };
 }
 
-export async function executeAgentPublication(videoId: string, actorUserId: string, signal?: AbortSignal) {
-  const data = await validateAgentPublicationTarget(videoId, signal);
+export async function executeAgentPublication(videoId: string, actorUserId: string, signal?: AbortSignal, expectedTokenId?: string) {
+  const data = await validateAgentPublicationTarget(videoId, signal, expectedTokenId);
   const admin = createAdminSupabase({ signal });
 
   const published = await admin.rpc("publish_video_lesson", {
@@ -112,12 +118,16 @@ export async function executeAgentPublication(videoId: string, actorUserId: stri
   if (published.error || !Array.isArray(published.data) || published.data.length !== 1) {
     throw new Error("La publication a échoué.");
   }
+  const previousAssetId = typeof published.data[0]?.previous_mux_asset_id === "string"
+    ? published.data[0].previous_mux_asset_id
+    : null;
+  if (previousAssetId && !await cleanupMuxAsset(previousAssetId, signal)) {
+    throw new Error("La publication est faite, mais l'ancien asset Mux attend son nettoyage.");
+  }
   return {
     blocNumero: displayNumberFromBlocId(data.bloc_id),
     position: data.position as number,
-    previousAssetId: typeof published.data[0]?.previous_mux_asset_id === "string"
-      ? published.data[0].previous_mux_asset_id
-      : null,
+    previousAssetId,
   };
 }
 

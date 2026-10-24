@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { readBoundedBody } from "@/lib/mcp/http";
 import { pickSignedPlaybackId } from "@/lib/mux/lessons";
-import { parseMuxPassthrough } from "@/lib/mux/adminLessons";
+import { MAX_ADMIN_VIDEO_BYTES, parseMuxPassthrough } from "@/lib/mux/adminLessons";
 import { createMuxAdminClient } from "@/lib/mux/adminServer";
 import { syncMuxTranscriptForReadyAsset } from "@/lib/mux/transcript.server";
 
@@ -125,7 +125,10 @@ export async function POST(request: NextRequest) {
   if (event.type === "video.asset.ready") {
     const playbackId = pickSignedPlaybackId(asset.playback_ids);
     const durationSeconds = Math.round(asset.duration ?? 0);
-    update = playbackId && durationSeconds > 0
+    const sizeBytes = Number(asset.filesize);
+    const tooLarge = Number.isFinite(sizeBytes) && sizeBytes > MAX_ADMIN_VIDEO_BYTES;
+    if (tooLarge) await createMuxAdminClient().video.assets.delete(asset.id).catch(() => undefined);
+    update = !tooLarge && playbackId && durationSeconds > 0
       ? {
           status: "ready",
           mux_asset_id: asset.id,
@@ -136,7 +139,7 @@ export async function POST(request: NextRequest) {
       : {
           status: "errored",
           mux_asset_id: asset.id,
-          error_code: playbackId ? "duration_missing" : "signed_playback_missing",
+          error_code: tooLarge ? "asset_too_large" : playbackId ? "duration_missing" : "signed_playback_missing",
         };
   } else if (event.type === "video.asset.errored") {
     update = {

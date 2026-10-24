@@ -31,8 +31,8 @@
 .active { color: #f1f5f2; box-shadow: 0 2px 0 #22d96e; padding-block: 6px; }
 .tools { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 .tool, .avatar { border-radius: 50%; background: rgba(241, 245, 242, .12); }
-.tool { width: 36px; height: 36px; }
-.avatar { width: 30px; height: 30px; background: #2f3330; }
+.tool { width: 44px; height: 44px; }
+.avatar { width: 44px; height: 44px; background: #2f3330; }
 
 @media (min-width: 735px) {
   .links { display: flex; }

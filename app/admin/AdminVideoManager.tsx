@@ -328,7 +328,7 @@ export function AdminVideoManager({
         </div>
 
         <div className="adm-video-list" aria-live="polite">
-          {videos.length === 0 ? <div className="adm-empty-card"><FileVideo aria-hidden="true" /><h3>Aucune vidéo envoyée</h3><p>Le premier envoi apparaîtra ici avec son traitement et ses contrôles.</p></div> : null}
+          {!setupMissing && videos.length === 0 ? <div className="adm-empty-card"><FileVideo aria-hidden="true" /><h3>Aucune vidéo envoyée</h3><p>Le premier envoi apparaîtra ici avec son traitement et ses contrôles.</p></div> : null}
           {videos.map((video) => {
             const complete = {
               transcript: video.transcript.trim().length >= 20,
@@ -369,7 +369,7 @@ export function AdminVideoManager({
                 <div className="adm-video-card-actions">
                   {video.status === "waiting" && !video.published_at ? <button type="button" className="adm-danger-button" disabled={busy} onClick={() => { void cancelWaitingUpload(video.id); }}>Annuler l'envoi</button> : null}
                   {video.published_at ? <span className="adm-status" data-status="published"><i aria-hidden="true" />Publiée</span> : null}
-                  {video.status === "ready" && !video.published_at && publishId !== video.id ? (
+                  {video.status === "ready" && !video.published_at && !video.replaced_at && publishId !== video.id ? (
                     <button type="button" className="adm-ghost-button" disabled={!publishable || busy} onClick={() => { setPublishId(video.id); setConfirmation(""); void playAppSound("open"); }}>
                       {publishable ? "Relire puis publier" : "Complète les étapes"}
                     </button>

@@ -14,6 +14,7 @@ export function RouteErrorState({
   backLabel = "Retour au programme",
   chrome = true,
   object = "bloc",
+  active,
 }: {
   error?: unknown;
   reset: () => void;
@@ -23,6 +24,7 @@ export function RouteErrorState({
   backLabel?: string;
   chrome?: boolean;
   object?: "bloc" | "livraison" | "offre" | "vente";
+  active?: string;
 }) {
   useEffect(() => {
     if (error) console.error(error);
@@ -30,7 +32,7 @@ export function RouteErrorState({
 
   return (
     <DaRoot className={`da-app${chrome ? " has-tabbar" : ""}`}>
-      {chrome ? <AppChromePlaceholder /> : null}
+      {chrome ? <AppChromePlaceholder active={active} /> : null}
       <main>
         <AppState
           tone="alert"

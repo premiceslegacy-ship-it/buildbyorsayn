@@ -44,7 +44,7 @@ type MuxPlaybackOptions = {
   type: Array<[string, Record<string, unknown>]>;
 };
 
-function loadServer(path: string, tier: string | null, authenticated = true, profileError = false, extraMocks: Record<string, unknown> = {}) {
+function loadServer(path: string, tier: string | null, authenticated = true, profileError = false, extraMocks: Record<string, unknown> = {}, videoQueryError = false) {
   const calls: string[] = [];
   function table(name: string) {
     const filters: [string, string][] = [];
@@ -72,9 +72,11 @@ function loadServer(path: string, tier: string | null, authenticated = true, pro
     in() { return adminQuery; },
     eq() { return adminQuery; },
     not() { return adminQuery; },
+    is() { return adminQuery; },
+    order() { return adminQuery; },
     async maybeSingle() { return { data: null, error: null }; },
-    then(resolve: (value: { data: never[]; error: null }) => unknown) {
-      return Promise.resolve({ data: [], error: null }).then(resolve);
+    then(resolve: (value: { data: never[] | null; error: { code: string } | null }) => unknown) {
+      return Promise.resolve(videoQueryError ? { data: null, error: { code: "42703" } } : { data: [], error: null }).then(resolve);
     },
   };
   const adminSupabase = { from(name: string) { assert.equal(name, "video_lessons"); return adminQuery; } };
@@ -88,7 +90,7 @@ function loadServer(path: string, tier: string | null, authenticated = true, pro
     if (name === "@/lib/blocAccess") return access;
     if (name === "@/lib/supabase/admin") return { createAdminSupabase: () => adminSupabase };
     if (name === "@/lib/mux/adminLessons") return adminLessons;
-    if (name === "@/lib/mux/transcript.server") return { signMuxPlaybackId: async (id: string) => id };
+    if (name === "@/lib/mux/transcript.server") return { signMuxPlaybackId: async (id: string) => id, signMuxPlaybackTokens: async (id: string) => ({ playback: id, thumbnail: id, storyboard: id }) };
     if (name === "zod") return { z };
     if (name === "@/lib/mockData") { calls.push("corpus"); return { BLOCS_DATA: corpus }; }
     throw new Error(`Unexpected import: ${name}`);
@@ -114,6 +116,11 @@ test("server loader authenticates and projects exact tier scope, including profi
   const failed = loadServer("lib/blocData.server.ts", "full", true, true);
   const result = await failed.exports.getBlocForCurrentUser("1");
   assert.equal(result.bloc.sections.length, 0);
+});
+
+test("une panne de lecture vidéo ne bloque pas l'accès au texte du bloc", async () => {
+  const loader = loadServer("lib/blocData.server.ts", "full", true, false, {}, true);
+  assert.deepEqual(plain(await (loader.exports as Record<string, (...args: unknown[]) => Promise<unknown>>).getBlocVideos("1", "full")), []);
 });
 
 // Values built inside the vm context carry foreign prototypes; compare their JSON shape.

@@ -79,6 +79,7 @@ function VideoRail({
 
 export function BlocOverview({ blocId, title, displayNumber, sections, previewSections, totalSections, completedIds, videos, initialVideoPosition, initialSummaryOpen, checkoutHref, checkoutLabel, checkoutPrice, previousBloc, nextBloc }: BlocOverviewProps) {
   const root = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<LessonPlayerHandle>(null);
   const chapterRailRef = useRef<HTMLDivElement>(null);
   const videoRailRef = useRef<HTMLDivElement>(null);
@@ -93,7 +94,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
   const [openSummaryFor, setOpenSummaryFor] = useState<string | null>(initialSummaryOpen ? selectedInitial?.id ?? null : null);
   const selectedVideo = videos.find((video) => video.position === selectedPosition) ?? videos[0] ?? null;
   const selectedPlayableVideo = selectedVideo?.playbackId.trim() && selectedVideo.tokens.playback ? selectedVideo : null;
-  const currentChapterIndex = selectedVideo?.chapters.reduce((current, chapter, index) => chapter.startSeconds <= currentTime ? index : current, -1) ?? -1;
+  const currentChapterIndex = selectedPlayableVideo?.chapters.reduce((current, chapter, index) => chapter.startSeconds <= currentTime ? index : current, -1) ?? -1;
   const totalVideoDuration = videos.reduce((sum, video) => sum + video.durationSeconds, 0);
   const thumbnail = `/da/mini/b${displayNumber}.jpg`;
 
@@ -108,7 +109,9 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
   const selectVideo = (position: number) => {
     setSelectedPosition(position);
     setCurrentTime(0);
+    setOpenSummaryFor(null);
     window.history.replaceState({}, "", `${window.location.pathname}?video=${position}`);
+    window.requestAnimationFrame(() => stageRef.current?.scrollIntoView({ block: "start", behavior: motionAllowed() ? "smooth" : "auto" }));
   };
   const selectChapter = (startSeconds: number) => {
     setCurrentTime(startSeconds);
@@ -121,19 +124,22 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
 
   return <div ref={root} className={`${styles.page} ${styles.overviewPage}`}>
     <main className={styles.overviewMain}>
-      <div className={styles.overviewStage} data-testid="bloc-overview-media">
-        {selectedPlayableVideo ? <LessonPlayer
-          ref={playerRef}
-          directVideo={{ id: selectedPlayableVideo.id, playbackId: selectedPlayableVideo.playbackId, tokens: selectedPlayableVideo.tokens }}
-          progressId={selectedPlayableVideo.id}
-          title={selectedPlayableVideo.title}
-          onCompleted={() => undefined}
-          onTimeUpdate={(time) => setCurrentTime(time)}
-        /> : <>
-          <Image src={selectedVideo?.thumbnail || thumbnail} alt="" fill priority sizes="(min-width: 1200px) 1184px, 100vw" />
-          <div className={styles.overviewStageShade} />
-          {selectedVideo ? null : unlocked ? <div className={styles.overviewUpcoming}><h2>La vidéo arrive bientôt. Le texte est déjà là.</h2><Link className="btn btn--p" href={`/blocs/${blocId}/lire?chapter=${encodeURIComponent(sections[resumeIndex]?.id ?? "")}`} data-sfx="none" onClick={(event) => animateAction(event.currentTarget, "open")}>Lire le texte</Link></div> : <div className={styles.overviewLocked}><p>Cette vidéo est dans LE COFFRE.</p></div>}
-        </>}
+      <div className={styles.overviewStageWrap}>
+        <div ref={stageRef} className={styles.overviewStage} data-testid="bloc-overview-media">
+          {selectedPlayableVideo ? <LessonPlayer
+            ref={playerRef}
+            directVideo={{ id: selectedPlayableVideo.id, playbackId: selectedPlayableVideo.playbackId, tokens: selectedPlayableVideo.tokens }}
+            progressId={selectedPlayableVideo.id}
+            title={selectedPlayableVideo.title}
+            onCompleted={() => undefined}
+            onTimeUpdate={(time) => setCurrentTime(time)}
+          /> : <>
+            <Image src={selectedVideo?.thumbnail || thumbnail} alt="" fill priority sizes="(min-width: 1200px) 1184px, 100vw" />
+            <div className={styles.overviewStageShade} />
+            {selectedVideo ? <div className={styles.overviewUpcoming} role="status"><h2>Lecture indisponible pour le moment.</h2></div> : null}
+          </>}
+        </div>
+        {!selectedVideo ? unlocked ? <div className={styles.overviewUpcoming}><h2>La vidéo arrive bientôt. Le texte est déjà là.</h2><Link className="btn btn--p" href={`/blocs/${blocId}/lire?chapter=${encodeURIComponent(sections[resumeIndex]?.id ?? "")}`} data-sfx="none" onClick={(event) => animateAction(event.currentTarget, "open")}>Lire le texte</Link></div> : <div className={styles.overviewLocked}><p>Cette vidéo est dans LE COFFRE.</p></div> : null}
       </div>
 
       <header className={styles.overviewIntro}>
@@ -153,7 +159,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
       </section> : null}
 
       {selectedVideo && selectedVideo.chapters.length > 0 ? <VideoRail title="Dans cette vidéo" labelledBy="video-chapters-title" railRef={chapterRailRef}>
-        {selectedVideo.chapters.map((chapter, index) => <button key={`${selectedVideo.id}-${chapter.startSeconds}`} type="button" className={`${styles.videoChapterCard} ${index === currentChapterIndex ? styles.videoChapterCurrent : ""}`} aria-current={index === currentChapterIndex ? "true" : undefined} onClick={() => selectChapter(chapter.startSeconds)}>
+        {selectedVideo.chapters.map((chapter, index) => <button key={`${selectedVideo.id}-${chapter.startSeconds}`} type="button" className={`${styles.videoChapterCard} ${index === currentChapterIndex ? styles.videoChapterCurrent : ""}`} aria-label={`${chapter.title}, à ${formatStart(chapter.startSeconds)}`} aria-current={index === currentChapterIndex ? "true" : undefined} disabled={!selectedPlayableVideo} onClick={() => selectChapter(chapter.startSeconds)}>
           <span className={styles.videoChapterArtwork}><Image src={chapter.thumbnailUrl || selectedVideo.thumbnail || thumbnail} alt="" fill unoptimized loading="lazy" sizes="(min-width: 900px) 240px, 80vw" /><span className={styles.videoTime}>{formatStart(chapter.startSeconds)}</span>{index === currentChapterIndex ? <span className={styles.equalizer} aria-hidden="true"><i /><i /><i /></span> : null}</span>
           <strong>{chapter.title}</strong>
         </button>)}

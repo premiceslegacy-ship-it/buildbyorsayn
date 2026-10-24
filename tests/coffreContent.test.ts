@@ -59,6 +59,14 @@ test("la recherche lit les nouveaux textes sans fuite entre les paliers", () => 
   assert.deepEqual(searchCatalog(buildSearchCatalog("free"), "photos salle de bains devis"), []);
 });
 
+test("la recherche classe les titres avant le contexte et respecte le numéro affiché du bloc", () => {
+  const catalog = buildSearchCatalog("full");
+  const siteResults = searchCatalog(catalog, "site");
+  assert.match(siteResults[0]?.title ?? "", /site/i);
+  assert.notEqual(siteResults[0]?.title, "Fondations 1 : ce qui ne change pas");
+  assert.match(searchCatalog(catalog, "bloc 5")[0]?.title ?? "", /^Bloc 5\b/);
+});
+
 test("le corpus inclut les introductions et les chapitres avec le bon palier", async () => {
   const documents = await collectBlocsDocuments();
   assert.equal(documents.length, EXPECTED_SECTION_IDS.length + BLOCS_DATA.length);

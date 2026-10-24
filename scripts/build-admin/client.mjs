@@ -114,6 +114,7 @@ const MIME_BY_EXTENSION = new Map([
 ]);
 
 export async function uploadVideo(filePath, blocNumero, position, title, options = {}) {
+  if (typeof title !== "string" || !title.trim()) throw new Error("Ajoute --titre.");
   const fileStat = await stat(filePath);
   if (!fileStat.isFile()) throw new Error("Fichier vidéo introuvable.");
   const type = MIME_BY_EXTENSION.get(extname(filePath).toLowerCase());
@@ -121,6 +122,7 @@ export async function uploadVideo(filePath, blocNumero, position, title, options
   const prepared = await callTool("envoyer_video", {
     blocNumero,
     position,
+    title: title.trim(),
     file: { name: basename(filePath), size: fileStat.size, type },
   }, options);
   const uploadUrl = new URL(prepared.uploadUrl);

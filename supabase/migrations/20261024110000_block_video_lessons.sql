@@ -19,7 +19,8 @@ alter table public.video_lessons
   add column replaced_at timestamptz,
   add column transcript_segments jsonb not null default '[]'::jsonb,
   add column transcript_source text not null default 'automatic',
-  add column subtitle_track_id text;
+  add column subtitle_track_id text,
+  add column created_by_agent_token_id uuid references public.admin_agent_tokens(id) on delete set null;
 
 alter table public.video_lessons
   add constraint video_lessons_bloc_id_check
@@ -42,6 +43,23 @@ create unique index video_lessons_one_current_per_position
 create index video_lessons_bloc_position_idx
   on public.video_lessons (bloc_id, "position", created_at desc);
 
+create table if not exists public.video_asset_cleanup (
+  id uuid primary key default gen_random_uuid(),
+  mux_asset_id text not null unique,
+  video_id uuid not null references public.video_lessons(id) on delete cascade,
+  status text not null default 'pending' check (status in ('pending', 'processing', 'completed', 'failed')),
+  attempts integer not null default 0 check (attempts >= 0),
+  last_error text,
+  created_at timestamptz not null default pg_catalog.now(),
+  updated_at timestamptz not null default pg_catalog.now(),
+  completed_at timestamptz
+);
+
+alter table public.video_asset_cleanup enable row level security;
+alter table public.video_asset_cleanup force row level security;
+revoke all on table public.video_asset_cleanup from public, anon, authenticated;
+grant all on table public.video_asset_cleanup to service_role;
+
 drop function if exists public.publish_video_lesson(uuid, uuid);
 
 create or replace function public.publish_video_lesson(
@@ -60,13 +78,19 @@ begin
   if not public.is_platform_admin(p_actor_user_id) then
     raise exception 'admin authorization required' using errcode = '42501';
   end if;
-
   select * into v_video
   from public.video_lessons
   where id = p_video_id
   for update;
 
-  if not found
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(
+      pg_catalog.format('video-slot:%s:%s', v_video.bloc_id, v_video."position"),
+      0
+    )
+  );
+  if v_video.id is null
+    or v_video.replaced_at is not null
     or v_video.status <> 'ready'
     or v_video.mux_asset_id is null
     or v_video.playback_id is null
@@ -96,6 +120,11 @@ begin
     and previous_video.published_at is not null
     and previous_video.replaced_at is null
     and previous_video.id <> v_video.id;
+  if v_previous_asset is not null then
+    insert into public.video_asset_cleanup (mux_asset_id, video_id)
+    values (v_previous_asset, v_video.id)
+    on conflict (mux_asset_id) do nothing;
+  end if;
 
   update public.video_lessons
   set published_at = pg_catalog.now(),

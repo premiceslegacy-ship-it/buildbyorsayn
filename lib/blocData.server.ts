@@ -32,46 +32,54 @@ function muxThumbnailUrl(playbackId: string, thumbnailToken: string, timeSeconds
 export async function getBlocVideos(blocId: string, tier: McpTier): Promise<BlocVideo[]> {
   const requiredTier = tierForBloc(blocId);
   if (!canAccess(tier, requiredTier)) return [];
-  const { data, error } = await createAdminSupabase()
-    .from("video_lessons")
-    .select("id,position,title,summary,chapters,thumbnail,playback_id,duration_seconds,tier_required")
-    .eq("bloc_id", blocId)
-    .eq("status", "ready")
-    .not("published_at", "is", null)
-    .is("replaced_at", null)
-    .order("position", { ascending: true });
-  if (error) throw new Error("Les vidéos du bloc sont indisponibles.");
-  const visible = (data ?? []).filter((row) => (
-    typeof row.playback_id === "string"
-    && Number.isSafeInteger(row.duration_seconds)
-    && row.duration_seconds > 0
-    && canAccess(tier, row.tier_required as McpTier)
-  ));
-  return Promise.all(visible.map(async (row) => {
-    const chapters = z.array(videoChapterSchema).safeParse(row.chapters);
-    const tokens = await signMuxPlaybackTokens(row.playback_id);
-    const fallbackTime = typeof row.thumbnail === "string" && row.thumbnail.startsWith("mux:")
-      ? Number(row.thumbnail.slice(4))
-      : undefined;
-    const thumbnail = muxThumbnailUrl(row.playback_id, tokens.thumbnail, Number.isFinite(fallbackTime) ? fallbackTime : undefined);
-    return {
-      id: row.id,
-      position: row.position,
-      title: row.title,
-      summary: row.summary,
-      durationSeconds: row.duration_seconds,
-      chapters: chapters.success
-        ? chapters.data.map((chapter) => ({
-          startSeconds: chapter.startSeconds,
-          title: chapter.title,
-          thumbnailUrl: muxThumbnailUrl(row.playback_id, tokens.thumbnail, chapter.startSeconds),
-        }))
-        : [],
-      thumbnail,
-      playbackId: row.playback_id,
-      tokens,
-    };
-  }));
+  try {
+    const { data, error } = await createAdminSupabase()
+      .from("video_lessons")
+      .select("id,position,title,summary,chapters,thumbnail,playback_id,duration_seconds,tier_required")
+      .eq("bloc_id", blocId)
+      .eq("status", "ready")
+      .not("published_at", "is", null)
+      .is("replaced_at", null)
+      .order("position", { ascending: true });
+    if (error) {
+      console.error("bloc.videos.query_failed", error.code ?? "unknown");
+      return [];
+    }
+    const visible = (data ?? []).filter((row) => (
+      typeof row.playback_id === "string"
+      && Number.isSafeInteger(row.duration_seconds)
+      && row.duration_seconds > 0
+      && canAccess(tier, row.tier_required as McpTier)
+    ));
+    return await Promise.all(visible.map(async (row) => {
+      const chapters = z.array(videoChapterSchema).safeParse(row.chapters);
+      const tokens = await signMuxPlaybackTokens(row.playback_id);
+      const fallbackTime = typeof row.thumbnail === "string" && row.thumbnail.startsWith("mux:")
+        ? Number(row.thumbnail.slice(4))
+        : undefined;
+      const thumbnail = muxThumbnailUrl(row.playback_id, tokens.thumbnail, Number.isFinite(fallbackTime) ? fallbackTime : undefined);
+      return {
+        id: row.id,
+        position: row.position,
+        title: row.title,
+        summary: row.summary,
+        durationSeconds: row.duration_seconds,
+        chapters: chapters.success
+          ? chapters.data.map((chapter) => ({
+            startSeconds: chapter.startSeconds,
+            title: chapter.title,
+            thumbnailUrl: muxThumbnailUrl(row.playback_id, tokens.thumbnail, chapter.startSeconds),
+          }))
+          : [],
+        thumbnail,
+        playbackId: row.playback_id,
+        tokens,
+      };
+    }));
+  } catch (error) {
+    console.error("bloc.videos.load_failed", error instanceof Error ? error.name : "unknown");
+    return [];
+  }
 }
 
 export async function getBlocForCurrentUser(id: string) {
