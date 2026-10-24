@@ -145,9 +145,10 @@ function actionFailure(error: unknown, fallback: string): AssignmentActionState 
 }
 
 export async function saveAccompanimentAssignment(
-  _previousState: AssignmentActionState = EMPTY_STATE,
+  previousState: AssignmentActionState = EMPTY_STATE,
   formData: FormData
 ): Promise<AssignmentActionState> {
+  void previousState;
   const trainer = await requireTrainer();
   try {
     const input = readAssignmentInput(formData);
@@ -184,9 +185,10 @@ export async function saveAccompanimentAssignment(
 }
 
 export async function revokeAccompanimentAssignment(
-  _previousState: AssignmentActionState = EMPTY_STATE,
+  previousState: AssignmentActionState = EMPTY_STATE,
   formData: FormData
 ): Promise<AssignmentActionState> {
+  void previousState;
   await requireTrainer();
   try {
     const input = readRevokeInput(formData);
@@ -209,9 +211,10 @@ export async function revokeAccompanimentAssignment(
 }
 
 export async function saveMemberWorkspaceContext(
-  _previousState: AssignmentActionState = EMPTY_STATE,
+  previousState: AssignmentActionState = EMPTY_STATE,
   formData: FormData
 ): Promise<AssignmentActionState> {
+  void previousState;
   try {
     const supabase = await createClient();
     const {
@@ -256,9 +259,10 @@ export async function saveMemberWorkspaceContext(
 }
 
 export async function saveTrainerWorkspaceContext(
-  _previousState: AssignmentActionState = EMPTY_STATE,
+  previousState: AssignmentActionState = EMPTY_STATE,
   formData: FormData
 ): Promise<AssignmentActionState> {
+  void previousState;
   try {
     const trainer = await requireTrainer();
     const input = readWorkspaceContext(formData);

@@ -47,9 +47,6 @@ export function resolveRateLimitDecision(data: unknown, error: unknown): RateLim
   return data ? "allowed" : "denied";
 }
 
-export function isRateLimitAllowed(data: unknown, error: unknown): boolean {
-  return resolveRateLimitDecision(data, error) === "allowed";
-}
 
 export function isExactMcpResource(
   tokenResource: string | null | undefined,

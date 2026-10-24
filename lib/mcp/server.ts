@@ -85,7 +85,7 @@ function searchTerms(value: string): Set<string> {
  * then rewards the concrete trade terms from the request, which prevents a
  * broadly related long passage from hiding a more precise result.
  */
-export function rerankKnowledgeMatches(
+function rerankKnowledgeMatches(
   query: string,
   matches: KnowledgeMatch[],
   limit: number,

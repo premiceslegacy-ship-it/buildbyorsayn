@@ -2,7 +2,6 @@ import { LocataireVsCapitalDiagram, ProtocolePipelineDiagram } from "../protocol
 import { createCourseVisualComponent } from "./kit-instance";
 import { PROTOCOLE_ZERO_VISUALS } from "./protocole-zero";
 
-export const PROTOCOLE_VISUAL_DEFINITIONS = PROTOCOLE_ZERO_VISUALS;
 
 export const PROTOCOLE_VISUAL_CATALOG = [
   { name: "LocataireVsCapitalDiagram", kind: "schema" as const, chapter: "introduction", template: "curves" as const, component: LocataireVsCapitalDiagram },

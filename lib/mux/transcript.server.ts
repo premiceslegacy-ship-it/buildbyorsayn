@@ -4,7 +4,7 @@ import Mux from "@mux/ts";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { recoverMuxTranscript, type MuxTranscriptClient } from "./transcript";
 
-export function createMuxTranscriptClient(): MuxTranscriptClient {
+function createMuxTranscriptClient(): MuxTranscriptClient {
   const mux = new Mux({
     tokenId: process.env.MUX_TOKEN_ID?.trim(),
     tokenSecret: process.env.MUX_TOKEN_SECRET?.trim(),

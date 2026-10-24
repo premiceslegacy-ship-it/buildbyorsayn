@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function PreuveAChaqueEtageDiagram() {
+function PreuveAChaqueEtageDiagram() {
   return <Ladder
     title="Chaque preuve ferme un étage"
     description="Exemple : une relance de devis. Chaque preuve répond à une question, de décrit à mesuré."
@@ -23,7 +23,7 @@ export function PreuveAChaqueEtageDiagram() {
   />;
 }
 
-export function IncidentVersTestDiagram() {
+function IncidentVersTestDiagram() {
   return <Steps
     title="L'erreur devient un test"
     description="Une erreur sert quand tu peux la rejouer, la corriger un peu et la garder comme test."
@@ -40,7 +40,7 @@ export function IncidentVersTestDiagram() {
   />;
 }
 
-export function ObservationVersMethodeDiagram() {
+function ObservationVersMethodeDiagram() {
   return <Funnel
     title="L'observation passe au tamis"
     description="Exemple : dix idées notées en un mois. Chacune est comparée avant de devenir une méthode."

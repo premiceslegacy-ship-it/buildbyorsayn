@@ -7,7 +7,6 @@ const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.ur
 const schemaSources = [
   "components/schemas/primitives.tsx",
   "components/schemas/layouts.tsx",
-  "components/schemas/foundations.tsx",
   "components/schemas/fondations/intro.tsx",
   "components/schemas/fondations/etat-esprit.tsx",
   "components/schemas/fondations/comprendre.tsx",
@@ -43,8 +42,6 @@ const schemaSources = [
   "components/schemas/hermes/20-commencer-petit.tsx",
   "components/schemas/hermes/21-laisser-un-dossier.tsx",
   "components/schemas/hermes/22-planifier-sans-perdre-la-main.tsx",
-  "components/schemas/protocole.tsx",
-  "components/schemas/hermes.tsx",
   "components/schemas/schema.module.css",
 ].map(read).join("\n");
 
@@ -65,10 +62,9 @@ test("chaque figure et chaque SVG ont un nom, un titre et une description", () =
   assert.match(primitives, /aria-labelledby=\{`\$\{titleId\} \$\{descriptionId\}`\}/);
   assert.match(primitives, /<title id=\{titleId\}>\{title\}<\/title>/);
   assert.match(primitives, /<desc id=\{descriptionId\}>\{description\}<\/desc>/);
-  assert.match(read("components/schemas/foundations.tsx"), /title = "La fenêtre de contexte se remplit, puis oublie"/);
 });
 
-test("chaque schéma du registre expose un seul rendu selon la largeur de son conteneur", () => {
+test("le rendu des schémas utilise une bascule stable selon la largeur du conteneur", () => {
   const primitives = read("components/schemas/primitives.tsx");
   const motion = read("components/schemas/DiagramMotion.tsx");
   assert.match(primitives, /width: 680 \| 328/);
@@ -86,21 +82,6 @@ test("chaque schéma du registre expose un seul rendu selon la largeur de son co
   assert.match(switchRule[2], /\.figure \.wide\s*\{\s*display: block;/s);
   assert.match(switchRule[2], /\.figure \.compact\s*\{\s*display: none;/s);
 
-  const historicalComponents = ["foundations.tsx", "protocole.tsx", "hermes.tsx"]
-    .flatMap((path) => [...read(`components/schemas/${path}`).matchAll(/export function (\w+Diagram)\(/g)].map((match) => match[1]));
-  assert.equal(historicalComponents.length, 23, "les 23 schémas historiques passent par le même sélecteur");
-  const cases = [
-    { viewport: 390, container: 350, expected: "compact" },
-    { viewport: 834, container: 640, expected: "wide" },
-    { viewport: 1440, container: 640, expected: "wide" },
-    { viewport: 1920, container: 640, expected: "wide" },
-  ] as const;
-  for (const id of historicalComponents) {
-    for (const { viewport, container, expected } of cases) {
-      const visibleLayouts = container >= threshold ? ["wide"] : ["compact"];
-      assert.deepEqual(visibleLayouts, [expected], `${id} dans ${container}px à ${viewport}px`);
-    }
-  }
 });
 
 test("le mouvement joue une fois et disparaît en mouvement réduit", () => {

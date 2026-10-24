@@ -13,7 +13,7 @@ type PricingEnv = {
   STRIPE_UPGRADE_PRICE_ID?: string;
 };
 
-export const STRIPE_PRICE_EXPECTATIONS = [
+const STRIPE_PRICE_EXPECTATIONS = [
   { name: "Fondations", env: "STRIPE_BEGINNER_PRICE_ID", amount: FONDATIONS_PRICE * 100 },
   { name: "LE COFFRE", env: "STRIPE_FULL_PRICE_ID", amount: COFFRE_PRICE * 100 },
   { name: "complément", env: "STRIPE_UPGRADE_PRICE_ID", amount: UPGRADE_PRICE * 100 },

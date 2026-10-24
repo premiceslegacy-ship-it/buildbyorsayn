@@ -54,7 +54,7 @@ export function FlowDiagram({ id, title, says, caption, description, items, comp
   />;
 }
 
-export function StackDiagram({ id, title, says, caption, description, items }: {
+function StackDiagram({ id, title, says, caption, description, items }: {
   id: string;
   title: string;
   says: string;

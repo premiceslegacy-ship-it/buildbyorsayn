@@ -66,7 +66,6 @@ function runTier(tier: E2eTier): Promise<E2eReport> {
     let closeCode: number | null = null;
     let terminationReason: "deadline" | "output-overflow" | "orphaned-descendant" | "child-error" | null = null;
     let terminationFailure: Error | undefined;
-    let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
     let killTimer: ReturnType<typeof setTimeout> | undefined;
     let drainTimer: ReturnType<typeof setTimeout> | undefined;
     let terminationWatchdogTimer: ReturnType<typeof setTimeout> | undefined;
@@ -171,7 +170,7 @@ function runTier(tier: E2eTier): Promise<E2eReport> {
       requestTermination("deadline");
     };
 
-    deadlineTimer = setTimeout(terminateAfterDeadline, TIER_CHILD_DEADLINE_MS);
+    const deadlineTimer = setTimeout(terminateAfterDeadline, TIER_CHILD_DEADLINE_MS);
     child.stdout.on("data", (chunk: Buffer) => {
       if (terminationReason) return;
       const bounded = appendBoundedOutput(stdout, chunk.toString("utf8"));

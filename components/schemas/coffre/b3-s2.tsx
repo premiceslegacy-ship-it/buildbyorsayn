@@ -85,7 +85,7 @@ export function TroisCalquesUnePageDiagram() {
     title="Trois calques, une histoire"
     description="Exemple d'une architecte d'intérieur : message, sections et allure doivent mener au même geste."
     legend="Relis le titre, le formulaire et l'image comme une seule phrase."
-    ariaLabel="Deux versions d'une page d'architecte d'intérieur. À gauche, trois histoires : le titre promet une estimation en deux minutes, la page demande quinze champs et l'image montre un salon de luxe. À droite, une seule histoire : planifier sa pièce avant d'acheter, une visite et un budget clair, un plan réel et un bouton préparer ma visite."
+    ariaLabel="Deux versions d'une page d'architecte d'intérieur. À gauche, trois histoires : le titre promet une estimation en deux minutes, la page demande quinze champs et l'image montre un salon de luxe. À droite, une seule histoire : planifier sa pièce avant d'acheter, une visite et un budget clair, une vraie pièce et un bouton préparer ma visite."
     accent={EM}
     beforeTitle="Trois histoires"
     afterTitle="Une seule histoire"
@@ -95,6 +95,7 @@ export function TroisCalquesUnePageDiagram() {
       heading: "Ton estimation en deux minutes",
       subtitle: "Remplis les quinze champs du formulaire.",
       button: "Envoyer",
+      photo: "salon",
     }}
     after={{
       url: "interieur-lille.fr",
@@ -110,13 +111,13 @@ export function TroisCalquesUnePageDiagram() {
       { pin: 2, role: "Le formulaire demande quinze champs", why: "La page contredit son titre : quinze champs ne se remplissent pas en deux minutes.", alt: "Trois champs, le reste à la visite." },
       { pin: 3, role: "Le bouton ne dit rien", why: "« Envoyer » ne dit pas ce qui se passe ensuite.", alt: "Un verbe précis : Préparer ma visite." },
       { pin: 4, role: "Un second bouton à égalité", why: "Deux gestes pour une seule demande : le regard hésite.", alt: "Un seul bouton, le reste en simple lien." },
-      { pin: 5, role: "Une image de salon de luxe", why: "Elle raconte une troisième histoire : le haut de gamme, loin de la demande d'estimation.", alt: "Le plan d'une vraie pièce, avec ses cotes." },
+      { pin: 5, role: "Une image de salon de luxe", why: "Elle raconte une troisième histoire : le haut de gamme, loin de la demande d'estimation.", alt: "Une vraie pièce de client, avec son plan." },
     ]}
     afterNotes={[
       { pin: 1, role: "Un titre, une promesse", why: "Planifier avant d'acheter : la page entière sert cette seule idée.", alt: "Un chiffre : économies faites sur un premier projet." },
       { pin: 2, role: "Un sous-titre qui montre le trajet", why: "Une visite, un budget clair, un plan : trois livrables, dans l'ordre.", alt: "Trois pastilles sous le titre." },
       { pin: 3, role: "Un bouton qui annonce la suite", why: "Préparer ma visite : le verbe dit ce qui se passe au clic.", alt: "Un numéro de téléphone en simple lien." },
-      { pin: 4, role: "Un plan à la place du décor", why: "Un plan de pièce réelle tient la même histoire que le titre et le bouton.", alt: "Une photo avant et après du même projet." },
+      { pin: 4, role: "Une vraie pièce à la place du décor", why: "Une pièce réelle, en cours de travaux, tient la même histoire que le titre et le bouton.", alt: "Le plan coté de cette même pièce." },
     ]}
   />;
 }

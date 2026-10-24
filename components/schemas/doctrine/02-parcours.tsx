@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function HuitQuestionsEnRelaisDiagram() {
+function HuitQuestionsEnRelaisDiagram() {
   return <Steps
     title="Huit questions tiennent le travail"
     description="Exemple : un devis de rénovation. Les quatre premières ouvrent le dossier, les quatre suivantes le ferment."
@@ -24,7 +24,7 @@ export function HuitQuestionsEnRelaisDiagram() {
   />;
 }
 
-export function QuatreNiveauxDeMethodeDiagram() {
+function QuatreNiveauxDeMethodeDiagram() {
   return <Ladder
     title="Du principe au choix"
     description="Exemple sur les devis : chaque niveau devient plus précis, de la règle qui tranche au skill qui choisit."
@@ -43,7 +43,7 @@ export function QuatreNiveauxDeMethodeDiagram() {
   />;
 }
 
-export function DossierDeMissionDiagram() {
+function DossierDeMissionDiagram() {
   return <FileCard
     title="Le petit dossier utile"
     description="Exemple : la mission emporte l'objectif, les limites, les faits, les sources et la preuve de fin."

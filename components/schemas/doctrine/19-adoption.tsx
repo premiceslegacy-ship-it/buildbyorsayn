@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function PhotoCompleteDuTravailDiagram() {
+function PhotoCompleteDuTravailDiagram() {
   return <BigNumber
     title="Mesurer tout le travail"
     description="Exemple : le même devis chronométré sur l'action seule, puis jusqu'au résultat accepté."
@@ -16,7 +16,7 @@ export function PhotoCompleteDuTravailDiagram() {
   />;
 }
 
-export function EscalierDAutonomieDiagram() {
+function EscalierDAutonomieDiagram() {
   return <Ladder
     title="L'autonomie monte par paliers"
     description="Chaque marche demande sa preuve avant de passer à la suivante."
@@ -37,7 +37,7 @@ export function EscalierDAutonomieDiagram() {
   />;
 }
 
-export function VictoireAvecContrepoidsDiagram() {
+function VictoireAvecContrepoidsDiagram() {
   return <Curves
     title="Une victoire garde son contrepoids"
     description="Exemple : sur quatre semaines, le délai baisse pendant que les erreurs montent."

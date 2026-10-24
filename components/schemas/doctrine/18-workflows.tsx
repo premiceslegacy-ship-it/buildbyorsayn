@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function DossierQuiTraverseDiagram() {
+function DossierQuiTraverseDiagram() {
   return <Workflow
     title="Le dossier garde sa version"
     description="Le même dossier passe de la vente aux opérations puis à la finance, avec sa version."
@@ -21,7 +21,7 @@ export function DossierQuiTraverseDiagram() {
   />;
 }
 
-export function PreuvesParMetierDiagram() {
+function PreuvesParMetierDiagram() {
   return <Compare
     title="Chaque métier a sa preuve"
     description="Une étape franchie dans un métier ne prouve pas le résultat attendu par le suivant."
@@ -39,7 +39,7 @@ export function PreuvesParMetierDiagram() {
   />;
 }
 
-export function CarteDePassationDiagram() {
+function CarteDePassationDiagram() {
   return <FileCard
     title="La passation tient sur une carte"
     description="La carte suffit pour reprendre le dossier sans répéter une action extérieure."

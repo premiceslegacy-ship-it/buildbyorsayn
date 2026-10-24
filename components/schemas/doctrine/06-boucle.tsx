@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function SignalVersDossierDiagram() {
+function SignalVersDossierDiagram() {
   return <Workflow
     title="Le signal ouvre un dossier"
     description="Une demande réveille le travail, mais elle est vérifiée avant de devenir un dossier suivi."
@@ -21,7 +21,7 @@ export function SignalVersDossierDiagram() {
   />;
 }
 
-export function ComptoirInboxDiagram() {
+function ComptoirInboxDiagram() {
   return <Chat
     title="L'Inbox montre ce qui attend"
     description="Ton agent te présente seulement ce qui demande ta main : décider, répondre ou reprendre."
@@ -46,7 +46,7 @@ export function ComptoirInboxDiagram() {
   />;
 }
 
-export function TroisProtectionsDiagram() {
+function TroisProtectionsDiagram() {
   return <Rings
     title="Trois protections différentes"
     description="Trois problèmes distincts entourent l'envoi du devis, chacun avec sa propre protection."

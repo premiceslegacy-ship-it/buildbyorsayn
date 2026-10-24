@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function AssietteVersPostesDiagram() {
+function AssietteVersPostesDiagram() {
   return <Steps
     title="Remonter depuis le résultat"
     description="Comme en cuisine, tu pars de l'assiette servie : ici, le devis accepté par le client."
@@ -20,7 +20,7 @@ export function AssietteVersPostesDiagram() {
   />;
 }
 
-export function RecetteTicketCuisinierDiagram() {
+function RecetteTicketCuisinierDiagram() {
   return <Workflow
     title="Ticket, recette, cuisinier"
     description="La tâche dit quoi faire, le skill dit comment, l'agent exécute avec ses permissions."
@@ -37,7 +37,7 @@ export function RecetteTicketCuisinierDiagram() {
   />;
 }
 
-export function UneEquipePasUneFouleDiagram() {
+function UneEquipePasUneFouleDiagram() {
   return <Fork
     title="Une équipe, pas une foule"
     description="Avant d'ajouter un agent, regarde si le risque demande vraiment de séparer le travail."

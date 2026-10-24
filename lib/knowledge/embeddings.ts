@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const EMBEDDING_DIMENSIONS = 768;
+const EMBEDDING_DIMENSIONS = 768;
 export const DEFAULT_EMBEDDING_TOTAL_TIMEOUT_MS = 14_000;
 export const DEFAULT_EMBEDDING_ATTEMPT_TIMEOUT_MS = 4_000;
 const BATCH_SIZE = 100;
@@ -91,7 +91,7 @@ export function embeddingFingerprint(config: EmbeddingConfig): string {
     .digest("hex");
 }
 
-export class EmbeddingDeadlineError extends Error {
+class EmbeddingDeadlineError extends Error {
   constructor() {
     super("Embedding request exceeded its total deadline.");
     this.name = "EmbeddingDeadlineError";

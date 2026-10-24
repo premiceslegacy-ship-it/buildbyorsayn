@@ -54,9 +54,25 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
   });
   tokenRow = validTokenRow();
 
+  type QueryResult = { data: unknown; error: null };
+  type MockChain = {
+    select(): MockChain;
+    order(): MockChain;
+    limit(): Promise<QueryResult>;
+    insert(values: Record<string, unknown>): MockChain;
+    update(values: Record<string, unknown>): MockChain;
+    eq(column: string, value: unknown): MockChain;
+    is(): MockChain;
+    lte(): MockChain;
+    like(): MockChain;
+    contains(): MockChain;
+    maybeSingle(): Promise<QueryResult>;
+    single(): Promise<QueryResult>;
+    then(resolveFn: (value: QueryResult) => unknown): Promise<unknown>;
+  };
   function table(name: string) {
     const state: { op: string; values?: Record<string, unknown>; filters: Array<[string, unknown]> } = { op: "select", filters: [] };
-    const chain: any = {
+    const chain: MockChain = {
       select() { return chain; },
       order() { return chain; },
       limit() { return Promise.resolve({ data: [], error: null }); },
@@ -79,7 +95,7 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
         }
         return Promise.resolve({ data: null, error: null });
       },
-      then(resolveFn: (value: unknown) => unknown) {
+      then(resolveFn: (value: QueryResult) => unknown) {
         if (name === "admin_agent_requests" && state.op === "update" && state.values?.status === "approved") requestStatus = "approved";
         return Promise.resolve({ data: null, error: null }).then(resolveFn);
       },

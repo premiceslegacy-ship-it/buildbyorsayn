@@ -1,9 +1,7 @@
 export {
   createAgentToken,
-  DEFAULT_AGENT_PERMISSIONS,
   decideRequest,
   getAgentMode,
-  getAgentPermissions,
   listAgentJournal,
   listAgentTokens,
   listPendingRequests,

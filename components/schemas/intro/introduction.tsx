@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function ConsommerOuConstruireDiagram() {
+function ConsommerOuConstruireDiagram() {
   return <Compare
     title="Regarder ou construire"
     description="Regarder te donne l'impression d'avancer. Construire te laisse un objet que tu peux montrer."
@@ -20,7 +20,7 @@ export function ConsommerOuConstruireDiagram() {
   />;
 }
 
-export function CarteDuParcoursBUILDDiagram() {
+function CarteDuParcoursBUILDDiagram() {
   return <Steps
     title="Un seul trajet en trois temps"
     description="Tu comprends le besoin, tu construis une réponse, puis tu la rends plus facile à reprendre."
@@ -36,7 +36,7 @@ export function CarteDuParcoursBUILDDiagram() {
   />;
 }
 
-export function BoussoleDesQuatreHabitudesDiagram() {
+function BoussoleDesQuatreHabitudesDiagram() {
   return <Rings
     title="Quatre habitudes pour avancer"
     description="L'action reste au centre. La curiosité, l'erreur encaissée et le rythme la rendent durable."
@@ -54,7 +54,7 @@ export function BoussoleDesQuatreHabitudesDiagram() {
   />;
 }
 
-export function UnBlocUnLivrableDiagram() {
+function UnBlocUnLivrableDiagram() {
   return <Cycle
     title="Chaque bloc ferme une boucle"
     description="Tu produis une première version, tu la montres, tu notes le retour."

@@ -9,7 +9,6 @@ const nextConfig = {
   images: {
     localPatterns: [
       { pathname: "/_next-image-not-used/**" },
-      { pathname: "/assets/protocole-references/**" },
       { pathname: "/assets/illustrations/**" },
       { pathname: "/brand-logos/**" },
       { pathname: "/da/**" },

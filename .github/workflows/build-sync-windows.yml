@@ -26,6 +26,22 @@ jobs:
           node-version: 22
       - name: Install test dependencies
         run: npm ci --ignore-scripts
+      - name: Generate and verify published SHA-256 checksums
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          foreach ($artifact in @("build.mjs", "install.sh", "install.ps1")) {
+            $path = Join-Path "public/build-sync" $artifact
+            $checksumPath = "$path.sha256"
+            $actual = (Get-FileHash -Algorithm SHA256 -Path $path).Hash
+            [System.IO.File]::WriteAllText($checksumPath, "$actual  $artifact`n", [System.Text.UTF8Encoding]::new($false))
+            $expected = ((Get-Content -Raw $checksumPath) -split "\s+")[0]
+            if ($expected -notmatch '^[0-9a-fA-F]{64}$' -or $actual.ToLowerInvariant() -ne $expected.ToLowerInvariant()) {
+              throw "Published checksum mismatch for $artifact"
+            }
+            Write-Host "$artifact $actual"
+          }
+          git diff --exit-code -- public/build-sync/*.sha256
       - name: Verify BUILD Sync behavior
         run: node --import tsx --test tests/buildSync.test.ts
       - name: Parse and install BUILD Sync

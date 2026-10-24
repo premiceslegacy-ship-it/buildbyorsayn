@@ -26,8 +26,21 @@ $InstallRoot = Join-Path $env:LOCALAPPDATA "BUILD Sync"
 $BinRoot = Join-Path $InstallRoot "bin"
 $CliPath = Join-Path $InstallRoot "build.mjs"
 $TempPath = "$CliPath.tmp"
+$ChecksumPath = "$TempPath.sha256"
 New-Item -ItemType Directory -Force -Path $InstallRoot, $BinRoot | Out-Null
 Invoke-WebRequest -UseBasicParsing "$BuildSyncOrigin/build-sync/build.mjs" -OutFile $TempPath
+Invoke-WebRequest -UseBasicParsing "$BuildSyncOrigin/build-sync/build.mjs.sha256" -OutFile $ChecksumPath
+$ExpectedHash = ((Get-Content -Raw $ChecksumPath) -split "\s+")[0]
+if ($ExpectedHash -notmatch '^[0-9a-fA-F]{64}$') {
+  Remove-Item -Force -ErrorAction SilentlyContinue $TempPath, $ChecksumPath
+  throw "Le checksum SHA-256 publié est invalide."
+}
+$ActualHash = (Get-FileHash -Algorithm SHA256 -Path $TempPath).Hash
+if ($ActualHash.ToLowerInvariant() -ne $ExpectedHash.ToLowerInvariant()) {
+  Remove-Item -Force -ErrorAction SilentlyContinue $TempPath, $ChecksumPath
+  throw "Le checksum SHA-256 de BUILD Sync ne correspond pas au fichier téléchargé."
+}
+Remove-Item -Force $ChecksumPath
 Move-Item -Force $TempPath $CliPath
 
 $Wrapper = Join-Path $BinRoot "build-skills.cmd"

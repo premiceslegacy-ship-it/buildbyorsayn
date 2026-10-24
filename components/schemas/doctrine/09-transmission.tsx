@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function TerrainAvantBibliothequeDiagram() {
+function TerrainAvantBibliothequeDiagram() {
   return <Fork
     title="Juste assez avant le terrain"
     description="Tu apprends le vocabulaire, les erreurs et les critères utiles, puis tu livres un vrai travail limité."
@@ -18,7 +18,7 @@ export function TerrainAvantBibliothequeDiagram() {
   />;
 }
 
-export function BoucleAcquisitionLivraisonDiagram() {
+function BoucleAcquisitionLivraisonDiagram() {
   return <Cycle
     title="Les retours circulent"
     description="Ce que tu entends en vendant et ce que tu vois en livrant améliore la vente suivante."
@@ -36,7 +36,7 @@ export function BoucleAcquisitionLivraisonDiagram() {
   />;
 }
 
-export function LivrablePlusRegardDiagram() {
+function LivrablePlusRegardDiagram() {
   return <Compare
     title="Remets le résultat et le regard"
     description="La personne reçoit le livrable et la méthode qui lui permet de le juger puis de le reprendre."

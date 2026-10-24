@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function DoctrineCommeAtelierDiagram() {
+function DoctrineCommeAtelierDiagram() {
   return <Compare
     title="Préparer avant d'agir"
     description="La même demande, lancée telle quelle à un agent, puis préparée comme une vraie mission."
@@ -21,7 +21,7 @@ export function DoctrineCommeAtelierDiagram() {
   />;
 }
 
-export function TroisObjetsTroisRolesDiagram() {
+function TroisObjetsTroisRolesDiagram() {
   return <Steps
     title="Trois objets, trois rôles"
     description="Exemple : une demande de devis. Le workflow porte le trajet, le skill la méthode, la mémoire un fait."
@@ -37,7 +37,7 @@ export function TroisObjetsTroisRolesDiagram() {
   />;
 }
 
-export function CinqPartiesUnDossierDiagram() {
+function CinqPartiesUnDossierDiagram() {
   return <Workflow
     title="Cinq parties, un seul dossier"
     description="Chaque partie de la Doctrine se ferme sur un objet que la partie suivante reprend."

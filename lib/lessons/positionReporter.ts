@@ -1,5 +1,5 @@
-export const LESSON_REPORT_INTERVAL_MS = 15_000;
-export const LESSON_COMPLETION_RATIO = 0.9;
+const LESSON_REPORT_INTERVAL_MS = 15_000;
+const LESSON_COMPLETION_RATIO = 0.9;
 
 export type LessonPositionSnapshot = { positionSeconds: number; completed: boolean };
 

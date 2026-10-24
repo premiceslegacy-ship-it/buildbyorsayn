@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function ChaqueObjetSaMaisonDiagram() {
+function ChaqueObjetSaMaisonDiagram() {
   return <Fork
     title="Chaque information a sa maison"
     description="Le format suit la responsabilité : méthode, objet vivant, photo datée ou vue de recherche."
@@ -20,7 +20,7 @@ export function ChaqueObjetSaMaisonDiagram() {
   />;
 }
 
-export function DeuxHorlogesDiagram() {
+function DeuxHorlogesDiagram() {
   return <BigNumber
     title="Deux dates, deux questions"
     description="Exemple : un tarif fournisseur contrôlé le 2 octobre et valable jusqu'au 31 décembre."
@@ -33,7 +33,7 @@ export function DeuxHorlogesDiagram() {
   />;
 }
 
-export function BibliothequeEtPorteDiagram() {
+function BibliothequeEtPorteDiagram() {
   return <Workflow
     title="Retrouver ne donne pas le droit"
     description="Le RAG retrouve, MCP ouvre une porte, le serveur contrôle encore l'identité."

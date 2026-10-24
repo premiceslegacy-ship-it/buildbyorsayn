@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function QuatrePortesUnCoffreDiagram() {
+function QuatrePortesUnCoffreDiagram() {
   return <ToolMap
     title="Quatre portes, la même serrure"
     description="API, CLI, MCP ou interface : la route technique change, la permission reste la même."
@@ -20,7 +20,7 @@ export function QuatrePortesUnCoffreDiagram() {
   />;
 }
 
-export function BarriereDevantActionDiagram() {
+function BarriereDevantActionDiagram() {
   return <Steps
     title="La barrière vient avant l'appel"
     description="La règle explique, le contrôle bloque l'appel, et le test prouve que le refus arrive."
@@ -36,7 +36,7 @@ export function BarriereDevantActionDiagram() {
   />;
 }
 
-export function TroisFiletsSousActionDiagram() {
+function TroisFiletsSousActionDiagram() {
   return <Rings
     title="Trois filets sous l'action"
     description="Une action extérieure, comme un paiement, se protège de trois façons différentes."

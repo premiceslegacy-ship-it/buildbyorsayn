@@ -1,5 +1,5 @@
-export const DEFAULT_RESEND_TIMEOUT_MS = 10_000;
-export const DEFAULT_ADMIN_BROADCAST_TIMEOUT_MS = 10_000;
+const DEFAULT_RESEND_TIMEOUT_MS = 10_000;
+const DEFAULT_ADMIN_BROADCAST_TIMEOUT_MS = 10_000;
 export const MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS = 10;
 
 export type StripeEmailKind = "welcome" | "upgrade-refused" | "purchase-confirmation";

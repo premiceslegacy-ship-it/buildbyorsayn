@@ -53,6 +53,7 @@ const PHOTOS = {
   velo: { src: "atelier-velo-reparation", alt: "Réparation d'un vélo à l'atelier" },
   cuisine: { src: "cuisine-en-renovation", alt: "Une cuisine en rénovation" },
   piece: { src: "piece-en-renovation", alt: "Une pièce en rénovation" },
+  salon: { src: "salon-de-luxe", alt: "Un salon de luxe mis en scène" },
   bureau: { src: "bureau-ordinateur-portable", alt: "Un bureau avec un ordinateur portable" },
 } as const;
 
@@ -83,7 +84,7 @@ const SLOP_CARDS = [
 /** Les éléments de la page, dans l'ordre de lecture, avec leur pastille si elle est demandée. */
 function buildSite(page: WebPageData, quality: Quality, pinOf: (slot: SiteSlot) => number | undefined, compare = false): SiteSpec {
   const slop = quality === "slop";
-  const photo = slop ? null : photoOf(page);
+  const photo = photoOf(page);
   const screen = slop ? null : screenOf(page);
   const pin = (...slots: SiteSlot[]) => {
     const pins: Partial<Record<SiteSlot, number>> = {};
@@ -107,7 +108,7 @@ function buildSite(page: WebPageData, quality: Quality, pinOf: (slot: SiteSlot) 
   const hero: SiteSection = slop
     ? {
       kind: "hero", variant: "centered", glow: true, eyebrow: page.eyebrow, title: page.heading, accent: lastWord(page.heading),
-      text: page.subtitle, cta: page.button, cta2: "En savoir plus", image: "orbs",
+      text: page.subtitle, cta: page.button, cta2: "En savoir plus", image: photo?.src ?? "orbs", imageAlt: photo?.alt,
       pins: pin("eyebrow", "title", "text", "cta", "cta2", "image"),
     }
     : {

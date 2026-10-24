@@ -48,7 +48,7 @@ export function getMcpResourceUrl(): string {
   return `${getMcpIssuer()}/api/mcp`;
 }
 
-export function parseMcpAllowedOrigins(configured: string | undefined): string[] {
+function parseMcpAllowedOrigins(configured: string | undefined): string[] {
   const values = configured
     ? configured.split(",").map((origin) => origin.trim()).filter(Boolean)
     : ["https://claude.ai", "https://chatgpt.com"];

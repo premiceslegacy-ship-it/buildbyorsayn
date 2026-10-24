@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function TacheSousLaLoupeDiagram() {
+function TacheSousLaLoupeDiagram() {
   return <Steps
     title="Une tâche sous la loupe"
     description="Tu pars d'un domaine trop large et tu resserres jusqu'à un objet que quelqu'un peut lire."
@@ -20,7 +20,7 @@ export function TacheSousLaLoupeDiagram() {
   />;
 }
 
-export function CarteDesSourcesDiagram() {
+function CarteDesSourcesDiagram() {
   return <Rings
     title="Plusieurs sources, un même travail"
     description="Chaque source voit une partie de la tâche. Le terrain reste au plus près du vrai travail."
@@ -38,7 +38,7 @@ export function CarteDesSourcesDiagram() {
   />;
 }
 
-export function SourceVersFicheDiagram() {
+function SourceVersFicheDiagram() {
   return <FileCard
     title="La matière devient une fiche"
     description="Exemple : six questions suffisent pour tenir une tâche sur une seule page."
@@ -64,7 +64,7 @@ export function SourceVersFicheDiagram() {
   />;
 }
 
-export function FicheContreCasReelDiagram() {
+function FicheContreCasReelDiagram() {
   return <Cycle
     title="La fiche rencontre le réel"
     description="Ta fiche reste une hypothèse jusqu'au moment où un vrai cas l'oblige à changer."
@@ -82,7 +82,7 @@ export function FicheContreCasReelDiagram() {
   />;
 }
 
-export function PremierClientAvantSystemeDiagram() {
+function PremierClientAvantSystemeDiagram() {
   return <Fork
     title="La conversation avant la machine"
     description="Une fois ta fiche prête, la route courte passe par une vraie personne, pas par l'organisation."
@@ -97,7 +97,7 @@ export function PremierClientAvantSystemeDiagram() {
   />;
 }
 
-export function ParcoursDuTerrainDiagram() {
+function ParcoursDuTerrainDiagram() {
   return <Funnel
     title="Le parcours reste visible"
     description="Exemple : vingt contacts notés dans un simple tableau, du premier message à la livraison."
@@ -116,7 +116,7 @@ export function ParcoursDuTerrainDiagram() {
   />;
 }
 
-export function ToiEtTonIAEnSprintDiagram() {
+function ToiEtTonIAEnSprintDiagram() {
   return <Workflow
     title="L'IA prépare, tu engages"
     description="Ton IA prépare la recherche et le brouillon. Toi, tu choisis la personne et tu décides l'envoi."
@@ -134,7 +134,7 @@ export function ToiEtTonIAEnSprintDiagram() {
   />;
 }
 
-export function MargeReelleDiagram() {
+function MargeReelleDiagram() {
   return <Compare
     title="Ce que la vente cache"
     description="Exemple : un formulaire de réservation vendu à un salon, puis trois soirées de corrections imprévues."
@@ -151,7 +151,7 @@ export function MargeReelleDiagram() {
   />;
 }
 
-export function ProjetQuiDisparaitOuResteDiagram() {
+function ProjetQuiDisparaitOuResteDiagram() {
   return <Compare
     title="Deux fins pour un projet"
     description="Après la livraison, ce que tu as appris disparaît dans tes messages ou rejoint ta méthode."
@@ -168,7 +168,7 @@ export function ProjetQuiDisparaitOuResteDiagram() {
   />;
 }
 
-export function BonContenantDiagram() {
+function BonContenantDiagram() {
   return <Fork
     title="Chaque apprentissage à sa place"
     description="Une observation du terrain rejoint le contenant qui correspond à sa nature."
@@ -185,7 +185,7 @@ export function BonContenantDiagram() {
   />;
 }
 
-export function PatchDeMethodeDiagram() {
+function PatchDeMethodeDiagram() {
   return <FileCard
     title="Une petite modification relue"
     description="Exemple : ton IA propose de changer une ligne de ta méthode, avec le cas qui la justifie."
@@ -210,7 +210,7 @@ export function PatchDeMethodeDiagram() {
   />;
 }
 
-export function EscalierDuCapitalDiagram() {
+function EscalierDuCapitalDiagram() {
   return <Ladder
     title="Chaque projet ajoute une marche"
     description="Le premier projet te donne une fiche. Les suivants la corrigent et la complètent."
@@ -228,7 +228,7 @@ export function EscalierDuCapitalDiagram() {
   />;
 }
 
-export function ChangerDOutilSansRetomberDiagram() {
+function ChangerDOutilSansRetomberDiagram() {
   return <ToolMap
     title="Les outils passent, la méthode reste"
     description="Tu loues les modèles. Tes fiches, tes règles et tes tests passent de l'un à l'autre."

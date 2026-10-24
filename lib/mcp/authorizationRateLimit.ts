@@ -38,12 +38,3 @@ export async function reserveAuthorizationPrincipal(
   });
   return resolveRateLimitDecision(data, error);
 }
-
-export async function reserveAuthorizationRequest(
-  admin: SupabaseClient,
-  input: { headers: Headers; userId: string; clientId: string; product: "build-sync" | "mcp" },
-): Promise<RateLimitDecision> {
-  const networkDecision = await reserveAuthorizationNetworkRequest(admin, input);
-  if (networkDecision !== "allowed") return networkDecision;
-  return reserveAuthorizationPrincipal(admin, input);
-}

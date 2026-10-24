@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function ManuelDossierBoiteDiagram() {
+function ManuelDossierBoiteDiagram() {
   return <ToolMap
     title="Trois maisons séparées"
     description="La méthode, le cas du jour et les outils restent rangés à part pour savoir ce qui fait foi."
@@ -19,7 +19,7 @@ export function ManuelDossierBoiteDiagram() {
   />;
 }
 
-export function DeuxSourcesQuiSeContredisentDiagram() {
+function DeuxSourcesQuiSeContredisentDiagram() {
   return <Fork
     title="Le désaccord reste visible"
     description="Exemple : le CRM et un e-mail du client donnent deux prix différents pour le même devis."
@@ -35,7 +35,7 @@ export function DeuxSourcesQuiSeContredisentDiagram() {
   />;
 }
 
-export function ContexteDansUneValiseDiagram() {
+function ContexteDansUneValiseDiagram() {
   return <Compare
     title="Une petite valise de contexte"
     description="La mission emporte l'essentiel du dossier et laisse les archives derrière elle."

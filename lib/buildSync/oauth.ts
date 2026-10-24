@@ -38,7 +38,7 @@ export function createBuildSyncAuthorizationSchema(resourceUrl: string) {
 
 const opaqueToken = z.string().regex(/^[A-Za-z0-9_-]{43}$/);
 
-export function createBuildSyncTokenSchema(resourceUrl: string) {
+function createBuildSyncTokenSchema(resourceUrl: string) {
   return z.discriminatedUnion("grant_type", [
     z.object({
       grant_type: z.literal("authorization_code"),

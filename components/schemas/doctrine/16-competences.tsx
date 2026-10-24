@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function BriquesDuSavoirFaireDiagram() {
+function BriquesDuSavoirFaireDiagram() {
   return <Rings
     title="Les briques du savoir-faire"
     description="Du métier à l'agent, chaque brique a un rôle et ne remplace pas les autres."
@@ -21,7 +21,7 @@ export function BriquesDuSavoirFaireDiagram() {
   />;
 }
 
-export function ProcedureAvecSortiesDeSecoursDiagram() {
+function ProcedureAvecSortiesDeSecoursDiagram() {
   return <Fork
     title="La procédure prévoit ses sorties"
     description="Après la comparaison, la procédure continue, s'arrête ou passe la main."
@@ -37,7 +37,7 @@ export function ProcedureAvecSortiesDeSecoursDiagram() {
   />;
 }
 
-export function CandidatPuisPromotionDiagram() {
+function CandidatPuisPromotionDiagram() {
   return <Cycle
     title="Une répétition reste candidate"
     description="Une méthode observée passe par un test et une revue avant d'être gardée."

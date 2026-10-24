@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
 
 type StateAction = { label: string; href: string; onClick?: never } | { label: string; onClick: () => void; href?: never };
 
@@ -42,8 +41,4 @@ export function AppState({
       </div>
     </section>
   );
-}
-
-export function InlineState({ children }: { children: ReactNode }) {
-  return <div className="grid w-full max-w-[38rem] justify-items-center gap-[14px]">{children}</div>;
 }

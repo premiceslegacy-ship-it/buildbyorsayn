@@ -13,7 +13,7 @@
  */
 
 export const DEV_SITE_ORIGIN = "http://localhost:3000";
-export const SITE_ORIGIN_VARIABLE = "NEXT_PUBLIC_APP_URL";
+const SITE_ORIGIN_VARIABLE = "NEXT_PUBLIC_APP_URL";
 
 const LOOPBACK_HOSTS = ["localhost", "127.0.0.1", "[::1]"];
 

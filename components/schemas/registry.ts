@@ -314,7 +314,7 @@ export const READER_VISUAL_CATALOG: readonly ReaderVisualCatalogEntry[] = [
   { name: "PageOffreAnnotée", kind: "maquette", course: "general", component: OfferPageMockup },
 ] as const;
 
-export const SCHEMA_REGISTRY = registry([
+const SCHEMA_REGISTRY = registry([
   ...READER_VISUAL_CATALOG
     .filter((entry) => entry.kind === "schema")
     .map((entry) => [entry.name, entry.component] as const),
@@ -323,7 +323,7 @@ export const SCHEMA_REGISTRY = registry([
   ["EtapesDuProjet", ProjectStepsSchema],
 ]);
 
-export const MOCKUP_REGISTRY = registry([
+const MOCKUP_REGISTRY = registry([
   ...READER_VISUAL_CATALOG
     .filter((entry) => entry.kind === "maquette")
     .map((entry) => [entry.name, entry.component] as const),
@@ -331,7 +331,7 @@ export const MOCKUP_REGISTRY = registry([
   ["PageOffreAnnotee", OfferPageMockup],
 ]);
 
-export function resolveReaderVisual(kind: ReaderVisualKind, name: string): ReaderVisualComponent | undefined {
+function resolveReaderVisual(kind: ReaderVisualKind, name: string): ReaderVisualComponent | undefined {
   const component = (kind === "schema" ? SCHEMA_REGISTRY : MOCKUP_REGISTRY).get(normalizeVisualName(name));
   if (!component && process.env.NODE_ENV !== "production") {
     console.warn(`[reader] ${kind} inconnu : ${name}`);

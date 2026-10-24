@@ -2103,6 +2103,7 @@
   to { background-position-x: -220%; }
 }
 
+
 @media (min-width: 1280px) {
   .textLayout[data-outline-open="true"] {
     --reader-wide-width: min(960px, calc(min(calc(100vw - 2 * var(--gutter)), 74rem) - 330px - clamp(40px, 5vw, 72px)));

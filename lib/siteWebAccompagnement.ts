@@ -611,23 +611,6 @@ export function isThemeUnderstood(
 
 export const PHASES = THEMES;
 
-export const OUTCOMES = [
-  "Une offre de sites web que les bons clients comprennent",
-  "Des sites et preuves qui renforcent la confiance",
-  "Un site réel que tu peux vendre et livrer",
-  "Un parcours simple entre demande, vente et livraison",
-  "Des signaux pour augmenter le volume sans perdre la marge",
-  "Une méthode réutilisable pour scaler ton activité web",
-];
-
-export const TOOL_LAYERS = [
-  { label: "Comprendre", tools: "Marché, entreprise cliente, problème et offre de site" },
-  { label: "Préparer", tools: "Brief, copy, références, preuves et direction du site" },
-  { label: "Produire", tools: "Outils de création web, versions, relecture et livraison" },
-  { label: "Relier", tools: "Formulaires, CRM, paiements et automatisations utiles au site" },
-  { label: "Vendre", tools: "Canaux, conversations, propositions de sites et suivi" },
-  { label: "Apprendre", tools: "Ventes, délais, marge, retours et méthodes réutilisables" },
-];
 
 export type SiteWebFollowUpProfile = {
   name: string;

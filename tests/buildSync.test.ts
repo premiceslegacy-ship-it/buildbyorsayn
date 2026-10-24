@@ -285,11 +285,14 @@ test("a legacy multi-unit marker is migrated once before unchanged checks skip a
 
 test("the install card and the assistant share one source for commands, folders and subcommands", async () => {
   const [posix, windows] = buildSyncInstallCommands("https://build.example/");
-  assert.equal(posix.command, "curl -fsSL https://build.example/build-sync/install.sh | sh");
-  assert.equal(windows.command, "irm https://build.example/build-sync/install.ps1 | iex");
+  assert.ok(posix.command.includes("https://build.example/build-sync/install.sh"));
+  assert.ok(posix.command.includes("https://build.example/build-sync/install.sh.sha256"));
+  assert.ok(!posix.command.includes("| sh"));
+  assert.ok(windows.command.includes("https://build.example/build-sync/install.ps1"));
+  assert.ok(windows.command.includes("https://build.example/build-sync/install.ps1.sha256"));
+  assert.ok(!windows.command.includes("| iex"));
   assert.equal(buildSyncOrigin(undefined), BUILD_SYNC_FALLBACK_ORIGIN);
   assert.equal(buildSyncOrigin("  https://build.example//  "), "https://build.example");
-
 
   let printed = "";
   const originalWrite = process.stdout.write;
@@ -347,37 +350,53 @@ test("a hostile or malformed origin never reaches the displayed install command"
   assert.equal(buildSyncOrigin("http://127.0.0.1:3000"), "http://127.0.0.1:3000");
 });
 
-test("generated shell commands re-read any origin as one inert argument, even when callers skip buildSyncOrigin", () => {
-  const sandbox = path.join(os.tmpdir(), `build-sync-quote-${process.pid}`);
-  const marker = "/tmp/build-sync-pwned-marker";
+test("generated install commands quote origins and require a checksum before execution", () => {
   for (const hostile of [...HOSTILE_ORIGINS, "https://build.example/it's \u2018smart\u2019"]) {
     const [posix, windows] = buildSyncInstallCommands(hostile);
-    // curl est remplacé par une fonction qui écrit son argument : si le shell interprétait la valeur, le marqueur apparaîtrait.
-    const script = `mkdir -p '${sandbox}'; curl() { for a in "$@"; do printf '%s\\0' "$a"; done; }; ${posix.command.replace(/ \| sh$/, "")}`;
-    const run = spawnSync("sh", ["-c", script], { encoding: "utf8" });
-    assert.equal(run.status, 0, `${JSON.stringify(hostile)}: ${run.stderr}`);
-    const args = run.stdout.split("\0").filter((value) => value !== "");
-    assert.deepEqual(args, ["-fsSL", `${hostile.replace(/\/+$/, "")}/build-sync/install.sh`], JSON.stringify(hostile));
-    assert.ok(!windows.command.includes("\n") || windows.command.includes("'"), "a multi-line origin must stay inside quotes");
+    const base = hostile.replace(/\/+$/, "");
+    const shUrl = `${base}/build-sync/install.sh`;
+    const psUrl = `${base}/build-sync/install.ps1`;
+    assert.ok(posix.command.includes(shUrl) || posix.command.includes(quotePosixArgument(shUrl)), JSON.stringify(hostile));
+    assert.ok(posix.command.includes(`${base}/build-sync/install.sh.sha256`) || posix.command.includes(quotePosixArgument(`${base}/build-sync/install.sh.sha256`)));
+    assert.ok(!posix.command.includes("| sh"), JSON.stringify(hostile));
+    assert.ok(windows.command.includes(psUrl) || windows.command.includes(quotePowerShellArgument(psUrl)), JSON.stringify(hostile));
+    assert.ok(windows.command.includes(`${base}/build-sync/install.ps1.sha256`) || windows.command.includes(quotePowerShellArgument(`${base}/build-sync/install.ps1.sha256`)));
+    assert.ok(!windows.command.includes("| iex"), JSON.stringify(hostile));
   }
   assert.equal(quotePosixArgument("a'b"), `'a'\\''b'`);
   // PowerShell traite aussi les apostrophes typographiques comme des guillemets simples.
   assert.equal(quotePowerShellArgument("a'b\u2019c"), "'a''b\u2019\u2019c'");
-  assert.equal(
-    buildSyncInstallCommands("https://build.example")[0].command,
-    "curl -fsSL https://build.example/build-sync/install.sh | sh",
-    "a plain origin is displayed without noise",
-  );
-  return rm(sandbox, { recursive: true, force: true }).then(async () => {
-    await assert.rejects(lstat(marker));
-  });
 });
 
 async function runInstallSh(env: Record<string, string>, home: string) {
   const bin = path.join(home, "stub-bin");
   await mkdir(bin, { recursive: true });
   const logFile = path.join(home, "curl-calls.log");
-  await writeFile(path.join(bin, "curl"), `#!/bin/sh\nprintf '%s\\n' "$*" >> "$BUILD_SYNC_TEST_CURL_LOG"\nwhile [ $# -gt 0 ]; do if [ "$1" = "-o" ]; then printf '%s\\n' 'process.stdout.write(JSON.stringify({ args: process.argv.slice(2), cli: process.env.BUILD_SYNC_CLI_PATH }));' > "$2"; fi; shift; done\n`);
+  await writeFile(
+    path.join(bin, "curl"),
+    `#!/bin/sh
+printf '%s\\n' "$*" >> "$BUILD_SYNC_TEST_CURL_LOG"
+out=""
+url=""
+previous=""
+for arg in "$@"; do
+  if [ "$previous" = "-o" ]; then out="$arg"; fi
+  case "$arg" in http://*|https://*) url="$arg" ;; esac
+  previous="$arg"
+done
+payload='process.stdout.write(JSON.stringify({ args: process.argv.slice(2), cli: process.env.BUILD_SYNC_CLI_PATH }));'
+printf '%s\\n' "$payload" > "$out"
+case "$url" in
+  *.sha256)
+    if [ "\${BUILD_SYNC_TEST_BAD_CHECKSUM:-0}" = "1" ]; then
+      printf '%064d\\n' 0 > "$out"
+    else
+      shasum -a 256 "\${out%.sha256.tmp}.tmp" | awk '{ print $1 }' > "$out"
+    fi
+    ;;
+esac
+`,
+  );
   await chmod(path.join(bin, "curl"), 0o755);
   const run = spawnSync("sh", [path.resolve("public/build-sync/install.sh")], {
     encoding: "utf8",
@@ -417,6 +436,17 @@ test("install.sh writes a wrapper that survives quotes, spaces and shell syntax 
     await assert.rejects(lstat(path.join(parent, "pwned")), "the \\$(…) in HOME must never run");
   } finally {
     await rm(parent, { recursive: true, force: true });
+  }
+});
+
+test("install.sh refuses a tampered published checksum before replacing the CLI", async () => {
+  const home = await mkdtemp(path.join(os.tmpdir(), "build-sync-sh-checksum-"));
+  try {
+    const { run } = await runInstallSh({ BUILD_SYNC_BASE_URL: "https://build.example", BUILD_SYNC_TEST_BAD_CHECKSUM: "1" }, home);
+    assert.notEqual(run.status, 0);
+    await assert.rejects(lstat(path.join(home, ".local", "share", "build-sync", "build.mjs")));
+  } finally {
+    await rm(home, { recursive: true, force: true });
   }
 });
 

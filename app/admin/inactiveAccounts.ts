@@ -1,5 +1,5 @@
-export const INACTIVE_ACCOUNT_DAYS = 90;
-export const NEW_ACCOUNT_GRACE_DAYS = 14;
+const INACTIVE_ACCOUNT_DAYS = 90;
+const NEW_ACCOUNT_GRACE_DAYS = 14;
 export const MAX_INACTIVE_ACCOUNT_BATCH = 200;
 
 const DAY_MS = 24 * 60 * 60 * 1000;

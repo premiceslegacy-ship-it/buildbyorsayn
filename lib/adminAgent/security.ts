@@ -6,10 +6,10 @@ import { createAdminSupabase } from "@/lib/supabase/admin";
 import { trustedClientAddress } from "@/lib/mcp/security";
 import { AGENT_PERMISSION_VALUES, type AgentPermission, type AgentTokenContext } from "./types";
 
-export const AGENT_TOKEN_PREFIX = "btv_agt_";
+const AGENT_TOKEN_PREFIX = "btv_agt_";
 export const DEFAULT_AGENT_TOKEN_DAYS = 90;
 export const AGENT_MAX_BODY_BYTES = 64 * 1024;
-export const AGENT_TOKEN_PATTERN = /^btv_agt_[A-Za-z0-9_-]{43}$/;
+const AGENT_TOKEN_PATTERN = /^btv_agt_[A-Za-z0-9_-]{43}$/;
 
 const storedTokenSchema = z.object({
   id: z.string().uuid(),
@@ -45,7 +45,7 @@ function rateSubject(kind: "token" | "address", value: string, pepper: string): 
   return `admin-agent-${kind}:${createHmac("sha256", pepper).update(value, "utf8").digest("hex")}`;
 }
 
-export function readBearerToken(headers: Headers): string | null {
+function readBearerToken(headers: Headers): string | null {
   const value = headers.get("authorization") ?? "";
   const match = /^Bearer ([^\s]+)$/.exec(value);
   return match && AGENT_TOKEN_PATTERN.test(match[1]) ? match[1] : null;

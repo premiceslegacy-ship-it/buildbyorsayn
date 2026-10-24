@@ -10,16 +10,16 @@ import fs from "node:fs";
  * so the suite still runs (minus gated specs) in environments without the
  * fixture accounts configured.
  */
-export const E2E_EMAIL = process.env.E2E_TEST_EMAIL;
-export const E2E_PASSWORD = process.env.E2E_TEST_PASSWORD;
+const E2E_EMAIL = process.env.E2E_TEST_EMAIL;
+const E2E_PASSWORD = process.env.E2E_TEST_PASSWORD;
 export const hasE2eAccount = Boolean(E2E_EMAIL && E2E_PASSWORD);
 
-export const BEGINNER_E2E_EMAIL = process.env.E2E_BEGINNER_TEST_EMAIL;
-export const BEGINNER_E2E_PASSWORD = process.env.E2E_BEGINNER_TEST_PASSWORD;
+const BEGINNER_E2E_EMAIL = process.env.E2E_BEGINNER_TEST_EMAIL;
+const BEGINNER_E2E_PASSWORD = process.env.E2E_BEGINNER_TEST_PASSWORD;
 export const hasBeginnerE2eAccount = Boolean(BEGINNER_E2E_EMAIL && BEGINNER_E2E_PASSWORD);
 
-export const FREE_E2E_EMAIL = process.env.E2E_FREE_TEST_EMAIL;
-export const FREE_E2E_PASSWORD = process.env.E2E_FREE_TEST_PASSWORD;
+const FREE_E2E_EMAIL = process.env.E2E_FREE_TEST_EMAIL;
+const FREE_E2E_PASSWORD = process.env.E2E_FREE_TEST_PASSWORD;
 export const hasE2eFreeAccount = Boolean(FREE_E2E_EMAIL && FREE_E2E_PASSWORD);
 
 const STORAGE_STATE_PATH = path.join(process.cwd(), "e2e", ".auth", "user.json");
@@ -94,12 +94,6 @@ async function openAuthenticatedPage(
   return { page, close: () => context.close() };
 }
 
-/** Reuses a cached logged-in session across the whole run when possible. */
-export async function ensureAuthState(page: Page): Promise<void> {
-  fs.mkdirSync(path.dirname(STORAGE_STATE_PATH), { recursive: true });
-  await loginViaUi(page, E2E_EMAIL, E2E_PASSWORD);
-  await saveBoundAuthState(page, STORAGE_STATE_PATH, "full", E2E_EMAIL!);
-}
 
 export const test = base.extend<{ authedPage: Page; beginnerPage: Page; freePage: Page }>({
   authedPage: async ({ browser }, use) => {

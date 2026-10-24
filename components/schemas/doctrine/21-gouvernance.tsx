@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function TableauDeBordHuitCasesDiagram() {
+function TableauDeBordHuitCasesDiagram() {
   return <FileCard
     title="Le contrat tient sur huit cases"
     description="Résultat, humain, source, entrées, sortie, droits, reprise et revue, remplis avant le lancement."
@@ -29,7 +29,7 @@ export function TableauDeBordHuitCasesDiagram() {
   />;
 }
 
-export function TroisCerclesDAutoriteDiagram() {
+function TroisCerclesDAutoriteDiagram() {
   return <Ladder
     title="L'accord grandit avec l'effet"
     description="Préparer, modifier et engager ne demandent pas le même niveau d'accord."
@@ -47,7 +47,7 @@ export function TroisCerclesDAutoriteDiagram() {
   />;
 }
 
-export function ManuelAvantAutomatiqueDiagram() {
+function ManuelAvantAutomatiqueDiagram() {
   return <Steps
     title="Le manuel précède l'automatique"
     description="Le travail se fait d'abord à la main, puis se teste et se limite avant d'être planifié."

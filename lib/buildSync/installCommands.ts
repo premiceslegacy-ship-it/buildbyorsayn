@@ -71,17 +71,33 @@ export function quotePowerShellArgument(value: string): string {
 export function buildSyncInstallCommands(origin: string): readonly [BuildSyncInstallCommand, BuildSyncInstallCommand] {
   const base = origin.replace(/\/+$/, "");
   const shUrl = `${base}/build-sync/install.sh`;
+  const shChecksumUrl = `${shUrl}.sha256`;
   const psUrl = `${base}/build-sync/install.ps1`;
+  const psChecksumUrl = `${psUrl}.sha256`;
+  const shTarget = `"${"${TMPDIR:-/tmp}"}/bsi.$$"`;
+  const shUrlArg = SHELL_NEUTRAL_URL.test(shUrl) ? shUrl : quotePosixArgument(shUrl);
+  const shChecksumUrlArg = SHELL_NEUTRAL_URL.test(shChecksumUrl) ? shChecksumUrl : quotePosixArgument(shChecksumUrl);
+  const shCommand = `t=${shTarget};c="$t.sha256";curl -fsSL --proto-redir "=https" ${shUrlArg} -o "$t"&&curl -fsSL --proto-redir "=https" ${shChecksumUrlArg} -o "$c"&&e=$(awk 'NF{print $1;exit}' "$c")&&a=$(if command -v sha256sum>/dev/null 2>&1;then sha256sum "$t";else shasum -a 256 "$t";fi|awk '{print $1}')&&test "$e" = "$a"&&sh "$t";s=$?;rm -f "$t" "$c";exit "$s"`;
+  const psCommand = [
+    `$t="$env:TEMP\\bsi-$PID.ps1";$c="$t.sha256"`,
+    `irm ${SHELL_NEUTRAL_URL.test(psUrl) ? psUrl : quotePowerShellArgument(psUrl)} -OutFile $t`,
+    `irm ${SHELL_NEUTRAL_URL.test(psChecksumUrl) ? psChecksumUrl : quotePowerShellArgument(psChecksumUrl)} -OutFile $c`,
+    `$e=((gc -Raw $c)-split "\\s+")[0]`,
+    `$a=(Get-FileHash $t -Algorithm SHA256).Hash`,
+    `if($a -ne $e){ri -fo $t,$c;throw 'Checksum invalide'}`,
+    `& powershell -nop -ep Bypass -f $t`,
+    `$s=$LASTEXITCODE;ri -fo $t,$c;exit $s`,
+  ].join("; ");
   return [
     {
       id: "posix",
       label: "macOS, Linux ou WSL",
-      command: `curl -fsSL ${SHELL_NEUTRAL_URL.test(shUrl) ? shUrl : quotePosixArgument(shUrl)} | sh`,
+      command: shCommand,
     },
     {
       id: "windows",
       label: "Windows PowerShell",
-      command: `irm ${SHELL_NEUTRAL_URL.test(psUrl) ? psUrl : quotePowerShellArgument(psUrl)} | iex`,
+      command: psCommand,
     },
   ] as const;
 }

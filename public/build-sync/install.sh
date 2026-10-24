@@ -47,9 +47,33 @@ echo "✓ Node.js $(node -v)"
 echo "→ Téléchargement sécurisé de BUILD Sync…"
 
 mkdir -p "$BUILD_SYNC_DATA_DIR" "$BUILD_SYNC_BIN_DIR"
-curl -fsSL --proto-redir "=https" "$BUILD_SYNC_ORIGIN/build-sync/build.mjs" -o "$BUILD_SYNC_DATA_DIR/build.mjs.tmp"
-chmod 700 "$BUILD_SYNC_DATA_DIR/build.mjs.tmp"
-mv "$BUILD_SYNC_DATA_DIR/build.mjs.tmp" "$BUILD_SYNC_DATA_DIR/build.mjs"
+BUILD_SYNC_PAYLOAD_TMP="$BUILD_SYNC_DATA_DIR/build.mjs.tmp"
+BUILD_SYNC_CHECKSUM_TMP="$BUILD_SYNC_DATA_DIR/build.mjs.sha256.tmp"
+curl -fsSL --proto-redir "=https" "$BUILD_SYNC_ORIGIN/build-sync/build.mjs" -o "$BUILD_SYNC_PAYLOAD_TMP"
+curl -fsSL --proto-redir "=https" "$BUILD_SYNC_ORIGIN/build-sync/build.mjs.sha256" -o "$BUILD_SYNC_CHECKSUM_TMP"
+BUILD_SYNC_EXPECTED="$(awk 'NF { print $1; exit }' "$BUILD_SYNC_CHECKSUM_TMP")"
+if ! printf '%s\n' "$BUILD_SYNC_EXPECTED" | grep -Eq '^[[:xdigit:]]{64}$'; then
+  echo "✗ Le checksum SHA-256 publié est invalide." >&2
+  rm -f "$BUILD_SYNC_PAYLOAD_TMP" "$BUILD_SYNC_CHECKSUM_TMP"
+  exit 1
+fi
+if command -v sha256sum >/dev/null 2>&1; then
+  BUILD_SYNC_ACTUAL="$(sha256sum "$BUILD_SYNC_PAYLOAD_TMP" | awk '{ print $1 }')"
+elif command -v shasum >/dev/null 2>&1; then
+  BUILD_SYNC_ACTUAL="$(shasum -a 256 "$BUILD_SYNC_PAYLOAD_TMP" | awk '{ print $1 }')"
+else
+  echo "✗ Aucun outil SHA-256 disponible (sha256sum ou shasum)." >&2
+  rm -f "$BUILD_SYNC_PAYLOAD_TMP" "$BUILD_SYNC_CHECKSUM_TMP"
+  exit 1
+fi
+if [ "$(printf '%s' "$BUILD_SYNC_EXPECTED" | tr '[:upper:]' '[:lower:]')" != "$BUILD_SYNC_ACTUAL" ]; then
+  echo "✗ Le checksum SHA-256 de BUILD Sync ne correspond pas au fichier téléchargé." >&2
+  rm -f "$BUILD_SYNC_PAYLOAD_TMP" "$BUILD_SYNC_CHECKSUM_TMP"
+  exit 1
+fi
+rm -f "$BUILD_SYNC_CHECKSUM_TMP"
+chmod 700 "$BUILD_SYNC_PAYLOAD_TMP"
+mv "$BUILD_SYNC_PAYLOAD_TMP" "$BUILD_SYNC_DATA_DIR/build.mjs"
 
 {
   echo '#!/bin/sh'

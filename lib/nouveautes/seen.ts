@@ -1,6 +1,6 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 
-export const NOUVEAUTES_BADGE_CAP = 9;
+const NOUVEAUTES_BADGE_CAP = 9;
 
 export function isNewVideo(publishedAt: string, seenAt: string): boolean {
   const published = Date.parse(publishedAt);

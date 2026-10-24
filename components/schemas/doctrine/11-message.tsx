@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function SceneAvantSloganDiagram() {
+function SceneAvantSloganDiagram() {
   return <AdCard
     title="La scène avant le slogan"
     description="Le même message, d'abord en slogan vague, puis réécrit autour d'un moment et d'un progrès."
@@ -49,7 +49,7 @@ export function SceneAvantSloganDiagram() {
   />;
 }
 
-export function EchelleDePromesseDiagram() {
+function EchelleDePromesseDiagram() {
   return <Ladder
     title="La promesse s'arrête à la preuve"
     description="Chaque promesse demande une preuve plus forte, du problème reconnu au résultat mesuré."
@@ -68,7 +68,7 @@ export function EchelleDePromesseDiagram() {
   />;
 }
 
-export function PageQuiAideAChoisirDiagram() {
+function PageQuiAideAChoisirDiagram() {
   return <WebPage
     title="Une page qui aide à choisir"
     description="Le premier écran porte une idée : la scène, le mécanisme, la preuve et un geste volontaire."

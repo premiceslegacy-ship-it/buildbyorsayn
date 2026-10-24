@@ -1,7 +1,7 @@
 import { DOCTRINE_BUCKET, DOCTRINE_MANIFEST_PATH, doctrineArtifactPath, parseDoctrineManifest, type DoctrineManifest } from "./publication";
 import { DOCTRINE_MANIFEST_MAX_BYTES, DOCTRINE_TOTAL_MAX_BYTES, readBoundedResponse, withinDoctrineReadDeadline } from "./readbounded";
 
-export const DOCTRINE_PUBLICATION_TIMEOUT_MS = 120_000;
+const DOCTRINE_PUBLICATION_TIMEOUT_MS = 120_000;
 const failed = () => new Error("Doctrine publication transport unavailable");
 
 // Conservative reservation for both bucket metadata and manifest in the app reader.

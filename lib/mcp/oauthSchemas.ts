@@ -35,7 +35,7 @@ export function createAuthorizationRequestSchema(resourceUrl: string) {
 const opaqueTokenSchema = z.string().regex(/^[A-Za-z0-9_-]{43}$/);
 const clientIdSchema = z.string().min(1).max(256);
 
-export function createTokenRequestSchema(resourceUrl: string) {
+function createTokenRequestSchema(resourceUrl: string) {
   const authorizationCode = z.object({
     grant_type: z.literal("authorization_code"),
     code: opaqueTokenSchema,

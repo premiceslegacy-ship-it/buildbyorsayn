@@ -57,7 +57,7 @@ export function formatLegalDate(isoDate: string): string {
 }
 
 /** Montant écrit pour des humains : « 97 € » avec espace insécable. Les prix viennent toujours de lib/pricing.ts. */
-export function euros(amount: number): string {
+function euros(amount: number): string {
   return `${amount}\u00a0€`;
 }
 

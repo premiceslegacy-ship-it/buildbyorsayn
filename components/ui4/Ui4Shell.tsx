@@ -24,45 +24,6 @@ export function Ui4Shell({
   );
 }
 
-export function Ui4Header({
-  eyebrow,
-  title,
-  lead,
-}: {
-  eyebrow?: string;
-  title: ReactNode;
-  lead: ReactNode;
-}) {
-  return (
-    <header className={styles.header}>
-      <div className={styles.headerInner}>
-        {eyebrow ? <p className={styles.eyebrow}>{eyebrow}</p> : null}
-        <h1 className="t-1">{title}</h1>
-        <p className="t-lede">{lead}</p>
-      </div>
-    </header>
-  );
-}
-
-export function Ui4SectionHeading({
-  eyebrow,
-  title,
-  lead,
-  id,
-}: {
-  eyebrow?: string;
-  title: ReactNode;
-  lead?: ReactNode;
-  id?: string;
-}) {
-  return (
-    <div className={styles.sectionHeading}>
-      {eyebrow ? <p className={styles.eyebrow}>{eyebrow}</p> : null}
-      <h2 className="t-2" id={id}>{title}</h2>
-      {lead ? <p>{lead}</p> : null}
-    </div>
-  );
-}
 
 export function Ui4State({
   title,
@@ -83,22 +44,3 @@ export function Ui4State({
     </section>
   );
 }
-
-export function Ui4Loading({ label = "Chargement de la page" }: { label?: string }) {
-  return (
-    <DaRoot className="da-app">
-      <main className={styles.loading} aria-busy="true" aria-label={label}>
-        <div className={styles.loadingLabel} />
-        <div className={styles.loadingTitle} />
-        <div className={styles.loadingLead} />
-        <div className={styles.loadingGrid}>
-          <div />
-          <div />
-          <div />
-        </div>
-      </main>
-    </DaRoot>
-  );
-}
-
-export { styles as ui4Styles };

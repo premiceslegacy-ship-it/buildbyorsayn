@@ -8,7 +8,7 @@ export function canUseBuildSync(tier: McpTier | null): tier is "beginner" | "ful
   return tier === "beginner" || tier === "full";
 }
 
-export function getBuildSyncIssuer(): string {
+function getBuildSyncIssuer(): string {
   return resolveMcpIssuer(
     process.env.BUILD_SYNC_OAUTH_ISSUER ?? process.env.MCP_OAUTH_ISSUER,
     process.env.NEXT_PUBLIC_APP_URL,

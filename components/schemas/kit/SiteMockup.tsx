@@ -21,7 +21,7 @@ export type SiteTheme = {
   serif?: boolean;
 };
 
-export const SITE_THEMES = {
+const SITE_THEMES = {
   chaux: { bg: "#ffffff", ink: "#1d1d1f", muted: "#6e6e73", accent: "#b4532a", accentInk: "#ffffff", card: "#f5f5f7", line: "rgba(29,29,31,.14)" },
   bois: { bg: "#ffffff", ink: "#1d1d1f", muted: "#6e6e73", accent: "#7a4a21", accentInk: "#ffffff", card: "#f5f5f7", line: "rgba(29,29,31,.14)" },
   sauge: { bg: "#ffffff", ink: "#1d1d1f", muted: "#6e6e73", accent: "#2f6b4f", accentInk: "#ffffff", card: "#f5f5f7", line: "rgba(29,29,31,.14)" },
@@ -420,7 +420,7 @@ function Section({ s, q }: { s: SiteSection; q: Quality }) {
   }
 }
 
-export function SiteWindow({ site, quality }: { site: SiteSpec; quality: Quality }) {
+function SiteWindow({ site, quality }: { site: SiteSpec; quality: Quality }) {
   const theme = themeOf(site, quality);
   const nav = site.nav;
   return <div className={styles.window} data-quality={quality}>

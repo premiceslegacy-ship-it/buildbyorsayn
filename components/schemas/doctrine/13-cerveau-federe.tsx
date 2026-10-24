@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function EntrepriseSansSuperAgentDiagram() {
+function EntrepriseSansSuperAgentDiagram() {
   return <Rings
     title="Quatre rôles, aucun super-agent"
     description="Autour d'un objet partagé, chaque responsabilité reste à sa place."
@@ -21,7 +21,7 @@ export function EntrepriseSansSuperAgentDiagram() {
   />;
 }
 
-export function ArchipelDesAutoritesDiagram() {
+function ArchipelDesAutoritesDiagram() {
   return <ToolMap
     title="Chaque source garde son état"
     description="Le CRM, le planning et la comptabilité font foi chacun pour un état différent."
@@ -38,7 +38,7 @@ export function ArchipelDesAutoritesDiagram() {
   />;
 }
 
-export function ProjectionSansDossierCompletDiagram() {
+function ProjectionSansDossierCompletDiagram() {
   return <Compare
     title="Voir le blocage, pas le dossier"
     description="La vue de direction montre l'état, la raison et la personne, sans ouvrir les pièces."

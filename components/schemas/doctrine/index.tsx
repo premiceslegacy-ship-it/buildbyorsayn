@@ -21,7 +21,7 @@ import { doctrine19 } from "./19-adoption";
 import { doctrine20 } from "./20-modeles";
 import { doctrine21 } from "./21-gouvernance";
 
-export const DOCTRINE_VISUAL_DEFINITIONS = [
+const DOCTRINE_VISUAL_DEFINITIONS = [
   ...doctrine01, ...doctrine02, ...doctrine03, ...doctrine04, ...doctrine05, ...doctrine06, ...doctrine07,
   ...doctrine08, ...doctrine09, ...doctrine10, ...doctrine11, ...doctrine12, ...doctrine13, ...doctrine14,
   ...doctrine15, ...doctrine16, ...doctrine17, ...doctrine18, ...doctrine19, ...doctrine20, ...doctrine21,

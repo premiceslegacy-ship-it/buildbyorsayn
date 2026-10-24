@@ -9,7 +9,7 @@ function safeId(value: string) {
   return value.replace(/[^a-zA-Z0-9_-]/g, "");
 }
 
-export function wrapDiagramText(text: string, maxChars: number): string[] {
+function wrapDiagramText(text: string, maxChars: number): string[] {
   if (text.includes("|")) return text.split("|");
   const lines: string[] = [];
   let current = "";

@@ -61,7 +61,7 @@ export type LegalEntityParse =
 
 type Env = Readonly<Record<string, string | undefined>>;
 
-export function formatAddress(parts: Pick<LegalEntity, "street" | "postalCode" | "city">): string {
+function formatAddress(parts: Pick<LegalEntity, "street" | "postalCode" | "city">): string {
   return `${parts.street}, ${parts.postalCode} ${parts.city}`;
 }
 

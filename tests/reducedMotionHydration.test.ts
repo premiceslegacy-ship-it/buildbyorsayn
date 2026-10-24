@@ -8,7 +8,6 @@ test("le mouvement réduit ne change aucun état initial pendant l'hydratation",
   const sources = [
     "components/schemas/kit/KitFrame.tsx",
     "components/reader/ReaderView.tsx",
-    "components/ui/section-reveal.tsx",
     "components/ui/ToastViewport.tsx",
     "components/ui/BusyButton.tsx",
   ].map(read).join("\n");
@@ -20,21 +19,15 @@ test("le mouvement réduit ne change aucun état initial pendant l'hydratation",
 test("les surfaces animées sont déjà dans leur état final en mouvement réduit", () => {
   const kitCss = read("components/schemas/kit/kit.module.css");
   const readerCss = read("components/reader/reader.module.css");
-  const revealCss = read("components/ui/section-reveal.module.css");
 
   assert.match(kitCss, /prefers-reduced-motion: reduce[\s\S]*?\.frame \{[\s\S]*?opacity: 1 !important;[\s\S]*?transform: none !important;/);
   assert.match(readerCss, /prefers-reduced-motion: reduce[\s\S]*?\.article,[\s\S]*?opacity: 1 !important;[\s\S]*?transform: none !important;/);
-  assert.match(revealCss, /prefers-reduced-motion: reduce[\s\S]*?opacity: 1 !important;[\s\S]*?transform: none !important;/);
 });
 
-test("les révélations restent visibles si l'observation de la fenêtre ne se déclenche pas", () => {
+test("le cadre animé reste visible si l'observation de la fenêtre ne se déclenche pas", () => {
   const frame = read("components/schemas/kit/KitFrame.tsx");
-  const reveal = read("components/ui/section-reveal.tsx");
-
   assert.match(frame, /initial=\{\{ opacity: 1, y: 12, scale: \.985 \}\}/);
   assert.match(frame, /viewport=\{\{ once: true, amount: \.15 \}\}/);
-  assert.match(reveal, /initial=\{\{ opacity: 1, y: 16 \}\}/);
-  assert.match(reveal, /viewport=\{\{ once: true, amount: 0\.15 \}\}/);
 });
 
 test("l'accent du kit reste une propriété stable du premier rendu", () => {

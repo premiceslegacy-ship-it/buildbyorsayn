@@ -6,7 +6,7 @@
  */
 export type TextScope = "bloc" | "fondations" | "hermes";
 
-export const TEXT_POSITION_SCALE = 1000;
+const TEXT_POSITION_SCALE = 1000;
 /** Below this, opening a chapter is not reading it yet: nothing is saved or restored. */
 export const TEXT_MIN_POSITION = 20;
 /** From this point, the chapter counts as read. */

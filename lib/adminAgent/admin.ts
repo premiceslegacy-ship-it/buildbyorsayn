@@ -99,17 +99,6 @@ export async function revokeAgentToken(tokenId: string) {
   return { revoked: Boolean(data) };
 }
 
-export async function getAgentPermissions(tokenId: string) {
-  await requireHumanAdmin();
-  const id = uuidSchema.parse(tokenId);
-  const { data, error } = await createAdminSupabase()
-    .from("admin_agent_tokens")
-    .select("permissions")
-    .eq("id", id)
-    .maybeSingle();
-  if (error || !data) throw new Error("Jeton introuvable.");
-  return permissionsSchema.parse(data.permissions);
-}
 
 export async function setAgentPermissions(tokenId: string, permissions: AgentPermission[]) {
   const user = await requireHumanAdmin();

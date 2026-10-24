@@ -51,8 +51,8 @@ type ToolDefinition = {
   title: string;
   description: string;
   permission: AgentPermission;
-  schema: z.ZodObject<any>;
-  run: (input: any, context: AgentTokenContext) => Promise<Record<string, unknown>>;
+  schema: z.ZodObject<z.ZodRawShape>;
+  run: (input: unknown, context: AgentTokenContext) => Promise<Record<string, unknown>>;
 };
 
 function asResult(value: Record<string, unknown>): AgentToolResult {
@@ -170,7 +170,8 @@ export const ADMIN_AGENT_TOOLS = {
     description: "Crée un envoi direct Mux signé. Le fichier ne passe pas par BUILD.",
     permission: "envoyer_video",
     schema: uploadInput,
-    async run(input, context) {
+    async run(rawInput, context) {
+      const input = uploadInput.parse(rawInput);
       const section = await assertSectionExists(input.sectionId);
       const videoId = randomUUID();
       const mux = createMuxAdminClient();
@@ -221,7 +222,8 @@ export const ADMIN_AGENT_TOOLS = {
     description: "Enregistre des repères strictement croissants avant la fin de la vidéo.",
     permission: "ecrire_chapitres",
     schema: writeChaptersInput,
-    async run(input, context) {
+    async run(rawInput, context) {
+      const input = writeChaptersInput.parse(rawInput);
       const admin = createAdminSupabase();
       const data = await requireWritableVideo(input.videoId, { ready: true });
       const timelineError = validateChapterTimeline(input.chapters, data.duration_seconds);
@@ -238,7 +240,8 @@ export const ADMIN_AGENT_TOOLS = {
     description: "Enregistre le résumé d'une vidéo non publiée.",
     permission: "ecrire_resume",
     schema: writeSummaryInput,
-    async run(input, context) {
+    async run(rawInput, context) {
+      const input = writeSummaryInput.parse(rawInput);
       await requireWritableVideo(input.videoId);
       const { data, error } = await createAdminSupabase().from("video_lessons")
         .update({ summary: input.summary, updated_at: new Date().toISOString() })
@@ -253,7 +256,8 @@ export const ADMIN_AGENT_TOOLS = {
     description: "Choisit une image Mux à un temps donné, sans conserver de jeton signé.",
     permission: "choisir_miniature",
     schema: chooseThumbnailInput,
-    async run(input, context) {
+    async run(rawInput, context) {
+      const input = chooseThumbnailInput.parse(rawInput);
       const admin = createAdminSupabase();
       const data = await requireWritableVideo(input.videoId, { ready: true, playback: true });
       if (!data.duration_seconds || input.timeSeconds >= data.duration_seconds) {
@@ -272,7 +276,8 @@ export const ADMIN_AGENT_TOOLS = {
     description: "Crée une demande à valider, sauf si l'admin a confirmé le mode de publication autonome.",
     permission: "demander_publication",
     schema: videoIdInput,
-    async run(input, context) {
+    async run(rawInput, context) {
+      const input = videoIdInput.parse(rawInput);
       const video = await validateAgentPublicationTarget(input.videoId);
       await assertSectionExists(video.section_id);
       const { data } = await createAdminSupabase().from("admin_agent_settings").select("mode").eq("singleton", true).maybeSingle();
@@ -289,7 +294,8 @@ export const ADMIN_AGENT_TOOLS = {
     description: "Prépare un mail qui ne part qu'après approbation humaine et confirmation ENVOYER.",
     permission: "preparer_mail",
     schema: prepareMailInput,
-    async run(input, context) {
+    async run(rawInput, context) {
+      const input = prepareMailInput.parse(rawInput);
       const campaignId = randomUUID();
       const payload = validatePreparedMailForExecution({ ...input, campaignId });
       return createRequest(context, "mail", campaignId, payload);
@@ -300,7 +306,8 @@ export const ADMIN_AGENT_TOOLS = {
     description: "Lit seulement l'état technique et les étapes de préparation nécessaires.",
     permission: "statut_video",
     schema: videoIdInput,
-    async run(input, context) {
+    async run(rawInput, context) {
+      const input = videoIdInput.parse(rawInput);
       const { data, error } = await createAdminSupabase().from("video_lessons")
         .select("id,section_id,title,status,duration_seconds,summary,transcript,chapters,thumbnail,published_at,error_code")
         .eq("id", input.videoId).maybeSingle();
@@ -327,7 +334,8 @@ export const ADMIN_AGENT_TOOLS = {
     description: "Lit uniquement les actions de ce jeton, sans secret, adresse ni corps de mail.",
     permission: "journal",
     schema: journalInput,
-    async run(input, context) {
+    async run(rawInput, context) {
+      const input = journalInput.parse(rawInput);
       const { data, error } = await createAdminSupabase().from("admin_action_audit")
         .select("action,target_type,target_id,result,created_at,details")
         .contains("details", { tokenId: context.id })

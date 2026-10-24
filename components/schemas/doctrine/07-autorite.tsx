@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function CleQuiNOuvreQuUnePorteDiagram() {
+function CleQuiNOuvreQuUnePorteDiagram() {
   return <Fork
     title="Une clé pour une seule porte"
     description="Exemple : la mission permet de lire un devis précis et refuse tout le reste."
@@ -19,7 +19,7 @@ export function CleQuiNOuvreQuUnePorteDiagram() {
   />;
 }
 
-export function TamponSurLaBonneVersionDiagram() {
+function TamponSurLaBonneVersionDiagram() {
   return <Chat
     title="L'accord suit la version"
     description="Ton accord porte sur un message précis. S'il change, ton agent revient te demander."
@@ -41,7 +41,7 @@ export function TamponSurLaBonneVersionDiagram() {
   />;
 }
 
-export function CoffreDerriereLeGuichetDiagram() {
+function CoffreDerriereLeGuichetDiagram() {
   return <Workflow
     title="Le secret reste au guichet"
     description="Ton agent demande une opération limitée. La clé d'API reste derrière l'outil, jamais dans le prompt."

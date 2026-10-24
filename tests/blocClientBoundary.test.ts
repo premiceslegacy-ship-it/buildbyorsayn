@@ -29,6 +29,21 @@ test("public catalog preserves navigation without bodies, lessons or playback id
 // Execute the actual server modules with only the Supabase transport replaced.
 const serverEnv: Record<string, string> = { MUX_SIGNING_KEY: "kid", MUX_PRIVATE_KEY: "key" };
 
+type DynamicResult = {
+  ok: boolean;
+  bloc: { sections: unknown[] };
+  playbackId: string;
+  startSeconds: number;
+  viewerEmail: string;
+  tokens: Record<string, unknown>;
+  [key: string]: unknown;
+};
+type DynamicExport = (...args: unknown[]) => Promise<DynamicResult>;
+type MuxPlaybackOptions = {
+  expiration: string;
+  type: Array<[string, Record<string, unknown>]>;
+};
+
 function loadServer(path: string, tier: string | null, authenticated = true, profileError = false, extraMocks: Record<string, unknown> = {}) {
   const calls: string[] = [];
   function table(name: string) {
@@ -64,7 +79,7 @@ function loadServer(path: string, tier: string | null, authenticated = true, pro
   };
   const adminSupabase = { from(name: string) { assert.equal(name, "video_lessons"); return adminQuery; } };
   const output = ts.transpileModule(readFileSync(path, "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
-  const exports: Record<string, (...args: any[]) => Promise<any>> = {};
+  const exports: Record<string, DynamicExport> = {};
   runInNewContext(output, { exports, console: { error() {} }, process: { env: { ...serverEnv } }, require(name: string) {
     if (name in extraMocks) return extraMocks[name];
     if (name === "server-only") return {};
@@ -110,9 +125,9 @@ const LESSONS_MOCK = { lessons: [
 ] };
 
 function loadPlayback(tier: string | null, authenticated = true, profileError = false) {
-  const signed: { playbackId: string; options: any }[] = [];
+  const signed: { playbackId: string; options: MuxPlaybackOptions }[] = [];
   class FakeMux {
-    jwt = { async signPlaybackId(playbackId: string, options: any) {
+    jwt = { async signPlaybackId(playbackId: string, options: MuxPlaybackOptions) {
       signed.push({ playbackId, options });
       return { "playback-token": `v.${playbackId}`, "thumbnail-token": `t.${playbackId}`, "storyboard-token": `s.${playbackId}` };
     } };

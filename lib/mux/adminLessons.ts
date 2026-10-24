@@ -3,7 +3,7 @@ import type { McpTier } from "@/lib/mcpAccess";
 
 export const MAX_ADMIN_VIDEO_BYTES = 10 * 1024 * 1024 * 1024;
 export const MAX_VIDEO_TRANSCRIPT_CHARACTERS = 250_000;
-export const MAX_VIDEO_CHAPTERS = 40;
+const MAX_VIDEO_CHAPTERS = 40;
 export const ADMIN_VIDEO_CONFIRMATION = "PUBLIER";
 export const VIDEO_MIME_TYPES = [
   "video/mp4",
@@ -12,7 +12,7 @@ export const VIDEO_MIME_TYPES = [
   "video/x-m4v",
 ] as const;
 
-export const SECTION_ID_PATTERN = /^b\d+-s[0-9a-z]+$/;
+const SECTION_ID_PATTERN = /^b\d+-s[0-9a-z]+$/;
 const MUX_PASSTHROUGH_PATTERN = /^build-video:([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i;
 
 export type VideoChapter = {

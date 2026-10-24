@@ -24,14 +24,14 @@ interface NavBarProps {
   onStackClick?: () => void;
 }
 
-export const MEMBER_NAV = [
+const MEMBER_NAV = [
   { label: "Aujourd'hui", href: "/dashboard", icon: "home" as const },
   { label: "Programme", href: "/programme", icon: "grid" as const },
   { label: "Skills", href: "/skills", icon: "skill" as const },
   { label: "Nouveautés", href: "/nouveautes", icon: "news" as const },
 ];
 
-export const PUBLIC_NAV = [
+const PUBLIC_NAV = [
   { label: "Programme", href: "/#contenu" },
   { label: "Skills", href: "/#contenu" },
   { label: "Prix", href: "/#prix" },

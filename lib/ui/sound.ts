@@ -30,7 +30,7 @@ function subscribe(listener: () => void) { listeners.add(listener); return () =>
 function snapshot() { hydrate(); return enabled; }
 function serverSnapshot() { return true; }
 
-export function setSoundEnabled(next: boolean) {
+function setSoundEnabled(next: boolean) {
   hydrate();
   enabled = next;
   window.localStorage.setItem(SOUND_STORAGE_KEY, next ? "1" : "0");

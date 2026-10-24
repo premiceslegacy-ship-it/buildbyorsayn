@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function KitDuPremierDossierDiagram() {
+function KitDuPremierDossierDiagram() {
   return <FileCard
     title="Le kit du premier dossier"
     description="Huit fichiers suffisent pour qu'une autre personne reprenne le pilote."
@@ -29,7 +29,7 @@ export function KitDuPremierDossierDiagram() {
   />;
 }
 
-export function MatriceQuiNeMentPasDiagram() {
+function MatriceQuiNeMentPasDiagram() {
   return <Funnel
     title="Une case vide dit non testé"
     description="Exemple : dix tests prévus, six exécutés, quatre vraiment prouvés."
@@ -46,7 +46,7 @@ export function MatriceQuiNeMentPasDiagram() {
   />;
 }
 
-export function EtiquetteCandidateDiagram() {
+function EtiquetteCandidateDiagram() {
   return <Fork
     title="Candidate avant d'être gardée"
     description="Une méthode observée reste candidate jusqu'à la revue, avec sa condition de retrait."

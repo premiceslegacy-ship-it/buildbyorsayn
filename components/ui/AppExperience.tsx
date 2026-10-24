@@ -3,7 +3,7 @@
 import { animate, MotionConfig, useReducedMotion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { finishPressFeedback, pulsePressFeedback, startPressFeedback, type PressSound } from "@/lib/ui/feedback";
+import { finishPressFeedback, pulsePressFeedback, startPressFeedback } from "@/lib/ui/feedback";
 import { animateEntryCascade, MOTION_SPRINGS } from "@/lib/ui/motion";
 import { ToastViewport } from "@/components/ui/ToastViewport";
 import styles from "./AppExperience.module.css";
@@ -17,12 +17,6 @@ function pressTarget(event: Event) {
   return target;
 }
 
-function soundFor(target: HTMLElement): PressSound {
-  const explicit = target.dataset.sfx;
-  if (explicit === "none") return "none";
-  if (explicit === "click" || explicit === "select" || explicit === "open" || explicit === "confirm" || explicit === "error") return explicit;
-  return target.closest('[role="tablist"], .tabs, .seg') ? "select" : "click";
-}
 
 function useFallbackPressFeedback() {
   useEffect(() => {
@@ -95,5 +89,3 @@ export function AppExperience({ children }: { children: ReactNode }) {
     </MotionConfig>
   );
 }
-
-export { pressTarget, soundFor };

@@ -148,7 +148,3 @@ export const BLOCS_DATA = CHRONOLOGICAL_BLOCK_ORDER
       lesson: lessonFor(section.id),
     })),
   }));
-
-export const BLOCK_DISPLAY_NUMBER_BY_ID = Object.fromEntries(
-  BLOCS_DATA.map((bloc) => [bloc.id, bloc.displayNumber])
-);

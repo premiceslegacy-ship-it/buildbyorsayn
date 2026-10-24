@@ -143,7 +143,7 @@ function buildWelcomeEmailHtml(actionLink: string) {
 async function sendWelcomeEmail(email: string, actionLink: string, checkoutSessionId: string) {
     return sendResendMessage({
         apiKey: process.env.RESEND_API_KEY,
-        from: process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM,
+        from: process.env.RESEND_FROM_EMAIL,
         to: email,
         subject: "Bienvenue dans BUILD - active ton compte",
         html: buildWelcomeEmailHtml(actionLink),
@@ -156,7 +156,7 @@ async function sendUpgradeRefusalEmail(email: string, checkoutSessionId: string)
     const { subject, text, html } = buildUpgradeRefusalEmail(optionalSiteOrigin());
     return sendResendMessage({
         apiKey: process.env.RESEND_API_KEY,
-        from: process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM,
+        from: process.env.RESEND_FROM_EMAIL,
         to: email,
         subject,
         html,
@@ -199,7 +199,7 @@ async function sendPurchaseConfirmationEmail(
         });
         return sendResendMessage({
             apiKey: process.env.RESEND_API_KEY,
-            from: process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM,
+            from: process.env.RESEND_FROM_EMAIL,
             to: email,
             subject,
             html,
@@ -213,7 +213,7 @@ async function sendPurchaseConfirmationEmail(
 }
 
 function canSendWelcomeEmail() {
-    return Boolean(process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM));
+    return Boolean(process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL);
 }
 
 async function refundRejectedCheckout(

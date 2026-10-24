@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function TroisScenesUneCarteDiagram() {
+function TroisScenesUneCarteDiagram() {
   return <Steps
     title="Trois scènes, une seule carte"
     description="Rejoue trois cas récents, puis garde les passages qu'ils ont en commun."
@@ -20,7 +20,7 @@ export function TroisScenesUneCarteDiagram() {
   />;
 }
 
-export function FlecheAvecContenuDiagram() {
+function FlecheAvecContenuDiagram() {
   return <Workflow
     title="Chaque passage porte un contrat"
     description="« Devis transmis » ne suffit pas : le lot dit quelle version, quel délai et quelles réserves."
@@ -38,7 +38,7 @@ export function FlecheAvecContenuDiagram() {
   />;
 }
 
-export function CarteAvecTrousAssumesDiagram() {
+function CarteAvecTrousAssumesDiagram() {
   return <FileCard
     title="Les trous deviennent des enquêtes"
     description="La carte d'un métier sépare ce qui est connu, ce qui reste à enquêter et ce qui ne s'applique pas."

@@ -1,4 +1,4 @@
-import { ANGLE_MORT, SECTIONS } from "@/app/beginner/sections.data";
+import { SECTIONS } from "@/app/beginner/sections.data";
 import { BLOCS_DATA } from "@/lib/blocCatalog";
 import { canReadBlocSection } from "@/lib/blocAccess";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
@@ -47,11 +47,6 @@ export function programmeForTier(rawTier: string | null): ProgrammeSection[] {
   ];
 }
 
-export const PROGRAMME_SOURCE_COUNTS = {
-  foundations: SECTIONS.length + 1,
-  foundationFinale: ANGLE_MORT.id,
-  blocs: BLOCS_DATA.length,
-};
 
 export function completedBlocCount(sectionIds: readonly string[]) {
   const completed = new Set(sectionIds);

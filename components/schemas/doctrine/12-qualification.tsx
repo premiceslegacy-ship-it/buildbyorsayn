@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function TroisRoutesSelonLaClarteDiagram() {
+function TroisRoutesSelonLaClarteDiagram() {
   return <Fork
     title="La clarté choisit la route"
     description="La route dépend de ce que la personne comprend déjà de son besoin et de ton offre."
@@ -20,7 +20,7 @@ export function TroisRoutesSelonLaClarteDiagram() {
   />;
 }
 
-export function FormulaireQuiRendQuelqueChoseMockup() {
+function FormulaireQuiRendQuelqueChoseMockup() {
   return <WebPage
     title="Un formulaire qui rend une carte"
     description="Trois questions qui changent la suite, puis une restitution que la personne garde."
@@ -45,7 +45,7 @@ export function FormulaireQuiRendQuelqueChoseMockup() {
   />;
 }
 
-export function MemePromesseJusquaLaValeurDiagram() {
+function MemePromesseJusquaLaValeurDiagram() {
   return <Workflow
     title="La même histoire jusqu'à la valeur"
     description="Du post à la livraison, chaque étape parle du même dossier de devis."

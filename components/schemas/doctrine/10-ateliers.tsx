@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function ArmoireDuPiloteDiagram() {
+function ArmoireDuPiloteDiagram() {
   return <FileCard
     title="L'armoire garde les bons liens"
     description="Le dossier du pilote range méthodes, décisions et projet, et garde des liens vers les données."
@@ -29,7 +29,7 @@ export function ArmoireDuPiloteDiagram() {
   />;
 }
 
-export function TrouQuiBloqueDiagram() {
+function TrouQuiBloqueDiagram() {
   return <FileCard
     title="Un inconnu critique bloque"
     description="Exemple : un contrat de mission où le montant maximal manque encore. Le pilote ne démarre pas."
@@ -53,7 +53,7 @@ export function TrouQuiBloqueDiagram() {
   />;
 }
 
-export function CinqCartesDeTestDiagram() {
+function CinqCartesDeTestDiagram() {
   return <Steps
     title="Cinq cas avant d'activer"
     description="Le pilote affronte le cas normal puis quatre cas qui cassent, avec des données fictives."

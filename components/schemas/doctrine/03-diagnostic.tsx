@@ -3,7 +3,7 @@ import type { HandcraftedVisual } from "../coffre/types";
 
 const EM = "#22d96e";
 
-export function RadiographieDuDernierCasDiagram() {
+function RadiographieDuDernierCasDiagram() {
   return <Workflow
     title="Rejouer le dernier cas"
     description="Exemple : un devis de rénovation rejoué pas à pas. La rédaction va vite, le dossier attend ailleurs."
@@ -21,7 +21,7 @@ export function RadiographieDuDernierCasDiagram() {
   />;
 }
 
-export function EscalierDesReponsesDiagram() {
+function EscalierDesReponsesDiagram() {
   return <Ladder
     title="La réponse la plus simple d'abord"
     description="Exemple : la remise qui bloque les devis. Chaque marche ajoute du coût, des erreurs et de l'entretien."
@@ -40,7 +40,7 @@ export function EscalierDesReponsesDiagram() {
   />;
 }
 
-export function PhotoAvantApresDiagram() {
+function PhotoAvantApresDiagram() {
   return <BigNumber
     title="Une photo avant l'essai"
     description="Exemple : tu mesures l'attente d'un devis aujourd'hui, avant de changer quoi que ce soit."

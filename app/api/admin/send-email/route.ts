@@ -171,7 +171,7 @@ export async function POST(req: NextRequest) {
   } = parsed.data;
 
   const resendApiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL ?? process.env.EMAIL_FROM;
+  const from = process.env.RESEND_FROM_EMAIL;
 
   if (!resendApiKey || !from) {
     return NextResponse.json(
