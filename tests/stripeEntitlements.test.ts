@@ -44,7 +44,8 @@ test("le fallback du backfill vient des claims d'upgrade accordées et non du ti
   assert.match(source, /source: "upgrade_claim"/);
   assert.match(source, /unresolved_upgrade/);
   assert.match(source, /allow-unresolved/);
-  assert.doesNotMatch(source, /loadProfileTiers/);
+  assert.match(source, /markerCounts/);
+  assert.match(source, /markerUsers/);
 });
 
 test("le ledger expose une transaction de backfill, les marqueurs terminaux et le fallback upgrade", async () => {
@@ -61,4 +62,15 @@ test("le chemin upgrade legacy garde le fallback et le même ordre ledger puis p
   assert.match(sql, /fallback_tier = coalesce\(public\.stripe_purchase_ledger\.fallback_tier, excluded\.fallback_tier\)/);
   assert.match(sql, /insert into public\.stripe_purchase_ledger[\s\S]*perform public\.recalculate_stripe_entitlement/);
   assert.doesNotMatch(sql, /select tier into current_tier from public\.profiles where id = p_user_id for update/);
+});
+
+test("les droits Stripe hérités sont marqués avant recalcul et restent service-role only", async () => {
+  const sql = await readFile("supabase/migrations/20261024101000_stripe_purchase_ledger.sql", "utf8");
+  assert.match(sql, /create table if not exists public\.stripe_legacy_entitlements/);
+  assert.match(sql, /alter table public\.stripe_legacy_entitlements enable row level security/);
+  assert.match(sql, /alter table public\.stripe_legacy_entitlements force row level security/);
+  assert.match(sql, /revoke all on table public\.stripe_legacy_entitlements from public, anon, authenticated/);
+  assert.match(sql, /grant all on table public\.stripe_legacy_entitlements to service_role/);
+  assert.match(sql, /max\(tier_rank\)/);
+  assert.match(sql, /insert into public\.stripe_legacy_entitlements[\s\S]*legacy_import[\s\S]*on conflict \(user_id\) do nothing/);
 });

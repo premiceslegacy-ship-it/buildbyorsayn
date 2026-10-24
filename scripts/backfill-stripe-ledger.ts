@@ -27,6 +27,15 @@ type BackfillRecord = {
 };
 
 type AuthUser = { id: string; email?: string; email_confirmed_at?: string | null };
+type PaidTier = "beginner" | "full";
+type ProfileTier = { id: string; tier: PaidTier };
+type ExistingLedgerRow = {
+  user_id: string | null;
+  tier: PaidTier;
+  status: LedgerStatus;
+  fallback_tier: PaidTier | null;
+};
+type ExistingLegacyMarker = { user_id: string; tier: PaidTier };
 
 function isUuid(value: string | null | undefined): boolean {
   return Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
@@ -44,6 +53,31 @@ async function loadAuthUsers(admin: ReturnType<typeof createAdminSupabase>): Pro
     users.push(...data.users);
     if (data.users.length < 1000) return users;
   }
+}
+
+async function loadProfileTiers(admin: ReturnType<typeof createAdminSupabase>): Promise<ProfileTier[]> {
+  const { data, error } = await admin
+    .from("profiles")
+    .select("id,tier")
+    .in("tier", ["beginner", "full"]);
+  if (error) throw new Error(`Profile tier lookup failed: ${error.message}`);
+  return data as ProfileTier[];
+}
+
+async function loadExistingEntitlements(admin: ReturnType<typeof createAdminSupabase>): Promise<{
+  ledger: ExistingLedgerRow[];
+  legacy: ExistingLegacyMarker[];
+}> {
+  const [ledgerResult, legacyResult] = await Promise.all([
+    admin.from("stripe_purchase_ledger").select("user_id,tier,status,fallback_tier"),
+    admin.from("stripe_legacy_entitlements").select("user_id,tier"),
+  ]);
+  if (ledgerResult.error) throw new Error(`Stripe ledger lookup failed: ${ledgerResult.error.message}`);
+  if (legacyResult.error) throw new Error(`Legacy entitlement lookup failed: ${legacyResult.error.message}`);
+  return {
+    ledger: ledgerResult.data as ExistingLedgerRow[],
+    legacy: legacyResult.data as ExistingLegacyMarker[],
+  };
 }
 
 type UpgradeClaim = { checkout_session_id: string; user_id: string; status: string };
@@ -180,6 +214,64 @@ async function collectRecords(
   return records;
 }
 
+type LegacyPlan = {
+  markerCounts: Record<PaidTier, number>;
+  markerUsers: Array<{ id: string; tier: PaidTier }>;
+  tierChanges: Array<{ id: string; from: PaidTier; to: PaidTier }>;
+};
+
+function tierRank(tier: PaidTier | null): number {
+  return tier === "full" ? 2 : tier === "beginner" ? 1 : 0;
+}
+
+function tierFromRank(rank: number): PaidTier | null {
+  return rank === 2 ? "full" : rank === 1 ? "beginner" : null;
+}
+
+function truncatedUserId(id: string): string {
+  return id.length > 12 ? `${id.slice(0, 8)}...${id.slice(-4)}` : id;
+}
+
+function buildLegacyPlan(
+  profiles: ProfileTier[],
+  existingLedger: ExistingLedgerRow[],
+  existingLegacy: ExistingLegacyMarker[],
+  records: BackfillRecord[],
+): LegacyPlan {
+  const represented = new Map<string, number>();
+  const add = (userId: string | null, tier: PaidTier | null) => {
+    if (!userId || !tier) return;
+    represented.set(userId, Math.max(represented.get(userId) ?? 0, tierRank(tier)));
+  };
+  for (const row of existingLedger) {
+    if (row.status === "active") add(row.user_id, row.tier);
+    add(row.user_id, row.fallback_tier);
+  }
+  for (const marker of existingLegacy) add(marker.user_id, marker.tier);
+  for (const record of records) {
+    if (record.user?.id && record.status === "active") add(record.user.id, record.tier);
+    add(record.user?.id ?? null, record.fallbackTier);
+  }
+
+  const markerUsers: Array<{ id: string; tier: PaidTier }> = [];
+  const markerCounts: Record<PaidTier, number> = { beginner: 0, full: 0 };
+  const tierChanges: Array<{ id: string; from: PaidTier; to: PaidTier }> = [];
+  for (const profile of profiles) {
+    const currentRank = tierRank(profile.tier);
+    const representedRank = represented.get(profile.id) ?? 0;
+    if (currentRank > representedRank) {
+      markerUsers.push({ id: truncatedUserId(profile.id), tier: profile.tier });
+      markerCounts[profile.tier] += 1;
+    }
+    const plannedRank = Math.max(currentRank, representedRank);
+    const plannedTier = tierFromRank(plannedRank);
+    if (plannedTier && plannedTier !== profile.tier) {
+      tierChanges.push({ id: truncatedUserId(profile.id), from: profile.tier, to: plannedTier });
+    }
+  }
+  return { markerCounts, markerUsers, tierChanges };
+}
+
 async function applyRecords(admin: ReturnType<typeof createAdminSupabase>, records: BackfillRecord[]) {
   const rows = records
     .filter((record): record is BackfillRecord & {
@@ -204,15 +296,39 @@ async function applyRecords(admin: ReturnType<typeof createAdminSupabase>, recor
   if (error) throw new Error(`Stripe ledger backfill failed: ${error.message}`);
 }
 
+function reportRecord(record: BackfillRecord) {
+  const safeRecord: Partial<BackfillRecord> = { ...record };
+  delete safeRecord.customerEmail;
+  return safeRecord;
+}
+
 async function main() {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is required.");
   const admin = createAdminSupabase();
-  const authUsers = await loadAuthUsers(admin);
+  const [authUsers, profiles, existing] = await Promise.all([
+    loadAuthUsers(admin),
+    loadProfileTiers(admin),
+    loadExistingEntitlements(admin),
+  ]);
   const upgradeClaims = await loadUpgradeClaims(admin);
   const records = await collectRecords(authUsers, upgradeClaims);
-  const unmatched = records.filter((record) => !record.user);
-  const unresolvedUpgrades = records.filter((record) => record.reason?.startsWith("unresolved_upgrade"));
-  console.log(JSON.stringify({ mode: APPLY ? "apply" : "dry-run", records, unmatched, unresolvedUpgrades }, null, 2));
+  const reportRecords = records.map(reportRecord);
+  const unmatched = records.filter((record) => !record.user).map(reportRecord);
+  const unresolvedUpgrades = records
+    .filter((record) => record.reason?.startsWith("unresolved_upgrade"))
+    .map(reportRecord);
+  const legacyPlan = buildLegacyPlan(profiles, existing.ledger, existing.legacy, records);
+  console.log(JSON.stringify({
+    mode: APPLY ? "apply" : "dry-run",
+    records: reportRecords,
+    unmatched,
+    unresolvedUpgrades,
+    legacy: {
+      markerCounts: legacyPlan.markerCounts,
+      markerUsers: legacyPlan.markerUsers,
+      tierChanges: legacyPlan.tierChanges,
+    },
+  }, null, 2));
   if (APPLY && unresolvedUpgrades.length && !ALLOW_UNRESOLVED) {
     throw new Error(
       `${unresolvedUpgrades.length} upgrade checkout(s) have no granted server claim; pass --allow-unresolved to keep them pending.`,

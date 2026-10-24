@@ -23,6 +23,18 @@ create table if not exists public.stripe_checkout_terminal_events (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.stripe_legacy_entitlements (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  tier text not null,
+  reason text not null,
+  created_at timestamptz not null default pg_catalog.now()
+);
+
+alter table public.stripe_legacy_entitlements enable row level security;
+alter table public.stripe_legacy_entitlements force row level security;
+revoke all on table public.stripe_legacy_entitlements from public, anon, authenticated;
+grant all on table public.stripe_legacy_entitlements to service_role;
+
 alter table public.stripe_checkout_terminal_events enable row level security;
 alter table public.stripe_checkout_terminal_events force row level security;
 revoke all on table public.stripe_checkout_terminal_events from public, anon, authenticated;
@@ -151,8 +163,8 @@ security definer
 set search_path = ''
 as $$
 declare
+  best_rank integer;
   best_tier text;
-  inherited_tier text;
 begin
   if p_user_id is null then return null; end if;
   if p_fallback_tier is not null and p_fallback_tier not in ('beginner', 'full') then
@@ -164,33 +176,26 @@ begin
   on conflict (id) do nothing;
   perform 1 from public.profiles where id = p_user_id for update;
 
-  select case
-    when exists (
-      select 1 from public.stripe_purchase_ledger
-      where user_id = p_user_id and status = 'active' and tier = 'full'
-    ) then 'full'
-    when exists (
-      select 1 from public.stripe_purchase_ledger
-      where user_id = p_user_id and status = 'active' and tier = 'beginner'
-    ) then 'beginner'
-    else null
-  end into best_tier;
+  select coalesce(max(tier_rank), 0)
+    into best_rank
+  from (
+    select case when tier = 'full' then 2 else 1 end as tier_rank
+    from public.stripe_purchase_ledger
+    where user_id = p_user_id and status = 'active'
+    union all
+    select case when fallback_tier = 'full' then 2 else 1 end
+    from public.stripe_purchase_ledger
+    where user_id = p_user_id and fallback_tier is not null
+    union all
+    select case when tier = 'full' then 2 else 1 end
+    from public.stripe_legacy_entitlements
+    where user_id = p_user_id
+    union all
+    select case when p_fallback_tier = 'full' then 2 else 1 end
+    where p_fallback_tier is not null
+  ) sources;
 
-  if best_tier is null then
-    select case
-      when exists (
-        select 1 from public.stripe_purchase_ledger
-        where user_id = p_user_id and fallback_tier = 'full'
-      ) then 'full'
-      when exists (
-        select 1 from public.stripe_purchase_ledger
-        where user_id = p_user_id and fallback_tier = 'beginner'
-      ) then 'beginner'
-      else p_fallback_tier
-    end into inherited_tier;
-    best_tier := inherited_tier;
-  end if;
-
+  best_tier := case best_rank when 2 then 'full' when 1 then 'beginner' else null end;
   update public.profiles
   set tier = best_tier
   where id = p_user_id and tier is distinct from 'admin';
@@ -369,6 +374,9 @@ declare
   existing_user_id uuid;
   row_status text;
   row_tier text;
+  profile_record record;
+  profile_tier text;
+  represented_rank integer;
   owner_ids uuid[] := array[]::uuid[];
 begin
   if p_rows is null or pg_catalog.jsonb_typeof(p_rows) <> 'array' then
@@ -449,6 +457,39 @@ begin
     returning user_id into existing_user_id;
     if existing_user_id is not null then owner_ids := array_append(owner_ids, existing_user_id); end if;
     row_count := row_count + 1;
+  end loop;
+
+  -- Preserve manually inherited access before recalculating imported purchases.
+  for profile_record in
+    select id
+    from public.profiles
+    where tier in ('beginner', 'full')
+    order by id
+  loop
+    row_user_id := profile_record.id;
+    perform 1 from public.profiles where id = row_user_id for update;
+    select tier into profile_tier from public.profiles where id = row_user_id;
+    select coalesce(max(tier_rank), 0)
+      into represented_rank
+    from (
+      select case when tier = 'full' then 2 else 1 end as tier_rank
+      from public.stripe_purchase_ledger
+      where user_id = row_user_id and status = 'active'
+      union all
+      select case when fallback_tier = 'full' then 2 else 1 end
+      from public.stripe_purchase_ledger
+      where user_id = row_user_id and fallback_tier is not null
+      union all
+      select case when tier = 'full' then 2 else 1 end
+      from public.stripe_legacy_entitlements
+      where user_id = row_user_id
+    ) represented;
+    if (case when profile_tier = 'full' then 2 else 1 end) > represented_rank then
+      insert into public.stripe_legacy_entitlements (user_id, tier, reason)
+      values (row_user_id, profile_tier, 'legacy_import')
+      on conflict (user_id) do nothing;
+      owner_ids := array_append(owner_ids, row_user_id);
+    end if;
   end loop;
 
   for row_user_id in

@@ -124,6 +124,8 @@ try {
   `);
   sql(readFileSync("supabase/migrations/20261022130000_stripe_upgrade_idempotency.sql", "utf8"));
   sql(readFileSync("supabase/migrations/20261024101000_stripe_purchase_ledger.sql", "utf8"));
+  assert.equal(sql("select relrowsecurity::int from pg_class where oid='public.stripe_legacy_entitlements'::regclass;"), "1");
+  assert.equal(sql("select has_table_privilege('anon','public.stripe_legacy_entitlements','select')::int || ':' || has_table_privilege('authenticated','public.stripe_legacy_entitlements','select')::int || ':' || has_table_privilege('service_role','public.stripe_legacy_entitlements','select')::int;"), "0:0:1");
 
   assert.equal(sql("select relrowsecurity::int from pg_class where oid='public.stripe_upgrade_claims'::regclass;"), "1");
   assert.equal(sql("select has_table_privilege('anon','public.stripe_upgrade_claims','select')::int || ':' || has_table_privilege('authenticated','public.stripe_upgrade_claims','select')::int;"), "0:0");
@@ -154,6 +156,34 @@ try {
   assert.equal(sql(`select public.backfill_stripe_purchase_ledger('[{"checkout_session_id":"cs_backfill_active","payment_intent_id":"pi_backfill_active","user_id":"${backfillUser}","tier":"beginner","status":"active","amount_total":9700,"currency":"eur","customer_email":"buyer@example.test"},{"checkout_session_id":"cs_backfill_refunded","payment_intent_id":"pi_backfill_refunded","user_id":"${backfillUser}","tier":"full","status":"refunded","amount_total":26700,"currency":"eur","customer_email":"buyer@example.test","revoke_reason":"stripe_backfill"}]'::jsonb);`), "2");
   assert.equal(sql(`select string_agg(status, ',' order by status) from public.stripe_purchase_ledger where user_id='${backfillUser}';`), "active,refunded");
   assert.equal(sql(`select tier from public.profiles where id='${backfillUser}';`), "beginner");
+  const legacyFullUser = "77777777-7777-4777-8777-777777777777";
+  createUser(legacyFullUser, "full");
+  sql(`insert into public.stripe_legacy_entitlements(user_id,tier,reason) values ('${legacyFullUser}','full','manual_access');`);
+  assert.equal(sql(`select public.record_stripe_purchase('cs_legacy_beginner','pi_legacy_beginner','${legacyFullUser}'::uuid,'beginner','active',9700,'eur','legacy@example.test');`), "active");
+  assert.equal(sql(`select public.revoke_stripe_purchase('pi_legacy_beginner','refunded','charge.refunded');`), "refunded");
+  assert.equal(sql(`select tier from public.profiles where id='${legacyFullUser}';`), "full");
+
+  const legacyBeginnerUser = "88888888-8888-4888-8888-888888888888";
+  createUser(legacyBeginnerUser);
+  sql(`insert into public.stripe_legacy_entitlements(user_id,tier,reason) values ('${legacyBeginnerUser}','beginner','manual_access');`);
+  assert.equal(sql(`select public.apply_stripe_upgrade('${legacyBeginnerUser}','cs_legacy_upgrade','pi_legacy_upgrade');`), "granted");
+  assert.equal(sql(`select public.revoke_stripe_purchase('pi_legacy_upgrade','refunded','charge.refunded');`), "refunded");
+  assert.equal(sql(`select tier from public.profiles where id='${legacyBeginnerUser}';`), "beginner");
+
+  const noLegacyUser = "99999999-9999-4999-8999-999999999999";
+  createUser(noLegacyUser, "full");
+  assert.equal(sql(`select public.recalculate_stripe_entitlement('${noLegacyUser}');`), "");
+  assert.equal(sql(`select tier from public.profiles where id='${noLegacyUser}';`), "");
+
+  const legacyBackfillUser = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  createUser(legacyBackfillUser, "full");
+  const backfillRow = `{"checkout_session_id":"cs_legacy_marker","payment_intent_id":"pi_legacy_marker","user_id":"${legacyBackfillUser}","tier":"beginner","status":"active","amount_total":9700,"currency":"eur","customer_email":"legacy-marker@example.test"}`;
+  assert.equal(sql(`select public.backfill_stripe_purchase_ledger('[${backfillRow}]'::jsonb);`), "1");
+  assert.equal(sql(`select tier from public.profiles where id='${legacyBackfillUser}';`), "full");
+  assert.equal(sql(`select public.backfill_stripe_purchase_ledger('[${backfillRow}]'::jsonb);`), "1");
+  assert.equal(sql(`select count(*) from public.stripe_legacy_entitlements where user_id='${legacyBackfillUser}';`), "1");
+  assert.equal(sql(`select tier from public.profiles where id='${legacyBackfillUser}';`), "full");
+
 
   assert.equal(sql("select public.record_stripe_checkout_terminal('cs_terminal','pi_terminal','unknown_price');"), "recorded");
   assert.equal(sql("select public.revoke_stripe_purchase('pi_terminal','refunded','charge.refunded');"), "terminal");
