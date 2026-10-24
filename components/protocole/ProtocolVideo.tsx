@@ -28,6 +28,7 @@ export function ProtocolVideo({ videos }: { videos: BlocVideo[] }) {
           ref={playerRef}
           directVideo={{ id: selected.id, playbackId: selected.playbackId, tokens: selected.tokens }}
           progressId={selected.id}
+          posterUrl={selected.thumbnailUrl}
           title={selected.title}
           onCompleted={() => undefined}
           onTimeUpdate={(time) => setCurrentTime(time)}

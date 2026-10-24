@@ -187,6 +187,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
             ref={playerRef}
             directVideo={{ id: selectedPlayableVideo.id, playbackId: selectedPlayableVideo.playbackId, tokens: selectedPlayableVideo.tokens }}
             progressId={selectedPlayableVideo.id}
+            posterUrl={selectedPlayableVideo.thumbnailUrl}
             title={selectedPlayableVideo.title}
             onCompleted={() => undefined}
             onEnded={() => setEndedVideoId(selectedPlayableVideo.id)}

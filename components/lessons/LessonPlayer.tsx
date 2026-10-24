@@ -25,11 +25,12 @@ type LessonPlayerProps = {
   onEnded?: () => void;
   onTimeUpdate?: (time: number, duration: number) => void;
   directVideo?: DirectVideo;
+  posterUrl?: string;
 };
 
 type PlayerState = { status: "loading" } | { status: "unavailable" } | { status: "ready"; playback: Extract<LessonPlayback, { ok: true }> };
 
-export const LessonPlayer = forwardRef<LessonPlayerHandle, LessonPlayerProps>(function LessonPlayer({ sectionId, progressId, title, onCompleted, onEnded, onTimeUpdate, directVideo }, ref) {
+export const LessonPlayer = forwardRef<LessonPlayerHandle, LessonPlayerProps>(function LessonPlayer({ sectionId, progressId, title, onCompleted, onEnded, onTimeUpdate, directVideo, posterUrl }, ref) {
   const initialPlayback: PlayerState = directVideo ? {
     status: "ready",
     playback: {
@@ -150,6 +151,7 @@ export const LessonPlayer = forwardRef<LessonPlayerHandle, LessonPlayerProps>(fu
         tokens={playback.tokens}
         startTime={playback.startSeconds}
         streamType="on-demand"
+        poster={posterUrl}
         disableCookies
         metadata={{ video_id: progressKey, video_title: title }}
         style={{ width: "100%", height: "100%" }}
