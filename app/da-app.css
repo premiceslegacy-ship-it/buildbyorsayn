@@ -84,7 +84,8 @@ html.r2-reader-open .da.da-app.has-tabbar {
 @media (min-width: 735px) { .da.da-app .navbar__nav { display: flex; } }
 
 .da.da-app .tabbar { position: fixed; z-index: 70; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(402px, calc(100% - 32px)); height: 64px; border-radius: 999px; display: flex; padding: 6px; background: rgba(0, 0, 0, .32); -webkit-backdrop-filter: blur(12px) saturate(1.6); backdrop-filter: blur(12px) saturate(1.6); view-transition-name: tabbar; }
-.da.da-app .tabbar a { position: relative; z-index: 1; flex: 1; display: grid; place-items: center; align-content: center; gap: 3px; border-radius: 999px; font: 600 10px/1 var(--font); color: #fff; min-width: 0; }
+.da.da-app .tabbar::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(158deg, rgba(255, 255, 255, .17) 0%, rgba(255, 255, 255, .05) 34%, rgba(255, 255, 255, 0) 58%, rgba(255, 255, 255, .06) 100%); box-shadow: inset 0 10px 16px -10px rgba(255, 255, 255, .22), inset 0 -14px 18px -12px rgba(0, 0, 0, .35); }
+.da.da-app .tabbar a { position: relative; z-index: 1; flex: 1; display: grid; place-items: center; align-content: center; gap: 3px; border-radius: 999px; font: 600 10px/1 var(--font); color: #fff; min-width: 0; text-shadow: 0 1px 6px rgba(0, 0, 0, .55); }
 .da.da-app .tabbar a .ic { width: 22px; height: 22px; }
 .da.da-app .tabbar a.on { color: var(--em); }
 .da.da-app .tabbar .slider { background: rgba(255, 255, 255, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .38), inset 0 -1px 0 rgba(255, 255, 255, .08); opacity: 0; transition: none; }

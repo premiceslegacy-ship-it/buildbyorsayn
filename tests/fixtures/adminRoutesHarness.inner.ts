@@ -16,7 +16,7 @@ let currentUser: { id: string; app_metadata: Record<string, unknown> } | null = 
 let videoRow: Record<string, unknown> | null = null;
 const file = (path: string) => pathToFileURL(resolve(path)).href;
 
-mock.module("next/cache", { namedExports: { revalidatePath: (path: string) => { calls.push({ kind: "revalidate", payload: path }); } } });
+mock.module("next/cache", { namedExports: { revalidatePath: (path: string) => { calls.push({ kind: "revalidate", payload: path }); }, revalidateTag: (tag: string) => { calls.push({ kind: "revalidate-tag", payload: tag }); } } });
 mock.module(file("lib/supabase/server.ts"), {
   namedExports: { createClient: async () => ({ auth: { getUser: async () => ({ data: { user: currentUser }, error: null }) } }) },
 });
@@ -31,12 +31,15 @@ function table(name: string) {
     update(values: unknown) { state.op = "update"; state.values = values; return chain; },
     delete() { state.op = "delete"; return chain; },
     eq(column: string, value: unknown) { state.filters.push(`${column}=${String(value)}`); return chain; },
+    neq(column: string, value: unknown) { state.filters.push(`${column}!=${String(value)}`); return chain; },
+    not(column: string, operator: string, value: unknown) { state.filters.push(`${column} not ${operator} ${String(value)}`); return chain; },
     is(column: string) { state.filters.push(`${column} is null`); return chain; },
     maybeSingle() {
       if (state.op === "update") {
         calls.push({ kind: `update:${name}`, payload: { values: state.values, filters: state.filters } });
         return Promise.resolve({ data: { id: "x" }, error: null });
       }
+      if (name === "video_asset_cleanup") return Promise.resolve({ data: null, error: null });
       return Promise.resolve({ data: videoRow, error: null });
     },
     then(resolveFn: (value: unknown) => unknown) {
@@ -70,6 +73,7 @@ mock.module(file("lib/supabase/admin.ts"), {
           return { data: "processed", error: null };
         }
         if (name === "record_admin_action") return { data: "00000000-0000-4000-8000-000000000000", error: null };
+        if (name === "replace_video_thumbnail") return { data: [{ old_storage_path: null }], error: null };
         if (name === "publish_video_lesson") return { data: [{ section_id: "b2-s1", previous_mux_asset_id: "old-asset" }], error: null };
         if (name === "set_admin_user_tier") return { data: true, error: null };
         return { data: null, error: null };
@@ -105,13 +109,14 @@ const videosRoute = await import("../../app/api/admin/videos/route");
 const publishRoute = await import("../../app/api/admin/videos/[id]/publish/route");
 const deleteRoute = await import("../../app/api/admin/videos/[id]/route");
 const webhookRoute = await import("../../app/api/mux/webhook/route");
+const adminContentActions = await import("../../app/admin/actions");
 
 const VIDEO_ID = "123e4567-e89b-42d3-a456-426614174000";
-const create = (sectionId: string) => new NextRequest("http://localhost/api/admin/videos", {
+const create = (blocNumero: unknown) => new NextRequest("http://localhost/api/admin/videos", {
   method: "POST",
   headers: { "content-type": "application/json" },
   body: JSON.stringify({
-    sectionId, title: "Une vidéo", summary: "", transcript: "[0:00] Une transcription relue assez longue.",
+    blocNumero, position: 1, title: "Une vidéo", summary: "", transcript: "[0:00] Une transcription relue assez longue.",
     deliverables: [], chapters: [{ index: 1, title: "Départ", startSeconds: 0 }],
     file: { name: "a.mp4", size: 1000, type: "video/mp4" },
   }),
@@ -143,10 +148,10 @@ test("un non admin (palier COFFRE, rôle absent ou autre) est refusé partout av
 
 test("un admin crée un envoi Mux signé, le palier vient du serveur, l'action est journalisée", async () => {
   currentUser = { id: "admin-1", app_metadata: { role: "admin" } };
-  for (const [section, tier] of [["b1-s0", "preview"], ["b1-s2", "beginner"], ["b2-s1", "full"]] as const) {
+  for (const [blocNumero, tier] of [[1, "beginner"], [2, "full"], ["protocole", "beginner"]] as const) {
     reset();
-    const response = await videosRoute.POST(create(section));
-    assert.equal(response.status, 201, section);
+    const response = await videosRoute.POST(create(blocNumero));
+    assert.equal(response.status, 201, String(blocNumero));
     const created = muxCalls.find((c) => c.kind === "uploads.create")?.payload as { new_asset_settings: { playback_policies: string[]; passthrough: string } };
     assert.deepEqual(created.new_asset_settings.playback_policies, ["signed"]);
     const inserted = calls.find((c) => c.kind === "insert:video_lessons")?.payload as Record<string, unknown>;
@@ -159,6 +164,37 @@ test("un admin crée un envoi Mux signé, le palier vient du serveur, l'action e
   reset();
   assert.equal((await videosRoute.POST(create("b99-s9"))).status, 400);
   assert.deepEqual(muxCalls, []);
+});
+
+test("les écritures de contenu vidéo exigent un admin et refusent une vidéo remplacée", async () => {
+  reset();
+  currentUser = null;
+  const denied = await adminContentActions.saveAdminVideoSummaryAction({ videoId: VIDEO_ID, summary: "Résumé" });
+  assert.equal(denied.ok, false);
+  assert.deepEqual(calls, []);
+
+  currentUser = { id: "admin-1", app_metadata: { role: "admin" } };
+  videoRow = { id: VIDEO_ID, status: "ready", duration_seconds: 120, replaced_at: null };
+  const chapters = await adminContentActions.saveAdminVideoChaptersAction({
+    videoId: VIDEO_ID,
+    chaptersText: "0:00 Départ\n1:00 Suite",
+  });
+  assert.equal(chapters.ok, true);
+  const chapterUpdate = calls.find((call) => call.kind === "update:video_lessons")?.payload as { values: Record<string, unknown> };
+  assert.deepEqual(chapterUpdate.values.chapters, [
+    { index: 1, title: "Départ", startSeconds: 0 },
+    { index: 2, title: "Suite", startSeconds: 60 },
+  ]);
+  const thumbnail = await adminContentActions.setAdminVideoThumbnailAction({ videoId: VIDEO_ID, timeSeconds: 1 });
+  assert.equal(thumbnail.ok, true);
+  assert.ok(calls.some((call) => call.kind === "rpc:replace_video_thumbnail"));
+
+  reset();
+  currentUser = { id: "admin-1", app_metadata: { role: "admin" } };
+  videoRow = { id: VIDEO_ID, status: "ready", duration_seconds: 120, replaced_at: "2026-01-01T00:00:00.000Z" };
+  const replaced = await adminContentActions.saveAdminVideoSummaryAction({ videoId: VIDEO_ID, summary: "Ne pas écrire" });
+  assert.equal(replaced.ok, false);
+  assert.equal(calls.some((call) => call.kind === "update:video_lessons"), false);
 });
 
 test("un admin publie via la RPC uniquement avec la confirmation PUBLIER", async () => {

@@ -61,7 +61,7 @@ if (process.env.REVIEW1_MUX_INNER !== "1") {
       playbackId: "playback-expected",
       client,
     });
-    assert.deepEqual(writes[0].filters, [["id", "video-expected"], ["mux_asset_id", "asset-expected"]]);
+    assert.deepEqual(writes[0].filters, [["id", "video-expected"], ["mux_asset_id", "asset-expected"], ["transcript_source", "automatic"]]);
     assert.deepEqual(writes[0].nullFilters, ["published_at"]);
     assert.match(JSON.stringify(writes[0].values), /Transcription assez longue/);
   });

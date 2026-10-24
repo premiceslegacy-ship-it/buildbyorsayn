@@ -5,8 +5,9 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import Stripe from "stripe";
 import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { MAX_VIDEO_THUMBNAIL_BYTES, removeStoredVideoThumbnail, storeVideoThumbnail, storedVideoThumbnailPath } from "@/lib/mux/thumbnail.server";
+import { MAX_VIDEO_THUMBNAIL_BYTES, removeStoredVideoThumbnail, storeVideoThumbnail } from "@/lib/mux/thumbnail.server";
 import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
+import { parseChapterLines, validateManualTranscript } from "@/lib/mux/videoContent";
 import { syncYoutubeChannel } from "@/lib/youtube/feed";
 import { YOUTUBE_VIDEOS_CACHE_TAG } from "@/lib/nouveautes/loadVideos";
 import {
@@ -33,6 +34,10 @@ const deleteInputSchema = z.object({
   expectedCount: z.number().int().min(1).max(MAX_INACTIVE_ACCOUNT_BATCH),
   confirmation: z.string().max(32),
 }).strict();
+const adminVideoIdSchema = z.object({ videoId: z.string().uuid() }).strict();
+const adminVideoSummarySchema = adminVideoIdSchema.extend({ summary: z.string().trim().min(1).max(2_000) }).strict();
+const adminVideoChaptersSchema = adminVideoIdSchema.extend({ chaptersText: z.string().trim().min(1).max(8_000) }).strict();
+const adminVideoTranscriptSchema = adminVideoIdSchema.extend({ transcript: z.string().trim().max(250_000) }).strict();
 
 async function mapWithConcurrency<T, R>(items: T[], concurrency: number, worker: (item: T) => Promise<R>) {
   const results = new Array<R>(items.length);
@@ -241,6 +246,116 @@ export async function addYoutubeNewsAction(rawUrl: string): Promise<{ ok: boolea
     return { ok: false, message: "YouTube n'a pas répondu. Rien n'a été ajouté, tu peux réessayer." };
   }
 }
+async function loadAdminVideoForContent(videoId: string) {
+  const admin = createAdminSupabase();
+  const { data: video, error } = await admin
+    .from("video_lessons")
+    .select("id,status,duration_seconds,replaced_at,published_at")
+    .eq("id", videoId)
+    .maybeSingle();
+  if (error || !video) return { error: "La vidéo est introuvable." as const };
+  if (video.replaced_at) return { error: "Cette vidéo a été remplacée." as const };
+  if (video.published_at) return { error: "Une vidéo en ligne ne peut plus être modifiée." as const };
+  if (video.status === "errored" || video.status === "cancelled") {
+    return { error: "Cette vidéo ne peut plus être modifiée." as const };
+  }
+  return { admin, video };
+}
+
+export async function saveAdminVideoSummaryAction(input: unknown): Promise<{ ok: boolean; message: string }> {
+  const user = await getVerifiedAdmin();
+  if (!user) return { ok: false, message: "Accès administrateur refusé." };
+  const parsed = adminVideoSummarySchema.safeParse(input);
+  if (!parsed.success) return { ok: false, message: "Le résumé est invalide." };
+  const loaded = await loadAdminVideoForContent(parsed.data.videoId);
+  if ("error" in loaded) return { ok: false, message: loaded.error };
+  const { data: updated, error } = await loaded.admin.from("video_lessons")
+    .update({ summary: parsed.data.summary, updated_at: new Date().toISOString() })
+    .eq("id", parsed.data.videoId)
+    .is("published_at", null)
+    .select("id")
+    .maybeSingle();
+  if (error || !updated) return { ok: false, message: "Le résumé n'a pas pu être enregistré." };
+  await recordAdminAction({
+    actorUserId: user.id,
+    action: "video.summary_update",
+    targetType: "video_lesson",
+    targetId: parsed.data.videoId,
+    result: "completed",
+    approved: true,
+    details: { characterCount: parsed.data.summary.length },
+  }).catch(() => undefined);
+  revalidatePath("/admin");
+  return { ok: true, message: "Résumé enregistré." };
+}
+
+export async function saveAdminVideoChaptersAction(input: unknown): Promise<{ ok: boolean; message: string }> {
+  const user = await getVerifiedAdmin();
+  if (!user) return { ok: false, message: "Accès administrateur refusé." };
+  const parsed = adminVideoChaptersSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, message: "Les chapitres sont invalides." };
+  const loaded = await loadAdminVideoForContent(parsed.data.videoId);
+  if ("error" in loaded) return { ok: false, message: loaded.error };
+  if (loaded.video.status !== "ready") return { ok: false, message: "Attends que la vidéo soit prête avant d'enregistrer les chapitres." };
+  const chapters = parseChapterLines(parsed.data.chaptersText, loaded.video.duration_seconds);
+  if (chapters.error) return { ok: false, message: chapters.error };
+  const { data: updated, error } = await loaded.admin.from("video_lessons")
+    .update({ chapters: chapters.chapters, updated_at: new Date().toISOString() })
+    .eq("id", parsed.data.videoId)
+    .is("replaced_at", null)
+    .is("published_at", null)
+    .select("id")
+    .maybeSingle();
+  if (error || !updated) return { ok: false, message: "Les chapitres n'ont pas pu être enregistrés." };
+  await recordAdminAction({
+    actorUserId: user.id,
+    action: "video.chapters_update",
+    targetType: "video_lesson",
+    targetId: parsed.data.videoId,
+    result: "completed",
+    approved: true,
+    details: { chapterCount: chapters.chapters.length },
+  }).catch(() => undefined);
+  revalidatePath("/admin");
+  return { ok: true, message: "Chapitres enregistrés." };
+}
+
+export async function saveAdminVideoTranscriptAction(input: unknown): Promise<{ ok: boolean; message: string }> {
+  const user = await getVerifiedAdmin();
+  if (!user) return { ok: false, message: "Accès administrateur refusé." };
+  const parsed = adminVideoTranscriptSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, message: "La transcription est invalide." };
+  const transcript = validateManualTranscript(parsed.data.transcript);
+  if (transcript.error) return { ok: false, message: transcript.error };
+  const loaded = await loadAdminVideoForContent(parsed.data.videoId);
+  if ("error" in loaded) return { ok: false, message: loaded.error };
+  const { data: updated, error } = await loaded.admin.from("video_lessons")
+    .update({
+      transcript: transcript.transcript,
+      transcript_segments: transcript.segments,
+      transcript_source: "manual",
+      subtitle_track_id: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", parsed.data.videoId)
+    .is("replaced_at", null)
+    .is("published_at", null)
+    .select("id")
+    .maybeSingle();
+  if (error || !updated) return { ok: false, message: "La transcription n'a pas pu être enregistrée." };
+  await recordAdminAction({
+    actorUserId: user.id,
+    action: "video.transcript_update",
+    targetType: "video_lesson",
+    targetId: parsed.data.videoId,
+    result: "completed",
+    approved: true,
+    details: { characterCount: transcript.transcript.length, segmentCount: transcript.segments.length },
+  }).catch(() => undefined);
+  revalidatePath("/admin");
+  return { ok: true, message: "Transcription relue enregistrée." };
+}
+
 
 export async function setAdminVideoThumbnailAction(input: unknown): Promise<{ ok: boolean; thumbnail?: string; message: string }> {
   const user = await getVerifiedAdmin();
@@ -259,15 +374,16 @@ export async function setAdminVideoThumbnailAction(input: unknown): Promise<{ ok
     return { ok: false, message: "Attends la fin du traitement avant de choisir la miniature." };
   }
   const thumbnail = `mux:${parsed.data.timeSeconds}`;
-  const { error } = await admin
-    .from("video_lessons")
-    .update({ thumbnail, updated_at: new Date().toISOString() })
-    .eq("id", parsed.data.videoId)
-    .eq("status", "ready")
-    .is("replaced_at", null);
-  if (error) return { ok: false, message: "La miniature n'a pas pu être enregistrée." };
-  const oldPath = storedVideoThumbnailPath(video.thumbnail);
-  if (oldPath) await removeStoredVideoThumbnail(oldPath).catch(() => undefined);
+  const { data: replacement, error } = await admin.rpc("replace_video_thumbnail", {
+    p_video_id: parsed.data.videoId,
+    p_actor_user_id: user.id,
+    p_thumbnail: thumbnail,
+  });
+  if (error || !Array.isArray(replacement) || replacement.length !== 1) {
+    return { ok: false, message: "La miniature n'a pas pu être enregistrée." };
+  }
+  const oldStoragePath = typeof replacement[0]?.old_storage_path === "string" ? replacement[0].old_storage_path : null;
+  if (oldStoragePath) await removeStoredVideoThumbnail(oldStoragePath).catch(() => undefined);
   await recordAdminAction({
     actorUserId: user.id,
     action: "video.thumbnail_select",
@@ -306,16 +422,16 @@ export async function setAdminVideoThumbnailImageAction(input: FormData): Promis
     return { ok: false, message: error instanceof Error ? error.message : "La miniature est invalide." };
   }
   const thumbnail = `storage:${stored.path}`;
-  const { error: updateError } = await admin.from("video_lessons")
-    .update({ thumbnail, updated_at: new Date().toISOString() })
-    .eq("id", videoId)
-    .eq("status", "ready")
-    .is("replaced_at", null);
-  if (updateError) {
+  const { data: replacement, error: updateError } = await admin.rpc("replace_video_thumbnail", {
+    p_video_id: videoId,
+    p_actor_user_id: user.id,
+    p_thumbnail: thumbnail,
+  });
+  if (updateError || !Array.isArray(replacement) || replacement.length !== 1) {
     await removeStoredVideoThumbnail(stored.path).catch(() => undefined);
     return { ok: false, message: "La miniature n'a pas pu être enregistrée." };
   }
-  const oldPath = storedVideoThumbnailPath(video.thumbnail);
+  const oldPath = typeof replacement[0]?.old_storage_path === "string" ? replacement[0].old_storage_path : null;
   if (oldPath && oldPath !== stored.path) await removeStoredVideoThumbnail(oldPath).catch(() => undefined);
   await recordAdminAction({
     actorUserId: user.id,

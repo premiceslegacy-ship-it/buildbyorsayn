@@ -120,9 +120,11 @@ test("server loader authenticates and projects exact tier scope, including profi
   assert.equal(result.bloc.sections.length, 0);
 });
 
-test("une panne de lecture vidéo ne bloque pas l'accès au texte du bloc", async () => {
-  const loader = loadServer("lib/blocData.server.ts", "full", true, false, {}, true);
-  assert.deepEqual(plain(await (loader.exports as Record<string, (...args: unknown[]) => Promise<unknown>>).getBlocVideos("1", "full")), []);
+test("une panne de lecture vidéo ne bloque pas l'accès au texte du bloc et un palier insuffisant ne reçoit aucun playback", async () => {
+  const unavailableLoader = loadServer("lib/blocData.server.ts", "full", true, false, {}, true);
+  assert.deepEqual(plain(await (unavailableLoader.exports as Record<string, (...args: unknown[]) => Promise<unknown>>).getBlocVideos("1", "full")), { state: "unavailable", videos: [] });
+  const deniedLoader = loadServer("lib/blocData.server.ts", "preview");
+  assert.deepEqual(plain(await (deniedLoader.exports as Record<string, (...args: unknown[]) => Promise<unknown>>).getBlocVideos("2", "preview")), { state: "none", videos: [] });
 });
 
 // Values built inside the vm context carry foreign prototypes; compare their JSON shape.

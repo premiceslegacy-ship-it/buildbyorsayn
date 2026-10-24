@@ -14,7 +14,8 @@ export const VIDEO_MIME_TYPES = [
 ] as const;
 
 const BLOC_NUMBER_SCHEMA = z.number().int().min(1).max(7);
-const BLOC_ID_PATTERN = /^(1|2|3|4|5|6|7)$/;
+export const VIDEO_LOCATION_SCHEMA = z.union([BLOC_NUMBER_SCHEMA, z.literal("protocole")]);
+const BLOC_ID_PATTERN = /^(1|2|3|4|5|6|7|protocole)$/;
 const MUX_PASSTHROUGH_PATTERN = /^build-video:([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i;
 
 export type VideoChapter = {
@@ -35,7 +36,7 @@ export const videoChapterSchema = z.object({
 }).strict();
 
 export const adminVideoCreateSchema = z.object({
-  blocNumero: BLOC_NUMBER_SCHEMA,
+  blocNumero: VIDEO_LOCATION_SCHEMA,
   position: z.number().int().min(1).max(1_000),
   title: z.string().trim().min(1).max(200),
   summary: z.string().trim().max(2_000).default(""),
@@ -66,7 +67,7 @@ export function isBlocId(value: string): boolean {
 
 export function tierForBloc(blocId: string): McpTier {
   if (!isBlocId(blocId)) throw new Error("Identifiant de bloc invalide.");
-  return blocId === "1" ? "beginner" : "full";
+  return blocId === "1" || blocId === "protocole" ? "beginner" : "full";
 }
 
 export function parseTranscriptSegmentsJson(value: unknown): TranscriptSegment[] {

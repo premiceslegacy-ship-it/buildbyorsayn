@@ -67,7 +67,8 @@ test("les confirmations PUBLIER et ENVOYER restent saisies avant les actions", a
   ]);
   assert.match(video, /confirmation !== ADMIN_VIDEO_CONFIRMATION/);
   assert.match(video, /thumbnail/);
-  assert.match(mail, /confirmation !== "ENVOYER"/);
+  assert.match(mail, /confirmation !== CONFIRM_WORD/);
+  assert.match(mail, /CONFIRM_WORD = "ENVOYER"/);
   assert.match(mail, /inactiveForEmail/);
 });
 

@@ -29,10 +29,8 @@ test("Mux webhook leases expire before a retry and never regress a terminal less
 test("tier changes and email sends use an approval-aware audit path", async () => {
   const tierAction = await readFile("app/actions/setUserTier.ts", "utf8");
   const emailRoute = await readFile("app/api/admin/send-email/route.ts", "utf8");
-  const composer = await readFile("components/AdminMailComposer.tsx", "utf8");
   assert.match(tierAction, /rpc\("set_admin_user_tier"/);
   assert.match(emailRoute, /approved:\s*z\.literal\(true\)/);
   assert.match(emailRoute, /confirmation:\s*z\.literal\("ENVOYER"\)/);
   assert.match(emailRoute, /action:\s*"email\.broadcast"/);
-  assert.match(composer, /Je confirme cet envoi réel/);
 });

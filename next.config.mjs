@@ -3,6 +3,12 @@ const nextConfig = {
   // Remove X-Powered-By header
   poweredByHeader: false,
 
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "2mb",
+    },
+  },
+
   // Keep the revocable MCP asset out of /_next/image so its launch gate and
   // no-store response cannot be bypassed. Editorial reference covers, card
   // illustrations and client logos may use the optimized local image pipeline.

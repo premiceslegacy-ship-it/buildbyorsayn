@@ -24,7 +24,8 @@ export default async function BlocPage({ params, searchParams }: { params: Promi
   const result = await getBlocForCurrentUser(id);
   if (!result) redirect("/login");
   if (!result.bloc) notFound();
-  const videos = await getBlocVideos(result.bloc.id, result.tier);
+  const videoResult = await getBlocVideos(result.bloc.id, result.tier);
+  const videos = videoResult.state === "ready" ? videoResult.videos : [];
   const initialVideoPosition = query.video ? Number(query.video) : undefined;
   return <BlocClient bloc={result.bloc} tier={result.tier} checkoutUserId={result.userId} identity={result.identity} videos={videos} initialVideoPosition={Number.isSafeInteger(initialVideoPosition) ? initialVideoPosition : undefined} />;
 }

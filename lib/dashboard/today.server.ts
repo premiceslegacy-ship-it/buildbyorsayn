@@ -27,7 +27,7 @@ async function loadVideoMeta(videoIds: string[], tier: string | null): Promise<V
     const videosByBlock = await Promise.all(
       [...new Set((data ?? []).map((row) => row.bloc_id))].map((blocId) => getBlocVideos(blocId, normalizedTier)),
     );
-    const thumbnails = new Map(videosByBlock.flat().map((video) => [video.id, video.thumbnailUrl]));
+    const thumbnails = new Map(videosByBlock.flatMap((result) => result.state === "ready" ? result.videos : []).map((video) => [video.id, video.thumbnailUrl]));
     return (data ?? []).flatMap((row) => {
       const bloc = BLOCS_DATA.find((item) => item.id === row.bloc_id);
       const thumbnail = thumbnails.get(row.id);

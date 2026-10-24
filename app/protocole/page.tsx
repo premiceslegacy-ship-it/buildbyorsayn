@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getBlocVideos } from "@/lib/blocData.server";
 import { NavBar } from "@/components/NavBar";
 import { DaRoot } from "@/components/da/DaRoot";
 import { ReaderView } from "@/components/reader/ReaderView";
 import { parseReaderMode } from "@/components/reader/readerModel";
 import { VideoCard } from "@/components/VideoCard";
+import { ProtocolVideo } from "@/components/protocole/ProtocolVideo";
 import { protocoleIntroductionMarkdown, protocoleMarkdown } from "@/lib/protocoleContent";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 
@@ -28,6 +30,8 @@ export default async function ProtocolePage({ searchParams }: { searchParams: Pr
   const userTier = normalizeProfileTier(profile?.tier ?? null);
 
   if (userTier !== "beginner" && userTier !== "full") redirect("/checkout");
+  const protocolVideoResult = await getBlocVideos("protocole", userTier);
+  const protocolVideos = protocolVideoResult.state === "ready" ? protocolVideoResult.videos : [];
 
   const email = user.email ?? "";
   const displayName =
@@ -59,7 +63,11 @@ export default async function ProtocolePage({ searchParams }: { searchParams: Pr
         title: "Absorber, produire, distiller",
         summary: "Tu vas apprendre une tâche assez précise pour être testée. Tu vas la mettre devant une vraie personne.",
         markdown,
-        video: <VideoCard title="Le protocole zéro" youtubeId="tcFGu_zNsPE" description="La méthode complète, de l’absorption à la distillation." />,
+        video: protocolVideoResult.state === "ready"
+          ? <ProtocolVideo videos={protocolVideos} />
+          : protocolVideoResult.state === "unavailable"
+            ? <p role="status">La vidéo est momentanément indisponible.</p>
+            : <VideoCard title="Le protocole zéro" youtubeId="tcFGu_zNsPE" description="La méthode complète, de l’absorption à la distillation." />,
       }]}
       copyMarkdown={`${introduction}\n\n${markdownForCopy}`}
       videoIntroductionMarkdown={introduction}

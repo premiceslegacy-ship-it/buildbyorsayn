@@ -15,7 +15,8 @@ import { BLOCS_DATA } from "@/lib/mockData";
 import type { AdminVideoLessonRow } from "@/lib/mux/adminServer";
 import { createClient } from "@/lib/supabase/server";
 import { AdminVideoManager } from "./AdminVideoManager";
-import "./admin.css";
+import "./videos.css";
+import "../../components/admin/agent/agent.css";
 
 const TOTAL_BLOCS = BLOCS_DATA.length;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -227,7 +228,7 @@ export default async function AdminPage() {
           ),
           videos: (
             <AdminVideoManager
-              blocs={BLOCS_DATA.map((bloc) => ({ id: bloc.id, displayNumber: bloc.displayNumber, title: bloc.titre }))}
+              blocs={[...BLOCS_DATA.map((bloc) => ({ id: bloc.id, displayNumber: bloc.displayNumber, title: bloc.titre })), { id: "protocole", displayNumber: "protocole" as const, title: "Protocole zéro" }]}
               initialVideos={(videoData ?? []) as AdminVideoLessonRow[]}
               setupMissing={Boolean(videoError)}
             />

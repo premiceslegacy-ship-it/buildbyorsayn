@@ -355,6 +355,11 @@ if (process.env.ADMIN_AGENT_INNER !== "1") {
       chapters: [{ index: 1, title: "Départ", startSeconds: 0 }],
     }, toolContext());
     assert.match(result.content[0].text, /déjà publiée/);
+    result = await tools.invokeAdminAgentTool("deposer_miniature", {
+      videoId: VIDEO_ID,
+      file: { bytesBase64: "not-a-thumbnail" },
+    }, toolContext());
+    assert.match(result.content[0].text, /déjà publiée/);
     videoRow = { ...publishableVideo(), status: "preparing" };
     result = await tools.invokeAdminAgentTool("choisir_miniature", { videoId: VIDEO_ID, timeSeconds: 1 }, toolContext());
     assert.match(result.content[0].text, /n'est pas prête/);

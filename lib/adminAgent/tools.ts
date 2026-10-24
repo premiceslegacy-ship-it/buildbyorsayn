@@ -3,11 +3,13 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { blocIdFromDisplayNumber, displayNumberFromBlocId } from "@/lib/blocCatalog";
+import { blocIdFromDisplayLocation, displayLocationFromBlocId } from "@/lib/blocCatalog";
+import { BLOCS_DATA } from "@/lib/mockData";
 import { getSiteOrigin } from "@/lib/siteOrigin";
 import {
   MAX_ADMIN_VIDEO_DURATION_SECONDS,
   MAX_VIDEO_TRANSCRIPT_CHARACTERS,
+  VIDEO_LOCATION_SCHEMA,
   VIDEO_MIME_TYPES,
   buildMuxPassthrough,
   formatTimecode,
@@ -49,7 +51,7 @@ const writeChaptersInput = z.object({
 const writeSummaryInput = z.object({ videoId: uuid, summary: z.string().trim().min(1).max(2_000) }).strict();
 const chooseThumbnailInput = z.object({ videoId: uuid, timeSeconds: z.number().int().min(0).max(43_200) }).strict();
 const uploadInput = z.object({
-  blocNumero: z.number().int().min(1).max(7),
+  blocNumero: VIDEO_LOCATION_SCHEMA,
   position: z.number().int().min(1).max(1_000),
   title: z.string().trim().min(1).max(200),
   file: z.object({
@@ -70,7 +72,7 @@ const thumbnailInput = z.object({
 const listVideosInput = z.object({
   status: z.enum(["waiting", "preparing", "ready", "errored", "cancelled"]).optional(),
   sansResume: z.boolean().default(false),
-  blocNumero: z.number().int().min(1).max(7).optional(),
+  blocNumero: VIDEO_LOCATION_SCHEMA.optional(),
 }).strict();
 const readTranscriptInput = z.object({
   videoId: uuid,
@@ -100,6 +102,7 @@ function asResult(value: Record<string, unknown>): AgentToolResult {
 }
 
 async function assertBlocExists(blocId: string) {
+  if (blocId === "protocole") return { id: "protocole", titre: "Le protocole zéro", sections: [] };
   const { BLOCS_DATA } = await import("@/lib/mockData");
   const bloc = BLOCS_DATA.find((candidate) => candidate.id === blocId);
   if (!bloc) throw new AgentToolError("Ce bloc n'existe pas.");
@@ -171,7 +174,7 @@ async function createRequest(
 
 async function requireWritableVideo(videoId: string, options: { ready?: boolean; playback?: boolean } = {}) {
   const { data, error } = await createAdminSupabase().from("video_lessons")
-    .select("id,status,published_at,replaced_at,duration_seconds,playback_id")
+    .select("id,status,published_at,replaced_at,duration_seconds,playback_id,thumbnail")
     .eq("id", videoId)
     .maybeSingle();
   if (error) throw new Error("La vidéo ne peut pas être vérifiée.");
@@ -193,12 +196,14 @@ export const ADMIN_AGENT_TOOLS = {
     permission: "liste_blocs",
     schema: z.object({}).strict(),
     async run(_input, context) {
-      const { BLOCS_DATA } = await import("@/lib/mockData");
-      const blocs = BLOCS_DATA.map((bloc) => ({
-        numero: bloc.displayNumber,
-        titre: bloc.titre,
-        chapitres: bloc.sections.map((section) => ({ id: section.id, titre: section.title })),
-      }));
+      const blocs = [
+        ...BLOCS_DATA.map((bloc) => ({
+          numero: bloc.displayNumber,
+          titre: bloc.titre,
+          chapitres: bloc.sections.map((section) => ({ id: section.id, titre: section.title })),
+        })),
+        { numero: "protocole" as const, titre: "Protocole zéro", chapitres: [{ id: "protocole-zero", titre: "Absorber, produire, distiller" }] },
+      ];
       await auditTool(context, "liste_blocs", context.id, { count: blocs.length });
       return { blocs };
     },
@@ -216,7 +221,7 @@ export const ADMIN_AGENT_TOOLS = {
         .order("created_at", { ascending: false })
         .limit(100);
       if (input.status) query = query.eq("status", input.status);
-      const filteredBlocId = input.blocNumero === undefined ? null : blocIdFromDisplayNumber(input.blocNumero);
+      const filteredBlocId = input.blocNumero === undefined ? null : blocIdFromDisplayLocation(input.blocNumero);
       if (input.blocNumero !== undefined && !filteredBlocId) throw new AgentToolError("Bloc inconnu.");
       if (filteredBlocId) query = query.eq("bloc_id", filteredBlocId);
       if (input.sansResume) query = query.eq("summary", "");
@@ -224,7 +229,7 @@ export const ADMIN_AGENT_TOOLS = {
       if (error) throw new Error("Les vidéos ne peuvent pas être listées.");
       const videos = (data ?? []).map((video) => ({
         id: video.id,
-        blocNumero: displayNumberFromBlocId(video.bloc_id),
+        blocNumero: displayLocationFromBlocId(video.bloc_id),
         position: video.position,
         title: video.title,
         status: video.status,
@@ -245,7 +250,7 @@ export const ADMIN_AGENT_TOOLS = {
     schema: uploadInput,
     async run(rawInput, context) {
       const input = uploadInput.parse(rawInput);
-      const blocId = blocIdFromDisplayNumber(input.blocNumero);
+      const blocId = blocIdFromDisplayLocation(input.blocNumero);
       if (!blocId) throw new AgentToolError("Bloc inconnu.");
       await assertBlocExists(blocId);
       const videoId = randomUUID();
@@ -429,19 +434,14 @@ export const ADMIN_AGENT_TOOLS = {
     schema: thumbnailInput,
     async run(rawInput, context) {
       const input = thumbnailInput.parse(rawInput);
+      const admin = createAdminSupabase();
+      const video = await requireWritableVideo(input.videoId, { ready: true });
       let bytes: Uint8Array;
       try {
         bytes = decodeVideoThumbnailBase64(input.file.bytesBase64);
       } catch (error) {
         throw new AgentToolError(error instanceof Error ? error.message : "Le fichier de miniature est invalide.");
       }
-      const { data: video, error } = await createAdminSupabase().from("video_lessons")
-        .select("id,status,replaced_at,thumbnail,published_at")
-        .eq("id", input.videoId)
-        .maybeSingle();
-      if (error || !video) throw new AgentToolError("La vidéo est introuvable.");
-      if (video.replaced_at) throw new AgentToolError("Cette vidéo a été remplacée.");
-      if (video.status !== "ready") throw new AgentToolError("Attends que la vidéo soit prête avant de déposer sa miniature.");
       let stored: Awaited<ReturnType<typeof storeVideoThumbnail>>;
       try {
         stored = await storeVideoThumbnail(input.videoId, bytes);
@@ -449,10 +449,11 @@ export const ADMIN_AGENT_TOOLS = {
         throw new AgentToolError(error instanceof Error ? error.message : "La miniature est invalide.");
       }
       const thumbnail = `storage:${stored.path}`;
-      const updated = await createAdminSupabase().from("video_lessons")
+      const updated = await admin.from("video_lessons")
         .update({ thumbnail, updated_at: new Date().toISOString() })
         .eq("id", input.videoId)
         .eq("status", "ready")
+        .is("published_at", null)
         .is("replaced_at", null)
         .select("id")
         .maybeSingle();
@@ -577,7 +578,7 @@ export const ADMIN_AGENT_TOOLS = {
       if (error || !data) throw new Error("Vidéo introuvable.");
       const segments = parseTranscriptSegmentsJson(data.transcript_segments);
       const result = {
-        blocNumero: displayNumberFromBlocId(data.bloc_id),
+        blocNumero: displayLocationFromBlocId(data.bloc_id),
         position: data.position,
         title: data.title,
         status: data.status,

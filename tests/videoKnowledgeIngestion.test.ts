@@ -32,6 +32,13 @@ test("a published transcript becomes timestamped bloc knowledge with full-tier m
   assert.equal(documents[1].metadata?.endSeconds, 240);
   assert.equal(documents[1].metadata?.kind, "transcript");
 });
+test("a published protocol transcript keeps its public location and beginner access tier", () => {
+  const documents = collectVideoTranscriptDocuments([{ ...row, bloc_id: "protocole", tier_required: "beginner" }]);
+  assert.equal(documents.length, 2);
+  assert.equal(documents[0].sourceId, "video:protocole:video-1:chapter-1");
+  assert.equal(documents[0].tier, "beginner");
+  assert.equal(documents[0].metadata?.blocNumero, "protocole");
+});
 
 test("ingestion fails closed if a reserved video is mislabeled as beginner", () => {
   assert.throws(

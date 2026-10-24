@@ -22,6 +22,10 @@ export type BlocVideo = {
   progressPercent?: number;
   completed?: boolean;
 };
+export type BlocVideosResult =
+  | { state: "none"; videos: [] }
+  | { state: "ready"; videos: BlocVideo[] }
+  | { state: "unavailable"; videos: [] };
 function muxThumbnailUrl(playbackId: string, thumbnailToken: string, timeSeconds = 0): string {
   const query = new URLSearchParams({
     time: String(timeSeconds),
@@ -32,9 +36,9 @@ function muxThumbnailUrl(playbackId: string, thumbnailToken: string, timeSeconds
 }
 
 /** Server-only contract for the Apple-TV video rail. It never returns transcript text. */
-export async function getBlocVideos(blocId: string, tier: McpTier): Promise<BlocVideo[]> {
+export async function getBlocVideos(blocId: string, tier: McpTier): Promise<BlocVideosResult> {
   const requiredTier = tierForBloc(blocId);
-  if (!canAccess(tier, requiredTier)) return [];
+  if (!canAccess(tier, requiredTier)) return { state: "none", videos: [] };
   try {
     const admin = createAdminSupabase();
     const { data, error } = await admin
@@ -47,15 +51,18 @@ export async function getBlocVideos(blocId: string, tier: McpTier): Promise<Bloc
       .order("position", { ascending: true });
     if (error) {
       console.error("bloc.videos.query_failed", error.code ?? "unknown");
-      return [];
+      return { state: "unavailable", videos: [] };
     }
-    const visible = (data ?? []).filter((row) => (
+    const rows = data ?? [];
+    const accessible = rows.filter((row) => canAccess(tier, row.tier_required as McpTier));
+    if (accessible.length === 0) return { state: "none", videos: [] };
+    const visible = accessible.filter((row) => (
       typeof row.playback_id === "string"
       && Number.isSafeInteger(row.duration_seconds)
       && row.duration_seconds > 0
-      && canAccess(tier, row.tier_required as McpTier)
     ));
-    return await Promise.all(visible.map(async (row) => {
+    if (visible.length === 0) return { state: "unavailable", videos: [] };
+    const videos = await Promise.all(visible.map(async (row) => {
       const chapters = z.array(videoChapterSchema).safeParse(row.chapters);
       const tokens = await signMuxPlaybackTokens(row.playback_id);
       const fallbackTime = typeof row.thumbnail === "string" && row.thumbnail.startsWith("mux:")
@@ -63,10 +70,13 @@ export async function getBlocVideos(blocId: string, tier: McpTier): Promise<Bloc
         : undefined;
       const storedPath = storedVideoThumbnailPath(row.thumbnail);
       const storedUrl = storedPath ? admin.storage.from("video-thumbnails").getPublicUrl(storedPath).data.publicUrl : null;
+      const fallbackThumbnail = blocId === "protocole"
+        ? "/da/mini/protocole.jpg"
+        : `/da/mini/b${displayNumberFromBlocId(blocId) ?? 0}.jpg`;
       const thumbnailUrl = storedUrl
         || (Number.isFinite(fallbackTime)
           ? muxThumbnailUrl(row.playback_id, tokens.thumbnail, fallbackTime)
-          : `/da/mini/b${displayNumberFromBlocId(blocId) ?? 0}.jpg`);
+          : fallbackThumbnail);
       return {
         id: row.id,
         position: row.position,
@@ -85,9 +95,10 @@ export async function getBlocVideos(blocId: string, tier: McpTier): Promise<Bloc
         tokens,
       };
     }));
+    return { state: "ready", videos };
   } catch (error) {
     console.error("bloc.videos.load_failed", error instanceof Error ? error.name : "unknown");
-    return [];
+    return { state: "unavailable", videos: [] };
   }
 }
 

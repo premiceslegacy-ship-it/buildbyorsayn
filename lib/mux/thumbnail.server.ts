@@ -29,7 +29,7 @@ function readUint24(view: DataView, offset: number, littleEndian = false) {
 }
 
 function jpegDimensions(bytes: Uint8Array): { width: number; height: number } | null {
-  if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) return null;
+  if (bytes.length < 6 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes.at(-2) !== 0xff || bytes.at(-1) !== 0xd9) return null;
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   let offset = 2;
   while (offset + 3 < bytes.length) {
@@ -37,7 +37,8 @@ function jpegDimensions(bytes: Uint8Array): { width: number; height: number } | 
     while (offset < bytes.length && bytes[offset] === 0xff) offset += 1;
     if (offset >= bytes.length) break;
     const marker = bytes[offset++];
-    if (marker === 0xd8 || marker === 0xd9 || (marker >= 0xd0 && marker <= 0xd7)) continue;
+    if (marker === 0xd9) break;
+    if (marker === 0xd8 || (marker >= 0xd0 && marker <= 0xd7)) continue;
     if (offset + 1 >= bytes.length) return null;
     const segmentLength = readUint16(view, offset);
     if (segmentLength < 2 || offset + segmentLength > bytes.length) return null;
@@ -54,36 +55,60 @@ function jpegDimensions(bytes: Uint8Array): { width: number; height: number } | 
 }
 
 function pngDimensions(bytes: Uint8Array): { width: number; height: number } | null {
-  if (bytes.length < 24 || !bytes.subarray(0, 8).every((value, index) => value === [137, 80, 78, 71, 13, 10, 26, 10][index])) return null;
+  const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+  if (bytes.length < 8 || !signature.every((value, index) => bytes[index] === value)) return null;
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  if (String.fromCharCode(...bytes.subarray(12, 16)) !== "IHDR") return null;
-  return { width: view.getUint32(16), height: view.getUint32(20) };
+  let offset = 8;
+  let dimensions: { width: number; height: number } | null = null;
+  let hasIdat = false;
+  let hasIend = false;
+  while (offset + 12 <= bytes.length) {
+    const length = view.getUint32(offset);
+    const type = String.fromCharCode(...bytes.subarray(offset + 4, offset + 8));
+    const chunkEnd = offset + 12 + length;
+    if (chunkEnd > bytes.length) return null;
+    if (type === "IHDR") {
+      if (offset !== 8 || length !== 13) return null;
+      dimensions = { width: view.getUint32(offset + 8), height: view.getUint32(offset + 12) };
+    } else if (type === "IDAT") {
+      hasIdat = true;
+    } else if (type === "IEND") {
+      if (length !== 0 || chunkEnd !== bytes.length) return null;
+      hasIend = true;
+      break;
+    }
+    offset = chunkEnd;
+  }
+  return dimensions && hasIdat && hasIend ? dimensions : null;
 }
 
 function webpDimensions(bytes: Uint8Array): { width: number; height: number } | null {
   if (bytes.length < 16 || String.fromCharCode(...bytes.subarray(0, 4)) !== "RIFF" || String.fromCharCode(...bytes.subarray(8, 12)) !== "WEBP") return null;
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  if (view.getUint32(4, true) !== bytes.length - 8) return null;
   let offset = 12;
+  let dimensions: { width: number; height: number } | null = null;
   while (offset + 8 <= bytes.length) {
     const kind = String.fromCharCode(...bytes.subarray(offset, offset + 4));
     const size = view.getUint32(offset + 4, true);
     const payload = offset + 8;
-    if (payload + size > bytes.length) return null;
+    const chunkEnd = payload + size;
+    const paddedEnd = chunkEnd + (size % 2);
+    if (chunkEnd > bytes.length || paddedEnd > bytes.length) return null;
     if (kind === "VP8X" && size >= 10) {
-      return { width: readUint24(view, payload + 4, true) + 1, height: readUint24(view, payload + 7, true) + 1 };
-    }
-    if (kind === "VP8 " && size >= 10 && bytes[payload + 3] === 0x9d && bytes[payload + 4] === 0x01 && bytes[payload + 5] === 0x2a) {
-      return { width: readUint16(view, payload + 6, true) & 0x3fff, height: readUint16(view, payload + 8, true) & 0x3fff };
-    }
-    if (kind === "VP8L" && size >= 5 && bytes[payload] === 0x2f) {
+      dimensions = { width: readUint24(view, payload + 4, true) + 1, height: readUint24(view, payload + 7, true) + 1 };
+    } else if (kind === "VP8 " && size >= 10 && bytes[payload + 3] === 0x9d && bytes[payload + 4] === 0x01 && bytes[payload + 5] === 0x2a) {
+      dimensions = { width: readUint16(view, payload + 6, true) & 0x3fff, height: readUint16(view, payload + 8, true) & 0x3fff };
+    } else if (kind === "VP8L" && size >= 6 && bytes[payload] === 0x2f) {
       const width = 1 + (bytes[payload + 1] | (bytes[payload + 2] << 8) | ((bytes[payload + 3] & 0x3f) << 16));
-      const height = 1 + ((bytes[payload + 3] >> 6) | (bytes[payload + 4] << 2) | ((bytes[payload + 5] & 0x0f) << 10));
-      return { width, height };
+      const height = 1 + ((bytes[payload + 3] >> 6) | (bytes[payload + 4] << 2) | ((bytes[payload + 5] & 0x3f) << 10));
+      dimensions = { width, height };
     }
-    offset = payload + size + (size % 2);
+    offset = paddedEnd;
   }
-  return null;
+  return offset === bytes.length ? dimensions : null;
 }
+
 
 function formatFor(bytes: Uint8Array): { format: ThumbnailFormat; dimensions: { width: number; height: number } | null } {
   return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff

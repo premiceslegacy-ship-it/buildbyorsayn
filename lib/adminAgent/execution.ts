@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { displayNumberFromBlocId } from "@/lib/blocCatalog";
+import { displayLocationFromBlocId } from "@/lib/blocCatalog";
 import { videoChapterSchema, validateChapterTimeline } from "@/lib/mux/adminLessons";
 import { cleanupMuxAsset } from "@/lib/mux/assetCleanup.server";
 import { AgentToolError } from "./types";
@@ -125,7 +125,7 @@ export async function executeAgentPublication(videoId: string, actorUserId: stri
     throw new Error("La publication est faite, mais l'ancien asset Mux attend son nettoyage.");
   }
   return {
-    blocNumero: displayNumberFromBlocId(data.bloc_id),
+    blocNumero: displayLocationFromBlocId(data.bloc_id),
     position: data.position as number,
     previousAssetId,
   };

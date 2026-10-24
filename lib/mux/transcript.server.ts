@@ -68,7 +68,7 @@ export async function syncMuxTranscriptForReadyAsset(input: {
         .eq("id", input.videoId)
         .eq("mux_asset_id", input.assetId)
         .eq("transcript", "")
-        .is("published_at", null)
+        .eq("transcript_source", "automatic")
         .select("id")
         .maybeSingle();
       if (error) throw new Error("La transcription Mux n'a pas pu être enregistrée.");

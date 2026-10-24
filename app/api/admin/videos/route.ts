@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isJsonMediaType, readBoundedBody } from "@/lib/mcp/http";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { getSiteOrigin } from "@/lib/siteOrigin";
-import { blocIdFromDisplayNumber } from "@/lib/blocCatalog";
+import { blocIdFromDisplayLocation } from "@/lib/blocCatalog";
 import {
   adminVideoCreateSchema,
   buildMuxPassthrough,
@@ -72,8 +72,7 @@ export async function POST(request: NextRequest) {
   const timelineError = validateChapterTimeline(parsed.data.chapters);
   if (timelineError) return jsonError(timelineError, 400);
 
-  const blocId = blocIdFromDisplayNumber(parsed.data.blocNumero);
-  if (!blocId) return jsonError("Bloc inconnu.", 400);
+  const blocId = blocIdFromDisplayLocation(parsed.data.blocNumero);
 
   const videoId = randomUUID();
   let uploadId: string | null = null;

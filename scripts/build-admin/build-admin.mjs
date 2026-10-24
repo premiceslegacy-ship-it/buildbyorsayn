@@ -12,6 +12,12 @@ function required(value, message) {
   if (!value) throw new Error(message);
   return value;
 }
+function videoLocation(raw) {
+  if (raw === "protocole") return "protocole";
+  const value = Number(raw);
+  if (Number.isInteger(value) && value >= 1 && value <= 7) return value;
+  throw new Error("Emplacement vidéo invalide.");
+}
 
 function print(value, json) {
   if (json) console.log(JSON.stringify(value, null, 2));
@@ -24,7 +30,7 @@ async function main(argv) {
   const json = args.includes("--json");
   const command = args[0];
   if (command === "help" || args.includes("--help")) {
-    return print("video envoyer <fichier> --bloc <numéro affiché> --position <n> --titre <titre>\nvideo miniature <videoId> <fichier.jpg|png|webp>\nvideo lister [--bloc <numéro>] [--statut <statut>] [--sans-resume]\nvideo transcription <videoId> [--offset <n>] [--limite <n>]\nvideo synchroniser <videoId>\nvideo sous-titres <videoId> --fichier <fichier.vtt|fichier.srt>", json);
+    return print("video envoyer <fichier> --bloc <numéro affiché ou protocole> --position <n> --titre <titre>\nvideo miniature <videoId> <fichier.jpg|png|webp>\nvideo lister [--bloc <numéro affiché ou protocole>] [--statut <statut>] [--sans-resume]\nvideo transcription <videoId> [--offset <n>] [--limite <n>]\nvideo synchroniser <videoId>\nvideo sous-titres <videoId> --fichier <fichier.vtt|fichier.srt>", json);
   }
   if (command === "login") {
     const origin = required(option(args, "--origin", process.env.BUILD_ADMIN_ORIGIN), "Ajoute --origin.");
@@ -39,17 +45,15 @@ async function main(argv) {
   if (command === "blocs") return print(await callTool("liste_blocs", {}), json);
   if (command === "video" && args[1] === "envoyer") {
     const file = required(args[2], "Ajoute le fichier.");
-    const blocNumero = Number(required(option(args, "--bloc"), "Ajoute --bloc."));
+    const blocNumero = videoLocation(required(option(args, "--bloc"), "Ajoute --bloc."));
     const position = Number(required(option(args, "--position"), "Ajoute --position."));
     const title = required(option(args, "--titre"), "Ajoute --titre.");
-    if (!Number.isInteger(blocNumero) || blocNumero < 1 || blocNumero > 7) throw new Error("Numéro de bloc invalide.");
     if (!Number.isInteger(position) || position < 1) throw new Error("Position invalide.");
     return print(await uploadVideo(file, blocNumero, position, title), json);
   }
   if (command === "video" && args[1] === "lister") {
     const blocRaw = option(args, "--bloc");
-    const blocNumero = blocRaw === undefined ? undefined : Number(blocRaw);
-    if (blocNumero !== undefined && (!Number.isInteger(blocNumero) || blocNumero < 1 || blocNumero > 7)) throw new Error("Numéro de bloc invalide.");
+    const blocNumero = blocRaw === undefined ? undefined : videoLocation(blocRaw);
     return print(await callTool("lister_videos", {
       status: option(args, "--statut"),
       blocNumero,

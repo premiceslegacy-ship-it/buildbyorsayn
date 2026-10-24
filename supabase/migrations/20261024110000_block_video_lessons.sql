@@ -24,7 +24,7 @@ alter table public.video_lessons
 
 alter table public.video_lessons
   add constraint video_lessons_bloc_id_check
-    check (bloc_id in ('1', '2', '3', '4', '5', '6', '7')),
+    check (bloc_id in ('1', '2', '3', '4', '5', '6', '7', 'protocole')),
   add constraint video_lessons_position_check
     check ("position" >= 1),
   add constraint video_lessons_transcript_segments_check
@@ -149,7 +149,7 @@ begin
   select previous_video.id,
          previous_video.mux_asset_id,
          case when previous_video.thumbnail like 'storage:%'
-           then pg_catalog.substring(previous_video.thumbnail from 9)
+           then pg_catalog.substr(previous_video.thumbnail, 9)
            else null
          end
     into v_previous_video_id, v_previous_asset, v_previous_storage_path

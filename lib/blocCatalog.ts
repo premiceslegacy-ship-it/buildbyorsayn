@@ -33,3 +33,12 @@ export function blocIdFromDisplayNumber(displayNumber: number): string | null {
 export function displayNumberFromBlocId(blocId: string): number | null {
   return BLOCS_DATA.find((bloc) => bloc.id === blocId)?.displayNumber ?? null;
 }
+export type VideoDisplayLocation = number | "protocole";
+
+export function blocIdFromDisplayLocation(location: VideoDisplayLocation): string | null {
+  return location === "protocole" ? "protocole" : blocIdFromDisplayNumber(location);
+}
+
+export function displayLocationFromBlocId(blocId: string): VideoDisplayLocation | null {
+  return blocId === "protocole" ? "protocole" : displayNumberFromBlocId(blocId);
+}

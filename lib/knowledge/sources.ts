@@ -1,5 +1,5 @@
 import type { McpTier } from "@/lib/mcpAccess";
-import { displayNumberFromBlocId } from "@/lib/blocCatalog";
+import { displayLocationFromBlocId } from "@/lib/blocCatalog";
 import { ANGLE_MORT, SECTIONS } from "@/app/beginner/sections.data";
 import { allFoundationIntroductions, allFoundationMarkdown } from "@/lib/fondations/content";
 import type { SkillAccess } from "@/lib/skillsCatalog";
@@ -186,23 +186,25 @@ export function collectVideoTranscriptDocuments(rows: PublishedVideoTranscriptRo
   const documents: KnowledgeDocument[] = [];
 
   for (const row of rows) {
-    const blocNumero = displayNumberFromBlocId(row.bloc_id);
+    const location = displayLocationFromBlocId(row.bloc_id);
     const expectedTier = tierForBloc(row.bloc_id);
-    if (blocNumero === null) throw new Error("Video bloc unknown");
+    if (location === null) throw new Error("Video emplacement inconnu");
+    const locationLabel = location === "protocole" ? "Protocole" : `Bloc ${location}`;
+    const sourceLocation = location === "protocole" ? "protocole" : `bloc-${location}`;
     if (row.tier_required !== expectedTier) {
-      throw new Error(`Video tier mismatch for Bloc ${blocNumero}`);
+      throw new Error(`Video tier mismatch for ${locationLabel}`);
     }
     if (!Number.isSafeInteger(row.position) || row.position < 1) {
-      throw new Error(`Video position invalid for Bloc ${blocNumero}`);
+      throw new Error(`Video position invalid for ${locationLabel}`);
     }
     if (!Number.isSafeInteger(row.duration_seconds) || row.duration_seconds <= 0) {
-      throw new Error(`Video duration missing for Bloc ${blocNumero}`);
+      throw new Error(`Video duration missing for ${locationLabel}`);
     }
     const parsedChapters = z.array(videoChapterSchema).min(1).safeParse(row.chapters);
-    if (!parsedChapters.success) throw new Error(`Video chapters invalid for Bloc ${blocNumero}`);
+    if (!parsedChapters.success) throw new Error(`Video chapters invalid for ${locationLabel}`);
     const storedSegments = parseTranscriptSegmentsJson(row.transcript_segments);
     const segments = storedSegments.length > 0 ? storedSegments : parseTranscriptSegments(row.transcript);
-    if (segments.length === 0) throw new Error(`Video transcript empty for Bloc ${blocNumero}`);
+    if (segments.length === 0) throw new Error(`Video transcript empty for ${locationLabel}`);
 
     parsedChapters.data.forEach((chapter, chapterOffset) => {
       const endSeconds = parsedChapters.data[chapterOffset + 1]?.startSeconds ?? row.duration_seconds;
@@ -213,7 +215,7 @@ export function collectVideoTranscriptDocuments(rows: PublishedVideoTranscriptRo
 
       documents.push({
         source: "blocs",
-        sourceId: `video:bloc-${blocNumero}:video-${row.position}:chapter-${chapter.index}`,
+        sourceId: `video:${sourceLocation}:video-${row.position}:chapter-${chapter.index}`,
         title: `${row.title} - ${chapter.title}`,
         content: chapterSegments
           .map((segment) => `[${formatTimecode(segment.startSeconds)}] ${segment.text}`)
@@ -221,7 +223,7 @@ export function collectVideoTranscriptDocuments(rows: PublishedVideoTranscriptRo
         tier: expectedTier,
         metadata: {
           videoId: row.id,
-          blocNumero,
+          blocNumero: location,
           position: row.position,
           video: row.position,
           chapterIndex: chapter.index,

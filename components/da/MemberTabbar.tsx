@@ -87,7 +87,7 @@ export function MemberTabbar({ unseen }: { unseen?: { label: string; count: numb
   }, [active]);
 
   return (
-    <LiquidGlassNav className="tabbar" aria-label="Navigation mobile" glass={{ teinte: "rgba(0,0,0,.5)", reflet: 0.9, bord: 0.44, force: 1.9, dispersion: 0.6, angle: -28, flou: 2.4 }}>
+    <LiquidGlassNav className="tabbar" aria-label="Navigation mobile" glass={{ teinte: "rgba(12,14,16,.14)", reflet: 0.9, bord: 0.5, force: 2.6, dispersion: 0.9, angle: -28, flou: 0.8 }}>
       <span className="slider" ref={slider} aria-hidden="true" />
       {MEMBER_NAV.map((item) => (
         <Link
