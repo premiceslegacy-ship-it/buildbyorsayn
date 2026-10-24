@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { resolveMcpProfileTier, canAccess, type McpTier } from "@/lib/mcpAccess";
 import { projectBlocForTier } from "@/lib/blocAccess";
 import { tierForBloc, videoChapterSchema } from "@/lib/mux/adminLessons";
-import { signMuxPlaybackTokens, type MuxPlaybackTokens } from "@/lib/mux/transcript.server";
+import { signMuxPlaybackTokens, signMuxThumbnailUrl, type MuxPlaybackTokens } from "@/lib/mux/transcript.server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { displayNumberFromBlocId } from "@/lib/blocCatalog";
 import { storedVideoThumbnailPath } from "@/lib/mux/thumbnail.server";
@@ -26,14 +26,6 @@ export type BlocVideosResult =
   | { state: "none"; videos: [] }
   | { state: "ready"; videos: BlocVideo[] }
   | { state: "unavailable"; videos: [] };
-function muxThumbnailUrl(playbackId: string, thumbnailToken: string, timeSeconds = 0): string {
-  const query = new URLSearchParams({
-    time: String(timeSeconds),
-    width: "640",
-    token: thumbnailToken,
-  });
-  return `https://image.mux.com/${encodeURIComponent(playbackId)}/thumbnail.jpg?${query.toString()}`;
-}
 
 /** Server-only contract for the Apple-TV video rail. It never returns transcript text. */
 export async function getBlocVideos(blocId: string, tier: McpTier): Promise<BlocVideosResult> {
@@ -74,22 +66,23 @@ export async function getBlocVideos(blocId: string, tier: McpTier): Promise<Bloc
         ? "/da/mini/protocole.jpg"
         : `/da/mini/b${displayNumberFromBlocId(blocId) ?? 0}.jpg`;
       const thumbnailUrl = storedUrl
-        || (Number.isFinite(fallbackTime)
-          ? muxThumbnailUrl(row.playback_id, tokens.thumbnail, fallbackTime)
+        || (fallbackTime !== undefined && Number.isFinite(fallbackTime)
+          ? await signMuxThumbnailUrl(row.playback_id, { time: fallbackTime, width: 640 })
           : fallbackThumbnail);
+      const chapterList = chapters.success
+        ? await Promise.all(chapters.data.map(async (chapter) => ({
+          startSeconds: chapter.startSeconds,
+          title: chapter.title,
+          thumbnailUrl: await signMuxThumbnailUrl(row.playback_id, { time: chapter.startSeconds, width: 640 }),
+        })))
+        : [];
       return {
         id: row.id,
         position: row.position,
         title: row.title,
         summary: row.summary,
         durationSeconds: row.duration_seconds,
-        chapters: chapters.success
-          ? chapters.data.map((chapter) => ({
-            startSeconds: chapter.startSeconds,
-            title: chapter.title,
-            thumbnailUrl: muxThumbnailUrl(row.playback_id, tokens.thumbnail, chapter.startSeconds),
-          }))
-          : [],
+        chapters: chapterList,
         thumbnailUrl,
         playbackId: row.playback_id,
         tokens,

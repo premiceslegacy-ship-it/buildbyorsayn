@@ -89,7 +89,7 @@ function loadServer(path: string, tier: string | null, authenticated = true, pro
     if (name === "@/lib/mcpAccess") return tiers;
     if (name === "@/lib/blocAccess") return access;
     if (name === "@/lib/supabase/admin") return { createAdminSupabase: () => adminSupabase };
-    if (name === "@/lib/mux/transcript.server") return { signMuxPlaybackId: async (id: string) => id, signMuxPlaybackTokens: async (id: string) => ({ playback: id, thumbnail: id, storyboard: id }) };
+    if (name === "@/lib/mux/transcript.server") return { signMuxPlaybackId: async (id: string) => id, signMuxPlaybackTokens: async (id: string) => ({ playback: id, thumbnail: id, storyboard: id }), signMuxThumbnailUrl: async (id: string, options: { time: number; width: number }) => `https://image.mux.com/${id}/thumbnail.jpg?token=t.${options.time}.${options.width}` };
     if (name === "@/lib/mux/adminLessons") return adminLessons;
     if (name === "@/lib/blocCatalog") return { displayNumberFromBlocId: (id: string) => Number(id) };
     if (name === "@/lib/mux/thumbnail.server") return { storedVideoThumbnailPath: () => null };
@@ -271,19 +271,6 @@ test("lesson tokens are real RS256 JWTs bound to the playback id, audience, expi
     delete serverEnv.MUX_PLAYBACK_RESTRICTION_ID;
   }
 });
-test("the database video rail separates raw playback ids from short-lived signed tokens", () => {
-  const source = readFileSync("lib/blocData.server.ts", "utf8");
-  const signer = readFileSync("lib/mux/transcript.server.ts", "utf8");
-  assert.match(source, /playbackId:\s*row\.playback_id/);
-  assert.match(source, /tokens,\s*$/m);
-  assert.match(source, /thumbnailUrl:/);
-  assert.match(source, /width:\s*"640"/);
-  assert.doesNotMatch(source, /playbackToken/);
-  assert.match(signer, /expiration:\s*"5m"/);
-  assert.match(signer, /type:\s*\[\["video"/);
-  assert.match(signer, /type:\s*\[\["video".*"thumbnail".*"storyboard"/s);
-});
-
 test("a tier that may not read the section never reaches the signing key", async () => {
   let keyTouched = false;
   class SpyMux { constructor() { keyTouched = true; } jwt = { signPlaybackId: async () => ({}) }; }

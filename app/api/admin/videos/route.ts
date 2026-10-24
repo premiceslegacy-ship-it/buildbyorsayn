@@ -12,7 +12,7 @@ import {
   validateChapterTimeline,
 } from "@/lib/mux/adminLessons";
 import { getVerifiedAdmin, recordAdminAction, createMuxAdminClient, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
-import { signMuxPlaybackTokens } from "@/lib/mux/transcript.server";
+import { signMuxThumbnailUrl } from "@/lib/mux/transcript.server";
 import { storedVideoThumbnailPath } from "@/lib/mux/thumbnail.server";
 
 const MAX_CREATE_BODY_BYTES = 300 * 1024;
@@ -41,9 +41,7 @@ export async function GET() {
       const muxTime = typeof row.thumbnail === "string" && row.thumbnail.startsWith("mux:") ? Number(row.thumbnail.slice(4)) : null;
       if (!thumbnailUrl && Number.isFinite(muxTime) && typeof row.playback_id === "string") {
         try {
-          const tokens = await signMuxPlaybackTokens(row.playback_id);
-          const query = new URLSearchParams({ time: String(muxTime), width: "640", token: tokens.thumbnail });
-          thumbnailUrl = `https://image.mux.com/${encodeURIComponent(row.playback_id)}/thumbnail.jpg?${query.toString()}`;
+          thumbnailUrl = await signMuxThumbnailUrl(row.playback_id, { time: muxTime, width: 640 });
         } catch {
           thumbnailUrl = null;
         }

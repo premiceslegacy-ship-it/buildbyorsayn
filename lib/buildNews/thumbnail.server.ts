@@ -2,7 +2,7 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { signMuxPlaybackTokens } from "@/lib/mux/transcript.server";
+import { signMuxThumbnailUrl } from "@/lib/mux/transcript.server";
 import {
   MAX_VIDEO_THUMBNAIL_BYTES,
   storedVideoThumbnailPath,
@@ -26,9 +26,7 @@ function requestPath(requestId: string, bytes: Uint8Array, extension: string) {
 async function downloadMuxThumbnail(playbackId: string, thumbnail: string): Promise<Uint8Array> {
   const time = thumbnail.startsWith("mux:") ? Number(thumbnail.slice(4)) : 0;
   if (!Number.isFinite(time) || time < 0) throw new Error("La miniature de la vidéo est invalide.");
-  const tokens = await signMuxPlaybackTokens(playbackId);
-  const query = new URLSearchParams({ time: String(time), width: "1280", token: tokens.thumbnail });
-  const response = await fetch(`https://image.mux.com/${encodeURIComponent(playbackId)}/thumbnail.jpg?${query}`, {
+  const response = await fetch(await signMuxThumbnailUrl(playbackId, { time, width: 1280 }), {
     signal: AbortSignal.timeout(15_000),
   });
   if (!response.ok) throw new Error("La miniature Mux est indisponible.");

@@ -50,6 +50,19 @@ export async function signMuxPlaybackTokens(playbackId: string): Promise<MuxPlay
   return { playback, thumbnail, storyboard };
 }
 
+/**
+ * URL d'image Mux signée pour une seconde précise. Avec une politique « signed », Mux ignore `time` et `width`
+ * dans l'URL : ils doivent être dans les revendications du jeton (sinon toutes les images sont la même).
+ */
+export async function signMuxThumbnailUrl(playbackId: string, options: { time: number; width: number }): Promise<string> {
+  const token = await createMuxClient().jwt.signPlaybackId(playbackId, {
+    expiration: "5m",
+    type: "thumbnail",
+    params: { time: String(Math.max(0, Math.floor(options.time))), width: String(options.width) },
+  });
+  return `https://image.mux.com/${encodeURIComponent(playbackId)}/thumbnail.jpg?token=${encodeURIComponent(token)}`;
+}
+
 export async function syncMuxTranscriptForReadyAsset(input: {
   videoId: string;
   assetId: string;
