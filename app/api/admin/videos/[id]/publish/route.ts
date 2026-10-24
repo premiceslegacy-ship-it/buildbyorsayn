@@ -4,7 +4,7 @@ import { z } from "zod";
 import { isJsonMediaType, readBoundedBody } from "@/lib/mcp/http";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { publishVideoSchema, validateChapterTimeline, videoChapterSchema } from "@/lib/mux/adminLessons";
-import { getVerifiedAdmin, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
+import { createMuxAdminClient, getVerifiedAdmin, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
 
 type VideoPublishRouteContext = { params: Promise<{ id: string }> };
 
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest, context: VideoPublishRouteConte
   const admin = createAdminSupabase({ signal: request.signal });
   const { data: row, error: readError } = await admin
     .from("video_lessons")
-    .select("id,section_id,title,summary,transcript,deliverables,chapters,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,approved_at,created_at")
+    .select("id,bloc_id,position,title,summary,transcript,transcript_segments,transcript_source,deliverables,chapters,thumbnail,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,replaced_at,approved_at,created_at")
     .eq("id", id)
     .maybeSingle();
   if (readError || !row) return NextResponse.json({ ok: false, error: "Vidéo introuvable." }, { status: 404 });
@@ -54,11 +54,19 @@ export async function POST(request: NextRequest, context: VideoPublishRouteConte
   if (error || !Array.isArray(data) || data.length !== 1) {
     return NextResponse.json({ ok: false, error: "La publication a échoué." }, { status: 503 });
   }
+  const previousAssetId = typeof data[0]?.previous_mux_asset_id === "string"
+    ? data[0].previous_mux_asset_id
+    : null;
+  if (previousAssetId) {
+    try {
+      await createMuxAdminClient().video.assets.delete(previousAssetId);
+    } catch {
+      console.error("admin.video.previous_asset_cleanup_failed");
+      return NextResponse.json({ ok: false, error: "La vidéo est publiée mais l'ancien asset Mux n'a pas pu être supprimé." }, { status: 503 });
+    }
+  }
 
   revalidatePath("/admin");
-  revalidatePath(`/blocs/${video.section_id.slice(1).split("-")[0]}`);
-  return NextResponse.json({
-    ok: true,
-    previousAssetId: typeof data[0]?.previous_mux_asset_id === "string" ? data[0].previous_mux_asset_id : null,
-  });
+  revalidatePath(`/blocs/${video.bloc_id}`);
+  return NextResponse.json({ ok: true, previousAssetId });
 }

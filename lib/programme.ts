@@ -43,7 +43,7 @@ export function programmeForTier(rawTier: string | null): ProgrammeSection[] {
 
   return [
     { id: "commencer", title: "Commencer ici", description: "Trois vidéos pour poser les bases, avant les sept blocs.", cards: foundations },
-    { id: "blocs", title: "Les sept blocs", description: "Une vidéo par bloc, dans l'ordre. Chaque chapitre a son texte.", cards: blocs },
+    { id: "blocs", title: "Les sept blocs", description: "Des vidéos par bloc, dans l'ordre. Chaque chapitre a son texte.", cards: blocs },
   ];
 }
 

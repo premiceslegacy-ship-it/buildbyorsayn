@@ -19,7 +19,17 @@ const entries: [string, string, [string, string][]][] = [
   ["7", "Récapitulatif", [["b7-s1", "Tout processiser"], ["b7-s2", "L'audit avant l'automatisation"], ["b7-s3", "Les skills comme infrastructure de connaissance"], ["b7-s4", "Itérer en continu"]]],
 ];
 
+export const BLOC_SOURCE_ORDER = entries.map(([id]) => id);
+
 export const BLOCS_DATA = entries.map(([id, title, sections], index) => ({
   id, titre: `Bloc ${index + 1} : ${title}`, displayNumber: index + 1,
   sections: sections.map(([id, title]) => ({ id, title })),
 }));
+
+export function blocIdFromDisplayNumber(displayNumber: number): string | null {
+  return BLOCS_DATA.find((bloc) => bloc.displayNumber === displayNumber)?.id ?? null;
+}
+
+export function displayNumberFromBlocId(blocId: string): number | null {
+  return BLOCS_DATA.find((bloc) => bloc.id === blocId)?.displayNumber ?? null;
+}

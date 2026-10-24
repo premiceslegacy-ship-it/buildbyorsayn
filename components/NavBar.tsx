@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
 import { SearchDialog } from "@/components/da/SearchDialog";
-import { LiquidGlassNav } from "@/components/ui/LiquidGlass";
+import { MEMBER_NAV, MemberTabbar } from "@/components/da/MemberTabbar";
 import { useNouveautesUnseenCount } from "@/components/nouveautes/useNouveautesUnseenCount";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { finishPressFeedback, pulsePressFeedback, soundKindFor, startPressFeedback } from "@/lib/ui/feedback";
@@ -24,13 +24,6 @@ interface NavBarProps {
   onFondationsClick?: () => void;
   onStackClick?: () => void;
 }
-
-const MEMBER_NAV = [
-  { label: "Aujourd'hui", href: "/dashboard", icon: "home" as const },
-  { label: "Programme", href: "/programme", icon: "grid" as const },
-  { label: "Skills", href: "/skills", icon: "skill" as const },
-  { label: "Nouveautés", href: "/nouveautes", icon: "news" as const },
-];
 
 const PUBLIC_NAV = [
   { label: "Programme", href: "/#contenu" },
@@ -190,7 +183,7 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
         </div>
         <div className="amenu__l amenu__l--b"><form action="/api/signout" method="post"><button role="menuitem" type="submit"><DaIcon name="logout" />Se déconnecter</button></form></div>
       </div>}
-      {signedIn && <LiquidGlassNav className="tabbar" aria-label="Navigation mobile" glass={{ teinte: "rgba(0,0,0,.42)" }}>{MEMBER_NAV.map((item) => <Link key={item.href} href={item.href} className={isCurrent(item.href) ? "on" : undefined} aria-current={isCurrent(item.href) ? "page" : undefined}><DaIcon name={item.icon} /><span className="tabbar__label">{item.label}</span>{item.href === "/nouveautes" && unseenLabel ? <span className="nav-unseen nav-unseen--mobile" data-testid="nouveautes-badge" aria-label={`${unseenCount} nouveautés non vues`}>{unseenLabel}</span> : null}</Link>)}</LiquidGlassNav>}
+      {signedIn && <MemberTabbar unseen={unseenLabel ? { label: unseenLabel, count: unseenCount } : null} />}
       {signedIn && <SearchDialog open={searchOpen} onClose={closeSearch} />}
     </div>
   );

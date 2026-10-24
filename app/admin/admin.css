@@ -29,7 +29,7 @@
 .adm-nav-group { display: grid; gap: 2px; }
 .adm-nav-group + .adm-nav-group { margin-top: 14px; padding-top: 14px; box-shadow: 0 -.5px 0 var(--trait); }
 .adm-nav-group > p { padding: 0 14px 7px; font: 600 12px/1.2 var(--font); color: var(--t3); }
-.adm-nav-item { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 40px; padding: 0 14px; border-radius: var(--r-s); text-align: left; color: var(--t2); font: 500 14px/1.2 var(--font); transition: transform .1s linear, color .2s var(--ease-c), background .2s var(--ease-c); }
+.da.adm-root .adm-nav-item { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 40px; padding: 0 14px; border-radius: var(--r-s); text-align: left; color: var(--t2); font: 500 14px/1.2 var(--font); transition: transform .1s linear, color .2s var(--ease-c), background .2s var(--ease-c); }
 .adm-nav-item svg { width: 18px; height: 18px; color: var(--t3); }
 .adm-nav-item small { color: var(--t3); font: 500 12px/1 var(--font); font-variant-numeric: tabular-nums; }
 .adm-nav-item:hover { background: var(--adm-hover); color: var(--encre); }
@@ -297,7 +297,7 @@
 
 @media (max-width: 834px) {
   .da.adm-root { --adm-side: 214px; --adm-pad: 40px; }
-  .adm-nav-item { padding-inline: 14px; }
+  .da.adm-root .adm-nav-item { padding-inline: 14px; }
   .adm-video-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .adm-template-fields { grid-template-columns: minmax(0, 1fr); }
 }

@@ -12,7 +12,8 @@ export const VIDEO_MIME_TYPES = [
   "video/x-m4v",
 ] as const;
 
-const SECTION_ID_PATTERN = /^b\d+-s[0-9a-z]+$/;
+const BLOC_NUMBER_SCHEMA = z.number().int().min(1).max(7);
+const BLOC_ID_PATTERN = /^(1|2|3|4|5|6|7)$/;
 const MUX_PASSTHROUGH_PATTERN = /^build-video:([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i;
 
 export type VideoChapter = {
@@ -33,10 +34,11 @@ export const videoChapterSchema = z.object({
 }).strict();
 
 export const adminVideoCreateSchema = z.object({
-  sectionId: z.string().regex(SECTION_ID_PATTERN),
+  blocNumero: BLOC_NUMBER_SCHEMA,
+  position: z.number().int().min(1).max(1_000),
   title: z.string().trim().min(1).max(200),
   summary: z.string().trim().max(2_000).default(""),
-  transcript: z.string().trim().min(20).max(MAX_VIDEO_TRANSCRIPT_CHARACTERS),
+  transcript: z.string().trim().max(MAX_VIDEO_TRANSCRIPT_CHARACTERS).default(""),
   deliverables: z.array(z.string().trim().min(1).max(200)).max(3).default([]),
   chapters: z.array(videoChapterSchema).min(1).max(MAX_VIDEO_CHAPTERS),
   file: z.object({
@@ -45,18 +47,37 @@ export const adminVideoCreateSchema = z.object({
     type: z.enum(VIDEO_MIME_TYPES),
   }).strict(),
 }).strict();
+ 
+export const transcriptSegmentSchema = z.object({
+  startSeconds: z.number().int().min(0).max(43_200),
+  text: z.string().trim().min(1).max(20_000),
+}).strict();
+
+export const transcriptPageSchema = z.object({
+  segments: z.array(transcriptSegmentSchema),
+  nextOffset: z.number().int().min(0).nullable(),
+  total: z.number().int().min(0),
+}).strict();
+
+export function isBlocId(value: string): boolean {
+  return BLOC_ID_PATTERN.test(value);
+}
+
+export function tierForBloc(blocId: string): McpTier {
+  if (!isBlocId(blocId)) throw new Error("Identifiant de bloc invalide.");
+  return blocId === "1" ? "beginner" : "full";
+}
+
+export function parseTranscriptSegmentsJson(value: unknown): TranscriptSegment[] {
+  const parsed = z.array(transcriptSegmentSchema).safeParse(value);
+  return parsed.success ? parsed.data : [];
+}
 
 export const publishVideoSchema = z.object({
   approved: z.literal(true),
   confirmation: z.literal(ADMIN_VIDEO_CONFIRMATION),
 }).strict();
 
-export function tierForSection(sectionId: string): McpTier {
-  if (!SECTION_ID_PATTERN.test(sectionId)) throw new Error("Identifiant de chapitre invalide.");
-  if (sectionId === "b1-s0") return "preview";
-  if (sectionId.startsWith("b1-")) return "beginner";
-  return "full";
-}
 
 export function validateChapterTimeline(
   chapters: VideoChapter[],
@@ -134,6 +155,39 @@ export function parseTranscriptSegments(transcript: string): TranscriptSegment[]
   return segments.filter((segment, index) => (
     segment.text.length > 0 && (index === 0 || segment.startSeconds >= segments[index - 1].startSeconds)
   ));
+}
+
+function subtitleTimestampToSeconds(raw: string): number | null {
+  const parts = raw.trim().replace(",", ".").split(":");
+  if (parts.length !== 2 && parts.length !== 3) return null;
+  const seconds = Number(parts.at(-1));
+  const minutes = Number(parts.at(-2));
+  const hours = parts.length === 3 ? Number(parts[0]) : 0;
+  if (![hours, minutes, seconds].every(Number.isFinite) || minutes < 0 || minutes >= 60 || seconds < 0 || seconds >= 60) return null;
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
+/** Parses reviewed WebVTT or SubRip captions into the MCP's paginable shape. */
+export function parseSubtitleSegments(content: string): TranscriptSegment[] {
+  const blocks = content.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").split(/\n{2,}/);
+  const segments: TranscriptSegment[] = [];
+  for (const block of blocks) {
+    const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+    const timingIndex = lines.findIndex((line) => line.includes("-->"));
+    if (timingIndex < 0) continue;
+    const startSeconds = subtitleTimestampToSeconds(lines[timingIndex].split("-->")[0] ?? "");
+    const text = lines.slice(timingIndex + 1).join(" ").replace(/<[^>]*>/g, "").trim();
+    if (startSeconds === null || !text) continue;
+    const previous = segments.at(-1);
+    if (previous && startSeconds <= previous.startSeconds) {
+      throw new Error("Les repères de transcription doivent être strictement croissants.");
+    }
+    segments.push({ startSeconds, text });
+  }
+  if (segments[0]?.startSeconds !== 0) {
+    throw new Error("La transcription doit commencer à 0 seconde.");
+  }
+  return segments;
 }
 
 export function formatTimecode(seconds: number): string {

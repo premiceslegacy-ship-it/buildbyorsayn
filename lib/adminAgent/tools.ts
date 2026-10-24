@@ -3,16 +3,22 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { blocIdFromDisplayNumber, displayNumberFromBlocId } from "@/lib/blocCatalog";
 import { getSiteOrigin } from "@/lib/siteOrigin";
 import {
   MAX_ADMIN_VIDEO_BYTES,
   VIDEO_MIME_TYPES,
   buildMuxPassthrough,
-  tierForSection,
+  formatTimecode,
+  parseSubtitleSegments,
+  parseTranscriptSegments,
+  parseTranscriptSegmentsJson,
+  tierForBloc,
   validateChapterTimeline,
   videoChapterSchema,
 } from "@/lib/mux/adminLessons";
 import { createMuxAdminClient, recordAdminAction } from "@/lib/mux/adminServer";
+import { syncMuxTranscriptForReadyAsset } from "@/lib/mux/transcript.server";
 import {
   executeAgentPublication,
   preparedMailSchema,
@@ -36,13 +42,28 @@ const writeChaptersInput = z.object({
 const writeSummaryInput = z.object({ videoId: uuid, summary: z.string().trim().min(1).max(2_000) }).strict();
 const chooseThumbnailInput = z.object({ videoId: uuid, timeSeconds: z.number().int().min(0).max(43_200) }).strict();
 const uploadInput = z.object({
-  sectionId: z.string().regex(/^b\d+-s[0-9a-z]+$/),
+  blocNumero: z.number().int().min(1).max(7),
+  position: z.number().int().min(1).max(1_000),
   title: z.string().trim().min(1).max(200),
   file: z.object({
     name: z.string().trim().min(1).max(255),
     size: z.number().int().positive().max(MAX_ADMIN_VIDEO_BYTES),
     type: z.enum(VIDEO_MIME_TYPES),
   }).strict(),
+}).strict();
+const listVideosInput = z.object({
+  status: z.enum(["waiting", "preparing", "ready", "errored", "cancelled"]).optional(),
+  sansResume: z.boolean().default(false),
+  blocNumero: z.number().int().min(1).max(7).optional(),
+}).strict();
+const readTranscriptInput = z.object({
+  videoId: uuid,
+  offset: z.number().int().min(0).default(0),
+  limite: z.number().int().min(1).max(100).default(20),
+}).strict();
+const depositSubtitlesInput = z.object({
+  videoId: uuid,
+  content: z.string().trim().min(1).max(MAX_ADMIN_VIDEO_BYTES),
 }).strict();
 const prepareMailInput = preparedMailSchema.omit({ campaignId: true });
 const journalInput = z.object({ limit: z.number().int().min(1).max(100).default(30) }).strict();
@@ -62,11 +83,11 @@ function asResult(value: Record<string, unknown>): AgentToolResult {
   };
 }
 
-async function assertSectionExists(sectionId: string) {
+async function assertBlocExists(blocId: string) {
   const { BLOCS_DATA } = await import("@/lib/mockData");
-  const section = BLOCS_DATA.flatMap((bloc) => bloc.sections).find((candidate) => candidate.id === sectionId);
-  if (!section) throw new AgentToolError("Ce chapitre n'existe pas.");
-  return section;
+  const bloc = BLOCS_DATA.find((candidate) => candidate.id === blocId);
+  if (!bloc) throw new AgentToolError("Ce bloc n'existe pas.");
+  return bloc;
 }
 
 function requestCreationError(error: unknown): AgentToolError | null {
@@ -96,7 +117,7 @@ async function auditTool(context: AgentTokenContext, tool: AgentPermission, targ
   await recordAdminAction({
     actorUserId: context.createdBy,
     action: `agent.${tool}`,
-    targetType: tool === "liste_blocs" || tool === "journal" ? "agent_token" : "video_lesson",
+    targetType: tool === "liste_blocs" || tool === "lister_videos" || tool === "journal" ? "agent_token" : "video_lesson",
     targetId,
     result: "completed",
     details: { tokenId: context.id, ...details },
@@ -157,12 +178,47 @@ export const ADMIN_AGENT_TOOLS = {
     async run(_input, context) {
       const { BLOCS_DATA } = await import("@/lib/mockData");
       const blocs = BLOCS_DATA.map((bloc) => ({
-        id: bloc.id,
-        title: bloc.titre,
-        chapters: bloc.sections.map((section) => ({ id: section.id, title: section.title })),
+        numero: bloc.displayNumber,
+        titre: bloc.titre,
+        chapitres: bloc.sections.map((section) => ({ id: section.id, titre: section.title })),
       }));
       await auditTool(context, "liste_blocs", context.id, { count: blocs.length });
       return { blocs };
+    },
+  },
+  lister_videos: {
+    title: "Lister les vidéos",
+    description: "Liste les vidéos par bloc et statut pour suivre les nouveaux envois.",
+    permission: "lister_videos",
+    schema: listVideosInput,
+    async run(rawInput, context) {
+      const input = listVideosInput.parse(rawInput);
+      let query = createAdminSupabase()
+        .from("video_lessons")
+        .select("id,bloc_id,position,title,status,summary,duration_seconds,published_at,error_code,created_at")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (input.status) query = query.eq("status", input.status);
+      const filteredBlocId = input.blocNumero === undefined ? null : blocIdFromDisplayNumber(input.blocNumero);
+      if (input.blocNumero !== undefined && !filteredBlocId) throw new AgentToolError("Bloc inconnu.");
+      if (filteredBlocId) query = query.eq("bloc_id", filteredBlocId);
+      if (input.sansResume) query = query.eq("summary", "");
+      const { data, error } = await query;
+      if (error) throw new Error("Les vidéos ne peuvent pas être listées.");
+      const videos = (data ?? []).map((video) => ({
+        id: video.id,
+        blocNumero: displayNumberFromBlocId(video.bloc_id),
+        position: video.position,
+        title: video.title,
+        status: video.status,
+        hasSummary: Boolean(video.summary?.trim()),
+        durationSeconds: video.duration_seconds,
+        published: Boolean(video.published_at),
+        errorCode: video.error_code,
+        createdAt: video.created_at,
+      }));
+      await auditTool(context, "lister_videos", context.id, { count: videos.length });
+      return { videos };
     },
   },
   envoyer_video: {
@@ -172,7 +228,9 @@ export const ADMIN_AGENT_TOOLS = {
     schema: uploadInput,
     async run(rawInput, context) {
       const input = uploadInput.parse(rawInput);
-      const section = await assertSectionExists(input.sectionId);
+      const blocId = blocIdFromDisplayNumber(input.blocNumero);
+      if (!blocId) throw new AgentToolError("Bloc inconnu.");
+      const bloc = await assertBlocExists(blocId);
       const videoId = randomUUID();
       const mux = createMuxAdminClient();
       let upload;
@@ -184,7 +242,7 @@ export const ADMIN_AGENT_TOOLS = {
             playback_policies: ["signed"],
             video_quality: "basic",
             passthrough: buildMuxPassthrough(videoId),
-            meta: { external_id: input.sectionId, title: input.title },
+            meta: { external_id: `${blocId}:${input.position}`, title: input.title },
             inputs: [{ generated_subtitles: [{ language_code: "fr", name: "Français", passthrough: "build-fr-auto" }] }],
           },
         });
@@ -194,13 +252,16 @@ export const ADMIN_AGENT_TOOLS = {
       if (!upload.url) throw new Error("URL d'envoi Mux absente.");
       const { error } = await createAdminSupabase().from("video_lessons").insert({
         id: videoId,
-        section_id: input.sectionId,
-        title: input.title || section.title,
+        bloc_id: blocId,
+        position: input.position,
+        title: input.title || bloc.titre,
         summary: "",
         transcript: "",
+        transcript_segments: [],
+        transcript_source: "automatic",
         deliverables: [],
         chapters: [],
-        tier_required: tierForSection(input.sectionId),
+        tier_required: tierForBloc(blocId),
         status: "waiting",
         mux_upload_id: upload.id,
         created_by: context.createdBy,
@@ -210,11 +271,63 @@ export const ADMIN_AGENT_TOOLS = {
         throw new Error("L'envoi ne peut pas démarrer.");
       }
       await auditTool(context, "envoyer_video", videoId, {
-        sectionId: input.sectionId,
+        blocNumero: input.blocNumero,
+        position: input.position,
         fileBytes: input.file.size,
         mimeType: input.file.type,
       });
       return { videoId, uploadUrl: upload.url, method: "PUT" };
+    },
+  },
+  lire_transcription: {
+    title: "Lire une transcription",
+    description: "Retourne une page d'extraits horodatés, jamais la transcription complète.",
+    permission: "lire_transcription",
+    schema: readTranscriptInput,
+    async run(rawInput, context) {
+      const input = readTranscriptInput.parse(rawInput);
+      const { data, error } = await createAdminSupabase().from("video_lessons")
+        .select("id,transcript,transcript_segments,published_at")
+        .eq("id", input.videoId)
+        .maybeSingle();
+      if (error || !data) throw new AgentToolError("Cette vidéo n'existe pas.");
+      if (!data.published_at) throw new AgentToolError("La transcription n'est disponible qu'après publication.");
+      const segments = parseTranscriptSegmentsJson(data.transcript_segments);
+      const source = segments.length > 0 ? segments : parseTranscriptSegments(data.transcript ?? "");
+      const page = source.slice(input.offset, input.offset + input.limite).map((segment) => ({
+        startSeconds: segment.startSeconds,
+        timecode: formatTimecode(segment.startSeconds),
+        text: segment.text,
+      }));
+      const nextOffset = input.offset + page.length < source.length ? input.offset + page.length : null;
+      await auditTool(context, "lire_transcription", input.videoId, { offset: input.offset, count: page.length });
+      return { videoId: input.videoId, segments: page, offset: input.offset, nextOffset, total: source.length };
+    },
+  },
+  deposer_sous_titres: {
+    title: "Déposer des sous-titres relus",
+    description: "Enregistre un fichier VTT ou SRT relu comme transcription horodatée.",
+    permission: "deposer_sous_titres",
+    schema: depositSubtitlesInput,
+    async run(rawInput, context) {
+      const input = depositSubtitlesInput.parse(rawInput);
+      const segments = parseSubtitleSegments(input.content);
+      const transcript = segments.map((segment) => `[${formatTimecode(segment.startSeconds)}] ${segment.text}`).join("\n");
+      if (transcript.length < 20) throw new AgentToolError("La transcription est trop courte.");
+      const updated = await createAdminSupabase().from("video_lessons")
+        .update({
+          transcript,
+          transcript_segments: segments,
+          transcript_source: "manual",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", input.videoId)
+        .is("published_at", null)
+        .select("id")
+        .maybeSingle();
+      if (updated.error || !updated.data) throw new Error("Les sous-titres n'ont pas pu être déposés.");
+      await auditTool(context, "deposer_sous_titres", input.videoId, { segmentCount: segments.length });
+      return { videoId: input.videoId, segmentCount: segments.length, source: "manual" };
     },
   },
   ecrire_chapitres: {
@@ -279,7 +392,7 @@ export const ADMIN_AGENT_TOOLS = {
     async run(rawInput, context) {
       const input = videoIdInput.parse(rawInput);
       const video = await validateAgentPublicationTarget(input.videoId);
-      await assertSectionExists(video.section_id);
+      await assertBlocExists(video.bloc_id as string);
       const { data } = await createAdminSupabase().from("admin_agent_settings").select("mode").eq("singleton", true).maybeSingle();
       if (data?.mode === "autopublish") {
         const result = await executeAgentPublication(input.videoId, context.createdBy);
@@ -301,6 +414,46 @@ export const ADMIN_AGENT_TOOLS = {
       return createRequest(context, "mail", campaignId, payload);
     },
   },
+  synchroniser_video: {
+    title: "Synchroniser une vidéo",
+    description: "Interroge Mux pour récupérer l'état de l'asset et sa piste de sous-titres.",
+    permission: "synchroniser_video",
+    schema: videoIdInput,
+    async run(rawInput, context) {
+      const input = videoIdInput.parse(rawInput);
+      const { data, error } = await createAdminSupabase().from("video_lessons")
+        .select("id,status,mux_asset_id,playback_id")
+        .eq("id", input.videoId)
+        .maybeSingle();
+      if (error || !data) throw new AgentToolError("Cette vidéo n'existe pas.");
+      if (!data.mux_asset_id || !data.playback_id) throw new AgentToolError("L'asset Mux n'est pas encore disponible.");
+      const mux = createMuxAdminClient();
+      const asset = await mux.video.assets.retrieve(data.mux_asset_id);
+      const ready = asset.status === "ready";
+      if (ready && data.status !== "ready") {
+        const durationSeconds = Math.round(asset.duration ?? 0);
+        const signed = Array.isArray(asset.playback_ids)
+          ? asset.playback_ids.find((playback) => playback.policy === "signed")?.id
+          : null;
+        await createAdminSupabase().from("video_lessons").update({
+          status: signed && durationSeconds > 0 ? "ready" : "errored",
+          playback_id: signed ?? data.playback_id,
+          duration_seconds: durationSeconds > 0 ? durationSeconds : null,
+          error_code: signed && durationSeconds > 0 ? null : "signed_playback_missing",
+          updated_at: new Date().toISOString(),
+        }).eq("id", input.videoId).is("published_at", null);
+      }
+      if (ready) {
+        await syncMuxTranscriptForReadyAsset({
+          videoId: input.videoId,
+          assetId: data.mux_asset_id,
+          playbackId: data.playback_id,
+        });
+      }
+      await auditTool(context, "synchroniser_video", input.videoId, { ready });
+      return { videoId: input.videoId, ready, assetId: data.mux_asset_id };
+    },
+  },
   statut_video: {
     title: "Lire le statut d'une vidéo",
     description: "Lit seulement l'état technique et les étapes de préparation nécessaires.",
@@ -309,16 +462,17 @@ export const ADMIN_AGENT_TOOLS = {
     async run(rawInput, context) {
       const input = videoIdInput.parse(rawInput);
       const { data, error } = await createAdminSupabase().from("video_lessons")
-        .select("id,section_id,title,status,duration_seconds,summary,transcript,chapters,thumbnail,published_at,error_code")
+        .select("id,bloc_id,position,title,status,duration_seconds,summary,transcript,transcript_segments,chapters,thumbnail,published_at,error_code")
         .eq("id", input.videoId).maybeSingle();
       if (error || !data) throw new Error("Vidéo introuvable.");
+      const segments = parseTranscriptSegmentsJson(data.transcript_segments);
       const result = {
-        id: data.id,
-        sectionId: data.section_id,
+        blocNumero: displayNumberFromBlocId(data.bloc_id),
+        position: data.position,
         title: data.title,
         status: data.status,
         durationSeconds: data.duration_seconds,
-        hasTranscript: typeof data.transcript === "string" && data.transcript.trim().length >= 20,
+        hasTranscript: segments.length > 0 || (typeof data.transcript === "string" && data.transcript.trim().length >= 20),
         hasSummary: typeof data.summary === "string" && data.summary.trim().length > 0,
         chapterCount: Array.isArray(data.chapters) ? data.chapters.length : 0,
         hasThumbnail: Boolean(data.thumbnail),

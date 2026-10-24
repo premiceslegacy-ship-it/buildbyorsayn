@@ -3,10 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { isJsonMediaType, readBoundedBody } from "@/lib/mcp/http";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { getSiteOrigin } from "@/lib/siteOrigin";
+import { blocIdFromDisplayNumber } from "@/lib/blocCatalog";
 import {
   adminVideoCreateSchema,
   buildMuxPassthrough,
-  tierForSection,
+  parseTranscriptSegments,
+  tierForBloc,
   validateChapterTimeline,
 } from "@/lib/mux/adminLessons";
 import {
@@ -29,7 +31,7 @@ export async function GET() {
   const admin = createAdminSupabase();
   const { data, error } = await admin
     .from("video_lessons")
-    .select("id,section_id,title,summary,transcript,deliverables,chapters,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,approved_at,created_at")
+    .select("id,bloc_id,position,title,summary,transcript,transcript_segments,transcript_source,deliverables,chapters,thumbnail,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,replaced_at,approved_at,created_at")
     .order("created_at", { ascending: false })
     .limit(100);
   if (error) return jsonError("Les vidéos sont indisponibles.", 503);
@@ -56,9 +58,8 @@ export async function POST(request: NextRequest) {
   const timelineError = validateChapterTimeline(parsed.data.chapters);
   if (timelineError) return jsonError(timelineError, 400);
 
-  const { BLOCS_DATA } = await import("@/lib/mockData");
-  const sectionExists = BLOCS_DATA.some((bloc) => bloc.sections.some((section) => section.id === parsed.data.sectionId));
-  if (!sectionExists) return jsonError("Chapitre inconnu.", 400);
+  const blocId = blocIdFromDisplayNumber(parsed.data.blocNumero);
+  if (!blocId) return jsonError("Bloc inconnu.", 400);
 
   const videoId = randomUUID();
   let uploadId: string | null = null;
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
         playback_policies: ["signed"],
         video_quality: "basic",
         passthrough: buildMuxPassthrough(videoId),
-        meta: { external_id: parsed.data.sectionId, title: parsed.data.title },
+        meta: { external_id: `${blocId}:${parsed.data.position}`, title: parsed.data.title },
         inputs: [{
           generated_subtitles: [{ language_code: "fr", name: "Français", passthrough: "build-fr-auto" }],
         }],
@@ -83,13 +84,16 @@ export async function POST(request: NextRequest) {
     const admin = createAdminSupabase({ signal: request.signal });
     const { error } = await admin.from("video_lessons").insert({
       id: videoId,
-      section_id: parsed.data.sectionId,
+      bloc_id: blocId,
+      position: parsed.data.position,
       title: parsed.data.title,
       summary: parsed.data.summary,
       transcript: parsed.data.transcript,
+      transcript_segments: parseTranscriptSegments(parsed.data.transcript),
+      transcript_source: parsed.data.transcript.trim() ? "manual" : "automatic",
       deliverables: parsed.data.deliverables,
       chapters: parsed.data.chapters,
-      tier_required: tierForSection(parsed.data.sectionId),
+      tier_required: tierForBloc(blocId),
       status: "waiting",
       mux_upload_id: upload.id,
       created_by: user.id,
@@ -103,8 +107,9 @@ export async function POST(request: NextRequest) {
       targetId: videoId,
       result: "completed",
       details: {
-        sectionId: parsed.data.sectionId,
-        tier: tierForSection(parsed.data.sectionId),
+        blocNumero: parsed.data.blocNumero,
+        position: parsed.data.position,
+        tier: tierForBloc(blocId),
         fileBytes: parsed.data.file.size,
         mimeType: parsed.data.file.type,
       },

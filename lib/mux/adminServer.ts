@@ -8,12 +8,16 @@ import { isPlatformAdminUser } from "@/lib/accompanimentAccess";
 
 export type AdminVideoLessonRow = {
   id: string;
-  section_id: string;
+  bloc_id: string;
+  position: number;
   title: string;
   summary: string;
   transcript: string;
+  transcript_segments: unknown;
+  transcript_source: "automatic" | "manual";
   deliverables: string[];
   chapters: unknown;
+  thumbnail?: string | null;
   tier_required: "preview" | "beginner" | "full";
   status: "waiting" | "preparing" | "ready" | "errored" | "cancelled";
   mux_upload_id: string;
@@ -22,6 +26,7 @@ export type AdminVideoLessonRow = {
   duration_seconds: number | null;
   error_code: string | null;
   published_at: string | null;
+  replaced_at?: string | null;
   approved_at: string | null;
   created_at: string;
 };

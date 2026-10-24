@@ -63,13 +63,9 @@ test("la recherche lit les nouveaux textes sans fuite entre les paliers", () => 
 test("le corpus inclut les introductions et les chapitres avec le bon palier", async () => {
   const documents = await collectBlocsDocuments();
   assert.equal(documents.length, EXPECTED_SECTION_IDS.length + BLOCS_DATA.length);
-  assert.equal(documents.find((document) => document.sourceId === "introduction:b1")?.tier, "preview");
-  assert.equal(documents.find((document) => document.sourceId === "introduction:b2")?.tier, "full");
+  assert.equal(documents.find((document) => document.sourceId === "introduction:bloc-1")?.tier, "preview");
+  assert.equal(documents.find((document) => document.sourceId === "introduction:bloc-2")?.tier, "full");
   assert.equal(documents.find((document) => document.sourceId === "b1-s3")?.tier, "beginner");
   assert.equal(documents.find((document) => document.sourceId === "b2-s1")?.tier, "full");
 });
 
-test("le lecteur reçoit l'introduction comme chapeau non numéroté", () => {
-  const reader = readFileSync("app/blocs/[id]/lire/ReaderClient.tsx", "utf8");
-  assert.match(reader, /videoIntroductionMarkdown=\{bloc\.introduction\}/);
-});

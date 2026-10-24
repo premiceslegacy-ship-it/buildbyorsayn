@@ -36,7 +36,7 @@ export function buildSearchCatalog(rawTier: string | null): SearchItem[] {
     const unlocked = bloc.sections.some((section) => canReadBlocSection(tier, bloc.id, section.id));
     if (unlocked) {
       const visibleSections = bloc.sections.filter((section) => canReadBlocSection(tier, bloc.id, section.id));
-      items.push({ id: `video-bloc-${bloc.id}`, kind: "Vidéo", title: bloc.titre, context: `${visibleSections.length} chapitres`, href: `/blocs/${bloc.id}`, image, locked: false, searchText: `${bloc.titre} ${bloc.introduction} ${visibleSections.map((section) => `${section.title} ${section.content}`).join(" ")}` });
+      items.push({ id: `video-bloc-${bloc.displayNumber}`, kind: "Vidéo", title: bloc.titre, context: `${visibleSections.length} chapitres`, href: `/blocs/${bloc.id}`, image, locked: false, searchText: `${bloc.titre} ${bloc.introduction} ${visibleSections.map((section) => `${section.title} ${section.content}`).join(" ")}` });
       visibleSections.forEach((section) => items.push({ id: `chapter-${section.id}`, kind: "Chapitre", title: section.title, context: bloc.titre, href: `/blocs/${bloc.id}#${section.id}`, image, locked: false, searchText: `${section.title} ${bloc.titre} ${section.content}` }));
     }
   });

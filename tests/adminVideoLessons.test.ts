@@ -11,12 +11,13 @@ import {
   parseMuxPassthrough,
   parseTranscriptSegments,
   publishVideoSchema,
-  tierForSection,
+  tierForBloc,
   validateChapterTimeline,
 } from "../lib/mux/adminLessons";
 
 const validCreate = {
-  sectionId: "b2-s1",
+  blocNumero: 2,
+  position: 1,
   title: "Une vidéo",
   summary: "Résumé",
   transcript: "[0:00] Une transcription relue assez longue.",
@@ -29,7 +30,7 @@ test("admin video inputs reject oversized and non-video files", () => {
   assert.equal(adminVideoCreateSchema.safeParse(validCreate).success, true);
   assert.equal(adminVideoCreateSchema.safeParse({ ...validCreate, file: { ...validCreate.file, type: "text/plain" } }).success, false);
   assert.equal(adminVideoCreateSchema.safeParse({ ...validCreate, file: { ...validCreate.file, size: MAX_ADMIN_VIDEO_BYTES + 1 } }).success, false);
-  assert.equal(adminVideoCreateSchema.safeParse({ ...validCreate, transcript: "trop court" }).success, false);
+  assert.equal(adminVideoCreateSchema.safeParse({ ...validCreate, transcript: "trop court" }).success, true);
 });
 
 test("chapter timelines start at zero, stay consecutive and fit the asset", () => {
@@ -48,12 +49,11 @@ test("chapter timelines start at zero, stay consecutive and fit the asset", () =
   ], 60) ?? "", /dépasse/);
 });
 
-test("section tier is derived on the server and never accepted from the browser", () => {
-  assert.equal(tierForSection("b1-s0"), "preview");
-  assert.equal(tierForSection("b1-s1"), "beginner");
-  assert.equal(tierForSection("b2-s1"), "full");
-  assert.equal(tierForSection("b7-s4"), "full");
-  assert.throws(() => tierForSection("../b2-s1"));
+test("block tier is derived on the server and never accepted from the browser", () => {
+  assert.equal(tierForBloc("1"), "beginner");
+  assert.equal(tierForBloc("2"), "full");
+  assert.equal(tierForBloc("7"), "full");
+  assert.throws(() => tierForBloc("b2-s1"));
 });
 
 test("Mux passthrough accepts only the opaque v4 video id", () => {

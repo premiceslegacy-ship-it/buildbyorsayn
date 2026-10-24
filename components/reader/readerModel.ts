@@ -1,3 +1,5 @@
+import { withoutFrontmatter } from "@/lib/coffre/frontmatter";
+
 export const READER_MODE_STORAGE_KEY = "btv-mode";
 
 export type ReaderMode = "video" | "texte";
@@ -155,7 +157,9 @@ export function chapterProgressLabel(done: number, total: number): string {
 }
 
 export function chapterSummary(content: string): string {
-  const plain = content
+  const body = withoutFrontmatter(content);
+  const withoutHeadings = body.replace(/^#{1,6}[ \t]+.*$/gm, " ");
+  const plain = (withoutHeadings.replace(/[\s*_`>#-]/g, "") ? withoutHeadings : body)
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^[-\d]+[.)]?\s+/gm, "")

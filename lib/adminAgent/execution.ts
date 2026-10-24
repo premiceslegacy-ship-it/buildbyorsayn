@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { displayNumberFromBlocId } from "@/lib/blocCatalog";
 import { videoChapterSchema, validateChapterTimeline } from "@/lib/mux/adminLessons";
 import { AgentToolError } from "./types";
 
@@ -42,9 +43,11 @@ export function validatePreparedMailForExecution(payload: unknown) {
 
 type PublishableVideo = {
   id: string;
-  section_id: string;
+  bloc_id: string;
+  position: number;
   summary: unknown;
   transcript: unknown;
+  transcript_segments: unknown;
   chapters: unknown;
   thumbnail: unknown;
   status: unknown;
@@ -89,7 +92,7 @@ export async function validateAgentPublicationTarget(videoId: string, signal?: A
   const admin = createAdminSupabase({ signal });
   const { data, error } = await admin
     .from("video_lessons")
-    .select("id,section_id,summary,transcript,chapters,thumbnail,status,mux_asset_id,playback_id,duration_seconds,published_at")
+    .select("id,bloc_id,position,summary,transcript,transcript_segments,chapters,thumbnail,status,mux_asset_id,playback_id,duration_seconds,published_at")
     .eq("id", videoId)
     .maybeSingle();
   if (error) throw new Error("La vidéo ne peut pas être vérifiée.");
@@ -110,7 +113,8 @@ export async function executeAgentPublication(videoId: string, actorUserId: stri
     throw new Error("La publication a échoué.");
   }
   return {
-    sectionId: data.section_id as string,
+    blocNumero: displayNumberFromBlocId(data.bloc_id),
+    position: data.position as number,
     previousAssetId: typeof published.data[0]?.previous_mux_asset_id === "string"
       ? published.data[0].previous_mux_asset_id
       : null,

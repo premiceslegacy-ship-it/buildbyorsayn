@@ -6,7 +6,6 @@ import { toggleBlocCompletion } from "@/app/actions/progress";
 import { NavBar } from "@/components/NavBar";
 import { DaRoot } from "@/components/da/DaRoot";
 import { ReaderView } from "@/components/reader/ReaderView";
-import type { ReaderMode } from "@/components/reader/readerModel";
 import { useProgress } from "@/hooks/useProgress";
 import { BLOCS_DATA, type DeliveredBloc } from "@/lib/blocCatalog";
 
@@ -17,7 +16,7 @@ type BlocIdentity = {
   isAdmin: boolean;
 };
 
-export default function ReaderClient({ bloc, tier, identity, initialMode, initialChapter }: { bloc: DeliveredBloc; tier: string | null; identity: BlocIdentity; initialMode?: ReaderMode | null; initialChapter?: string | null }) {
+export default function ReaderClient({ bloc, tier, identity, initialChapter }: { bloc: DeliveredBloc; tier: string | null; identity: BlocIdentity; initialChapter?: string | null }) {
   const router = useRouter();
   const { checkedItems, toggleItem, globalProgress, isLoaded, setLastVisitedBloc } = useProgress();
   const previousGlobalProgress = useRef<number | null>(null);
@@ -56,16 +55,15 @@ export default function ReaderClient({ bloc, tier, identity, initialMode, initia
       sections={bloc.sections}
       totalSections={catalogBloc?.sections.length ?? bloc.sections.length}
       completedIds={checkedItems}
-      initialMode={initialMode}
       initialChapter={initialChapter}
+      textOnly
+      syncAddress={false}
       onToggleChapter={toggleItem}
       onValidateBloc={validateBloc}
       nextBloc={nextBloc ? { href: `/blocs/${nextBloc.id}`, label: nextBloc.titre, thumbnailSrc: `/da/mini/b${nextBloc.displayNumber}.jpg` } : undefined}
       backHref={`/blocs/${bloc.id}`}
-      showUpcomingVideo
       finishTitle="Ce bloc est terminé."
       thumbnailSrc={`/da/mini/b${bloc.displayNumber}.jpg`}
-      videoIntroductionMarkdown={bloc.introduction}
       readingScope="bloc"
     />
   </DaRoot>;

@@ -62,6 +62,7 @@ type ReaderViewProps = {
   initialOutlineOpen?: boolean;
   toolbarTitle?: string;
   showUpcomingVideo?: boolean;
+  textOnly?: boolean;
   syncAddress?: boolean;
   copyMarkdown?: string;
   markdownLocalPaths?: readonly string[];
@@ -167,6 +168,7 @@ export function ReaderView({
   initialOutlineOpen,
   toolbarTitle = title,
   showUpcomingVideo = false,
+  textOnly = false,
   syncAddress = true,
   copyMarkdown,
   markdownLocalPaths,
@@ -184,9 +186,9 @@ export function ReaderView({
   const router = useRouter();
   const reduceMotion = useReducedMotion();
   const initialIndex = resolveChapterIndex(sections.map((section) => section.id), initialChapter);
-  const hasVideoMode = showUpcomingVideo || sections.some((section) => Boolean(section.lesson || section.video));
+  const hasVideoMode = !textOnly && (showUpcomingVideo || sections.some((section) => Boolean(section.lesson || section.video)));
   const [selected, setSelected] = useState(Math.max(0, initialIndex));
-  const [mode, setMode] = useState<ReaderMode>(hasVideoMode ? initialMode ?? "video" : "texte");
+  const [mode, setMode] = useState<ReaderMode>(textOnly ? "texte" : hasVideoMode ? initialMode ?? "video" : "texte");
   const [size, setSize] = useState<ReaderSize>("normal");
   const [copyState, setCopyState] = useState<"idle" | "done" | "error">("idle");
   const [readProgress, setReadProgress] = useState(0);

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { MemberTabbar } from "@/components/da/MemberTabbar";
 import styles from "./AppChromePlaceholder.module.css";
 
 export function AppChromePlaceholder({ active = "Aujourd’hui" }: { active?: string }) {
@@ -10,7 +11,7 @@ export function AppChromePlaceholder({ active = "Aujourd’hui" }: { active?: st
         <div className={styles.links}>{items.map((item) => <span className={item === active ? styles.active : undefined} key={item}>{item}</span>)}</div>
         <div className={styles.tools}><span className={styles.tool} /><span className={styles.tool} /><span className={styles.avatar} /></div>
       </div>
-      <div className={styles.tabbar}>{items.map((item) => <span className={styles.tab} key={item}><i />{item}</span>)}</div>
+      <MemberTabbar />
     </div>
   );
 }

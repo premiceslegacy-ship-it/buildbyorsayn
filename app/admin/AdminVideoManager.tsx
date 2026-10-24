@@ -12,7 +12,7 @@ import {
 import type { AdminVideoLessonRow } from "@/lib/mux/adminServer";
 import { playAppSound } from "@/lib/ui/sound";
 
-type SectionOption = { id: string; title: string; blocTitle: string };
+type BlocOption = { id: string; displayNumber: number; title: string };
 type AdminVideoRow = AdminVideoLessonRow & { thumbnail?: string | null };
 type ApiResult = { ok: boolean; error?: string; videoId?: string; uploadUrl?: string; previousAssetId?: string | null };
 
@@ -71,21 +71,22 @@ function hasChapters(value: unknown) {
 }
 
 export function AdminVideoManager({
-  sections,
+  blocs,
   initialVideos,
   setupMissing,
 }: {
-  sections: SectionOption[];
+  blocs: BlocOption[];
   initialVideos: AdminVideoRow[];
   setupMissing: boolean;
 }) {
   const [videos, setVideos] = useState<AdminVideoRow[]>(initialVideos);
-  const [sectionId, setSectionId] = useState(sections[0]?.id ?? "");
-  const [title, setTitle] = useState(sections[0]?.title ?? "");
+  const [blocNumero, setBlocNumero] = useState(blocs[0]?.displayNumber ?? 1);
+  const [position, setPosition] = useState(1);
+  const [title, setTitle] = useState(blocs[0]?.title ?? "");
   const [summary, setSummary] = useState("");
   const [transcript, setTranscript] = useState("");
   const [deliverables, setDeliverables] = useState("");
-  const [chapters, setChapters] = useState(`0:00 ${sections[0]?.title ?? "Introduction"}`);
+  const [chapters, setChapters] = useState(`0:00 ${blocs[0]?.title ?? "Introduction"}`);
   const [file, setFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
@@ -97,7 +98,7 @@ export function AdminVideoManager({
   const uploadAbort = useRef<AbortController | null>(null);
   const previousStatuses = useRef(new Map(initialVideos.map((video) => [video.id, video.status])));
   const fileInput = useRef<HTMLInputElement>(null);
-  const selected = sections.find((section) => section.id === sectionId);
+  const selected = blocs.find((bloc) => bloc.displayNumber === blocNumero);
   const hasProcessingVideo = useMemo(
     () => videos.some((video) => video.status === "waiting" || video.status === "preparing"),
     [videos],
@@ -136,9 +137,10 @@ export function AdminVideoManager({
     return () => window.clearInterval(poll);
   }, [hasProcessingVideo, refreshVideos]);
 
-  const changeSection = (nextId: string) => {
-    setSectionId(nextId);
-    const next = sections.find((section) => section.id === nextId);
+  const changeBloc = (nextValue: string) => {
+    const nextNumber = Number(nextValue);
+    setBlocNumero(nextNumber);
+    const next = blocs.find((bloc) => bloc.displayNumber === nextNumber);
     if (next) {
       setTitle(next.title);
       setChapters(`0:00 ${next.title}`);
@@ -167,10 +169,6 @@ export function AdminVideoManager({
       announce("Écris un chapitre par ligne sous la forme 0:00 Titre.", true);
       return;
     }
-    if (transcript.trim().length < 20 || !summary.trim()) {
-      announce("Ajoute le résumé et une transcription relue avant l'envoi.", true);
-      return;
-    }
 
     setBusy(true);
     const controller = new AbortController();
@@ -181,7 +179,8 @@ export function AdminVideoManager({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sectionId,
+          blocNumero,
+          position,
           title,
           summary,
           transcript,
@@ -261,8 +260,8 @@ export function AdminVideoManager({
       setPublishId(null);
       setConfirmation("");
       announce(payload.previousAssetId
-        ? `Vidéo publiée. Supprime manuellement l'ancien asset Mux ${payload.previousAssetId}.`
-        : "Vidéo publiée. Elle est disponible dans son chapitre.");
+        ? "Vidéo publiée. L'ancien asset Mux a été supprimé."
+        : "Vidéo publiée dans son bloc.");
       await refreshVideos();
     } catch (error) {
       announce(error instanceof Error ? error.message : "La publication a échoué.", true);
@@ -277,7 +276,7 @@ export function AdminVideoManager({
         <div className="adm-section-heading">
           <div>
             <h2 id="admin-video-title">Envoyer une vidéo</h2>
-            <p>Le fichier part directement vers Mux. Tu relis le résumé, la transcription et les chapitres avant de publier.</p>
+            <p>Le fichier part directement vers Mux. Les vidéos sont rattachées à un bloc et une position, puis relues avant publication.</p>
           </div>
         </div>
 
@@ -287,11 +286,12 @@ export function AdminVideoManager({
           <div className="adm-video-layout">
             <div className="adm-video-form">
               <div className="adm-form-grid-two">
-                <label>Bloc et chapitre<select value={sectionId} onChange={(event) => changeSection(event.target.value)}>{sections.map((section) => <option key={section.id} value={section.id}>{section.blocTitle} : {section.title}</option>)}</select></label>
-                <label>Titre<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={200} /></label>
+                <label>Bloc<select value={blocNumero} onChange={(event) => changeBloc(event.target.value)}>{blocs.map((bloc) => <option key={bloc.displayNumber} value={bloc.displayNumber}>Bloc {bloc.displayNumber}</option>)}</select></label>
+                <label>Position dans le bloc<input type="number" min={1} max={1000} value={position} onChange={(event) => setPosition(Math.max(1, Number(event.target.value) || 1))} /></label>
               </div>
+              <label>Titre<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={200} /></label>
               <label>Résumé<textarea value={summary} onChange={(event) => setSummary(event.target.value)} maxLength={2000} rows={3} /></label>
-              <label>Transcription relue<textarea value={transcript} onChange={(event) => setTranscript(event.target.value)} maxLength={250000} rows={8} placeholder="[0:00] Ce que tu dis dans la vidéo..." /><small>Ajoute [2:10] au début d'une ligne quand tu as un repère exact.</small></label>
+              <label>Transcription relue (optionnelle)<textarea value={transcript} onChange={(event) => setTranscript(event.target.value)} maxLength={250000} rows={6} placeholder="Tu peux la déposer ensuite depuis l'agent." /><small>La transcription publiée reste disponible par extraits dans le MCP, jamais dans le lecteur.</small></label>
               <div className="adm-form-grid-two">
                 <label>Chapitres et repères<textarea value={chapters} onChange={(event) => setChapters(event.target.value)} rows={4} /></label>
                 <label>Livrables, trois lignes maximum<textarea value={deliverables} onChange={(event) => setDeliverables(event.target.value)} rows={4} /></label>
@@ -342,7 +342,7 @@ export function AdminVideoManager({
               <article className="adm-video-card" key={video.id}>
                 <div className="adm-video-card-head">
                   <span className="adm-video-thumb"><ImageIcon aria-hidden="true" /></span>
-                  <div><h3>{video.title}</h3><p>{video.section_id}, {formatDuration(video.duration_seconds)}</p></div>
+                  <div><h3>{video.title}</h3><p>Bloc {blocs.find((bloc) => bloc.id === video.bloc_id)?.displayNumber ?? "?"}, Vidéo {video.position}, {formatDuration(video.duration_seconds)}</p></div>
                   <span className="adm-status" data-status={video.status}><i aria-hidden="true" />{STATUS_LABELS[video.status]}</span>
                 </div>
 

@@ -71,29 +71,30 @@ test("les nouveautés sont groupées par mois de Paris et gardent leur ordre", (
 test("Aujourd'hui reprend les chapitres en cours, texte et vidéo, puis la suite d'un chapitre fini", () => {
   const none = new Set<string>();
   const rows = [
-    { section_id: "b5-s3", position_seconds: 42, completed: false, updated_at: "2026-10-20T10:00:00Z" },
+    { section_id: "video-5-s3", position_seconds: 42, completed: false, updated_at: "2026-10-20T10:00:00Z" },
     { section_id: "texte:fondations:vente", position_seconds: 420, completed: false, updated_at: "2026-10-22T10:00:00Z" },
     { section_id: "texte:bloc:b1-s1", position_seconds: 1000, completed: true, updated_at: "2026-10-21T10:00:00Z" },
     { section_id: "texte:bloc:b1-s3", position_seconds: 5, completed: false, updated_at: "2026-10-23T10:00:00Z" },
     { section_id: "absent", position_seconds: 4, completed: false, updated_at: "2026-10-23T10:00:00Z" },
   ];
-  const full = buildContinueRail(rows, "full", none, new Map([["b5-s3", 600]]));
-  assert.deepEqual(full.map((item) => item.id), ["reprendre:fondations:vente", "suivre:bloc:b1-s2", "reprendre:bloc:b5-s3"]);
+  const videos = [{ id: "video-5-s3", blocId: "5", position: 3, title: "Vidéo du bloc", durationSeconds: 600, thumbnail: null, tierRequired: "preview" as const }];
+  const full = buildContinueRail(rows, "full", none, new Map([["video-5-s3", 600]]), videos);
+  assert.deepEqual(full.map((item) => item.id), ["reprendre:fondations:vente", "suivre:bloc:b1-s2", "reprendre:bloc:video-5-s3"]);
   assert.equal(full[0].href, "/beginner/vente?mode=text");
   assert.equal(full[0].progress, 0.42);
-  assert.equal(full[1].href, "/blocs/1/lire?mode=text&chapter=b1-s2");
-  assert.equal(full[2].href, "/blocs/5/lire?mode=video&chapter=b5-s3");
+  assert.equal(full[1].href, "/blocs/1/lire?chapter=b1-s2");
+  assert.equal(full[2].href, "/blocs/5?video=3");
   assert.equal(full[2].heroNumber, "3");
   assert.equal(full[2].progress, 0.07);
-  assert.deepEqual(buildContinueRail(rows, "beginner", none, new Map()).map((item) => item.id), ["reprendre:fondations:vente", "suivre:bloc:b1-s2"]);
-  assert.deepEqual(buildContinueRail(rows, "free", none, new Map()), []);
-  assert.deepEqual(buildContinueRail([], "full", none, new Map()), []);
-  assert.deepEqual(buildContinueRail(rows.slice(2, 3), "full", new Set(["b1-s2"]), new Map()), []);
+  assert.deepEqual(buildContinueRail(rows, "beginner", none, new Map(), videos).map((item) => item.id), ["reprendre:fondations:vente", "suivre:bloc:b1-s2", "reprendre:bloc:video-5-s3"]);
+  assert.deepEqual(buildContinueRail(rows, "free", none, new Map(), videos), []);
+  assert.deepEqual(buildContinueRail([], "full", none, new Map(), videos), []);
+  assert.deepEqual(buildContinueRail(rows.slice(2, 3), "full", new Set(["b1-s2"]), new Map(), videos), []);
 });
 
 test("navigation et pages exposent les liens, accès et états attendus sans ancien libellé", async () => {
   const [nav, dashboard, programme, nouveautes, searchRoute] = await Promise.all([
-    readFile("components/NavBar.tsx", "utf8"),
+    Promise.all([readFile("components/NavBar.tsx", "utf8"), readFile("components/da/MemberTabbar.tsx", "utf8")]).then((files) => files.join("\n")),
     readFile("app/dashboard/page.tsx", "utf8"),
     readFile("app/programme/page.tsx", "utf8"),
     readFile("components/da/NouveautesView.tsx", "utf8"),

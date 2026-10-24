@@ -88,6 +88,7 @@ function loadServer(path: string, tier: string | null, authenticated = true, pro
     if (name === "@/lib/blocAccess") return access;
     if (name === "@/lib/supabase/admin") return { createAdminSupabase: () => adminSupabase };
     if (name === "@/lib/mux/adminLessons") return adminLessons;
+    if (name === "@/lib/mux/transcript.server") return { signMuxPlaybackId: async (id: string) => id };
     if (name === "zod") return { z };
     if (name === "@/lib/mockData") { calls.push("corpus"); return { BLOCS_DATA: corpus }; }
     throw new Error(`Unexpected import: ${name}`);
@@ -162,14 +163,7 @@ test("lesson playback signs tokens only for the tiers entitled to that section",
   }
 });
 
-test("lesson playback uses only a published ready database video with the server-derived tier", async () => {
-  const row = { playback_id: "published-playback", duration_seconds: 720, tier_required: "full" };
-  const query = {
-    select() { return query; },
-    eq() { return query; },
-    not() { return query; },
-    async maybeSingle() { return { data: row, error: null }; },
-  };
+test("legacy lesson playback fails closed when no static playback is configured", async () => {
   const signed: string[] = [];
   class FakeMux {
     jwt = { async signPlaybackId(playbackId: string) {
@@ -180,15 +174,7 @@ test("lesson playback uses only a published ready database video with the server
   const loader = loadServer("app/actions/lessonPlayback.ts", "full", true, false, {
     "@mux/ts": { __esModule: true, default: FakeMux },
     "@/lib/blocLessons.json": { lessons: [] },
-    "@/lib/supabase/admin": { createAdminSupabase: () => ({ from: () => query }) },
   });
-  const result = await loader.exports.getLessonPlayback("b2-s1");
-  assert.equal(result.ok, true);
-  assert.equal(result.playbackId, "published-playback");
-  assert.deepEqual(signed, ["published-playback"]);
-
-  row.tier_required = "beginner";
-  signed.length = 0;
   assert.deepEqual(plain(await loader.exports.getLessonPlayback("b2-s1")), { ok: false });
   assert.deepEqual(signed, []);
 });
@@ -273,6 +259,18 @@ test("lesson tokens are real RS256 JWTs bound to the playback id, audience, expi
     serverEnv.MUX_PRIVATE_KEY = "key";
     delete serverEnv.MUX_PLAYBACK_RESTRICTION_ID;
   }
+});
+test("the database video rail separates raw playback ids from short-lived signed tokens", () => {
+  const source = readFileSync("lib/blocData.server.ts", "utf8");
+  const signer = readFileSync("lib/mux/transcript.server.ts", "utf8");
+  assert.match(source, /playbackId:\s*row\.playback_id/);
+  assert.match(source, /tokens,\s*$/m);
+  assert.match(source, /thumbnailUrl:/);
+  assert.match(source, /width:\s*"640"/);
+  assert.doesNotMatch(source, /playbackToken/);
+  assert.match(signer, /expiration:\s*"5m"/);
+  assert.match(signer, /type:\s*\[\["video"/);
+  assert.match(signer, /type:\s*\[\["video".*"thumbnail".*"storyboard"/s);
 });
 
 test("a tier that may not read the section never reaches the signing key", async () => {

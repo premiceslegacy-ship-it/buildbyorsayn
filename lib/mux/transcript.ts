@@ -41,21 +41,26 @@ function vttTimeToSeconds(value: string): number | null {
   return hours * 3600 + minutes * 60 + seconds;
 }
 
-export function parseMuxVtt(vtt: string): string {
+export function parseMuxVttSegments(vtt: string): Array<{ startSeconds: number; text: string }> {
   const blocks = vtt.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").split(/\n{2,}/);
-  const segments: Array<{ start: number; text: string }> = [];
+  const segments: Array<{ startSeconds: number; text: string }> = [];
   for (const block of blocks) {
     const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
     if (!lines.length || /^(WEBVTT|NOTE|STYLE|REGION)\b/.test(lines[0])) continue;
     const timingIndex = lines.findIndex((line) => line.includes("-->"));
     if (timingIndex < 0) continue;
-    const start = vttTimeToSeconds(lines[timingIndex].split("-->")[0]);
+    const startSeconds = vttTimeToSeconds(lines[timingIndex].split("-->")[0]);
     const text = decodeVttText(lines.slice(timingIndex + 1).join(" "));
-    if (start === null || !text) continue;
+    if (startSeconds === null || !text) continue;
     if (segments.at(-1)?.text === text) continue;
-    segments.push({ start, text });
+    segments.push({ startSeconds, text });
   }
-  const transcript = segments.map((segment) => `[${formatTimecode(segment.start)}] ${segment.text}`).join("\n");
+  return segments;
+}
+
+export function parseMuxVtt(vtt: string): string {
+  const segments = parseMuxVttSegments(vtt);
+  const transcript = segments.map((segment) => `[${formatTimecode(segment.startSeconds)}] ${segment.text}`).join("\n");
   if (transcript.length > MAX_VIDEO_TRANSCRIPT_CHARACTERS) {
     throw new MuxTranscriptUnavailableError("La transcription Mux dépasse la taille autorisée.");
   }
@@ -84,16 +89,21 @@ export async function recoverMuxTranscript(input: {
   assetId: string;
   playbackId: string;
   client: MuxTranscriptClient;
-  writeTranscript: (transcript: string) => Promise<void>;
+  writeTranscript: (
+    transcript: string,
+    segments: Array<{ startSeconds: number; text: string }>,
+    trackId: string,
+  ) => Promise<void>;
 }): Promise<{ transcript: string; trackId: string }> {
   const asset = await input.client.retrieveAsset(input.assetId);
   const track = selectMuxGeneratedSubtitleTrack(asset.tracks);
   const token = await input.client.signPlayback(input.playbackId);
   const vtt = await input.client.fetchVtt(input.playbackId, track.id!, token);
-  const transcript = parseMuxVtt(vtt);
+  const segments = parseMuxVttSegments(vtt);
+  const transcript = segments.map((segment) => `[${formatTimecode(segment.startSeconds)}] ${segment.text}`).join("\n");
   if (transcript.trim().length < 20) {
     throw new MuxTranscriptUnavailableError("La transcription Mux est vide ou trop courte.");
   }
-  await input.writeTranscript(transcript);
+  await input.writeTranscript(transcript, segments, track.id!);
   return { transcript, trackId: track.id! };
 }

@@ -113,14 +113,14 @@ const MIME_BY_EXTENSION = new Map([
   [".m4v", "video/x-m4v"],
 ]);
 
-export async function uploadVideo(filePath, sectionId, title, options = {}) {
+export async function uploadVideo(filePath, blocNumero, position, title, options = {}) {
   const fileStat = await stat(filePath);
   if (!fileStat.isFile()) throw new Error("Fichier vidéo introuvable.");
   const type = MIME_BY_EXTENSION.get(extname(filePath).toLowerCase());
   if (!type) throw new Error("Format vidéo refusé.");
   const prepared = await callTool("envoyer_video", {
-    sectionId,
-    title: title || basename(filePath, extname(filePath)),
+    blocNumero,
+    position,
     file: { name: basename(filePath), size: fileStat.size, type },
   }, options);
   const uploadUrl = new URL(prepared.uploadUrl);
@@ -132,5 +132,18 @@ export async function uploadVideo(filePath, sectionId, title, options = {}) {
     duplex: "half",
   }, options);
   if (!response.ok) throw new Error("L'envoi vers Mux a échoué.");
-  return { videoId: prepared.videoId, status: "uploaded" };
+
+  const timeoutMs = options.timeoutMs ?? 60 * 60 * 1000;
+  const pollIntervalMs = options.pollIntervalMs ?? 3_000;
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const status = await callTool("statut_video", { videoId: prepared.videoId }, options);
+    if (status.status === "ready") return { videoId: prepared.videoId, status: "ready" };
+    if (status.status === "errored" || status.status === "cancelled") {
+      throw new Error(`Mux a refusé la vidéo (${status.errorCode || status.status}).`);
+    }
+    console.error(`Mux traite la vidéo (${status.status})...`);
+    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+  }
+  throw new Error("Le traitement Mux dépasse le délai d'attente.");
 }

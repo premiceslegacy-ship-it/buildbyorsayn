@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
       .select("id,playback_id")
       .eq("mux_asset_id", asset.asset_id)
       .is("published_at", null)
+      .is("replaced_at", null)
       .maybeSingle();
     if (videoError) {
       return NextResponse.json({ ok: false }, { status: 503 });

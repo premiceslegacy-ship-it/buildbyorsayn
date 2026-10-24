@@ -95,7 +95,7 @@ export default async function AdminPage() {
       .limit(10000),
     supabaseAdmin
       .from("video_lessons")
-      .select("id,section_id,title,summary,transcript,deliverables,chapters,thumbnail,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,approved_at,created_at")
+      .select("id,bloc_id,position,title,summary,transcript,transcript_segments,transcript_source,deliverables,chapters,thumbnail,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,replaced_at,approved_at,created_at")
       .order("created_at", { ascending: false })
       .limit(100),
     supabaseAdmin
@@ -227,11 +227,7 @@ export default async function AdminPage() {
           ),
           videos: (
             <AdminVideoManager
-              sections={BLOCS_DATA.flatMap((bloc) => bloc.sections.map((section) => ({
-                id: section.id,
-                title: section.title,
-                blocTitle: bloc.titre,
-              })))}
+              blocs={BLOCS_DATA.map((bloc) => ({ id: bloc.id, displayNumber: bloc.displayNumber, title: bloc.titre }))}
               initialVideos={(videoData ?? []) as AdminVideoLessonRow[]}
               setupMissing={Boolean(videoError)}
             />

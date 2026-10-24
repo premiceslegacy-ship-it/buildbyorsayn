@@ -33,10 +33,13 @@ async function main(argv) {
     return print("Session locale supprimée.", json);
   }
   if (command === "blocs") return print(await callTool("liste_blocs", {}), json);
-  if (command === "upload") {
-    const file = required(args[1], "Ajoute le fichier.");
-    const sectionId = required(option(args, "--bloc"), "Ajoute --bloc.");
-    return print(await uploadVideo(file, sectionId, option(args, "--titre")), json);
+  if (command === "video" && args[1] === "envoyer") {
+    const file = required(args[2], "Ajoute le fichier.");
+    const blocNumero = Number(required(option(args, "--bloc"), "Ajoute --bloc."));
+    const position = Number(required(option(args, "--position"), "Ajoute --position."));
+    if (!Number.isInteger(blocNumero) || blocNumero < 1 || blocNumero > 7) throw new Error("Numéro de bloc invalide.");
+    if (!Number.isInteger(position) || position < 1) throw new Error("Position invalide.");
+    return print(await uploadVideo(file, blocNumero, position, option(args, "--titre")), json);
   }
   if (command === "chapitres") {
     const videoId = required(args[1], "Ajoute l'identifiant de la vidéo.");
@@ -74,7 +77,7 @@ async function main(argv) {
   if (command === "journal") {
     return print(await callTool("journal", { limit: Number(option(args, "--limite", 30)) }), json);
   }
-  throw new Error("Commande attendue : login, blocs, upload, chapitres, resume, miniature, publier, mail, statut, journal ou logout.");
+  throw new Error("Commande attendue : login, logout, blocs, video envoyer, chapitres, resume, miniature, publier, mail, statut, journal ou logout.");
 }
 
 main(process.argv.slice(2)).catch((error) => {

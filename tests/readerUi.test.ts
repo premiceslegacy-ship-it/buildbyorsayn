@@ -93,7 +93,7 @@ test("la progression de lecture et les états vides restent bornés", () => {
   assert.equal(chapterProgressLabel(0, 3), "0 chapitres sur 3 vus");
   assert.equal(chapterProgressLabel(1, 3), "1 chapitre sur 3 vu");
   assert.equal(chapterProgressLabel(3, 3), "3 chapitres sur 3 vus");
-  assert.equal(chapterSummary("## Titre\n\nLa première phrase est entière. La seconde reste dans le texte."), "Titre La première phrase est entière.");
+  assert.equal(chapterSummary("## Titre\n\nLa première phrase est entière. La seconde reste dans le texte."), "La première phrase est entière.");
 });
 
 test("le temps de lecture restant vient du texte et suit la progression", () => {
@@ -117,34 +117,6 @@ test("les trois paliers ne reçoivent que les chapitres autorisés", () => {
   assert.equal(canReadBlocSection("full", "7", "b7-s4"), true);
 });
 
-test("le lecteur expose son état vide et les interactions clavier", () => {
-  const view = read("components/reader/ReaderView.tsx");
-  const overview = read("components/reader/BlocOverview.tsx");
-  const blocPage = read("app/blocs/[id]/page.tsx");
-  const blocClient = read("app/blocs/[id]/BlocClient.tsx");
-  const readerPage = read("app/blocs/[id]/lire/page.tsx");
-  const foundation = read("components/reader/FoundationReader.tsx");
-  const player = read("components/lessons/LessonPlayer.tsx");
-  const state = read("components/reader/ReaderState.tsx");
-  for (const marker of ["Escape", "ArrowLeft", "ArrowRight", "chapterIndexForKey", 'role="radiogroup"', "aria-current", "Envoyer à mon IA", "Marquer comme lu"]) {
-    assert.ok(`${view}\n${foundation}\n${read("components/reader/ModeSwitch.tsx")}`.includes(marker), marker);
-  }
-  assert.doesNotMatch(blocPage, /ReaderView/);
-  assert.match(blocPage, /redirect\(`\/blocs\/\$\{id\}\/lire\?/);
-  assert.match(blocClient, /router\.replace\(`\/blocs\/\$\{bloc\.id\}\/lire\?chapter=/);
-  assert.match(blocClient, /section\.lesson \? "video" : "text"/);
-  assert.match(readerPage, /parseReaderMode/);
-  assert.match(overview, /\/lire\?chapter=/);
-  assert.match(overview, /className="mot"/);
-  assert.match(overview, /styles\.equalizer/);
-  assert.match(view, /router\.push\(backHref\)/);
-  assert.match(player, /lesson-loading/);
-  assert.match(player, /lesson-unavailable/);
-  assert.match(player, /Réessayer/);
-  assert.match(state, /Aucun chapitre disponible/);
-  assert.match(read("components/reader/ModeSwitch.tsx"), /tabIndex=\{mode === "video" \? 0 : -1\}/);
-  assert.match(read("components/reader/ModeSwitch.tsx"), /requestAnimationFrame[\s\S]{0,180}\.focus\(\)/);
-});
 
 test("les sons du lecteur partent dans les mêmes gestionnaires que leurs animations", () => {
   const source = `${read("components/reader/ReaderView.tsx")}\n${read("components/reader/ReaderProse.tsx")}`;

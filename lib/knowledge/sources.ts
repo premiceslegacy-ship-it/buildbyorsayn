@@ -1,13 +1,16 @@
 import type { McpTier } from "@/lib/mcpAccess";
+import { displayNumberFromBlocId } from "@/lib/blocCatalog";
 import { ANGLE_MORT, SECTIONS } from "@/app/beginner/sections.data";
 import { allFoundationIntroductions, allFoundationMarkdown } from "@/lib/fondations/content";
 import type { SkillAccess } from "@/lib/skillsCatalog";
 import { skillCatalogKnowledgeContent } from "@/lib/knowledge/skillCatalogDescription";
 import { z } from "zod";
+import { withoutFrontmatter } from "@/lib/coffre/frontmatter";
 import {
   formatTimecode,
   parseTranscriptSegments,
-  tierForSection,
+  parseTranscriptSegmentsJson,
+  tierForBloc,
   videoChapterSchema,
 } from "@/lib/mux/adminLessons";
 
@@ -24,9 +27,11 @@ export type KnowledgeDocument = {
 
 export type PublishedVideoTranscriptRow = {
   id: string;
-  section_id: string;
+  bloc_id: string;
+  position: number;
   title: string;
   transcript: string;
+  transcript_segments?: unknown;
   chapters: unknown;
   duration_seconds: number;
   tier_required: string;
@@ -48,7 +53,7 @@ export async function collectBlocsDocuments(): Promise<KnowledgeDocument[]> {
   for (const bloc of BLOCS_DATA) {
     documents.push({
       source: "blocs",
-      sourceId: `introduction:b${bloc.id}`,
+      sourceId: `introduction:bloc-${bloc.displayNumber}`,
       title: bloc.titre,
       content: bloc.introduction,
       tier: bloc.displayNumber === 1 ? "preview" : "full",
@@ -60,7 +65,7 @@ export async function collectBlocsDocuments(): Promise<KnowledgeDocument[]> {
         source: "blocs",
         sourceId: section.id,
         title: `${bloc.titre} - ${section.title}`,
-        content: section.content,
+        content: withoutFrontmatter(section.content),
         tier: bloc.displayNumber !== 1 ? "full" : isShowcaseSection ? "preview" : "beginner",
         metadata: { kind: "chapter" },
       });
@@ -174,25 +179,30 @@ export async function collectSkillsContentDocuments(): Promise<KnowledgeDocument
 }
 
 /**
- * Une vidéo publiée produit un document par chapitre. La source reste `blocs`
- * pour être immédiatement compatible avec le contrat MCP existant ; sourceId et
- * métadonnées la distinguent du texte pédagogique de la même section.
+ * A published video produces one MCP knowledge document per video chapter.
+ * Transcript text is never returned to the application reader.
  */
 export function collectVideoTranscriptDocuments(rows: PublishedVideoTranscriptRow[]): KnowledgeDocument[] {
   const documents: KnowledgeDocument[] = [];
 
   for (const row of rows) {
-    const expectedTier = tierForSection(row.section_id);
+    const blocNumero = displayNumberFromBlocId(row.bloc_id);
+    const expectedTier = tierForBloc(row.bloc_id);
+    if (blocNumero === null) throw new Error("Video bloc unknown");
     if (row.tier_required !== expectedTier) {
-      throw new Error(`Video tier mismatch for ${row.section_id}`);
+      throw new Error(`Video tier mismatch for Bloc ${blocNumero}`);
+    }
+    if (!Number.isSafeInteger(row.position) || row.position < 1) {
+      throw new Error(`Video position invalid for Bloc ${blocNumero}`);
     }
     if (!Number.isSafeInteger(row.duration_seconds) || row.duration_seconds <= 0) {
-      throw new Error(`Video duration missing for ${row.section_id}`);
+      throw new Error(`Video duration missing for Bloc ${blocNumero}`);
     }
     const parsedChapters = z.array(videoChapterSchema).min(1).safeParse(row.chapters);
-    if (!parsedChapters.success) throw new Error(`Video chapters invalid for ${row.section_id}`);
-    const segments = parseTranscriptSegments(row.transcript);
-    if (segments.length === 0) throw new Error(`Video transcript empty for ${row.section_id}`);
+    if (!parsedChapters.success) throw new Error(`Video chapters invalid for Bloc ${blocNumero}`);
+    const storedSegments = parseTranscriptSegmentsJson(row.transcript_segments);
+    const segments = storedSegments.length > 0 ? storedSegments : parseTranscriptSegments(row.transcript);
+    if (segments.length === 0) throw new Error(`Video transcript empty for Bloc ${blocNumero}`);
 
     parsedChapters.data.forEach((chapter, chapterOffset) => {
       const endSeconds = parsedChapters.data[chapterOffset + 1]?.startSeconds ?? row.duration_seconds;
@@ -203,7 +213,7 @@ export function collectVideoTranscriptDocuments(rows: PublishedVideoTranscriptRo
 
       documents.push({
         source: "blocs",
-        sourceId: `video:${row.section_id}:chapter:${chapter.index}`,
+        sourceId: `video:bloc-${blocNumero}:video-${row.position}:chapter-${chapter.index}`,
         title: `${row.title} - ${chapter.title}`,
         content: chapterSegments
           .map((segment) => `[${formatTimecode(segment.startSeconds)}] ${segment.text}`)
@@ -211,8 +221,9 @@ export function collectVideoTranscriptDocuments(rows: PublishedVideoTranscriptRo
         tier: expectedTier,
         metadata: {
           videoId: row.id,
-          sectionId: row.section_id,
-          bloc: Number(row.section_id.slice(1).split("-")[0]),
+          blocNumero,
+          position: row.position,
+          video: row.position,
           chapterIndex: chapter.index,
           chapterTitle: chapter.title,
           startSeconds: chapter.startSeconds,

@@ -34,41 +34,10 @@
 .tool { width: 36px; height: 36px; }
 .avatar { width: 30px; height: 30px; background: #2f3330; }
 
-.tabbar {
-  position: fixed;
-  z-index: 70;
-  left: 50%;
-  bottom: max(12px, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  width: min(402px, calc(100% - 32px));
-  height: 64px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  padding: 6px;
-  border-radius: 999px;
-  background: rgba(31, 34, 32, .78);
-  backdrop-filter: saturate(1.8) blur(20px);
-  box-shadow: inset 0 0 0 .5px rgba(241, 245, 242, .14), 0 14px 40px rgba(0, 0, 0, .5);
-}
-
-.tab {
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 5px;
-  color: rgba(241, 245, 242, .56);
-  font: 600 10px/1 var(--font, system-ui, sans-serif);
-}
-
-.tab i { width: 20px; height: 20px; border-radius: 6px; background: currentColor; opacity: .55; }
-.tab:first-child { color: #22d96e; border-radius: 999px; background: rgba(241, 245, 242, .08); }
-
 @media (min-width: 735px) {
   .links { display: flex; }
-  .tabbar { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bar, .tabbar { backdrop-filter: none; }
+  .bar { backdrop-filter: none; }
 }

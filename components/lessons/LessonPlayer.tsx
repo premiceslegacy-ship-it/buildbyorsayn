@@ -1,26 +1,59 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import MuxPlayer from "@mux/mux-player-react/lazy";
 import type MuxPlayerElement from "@mux/mux-player";
 import { getLessonPlayback, type LessonPlayback } from "@/app/actions/lessonPlayback";
 import { useLessonPosition } from "@/hooks/useLessonPosition";
 import styles from "@/components/reader/reader.module.css";
 
+export type LessonPlayerHandle = {
+  seekAndPlay: (seconds: number) => void;
+};
+
+type DirectVideo = {
+  id: string;
+  playbackId: string;
+  tokens: { playback: string; thumbnail: string; storyboard: string };
+};
+
 type LessonPlayerProps = {
-  sectionId: string;
+  sectionId?: string;
+  progressId?: string;
   title: string;
   onCompleted: () => void;
   onEnded?: () => void;
+  onTimeUpdate?: (time: number, duration: number) => void;
+  directVideo?: DirectVideo;
 };
 
 type PlayerState = { status: "loading" } | { status: "unavailable" } | { status: "ready"; playback: Extract<LessonPlayback, { ok: true }> };
 
-export function LessonPlayer({ sectionId, title, onCompleted, onEnded }: LessonPlayerProps) {
-  const [state, setState] = useState<PlayerState>({ status: "loading" });
+export const LessonPlayer = forwardRef<LessonPlayerHandle, LessonPlayerProps>(function LessonPlayer({ sectionId, progressId, title, onCompleted, onEnded, onTimeUpdate, directVideo }, ref) {
+  const initialPlayback: PlayerState = directVideo ? {
+    status: "ready",
+    playback: {
+      ok: true,
+      playbackId: directVideo.playbackId,
+      tokens: directVideo.tokens,
+      viewerEmail: "",
+      startSeconds: 0,
+    },
+  } : { status: "loading" };
+  const [state, setState] = useState<PlayerState>(initialPlayback);
   const tokenRefreshed = useRef(false);
   const watched = useRef({ time: 0, duration: 0 });
-  const { report } = useLessonPosition(sectionId, onCompleted);
+  const playerRef = useRef<MuxPlayerElement | null>(null);
+  const progressKey = progressId ?? sectionId ?? directVideo?.id ?? "";
+  const { report } = useLessonPosition(progressKey, onCompleted);
+  useImperativeHandle(ref, () => ({
+    seekAndPlay(seconds) {
+      const player = playerRef.current;
+      if (!player) return;
+      player.currentTime = Math.max(0, seconds);
+      void player.play();
+    },
+  }), []);
 
   // Leaving the lesson (another chapter, Aujourd'hui, a closed tab) keeps the exact second, not the last 15 s checkpoint.
   useEffect(() => {
@@ -39,12 +72,37 @@ export function LessonPlayer({ sectionId, title, onCompleted, onEnded }: LessonP
   }, [report]);
 
   const load = useCallback(async () => {
+    if (directVideo) {
+      setState({
+        status: "ready",
+        playback: {
+          ok: true,
+          playbackId: directVideo.playbackId,
+          tokens: directVideo.tokens,
+          viewerEmail: "",
+          startSeconds: 0,
+        },
+      });
+      return;
+    }
+    if (!sectionId) {
+      setState({ status: "unavailable" });
+      return;
+    }
     const playback = await getLessonPlayback(sectionId);
     setState(playback.ok ? { status: "ready", playback } : { status: "unavailable" });
-  }, [sectionId]);
+  }, [directVideo, sectionId]);
 
   useEffect(() => {
     tokenRefreshed.current = false;
+    if (directVideo) {
+      void load();
+      return;
+    }
+    if (!sectionId) {
+      setState({ status: "unavailable" });
+      return;
+    }
     let cancelled = false;
     getLessonPlayback(sectionId).then((playback) => {
       if (!cancelled) setState(playback.ok ? { status: "ready", playback } : { status: "unavailable" });
@@ -52,7 +110,7 @@ export function LessonPlayer({ sectionId, title, onCompleted, onEnded }: LessonP
       if (!cancelled) setState({ status: "unavailable" });
     });
     return () => { cancelled = true; };
-  }, [sectionId]);
+  }, [directVideo, load, sectionId]);
 
   // A tab left open past the token lifetime fails to fetch segments: sign a
   // fresh token once, then give up so a real outage is surfaced.
@@ -87,15 +145,15 @@ export function LessonPlayer({ sectionId, title, onCompleted, onEnded }: LessonP
   return (
     <div data-testid="lesson-player" className={styles.lessonPlayer}>
       <MuxPlayer
-        key={playback.tokens.playback}
+        ref={playerRef}
         playbackId={playback.playbackId}
         tokens={playback.tokens}
         startTime={playback.startSeconds}
         streamType="on-demand"
         disableCookies
-        metadata={{ video_id: sectionId, video_title: title }}
+        metadata={{ video_id: progressKey, video_title: title }}
         style={{ width: "100%", height: "100%" }}
-        onTimeUpdate={(event) => { const { time, duration } = readTime(event); watched.current = { time, duration }; report(time, duration); }}
+        onTimeUpdate={(event) => { const { time, duration } = readTime(event); watched.current = { time, duration }; report(time, duration); onTimeUpdate?.(time, duration); }}
         onPause={(event) => { const { time, duration } = readTime(event); report(time, duration, true); }}
         onEnded={(event) => { const { duration } = readTime(event); report(duration, duration, true); onEnded?.(); }}
         onError={handleError}
@@ -105,4 +163,4 @@ export function LessonPlayer({ sectionId, title, onCompleted, onEnded }: LessonP
       </div>
     </div>
   );
-}
+});

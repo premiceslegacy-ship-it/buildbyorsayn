@@ -77,7 +77,7 @@ async function collectAllDocuments(): Promise<{
   documents.push(...(await collectDoctrineDocuments()));
   const { data: publishedVideos, error: publishedVideosError } = await admin
     .from("video_lessons")
-    .select("id,section_id,title,transcript,chapters,duration_seconds,tier_required")
+    .select("id,bloc_id,position,title,transcript,transcript_segments,chapters,duration_seconds,tier_required")
     .eq("status", "ready")
     .not("published_at", "is", null);
   if (publishedVideosError) {

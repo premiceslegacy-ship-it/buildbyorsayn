@@ -19,12 +19,16 @@ import type { AgentRequestView, AgentTokenView, AgentViewData } from "./types";
 
 const permissionCopy: Record<AgentPermission, { label: string; description: string }> = {
   liste_blocs: { label: "Lire les blocs", description: "Voir le programme et les chapitres disponibles." },
-  envoyer_video: { label: "Envoyer une vidéo", description: "Créer un envoi direct vers Mux." },
+  envoyer_video: { label: "Envoyer une vidéo", description: "Transférer une vidéo pour traitement." },
+  lister_videos: { label: "Lister les vidéos", description: "Voir les vidéos et leur avancement." },
+  lire_transcription: { label: "Lire la transcription", description: "Consulter les extraits horodatés d'une vidéo." },
   ecrire_chapitres: { label: "Écrire les chapitres", description: "Enregistrer les repères de la vidéo." },
   ecrire_resume: { label: "Écrire le résumé", description: "Préparer le texte qui accompagne la vidéo." },
-  choisir_miniature: { label: "Choisir la miniature", description: "Choisir une image parmi les propositions Mux." },
+  deposer_sous_titres: { label: "Déposer les sous-titres", description: "Ajouter un fichier de sous-titres à une vidéo." },
+  choisir_miniature: { label: "Choisir la miniature", description: "Choisir l'image qui représente la vidéo." },
   demander_publication: { label: "Demander la publication", description: "Préparer une demande que tu valides." },
-  preparer_mail: { label: "Préparer le mail", description: "Préparer un mail qui attend toujours ton accord." },
+  synchroniser_video: { label: "Synchroniser une vidéo", description: "Récupérer l'état et les sous-titres d'une vidéo." },
+  preparer_mail: { label: "Préparer le mail", description: "Préparer un message qui attend toujours ton accord." },
   statut_video: { label: "Lire le statut", description: "Voir ce qui est prêt ou encore manquant." },
   journal: { label: "Lire le journal", description: "Voir les actions réalisées avec ce jeton." },
 };
@@ -48,11 +52,15 @@ const snippets: Record<ClientName, string> = {
 
 const journalLabels: Record<string, string> = {
   "agent.liste_blocs": "Ton agent a lu la liste des blocs.",
+  "agent.lister_videos": "Ton agent a consulté la liste des vidéos.",
   "agent.envoyer_video": "Ton agent a préparé l'envoi d'une vidéo.",
+  "agent.lire_transcription": "Ton agent a lu des extraits de transcription.",
   "agent.ecrire_chapitres": "Ton agent a écrit les chapitres.",
   "agent.ecrire_resume": "Ton agent a écrit le résumé.",
   "agent.choisir_miniature": "Ton agent a choisi la miniature.",
   "agent.demander_publication": "Ton agent a demandé une publication.",
+  "agent.synchroniser_video": "Ton agent a synchronisé une vidéo.",
+  "agent.deposer_sous_titres": "Ton agent a ajouté des sous-titres.",
   "agent.preparer_mail": "Ton agent a préparé un mail.",
   "agent.statut_video": "Ton agent a consulté le statut d'une vidéo.",
   "agent.journal": "Ton agent a consulté son journal.",

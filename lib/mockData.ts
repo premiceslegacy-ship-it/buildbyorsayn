@@ -1,5 +1,6 @@
 import lessonsFile from "./blocLessons.json";
 import type { LessonRecord, SectionLesson } from "./blocCatalog";
+import { BLOC_SOURCE_ORDER, displayNumberFromBlocId } from "./blocCatalog";
 import { coffreChapterMarkdown, coffreIntroductionMarkdown } from "./coffre/content";
 
 // Private lesson data. The playbackId never leaves the server: only the
@@ -122,29 +123,28 @@ const BLOCS_DATA_SOURCE = [
   },
 ];
 
-const CHRONOLOGICAL_BLOCK_ORDER = ["1", "2", "5", "3", "4", "6", "7"];
-const DISPLAY_NUMBER_BY_SOURCE_NUMBER: Record<string, number> = Object.fromEntries(
-  CHRONOLOGICAL_BLOCK_ORDER.map((sourceId, index) => [sourceId, index + 1])
-);
-
 function renumberBlockReferences(value: string) {
   return value.replace(/\bBlocs?\s+([1-7])\b/g, (match, sourceNumber: string) => {
-    const displayNumber = DISPLAY_NUMBER_BY_SOURCE_NUMBER[sourceNumber];
+    const sourceId = BLOC_SOURCE_ORDER.find((id) => id === sourceNumber);
+    const displayNumber = sourceId ? displayNumberFromBlocId(sourceId) : null;
     return displayNumber ? match.replace(sourceNumber, String(displayNumber)) : match;
   });
 }
 
-export const BLOCS_DATA = CHRONOLOGICAL_BLOCK_ORDER
+export const BLOCS_DATA = BLOC_SOURCE_ORDER
   .map((id) => BLOCS_DATA_SOURCE.find((bloc) => bloc.id === id))
   .filter((bloc): bloc is (typeof BLOCS_DATA_SOURCE)[number] => Boolean(bloc))
-  .map((bloc, index) => ({
-    ...bloc,
-    displayNumber: index + 1,
-    titre: bloc.titre.replace(/^Bloc \d+\s*:\s*/, `Bloc ${index + 1} : `),
-    introduction: renumberBlockReferences(bloc.introduction),
-    sections: bloc.sections.map((section) => ({
-      ...section,
-      content: renumberBlockReferences(section.content),
-      lesson: lessonFor(section.id),
-    })),
-  }));
+  .map((bloc) => {
+    const displayNumber = displayNumberFromBlocId(bloc.id) ?? 0;
+    return {
+      ...bloc,
+      displayNumber,
+      titre: bloc.titre.replace(/^Bloc \d+\s*:\s*/, `Bloc ${displayNumber} : `),
+      introduction: renumberBlockReferences(bloc.introduction),
+      sections: bloc.sections.map((section) => ({
+        ...section,
+        content: renumberBlockReferences(section.content),
+        lesson: lessonFor(section.id),
+      })),
+    };
+  });
