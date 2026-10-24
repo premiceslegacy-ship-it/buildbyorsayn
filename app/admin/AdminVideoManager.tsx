@@ -161,6 +161,23 @@ export function AdminVideoManager({
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [detailId]);
+  useEffect(() => {
+    const openFromHash = () => {
+      const query = window.location.hash.split("?")[1];
+      const videoId = query ? new URLSearchParams(query).get("videoId") : null;
+      const video = videoId ? videos.find((item) => item.id === videoId) : null;
+      if (!video || detailId === video.id) return;
+      window.setTimeout(() => {
+        setSummaryDraft(video.summary);
+        setChaptersDraft(displayChapters(video.chapters).map((chapter) => `${formatChapterTime(chapter.startSeconds)} ${chapter.title}`).join("\n"));
+        setTranscriptDraft(video.transcript);
+        setDetailId(video.id);
+      }, 0);
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, [detailId, videos]);
 
   const announce = useCallback((nextMessage: string, error = false) => {
     setMessage(nextMessage);

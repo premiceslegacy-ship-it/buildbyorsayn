@@ -43,8 +43,29 @@ const READ_ONLY_PERMISSIONS: AgentPermission[] = ["liste_blocs", "lister_videos"
 const DEMO_AGENT_DATA: AgentViewData = {
   mode: "prepare",
   requests: [
-    { id: "demo-request-1", kind: "publication", createdAt: "2026-10-24T09:20:00.000Z", expiresAt: "2026-10-26T09:20:00.000Z" },
-    { id: "demo-request-2", kind: "mail", createdAt: "2026-10-23T14:10:00.000Z", expiresAt: "2026-10-25T14:10:00.000Z" },
+    {
+      id: "demo-request-1",
+      kind: "publication",
+      createdAt: "2026-10-24T09:20:00.000Z",
+      expiresAt: "2026-10-26T09:20:00.000Z",
+      videoPreview: {
+        id: "123e4567-e89b-42d3-a456-426614174000",
+        title: "BUILD - Bloc 1 - Vidéo 1",
+        locationLabel: "Bloc 1",
+        position: 1,
+        durationSeconds: 372,
+        thumbnailUrl: "/images/og-image.png",
+        steps: { summary: true, chapters: true, thumbnail: true, transcript: false },
+        reviewUrl: "/admin#/videos?videoId=123e4567-e89b-42d3-a456-426614174000",
+      },
+    },
+    {
+      id: "demo-request-2",
+      kind: "mail",
+      createdAt: "2026-10-23T14:10:00.000Z",
+      expiresAt: "2026-10-25T14:10:00.000Z",
+      mailPreview: { subject: "La nouvelle étape de ton parcours", audience: "beginner", recipientCount: 7 },
+    },
   ],
   tokens: [
     { id: "demo-access-1", name: "Préparation des vidéos", lastFour: "7F2A", permissions: [...PREPARE_PERMISSIONS], expiresAt: "2027-01-22T09:00:00.000Z", lastUsedAt: "2026-10-24T09:18:00.000Z", revokedAt: null, createdAt: "2026-10-01T09:00:00.000Z" },
@@ -138,6 +159,17 @@ function Confirmation({ title, description, expected, confirmLabel, danger = fal
   return <div className="ag-confirm-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onCancel(); }}><section role="dialog" aria-modal="true" aria-labelledby="agent-confirm-title" className="ag-confirm"><h3 id="agent-confirm-title">{title}</h3><p>{description}</p>{expected && <label>Écris <b>{expected}</b> pour confirmer.<input autoFocus value={value} onChange={(event) => setValue(event.target.value)} /></label>}<div className="ag-actions"><button type="button" onClick={onCancel} className="ag-button ag-button-quiet">Annuler</button><button type="button" disabled={!allowed} onClick={() => onConfirm(value)} className={danger ? "ag-button ag-button-danger" : "ag-button ag-button-primary"}>{confirmLabel}</button></div></section></div>;
 }
 
+function durationLabel(seconds: number | null) {
+  if (!seconds || !Number.isFinite(seconds)) return "Durée indisponible";
+  const minutes = Math.floor(seconds / 60);
+  const remaining = Math.round(seconds % 60);
+  return `${minutes} min ${String(remaining).padStart(2, "0")} s`;
+}
+
+function audienceLabel(audience: "all" | "free" | "beginner" | "full") {
+  return { all: "tous les comptes autorisés", free: "comptes gratuits", beginner: "membres débutants", full: "membres du Coffre" }[audience];
+}
+
 export function AgentClient() {
   const root = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<AgentViewData | null>(null);
@@ -228,7 +260,7 @@ export function AgentClient() {
 
     {requestCount > 0 && <section className="ag-panel ag-requests" aria-labelledby="agent-requests-title">
       <div className="ag-section-heading"><div><h3 id="agent-requests-title">À valider</h3><p>Une action attend ton accord.</p></div></div>
-      <ul className="ag-request-list">{data.requests.map((request) => <li className="ag-request" key={request.id}><div className="min-w-0"><h4>{request.kind === "publication" ? "Préparer cette publication ?" : request.kind === "nouveaute" ? "Préparer cette nouveauté ?" : "Préparer cet envoi ?"}</h4><p>{request.kind === "publication" ? "Vérifie le contenu, puis autorise la mise en ligne." : request.kind === "nouveaute" ? "Vérifie l'aperçu membre, puis valide sa publication." : "Vérifie le message, puis autorise l'envoi."}</p>{request.kind === "nouveaute" && request.preview ? <div className="mt-4 grid gap-3 rounded-2xl border border-white/10 bg-black/20 p-3 sm:grid-cols-[180px_minmax(0,1fr)]"><img src={request.preview.thumbnail} alt="" className="aspect-video w-full rounded-xl object-cover" /><div className="min-w-0"><p className="text-xs font-medium uppercase tracking-[.14em] text-white/50">{request.preview.blocLabel ?? "Nouveauté BUILD"}</p><h5 className="mt-1 text-base font-semibold text-white">{request.preview.title}</h5><p className="mt-1 text-sm leading-5 text-white/70">{request.preview.sentence}</p>{request.preview.internalUrl ? <p className="mt-2 truncate text-xs text-white/45">{request.preview.internalUrl}</p> : null}<time className="mt-2 block text-xs text-white/45" dateTime={request.preview.publishedAt}>{dateLabel(request.preview.publishedAt)}</time></div></div> : null}<time dateTime={request.createdAt}>{dateLabel(request.createdAt)}</time></div><div className="ag-actions"><button type="button" disabled={busy} className="ag-button ag-button-quiet" onClick={() => void mutation(() => decideAgentRequestAction(request.id, "refuse"))}>Refuser</button><button type="button" disabled={busy} className="ag-button ag-button-primary" onClick={() => { setConfirm({ type: "request", request }); void playAppSound("open"); }}>Valider</button></div></li>)}</ul>
+      <ul className="ag-request-list">{data.requests.map((request) => <li className="ag-request" key={request.id}><div className="min-w-0"><h4>{request.kind === "publication" ? "Préparer cette publication ?" : request.kind === "nouveaute" ? "Préparer cette nouveauté ?" : "Préparer cet envoi ?"}</h4><p>{request.kind === "publication" ? "Vérifie le contenu, puis autorise la mise en ligne." : request.kind === "nouveaute" ? "Vérifie l'aperçu membre, puis valide sa publication." : "Vérifie le message, puis autorise l'envoi."}</p>{request.videoPreview ? <div className="mt-4 grid gap-3 rounded-2xl border border-white/10 bg-black/20 p-3 sm:grid-cols-[180px_minmax(0,1fr)]"><div className="aspect-video overflow-hidden rounded-xl bg-black/30">{request.videoPreview.thumbnailUrl ? <img src={request.videoPreview.thumbnailUrl} alt={`Miniature de ${request.videoPreview.title}`} className="h-full w-full object-cover" /> : <span className="grid h-full place-items-center text-xs text-white/45">Miniature indisponible</span>}</div><div className="min-w-0"><h5 className="text-base font-semibold text-white">{request.videoPreview.title}</h5><p className="mt-1 text-sm text-white/65">{request.videoPreview.locationLabel}, épisode {request.videoPreview.position}, {durationLabel(request.videoPreview.durationSeconds)}</p><ul className="mt-3 grid gap-1 text-sm text-white/70">{Object.entries({ Résumé: request.videoPreview.steps.summary, Chapitres: request.videoPreview.steps.chapters, Miniature: request.videoPreview.steps.thumbnail, Transcription: request.videoPreview.steps.transcript }).map(([label, complete]) => <li key={label}><span>{complete ? "Prêt" : "À compléter"}</span> {label}</li>)}</ul><a href={request.videoPreview.reviewUrl} className="mt-3 inline-block text-sm font-medium text-white underline underline-offset-4">Relire dans Vidéos</a></div></div> : null}{request.mailPreview ? <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4"><h5 className="text-base font-semibold text-white">{request.mailPreview.subject}</h5><p className="mt-1 text-sm text-white/65">{request.mailPreview.recipientCount === null ? "Nombre de destinataires indisponible" : `${request.mailPreview.recipientCount} destinataire${request.mailPreview.recipientCount > 1 ? "s" : ""}`} , {audienceLabel(request.mailPreview.audience)}</p></div> : null}<time className="mt-3 block text-xs text-white/45" dateTime={request.createdAt}>{dateLabel(request.createdAt)}</time></div><div className="ag-actions"><button type="button" disabled={busy} className="ag-button ag-button-quiet" onClick={() => void mutation(() => decideAgentRequestAction(request.id, "refuse"))}>Refuser</button><button type="button" disabled={busy} className="ag-button ag-button-primary" onClick={() => { setConfirm({ type: "request", request }); void playAppSound("open"); }}>Valider</button></div></li>)}</ul>
     </section>}
 
     <div className="ag-grid">

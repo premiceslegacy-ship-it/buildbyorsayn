@@ -1,11 +1,13 @@
 import "server-only";
 
 import { z } from "zod";
-import { createAdminSupabase } from "@/lib/supabase/admin";
-import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
 import { DEFAULT_AGENT_TOKEN_DAYS, generateAgentToken, hashAgentToken } from "./security";
+import { createAdminSupabase } from "@/lib/supabase/admin";
+import { displayLocationFromBlocId } from "@/lib/blocCatalog";
+import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
+import { withAdminThumbnailUrls } from "@/lib/mux/adminThumbnails.server";
 import { removeBuildNewsThumbnail } from "@/lib/buildNews/thumbnail.server";
-import { executeAgentPublication, executePreparedMail, executePreparedNews, preparedNewsSchema } from "./execution";
+import { executeAgentPublication, executePreparedMail, executePreparedNews, preparedMailSchema, preparedNewsSchema } from "./execution";
 import {
   AGENT_PERMISSION_VALUES,
   type AgentMode,
@@ -164,6 +166,89 @@ async function cleanupNewsPayload(payload: unknown) {
   if (parsed.success) await removeBuildNewsThumbnail(parsed.data.thumbnailStoragePath).catch(() => undefined);
 }
 
+type PendingRequestRow = {
+  id: string;
+  kind: "publication" | "mail" | "nouveaute";
+  target_id: string;
+  payload: unknown;
+  status: string;
+  expires_at: string;
+  created_at: string;
+};
+
+async function enrichPendingRequests(admin: ReturnType<typeof createAdminSupabase>, requests: PendingRequestRow[]) {
+  const videoIds = requests
+    .filter((request) => request.kind === "publication" && uuidSchema.safeParse(request.target_id).success)
+    .map((request) => request.target_id);
+  const videos = new Map<string, {
+    id: string;
+    title: string;
+    bloc_id: string;
+    position: number;
+    summary: string;
+    chapters: unknown;
+    transcript: string;
+    transcript_segments: unknown;
+    thumbnail: string | null;
+    playback_id: string | null;
+    duration_seconds: number | null;
+    status: string;
+    published_at: string | null;
+    thumbnailUrl: string | null;
+  }>();
+  if (videoIds.length > 0) {
+    const { data, error } = await admin
+      .from("video_lessons")
+      .select("id,title,bloc_id,position,summary,chapters,transcript,transcript_segments,thumbnail,playback_id,duration_seconds,status,published_at")
+      .in("id", videoIds);
+    if (error) throw new Error("Les détails des vidéos sont indisponibles.");
+    const withThumbnails = await withAdminThumbnailUrls(admin, (data ?? []) as Array<{
+      id: string;
+      title: string;
+      bloc_id: string;
+      position: number;
+      summary: string;
+      chapters: unknown;
+      transcript: string;
+      transcript_segments: unknown;
+      thumbnail: string | null;
+      playback_id: string | null;
+      duration_seconds: number | null;
+      status: string;
+      published_at: string | null;
+    }>);
+    for (const video of withThumbnails) videos.set(video.id, video);
+  }
+  return requests.map((request) => {
+    const video = request.kind === "publication" ? videos.get(request.target_id) : undefined;
+    const location = video ? displayLocationFromBlocId(video.bloc_id) : null;
+    const mail = request.kind === "mail" ? preparedMailSchema.safeParse(request.payload) : null;
+    return {
+      ...request,
+      videoPreview: video ? {
+        id: video.id,
+        title: video.title,
+        locationLabel: location === "protocole" ? "Protocole" : location === null ? "Emplacement inconnu" : `Bloc ${location}`,
+        position: video.position,
+        durationSeconds: video.duration_seconds,
+        thumbnailUrl: video.thumbnailUrl,
+        steps: {
+          summary: video.summary.trim().length > 0,
+          chapters: Array.isArray(video.chapters) && video.chapters.length > 0,
+          thumbnail: Boolean(video.thumbnail?.trim()),
+          transcript: video.transcript.trim().length >= 20 || (Array.isArray(video.transcript_segments) && video.transcript_segments.length > 0),
+        },
+        reviewUrl: `/admin#/videos?videoId=${encodeURIComponent(video.id)}`,
+      } : null,
+      mailPreview: mail?.success ? {
+        subject: mail.data.subject,
+        audience: mail.data.audience,
+        recipientCount: mail.data.recipientCount ?? null,
+      } : null,
+    };
+  });
+}
+
 export async function listPendingRequests() {
   const user = await requireHumanAdmin();
   const admin = createAdminSupabase();
@@ -179,7 +264,7 @@ export async function listPendingRequests() {
     .order("created_at", { ascending: true })
     .limit(100);
   if (error) throw new Error("Les demandes sont indisponibles.");
-  return data ?? [];
+  return enrichPendingRequests(admin, (data ?? []) as PendingRequestRow[]);
 }
 
 export async function listAgentJournal(limit = 100) {

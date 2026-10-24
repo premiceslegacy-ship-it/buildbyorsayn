@@ -60,6 +60,8 @@ export async function loadAgentViewAction(): Promise<AgentActionResult<AgentView
             createdAt: request.created_at,
             expiresAt: request.expires_at,
             preview: prepared?.success ? prepared.data.news : null,
+            videoPreview: request.videoPreview ?? null,
+            mailPreview: request.mailPreview ?? null,
           };
         }),
         journal: journal.map((entry) => ({

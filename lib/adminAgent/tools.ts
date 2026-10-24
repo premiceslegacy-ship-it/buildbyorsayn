@@ -86,7 +86,7 @@ const depositSubtitlesInput = z.object({
   videoId: uuid,
   content: z.string().trim().min(1).max(MAX_VIDEO_TRANSCRIPT_CHARACTERS),
 }).strict();
-const prepareMailInput = preparedMailSchema.omit({ campaignId: true });
+const prepareMailInput = preparedMailSchema.omit({ campaignId: true, recipientCount: true });
 const prepareNewsInput = z.object({
   videoId: uuid.optional(),
   title: z.string().trim().min(1).max(160).optional(),

@@ -23,6 +23,7 @@ export const preparedNewsSchema = z.object({
 export const preparedMailSchema = z.object({
   campaignId: z.string().uuid(),
   audience: z.enum(["all", "free", "beginner", "full"]),
+  recipientCount: z.number().int().min(0).max(10).optional(),
   subject: z.string().trim().min(1).max(160),
   preheader: z.string().trim().max(200).default(""),
   body: z.string().trim().min(1).max(20_000),

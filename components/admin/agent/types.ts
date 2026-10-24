@@ -24,6 +24,21 @@ export type AgentRequestView = {
     blocLabel?: string | null;
     publishedAt: string;
   } | null;
+  videoPreview?: {
+    id: string;
+    title: string;
+    locationLabel: string;
+    position: number;
+    durationSeconds: number | null;
+    thumbnailUrl: string | null;
+    steps: { summary: boolean; chapters: boolean; thumbnail: boolean; transcript: boolean };
+    reviewUrl: string;
+  } | null;
+  mailPreview?: {
+    subject: string;
+    audience: "all" | "free" | "beginner" | "full";
+    recipientCount: number | null;
+  } | null;
 };
 
 export type AgentJournalView = {
