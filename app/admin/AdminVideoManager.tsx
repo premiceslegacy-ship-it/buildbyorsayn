@@ -136,7 +136,7 @@ export function AdminVideoManager({
   const detailPanel = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (!detail) return;
+    if (!detailId) return;
     const panel = detailPanel.current;
     panel?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
@@ -160,7 +160,7 @@ export function AdminVideoManager({
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [detail?.id]);
+  }, [detailId]);
 
   const announce = useCallback((nextMessage: string, error = false) => {
     setMessage(nextMessage);
