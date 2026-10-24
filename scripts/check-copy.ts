@@ -104,7 +104,7 @@ export function extractVisibleText(source: string): { text: string; line: number
   for (const match of source.matchAll(/<[A-Za-z][^<>]*>([^<>{}\n]*[?!:;][^<>{}\n]*)<\/[A-Za-z][^>]*>/g)) add(match[1], match.index ?? 0);
   const stringSource = source
     .replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, " "))
-    .replace(/\/\/[^\n]*/g, (comment) => comment.replace(/[^\n]/g, " "));
+    .replace(/(^|[;\n])([ \t]*)\/\/[^\n]*/gm, (comment, prefix: string, indent: string) => `${prefix}${indent}${" ".repeat(comment.length - prefix.length - indent.length)}`);
   for (const match of stringSource.matchAll(/(["'`])((?:(?!\1)[^\\\n]|\\.){18,}?)\1/g)) {
     const text = match[2];
     if (/\b(?:className|href|src|aria-[\w-]+|style|key|router|window|location|process|replace|startsWith|endsWith|includes|querySelector|isLoading|filter|event|token|target|path|url|const|return|blocLabel)\b|=>|\?\?|[{}<>]/u.test(text)) continue;

@@ -12,7 +12,6 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const result = await getBlocForCurrentUser(id);
   const section = result?.bloc?.sections.find((item) => item.id === query.chapter);
   const fallback = result?.bloc?.titre?.replace(/^Bloc\s+\d+\s*[:：]\s*/u, "").trim() || "ton parcours";
-  return { title: `Bloc ${id}, ${section?.title || fallback} | BUILD`, robots: { index: false, follow: false } };
   return { title: `${section?.title || `Bloc ${id}, ${fallback}`} | BUILD`, robots: { index: false, follow: false } };
 }
 
