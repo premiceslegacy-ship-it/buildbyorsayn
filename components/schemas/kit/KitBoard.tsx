@@ -440,6 +440,7 @@ const entries: readonly KitEntry[] = [
           beforeTitle="Page qui disperse"
           afterTitle="Page qui guide"
           before={{
+            url: "maison-lila.fr",
             nav: "Maison Lila",
             eyebrow: "Expérience florale",
             heading: "Sublimez chaque instant",
@@ -447,6 +448,7 @@ const entries: readonly KitEntry[] = [
             button: "Découvrir ou commencer",
           }}
           after={{
+            url: "maison-lila.fr",
             nav: "Maison Lila",
             heading: "Ton bouquet prêt demain matin",
             subtitle: "Dis-nous l'occasion et le budget. Maison Lila te rappelle avant de composer.",

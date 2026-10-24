@@ -143,7 +143,7 @@ export default function ConfidentialitePage() {
                 <tr key={processor.id}>
                   <th scope="row">{processor.name}</th>
                   <td>
-                    {processor.role} <strong>Il reçoit :</strong> {processor.data} Société : {processor.company}, {processor.seat}.{processor.dataLocation ? ` Données stockées en ${processor.dataLocation}.` : ""}
+                    {processor.role} <strong>Il reçoit :</strong> {processor.data} Société : {processor.company}, {processor.seat}.{processor.dataLocation ? ` Données stockées en ${processor.dataLocation}.` : ""}
                   </td>
                 </tr>
               ))}
@@ -158,7 +158,7 @@ export default function ConfidentialitePage() {
       id: "transferts",
       title: "Données hors de l'Union européenne",
       children: (
-        <p>Plusieurs prestataires de la liste sont des sociétés américaines. Quand des données sont traitées hors de l&apos;Union européenne, le transfert s&apos;appuie sur les garanties que le RGPD prévoit : une décision d&apos;adéquation, dont le cadre de protection des données entre l&apos;Union européenne et les États-Unis pour les sociétés qui y adhèrent, ou les clauses contractuelles types de la Commission européenne. Tu peux nous demander des précisions en écrivant à {contact}.</p>
+        <p>Plusieurs prestataires de la liste sont des sociétés américaines. Quand des données sont traitées hors de l&apos;Union européenne, le transfert s&apos;appuie sur les garanties que le RGPD prévoit : une décision d&apos;adéquation, dont le cadre de protection des données entre l&apos;Union européenne et les États-Unis pour les sociétés qui y adhèrent, ou les clauses contractuelles types de la Commission européenne. Tu peux nous demander des précisions en écrivant à {contact}.</p>
       ),
     },
     {

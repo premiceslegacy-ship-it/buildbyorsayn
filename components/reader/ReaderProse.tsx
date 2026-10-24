@@ -119,7 +119,14 @@ function SimpleComparison({ pair, children }: { pair: BeforeAfterPair; children:
 function WebPair({ pair }: { pair: BeforeAfterPair }) {
   const subtitle = pair.context?.toLocaleLowerCase("fr").includes("sous-titre") ?? false;
   const subject = contextSubject(pair);
+  const domain = subject
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-|-$/g, "")
+    .toLocaleLowerCase("fr") || "atelier";
   const page = (text: string) => ({
+    url: `${domain}.fr`,
     nav: subject,
     heading: subtitle ? subject : text,
     subtitle: subtitle ? text : "Une phrase simple précise la suite.",

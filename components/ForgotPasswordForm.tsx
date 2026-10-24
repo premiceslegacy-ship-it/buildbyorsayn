@@ -34,7 +34,7 @@ export function ForgotPasswordForm() {
 
   async function verifyCode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (otp.length !== 6) return fail("Saisis le code reçu par e‑mail : 6 chiffres.");
+    if (otp.length !== 6) return fail("Saisis le code reçu par e‑mail : 6 chiffres.");
     setError("");
     setIsLoading(true);
     const { error: verifyError } = await createClient().auth.verifyOtp({ email: email.trim(), token: otp, type: "recovery" });

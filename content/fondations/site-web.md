@@ -36,7 +36,7 @@ Aucune liste magique de sections ne marche pour tout le monde. L'ordre de ta pag
 
 [[maquette:LandingRateeLandingUtile]]
 
-À gauche, la page florale ratée empile « Des fleurs uniques », « Des créations uniques », le bouton « Découvrir » et les repères « Avis », « Carte », « Blog ». À droite, Maison Lila montre un bouquet, demande l'occasion et le budget, puis propose « Commander un bouquet » avec un rappel pendant les horaires d'ouverture.
+À gauche, la page florale ratée empile « Des fleurs uniques », « Des créations uniques » et le bouton « Découvrir ». À droite, Maison Lila montre « Ton bouquet prêt demain matin », demande l'occasion et le budget, puis propose « Commander un bouquet » avec un rappel pendant les horaires d'ouverture.
 
 Dans les premières secondes, le premier écran répond à quatre questions : est-ce pour moi, qu'est-ce qui change, comment, et que dois-je faire maintenant ?
 

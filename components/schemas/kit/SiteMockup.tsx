@@ -286,7 +286,7 @@ function Hero({ s, q }: { s: Extract<SiteSection, { kind: "hero" }>; q: Quality 
     return <header className={`${styles.hero} ${styles.heroProduct}`}>{copy}{visual}</header>;
   }
   return <header className={`${styles.hero} ${styles.heroCentered}`} data-glow={s.glow ? "" : undefined}>
-    {s.glow ? <Orbs /> : null}
+    {s.glow ? <Pinned pins={p} slot="image" q={q}><Orbs /></Pinned> : null}
     {copy}
     {visual && s.image !== "orbs" ? visual : null}
   </header>;

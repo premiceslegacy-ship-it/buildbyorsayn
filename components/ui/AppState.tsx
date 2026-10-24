@@ -37,7 +37,7 @@ export function AppState({
         <Image className={compact ? "mb-1 h-auto w-24 drop-shadow-[0_24px_46px_rgba(0,0,0,.38)]" : "mb-1 h-auto w-[clamp(112px,18vw,176px)] drop-shadow-[0_24px_46px_rgba(0,0,0,.38)]"} src={`/da/objets/${object}.png`} alt="" width={256} height={256} aria-hidden="true" />
         <Heading className={compact ? "m-0 text-balance font-[var(--font-t,system-ui)] text-2xl font-bold leading-[1.1] tracking-[-.03em] text-[var(--encre,#f1f5f2)]" : "m-0 text-balance font-[var(--font-t,system-ui)] text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-.03em] text-[var(--encre,#f1f5f2)]"}>{title}</Heading>
         <p className="m-0 max-w-[34rem] text-pretty font-[var(--font,system-ui)] text-[17px] leading-[1.48] text-[var(--t2,rgba(241,245,242,.7))]">{detail}</p>
-        {action || secondary ? <div className="mt-[14px] flex flex-wrap justify-center gap-x-4 gap-y-[10px]">{action ? renderAction(action) : null}{secondary ? <Link className="btn btn--l" href={secondary.href}>{secondary.label}</Link> : null}</div> : null}
+        {action || secondary ? <div className="mt-[14px] flex flex-wrap justify-center gap-x-4 gap-y-[10px]">{action ? renderAction(action) : null}{secondary ? <Link className="btn btn--l app-state-secondary" href={secondary.href}>{secondary.label}</Link> : null}</div> : null}
       </div>
     </section>
   );

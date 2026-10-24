@@ -13,16 +13,17 @@ export function TerminalInstallationHermesMockup() {
     tool="Ghostty"
     lines={[
       { text: "# Linux, macOS ou WSL2", tone: "muted" },
-      { text: "$ curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash" },
+      { text: "$ curl -fsSL \\" },
+      { text: "https://hermes-agent.nousresearch.com/install.sh" },
       { text: "# Recharge ton terminal", tone: "muted" },
       { text: "$ hermes --version" },
       { text: "$ hermes doctor" },
       { text: "$ hermes status --all" },
     ]}
     annotations={[
-      { line: 2, label: "Vérifie le domaine" },
-      { line: 3, label: "Recharge avant de tester" },
-      { line: 4, label: "Trois vérifications" },
+      { line: 3, label: "Vérifie le domaine" },
+      { line: 4, label: "Recharge avant de tester" },
+      { line: 5, label: "Trois vérifications" },
     ]}
   />;
 }

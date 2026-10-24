@@ -11,12 +11,15 @@ export function LandingRateeLandingUtileMockup() {
     beforeTitle="Page ratée"
     afterTitle="Page utile"
     before={{
+      url: "maison-lila.fr",
+      nav: "Maison Lila",
       eyebrow: "Expérience florale",
       heading: "Des fleurs uniques",
       subtitle: "Des créations uniques",
       button: "Découvrir",
     }}
     after={{
+      url: "maison-lila.fr",
       nav: "Maison Lila",
       heading: "Ton bouquet prêt demain matin",
       subtitle: "Dis-nous l'occasion et le budget. Maison Lila te rappelle avant de composer.",
@@ -35,6 +38,8 @@ export function AnatomiePremierEcranMockup() {
     ariaLabel="Une page de plaquiste répond à quatre questions autour du titre, du sous-titre et du bouton."
     accent={EM}
     page={{
+      url: "karim-plaquiste.fr",
+      nav: "Karim Plaquiste",
       eyebrow: "Plaquiste à Lyon",
       heading: "Cloisons et faux plafonds à Lyon, selon ton chantier",
       subtitle: "Envoie ton plan et trois photos. Karim te rappelle après étude avec un prix.",

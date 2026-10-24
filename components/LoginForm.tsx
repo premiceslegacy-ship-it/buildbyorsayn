@@ -108,7 +108,7 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
           {errors.email ? <span className="ui3-field-error"><AccountIcon name="mail" />{errors.email}</span> : null}
         </label>
         <label className="ui3-field" data-invalid={Boolean(errors.password)}>
-          <span className="ui3-field-head"><span>Mot de passe</span>{!isSignup ? <Link href="/forgot-password">Mot de passe oublié ?</Link> : null}</span>
+          <span className="ui3-field-head"><span>Mot de passe</span>{!isSignup ? <Link href="/forgot-password">Mot de passe oublié ?</Link> : null}</span>
           <input name="password" type="password" autoComplete={isSignup ? "new-password" : "current-password"} aria-invalid={Boolean(errors.password)} />
           {isSignup ? <span className="ui3-password-rules">8 caractères, une majuscule, une minuscule et un chiffre.</span> : null}
           {errors.password ? <span className="ui3-field-error"><AccountIcon name="key" />{errors.password}</span> : null}
@@ -116,7 +116,7 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
         <div className="ui3-auth-actions"><button className="btn btn--p" type="submit" disabled={isLoading}>{isLoading ? (isSignup ? "Création" : "Connexion") : (isSignup ? "Créer mon compte" : "Se connecter")}</button></div>
       </form>
       {isSignup ? <p className="ui3-auth-legal">En créant ton compte, tu acceptes les <Link href="/cgv">conditions générales de vente</Link> et la <Link href="/confidentialite">politique de confidentialité</Link>.</p> : null}
-      <p className="ui3-auth-switch">{isSignup ? "Tu as déjà un compte ?" : "Tu n’as pas encore de compte ?"}<button type="button" onClick={switchMode}>{isSignup ? "Se connecter" : "Créer un compte"}</button></p>
+      <p className="ui3-auth-switch">{isSignup ? "Tu as déjà un compte ?" : "Tu n’as pas encore de compte ?"}<button type="button" onClick={switchMode}>{isSignup ? "Se connecter" : "Créer un compte"}</button></p>
     </>
   );
 }

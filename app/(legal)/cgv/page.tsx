@@ -47,21 +47,21 @@ export default function CgvPage() {
             <tbody>
               <tr>
                 <th scope="row">{fondations}</th>
-                <td><strong>{PRICES.fondations}</strong> : le parcours Fondations en vidéo, les skills du niveau Fondations, et ton assistant IA qui connaît le contenu Fondations.</td>
+                <td><strong>{PRICES.fondations}</strong> : le parcours Fondations en vidéo, les skills du niveau Fondations, et ton assistant IA qui connaît le contenu Fondations.</td>
               </tr>
               <tr>
                 <th scope="row">{coffre}</th>
-                <td><strong>{PRICES.coffre}</strong> : tout ce que contient {fondations}, tous les blocs en vidéo, tous les skills et ton assistant IA qui connaît tout BUILD.</td>
+                <td><strong>{PRICES.coffre}</strong> : tout ce que contient {fondations}, tous les blocs en vidéo, tous les skills et ton assistant IA qui connaît tout BUILD.</td>
               </tr>
               <tr>
                 <th scope="row">Passer de {fondations} à {coffre}</th>
-                <td><strong>{PRICES.upgrade}</strong> : tu ne paies que la différence entre les deux offres.</td>
+                <td><strong>{PRICES.upgrade}</strong> : tu ne paies que la différence entre les deux offres.</td>
               </tr>
             </tbody>
           </table>
-          <p>Les prix sont en euros et sont des prix nets : {entity.vatMention}. Le prix qui compte est celui affiché au moment de ta commande. Un changement de prix ne touche jamais un achat déjà fait.</p>
+          <p>Les prix sont en euros et sont des prix nets : {entity.vatMention}. Le prix qui compte est celui affiché au moment de ta commande. Un changement de prix ne touche jamais un achat déjà fait.</p>
           <p>
-            {quote("Accès à vie")} veut dire : sans limite de durée et sans abonnement, tant que BUILD est exploité. Si BUILD devait s&apos;arrêter, nous te préviendrions par e-mail à l&apos;avance.
+            {quote("Accès à vie")} veut dire : sans limite de durée et sans abonnement, tant que BUILD est exploité. Si BUILD devait s&apos;arrêter, nous te préviendrions par e-mail à l&apos;avance.
           </p>
           <p>Le contenu exact de chaque offre est décrit sur la page des offres, avant que tu paies.</p>
         </>
@@ -192,7 +192,7 @@ export default function CgvPage() {
           <p>Si quelque chose ne va pas, écris-nous d&apos;abord à <ContactLink entity={entity} />. Nous répondons et cherchons une solution avec toi.</p>
           {entity.mediator ? (
             <>
-              <p>Si nous n&apos;arrivons pas à nous entendre, tu peux saisir gratuitement le médiateur de la consommation (articles L611-1 et suivants du Code de la consommation) :</p>
+              <p>Si nous n&apos;arrivons pas à nous entendre, tu peux saisir gratuitement le médiateur de la consommation (articles L611-1 et suivants du Code de la consommation) :</p>
               <table>
                 <tbody>
                   <tr><th scope="row">Médiateur</th><td>{entity.mediator.name}</td></tr>

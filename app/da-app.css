@@ -37,9 +37,11 @@ html.r2-reader-open .da.da-app.has-tabbar {
 .da.da-app .t-lede { font: 400 19px/1.4 var(--font); }
 .da.da-app .t-meta { font: 500 14px/1.3 var(--font); color: var(--t3); letter-spacing: .005em; }
 .da.da-app .btn { height: var(--btn-h); padding-inline: var(--btn-p); font-size: 14px; }
+.da.da-app .ui3-page .btn { min-height: 44px; height: 44px; }
 .da.da-app .btn--i { width: var(--btn-h); padding: 0; background: rgba(241, 245, 242, .16); }
 .da.da-app .btn--l { height: auto; padding: 4px 0; background: none; color: var(--menthe); font-weight: 500; }
 .da.da-app .btn--l:hover { color: #fff; }
+.da.da-app .app-state-secondary { min-height: 44px; height: 44px; padding-inline: 4px; }
 .da.da-app .btn--xl { height: 52px; padding-inline: 30px; font-size: 17px; }
 .da.da-app :is(h1, h2, h3, .btn, .navbar__nav a, .tabbar__label) { overflow-wrap: normal; word-break: normal; hyphens: none; }
 

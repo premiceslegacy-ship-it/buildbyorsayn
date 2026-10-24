@@ -507,18 +507,23 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ error: "Processing failed" }, { status: 500 });
             }
             if (result.outcome === "refunded" || result.outcome === "no_payment_intent") {
+                const terminalError = await recordTerminalCheckout(supabase, session, "upgrade_refused");
+                if (terminalError) return NextResponse.json({ error: "Processing failed" }, { status: 500 });
                 return NextResponse.json({ received: true }, { status: 200 });
             }
 
             revalidatePath("/", "layout");
             if (customerEmail) {
-                await sendPurchaseConfirmationEmail(
+                const confirmation = await sendPurchaseConfirmationEmail(
                     customerEmail,
                     `Passage de ${FONDATIONS_LABEL} à ${COFFRE_LABEL}`,
                     session.amount_total ?? null,
                     event.created,
                     session.id,
                 );
+                if (confirmation === "failed") {
+                    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                }
             }
             return NextResponse.json({ received: true }, { status: 200 });
         }
@@ -688,13 +693,16 @@ export async function POST(req: NextRequest) {
         if (userId) revalidatePath("/", "layout");
         if (customerEmail) {
             const offerName = tier === "beginner" ? FONDATIONS_LABEL : COFFRE_LABEL;
-            await sendPurchaseConfirmationEmail(
+            const confirmation = await sendPurchaseConfirmationEmail(
                 customerEmail,
                 offerName,
                 session.amount_total ?? null,
                 event.created,
                 session.id,
             );
+            if (confirmation === "failed") {
+                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+            }
         }
     }
 

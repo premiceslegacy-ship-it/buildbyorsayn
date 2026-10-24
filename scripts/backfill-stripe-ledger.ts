@@ -26,7 +26,6 @@ type BackfillRecord = {
 };
 
 type AuthUser = { id: string; email?: string; email_confirmed_at?: string | null };
-type ProfileTier = { id: string; tier?: string | null };
 
 function isUuid(value: string | null | undefined): boolean {
   return Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
@@ -46,13 +45,17 @@ async function loadAuthUsers(admin: ReturnType<typeof createAdminSupabase>): Pro
   }
 }
 
-async function loadProfileTiers(admin: ReturnType<typeof createAdminSupabase>): Promise<Map<string, "beginner" | "full" | null>> {
-  const { data, error } = await admin.from("profiles").select("id,tier");
-  if (error) throw new Error(`Profile lookup failed: ${error.message}`);
-  return new Map((data as ProfileTier[]).map((profile) => [
-    profile.id,
-    profile.tier === "beginner" || profile.tier === "full" ? profile.tier : null,
-  ]));
+type UpgradeClaim = { checkout_session_id: string; user_id: string; status: string };
+
+async function loadGrantedUpgradeClaims(
+  admin: ReturnType<typeof createAdminSupabase>,
+): Promise<Map<string, UpgradeClaim>> {
+  const { data, error } = await admin
+    .from("stripe_upgrade_claims")
+    .select("checkout_session_id,user_id,status")
+    .eq("status", "granted");
+  if (error) throw new Error(`Upgrade claim lookup failed: ${error.message}`);
+  return new Map((data as UpgradeClaim[]).map((claim) => [claim.checkout_session_id, claim]));
 }
 
 async function resolveUser(
@@ -81,13 +84,16 @@ async function resolveUser(
   return { id: user.id, email: user.email ?? null, source: "email" };
 }
 
-async function inferTier(sessionId: string): Promise<"beginner" | "full" | null> {
+async function inferTier(sessionId: string): Promise<{ tier: "beginner" | "full"; priceId: string } | null> {
   const items = [] as Stripe.LineItem[];
   for await (const item of stripe.checkout.sessions.listLineItems(sessionId, { limit: 100 })) items.push(item);
   if (items.length !== 1) return null;
   const priceId = items[0].price?.id;
-  if (priceId === process.env.STRIPE_BEGINNER_PRICE_ID) return "beginner";
-  if (priceId === process.env.STRIPE_FULL_PRICE_ID || priceId === process.env.STRIPE_UPGRADE_PRICE_ID) return "full";
+  if (!priceId) return null;
+  if (priceId === process.env.STRIPE_BEGINNER_PRICE_ID) return { tier: "beginner", priceId };
+  if (priceId === process.env.STRIPE_FULL_PRICE_ID || priceId === process.env.STRIPE_UPGRADE_PRICE_ID) {
+    return { tier: "full", priceId };
+  }
   return null;
 }
 
@@ -106,20 +112,23 @@ async function currentPaymentStatus(paymentIntent: string | null): Promise<{ sta
 
 async function collectRecords(
   authUsers: AuthUser[],
-  profileTiers: Map<string, "beginner" | "full" | null>,
+  grantedUpgradeClaims: Map<string, UpgradeClaim>,
 ): Promise<BackfillRecord[]> {
   const records: BackfillRecord[] = [];
   for await (const session of stripe.checkout.sessions.list({ status: "complete", limit: 100 })) {
     if (session.payment_status !== "paid") continue;
     const customerEmail = session.customer_details?.email?.trim().toLowerCase() ?? null;
     const paymentIntent = paymentIntentId(session.payment_intent);
-    const tier = await inferTier(session.id);
+    const inferred = await inferTier(session.id);
     const payment = await currentPaymentStatus(paymentIntent);
     const user = await resolveUser(authUsers, session, customerEmail);
-    const finalStatus: LedgerStatus | null = tier && paymentIntent
+    const finalStatus: LedgerStatus | null = inferred && paymentIntent
       ? payment.status === "active" && !user ? "pending" : payment.status
       : null;
-    const fallbackTier = tier === "full" && user && profileTiers.get(user.id) === "beginner"
+    const claim = grantedUpgradeClaims.get(session.id);
+    const fallbackTier = inferred?.priceId === process.env.STRIPE_UPGRADE_PRICE_ID
+      && claim?.status === "granted"
+      && claim.user_id === user?.id
       ? "beginner"
       : null;
     records.push({
@@ -127,17 +136,17 @@ async function collectRecords(
       paymentIntentId: paymentIntent,
       customerEmail,
       amountTotal: session.amount_total ?? null,
-      tier,
+      tier: inferred?.tier ?? null,
       fallbackTier,
       paymentDetail: payment.detail,
       status: finalStatus,
       user,
       wouldInsert: {
         userId: user?.id ?? null,
-        tier,
+        tier: inferred?.tier ?? null,
         status: finalStatus,
       },
-      reason: !tier ? "unknown_price" : !paymentIntent ? "missing_payment_intent" : user ? null : "no_verified_account_match",
+      reason: !inferred ? "unknown_price" : !paymentIntent ? "missing_payment_intent" : user ? null : "no_verified_account_match",
     });
   }
   return records;
@@ -171,8 +180,8 @@ async function main() {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is required.");
   const admin = createAdminSupabase();
   const authUsers = await loadAuthUsers(admin);
-  const profileTiers = await loadProfileTiers(admin);
-  const records = await collectRecords(authUsers, profileTiers);
+  const grantedUpgradeClaims = await loadGrantedUpgradeClaims(admin);
+  const records = await collectRecords(authUsers, grantedUpgradeClaims);
   const unmatched = records.filter((record) => !record.user);
   console.log(JSON.stringify({ mode: APPLY ? "apply" : "dry-run", records, unmatched }, null, 2));
   if (APPLY) await applyRecords(admin, records);

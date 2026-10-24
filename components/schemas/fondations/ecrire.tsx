@@ -65,6 +65,7 @@ export function PreuveAuBonEndroitDiagram() {
     ariaLabel="La page d'un atelier vélo place un mécanicien au travail sur l'image pour répondre à ton travail, une scène précise dans le titre pour répondre à mon cas, et le devis avant réparation dans le sous-titre pour répondre à pour moi."
     accent={EM}
     page={{
+      url: "atelier-mehdi-velo.fr",
       nav: "Atelier de Mehdi",
       heading: "Le bruit de ton vélo, diagnostiqué à l'atelier",
       subtitle: "Dépose-le. Je vérifie, tu valides le devis avant que je touche à quoi que ce soit.",

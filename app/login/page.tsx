@@ -7,7 +7,10 @@ import { PHASES } from "@/lib/siteWebAccompagnement";
 import { sanitizeInternalRedirect } from "@/lib/safeRedirect";
 import "@/app/ui3.css";
 
-export const metadata: Metadata = { title: "Connexion | BUILD" };
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ mode?: string | string[] }> }): Promise<Metadata> {
+  const { mode } = await searchParams;
+  return { title: mode === "signup" ? "Créer ton compte | BUILD" : "Connexion | BUILD" };
+}
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ mode?: string | string[]; next?: string | string[]; phase?: string | string[] }> }) {
   const { mode, next, phase } = await searchParams;

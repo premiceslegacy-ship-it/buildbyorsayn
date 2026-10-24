@@ -36,6 +36,14 @@ test("le backfill ne rattache une référence qu'avec un e-mail Auth confirmé i
   assert.match(source, /candidate\.email_confirmed_at/);
 });
 
+test("le fallback du backfill vient des claims d'upgrade accordées et non du tier courant", async () => {
+  const source = await readFile("scripts/backfill-stripe-ledger.ts", "utf8");
+  assert.match(source, /stripe_upgrade_claims/);
+  assert.match(source, /status", "granted"/);
+  assert.match(source, /inferred\?\.priceId === process\.env\.STRIPE_UPGRADE_PRICE_ID/);
+  assert.doesNotMatch(source, /loadProfileTiers/);
+});
+
 test("le ledger expose une transaction de backfill, les marqueurs terminaux et le fallback upgrade", async () => {
   const sql = await readFile("supabase/migrations/20261024101000_stripe_purchase_ledger.sql", "utf8");
   assert.match(sql, /create or replace function public\.backfill_stripe_purchase_ledger\(p_rows jsonb\)/);

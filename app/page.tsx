@@ -128,7 +128,7 @@ export default async function HomePage() {
 
         <section className="final">
           <div className="wrap">
-            <h2 className="t-1 t-center">Prêt à <span className="mot">t&apos;y mettre ?</span></h2>
+            <h2 className="t-1 t-center">Prêt à <span className="mot">t&apos;y mettre ?</span></h2>
             <p className="t-lede t-center">Le bloc 1 est gratuit.</p>
             <Link className="btn btn--p" href={start.href}>{start.label}</Link>
           </div>

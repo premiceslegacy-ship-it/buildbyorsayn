@@ -29,6 +29,16 @@ function sql(statement, app = "stripe_upgrade_qa") {
   ], { input: statement });
 }
 
+function assertRoleFunctionPrivilege(signature, expected) {
+  for (const [role, value] of Object.entries(expected)) {
+    const observed = sql(
+      `set role ${role}; select has_function_privilege(current_user,'public.${signature}','execute')::int; reset role;`,
+      `stripe_upgrade_role_${role}`,
+    );
+    assert.equal(observed, String(value), `${role} privilege for ${signature}`);
+  }
+}
+
 function sqlAsync(statement, app) {
   return new Promise((resolve, reject) => {
     const child = spawn("docker", [
@@ -118,6 +128,8 @@ try {
   assert.equal(sql("select relrowsecurity::int from pg_class where oid='public.stripe_upgrade_claims'::regclass;"), "1");
   assert.equal(sql("select has_table_privilege('anon','public.stripe_upgrade_claims','select')::int || ':' || has_table_privilege('authenticated','public.stripe_upgrade_claims','select')::int;"), "0:0");
   assert.equal(sql("select has_function_privilege('anon','public.apply_stripe_upgrade(uuid,text,text)','execute')::int || ':' || has_function_privilege('authenticated','public.apply_stripe_upgrade(uuid,text,text)','execute')::int || ':' || has_function_privilege('service_role','public.apply_stripe_upgrade(uuid,text,text)','execute')::int;"), "0:0:1");
+  assertRoleFunctionPrivilege("backfill_stripe_purchase_ledger(jsonb)", { anon: 0, authenticated: 0, service_role: 1 });
+  assertRoleFunctionPrivilege("record_stripe_checkout_terminal(text,text,text)", { anon: 0, authenticated: 0, service_role: 1 });
   assert.equal(sql("select coalesce(array_to_string(proconfig, ','), '') from pg_proc where oid='public.apply_stripe_upgrade(uuid,text,text)'::regprocedure;"), "search_path=\"\"");
 
   const replayUser = "11111111-1111-4111-8111-111111111111";

@@ -261,7 +261,7 @@ test("un concurrent transcript Mux reçoit in_progress sans refaire le fetch Mux
     headers: { "content-type": "application/json", "mux-signature": `t=${timestamp},v1=${signature}` },
     body,
   }));
-  assert.equal(response.status, 200);
+  assert.equal(response.status, 503);
   assert.deepEqual(calls.map((call) => call.kind), ["rpc:reserve_mux_webhook_event"]);
   assert.deepEqual(muxCalls, []);
 });

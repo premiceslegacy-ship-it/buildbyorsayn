@@ -38,6 +38,7 @@ export function MessageQuiOuvreDiagram() {
     beforeTitle="Le pitch"
     afterTitle="La question"
     before={{
+      label: "Message d'illustration",
       subject: "Solutions digitales pour restaurants",
       preview: "Découvre notre offre innovante",
       text: "Bonjour, nous proposons des solutions digitales innovantes aux restaurants. Serais-tu disponible pour un appel ?",
@@ -45,6 +46,7 @@ export function MessageQuiOuvreDiagram() {
       pins: { subject: 1, text: 2, action: 3 },
     }}
     after={{
+      label: "Message d'illustration",
       subject: "Les réservations après le service",
       preview: "Une seule question",
       text: "Bonjour Lina, quand une réservation arrive après le service, qui la reprend le lendemain ?",

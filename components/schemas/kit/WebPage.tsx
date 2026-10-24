@@ -8,8 +8,8 @@ import type { KitBaseProps } from "./types";
    --------------------------------------------------------------------------------------------- */
 
 export type WebPageData = {
-  url?: string;
-  nav?: string;
+  url: string;
+  nav: string;
   eyebrow?: string;
   heading: string;
   subtitle: string;
@@ -97,9 +97,9 @@ function buildSite(page: WebPageData, quality: Quality, pinOf: (slot: SiteSlot) 
 
   if (!slop && page.fields?.length) {
     return {
-      url: page.url ?? (slop ? "exemple-site.fr" : "atelier-lumen.fr"),
+      url: page.url,
       theme: page.theme ?? "chaux",
-      nav: { brand: page.nav ?? (slop ? "Atelier exemple" : "Atelier Lumen") },
+      nav: { brand: page.nav },
       sections: [{ kind: "form", title: page.heading, text: page.subtitle, fields: page.fields, button: page.button, note: page.offer ?? page.proofs?.join(". "), pins: pin("title", "text", "fields", "cta", "note") }],
     };
   }
@@ -129,9 +129,9 @@ function buildSite(page: WebPageData, quality: Quality, pinOf: (slot: SiteSlot) 
   if (slop && page.offer) sections.push({ kind: "faq", title: "En savoir plus", items: [{ q: page.offer }], pins: pin("note") });
 
   return {
-    url: page.url ?? (slop ? "exemple-site.fr" : "atelier-lumen.fr"),
+    url: page.url,
     theme: slop ? "slopNuit" : page.theme ?? "chaux",
-    nav: { brand: page.nav ?? (slop ? "Atelier exemple" : "Atelier Lumen"), cta: slop ? "Contact" : undefined },
+    nav: { brand: page.nav, cta: slop ? "Contact" : undefined },
     sections,
   };
 }

@@ -11,12 +11,15 @@ export function LandingGeneriqueContreMarqueMockup() {
     beforeTitle="Interchangeable"
     afterTitle="Maison Lila"
     before={{
+      url: "maison-lila.fr",
+      nav: "Maison Lila",
       eyebrow: "Innovation",
       heading: "Réinventez votre expérience",
       subtitle: "Des solutions innovantes pour vos besoins",
       button: "Commencer",
     }}
     after={{
+      url: "maison-lila.fr",
       nav: "Maison Lila",
       heading: "Ton bouquet prêt demain matin",
       subtitle: "Choisis l'occasion. Maison Lila te rappelle avant la composition.",
@@ -103,7 +106,8 @@ export function DesignSystemOuvertMockup() {
       ariaLabel="Une page de produit applique les règles : un titre lisible, un bouton d'action principale, et un écran qui montre le chargement, l'erreur et le succès."
       accent={EM}
       page={{
-        nav: "Ton produit",
+        url: "devis-clients.app",
+        nav: "Atelier devis",
         heading: "Envoie tes devis en deux minutes",
         subtitle: "Choisis le client, vérifie le montant, envoie. Chaque étape te dit ce qui se passe.",
         button: "Envoyer le devis",

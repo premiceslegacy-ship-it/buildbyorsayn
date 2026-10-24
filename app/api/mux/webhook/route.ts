@@ -63,7 +63,8 @@ export async function POST(request: NextRequest) {
     if (reservationError || !["new", "retry", "duplicate", "in_progress"].includes(String(reservation))) {
       return NextResponse.json({ ok: false }, { status: 503 });
     }
-    if (reservation === "duplicate" || reservation === "in_progress") return NextResponse.json({ ok: true });
+    if (reservation === "duplicate") return NextResponse.json({ ok: true });
+    if (reservation === "in_progress") return NextResponse.json({ ok: false, error: "in_progress" }, { status: 503 });
     const { data: video, error: videoError } = await admin.from("video_lessons")
       .select("id,playback_id")
       .eq("mux_asset_id", asset.asset_id)

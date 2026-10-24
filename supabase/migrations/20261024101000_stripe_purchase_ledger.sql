@@ -366,14 +366,20 @@ declare
   row_data jsonb;
   row_count integer := 0;
   row_user_id uuid;
+  existing_user_id uuid;
   row_status text;
   row_tier text;
+  owner_ids uuid[] := array[]::uuid[];
 begin
   if p_rows is null or pg_catalog.jsonb_typeof(p_rows) <> 'array' then
     raise exception 'invalid stripe backfill rows';
   end if;
 
-  for row_data in select value from pg_catalog.jsonb_array_elements(p_rows) loop
+  for row_data in
+    select value
+    from pg_catalog.jsonb_array_elements(p_rows)
+    order by value->>'checkout_session_id'
+  loop
     if nullif(row_data->>'checkout_session_id', '') is null
       or char_length(row_data->>'checkout_session_id') not between 3 and 255
       or nullif(row_data->>'payment_intent_id', '') is null
@@ -385,6 +391,14 @@ begin
     end if;
 
     row_user_id := nullif(row_data->>'user_id', '')::uuid;
+    if row_user_id is not null then owner_ids := array_append(owner_ids, row_user_id); end if;
+    select user_id
+      into existing_user_id
+      from public.stripe_purchase_ledger
+      where checkout_session_id = row_data->>'checkout_session_id'
+      for update;
+    if existing_user_id is not null then owner_ids := array_append(owner_ids, existing_user_id); end if;
+
     row_status := row_data->>'status';
     row_tier := row_data->>'tier';
     insert into public.stripe_purchase_ledger (
@@ -404,39 +418,45 @@ begin
       nullif(row_data->>'revoke_reason', '')
     )
     on conflict (checkout_session_id) do update
-    set payment_intent_id = excluded.payment_intent_id,
-        user_id = excluded.user_id,
+    set payment_intent_id = coalesce(public.stripe_purchase_ledger.payment_intent_id, excluded.payment_intent_id),
+        user_id = coalesce(public.stripe_purchase_ledger.user_id, excluded.user_id),
         tier = excluded.tier,
         status = case
-          when public.stripe_purchase_ledger.status in ('refunded', 'revoked')
+          when public.stripe_purchase_ledger.status in ('refunded', 'disputed', 'revoked')
             then public.stripe_purchase_ledger.status
+          when public.stripe_purchase_ledger.status = 'active'
+            and excluded.status = 'pending'
+            then 'active'
           else excluded.status
         end,
-        amount_total = excluded.amount_total,
-        currency = excluded.currency,
-        customer_email = excluded.customer_email,
-        fallback_tier = coalesce(excluded.fallback_tier, public.stripe_purchase_ledger.fallback_tier),
+        amount_total = coalesce(public.stripe_purchase_ledger.amount_total, excluded.amount_total),
+        currency = coalesce(public.stripe_purchase_ledger.currency, excluded.currency),
+        customer_email = coalesce(public.stripe_purchase_ledger.customer_email, excluded.customer_email),
+        fallback_tier = coalesce(public.stripe_purchase_ledger.fallback_tier, excluded.fallback_tier),
         revoked_at = case
-          when public.stripe_purchase_ledger.status in ('refunded', 'revoked')
+          when public.stripe_purchase_ledger.status in ('refunded', 'disputed', 'revoked')
             then public.stripe_purchase_ledger.revoked_at
           when excluded.status in ('refunded', 'disputed', 'revoked')
             then pg_catalog.now()
           else null
         end,
         revoke_reason = case
-          when public.stripe_purchase_ledger.status in ('refunded', 'revoked')
+          when public.stripe_purchase_ledger.status in ('refunded', 'disputed', 'revoked')
             then public.stripe_purchase_ledger.revoke_reason
           else excluded.revoke_reason
         end,
-        updated_at = pg_catalog.now();
+        updated_at = pg_catalog.now()
+    returning user_id into existing_user_id;
+    if existing_user_id is not null then owner_ids := array_append(owner_ids, existing_user_id); end if;
     row_count := row_count + 1;
   end loop;
 
   for row_user_id in
-    select distinct nullif(value->>'user_id', '')::uuid
-    from pg_catalog.jsonb_array_elements(p_rows)
-    where nullif(value->>'user_id', '') is not null
+    select distinct owner_id
+    from pg_catalog.unnest(owner_ids) as owners(owner_id)
+    order by owner_id
   loop
+    perform 1 from public.profiles where id = row_user_id for update;
     perform public.recalculate_stripe_entitlement(row_user_id);
   end loop;
   return row_count;

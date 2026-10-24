@@ -23,9 +23,9 @@
 .da .ui3-auth-alert-success { color: var(--menthe); background: rgba(34,217,110,.1); }
 .da .ui3-auth-actions { display: grid; gap: 8px; justify-items: center; }
 .da .ui3-auth-actions .btn--p { width: 100%; height: 52px; font-size: 17px; }
-.da .ui3-auth-switch { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; text-align: center; font: 400 17px/1.4 var(--font); color: var(--t2); }
+.da .ui3-auth-switch { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; text-align: center; font: 400 17px/1.4 var(--font); color: var(--t2); }
 .da .ui3-auth-legal { margin: -8px 0 0; color: var(--t3); font: 400 13px/1.45 var(--font); text-align: center; }
-.da .ui3-auth-legal a { display: inline-flex; min-height: 44px; align-items: center; color: var(--menthe); text-decoration: underline; text-underline-offset: 3px; }
+.da .ui3-auth-legal a { color: var(--menthe); text-decoration: underline; text-underline-offset: 3px; padding: 10px 4px; margin: -10px -4px; }
 .da .ui3-auth-switch button, .da .ui3-auth-switch a, .da .ui3-text-link { display: inline-flex; min-height: 44px; align-items: center; color: var(--menthe); font-weight: 500; }
 .da .ui3-auth-progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .da .ui3-auth-progress i { height: 4px; border-radius: 2px; background: rgba(241,245,242,.18); overflow: hidden; }

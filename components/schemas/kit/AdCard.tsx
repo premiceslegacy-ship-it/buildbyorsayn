@@ -14,9 +14,10 @@ import styles from "./ad.module.css";
 export type AdPins = { text?: number; image?: number; headline?: number; action?: number; subject?: number };
 
 export type AdCopy = {
+  /** Libellé affiché dans l'en-tête, notamment pour distinguer un message froid d'une publicité. */
+  label?: string;
   account?: string;
   text: string;
-  /** Légende alternative de l'image (sinon vide). */
   visual?: string;
   /** Photo de la publicité (chemin public). */
   image?: string;
@@ -84,7 +85,7 @@ function EmailAd({ copy, q }: { copy: AdCopy; q: Quality }) {
   const pins = copy.pins ?? {};
   return <article className={styles.email} data-quality={q}>
     <header>
-      <small className={styles.sponsored}>Sponsorisé</small>
+      <small className={styles.sponsored}>{copy.label ?? "Sponsorisé"}</small>
       <Row n={pins.subject} q={q}><strong>{copy.subject}</strong></Row>
       <span>{copy.preview}</span>
     </header>

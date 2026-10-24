@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -16,6 +17,46 @@ test("la porte de release ne référence que des sous-commandes déclarées", ()
   for (const match of release.matchAll(/npm run ([a-z0-9:_-]+)/g)) {
     assert.ok(manifest.scripts[match[1]], `sous-commande absente: ${match[1]}`);
   }
+});
+
+test("la porte de release vérifie les identifiants Resend en mode production", () => {
+  const manifest = JSON.parse(readFileSync("package.json", "utf8")) as { scripts: Record<string, string> };
+  const preflight = readFileSync("scripts/verify-production-env.ts", "utf8");
+  assert.equal(manifest.scripts["verify:production-env"], "tsx scripts/verify-production-env.ts --production");
+  assert.match(manifest.scripts["verify:release"], /npm run verify:production-env/);
+  assert.match(preflight, /RESEND_API_KEY/);
+  assert.match(preflight, /RESEND_FROM_EMAIL/);
+  assert.match(preflight, /process\.argv\.includes\("--production"\)/);
+});
+
+test("le préflight production accepte une configuration Resend complète", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["--import", "tsx", "scripts/verify-production-env.ts", "--production"],
+    {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        RESEND_API_KEY: "test",
+        RESEND_FROM_EMAIL: "BUILD <updates@example.test>",
+      },
+    },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /configuration is present/);
+});
+
+test("le préflight production refuse une configuration Resend absente", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["--import", "tsx", "scripts/verify-production-env.ts", "--production"],
+    {
+      encoding: "utf8",
+      env: { ...process.env, RESEND_API_KEY: "", RESEND_FROM_EMAIL: "" },
+    },
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Production email configuration is missing/);
 });
 
 test("les pages protégées gardent leur contenu dans des Server Components", () => {

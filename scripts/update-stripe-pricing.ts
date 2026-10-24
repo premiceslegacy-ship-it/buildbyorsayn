@@ -102,20 +102,49 @@ async function main() {
   }
 
   if (RETIRE) {
+    const upgradeLinks = links.filter((link) => link.url === PUBLIC_UPGRADE_LINK_URL);
+    if (upgradeLinks.length !== 1) {
+      throw new Error(`STRIPE_UPGRADE_CHECKOUT_LINK must identify exactly one active old upgrade link; found ${upgradeLinks.length}.`);
+    }
+
+    // Toutes les offres non conformes doivent avoir un remplaçant actif, conforme et équivalent avant toute désactivation.
+    const retirementReplacements = new Map<string, Stripe.PaymentLink>();
+    for (const entry of configured) {
+      const oldLinks = links.filter((link) => link.url === entry.url);
+      if (oldLinks.length !== 1) {
+        throw new Error(`${entry.name}: expected exactly one active configured Payment Link; found ${oldLinks.length}.`);
+      }
+      const oldLink = oldLinks[0];
+      if (isCompliant(oldLink)) continue;
+      const replacements: Stripe.PaymentLink[] = [];
+      for (const candidate of links) {
+        if (candidate.metadata?.replaces !== oldLink.id || !isCompliant(candidate)) continue;
+        if (await sameLineItems(oldLink.id, candidate.id)) replacements.push(candidate);
+      }
+      if (replacements.length !== 1) {
+        throw new Error(`${entry.name}: expected exactly one active compliant replacement for ${oldLink.id}; found ${replacements.length}.`);
+      }
+      retirementReplacements.set(oldLink.id, replacements[0]);
+    }
+    for (const [oldId, replacement] of retirementReplacements) {
+      console.log(`remplaçant actif vérifié ${oldId} -> ${replacement.id}`);
+    }
+
+    let retiredUpgradeCount = 0;
     for (const link of links) {
-      const isPublicUpgrade = Boolean(PUBLIC_UPGRADE_LINK_URL) && link.url === PUBLIC_UPGRADE_LINK_URL;
+      const isPublicUpgrade = link.id === upgradeLinks[0].id;
       if (!isPublicUpgrade) {
         // Un lien conforme ne se retire jamais ; un ancien lien seulement si son remplaçant conforme vend la même chose.
         if (isCompliant(link)) continue;
-        const replacement = links.find((candidate) => candidate.metadata?.replaces === link.id && isCompliant(candidate));
+        const replacement = retirementReplacements.get(link.id);
         if (!replacement) continue;
-        if (!(await sameLineItems(link.id, replacement.id))) {
-          console.log(`gardé ${link.id} : son remplaçant ${replacement.id} ne vend pas les mêmes lignes`);
-          continue;
-        }
       }
       await stripe.paymentLinks.update(link.id, { active: false });
+      if (isPublicUpgrade) retiredUpgradeCount += 1;
       console.log(`désactivé ${link.id} ${link.url}`);
+    }
+    if (retiredUpgradeCount !== 1) {
+      throw new Error(`Expected exactly one old upgrade Payment Link to be deactivated; deactivated ${retiredUpgradeCount}.`);
     }
   }
 

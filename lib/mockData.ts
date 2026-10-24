@@ -111,7 +111,7 @@ const BLOCS_DATA_SOURCE = [
   },
   {
     id: "7",
-    titre: "Bloc 7 : Récapitulatif",
+    titre: "Bloc 7 : Récapitulatif",
     introduction: coffreIntroductionMarkdown("7"),
     sections: [
       { id: "b7-s1", title: "Tout processiser", content: coffreChapterMarkdown("b7-s1") },

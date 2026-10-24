@@ -25,8 +25,13 @@ const CONTENT_TARGETS = [
   "app/videos/tutos",
   "app/doctrine",
   "app/page.tsx",
+  "app/checkout",
+  "app/login",
   "app/(legal)",
   "components/da",
+  "components/ui5/CheckoutView.tsx",
+  "components/LoginForm.tsx",
+  "components/ForgotPasswordForm.tsx",
   "lib/mockData.ts",
   "lib/mcp/assistantInstructions.ts",
   "lib/protocoleContent.ts",
@@ -81,16 +86,31 @@ function walk(target: string, out: string[]) {
 /** Texte visible approximatif : texte entre balises JSX et chaînes assez longues pour être une phrase. */
 export function extractVisibleText(source: string): { text: string; line: number }[] {
   const pieces: { text: string; line: number }[] = [];
+  const seen = new Set<string>();
   const lineAt = (index: number) => source.slice(0, index).split("\n").length;
+  const add = (raw: string, index: number) => {
+    const text = raw
+      .replace(/\$\{[^{}]*\}/g, "variable")
+      .replace(/\\n/g, "\n")
+      .replace(/[ \t\r\n\f\v]+/g, " ")
+      .trim();
+    if (!text) return;
+    const key = `${lineAt(index)}:${text}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    pieces.push({ text, line: lineAt(index) });
+  };
 
-  for (const match of source.matchAll(/>([^<>{}]{25,})</g)) {
-    pieces.push({ text: match[1].replace(/[ \t\r\n\f\v]+/g, " ").trim(), line: lineAt(match.index ?? 0) });
-  }
-  for (const match of source.matchAll(/(["'`])((?:(?!\1)[^\\\n]|\\.){40,}?)\1/g)) {
+  for (const match of source.matchAll(/<[A-Za-z][^<>]*>([^<>{}\n]*[?!:;][^<>{}\n]*)<\/[A-Za-z][^>]*>/g)) add(match[1], match.index ?? 0);
+  const stringSource = source
+    .replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, " "))
+    .replace(/\/\/[^\n]*/g, (comment) => comment.replace(/[^\n]/g, " "));
+  for (const match of stringSource.matchAll(/(["'`])((?:(?!\1)[^\\\n]|\\.){18,}?)\1/g)) {
     const text = match[2];
+    if (/\b(?:className|href|src|aria-[\w-]+|style|key|router|window|location|process|replace|startsWith|endsWith|includes|querySelector|isLoading|filter|event|token|target|path|url|const|return|blocLabel)\b|=>|\?\?|[{}<>]/u.test(text)) continue;
     // Ignore classes, chemins, URL, sélecteurs et imports.
     if (/^[\w./:#@\-[\]()=,%\s]+$/.test(text) && !/[.!?]\s/.test(text)) continue;
-    pieces.push({ text: text.replace(/\\n/g, "\n").replace(/[ \t\r\n\f\v]+/g, " ").trim(), line: lineAt(match.index ?? 0) });
+    add(text, match.index ?? 0);
   }
   return pieces;
 }

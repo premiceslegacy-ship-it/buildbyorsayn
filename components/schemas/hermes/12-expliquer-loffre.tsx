@@ -28,8 +28,8 @@ export function OffreCRMAvantApresMockup() {
     accent={EM}
     beforeTitle="Avant"
     afterTitle="Après"
-    before={{ nav: "Qualif.IA", heading: "Agent IA de qualification commerciale", subtitle: "Automatise et gagne du temps.", button: "Voir le principe", link: "En savoir plus" }}
-    after={{ nav: "Suivi prospects", heading: "Chaque nouveau prospect reçoit une fiche claire", subtitle: "Tu vois son besoin, les pièces manquantes et la prochaine question.", button: "Voir une fiche type", screen: { title: "Fiche prospect", rows: [{ left: "Besoin", right: "Cuisine à rénover", state: "ok" }, { left: "Pièces", right: "Plan, photos", state: "warn" }, { left: "Question", right: "Quel budget ?", state: "todo" }] } }}
+    before={{ url: "qualif-ia.app", nav: "Qualif.IA", heading: "Agent IA de qualification commerciale", subtitle: "Automatise et gagne du temps.", button: "Voir le principe", link: "En savoir plus" }}
+    after={{ url: "suivi-prospects.app", nav: "Suivi prospects", heading: "Chaque nouveau prospect reçoit une fiche claire", subtitle: "Tu vois son besoin, les pièces manquantes et la prochaine question.", button: "Voir une fiche type", screen: { title: "Fiche prospect", rows: [{ left: "Besoin", right: "Cuisine à rénover", state: "ok" }, { left: "Pièces", right: "Plan, photos", state: "warn" }, { left: "Question", right: "Quel budget ?", state: "todo" }] } }}
     afterNotes={[
       { pin: 1, role: "Un titre qui se filme", why: "On peut voir la scène : un prospect arrive et reçoit une fiche.", alt: "Une date : chaque lundi, les nouveaux prospects." },
       { pin: 2, role: "Ce que le prospect reçoit", why: "Le besoin, les pièces manquantes et la prochaine question : trois choses concrètes.", alt: "Un exemple de fiche rempli." },
