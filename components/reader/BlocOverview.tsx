@@ -90,7 +90,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
   const selectedInitial = videos.find((video) => video.position === initialVideoPosition) ?? videos[0];
   const [selectedPosition, setSelectedPosition] = useState(selectedInitial?.position ?? 0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [summaryOpen, setSummaryOpen] = useState(initialSummaryOpen ?? false);
+  const [openSummaryFor, setOpenSummaryFor] = useState<string | null>(initialSummaryOpen ? selectedInitial?.id ?? null : null);
   const selectedVideo = videos.find((video) => video.position === selectedPosition) ?? videos[0] ?? null;
   const selectedPlayableVideo = selectedVideo?.playbackId.trim() && selectedVideo.tokens.playback ? selectedVideo : null;
   const currentChapterIndex = selectedVideo?.chapters.reduce((current, chapter, index) => chapter.startSeconds <= currentTime ? index : current, -1) ?? -1;
@@ -103,13 +103,11 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
     rows.forEach((row, index) => animateAppElement(row, [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], "doux", index * 55));
   }, []);
 
-  useEffect(() => {
-    setSummaryOpen(selectedVideo?.id === selectedInitial?.id ? initialSummaryOpen ?? false : false);
-    setCurrentTime(0);
-  }, [selectedVideo?.id, selectedInitial?.id, initialSummaryOpen]);
+  const summaryOpen = Boolean(selectedVideo) && openSummaryFor === selectedVideo?.id;
 
   const selectVideo = (position: number) => {
     setSelectedPosition(position);
+    setCurrentTime(0);
     window.history.replaceState({}, "", `${window.location.pathname}?video=${position}`);
   };
   const selectChapter = (startSeconds: number) => {
@@ -151,7 +149,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
           </div>
         </div>
         <p className={`${styles.videoSummary} ${summaryOpen ? styles.videoSummaryOpen : ""}`}>{selectedVideo.summary}</p>
-        {selectedVideo.summary.length > 180 ? <button type="button" className={styles.textButton} onClick={() => setSummaryOpen((open) => !open)}>{summaryOpen ? "Moins" : "Plus"}</button> : null}
+        {selectedVideo.summary.length > 180 ? <button type="button" className={styles.textButton} onClick={() => setOpenSummaryFor(summaryOpen ? null : selectedVideo.id)}>{summaryOpen ? "Moins" : "Plus"}</button> : null}
       </section> : null}
 
       {selectedVideo && selectedVideo.chapters.length > 0 ? <VideoRail title="Dans cette vidéo" labelledBy="video-chapters-title" railRef={chapterRailRef}>

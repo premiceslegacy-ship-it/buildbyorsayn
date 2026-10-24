@@ -1,6 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { projectBlocForTier } from "../lib/blocAccess";
 import { allCoffreIntroductions, allCoffreMarkdown } from "../lib/coffre/content";
 import { collectBlocsDocuments } from "../lib/knowledge/sources";

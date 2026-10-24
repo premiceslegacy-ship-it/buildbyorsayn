@@ -57,7 +57,7 @@ export async function syncMuxTranscriptForReadyAsset(input: {
     playbackId: input.playbackId,
     client: input.client ?? createMuxTranscriptClient(),
     async writeTranscript(transcript, segments, trackId) {
-      const { data, error } = await admin.from("video_lessons")
+      const { error } = await admin.from("video_lessons")
         .update({
           transcript,
           transcript_segments: segments,
