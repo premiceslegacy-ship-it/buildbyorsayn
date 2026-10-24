@@ -27,9 +27,9 @@ if (process.env.BUILD_NEWS_INNER !== "1") {
   let isAdmin = false;
   const audits: Array<Record<string, unknown>> = [];
   let deleteStoragePath: string | null = null;
-  let removedStoragePaths: string[] = [];
+  const removedStoragePaths: string[] = [];
   let storageRemoveError: Error | null = null;
-  let queuedStoragePaths: string[] = [];
+  const queuedStoragePaths: string[] = [];
   const NEWS_THUMBNAIL_PATH = "news/123e4567-e89b-42d3-a456-426614174000/aaaaaaaaaaaa.jpg";
   type MockChain = {
     insert: () => MockChain;
