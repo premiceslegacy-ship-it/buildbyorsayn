@@ -22,7 +22,13 @@ function createMuxTranscriptClient(): MuxTranscriptClient {
     async signPlayback(playbackId) {
       return mux.jwt.signPlaybackId(playbackId, { expiration: "5m", type: "video" });
     },
-    fetchVtt: (playbackId, trackId, token) => mux.video.playback.track(playbackId, trackId, { token }),
+    async fetchVtt(playbackId, trackId, token) {
+      // Le SDK ajoute l'authentification Basic de l'API à toute requête : stream.mux.com la refuse (400). Seul le jeton signé compte.
+      const url = `https://stream.mux.com/${encodeURIComponent(playbackId)}/text/${encodeURIComponent(trackId)}.vtt?token=${encodeURIComponent(token)}`;
+      const response = await fetch(url, { headers: { Accept: "text/vtt" }, signal: AbortSignal.timeout(15_000) });
+      if (!response.ok) throw new Error("La transcription Mux est indisponible.");
+      return response.text();
+    },
   };
 }
 

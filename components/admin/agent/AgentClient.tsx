@@ -37,11 +37,6 @@ const permissionCopy: Record<AgentPermission, { label: string; description: stri
   journal: { label: "Consulter l'historique", description: "Voir les actions réalisées avec ce jeton." },
 };
 
-const DEFAULT_NEW_TOKEN_PERMISSIONS: AgentPermission[] = [
-  "liste_blocs",
-  "statut_video",
-  "journal",
-];
 const PREPARE_PERMISSIONS: AgentPermission[] = [...AGENT_PERMISSION_VALUES];
 const READ_ONLY_PERMISSIONS: AgentPermission[] = ["liste_blocs", "lister_videos", "lire_transcription", "lister_nouveautes", "statut_video", "journal"];
 
@@ -52,7 +47,7 @@ const DEMO_AGENT_DATA: AgentViewData = {
     { id: "demo-request-2", kind: "mail", createdAt: "2026-10-23T14:10:00.000Z", expiresAt: "2026-10-25T14:10:00.000Z" },
   ],
   tokens: [
-    { id: "demo-access-1", name: "Préparation des vidéos", lastFour: "7F2A", permissions: [...DEFAULT_NEW_TOKEN_PERMISSIONS], expiresAt: "2027-01-22T09:00:00.000Z", lastUsedAt: "2026-10-24T09:18:00.000Z", revokedAt: null, createdAt: "2026-10-01T09:00:00.000Z" },
+    { id: "demo-access-1", name: "Préparation des vidéos", lastFour: "7F2A", permissions: [...PREPARE_PERMISSIONS], expiresAt: "2027-01-22T09:00:00.000Z", lastUsedAt: "2026-10-24T09:18:00.000Z", revokedAt: null, createdAt: "2026-10-01T09:00:00.000Z" },
     { id: "demo-access-2", name: "Lecture seule", lastFour: "19C4", permissions: ["liste_blocs", "lister_videos", "statut_video", "journal"], expiresAt: "2027-02-01T09:00:00.000Z", lastUsedAt: "2026-10-20T11:30:00.000Z", revokedAt: null, createdAt: "2026-09-01T09:00:00.000Z" },
     { id: "demo-access-3", name: "Ancien accès", lastFour: "0B91", permissions: ["liste_blocs", "journal"], expiresAt: "2026-08-01T09:00:00.000Z", lastUsedAt: null, revokedAt: "2026-08-12T08:00:00.000Z", createdAt: "2026-07-01T09:00:00.000Z" },
   ],
@@ -150,7 +145,7 @@ export function AgentClient() {
   const [busy, setBusy] = useState(false);
   const [name, setName] = useState("Mon agent");
   const [expiresInDays, setExpiresInDays] = useState(90);
-  const [newPermissions, setNewPermissions] = useState<AgentPermission[]>([...DEFAULT_NEW_TOKEN_PERMISSIONS]);
+  const [newPermissions, setNewPermissions] = useState<AgentPermission[]>([...PREPARE_PERMISSIONS]);
   const [permissionDrafts, setPermissionDrafts] = useState<Record<string, AgentPermission[]>>({});
   const [freshToken, setFreshToken] = useState<string | null>(null);
   const [client, setClient] = useState<ClientName>("Claude Code");
