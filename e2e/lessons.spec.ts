@@ -8,6 +8,7 @@ test.describe("Bloc lessons (member)", () => {
       await page.goto(`/blocs/${id}`);
       await expect(page.getByRole("heading", { name: "Chapitres" })).toBeVisible({ timeout: 10_000 });
       await expect(page.getByRole("radiogroup", { name: "Mode de lecture" })).toHaveCount(0);
+      await expect(page.getByTestId("bloc-overview-media")).toHaveCount(1);
       await expect(page.getByTestId("bloc-overview-media")).toBeVisible();
       await expect(page.locator(`a[href^="/blocs/${id}/lire?chapter="]`).first()).toBeVisible();
       await expect(page.getByText("Vidéos liées à ce bloc")).toHaveCount(0);
