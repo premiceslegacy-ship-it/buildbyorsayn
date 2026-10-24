@@ -231,7 +231,7 @@ export const ADMIN_AGENT_TOOLS = {
       const input = uploadInput.parse(rawInput);
       const blocId = blocIdFromDisplayNumber(input.blocNumero);
       if (!blocId) throw new AgentToolError("Bloc inconnu.");
-      const bloc = await assertBlocExists(blocId);
+      await assertBlocExists(blocId);
       const videoId = randomUUID();
       const mux = createMuxAdminClient();
       let upload;
