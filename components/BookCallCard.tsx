@@ -10,9 +10,9 @@ export function BookCallCard({ className = "" }: { className?: string }) {
       </div>
       <div className="book-call-card__text">
         <h2 id="book-call-title">Réserver un appel</h2>
-        <p>Choisis un créneau pour parler de ton projet.</p>
+        <p>Parle de ton projet avec Samuel.</p>
       </div>
-      <BookCallLink className="btn btn--g book-call-card__cta" />
+      <BookCallLink className="btn btn--g book-call-card__cta" label="Choisir un créneau" />
     </article>
   );
 }
