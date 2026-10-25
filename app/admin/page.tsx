@@ -16,6 +16,7 @@ import { DaRoot } from "@/components/da/DaRoot";
 import { BLOCS_DATA, displayLocationFromBlocId } from "@/lib/blocCatalog";
 import type { AdminVideoLessonRow } from "@/lib/mux/adminServer";
 import { withAdminThumbnailUrls } from "@/lib/mux/adminThumbnails.server";
+import { storedVideoThumbnailPath } from "@/lib/mux/thumbnail.server";
 import { createClient } from "@/lib/supabase/server";
 import { AdminVideoManager } from "./AdminVideoManager";
 import "./videos.css";
@@ -187,9 +188,10 @@ export default async function AdminPage() {
       const location = displayLocationFromBlocId(video.bloc_id);
       const locationLabel = location === "protocole" ? "Protocole" : location === null ? "Bloc" : `Bloc ${location}`;
       const news = videoNewsByVideoId.get(video.id);
-      const thumbnailPath = news?.thumbnail_storage_path;
-      const thumbnailUrl = thumbnailPath
-        ? supabaseAdmin.storage.from("video-thumbnails").getPublicUrl(thumbnailPath).data.publicUrl
+      const thumbnailPath = storedVideoThumbnailPath(video.thumbnail);
+      const thumbnailVersion = thumbnailPath?.match(/\/([0-9a-f]{12})\.(?:jpg|png|webp)$/i)?.[1];
+      const thumbnailUrl = thumbnailPath && thumbnailVersion && emailContext.baseUrl
+        ? `${emailContext.baseUrl}/api/email/video-thumb/${video.id}?v=${thumbnailVersion}`
         : null;
       return {
         id: video.id,

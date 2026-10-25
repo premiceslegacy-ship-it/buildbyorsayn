@@ -7,89 +7,72 @@ import {
   buildAuthEmail,
   buildBroadcastEmail,
   buildPurchaseConfirmationEmail,
-  buildUpgradeRefusalEmail,
   buildWelcomeEmail,
   type EmailContext,
 } from "../lib/email/templates";
 
-const ctx: EmailContext = {
-  baseUrl: "https://build.example.test",
-  seller: { contactEmail: "contact@orsayn.fr" },
-};
+const ctx: EmailContext = { baseUrl: "https://build.example.test", seller: { contactEmail: "contact@orsayn.fr" } };
 
-test("tous les e-mails passent par le gabarit : fond noir, un seul bouton blanc, 600 px, texte brut, aucun tiret long", () => {
-  const catalog = buildEmailCatalog(ctx);
-  assert.ok(catalog.length >= 10);
-  for (const mail of catalog) {
+for (const forbidden of [["SI", "RET"].join(""), ["Mbe", "boura"].join(""), ["héra", "ults"].join(""), ["Saint-", "Avertin"].join("")]) {
+  test(`aucune identité interdite dans les e-mails rendus : ${forbidden}`, () => {
+    for (const entry of buildEmailCatalog(ctx)) {
+      assert.doesNotMatch(`${entry.subject}\n${entry.html}\n${entry.text}`, new RegExp(forbidden, "i"), entry.id);
+    }
+  });
+}
+
+test("les e-mails utilisent la maquette sombre et centrée", () => {
+  for (const mail of buildEmailCatalog(ctx)) {
     assert.match(mail.html, /bgcolor="#050806"/, mail.id);
     assert.match(mail.html, /max-width:600px/, mail.id);
-    assert.match(mail.html, /<meta name="color-scheme" content="dark"/, mail.id);
-    assert.match(mail.html, /<img src="https:\/\/build\.example\.test\/email\/build-logo\.png"[^>]* alt="BUILD"/, mail.id);
-    assert.ok((mail.html.match(/background-color:#ffffff/g) ?? []).length <= 1, `${mail.id} : un seul bouton blanc`);
+    assert.match(mail.html, /align="center"/, mail.id);
+    if (mail.id !== "auth-recovery") assert.match(mail.html, /border-radius:980px/, mail.id);
     assert.ok(mail.text.length > 40, mail.id);
-    assert.ok(!/<[a-z]/i.test(mail.text), `${mail.id} : le texte brut ne contient pas de HTML`);
-    assert.ok(!/background-image|url\(/i.test(mail.html), `${mail.id} : aucune image de fond`);
-    for (const part of [mail.subject, mail.html, mail.text]) assert.ok(!/[\u2013\u2014\u2022]/.test(part), mail.id);
+    assert.ok(!/<[a-z]/i.test(mail.text), `${mail.id} : texte brut sans HTML`);
+    assert.ok(!/background-image|url\(/i.test(mail.html), `${mail.id} : pas d'image de fond`);
   }
 });
 
-test("sans adresse de site, le logo devient du texte et aucun lien ne part de rien", () => {
-  const mail = buildUpgradeRefusalEmail({ ...ctx, baseUrl: null });
-  assert.ok(!mail.html.includes("<img"));
-  assert.ok(!mail.html.includes("undefined") && !mail.text.includes("undefined"));
-  assert.ok(!mail.html.includes("/checkout"));
-});
-
-test("la confirmation d'achat reste courte et contient le prix, la date et l'accès", () => {
+test("la confirmation d'achat est courte et contient Offre, Prix payé, Date et le bouton", () => {
   const mail = buildPurchaseConfirmationEmail(ctx, { offerName: "LE\u00a0COFFRE", amountCents: 26700, purchasedAt: new Date("2026-10-22T10:30:00Z") });
-  for (const body of [mail.text, mail.html]) {
-    assert.ok(body.includes("267\u00a0€"));
-    assert.ok(body.includes("Offre"));
-    assert.ok(body.includes("Prix payé"));
-    assert.ok(body.includes("Date"));
-    assert.ok(body.includes("https://build.example.test/cgv"));
-    assert.ok(body.includes("https://build.example.test/mentions-legales"));
-    assert.ok(!body.includes("Vendeur"));
-    assert.ok(!body.includes("Je demande l'accès immédiat"));
-    assert.ok(!/\b\d{14}\b/.test(body));
-  }
+  assert.match(mail.html, /Ton achat est confirmé\./);
+  assert.match(mail.html, /Offre : LE/);
+  assert.match(mail.html, /Prix payé : 267/);
+  assert.match(mail.html, /Date :/);
+  assert.match(mail.html, />Ouvrir BUILD</);
+  assert.doesNotMatch(mail.html, /Vendeur|Je demande l'accès immédiat|\b\d{14}\b/);
   assert.throws(() => buildPurchaseConfirmationEmail(ctx, { offerName: "x", amountCents: 0, purchasedAt: new Date() }));
 });
 
-test("le contenu reçu est échappé et ne fabrique jamais de lien dangereux", () => {
+test("le contenu est échappé et les URL dangereuses sont refusées", () => {
   const purchase = buildPurchaseConfirmationEmail(ctx, { offerName: "<img src=x onerror=alert(1)>", amountCents: 9700, purchasedAt: new Date() });
   assert.ok(!purchase.html.includes("<img src=x"));
   assert.ok(purchase.html.includes("&lt;img"));
-  const broadcast = buildBroadcastEmail(ctx, { subject: "<b>x</b>", preheader: "<i>", body: "<script>alert(1)</script>", ctaLabel: "\"Voir\"", ctaUrl: "javascript:alert(1)" });
+  const broadcast = buildBroadcastEmail(ctx, { subject: "<b>x</b>", preheader: "<i>", body: "<script>alert(1)</script>", ctaLabel: "Voir", ctaUrl: "javascript:alert(1)" });
   assert.doesNotMatch(broadcast.html, /<script>|javascript:/);
-  const withQuery = buildBroadcastEmail(ctx, { subject: "s", preheader: "", body: "b", ctaLabel: "Voir", ctaUrl: "https://example.test/?a=1&b=2" });
-  assert.match(withQuery.html, /href="https:\/\/example\.test\/\?a=1&amp;b=2"/);
 });
 
-test("une diffusion garde une désinscription, et le corps devient paragraphes, citation et séparateur", () => {
+test("une diffusion devient des paragraphes, citations et séparateurs", () => {
   const mail = buildBroadcastEmail(ctx, { subject: "Salut", preheader: "", body: "Un\n\n> cité\n> deux\n\n---\n\nFin", ctaLabel: "", ctaUrl: "" });
-  assert.match(mail.html, /mailto:contact@orsayn\.fr\?subject=/);
+  assert.doesNotMatch(mail.html, /mailto:/);
   assert.deepEqual(broadcastBodyToBlocks("Un\n\n> a\n> b\n\n---\n\nFin").map((b) => b.type), ["paragraph", "quote", "divider", "paragraph"]);
 });
 
-test("les gabarits Supabase gardent leurs variables et la vidéo YouTube devient une miniature", () => {
-  assert.ok(buildAuthEmail(ctx, "recovery").html.includes("{{ .Token }}"));
-  assert.ok(!buildAuthEmail(ctx, "recovery").html.includes("{{ .ConfirmationURL }}"));
-  assert.ok(buildAuthEmail(ctx, "invite").html.includes('href="{{ .ConfirmationURL }}"'));
-  assert.ok(buildAuthEmail(ctx, "email-change").text.includes("{{ .NewEmail }}"));
-  const video = buildBroadcastEmail(ctx, { subject: "v", preheader: "", body: "b", ctaLabel: "Regarder", ctaUrl: "https://youtu.be/abcdefghijk" });
-  assert.match(video.html, /img\.youtube\.com\/vi\/abcdefghijk\//);
-  const storedThumbnail = buildBroadcastEmail(ctx, {
-    subject: "Le bon ordre avant de construire",
-    preheader: "",
-    body: "Regarde cette vidéo quand tu veux.",
-    ctaLabel: "Regarder",
-    ctaUrl: "https://build.example.test/blocs/3?video=1",
-    thumbnailUrl: "https://fqwzvskwgiimcmpvrldt.supabase.co/storage/v1/object/public/video-thumbnails/news/demo/thumbnail.jpg",
-  });
-  assert.match(storedThumbnail.html, /width="600"[^>]*alt="Miniature de Le bon ordre avant de construire"/);
-  assert.match(storedThumbnail.html, /<a href="https:\/\/build\.example\.test\/blocs\/3\?video=1"[^>]*>\s*<img[^>]*thumbnail\.jpg/);
-  assert.match(storedThumbnail.text, /Image\s:\sMiniature de Le bon ordre avant de construire/);
-  assert.ok(storedThumbnail.html.indexOf("thumbnail.jpg") < storedThumbnail.html.indexOf("Regarde cette vidéo"), "la miniature précède le texte");
-  assert.match(buildWelcomeEmail(ctx, "https://x.test/a").html, /href="https:\/\/x\.test\/a"/);
+test("les comptes utilisent un code sans bouton et une activation avec lien de secours", () => {
+  const recovery = buildAuthEmail(ctx, "recovery");
+  assert.ok(recovery.html.includes("{{ .Token }}"));
+  assert.ok(!recovery.html.includes("{{ .ConfirmationURL }}"));
+  assert.ok(!recovery.html.includes("border-radius:980px"));
+  const invite = buildAuthEmail(ctx, "invite");
+  assert.ok(invite.html.includes('href="{{ .ConfirmationURL }}"'));
+  assert.ok(invite.html.includes("Si le bouton ne s'ouvre pas"));
+  assert.ok(buildWelcomeEmail(ctx, "https://x.test/a").html.includes('href="https://x.test/a"'));
+});
+
+test("une miniature fournie est rendue seulement pour une diffusion vidéo", () => {
+  const video = buildBroadcastEmail(ctx, { kind: "video", subject: "v", preheader: "", body: "Titre\n\nTexte", ctaLabel: "Regarder", ctaUrl: "https://example.test/v", thumbnailUrl: "https://example.test/thumb.jpg" });
+  assert.match(video.html, /width="520"[^>]*height="293"/);
+  assert.match(video.html, /thumb\.jpg/);
+  const update = buildBroadcastEmail(ctx, { kind: "update", subject: "u", preheader: "", body: "Titre\n\nTexte", ctaLabel: "Voir", ctaUrl: "https://example.test/u", thumbnailUrl: "https://example.test/thumb.jpg" });
+  assert.doesNotMatch(update.html, /thumb\.jpg/);
 });

@@ -18,6 +18,7 @@ const INACTIVE_FREE_ACCOUNT_MS = 90 * 24 * 60 * 60 * 1000;
 const NEW_ACCOUNT_GRACE_MS = 14 * 24 * 60 * 60 * 1000;
 const ADMIN_EMAIL_SCHEMA = z.object({
   campaignId: z.string().uuid(),
+  kind: z.enum(["video", "update"]).default("update"),
   audience: z.enum(["selected", "all", "free", "beginner", "full"]),
   selectedUserIds: z.array(z.string().uuid())
     .max(MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS)
@@ -105,6 +106,7 @@ export async function POST(req: NextRequest) {
   }
   const {
     campaignId,
+    kind,
     audience,
     selectedUserIds,
     subject,
@@ -244,7 +246,7 @@ export async function POST(req: NextRequest) {
   }
 
   const emailContext = getEmailContext();
-  const { html, text } = buildBroadcastEmail(emailContext, { subject, preheader, body: messageBody, ctaLabel, ctaUrl, thumbnailUrl });
+  const { html, text } = buildBroadcastEmail(emailContext, { kind, subject, preheader, body: messageBody, ctaLabel, ctaUrl, thumbnailUrl });
   const result = await sendAdminBroadcast({
     apiKey: resendApiKey,
     from,

@@ -41,23 +41,31 @@ const TEMPLATES: Record<TemplateKey, { label: string; hint: string }> = {
 };
 
 function templateContent(key: TemplateKey, baseUrl: string | null, values: { videoTitle: string; videoUrl: string; videoThumbnailUrl: string; updateTitle: string; updateDesc: string }) {
-  if (key === "video") return {
-    subject: values.videoTitle || "Titre de la vidéo",
-    preheader: "La vidéo est disponible dans ton espace.",
-    body: "Cette vidéo est disponible dans ton espace. Tu peux la regarder quand tu veux.",
-    ctaLabel: "Regarder la vidéo",
-    ctaUrl: values.videoUrl,
-    thumbnailUrl: values.videoThumbnailUrl,
-  };
-  if (key === "update") return {
-    subject: values.updateTitle || "Titre de la mise à jour",
-    preheader: "Le contenu vient d'être mis à jour.",
-    body: `${values.updateDesc || "Décris ici ce qui a changé."}\n\nConnecte-toi pour voir ce qui a changé.`,
-    ctaLabel: "Voir la mise à jour",
-    ctaUrl: baseUrl ? `${baseUrl}/dashboard` : "",
-    thumbnailUrl: "",
-  };
-  return { subject: "", preheader: "", body: "", ctaLabel: "", ctaUrl: "", thumbnailUrl: "" };
+  if (key === "video") {
+    const title = values.videoTitle || "Titre de la vidéo";
+    return {
+      kind: "video" as const,
+      subject: title,
+      preheader: "La vidéo est disponible dans ton espace.",
+      body: `${title}\n\nUne nouvelle vidéo vient d'être ajoutée à BUILD. Elle illustre concrètement ce que tu apprends dans les modules : pas de théorie, de l'actionnable.`,
+      ctaLabel: "Regarder la vidéo",
+      ctaUrl: values.videoUrl,
+      thumbnailUrl: values.videoThumbnailUrl,
+    };
+  }
+  if (key === "update") {
+    const title = values.updateTitle || "Titre de la mise à jour";
+    return {
+      kind: "update" as const,
+      subject: title,
+      preheader: "Le contenu vient d'être mis à jour.",
+      body: `${title}\n\nBUILD vient d'être mis à jour. ${values.updateDesc || "Décris ici ce qui a changé."}`,
+      ctaLabel: "Voir la mise à jour",
+      ctaUrl: baseUrl ? `${baseUrl}/dashboard` : "",
+      thumbnailUrl: "",
+    };
+  }
+  return { kind: "update" as const, subject: "", preheader: "", body: "", ctaLabel: "", ctaUrl: "", thumbnailUrl: "" };
 }
 
 function readableVideoTitle(video: PublishedVideo): string {
@@ -121,6 +129,7 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
 
   const preview = useMemo(
     () => buildBroadcastEmail(emailContext, {
+      kind: activeTemplate === "video" ? "video" : "update",
       subject: subject || "L'objet de ton e-mail",
       preheader,
       body: body || "Ton message apparaîtra ici.",
@@ -128,7 +137,7 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
       ctaUrl,
       thumbnailUrl,
     }),
-    [emailContext, subject, preheader, body, ctaLabel, ctaUrl, thumbnailUrl],
+    [activeTemplate, emailContext, subject, preheader, body, ctaLabel, ctaUrl, thumbnailUrl],
   );
 
   const closeSheet = () => {
@@ -211,7 +220,7 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
     }
     setIsSending(true);
     setResult(null);
-    const requestPayload = { audience, selectedUserIds: selectedIds, subject, preheader, body, ctaLabel, ctaUrl, thumbnailUrl };
+    const requestPayload = { kind: activeTemplate === "video" ? "video" : "update", audience, selectedUserIds: selectedIds, subject, preheader, body, ctaLabel, ctaUrl, thumbnailUrl };
     const fingerprint = JSON.stringify(requestPayload);
     if (!campaignRef.current || campaignRef.current.fingerprint !== fingerprint) {
       campaignRef.current = { id: crypto.randomUUID(), fingerprint };

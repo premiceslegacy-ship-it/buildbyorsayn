@@ -17,6 +17,9 @@ export function MailPreview({ subject, html, text, from }: { subject: string; ht
   const [format, setFormat] = useState<Format>("html");
   const [frameHeight, setFrameHeight] = useState(0);
   const frameRef = useRef<HTMLIFrameElement>(null);
+  const previewHtml = typeof window === "undefined"
+    ? html
+    : html.replace(/https:\/\/[^/]+\/email\/(build-logo|video-thumb-demo\.jpg)/g, `${window.location.origin}/email/$1`);
 
   const observerRef = useRef<ResizeObserver | null>(null);
 
@@ -63,7 +66,7 @@ export function MailPreview({ subject, html, text, from }: { subject: string; ht
               style={frameHeight ? { height: frameHeight } : undefined}
               title={`Aperçu de l'e-mail : ${subject}`}
               sandbox="allow-same-origin"
-              srcDoc={html}
+              srcDoc={previewHtml}
               onLoad={watchFrame}
             />
           ) : (

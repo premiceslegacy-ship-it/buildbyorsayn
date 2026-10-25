@@ -70,12 +70,13 @@ export function buildEmailCatalog(ctx: EmailContext): EmailCatalogEntry[] {
       trigger: "Écrite et envoyée depuis l'onglet E-mails. Exemple avec le modèle Nouvelle vidéo.",
       sender: "BUILD",
       mail: buildBroadcastEmail(ctx, {
+        kind: "video",
         subject: "Brancher ton premier agent",
         preheader: "La vidéo est disponible dans ton espace.",
-        body: "Cette vidéo est disponible dans ton espace. Tu peux la regarder quand tu veux.",
+        body: "Brancher ton premier agent\n\nUne nouvelle vidéo vient d'être ajoutée à BUILD. Elle illustre concrètement ce que tu apprends dans les modules : pas de théorie, de l'actionnable.",
         ctaLabel: "Regarder la vidéo",
         ctaUrl: `${ctx.baseUrl ?? "https://build.example"}/blocs/1?video=1`,
-        thumbnailUrl: ctx.baseUrl ? `${ctx.baseUrl}/da/mini/b1.jpg` : "https://build.example/da/mini/b1.jpg",
+        thumbnailUrl: `${ctx.baseUrl ?? "https://build.example"}/email/video-thumb-demo.jpg`,
       }),
     },
     {
@@ -84,9 +85,10 @@ export function buildEmailCatalog(ctx: EmailContext): EmailCatalogEntry[] {
       trigger: "Écrite et envoyée depuis l'onglet E-mails. Exemple avec le modèle Mise à jour BUILD.",
       sender: "BUILD",
       mail: buildBroadcastEmail(ctx, {
+        kind: "update",
         subject: "Mise à jour BUILD : un chapitre de plus",
         preheader: "Le contenu vient d'être mis à jour.",
-        body: "Un nouveau chapitre vient d'arriver dans ton espace, avec ses étapes pas à pas.\n\nConnecte-toi pour voir ce qui a changé.",
+        body: "Mise à jour BUILD : un chapitre de plus\n\nBUILD vient d'être mis à jour. Un nouveau chapitre vient d'arriver dans ton espace, avec ses étapes pas à pas.",
         ctaLabel: "Voir la mise à jour",
         ctaUrl: `${ctx.baseUrl ?? "https://build.example"}/dashboard`,
       }),
