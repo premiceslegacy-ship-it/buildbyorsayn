@@ -1,9 +1,8 @@
 import { formatVideoDate, youtubeThumbnailUrl, youtubeWatchUrl, type FeedVideo } from "@/lib/nouveautes/videos";
 
-export function NewVideoMarker() {
-  // Revealed client-side by NouveautesSeen once the member's last visit is known.
+export function NewVideoMarker({ fresh = false }: { fresh?: boolean }) {
   return (
-    <span data-new-badge hidden className="rounded-full bg-accent/15 px-2.5 py-1 text-xs font-semibold text-[#b9f5cf]">
+    <span data-new-badge hidden={!fresh} className="rounded-full bg-accent/15 px-2.5 py-1 text-xs font-semibold text-[#b9f5cf]">
       Nouveau
     </span>
   );

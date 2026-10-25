@@ -67,8 +67,8 @@ export default function ConfidentialitePage() {
 
           <Traitement
             titre="Ta progression"
-            donnees="Pour chaque vidéo, l'endroit où tu t'es arrêté et si tu l'as terminée. La date à laquelle tu as consulté les Nouveautés pour la dernière fois."
-            pourquoi="Te faire reprendre là où tu t'étais arrêté et afficher ce qui est nouveau depuis ta dernière visite."
+            donnees="Pour chaque vidéo, l'endroit où tu t'es arrêté et si tu l'as terminée. Les nouveautés BUILD que tu as ouvertes."
+            pourquoi="Te faire reprendre là où tu t'étais arrêté et afficher ce qui reste nouveau pour toi."
             base="L'exécution du contrat."
             duree="Tant que ton compte existe. Ces données sont supprimées avec lui."
           />

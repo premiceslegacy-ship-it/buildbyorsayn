@@ -67,9 +67,23 @@ test("une diffusion garde une désinscription, et le corps devient paragraphes, 
 });
 
 test("les gabarits Supabase gardent leurs variables et la vidéo YouTube devient une miniature", () => {
-  assert.ok(buildAuthEmail(ctx, "recovery").html.includes('href="{{ .ConfirmationURL }}"'));
+  assert.ok(buildAuthEmail(ctx, "recovery").html.includes("{{ .Token }}"));
+  assert.ok(!buildAuthEmail(ctx, "recovery").html.includes("{{ .ConfirmationURL }}"));
+  assert.ok(buildAuthEmail(ctx, "invite").html.includes('href="{{ .ConfirmationURL }}"'));
   assert.ok(buildAuthEmail(ctx, "email-change").text.includes("{{ .NewEmail }}"));
   const video = buildBroadcastEmail(ctx, { subject: "v", preheader: "", body: "b", ctaLabel: "Regarder", ctaUrl: "https://youtu.be/abcdefghijk" });
   assert.match(video.html, /img\.youtube\.com\/vi\/abcdefghijk\//);
+  const storedThumbnail = buildBroadcastEmail(ctx, {
+    subject: "Le bon ordre avant de construire",
+    preheader: "",
+    body: "Regarde cette vidéo quand tu veux.",
+    ctaLabel: "Regarder",
+    ctaUrl: "https://build.example.test/blocs/3?video=1",
+    thumbnailUrl: "https://fqwzvskwgiimcmpvrldt.supabase.co/storage/v1/object/public/video-thumbnails/news/demo/thumbnail.jpg",
+  });
+  assert.match(storedThumbnail.html, /width="600"[^>]*alt="Miniature de Le bon ordre avant de construire"/);
+  assert.match(storedThumbnail.html, /<a href="https:\/\/build\.example\.test\/blocs\/3\?video=1"[^>]*>\s*<img[^>]*thumbnail\.jpg/);
+  assert.match(storedThumbnail.text, /Image\s:\sMiniature de Le bon ordre avant de construire/);
+  assert.ok(storedThumbnail.html.indexOf("thumbnail.jpg") < storedThumbnail.html.indexOf("Regarde cette vidéo"), "la miniature précède le texte");
   assert.match(buildWelcomeEmail(ctx, "https://x.test/a").html, /href="https:\/\/x\.test\/a"/);
 });

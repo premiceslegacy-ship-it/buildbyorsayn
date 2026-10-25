@@ -39,3 +39,4 @@ test("member_nouveautes_seen is owner-only", () => {
   assert.equal((section.match(/auth\.uid\(\) = user_id/g) ?? []).length, 4);
   assert.doesNotMatch(section, /using \(true\)/i);
 });
+

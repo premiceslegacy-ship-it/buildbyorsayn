@@ -113,7 +113,7 @@ export function LandingBento() {
             </div>
             <div className="vig__txt">
               <h3 className="t-2">Ton IA connaît BUILD</h3>
-              <p>Dans Claude, ChatGPT, Hermes Agent, Oh My Pi ou Cursor.</p>
+              <p>Dans Claude et ChatGPT.</p>
             </div>
           </article>
 

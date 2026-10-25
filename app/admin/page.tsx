@@ -13,7 +13,7 @@ import NewsView from "@/components/admin/NewsView";
 import { OverviewView } from "@/components/admin/OverviewView";
 import { YoutubeNewsPanel } from "@/components/admin/YoutubeNewsPanel";
 import { DaRoot } from "@/components/da/DaRoot";
-import { BLOCS_DATA } from "@/lib/mockData";
+import { BLOCS_DATA, displayLocationFromBlocId } from "@/lib/blocCatalog";
 import type { AdminVideoLessonRow } from "@/lib/mux/adminServer";
 import { withAdminThumbnailUrls } from "@/lib/mux/adminThumbnails.server";
 import { createClient } from "@/lib/supabase/server";
@@ -75,6 +75,7 @@ export default async function AdminPage() {
     { data: presenceData, error: presenceError },
     { data: eventData, error: eventError },
     { data: videoData, error: videoError },
+    { data: videoNewsData },
   ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id, tier, completed_blocks").order("id").limit(1000),
     supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
@@ -93,6 +94,11 @@ export default async function AdminPage() {
       .from("video_lessons")
       .select("id,bloc_id,position,title,summary,transcript,transcript_segments,transcript_source,deliverables,chapters,thumbnail,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,replaced_at,approved_at,created_at")
       .order("created_at", { ascending: false })
+      .limit(100),
+    supabaseAdmin
+      .from("build_news")
+      .select("source_key,thumbnail_storage_path,internal_url")
+      .like("source_key", "video:%")
       .limit(100),
   ]);
 
@@ -166,6 +172,36 @@ export default async function AdminPage() {
     ? users.reduce((total, account) => total + (account.completed_blocks?.length ?? 0), 0) / users.length
     : 0;
   const trackingSetupMissing = Boolean(profilesError || authError || presenceError || eventError);
+  const adminVideos = await withAdminThumbnailUrls(supabaseAdmin, (videoData ?? []) as AdminVideoLessonRow[]);
+  const videoNewsByVideoId = new Map(
+    (((videoNewsData as Array<{ source_key: string | null; thumbnail_storage_path: string | null; internal_url: string | null }> | null) ?? [])
+      .map((entry) => {
+        const match = entry.source_key?.match(/^video:([^:]+):1$/);
+        return match ? [match[1], entry] as const : null;
+      })
+      .filter((entry): entry is readonly [string, { source_key: string | null; thumbnail_storage_path: string | null; internal_url: string | null }] => entry !== null)),
+  );
+  const publishedVideos = adminVideos
+    .filter((video) => Boolean(video.published_at) && !video.replaced_at)
+    .map((video) => {
+      const location = displayLocationFromBlocId(video.bloc_id);
+      const locationLabel = location === "protocole" ? "Protocole" : location === null ? "Bloc" : `Bloc ${location}`;
+      const news = videoNewsByVideoId.get(video.id);
+      const thumbnailPath = news?.thumbnail_storage_path;
+      const thumbnailUrl = thumbnailPath
+        ? supabaseAdmin.storage.from("video-thumbnails").getPublicUrl(thumbnailPath).data.publicUrl
+        : null;
+      return {
+        id: video.id,
+        title: video.title,
+        position: video.position,
+        locationLabel,
+        thumbnailUrl,
+        href: news?.internal_url && emailContext.baseUrl
+          ? `${emailContext.baseUrl}${news.internal_url}`
+          : `${emailContext.baseUrl ?? ""}/blocs/${encodeURIComponent(video.bloc_id)}?video=${video.position}`,
+      };
+    });
 
   return (
     <DaRoot className="adm-root">
@@ -217,7 +253,7 @@ export default async function AdminPage() {
           videos: (
             <AdminVideoManager
               blocs={[...BLOCS_DATA.map((bloc) => ({ id: bloc.id, displayNumber: bloc.displayNumber, title: bloc.titre })), { id: "protocole", displayNumber: "protocole" as const, title: "Protocole zéro" }]}
-              initialVideos={await withAdminThumbnailUrls(supabaseAdmin, (videoData ?? []) as AdminVideoLessonRow[])}
+              initialVideos={adminVideos}
               setupMissing={Boolean(videoError)}
             />
           ),
@@ -227,6 +263,7 @@ export default async function AdminPage() {
             <AdminMailComposer
               emailContext={emailContext}
               catalog={buildEmailCatalog(emailContext)}
+              publishedVideos={publishedVideos}
               from={process.env.RESEND_FROM_EMAIL?.trim() || "BUILD"}
               dataWarning={authError || profilesError ? "Les destinataires sont momentanément indisponibles. Aucun envoi n'est proposé." : null}
               users={interactiveUsers.map((account) => ({

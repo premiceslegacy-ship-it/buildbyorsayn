@@ -64,8 +64,9 @@
   box-shadow: inset 0 1px 0 rgba(255,255,255,.34), inset 0 -1px 0 rgba(255,255,255,.06), inset 0 0 0 1px rgba(255,255,255,.1), 0 18px 40px -16px rgba(0,0,0,.7); }
 
 /* Verre liquide partagé (navbar de l'accueil, barre d'onglets membre). components/ui/LiquidGlass.tsx y ajoute en JS la réfraction
-   (filtre SVG dans backdrop-filter, Chromium seulement) et les arêtes spéculaires. Ce bloc est le repli : flou léger + saturation + lumière,
-   fond très transparent pour que les formes et couleurs du dessous restent lisibles. Le texte reste lisible grâce à la teinte sombre. */
+   (filtre SVG dans backdrop-filter, Chromium seulement) et les arêtes spéculaires. Le repli WebKit/Firefox combine un flou
+   net, saturation, une arête déplacée par SVG sur un calque fantôme et un reflet lié au défilement : ce n'est pas une
+   réfraction du contenu réel, impossible à capturer proprement sans rasteriser toute la page. Le texte reste lisible grâce à la teinte sombre. */
 .da .verre-liquide { position: fixed; overflow: hidden; isolation: isolate; background-color: rgba(8,12,10,.3); -webkit-backdrop-filter: blur(10px) saturate(1.8) brightness(1.1); backdrop-filter: blur(10px) saturate(1.8) brightness(1.1);
   box-shadow: 0 16px 34px -14px rgba(0,0,0,.6), 0 2px 8px rgba(0,0,0,.28); }
 .da .verre-liquide::before { content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none;
@@ -74,6 +75,9 @@
 /* Reflet diagonal : un seul calque transformé (jamais le filtre), qui glisse très peu avec le défilement de la page. */
 .da .verre-liquide::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 180%; z-index: 0; pointer-events: none; transform: translateX(-6%);
   background: linear-gradient(112deg, rgba(255,255,255,0) 38%, rgba(255,255,255,.12) 47%, rgba(255,255,255,.03) 53%, rgba(255,255,255,0) 62%); }
+/* WebKit/Firefox : une seule couche d'arête est déplacée, sans cloner ni repeindre le contenu. */
+.da .verre-liquide > .verre-liquide__bord { position: absolute; inset: -2px; z-index: 0 !important; width: auto; height: auto; border-radius: inherit; pointer-events: none;
+  opacity: .58; mix-blend-mode: screen; background-size: 100% 100%; background-repeat: no-repeat; will-change: transform; }
 .da .verre-liquide > * { position: relative; z-index: 1; }
 .da .verre-liquide > .slider { position: absolute; z-index: 0; }
 @keyframes verre-reflet { to { transform: translateX(10%); } }
@@ -81,8 +85,11 @@
   @media (prefers-reduced-motion: no-preference) { .da .verre-liquide::after { animation: verre-reflet linear both; animation-timeline: scroll(root); } }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .da .verre-liquide { background-color: rgb(14,18,16) !important; background-image: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 14px 30px -14px rgba(0,0,0,.7); }
-  .da .verre-liquide::after { display: none; }
+  /* Réduction de transparence : le contraste passe par une teinte plus dense, pas par un aplat sans verre. */
+  .da .verre-liquide { background-color: rgba(8,12,10,.68) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.42), inset 0 -1px 0 rgba(255,255,255,.1), inset 0 0 0 1px rgba(255,255,255,.16), 0 14px 30px -14px rgba(0,0,0,.72); }
+  .da .verre-liquide::before { background: linear-gradient(158deg, rgba(255,255,255,.24) 0%, rgba(255,255,255,.08) 32%, rgba(255,255,255,0) 58%, rgba(255,255,255,.1) 100%); }
+  .da .verre-liquide::after { display: block; }
+  .da .verre-liquide > .verre-liquide__bord { opacity: .72; }
 }
 .da .pastille { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 14px; border-radius: 999px; font: 600 13px/1 var(--font); color: var(--t1); }
 .da .pastille b { width: 7px; height: 7px; border-radius: 50%; background: var(--em); box-shadow: 0 0 12px var(--em); }

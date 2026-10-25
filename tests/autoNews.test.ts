@@ -51,7 +51,8 @@ const publishedVideo = {
   id: VIDEO_ID,
   bloc_id: "b1",
   position: 1,
-  title: "Pourquoi tout processiser",
+  title: "BUILD - Bloc 1 - Vidéo 1",
+  summary: "Poser le bon cadre avant de construire permet de décider plus vite. La suite vient ensuite.",
   duration_seconds: 1080,
   thumbnail: "mux:12",
   playback_id: "pb",
@@ -66,12 +67,17 @@ const deps = (client: SupabaseClient, loadThumbnail?: () => Promise<{ url: strin
   createdBy: "admin-1",
 });
 
-test("le texte d'une vidéo est factuel, en français, sans tiret cadratin", () => {
-  const text = videoNewsText({ title: "Pourquoi tout processiser", blocLabel: "Bloc 1", durationSeconds: 1080 });
-  assert.equal(text.title, "Pourquoi tout processiser");
-  assert.equal(text.sentence, "Nouvelle vidéo\u00a0: Pourquoi tout processiser. Bloc 1, durée 18 min.");
+test("le texte d'une vidéo retire les préfixes et utilise le résumé sans répéter le bloc", () => {
+  const text = videoNewsText({
+    title: "BUILD - Bloc 1 - Vidéo 1",
+    summary: "Poser le bon cadre avant de construire permet de décider plus vite. La suite vient ensuite.",
+    blocLabel: "Bloc 1",
+    durationSeconds: 1080,
+  });
+  assert.equal(text.title, "Poser le bon cadre avant de construire permet de décider plus vite");
+  assert.equal(text.sentence, "Poser le bon cadre avant de construire permet de décider plus vite. 18 min.");
+  assert.doesNotMatch(`${text.title}${text.sentence}`, /BUILD|Bloc 1/);
   assert.doesNotMatch(`${text.title}${text.sentence}`, /[—–]/);
-  assert.equal(videoNewsText({ title: "Fini !", blocLabel: null, durationSeconds: null }).sentence, "Nouvelle vidéo\u00a0: Fini !");
 });
 
 test("publier une vidéo crée une Nouveauté immédiate liée à la vidéo", async () => {

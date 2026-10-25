@@ -13,6 +13,7 @@ const stamp = Date.now();
 const password = `Lesson-${stamp}-Aa9!`;
 const section = "b1-s0";
 const videoId = "RLSprobe001"; // 11 chars, matches the table check
+const newsId = "00000000-0000-4000-8000-000000000001";
 const results: { check: string; pass: boolean; detail?: string }[] = [];
 
 function record(check: string, pass: boolean, detail?: string) {
@@ -34,9 +35,11 @@ async function cleanup(users: User[]) {
   const ids = users.map((user) => user.id);
   if (ids.length) {
     await admin.from("lesson_progress").delete().in("user_id", ids);
+    await admin.from("build_news_seen").delete().in("user_id", ids);
     await admin.from("member_nouveautes_seen").delete().in("user_id", ids);
     await admin.from("profiles").delete().in("id", ids);
   }
+  await admin.from("build_news").delete().eq("id", newsId);
   await admin.from("youtube_videos").delete().eq("video_id", videoId);
   for (const user of users) await admin.auth.admin.deleteUser(user.id);
 }
@@ -88,6 +91,28 @@ async function main() {
     const anonMark = await anon.from("member_nouveautes_seen").select("*").limit(1);
     record("member_nouveautes_seen: anonymous visitors are refused", denied(anonMark.error), anonMark.error?.message);
 
+    // build_news_seen --------------------------------------------------------
+    const seededNews = await admin.from("build_news").insert({
+      id: newsId,
+      title: "RLS probe",
+      published_at: new Date().toISOString(),
+      thumbnail: "/da/symbole-sombre.svg",
+      bloc_label: null,
+      internal_url: "/nouveautes",
+      sentence: "RLS probe.",
+      source_key: `rls-probe:${newsId}:1`,
+      created_by: a.id,
+    }).select("id").single();
+    record("build_news_seen: service role seeds a news row", !seededNews.error, seededNews.error?.message);
+    const ownNews = await clientA.from("build_news_seen").insert({ user_id: a.id, news_id: newsId });
+    record("build_news_seen: member writes own row", !ownNews.error, ownNews.error?.message);
+    const forgedNews = await clientB.from("build_news_seen").insert({ user_id: a.id, news_id: newsId });
+    record("build_news_seen: another member cannot write my row", denied(forgedNews.error), forgedNews.error?.message);
+    const hiddenNews = await clientB.from("build_news_seen").select("*").eq("user_id", a.id);
+    record("build_news_seen: another member reads nothing of mine", !hiddenNews.error && hiddenNews.data?.length === 0, hiddenNews.error?.message);
+    const anonNews = await anon.from("build_news_seen").select("*").limit(1);
+    record("build_news_seen: anonymous visitors are refused", denied(anonNews.error), anonNews.error?.message);
+
     // youtube_videos -----------------------------------------------------------
     const bad = await admin.from("youtube_videos").insert({ video_id: "not-valid", title: "x", published_at: new Date().toISOString() });
     record("youtube_videos: malformed video id rejected by the table check", Boolean(bad.error), "accepted");
@@ -105,7 +130,7 @@ async function main() {
     record("youtube_videos: the row was not defaced", still.data?.title === "RLS probe");
 
     // count query used by the nav badge ---------------------------------------
-    const count = await clientA.from("youtube_videos").select("video_id", { count: "exact", head: true }).gt("published_at", "2000-01-01T00:00:00Z");
+    const count = await clientA.from("build_news").select("id", { count: "exact", head: true }).gt("published_at", "2000-01-01T00:00:00Z");
     record("nav badge count query works for members", !count.error && (count.count ?? 0) >= 1, count.error?.message);
   } finally {
     await cleanup(users);

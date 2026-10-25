@@ -34,6 +34,7 @@ export type EmailBlock =
   | { type: "button"; label: string; url: string }
   | { type: "link"; label: string; url: string }
   | { type: "divider" }
+  | { type: "code"; text: string }
   | { type: "note"; text: string };
 
 export type EmailFooter = {
@@ -97,20 +98,27 @@ function renderBlock(block: EmailBlock): string {
     case "note":
       return paragraphs(block.text, `font-family:${FONT};font-size:13px;line-height:21px;color:${EMAIL_COLORS.muted};`);
     case "facts": {
+      // Liste typographique sobre : pas de carte, pas de cadre, seulement des filets fins entre les lignes.
       const rows = block.rows
         .map(
           ([label, value], index) =>
-            `<tr><td style="padding:16px 22px;${index ? `border-top:1px solid ${EMAIL_COLORS.line};` : ""}font-family:${FONT};"><div style="font-size:13px;line-height:20px;color:${EMAIL_COLORS.muted};">${escapeEmailHtml(label)}</div><div style="padding-top:2px;font-size:16px;line-height:24px;color:${EMAIL_COLORS.text};">${multiline(value)}</div></td></tr>`,
+            `<tr><td style="padding:14px 0;${index ? `border-top:1px solid ${EMAIL_COLORS.line};` : ""}font-family:${FONT};"><div style="font-size:13px;line-height:20px;color:${EMAIL_COLORS.muted};">${escapeEmailHtml(label)}</div><div style="padding-top:2px;font-size:16px;line-height:24px;color:${EMAIL_COLORS.text};">${multiline(value)}</div></td></tr>`,
         )
         .join("");
-      return `<tr><td class="px" style="padding:6px 40px 24px 40px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${EMAIL_COLORS.panel}" style="background-color:${EMAIL_COLORS.panel};border:1px solid ${EMAIL_COLORS.line};border-radius:14px;">${rows}</table></td></tr>`;
+      return `<tr><td class="px" style="padding:4px 40px 24px 40px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${rows}</table></td></tr>`;
     }
     case "quote":
-      return `<tr><td class="px" style="padding:4px 40px 24px 40px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="3" bgcolor="${EMAIL_COLORS.accent}" style="width:3px;background-color:${EMAIL_COLORS.accent};font-size:0;line-height:0;">&nbsp;</td><td bgcolor="${EMAIL_COLORS.panel}" style="padding:16px 20px;background-color:${EMAIL_COLORS.panel};font-family:${FONT};font-size:15px;line-height:24px;color:${EMAIL_COLORS.body};">${multiline(block.text)}</td></tr></table></td></tr>`;
+      // Citation en texte secondaire, entre guillemets français : jamais de barre latérale ni de fond de carte.
+      return `<tr><td class="px" style="padding:0 40px 24px 40px;font-family:${FONT};font-size:14px;line-height:23px;color:${EMAIL_COLORS.muted};">«\u00a0${multiline(block.text)}\u00a0»</td></tr>`;
+    case "code":
+      // Code à saisir : texte seul, grand et espacé, sans cadre ni fond.
+      return `<tr><td class="px" style="padding:4px 40px 28px 40px;font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:34px;line-height:40px;font-weight:600;letter-spacing:0.14em;color:${EMAIL_COLORS.text};">${escapeEmailHtml(block.text)}</td></tr>`;
     case "image": {
+      const src = safeUrl(block.src);
       const href = safeUrl(block.href);
-      const img = `<img src="${escapeEmailHtml(block.src)}" width="520" alt="${escapeEmailHtml(block.alt)}" style="display:block;width:100%;max-width:520px;height:auto;border:0;border-radius:14px;" />`;
-      return `<tr><td class="px" style="padding:4px 40px 24px 40px;">${href ? `<a href="${escapeEmailHtml(href)}" style="text-decoration:none;">${img}</a>` : img}</td></tr>`;
+      if (!src) return "";
+      const img = `<img src="${escapeEmailHtml(src)}" width="600" alt="${escapeEmailHtml(block.alt)}" style="display:block;width:100%;max-width:600px;height:auto;border:0;border-radius:14px;" />`;
+      return `<tr><td style="padding:0 0 28px 0;">${href ? `<a href="${escapeEmailHtml(href)}" target="_blank" style="display:block;text-decoration:none;">${img}</a>` : img}</td></tr>`;
     }
     case "button": {
       const url = safeUrl(block.url);
@@ -167,6 +175,9 @@ function renderText(doc: EmailDocument): string {
       case "quote":
         parts.push(block.text.trim().split(/\r?\n/).map((line) => `> ${line}`).join("\n"), "");
         break;
+      case "code":
+        parts.push(block.text, "");
+        break;
       case "facts":
         parts.push(...block.rows.map(([label, value]) => `${label} : ${value}`), "");
         break;
@@ -183,7 +194,7 @@ function renderText(doc: EmailDocument): string {
       }
       case "image": {
         const url = safeUrl(block.href);
-        if (url) parts.push(url, "");
+        if (url) parts.push(`Image : ${block.alt}`, url, "");
         break;
       }
       case "divider":
@@ -205,7 +216,8 @@ function renderText(doc: EmailDocument): string {
 
 export function renderEmail(doc: EmailDocument): RenderedEmail {
   const { page } = EMAIL_COLORS;
-  const preheader = escapeEmailHtml(doc.preheader);
+  const subject = french(doc.subject);
+  const preheader = escapeEmailHtml(french(doc.preheader));
   const filler = "&#8199;&#847; ".repeat(40);
   const html = `<!doctype html>
 <html lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -216,7 +228,7 @@ export function renderEmail(doc: EmailDocument): RenderedEmail {
 <meta name="color-scheme" content="dark" />
 <meta name="supported-color-schemes" content="dark" />
 <meta name="x-apple-disable-message-reformatting" />
-<title>${escapeEmailHtml(doc.subject)}</title>
+<title>${escapeEmailHtml(subject)}</title>
 <!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
 <style>
 :root{color-scheme:dark;supported-color-schemes:dark;}
@@ -247,5 +259,5 @@ ${renderFooter(doc.footer)}
 </table>
 </body>
 </html>`;
-  return { subject: doc.subject, html, text: renderText(doc) };
+  return { subject, html, text: renderText(doc) };
 }

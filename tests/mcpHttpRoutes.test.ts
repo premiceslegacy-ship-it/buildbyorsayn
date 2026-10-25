@@ -63,6 +63,26 @@ test("MCP preflight never reflects a denied origin", async () => {
   assert.equal(response.headers.get("vary"), "Origin");
 });
 
+test("the MCP preflight stays available for an allowlisted pre-launch account", async () => {
+  const originalLaunch = process.env.MCP_CONNECTOR_LAUNCHED;
+  const originalAllowlist = process.env.MCP_CONNECTOR_ALLOWED_ACCOUNT_IDS;
+  try {
+    process.env.MCP_CONNECTOR_LAUNCHED = "false";
+    process.env.MCP_CONNECTOR_ALLOWED_ACCOUNT_IDS = "e2e-account";
+    const response = await optionsMcp(new Request("https://buildbyorsayn.com/api/mcp", {
+      method: "OPTIONS",
+      headers: { Origin: allowedOrigin },
+    }));
+    assert.equal(response.status, 204);
+    assert.equal(response.headers.get("access-control-allow-origin"), allowedOrigin);
+  } finally {
+    if (originalLaunch === undefined) delete process.env.MCP_CONNECTOR_LAUNCHED;
+    else process.env.MCP_CONNECTOR_LAUNCHED = originalLaunch;
+    if (originalAllowlist === undefined) delete process.env.MCP_CONNECTOR_ALLOWED_ACCOUNT_IDS;
+    else process.env.MCP_CONNECTOR_ALLOWED_ACCOUNT_IDS = originalAllowlist;
+  }
+});
+
 test("MCP POST rejects a present disallowed Origin before infrastructure work", async () => {
   const response = await postMcp(new Request("https://buildbyorsayn.com/api/mcp", {
     method: "POST",
@@ -239,6 +259,27 @@ test("OAuth register and token endpoints answer browser preflights with the exac
     assert.equal(denied.status, 403);
     assert.equal(denied.headers.get("access-control-allow-origin"), null);
     assert.equal(denied.headers.get("vary"), "Origin");
+  }
+});
+
+test("the token preflight stays available for an allowlisted pre-launch account", async () => {
+  const token = await import("../app/api/mcp/oauth/token/route");
+  const originalLaunch = process.env.MCP_CONNECTOR_LAUNCHED;
+  const originalAllowlist = process.env.MCP_CONNECTOR_ALLOWED_ACCOUNT_IDS;
+  try {
+    process.env.MCP_CONNECTOR_LAUNCHED = "false";
+    process.env.MCP_CONNECTOR_ALLOWED_ACCOUNT_IDS = "e2e-account";
+    const response = token.OPTIONS(new Request("https://build.example/api", {
+      method: "OPTIONS",
+      headers: { Origin: "https://claude.ai" },
+    }));
+    assert.equal(response.status, 204);
+    assert.equal(response.headers.get("access-control-allow-origin"), "https://claude.ai");
+  } finally {
+    if (originalLaunch === undefined) delete process.env.MCP_CONNECTOR_LAUNCHED;
+    else process.env.MCP_CONNECTOR_LAUNCHED = originalLaunch;
+    if (originalAllowlist === undefined) delete process.env.MCP_CONNECTOR_ALLOWED_ACCOUNT_IDS;
+    else process.env.MCP_CONNECTOR_ALLOWED_ACCOUNT_IDS = originalAllowlist;
   }
 });
 

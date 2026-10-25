@@ -6,6 +6,8 @@ import { createServer } from "node:net";
 import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { chromium } from "@playwright/test";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { createClient } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
 import { hashRateLimitSubject } from "../lib/mcp/security";
@@ -196,6 +198,39 @@ async function mcpRequest(accessToken: string, body: Record<string, unknown>): P
     status: response.status,
     payload: text ? parseMcpPayload(text) : {},
   };
+}
+
+/**
+ * Exercise the SDK's real Streamable HTTP client after the OAuth exchange.
+ * The raw requests above retain protocol-level assertions; this client proves
+ * the transport's initialize/list/call path against the same bearer token.
+ */
+async function runSdkClient(accessToken: string): Promise<void> {
+  const client = new Client(
+    { name: "BUILD MCP SDK E2E", version: "1.0.0" },
+    { capabilities: {} },
+  );
+  const transport = new StreamableHTTPClientTransport(new URL(RESOURCE), {
+    requestInit: {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Origin: "https://claude.ai",
+        ...TRUSTED_NETWORK_HEADER,
+      },
+    },
+  });
+  try {
+    await client.connect(transport);
+    const tools = await client.listTools();
+    assertToolsList(tools);
+    const result = await client.callTool({
+      name: "list_available_content",
+      arguments: {},
+    });
+    assertTextToolResult(result);
+  } finally {
+    await client.close().catch(() => undefined);
+  }
 }
 
 function temporaryRateLimitSubjects(): string[] {
@@ -453,6 +488,8 @@ async function main(): Promise<void> {
     });
     assert.equal(toolsList.status, 200);
     assertToolsList(assertMcpSuccess(toolsList.payload, 2));
+    await runSdkClient(firstAccessToken);
+    report.sdkClient = "PASS";
 
     const knowledgeSearchStartedAt = performance.now();
     const search = await mcpRequest(firstAccessToken, {

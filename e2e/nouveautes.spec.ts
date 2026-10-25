@@ -75,7 +75,6 @@ test.describe("Nouveautés navigation (member)", () => {
   });
 });
 
-// Fulfilled cross-origin responses still go through CORS, so every mock must carry these.
 const CORS = {
   "access-control-allow-origin": "*",
   "access-control-allow-headers": "*",
@@ -95,7 +94,6 @@ publicTest.describe("Nouveautés (security and performance)", () => {
     let scriptBytes = 0;
     page.on("response", async (response) => {
       requests.push(response.url());
-      // Own bundle only: the YouTube player (an embed we do not ship) loads its own scripts inside the iframe.
       if (response.request().resourceType() === "script" && new URL(response.url()).origin === new URL(page.url()).origin) {
         const length = Number(response.headers()["content-length"] ?? 0);
         scriptBytes += length || (await response.body().catch(() => Buffer.alloc(0))).length;
@@ -132,7 +130,7 @@ publicTest.describe("Nouveautés (security and performance)", () => {
       () => page.frames().map((frame) => frame.url()),
       { message: "the embed must navigate to YouTube, not to a Chromium error page", timeout: 20_000 },
     ).toContainEqual(publicExpect.stringMatching(/^https:\/\/www\.youtube-nocookie\.com\/embed\//));
-    publicExpect(page.frames().map((frame) => frame.url()).filter((url) => url.startsWith("chrome-error:"))).toEqual([]);
+    publicExpect(page.frames().map((frame) => frame.url()).filter((url) => url.startsWith("chrome-error:")).length).toBe(0);
   });
 
   publicTest("an oversized WebSub body is refused without work", async ({ request }) => {
@@ -150,42 +148,32 @@ publicTest.describe("Nouveautés (security and performance)", () => {
 test.describe("Nouveautés badge (member)", () => {
   test.skip(!hasE2eAccount, "E2E_TEST_EMAIL/E2E_TEST_PASSWORD not configured");
 
-  test("counts unseen videos in the nav, caps at 9+, and clears after visiting /nouveautes", async ({ authedPage: page }) => {
-    let seenAt: string | null = "2020-01-01T00:00:00Z";
-    let upserted = false;
-
-    await page.route("**/rest/v1/member_nouveautes_seen**", async (route) => {
-      const method = route.request().method();
-      if (method === "OPTIONS") {
-        await route.fulfill({ status: 204, headers: CORS });
-      } else if (method === "GET") {
-        await route.fulfill({ status: 200, headers: CORS, contentType: "application/json", body: seenAt ? JSON.stringify({ seen_at: seenAt }) : "null" });
-      } else {
-        upserted = true;
-        seenAt = new Date().toISOString();
-        await route.fulfill({ status: 201, headers: CORS, body: "" });
-      }
-    });
-    await page.route("**/rest/v1/youtube_videos**", async (route) => {
+  test("counts fresh BUILD entries in the nav and caps at 9+", async ({ authedPage: page }) => {
+    const rows = Array.from({ length: 12 }, (_, index) => ({
+      id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+      published_at: "2026-10-24T09:00:00.000Z",
+      source_key: null,
+    }));
+    await page.route("**/rest/v1/build_news?*", async (route) => {
       if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: CORS });
-      const unseen = seenAt && new Date(seenAt).getFullYear() > 2020 ? 0 : 12;
-      await route.fulfill({ status: 200, headers: { ...CORS, "content-range": unseen === 0 ? "*/0" : "0-0/12" }, contentType: "application/json", body: "[]" });
+      await route.fulfill({ status: 200, headers: CORS, contentType: "application/json", body: JSON.stringify(rows) });
+    });
+    await page.route("**/rest/v1/build_news_seen?*", async (route) => {
+      if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: CORS });
+      await route.fulfill({ status: 200, headers: CORS, contentType: "application/json", body: "[]" });
+    });
+    await page.route("**/rest/v1/lesson_progress?*", async (route) => {
+      if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: CORS });
+      await route.fulfill({ status: 200, headers: CORS, contentType: "application/json", body: "[]" });
     });
 
     await page.goto("/dashboard");
     await expect(page.getByTestId("nouveautes-badge").first()).toHaveText("9+", { timeout: 10_000 });
-
-    await page.goto("/nouveautes");
-    await expect.poll(() => upserted, { timeout: 10_000 }).toBe(true);
-
-    await page.goto("/dashboard");
-    await expect(page.getByTestId("nouveautes-badge")).toHaveCount(0);
   });
 
   test("a failing lookup shows no badge instead of a wrong one", async ({ authedPage: page }) => {
-    await page.route("**/rest/v1/member_nouveautes_seen**", (route) => route.fulfill({ status: route.request().method() === "OPTIONS" ? 204 : 500, headers: CORS, contentType: "application/json", body: "{}" }));
+    await page.route("**/rest/v1/build_news?*", (route) => route.fulfill({ status: route.request().method() === "OPTIONS" ? 204 : 500, headers: CORS, contentType: "application/json", body: "{}" }));
     await page.goto("/dashboard");
-    // Attached, not visible: below the xl breakpoint the links live in the collapsed hamburger menu.
     await expect(page.locator('a[href="/nouveautes"]').first()).toBeAttached();
     await expect(page.getByTestId("nouveautes-badge")).toHaveCount(0);
   });

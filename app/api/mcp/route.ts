@@ -51,7 +51,9 @@ function originAllowed(request: Request): boolean {
 }
 
 export async function OPTIONS(request: Request) {
-  if (!isMcpConnectorLaunched()) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  if (!isMcpConnectorLaunched() && !hasMcpConnectorAllowlist()) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
   if (!originAllowed(request)) return jsonError(request, "origin_not_allowed", 403);
   return new Response(null, { status: 204, headers: responseHeaders(request) });
 }

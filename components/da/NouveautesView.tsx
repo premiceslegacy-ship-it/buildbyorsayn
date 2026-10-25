@@ -1,14 +1,15 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { markBuildNewsSeen } from "@/app/nouveautes/actions";
 import { DaIcon } from "@/components/da/DaIcon";
 import { AppState } from "@/components/ui/AppState";
 import { NewVideoMarker } from "@/components/nouveautes/NouveautesGrid";
 import type { NouveautesFeed } from "@/lib/nouveautes/loadVideos";
 import { formatVideoDate, groupNouveautesByMonth, type NouveautesItem } from "@/lib/nouveautes/videos";
-import { playAppSound } from "@/lib/ui/sound";
 import { animateEntryCascade } from "@/lib/ui/motion";
+import { playAppSound } from "@/lib/ui/sound";
 
 type Filter = "all" | "youtube" | "build";
 
@@ -63,9 +64,10 @@ export function NouveautesView({ feed }: { feed: NouveautesFeed }) {
     tabs.current?.querySelectorAll<HTMLButtonElement>('button[role="tab"]')[filters.indexOf(next)]?.focus();
   };
   const visibleItems = feed.items.filter((item) => filter === "all" || item.source === filter);
-  const groups = groupNouveautesByMonth(visibleItems);
+  const freshItems = visibleItems.filter((item) => item.isFresh);
+  const groups = groupNouveautesByMonth(visibleItems.filter((item) => !item.isFresh));
   const filterLabel = filter === "all" ? "Tout" : filter === "youtube" ? "YouTube" : "Sur BUILD";
-  const resultCount = groups.reduce((count, group) => count + group.items.length, 0);
+  const resultCount = freshItems.length + groups.reduce((count, group) => count + group.items.length, 0);
   const hasError = filter === "all"
     ? feed.status === "error"
     : filter === "youtube" ? feed.sources.youtube === "error" : feed.sources.build === "error";
@@ -74,13 +76,23 @@ export function NouveautesView({ feed }: { feed: NouveautesFeed }) {
     <p className="sr" role="status">{resultCount} nouveauté{resultCount > 1 ? "s" : ""}, filtre {filterLabel}</p>
     <div className="nw" ref={content}>
       {hasError && <AppState compact headingLevel={2} tone="alert" object="livraison" title="Ce fil ne répond pas." detail="Réessaie maintenant, ou retourne à Aujourd’hui." action={{ label: "Réessayer", onClick: () => window.location.reload() }} />}
-      {!hasError && groups.length === 0 && <AppState compact headingLevel={2} object="livraison" title="Rien de neuf pour l’instant." detail="Reviens bientôt, ou relis un chapitre." action={{ label: "Voir le programme", href: "/programme" }} testId="nouveautes-empty" />}
+      {!hasError && groups.length === 0 && freshItems.length === 0 && <AppState compact headingLevel={2} object="livraison" title="Rien de neuf pour l’instant." detail="Reviens bientôt, ou relis un chapitre." action={{ label: "Voir le programme", href: "/programme" }} testId="nouveautes-empty" />}
+      {freshItems.length > 0 && <section className="nw__m" aria-labelledby="nouveautes-fresh-title"><h2 className="t-h2" id="nouveautes-fresh-title">Nouveau</h2><ul>{freshItems.map((item) => <NewsEntry key={item.id} item={item} />)}</ul></section>}
       {groups.map((group) => <section className="nw__m" key={group.key}><h2 className="t-h2">{group.label}</h2><ul>{group.items.map((item) => <NewsEntry key={item.id} item={item} />)}</ul></section>)}
     </div>
   </>;
 }
 
 function NewsEntry({ item }: { item: NouveautesItem }) {
-  const body = <><span className="nw__img"><img src={item.thumbnail} alt="" loading="lazy" /></span><span className="nw__b"><span className="nw__tag">{item.source === "youtube" && <DaIcon name="external" />}{item.source === "youtube" ? "YouTube" : item.blocLabel ?? "Sur BUILD"}</span><NewVideoMarker /><span className="nw__t">{item.title}</span>{item.sentence && <span className="row__d">{item.sentence}</span>}<time className="nw__d" dateTime={item.publishedAt}>{formatVideoDate(item.publishedAt)}</time></span></>;
-  return <li data-video-card data-published-at={item.publishedAt}>{item.href ? <a className="nw__e" href={item.href} {...(item.source === "youtube" ? { target: "_blank", rel: "noopener" } : {})}>{body}</a> : <div className="nw__e">{body}</div>}</li>;
+  const open = async (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!item.newsId || !item.href || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    try {
+      await markBuildNewsSeen(item.newsId);
+    } finally {
+      window.location.assign(item.href);
+    }
+  };
+  const body = <><span className="nw__img"><img src={item.thumbnail} alt="" loading="lazy" /></span><span className="nw__b"><span className="nw__tag">{item.source === "youtube" && <DaIcon name="external" />}{item.source === "youtube" ? "YouTube" : item.blocLabel ?? "Sur BUILD"}</span><NewVideoMarker fresh={item.isFresh} /><span className="nw__t">{item.title}</span>{item.sentence && <span className="row__d">{item.sentence}</span>}<time className="nw__d" dateTime={item.publishedAt}>{formatVideoDate(item.publishedAt)}</time></span></>;
+  return <li data-video-card data-published-at={item.publishedAt}>{item.href ? <a className="nw__e" href={item.href} onClick={open} {...(item.source === "youtube" ? { target: "_blank", rel: "noopener" } : {})}>{body}</a> : <div className="nw__e">{body}</div>}</li>;
 }

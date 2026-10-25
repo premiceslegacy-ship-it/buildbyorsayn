@@ -4,10 +4,10 @@
  * (carte de déplacement SVG calculée à la taille exacte de l'élément), le rouge et le bleu ne dévient pas pareil
  * (dispersion), une arête lumineuse en haut à gauche et une plus faible en bas à droite.
  *
- * Chromium applique la réfraction. Ailleurs (Safari, Firefox), le filtre de déplacement n'existe pas sur le fond :
- * il reste la lumière calculée et un flou léger, comme dans le script d'origine.
- * La forme vient de `border-radius` ; l'ombre portée, le reflet au défilement et le mode « transparence réduite »
- * viennent de la classe `.verre-liquide` (app/da.css).
+ * Chromium applique la réfraction du contenu via backdrop-filter. Ailleurs (Safari, Firefox), le contenu réel ne peut
+ * pas être cloné sans rasteriser la page : on garde un flou net, saturation, un bord SVG déplacé sur un calque fantôme
+ * et un reflet lié au défilement. Budget : un seul calque, rasterisé au redimensionnement ; le défilement ne transforme que ce calque.
+ * La forme vient de `border-radius` ; l'ombre et la transparence réduite viennent du CSS.
  */
 export type LiquidGlassOptions = {
   /** Largeur du bord bombé, part du petit côté. */
@@ -37,7 +37,7 @@ let counter = 0;
 
 /**
  * `url(#filtre)` dans `backdrop-filter` : seul Chromium l'applique vraiment. Safari et Firefox acceptent parfois la syntaxe
- * (CSS.supports répond oui) puis ignorent le filtre : on exige donc en plus une propriété que seul le moteur Blink connaît.
+ * (CSS.supports répond oui) puis ignorent le filtre : on exige donc en plus une capacité CSS Blink indépendante.
  * Détection par capacité CSS, jamais par user agent.
  */
 function supportsRefraction() {
@@ -45,7 +45,12 @@ function supportsRefraction() {
   return CSS.supports("backdrop-filter", "url(#v) blur(1px)") && CSS.supports("-webkit-app-region", "none");
 }
 
-function render(el: HTMLElement, opts: LiquidGlassOptions, previous: SVGSVGElement | null): SVGSVGElement | null {
+function render(
+  el: HTMLElement,
+  opts: LiquidGlassOptions,
+  previous: SVGSVGElement | null,
+  edge: HTMLSpanElement,
+): SVGSVGElement | null {
   const w = Math.round(el.offsetWidth);
   const h = Math.round(el.offsetHeight);
   if (w < 8 || h < 8) return previous;
@@ -139,7 +144,7 @@ function render(el: HTMLElement, opts: LiquidGlassOptions, previous: SVGSVGEleme
     : `<feDisplacementMap in="b" in2="map" scale="${sc.toFixed(4)}" xChannelSelector="R" yChannelSelector="G"/>`;
 
   previous?.remove();
-  let svg: SVGSVGElement | null = document.createElementNS(NS, "svg");
+  const svg: SVGSVGElement | null = document.createElementNS(NS, "svg");
   svg.setAttribute("style", "position:absolute;width:0;height:0;pointer-events:none");
   svg.setAttribute("aria-hidden", "true");
   svg.innerHTML = `<filter id="${id}" color-interpolation-filters="sRGB" primitiveUnits="objectBoundingBox" x="0" y="0" width="1" height="1">${corps}</filter>`;
@@ -147,15 +152,19 @@ function render(el: HTMLElement, opts: LiquidGlassOptions, previous: SVGSVGEleme
 
   // Le flou est dans le filtre SVG (réfraction + flou léger) : les formes du dessous restent lisibles, le texte non.
   let filter = `url(#${id}) saturate(${opts.saturation ?? 1.8}) brightness(${opts.luminosite ?? 1.1})`;
-  if (!supportsRefraction()) {
-    // Repli sans réfraction : flou, saturation et lumière interne (les arêtes viennent du calque spéculaire ci-dessous).
+  const refraction = supportsRefraction();
+  if (!refraction) {
+    // Repli WebKit/Firefox : le SVG reste attaché au bord fantôme, le fond garde un flou CSS peu coûteux.
     filter = `blur(${opts.flouRepli ?? 10}px) saturate(${opts.saturation ?? 1.8}) brightness(${opts.luminosite ?? 1.1})`;
-    svg.remove();
-    svg = null;
   }
+  edge.style.filter = refraction ? "" : `url(#${id})`;
+  const edgeImage = `url(${s.toDataURL()})`;
+  edge.style.backgroundImage = edgeImage;
+  edge.style.backgroundSize = "100% 100%";
+  edge.style.backgroundRepeat = "no-repeat";
   el.style.backdropFilter = filter;
   el.style.setProperty("-webkit-backdrop-filter", filter);
-  el.style.backgroundImage = `url(${s.toDataURL()})`;
+  el.style.backgroundImage = edgeImage;
   el.style.backgroundSize = "100% 100%";
   el.style.backgroundRepeat = "no-repeat";
   el.style.backgroundColor = opts.teinte ?? "rgba(255,255,255,.05)";
@@ -166,9 +175,38 @@ function render(el: HTMLElement, opts: LiquidGlassOptions, previous: SVGSVGEleme
 export function applyLiquidGlass(el: HTMLElement, opts: LiquidGlassOptions = {}): () => void {
   let svg: SVGSVGElement | null = null;
   let frame = 0;
+  let reflectionFrame = 0;
+  let visible = true;
+  const edge = document.createElement("span");
+  edge.className = "verre-liquide__bord";
+  edge.setAttribute("aria-hidden", "true");
+  el.prepend(edge);
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+  const reflect = () => {
+    reflectionFrame = 0;
+    if (!visible || document.hidden || reducedMotion?.matches) return;
+    const y = window.scrollY;
+    edge.style.transform = `translate3d(${(-6 + ((y / 180) % 16)).toFixed(2)}%, 0, 0)`;
+  };
+  const scheduleReflection = () => {
+    if (!reflectionFrame) reflectionFrame = requestAnimationFrame(reflect);
+  };
+  const onVisibility = () => {
+    visible = !document.hidden;
+    if (visible) scheduleReflection();
+  };
+  const intersection = typeof IntersectionObserver === "undefined"
+    ? null
+    : new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) scheduleReflection();
+    }, { threshold: 0 });
+  intersection?.observe(el);
+  window.addEventListener("scroll", scheduleReflection, { passive: true });
+  document.addEventListener("visibilitychange", onVisibility);
   const run = () => {
     frame = 0;
-    svg = render(el, opts, svg);
+    svg = render(el, opts, svg, edge);
   };
   const schedule = () => {
     if (!frame) frame = requestAnimationFrame(run);
@@ -176,10 +214,16 @@ export function applyLiquidGlass(el: HTMLElement, opts: LiquidGlassOptions = {})
   const observer = new ResizeObserver(schedule);
   observer.observe(el);
   schedule();
+  scheduleReflection();
   return () => {
     observer.disconnect();
+    intersection?.disconnect();
+    window.removeEventListener("scroll", scheduleReflection);
+    document.removeEventListener("visibilitychange", onVisibility);
     if (frame) cancelAnimationFrame(frame);
+    if (reflectionFrame) cancelAnimationFrame(reflectionFrame);
     svg?.remove();
+    edge.remove();
     for (const property of ["backdropFilter", "backgroundImage", "backgroundSize", "backgroundRepeat", "backgroundColor"] as const) el.style[property] = "";
     el.style.removeProperty("-webkit-backdrop-filter");
   };

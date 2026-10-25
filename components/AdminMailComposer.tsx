@@ -13,6 +13,14 @@ import { playAppSound } from "@/lib/ui/sound";
 import "./admin/mail.css";
 
 type TemplateKey = "blank" | "video" | "update";
+type PublishedVideo = {
+  id: string;
+  title: string;
+  position: number;
+  locationLabel: string;
+  thumbnailUrl: string | null;
+  href: string;
+};
 type SendResult = { ok: boolean; accepted?: number; total?: number; error?: string };
 type Mode = "write" | "catalog";
 
@@ -32,22 +40,32 @@ const TEMPLATES: Record<TemplateKey, { label: string; hint: string }> = {
   update: { label: "Mise à jour BUILD", hint: "Explique ce qui a changé et renvoie vers ton espace." },
 };
 
-function templateContent(key: TemplateKey, baseUrl: string | null, values: { videoTitle: string; videoUrl: string; updateTitle: string; updateDesc: string }) {
+function templateContent(key: TemplateKey, baseUrl: string | null, values: { videoTitle: string; videoUrl: string; videoThumbnailUrl: string; updateTitle: string; updateDesc: string }) {
   if (key === "video") return {
-    subject: `Nouvelle vidéo : ${values.videoTitle || "Titre de la vidéo"}`,
-    preheader: "Disponible maintenant dans ta bibliothèque BUILD.",
-    body: "Une nouvelle vidéo vient d'être ajoutée à BUILD. Tu peux la regarder dès maintenant depuis ton espace.",
+    subject: values.videoTitle || "Titre de la vidéo",
+    preheader: "La vidéo est disponible dans ton espace.",
+    body: "Cette vidéo est disponible dans ton espace. Tu peux la regarder quand tu veux.",
     ctaLabel: "Regarder la vidéo",
     ctaUrl: values.videoUrl,
+    thumbnailUrl: values.videoThumbnailUrl,
   };
   if (key === "update") return {
-    subject: `Mise à jour BUILD : ${values.updateTitle || "Titre de la mise à jour"}`,
+    subject: values.updateTitle || "Titre de la mise à jour",
     preheader: "Le contenu vient d'être mis à jour.",
     body: `${values.updateDesc || "Décris ici ce qui a changé."}\n\nConnecte-toi pour voir ce qui a changé.`,
     ctaLabel: "Voir la mise à jour",
     ctaUrl: baseUrl ? `${baseUrl}/dashboard` : "",
+    thumbnailUrl: "",
   };
-  return { subject: "", preheader: "", body: "", ctaLabel: "", ctaUrl: "" };
+  return { subject: "", preheader: "", body: "", ctaLabel: "", ctaUrl: "", thumbnailUrl: "" };
+}
+
+function readableVideoTitle(video: PublishedVideo): string {
+  const title = video.title.trim();
+  if (!title || /^(?:build\s*[-:]\s*)?(?:bloc|block)\s+\w+\s*[-:,]\s*(?:vid(?:é|e)o|video)\s*\d+$/i.test(title)) {
+    return `${video.locationLabel}, vidéo ${video.position}`;
+  }
+  return title;
 }
 
 function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (mode: Mode) => void }) {
@@ -63,14 +81,16 @@ function plural(count: number, one: string, many: string) {
   return count > 1 ? many : one;
 }
 
-export function AdminMailComposer({ users, dataWarning, emailContext, catalog, from }: { users: MailUser[]; dataWarning: string | null; emailContext: EmailContext; catalog: EmailCatalogEntry[]; from: string }) {
+export function AdminMailComposer({ users, dataWarning, emailContext, catalog, from, publishedVideos = [] }: { users: MailUser[]; dataWarning: string | null; emailContext: EmailContext; catalog: EmailCatalogEntry[]; from: string; publishedVideos?: PublishedVideo[] }) {
   const [mode, setMode] = useState<Mode>("write");
   const [audience, setAudience] = useState<Audience>("selected");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [activeTemplate, setActiveTemplate] = useState<TemplateKey>("blank");
+  const [selectedVideoId, setSelectedVideoId] = useState("");
   const [videoTitle, setVideoTitle] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
+  const [videoThumbnailUrl, setVideoThumbnailUrl] = useState("");
   const [updateTitle, setUpdateTitle] = useState("");
   const [updateDesc, setUpdateDesc] = useState("");
   const [subject, setSubject] = useState("");
@@ -78,6 +98,7 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
   const [body, setBody] = useState("");
   const [ctaLabel, setCtaLabel] = useState("");
   const [ctaUrl, setCtaUrl] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [buttonOpen, setButtonOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -105,8 +126,9 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
       body: body || "Ton message apparaîtra ici.",
       ctaLabel,
       ctaUrl,
+      thumbnailUrl,
     }),
-    [emailContext, subject, preheader, body, ctaLabel, ctaUrl],
+    [emailContext, subject, preheader, body, ctaLabel, ctaUrl, thumbnailUrl],
   );
 
   const closeSheet = () => {
@@ -130,15 +152,44 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
   }, [sheetOpen, isSending]);
 
   const applyTemplate = (key: TemplateKey) => {
-    const next = templateContent(key, emailContext.baseUrl, { videoTitle, videoUrl, updateTitle, updateDesc });
+    const next = templateContent(key, emailContext.baseUrl, { videoTitle, videoUrl, videoThumbnailUrl, updateTitle, updateDesc });
     setActiveTemplate(key);
     setSubject(next.subject);
     setPreheader(next.preheader);
     setBody(next.body);
     setCtaLabel(next.ctaLabel);
     setCtaUrl(next.ctaUrl);
+    setThumbnailUrl(next.thumbnailUrl);
     setButtonOpen(Boolean(next.ctaLabel || next.ctaUrl));
     setOptionsOpen(Boolean(next.preheader));
+    setConfirmation("");
+    setResult(null);
+  };
+
+  const selectPublishedVideo = (id: string) => {
+    setSelectedVideoId(id);
+    const video = publishedVideos.find((item) => item.id === id);
+    if (!video) return;
+    const nextTitle = readableVideoTitle(video);
+    setVideoTitle(nextTitle);
+    setVideoUrl(video.href);
+    setVideoThumbnailUrl(video.thumbnailUrl ?? "");
+    const next = templateContent("video", emailContext.baseUrl, {
+      videoTitle: nextTitle,
+      videoUrl: video.href,
+      videoThumbnailUrl: video.thumbnailUrl ?? "",
+      updateTitle,
+      updateDesc,
+    });
+    setActiveTemplate("video");
+    setSubject(next.subject);
+    setPreheader(next.preheader);
+    setBody(next.body);
+    setCtaLabel(next.ctaLabel);
+    setCtaUrl(next.ctaUrl);
+    setThumbnailUrl(next.thumbnailUrl);
+    setButtonOpen(true);
+    setOptionsOpen(true);
     setConfirmation("");
     setResult(null);
   };
@@ -157,7 +208,7 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
     }
     setIsSending(true);
     setResult(null);
-    const requestPayload = { audience, selectedUserIds: selectedIds, subject, preheader, body, ctaLabel, ctaUrl };
+    const requestPayload = { audience, selectedUserIds: selectedIds, subject, preheader, body, ctaLabel, ctaUrl, thumbnailUrl };
     const fingerprint = JSON.stringify(requestPayload);
     if (!campaignRef.current || campaignRef.current.fingerprint !== fingerprint) {
       campaignRef.current = { id: crypto.randomUUID(), fingerprint };
@@ -239,8 +290,17 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
             </div>
             {activeTemplate === "video" ? (
               <div className="ml-fill">
+                {publishedVideos.length > 0 ? (
+                  <label>Vidéo publiée
+                    <select value={selectedVideoId} onChange={(event) => selectPublishedVideo(event.target.value)}>
+                      <option value="">Choisir une vidéo publiée</option>
+                      {publishedVideos.map((video) => <option key={video.id} value={video.id}>{readableVideoTitle(video)}</option>)}
+                    </select>
+                  </label>
+                ) : <p className="ml-note">Aucune vidéo publiée n'est disponible pour l'instant. Tu peux remplir les champs à la main.</p>}
                 <label>Titre de la vidéo<input value={videoTitle} onChange={(event) => setVideoTitle(event.target.value)} /></label>
                 <label>Lien de la vidéo<input value={videoUrl} onChange={(event) => setVideoUrl(event.target.value)} placeholder="https://..." inputMode="url" /></label>
+                <label>URL de la miniature<input value={videoThumbnailUrl} onChange={(event) => setVideoThumbnailUrl(event.target.value)} placeholder="https://..." inputMode="url" /></label>
                 <button type="button" className="ml-quiet" onClick={() => applyTemplate("video")}>Remplir le message avec ces infos</button>
               </div>
             ) : null}

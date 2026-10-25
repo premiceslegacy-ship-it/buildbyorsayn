@@ -19,9 +19,10 @@ test("the member MCP entry resolves an honest state for every access and connect
 test("the MCP setup page gates instructions by paid access and uses a focused layout", async () => {
   const page = await readFile("app/dashboard/mcp/page.tsx", "utf8");
 
-  for (const tool of ["Claude", "ChatGPT", "Hermes Agent", "Oh My Pi", "Cursor"]) {
+  for (const tool of ["Claude", "ChatGPT", "Hermes Agent", "Oh My Pi"]) {
     assert.ok(page.includes(`"${tool}"`), tool);
   }
+  assert.doesNotMatch(page, /"Cursor"/);
   assert.match(page, /<ToolLogo name=\{tool\}/);
   assert.doesNotMatch(page, /\/da\/logos\//);
   // 390 px : la rangée est flexible et le style UI-3 lui permet de revenir à la ligne.

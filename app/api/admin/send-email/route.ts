@@ -35,6 +35,14 @@ const ADMIN_EMAIL_SCHEMA = z.object({
       return false;
     }
   }, "ctaUrl must be an HTTPS URL").default(""),
+  thumbnailUrl: z.string().trim().max(2_048).refine((value) => {
+    if (!value) return true;
+    try {
+      return new URL(value).protocol === "https:";
+    } catch {
+      return false;
+    }
+  }, "thumbnailUrl must be an HTTPS URL").default(""),
   approved: z.literal(true),
   confirmation: z.literal("ENVOYER"),
 }).strict();
@@ -104,6 +112,7 @@ export async function POST(req: NextRequest) {
     body: messageBody,
     ctaLabel,
     ctaUrl,
+    thumbnailUrl,
   } = parsed.data;
 
   const resendApiKey = process.env.RESEND_API_KEY;
@@ -235,7 +244,7 @@ export async function POST(req: NextRequest) {
   }
 
   const emailContext = getEmailContext();
-  const { html, text } = buildBroadcastEmail(emailContext, { subject, preheader, body: messageBody, ctaLabel, ctaUrl });
+  const { html, text } = buildBroadcastEmail(emailContext, { subject, preheader, body: messageBody, ctaLabel, ctaUrl, thumbnailUrl });
   const result = await sendAdminBroadcast({
     apiKey: resendApiKey,
     from,

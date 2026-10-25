@@ -10,6 +10,7 @@ import { MEMBER_NAV, MemberTabbar } from "@/components/da/MemberTabbar";
 import { useNouveautesUnseenCount } from "@/components/nouveautes/useNouveautesUnseenCount";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { MCP_ENTRY_VISIBLE } from "@/lib/mcp/entryVisibility";
+import { BOOK_CALL_URL } from "@/lib/bookCall";
 import { finishPressFeedback, pulsePressFeedback, soundKindFor, startPressFeedback } from "@/lib/ui/feedback";
 import { formatNouveautesBadge } from "@/lib/nouveautes/seen";
 import { animateAppElement, installAppMotionTokens, motionAllowed } from "@/lib/ui/motion";
@@ -177,6 +178,7 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
         <div className="amenu__h"><span className="avatar amenu__av">{initials || displayName?.slice(0, 2).toUpperCase()}</span><span className="amenu__id"><b>{displayName}</b><small>{displayEmail}</small></span><span className="pastille amenu__tier"><b />{tierLabel(tier)}</span></div>
         <div className="amenu__l">
           <Link role="menuitem" href="/compte"><DaIcon name="user" />Compte</Link>
+          <a role="menuitem" href={BOOK_CALL_URL} target="_blank" rel="noopener noreferrer"><DaIcon name="phone" />Réserver un appel</a>
           <Link role="menuitem" href="/checkout"><DaIcon name="creditCard" />Abonnement</Link>
           {MCP_ENTRY_VISIBLE && <Link role="menuitem" href="/dashboard/mcp"><DaIcon name="plug" />Connexion IA</Link>}
           {isAdmin && <Link role="menuitem" href="/admin"><DaIcon name="grid" />Administration</Link>}

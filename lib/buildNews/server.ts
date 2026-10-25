@@ -7,7 +7,7 @@ import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
 import { removeBuildNewsThumbnail } from "./thumbnail.server";
 import { buildNewsInputSchema, buildNewsUpdateSchema, type BuildNewsInput, type BuildNewsRow, type BuildNewsUpdate } from "./model";
 
-const buildNewsColumns = "id,title,published_at,thumbnail,bloc_label,internal_url,sentence,created_at";
+const buildNewsColumns = "id,title,published_at,thumbnail,bloc_label,internal_url,sentence,created_at,source_key";
 const storagePathSchema = z.string().regex(/^news\/[0-9a-f-]{36}\/[0-9a-f]{12}\.(?:jpg|png|webp)$/i);
 
 async function queueThumbnailCleanup(storagePath: string, cause: unknown) {
@@ -38,7 +38,7 @@ export async function listAdminBuildNews(): Promise<BuildNewsRow[]> {
   if (!user) throw new Error("Accès refusé.");
   const { data, error } = await createAdminSupabase()
     .from("build_news")
-    .select(`${buildNewsColumns},source_key`)
+    .select(buildNewsColumns)
     .order("published_at", { ascending: false })
     .order("id", { ascending: false })
     .limit(100);

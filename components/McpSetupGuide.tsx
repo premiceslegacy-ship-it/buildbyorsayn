@@ -105,25 +105,13 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
     null,
     2
   );
-  const cursorConfig = JSON.stringify(
-    {
-      mcpServers: {
-        build: {
-          url: mcpUrl,
-        },
-      },
-    },
-    null,
-    2
-  );
-
   return (
     <section aria-labelledby="mcp-setup-guide-title" className="mt-12 border-t border-[var(--trait)] pt-10">
       <h2 id="mcp-setup-guide-title" className="text-2xl font-semibold tracking-tight">
         Configure ton assistant en quelques minutes
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--t2)]">
-        Ouvre le parcours qui correspond à ton assistant. Claude inclut des captures réelles. ChatGPT, Hermes Agent, Oh My Pi et Cursor suivent les réglages publiés par chaque outil.
+        Ouvre le parcours qui correspond à ton assistant. Claude inclut des captures réelles. ChatGPT, Hermes Agent et Oh My Pi suivent les réglages publiés par chaque outil.
       </p>
 
       <div className="mt-8 border-y border-[var(--trait)]">
@@ -284,41 +272,6 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
           </div>
         </details>
 
-        <details name="mcp-client-guide" className="group border-t border-[var(--trait)] px-0">
-          <ClientSummary
-            toolName="Cursor"
-            name="Cursor"
-            description="Ajoute BUILD dans le fichier MCP global ou dans celui de ton projet."
-          />
-          <div className="border-t border-[var(--trait)] pb-8">
-            <ol className="flex flex-col gap-8 pt-7">
-              <Step number="1">
-                Ouvre <code className="text-[var(--menthe)]">~/.cursor/mcp.json</code> pour tous tes projets, ou <code className="text-[var(--menthe)]">.cursor/mcp.json</code> à la racine du projet courant.
-              </Step>
-              <Step number="2">
-                Ajoute ce bloc, puis enregistre le fichier.
-                <ConfigBlock>{cursorConfig}</ConfigBlock>
-              </Step>
-              <Step number="3">
-                Dans Cursor, ouvre <strong className="font-semibold text-[var(--encre)]">Customize &gt; MCPs</strong>. Active BUILD, puis lance l&apos;authentification si Cursor la demande.
-              </Step>
-              <Step number="4">
-                Connecte-toi à BUILD dans le navigateur, contrôle l&apos;adresse et les permissions, puis autorise la connexion. Reviens ensuite dans Cursor.
-              </Step>
-              <Step number="5">
-                Ouvre une nouvelle conversation Agent et demande la liste de tes contenus BUILD accessibles. Si Cursor affiche un besoin d&apos;authentification, relance la connexion depuis la fiche BUILD.
-              </Step>
-            </ol>
-            <a
-              href="https://cursor.com/docs/mcp"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 inline-flex min-h-11 items-center text-xs text-[var(--menthe)] underline underline-offset-4"
-            >
-              Voir la procédure officielle Cursor
-            </a>
-          </div>
-        </details>
       </div>
 
       <div className="mt-8">

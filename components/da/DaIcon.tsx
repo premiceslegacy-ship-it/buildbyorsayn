@@ -19,6 +19,7 @@ const ICONS = {
   user: <><circle cx="12" cy="8.5" r="3.6" /><path d="M5 20a7 7 0 0 1 14 0" /></>,
   creditCard: <><rect x="3" y="5.5" width="18" height="13" rx="3" /><path d="M3 10h18M7 15h3" /></>,
   plug: <path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21" />,
+  phone: <path d="M6.8 4.5h2.3l1.4 4.2-2.3 1.6a13.2 13.2 0 0 0 5.5 5.5l1.6-2.3 4.2 1.4v2.3a2 2 0 0 1-2.1 2A14.3 14.3 0 0 1 4.8 6.6a2 2 0 0 1 2-2.1z" />,
   logout: <path d="M10 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20H10M15 8l4 4-4 4M19 12H9.5" />,
   lock: <><rect x="5" y="10.5" width="14" height="10" rx="2.6" /><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" /></>,
   external: <path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />,

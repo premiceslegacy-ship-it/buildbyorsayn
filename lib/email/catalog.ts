@@ -70,11 +70,12 @@ export function buildEmailCatalog(ctx: EmailContext): EmailCatalogEntry[] {
       trigger: "Écrite et envoyée depuis l'onglet E-mails. Exemple avec le modèle Nouvelle vidéo.",
       sender: "BUILD",
       mail: buildBroadcastEmail(ctx, {
-        subject: "Nouvelle vidéo : brancher ton premier agent",
-        preheader: "Disponible maintenant dans ta bibliothèque BUILD.",
-        body: "Une nouvelle vidéo vient d'être ajoutée à BUILD. Tu peux la regarder dès maintenant depuis ton espace.\n\n> Si tu ne dois en voir qu'une cette semaine, c'est celle-ci.",
+        subject: "Brancher ton premier agent",
+        preheader: "La vidéo est disponible dans ton espace.",
+        body: "Cette vidéo est disponible dans ton espace. Tu peux la regarder quand tu veux.",
         ctaLabel: "Regarder la vidéo",
-        ctaUrl: `${ctx.baseUrl ?? "https://build.example"}/videos`,
+        ctaUrl: `${ctx.baseUrl ?? "https://build.example"}/blocs/1?video=1`,
+        thumbnailUrl: ctx.baseUrl ? `${ctx.baseUrl}/da/mini/b1.jpg` : "https://build.example/da/mini/b1.jpg",
       }),
     },
     {

@@ -227,7 +227,7 @@ export async function POST(request: Request) {
 }
 
 export function OPTIONS(request: Request) {
-  if (!isMcpConnectorLaunched()) {
+  if (!isMcpConnectorLaunched() && !hasMcpConnectorAllowlist()) {
     return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
   }
   return oauthPreflightResponse(

@@ -9,6 +9,8 @@ export type YoutubeNewsItem = {
   href: string;
   blocLabel: null;
   sentence: null;
+  isFresh: false;
+  newsId: null;
 };
 
 export type BuildNewsItem = {
@@ -20,6 +22,8 @@ export type BuildNewsItem = {
   href: string | null;
   blocLabel: string | null;
   sentence: string;
+  isFresh: boolean;
+  newsId: string;
 };
 
 export type NouveautesItem = YoutubeNewsItem | BuildNewsItem;
@@ -31,7 +35,16 @@ export const youtubeThumbnailUrl = (videoId: string) => `https://i.ytimg.com/vi/
 
 export function mergeNouveautesItems(
   videos: FeedVideo[],
-  buildNews: Array<{ id: string; title: string; published_at: string; thumbnail: string; bloc_label: string | null; internal_url: string | null; sentence: string }>,
+  buildNews: Array<{
+    id: string;
+    title: string;
+    published_at: string;
+    thumbnail: string;
+    bloc_label: string | null;
+    internal_url: string | null;
+    sentence: string;
+    isFresh?: boolean;
+  }>,
 ): NouveautesItem[] {
   return [
     ...videos.map((video): YoutubeNewsItem => ({
@@ -43,6 +56,8 @@ export function mergeNouveautesItems(
       href: youtubeWatchUrl(video.video_id),
       blocLabel: null,
       sentence: null,
+      isFresh: false,
+      newsId: null,
     })),
     ...buildNews.map((entry): BuildNewsItem => ({
       id: `build:${entry.id}`,
@@ -53,6 +68,8 @@ export function mergeNouveautesItems(
       href: entry.internal_url,
       blocLabel: entry.bloc_label,
       sentence: entry.sentence,
+      isFresh: entry.isFresh ?? false,
+      newsId: entry.id,
     })),
   ].filter((item) => Number.isFinite(Date.parse(item.publishedAt)))
     .sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt) || left.id.localeCompare(right.id));

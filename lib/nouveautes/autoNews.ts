@@ -42,6 +42,16 @@ function clip(value: string, max: number): string {
   return text.length <= max ? text : `${text.slice(0, max - 1).trimEnd()}…`;
 }
 
+/** Coupe une phrase trop longue à une virgule ou à un mot entier, sans points de suspension. */
+function clipAtBoundary(value: string, max: number): string {
+  const text = value.replace(/[ \t\r\n]+/g, " ").trim().replace(/[.!?…]+$/, "");
+  if (text.length <= max) return text;
+  const head = text.slice(0, max);
+  const comma = head.lastIndexOf(", ");
+  if (comma >= 35) return head.slice(0, comma);
+  return head.slice(0, head.lastIndexOf(" ")).trimEnd();
+}
+
 function withFinalPeriod(text: string): string {
   return /[.!?…]$/.test(text) ? text : `${text}.`;
 }
@@ -52,19 +62,44 @@ export type VideoNewsInput = {
   blocLabel: string | null;
   position: number;
   title: string | null;
+  summary?: string | null;
   durationSeconds: number | null;
 };
 
-/** Texte factuel d'une vidéo publiée. Pas de promesse, pas de tiret cadratin. */
-export function videoNewsText(input: Pick<VideoNewsInput, "title" | "blocLabel" | "durationSeconds">) {
-  const videoTitle = clip(input.title?.trim() || "Nouveau chapitre", 120);
+function firstSentence(value: string | null | undefined): string {
+  const normalized = value?.replace(/[ \t\r\n]+/g, " ").trim() ?? "";
+  return normalized.match(/^(.+?[.!?…])(?:\s|$)/)?.[1] ?? normalized;
+}
+
+function cleanVideoTitle(value: string | null | undefined): string {
+  let title = value?.replace(/[ \t\r\n]+/g, " ").trim() ?? "";
+  for (let index = 0; index < 2; index += 1) {
+    title = title.replace(/^(?:BUILD\s*-\s*|Bloc\s+\d+\s*-\s*)/i, "").trim();
+  }
+  return title || "Nouveau chapitre";
+}
+
+function isGenericVideoTitle(value: string): boolean {
+  const normalized = value.trim().replace(/[.!?…]+$/, "");
+  return /^vid[ée]o(?:\s+\d+)?(?:\s+du\s+bloc)?$/i.test(normalized);
+}
+
+/** Texte factuel d'une vidéo publiée. Le bloc reste porté par son badge. */
+export function videoNewsText(input: Pick<VideoNewsInput, "title" | "summary" | "durationSeconds"> & Partial<Pick<VideoNewsInput, "blocLabel">>) {
+  const cleanedTitle = cleanVideoTitle(input.title);
+  const summarySentence = firstSentence(input.summary);
+  const title = clip(
+    isGenericVideoTitle(cleanedTitle) && summarySentence ? summarySentence.replace(/[.!?…]+$/, "").trim() : cleanedTitle,
+    120,
+  );
+  const sentenceBase = clipAtBoundary(summarySentence || title, 110);
+  const sentence = withFinalPeriod(sentenceBase);
   const duration = input.durationSeconds && input.durationSeconds > 0
-    ? `durée ${Math.max(1, Math.round(input.durationSeconds / 60))} min`
+    ? `${Math.max(1, Math.round(input.durationSeconds / 60))} min`
     : null;
-  const where = [input.blocLabel, duration].filter(Boolean).join(", ");
   return {
-    title: videoTitle,
-    sentence: clip(`${withFinalPeriod(`Nouvelle vidéo${NBSP}: ${videoTitle}`)}${where ? ` ${where}.` : ""}`, 500),
+    title,
+    sentence: clip(duration ? `${sentence} ${duration}.` : sentence, 500),
   };
 }
 
@@ -106,9 +141,16 @@ export function diffSkillsManifests(previous: SkillsPackRef[], next: SkillsPackR
   return { added, changed };
 }
 
+function readablePackName(fileName: string): string {
+  const baseName = fileName.split("/").at(-1) ?? fileName;
+  const readable = baseName.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
+  return readable ? readable.replace(/^./, (letter) => letter.toUpperCase()) : "Pack sans nom";
+}
+
 function listNames(names: string[], max: number): string {
-  if (names.length <= max) return names.join(", ");
-  return `${names.slice(0, max).join(", ")} et ${names.length - max} autre${names.length - max > 1 ? "s" : ""}`;
+  const readable = names.map(readablePackName);
+  if (readable.length <= max) return readable.join(", ");
+  return `${readable.slice(0, max).join(", ")} et ${readable.length - max} autre${readable.length - max > 1 ? "s" : ""}`;
 }
 
 export function skillsNewsText(added: string[], changed: string[]) {
@@ -176,12 +218,14 @@ type VideoRow = {
   bloc_id: string;
   position: number;
   title: string | null;
+  summary: string | null;
   duration_seconds: number | null;
   thumbnail: string | null;
   playback_id: string | null;
   published_at: string | null;
   replaced_at: string | null;
 };
+
 
 export type VideoNewsDeps = {
   client: SupabaseClient;
@@ -194,7 +238,7 @@ export type VideoNewsDeps = {
 /** Crée (une seule fois) la Nouveauté d'une vidéo déjà publiée. */
 export async function publishVideoNews(videoId: string, deps: VideoNewsDeps): Promise<AutoNewsResult> {
   const { data, error } = await deps.client.from("video_lessons")
-    .select("id,bloc_id,position,title,duration_seconds,thumbnail,playback_id,published_at,replaced_at")
+    .select("id,bloc_id,position,title,summary,duration_seconds,thumbnail,playback_id,published_at,replaced_at")
     .eq("id", videoId)
     .maybeSingle();
   if (error) throw new Error("La vidéo n'a pas pu être lue.");
@@ -218,6 +262,7 @@ export async function publishVideoNews(videoId: string, deps: VideoNewsDeps): Pr
     blocLabel: deps.blocLabelFor(video.bloc_id),
     position: video.position,
     title: video.title,
+    summary: video.summary,
     durationSeconds: video.duration_seconds,
     publishedAt: video.published_at,
   }, thumbnail, deps.createdBy ?? null));

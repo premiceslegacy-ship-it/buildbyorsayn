@@ -15,7 +15,7 @@ import "./mcp.css";
 
 export const metadata = { title: "Connexion aux assistants | BUILD", robots: { index: false, follow: false } };
 
-const clients = ["Claude", "ChatGPT", "Hermes Agent", "Oh My Pi", "Cursor"] as const;
+const clients = ["Claude", "ChatGPT", "Hermes Agent", "Oh My Pi"] as const;
 
 function ClientLogos() {
   return <div className="ui3-tool-logos" aria-label={clients.join(", ")}>{clients.map((tool) => <span key={tool}><ToolLogo name={tool} size={168} /></span>)}</div>;

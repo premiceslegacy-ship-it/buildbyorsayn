@@ -44,14 +44,14 @@ function formatAmount(cents: number): string {
 /** Achat réglé : le lien personnel qui ouvre le compte. */
 export function buildWelcomeEmail(ctx: EmailContext, actionLink: string): RenderedEmail {
   return renderEmail({
-    subject: `Bienvenue dans BUILD${NBSP}: active ton compte`,
+    subject: `Ton accès BUILD est prêt${NBSP}: choisis ton mot de passe`,
     preheader: "Ton paiement est confirmé. Choisis ton mot de passe pour ouvrir ton espace.",
     baseUrl: ctx.baseUrl,
     blocks: [
-      { type: "heading", text: "Bienvenue dans BUILD." },
-      { type: "paragraph", text: "Ton paiement est confirmé. Il reste une seule étape : choisir ton mot de passe pour ouvrir ton espace membre." },
+      { type: "heading", text: "Ton accès est prêt." },
+      { type: "paragraph", text: "Ton paiement est confirmé. Choisis ton mot de passe pour ouvrir ton espace membre." },
       { type: "button", label: "Activer mon compte", url: actionLink },
-      { type: "link", label: "Le bouton ne s'ouvre pas ? Copie ce lien dans ton navigateur :", url: actionLink },
+      { type: "link", label: "Le bouton ne s'ouvre pas ? Copie ce lien dans ton navigateur :", url: actionLink },
       { type: "note", text: "Ce lien est personnel. Si tu n'es pas à l'origine de cet achat, ignore simplement cet e-mail." },
     ],
     footer: footerFor(ctx, "Tu reçois ce message parce qu'un achat BUILD vient d'être réglé avec cette adresse."),
@@ -133,11 +133,20 @@ export type BroadcastInput = {
   body: string;
   ctaLabel: string;
   ctaUrl: string;
+  /** Miniature publique de la vidéo, stockée dans video-thumbnails. */
+  thumbnailUrl?: string;
+  /** Titre visible dans le corps quand l'objet de boîte est différent. */
+  heading?: string;
 };
 
 function youtubeThumbnail(url: string): string | null {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
   return match ? `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg` : null;
+}
+
+function broadcastThumbnail(input: BroadcastInput, ctaUrl: string): string | null {
+  const supplied = input.thumbnailUrl?.trim();
+  return supplied || youtubeThumbnail(ctaUrl);
 }
 
 /**
@@ -162,11 +171,12 @@ export function broadcastBodyToBlocks(body: string): EmailBlock[] {
 /** Diffusion écrite par l'administrateur (nouvelle vidéo, mise à jour, message libre). */
 export function buildBroadcastEmail(ctx: EmailContext, input: BroadcastInput): RenderedEmail {
   const ctaUrl = input.ctaUrl.trim();
-  const thumbnail = ctaUrl ? youtubeThumbnail(ctaUrl) : null;
+  const thumbnail = broadcastThumbnail(input, ctaUrl);
+  const heading = input.heading?.trim() || input.subject.trim();
   const blocks: EmailBlock[] = [
-    { type: "heading", text: input.subject.trim() },
+    { type: "heading", text: heading },
+    ...(thumbnail ? [{ type: "image", src: thumbnail, href: ctaUrl, alt: `Miniature de ${heading || "la vidéo"}` } as const] : []),
     ...broadcastBodyToBlocks(input.body),
-    ...(thumbnail ? [{ type: "image", src: thumbnail, href: ctaUrl, alt: "Miniature de la vidéo" } as const] : []),
     ...(ctaUrl ? [{ type: "button", label: input.ctaLabel.trim() || "Voir", url: ctaUrl } as const] : []),
   ];
   return renderEmail({
@@ -218,11 +228,11 @@ export function buildAuthEmail(
       note: "Si tu n'attendais pas cet e-mail, tu peux l'ignorer.",
     },
     recovery: {
-      subject: "Choisis un nouveau mot de passe BUILD",
-      preheader: "Ce lien te permet de choisir un nouveau mot de passe.",
-      heading: "Choisis un nouveau mot de passe.",
-      text: "Tu as demandé à réinitialiser ton mot de passe BUILD. Clique sur le bouton pour en choisir un nouveau.",
-      button: "Choisir un mot de passe",
+      subject: "Ton code BUILD pour changer de mot de passe",
+      preheader: "Saisis ce code pour choisir un nouveau mot de passe.",
+      heading: "Ton code de réinitialisation.",
+      text: "Tu as demandé à réinitialiser ton mot de passe BUILD. Saisis ce code sur la page de réinitialisation pour en choisir un nouveau.",
+      button: "",
       reason: "Tu reçois ce message parce qu'une réinitialisation de mot de passe a été demandée pour ce compte.",
       note: "Si tu n'es pas à l'origine de cette demande, ignore cet e-mail : ton mot de passe actuel reste valable.",
     },
@@ -240,13 +250,20 @@ export function buildAuthEmail(
     subject: copy.subject,
     preheader: copy.preheader,
     baseUrl: ctx.baseUrl,
-    blocks: [
-      { type: "heading", text: copy.heading },
-      { type: "paragraph", text: copy.text },
-      { type: "button", label: copy.button, url: link },
-      { type: "link", label: "Le bouton ne s'ouvre pas ? Copie ce lien dans ton navigateur :", url: link },
-      { type: "note", text: `${copy.note} Ce lien est personnel et ne reste valable que peu de temps.` },
-    ],
+    blocks: kind === "recovery"
+      ? [
+          { type: "heading", text: copy.heading },
+          { type: "paragraph", text: copy.text },
+          { type: "code", text: "{{ .Token }}" },
+          { type: "note", text: `${copy.note} Ce code est personnel et ne reste valable que peu de temps.` },
+        ]
+      : [
+          { type: "heading", text: copy.heading },
+          { type: "paragraph", text: copy.text },
+          { type: "button", label: copy.button, url: link },
+          { type: "link", label: "Le bouton ne s'ouvre pas ? Copie ce lien dans ton navigateur :", url: link },
+          { type: "note", text: `${copy.note} Ce lien est personnel et ne reste valable que peu de temps.` },
+        ],
     footer: footerFor(ctx, copy.reason),
   });
 }
