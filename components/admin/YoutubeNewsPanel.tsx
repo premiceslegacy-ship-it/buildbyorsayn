@@ -34,7 +34,7 @@ export function YoutubeNewsPanel() {
       <div className="adm-youtube-icon" aria-hidden="true"><Youtube /></div>
       <div>
         <h3 id="youtube-news-title">Ajouter une vidéo YouTube</h3>
-        <p>Colle le lien d'une vidéo longue récente de ta chaîne. BUILD vérifie son identifiant, resynchronise le flux et écarte les Shorts.</p>
+        <p>Colle un lien de vidéo longue publiée sur ta chaîne.</p>
       </div>
       <form onSubmit={submit}>
         <label>

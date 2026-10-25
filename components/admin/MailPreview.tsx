@@ -35,18 +35,18 @@ export function MailPreview({ subject, html, text, from }: { subject: string; ht
 
   return (
     <div className="ml-preview-box">
-      <div className="ml-preview-bar">
-        <div className="ml-device" role="group" aria-label="Boîte de réception">
+      <div className="ml-preview-bar" role="group" aria-label="Réglages de l'aperçu">
+        <div className="ml-device">
           <button type="button" aria-pressed={scheme === "light"} onClick={() => setScheme("light")}>Clair</button>
           <button type="button" aria-pressed={scheme === "dark"} onClick={() => setScheme("dark")}>Sombre</button>
         </div>
-        <div className="ml-device" role="group" aria-label="Taille de l'écran">
+        <div className="ml-device">
           <button type="button" aria-pressed={device === "desktop"} onClick={() => setDevice("desktop")}>Ordinateur</button>
           <button type="button" aria-pressed={device === "phone"} onClick={() => setDevice("phone")}>Téléphone</button>
         </div>
-        <div className="ml-device" role="group" aria-label="Format">
+        <div className="ml-device">
           <button type="button" aria-pressed={format === "html"} onClick={() => setFormat("html")}>HTML</button>
-          <button type="button" aria-pressed={format === "text"} onClick={() => setFormat("text")}>Texte brut</button>
+          <button type="button" aria-pressed={format === "text"} onClick={() => setFormat("text")}>Texte</button>
         </div>
       </div>
       <div className="ml-window" data-scheme={scheme} data-device={device}>

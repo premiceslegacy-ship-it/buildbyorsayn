@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { BookCallBanner } from "@/components/BookCallBanner";
 import { BookCallCard } from "@/components/BookCallCard";
 import Link from "next/link";
 import { DaIcon } from "@/components/da/DaIcon";
@@ -32,7 +31,6 @@ export default async function DashboardPage() {
     <NavBar {...identity} />
     <main>
       <h1 className="sr">Aujourd'hui</h1>
-      <BookCallBanner tier={identity.tier} />
       {lead ? <section className="cont" aria-label={lead.kind === "suivre" ? "À suivre" : "Reprendre"}><Link className="cont__img" href={lead.href} aria-label={`${lead.kind === "suivre" ? "Continuer" : "Reprendre"} : ${lead.title}`}><Image src={lead.image} alt="" width={1200} height={675} priority /></Link><div className="cont__b"><p className="cont__bloc"><span className="cont__n" aria-hidden="true">{lead.heroNumber}</span><span className="cont__bt"><small>{lead.courseLabel}</small>{lead.partTitle}</span></p><h2 className="cont__t">{lead.title}</h2><p className="cont__s">{lead.summary}</p>{lead.kind === "reprendre" && lead.progress !== null ? <span className="pbar cont__bar" role="img" aria-label={`Avancement : ${Math.round(lead.progress * 100)} %`}><i style={{ width: `${Math.max(3, Math.round(lead.progress * 100))}%` }} /></span> : null}<Link className="btn btn--p btn--xl" href={lead.href}><DaIcon name="play" />{lead.kind === "suivre" ? "Continuer" : "Reprendre"}</Link></div></section> : firstAccessible ? <section className="cont" aria-label="Commencer"><Link className="cont__img" href={firstAccessible.href} aria-label={`Commencer : ${firstAccessible.title}`}><Image src={firstAccessible.image} alt="" width={1200} height={675} priority /></Link><div className="cont__b"><p className="cont__bloc"><span className="cont__n" aria-hidden="true">01</span><span className="cont__bt">Ton premier contenu, {firstAccessible.meta}</span></p><h2 className="cont__t">{firstAccessible.title}</h2><p className="cont__s">Tout est prêt pour ton premier chapitre.</p><Link className="btn btn--p btn--xl" href={firstAccessible.href}><DaIcon name="play" />Commencer</Link></div></section> : null}
       {continueItems.length > 1 ? <ContinueRow items={continueItems} /> : null}
       <ProgrammeRows sections={sections} progressByCard={progressByCard} />

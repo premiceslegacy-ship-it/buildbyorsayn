@@ -27,17 +27,17 @@ type Mode = "write" | "catalog";
 const CONFIRM_WORD = "ENVOYER";
 
 const AUDIENCE_LABELS: Record<Audience, string> = {
-  all: "Tous les membres",
+  all: "Tous",
   free: "Gratuits",
   beginner: FONDATIONS_LABEL,
   full: COFFRE_LABEL,
-  selected: "Choisir à la main",
+  selected: "Choisir",
 };
 
 const TEMPLATES: Record<TemplateKey, { label: string; hint: string }> = {
-  blank: { label: "Message libre", hint: "Tu écris tout toi-même, à partir d'une page vide." },
-  video: { label: "Nouvelle vidéo", hint: "Annonce une vidéo avec un bouton pour la regarder." },
-  update: { label: "Mise à jour BUILD", hint: "Explique ce qui a changé et renvoie vers ton espace." },
+  blank: { label: "Libre", hint: "" },
+  video: { label: "Nouvelle vidéo", hint: "" },
+  update: { label: "Mise à jour", hint: "" },
 };
 
 function templateContent(key: TemplateKey, baseUrl: string | null, values: { videoTitle: string; videoUrl: string; videoThumbnailUrl: string; updateTitle: string; updateDesc: string }) {
@@ -91,16 +91,16 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
   const [videoTitle, setVideoTitle] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [videoThumbnailUrl, setVideoThumbnailUrl] = useState("");
-  const [updateTitle, setUpdateTitle] = useState("");
-  const [updateDesc, setUpdateDesc] = useState("");
   const [subject, setSubject] = useState("");
   const [preheader, setPreheader] = useState("");
   const [body, setBody] = useState("");
   const [ctaLabel, setCtaLabel] = useState("");
   const [ctaUrl, setCtaUrl] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
-  const [buttonOpen, setButtonOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [confirmation, setConfirmation] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -139,20 +139,25 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
   };
 
   useEffect(() => {
-    if (!sheetOpen) return;
+    if (!sheetOpen && !pickerOpen && !previewOpen) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !isSending) {
+      if (event.key !== "Escape" || isSending) return;
+      if (sheetOpen) {
         setSheetOpen(false);
         setConfirmation("");
         setResult(null);
+      } else if (pickerOpen) {
+        setPickerOpen(false);
+      } else {
+        setPreviewOpen(false);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [sheetOpen, isSending]);
+  }, [sheetOpen, pickerOpen, previewOpen, isSending]);
 
   const applyTemplate = (key: TemplateKey) => {
-    const next = templateContent(key, emailContext.baseUrl, { videoTitle, videoUrl, videoThumbnailUrl, updateTitle, updateDesc });
+    const next = templateContent(key, emailContext.baseUrl, { videoTitle, videoUrl, videoThumbnailUrl, updateTitle: "", updateDesc: "" });
     setActiveTemplate(key);
     setSubject(next.subject);
     setPreheader(next.preheader);
@@ -160,8 +165,7 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
     setCtaLabel(next.ctaLabel);
     setCtaUrl(next.ctaUrl);
     setThumbnailUrl(next.thumbnailUrl);
-    setButtonOpen(Boolean(next.ctaLabel || next.ctaUrl));
-    setOptionsOpen(Boolean(next.preheader));
+    setOptionsOpen(false);
     setConfirmation("");
     setResult(null);
   };
@@ -178,8 +182,8 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
       videoTitle: nextTitle,
       videoUrl: video.href,
       videoThumbnailUrl: video.thumbnailUrl ?? "",
-      updateTitle,
-      updateDesc,
+      updateTitle: "",
+      updateDesc: "",
     });
     setActiveTemplate("video");
     setSubject(next.subject);
@@ -188,8 +192,7 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
     setCtaLabel(next.ctaLabel);
     setCtaUrl(next.ctaUrl);
     setThumbnailUrl(next.thumbnailUrl);
-    setButtonOpen(true);
-    setOptionsOpen(true);
+    setOptionsOpen(false);
     setConfirmation("");
     setResult(null);
   };
@@ -273,23 +276,20 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
       {dataWarning ? <div className="adm-notice adm-notice-error" role="alert"><AlertCircle aria-hidden="true" /><p>{dataWarning}</p></div> : null}
       <header className="ml-head">
         <h2 id="admin-mail-title">Écrire à tes membres</h2>
-        <p>Choisis un modèle, écris ton message, puis vérifie qui le reçoit avant d'envoyer.</p>
       </header>
 
       <div className="ml-layout">
         <div className="ml-flow">
-          <fieldset className="ml-step">
-            <legend>Quel message ?</legend>
-            <div className="ml-templates">
+          <fieldset className="ml-step" aria-label="Modèle">
+            <div className="ml-templates" role="group" aria-label="Modèle de message">
               {(Object.keys(TEMPLATES) as TemplateKey[]).map((key) => (
                 <button type="button" key={key} className="ml-template" aria-pressed={activeTemplate === key} onClick={() => applyTemplate(key)}>
                   <strong>{TEMPLATES[key].label}</strong>
-                  <span>{TEMPLATES[key].hint}</span>
                 </button>
               ))}
             </div>
             {activeTemplate === "video" ? (
-              <div className="ml-fill">
+              <div className="ml-fill ml-video-picker">
                 {publishedVideos.length > 0 ? (
                   <label>Vidéo publiée
                     <select value={selectedVideoId} onChange={(event) => selectPublishedVideo(event.target.value)}>
@@ -297,95 +297,88 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
                       {publishedVideos.map((video) => <option key={video.id} value={video.id}>{readableVideoTitle(video)}</option>)}
                     </select>
                   </label>
-                ) : <p className="ml-note">Aucune vidéo publiée n'est disponible pour l'instant. Tu peux remplir les champs à la main.</p>}
-                <label>Titre de la vidéo<input value={videoTitle} onChange={(event) => setVideoTitle(event.target.value)} /></label>
-                <label>Lien de la vidéo<input value={videoUrl} onChange={(event) => setVideoUrl(event.target.value)} placeholder="https://..." inputMode="url" /></label>
-                <label>URL de la miniature<input value={videoThumbnailUrl} onChange={(event) => setVideoThumbnailUrl(event.target.value)} placeholder="https://..." inputMode="url" /></label>
-                <button type="button" className="ml-quiet" onClick={() => applyTemplate("video")}>Remplir le message avec ces infos</button>
-              </div>
-            ) : null}
-            {activeTemplate === "update" ? (
-              <div className="ml-fill">
-                <label>Titre de la mise à jour<input value={updateTitle} onChange={(event) => setUpdateTitle(event.target.value)} /></label>
-                <label>Ce qui a changé<input value={updateDesc} onChange={(event) => setUpdateDesc(event.target.value)} /></label>
-                <button type="button" className="ml-quiet" onClick={() => applyTemplate("update")}>Remplir le message avec ces infos</button>
+                ) : <p className="ml-note">Aucune vidéo publiée pour l'instant.</p>}
               </div>
             ) : null}
           </fieldset>
 
-          <fieldset className="ml-step">
-            <legend>Écris-le</legend>
+          <fieldset className="ml-step" aria-label="Message">
             <label className="ml-field">
               <span>Objet</span>
-              <small>Ce que les membres voient dans leur boîte</small>
-              <input value={subject} maxLength={160} onChange={(event) => setSubject(event.target.value)} />
+              <input aria-label="Objet de l'e-mail" value={subject} maxLength={160} onChange={(event) => setSubject(event.target.value)} />
             </label>
             <label className="ml-field">
-              <span>Message</span>
-              <small>Une ligne vide sépare les paragraphes. Des lignes qui commencent par &gt; forment une citation. Trois tirets seuls sur une ligne tracent un séparateur.</small>
+              <span>Message <button type="button" className="ml-help" aria-label="Afficher l'aide du message" aria-expanded={helpOpen} onClick={() => setHelpOpen((open) => !open)}>?</button></span>
+              <small>Une ligne vide sépare les paragraphes.</small>
+              {helpOpen ? <small className="ml-help-copy">Une ligne qui commence par &gt; devient une citation. Trois tirets seuls sur une ligne tracent un séparateur.</small> : null}
               <textarea value={body} maxLength={20000} rows={8} onChange={(event) => setBody(event.target.value)} />
             </label>
-
-            <button type="button" className="ml-disclose" aria-expanded={buttonOpen} aria-controls="ml-button-fields" onClick={() => setButtonOpen((open) => !open)}>
-              <ChevronDown aria-hidden="true" />Ajouter un bouton
-            </button>
-            {buttonOpen ? (
-              <div className="ml-pair" id="ml-button-fields">
-                <label className="ml-field"><span>Texte du bouton</span><input value={ctaLabel} maxLength={80} onChange={(event) => setCtaLabel(event.target.value)} /></label>
-                <label className="ml-field"><span>Lien du bouton</span><input value={ctaUrl} maxLength={2048} inputMode="url" placeholder="https://..." onChange={(event) => setCtaUrl(event.target.value)} /></label>
-              </div>
-            ) : null}
-
             <button type="button" className="ml-disclose" aria-expanded={optionsOpen} aria-controls="ml-option-fields" onClick={() => setOptionsOpen((open) => !open)}>
               <ChevronDown aria-hidden="true" />Options
             </button>
             {optionsOpen ? (
-              <label className="ml-field" id="ml-option-fields">
-                <span>Aperçu dans la boîte de réception</span>
-                <small>La courte phrase grisée qui suit l'objet</small>
-                <input value={preheader} maxLength={200} onChange={(event) => setPreheader(event.target.value)} />
-              </label>
+              <div className="ml-options" id="ml-option-fields">
+                <div className="ml-pair">
+                  <label className="ml-field"><span>Texte du bouton</span><input value={ctaLabel} maxLength={80} onChange={(event) => setCtaLabel(event.target.value)} /></label>
+                  <label className="ml-field"><span>Lien du bouton</span><input value={ctaUrl} maxLength={2048} inputMode="url" placeholder="https://..." onChange={(event) => setCtaUrl(event.target.value)} /></label>
+                </div>
+                <label className="ml-field">
+                  <span>Aperçu dans la boîte</span>
+                  <input value={preheader} maxLength={200} onChange={(event) => setPreheader(event.target.value)} />
+                </label>
+                <p className="ml-option-help">Citations et séparateurs sont disponibles dans le bouton « ? ».</p>
+              </div>
             ) : null}
           </fieldset>
 
           <fieldset className="ml-step">
             <legend>Pour qui ?</legend>
-            <div className="ml-segments" role="group" aria-label="Choisir les destinataires">
-              {(Object.keys(AUDIENCE_LABELS) as Audience[]).map((item) => (
-                <button type="button" key={item} aria-pressed={audience === item} onClick={() => { setAudience(item); setConfirmation(""); }}>{AUDIENCE_LABELS[item]}</button>
-              ))}
-            </div>
-
-            {audience === "selected" ? (
-              <div className="ml-picker">
-                <label className="ml-search"><Search aria-hidden="true" /><span className="ml-sr">Chercher un membre</span><input type="search" value={search} placeholder="Chercher un membre" onChange={(event) => setSearch(event.target.value)} autoComplete="off" /></label>
-                <div className="ml-list">
-                  {visibleUsers.length === 0 ? <p>Aucun membre ne correspond.</p> : visibleUsers.map((account) => {
-                    const checked = selectedIds.includes(account.id);
-                    return (
-                      <label key={account.id} data-disabled={account.inactiveForEmail || undefined}>
-                        <input type="checkbox" checked={checked} onChange={() => toggleUser(account.id)} disabled={account.inactiveForEmail || (!checked && selectedIds.length >= MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS)} />
-                        <span>{account.email}</span>
-                        <small>{account.inactiveForEmail ? "Inactif" : account.tier === "full" ? COFFRE_LABEL : account.tier === "beginner" ? FONDATIONS_LABEL : "Gratuit"}</small>
-                      </label>
-                    );
-                  })}
-                </div>
+            <div className="ml-audience-head">
+              <div className="ml-segments" role="group" aria-label="Choisir les destinataires">
+                {(Object.keys(AUDIENCE_LABELS) as Audience[]).map((item) => (
+                  <button type="button" key={item} aria-pressed={audience === item} onClick={() => {
+                    setAudience(item);
+                    setConfirmation("");
+                    if (item === "selected") setPickerOpen(true);
+                  }}>{AUDIENCE_LABELS[item]}</button>
+                ))}
               </div>
-            ) : null}
-
-            <p className="ml-count" role="status" aria-live="polite">
-              {expectedRecipients === 0
-                ? "Personne ne recevra ce mail pour l'instant."
-                : overLimit
-                  ? `${expectedRecipients} personnes, mais l'envoi est limité à ${MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS} à la fois.`
-                  : `${expectedRecipients} ${plural(expectedRecipients, "personne recevra", "personnes recevront")} ce mail.`}
-            </p>
-            {ruleApplies ? (
-              <p className="ml-note">Les comptes gratuits inactifs depuis plus de trois mois ne reçoivent jamais d'e-mail : {excludedInactiveCount} {plural(excludedInactiveCount, "compte est exclu", "comptes sont exclus")}.</p>
-            ) : null}
-            {overLimit && audience !== "selected" ? <button type="button" className="ml-quiet" onClick={() => { setAudience("selected"); setConfirmation(""); }}>Choisir à la main</button> : null}
+              <p className="ml-count" role="status" aria-live="polite">
+                {expectedRecipients === 0 ? "0 destinataire" : `${expectedRecipients} ${plural(expectedRecipients, "destinataire", "destinataires")}`}
+              </p>
+            </div>
+            {overLimit ? <p className="ml-note">Limite d'envoi : {MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS} destinataires.</p> : null}
+            {ruleApplies ? <p className="ml-note">Les comptes inactifs sont exclus : {excludedInactiveCount}.</p> : null}
+            {overLimit && audience !== "selected" ? <button type="button" className="ml-quiet" onClick={() => { setAudience("selected"); setPickerOpen(true); setConfirmation(""); }}>Choisir</button> : null}
           </fieldset>
+
+          {pickerOpen ? (
+            <div className="ml-picker-layer" role="presentation">
+              <button type="button" className="adm-dialog-scrim" aria-label="Fermer le choix des destinataires" onClick={() => setPickerOpen(false)} />
+              <section className="ml-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="ml-picker-title">
+                <div className="ml-picker-dialog-head">
+                  <div><h2 id="ml-picker-title">Choisir</h2><p>{selectedIds.length} sélectionné{selectedIds.length > 1 ? "s" : ""}</p></div>
+                  <button type="button" className="ml-picker-close" onClick={() => setPickerOpen(false)} aria-label="Fermer">Fermer</button>
+                </div>
+                <div className="ml-picker">
+                  <label className="ml-search"><Search aria-hidden="true" /><span className="ml-sr">Chercher un membre</span><input type="search" value={search} placeholder="Chercher un membre" onChange={(event) => setSearch(event.target.value)} autoComplete="off" autoFocus /></label>
+                  <div className="ml-list">
+                    {visibleUsers.length === 0 ? <p>Aucun membre ne correspond.</p> : visibleUsers.map((account) => {
+                      const checked = selectedIds.includes(account.id);
+                      return (
+                        <label key={account.id} data-disabled={account.inactiveForEmail || undefined}>
+                          <input type="checkbox" checked={checked} onChange={() => toggleUser(account.id)} disabled={account.inactiveForEmail || (!checked && selectedIds.length >= MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS)} />
+                          <span>{account.email}</span>
+                          <small>{account.inactiveForEmail ? "Inactif" : account.tier === "full" ? COFFRE_LABEL : account.tier === "beginner" ? FONDATIONS_LABEL : "Gratuit"}</small>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+                <button type="button" className="adm-ghost-button ml-picker-done" onClick={() => setPickerOpen(false)}>Terminer</button>
+              </section>
+            </div>
+          ) : null}
 
           <div className="ml-send">
             <button type="button" className="adm-primary-button" disabled={!canReview} onClick={() => { setResult(null); setConfirmation(""); setSheetOpen(true); }}>Vérifier et envoyer</button>
@@ -393,10 +386,23 @@ export function AdminMailComposer({ users, dataWarning, emailContext, catalog, f
           </div>
         </div>
 
+        <button type="button" className="ml-preview-trigger" onClick={() => setPreviewOpen(true)}>Aperçu</button>
         <aside className="ml-preview" aria-label="Aperçu de l'e-mail">
           <MailPreview subject={preview.subject} html={preview.html} text={preview.text} from={from} />
         </aside>
       </div>
+      {previewOpen ? (
+        <div className="ml-preview-layer" role="presentation">
+          <button type="button" className="adm-dialog-scrim" aria-label="Fermer l'aperçu" onClick={() => setPreviewOpen(false)} />
+          <section className="ml-preview-sheet" role="dialog" aria-modal="true" aria-labelledby="ml-preview-title">
+            <div className="ml-preview-sheet-head">
+              <h2 id="ml-preview-title">Aperçu</h2>
+              <button type="button" className="ml-picker-close" onClick={() => setPreviewOpen(false)}>Fermer</button>
+            </div>
+            <MailPreview subject={preview.subject} html={preview.html} text={preview.text} from={from} />
+          </section>
+        </div>
+      ) : null}
 
       {sheetOpen ? (
         <div className="adm-dialog-layer">
