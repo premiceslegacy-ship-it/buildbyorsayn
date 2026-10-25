@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
+import { SafeThumbnail } from "@/components/media/SafeThumbnail";
 import { LessonPlayer, type LessonPlayerHandle } from "@/components/lessons/LessonPlayer";
 import { formatLessonDuration } from "@/components/lessons/LessonMeta";
 import type { BlocVideo } from "@/lib/blocData.server";
@@ -44,6 +44,6 @@ export function ProtocolVideo({ videos }: { videos: BlocVideo[] }) {
       <div className={styles.chapterHeading}><h2>Chapitres</h2><span>{selected.chapters.length}</span></div>
       <ol className={styles.chapterList}>{selected.chapters.map((chapter, index) => <li key={`${selected.id}-${chapter.startSeconds}`}><button className={styles.chapterRow} type="button" aria-current={index === currentChapter ? "true" : undefined} disabled={!selected.playbackId} onClick={() => { setCurrentTime(chapter.startSeconds); playerRef.current?.seekAndPlay(chapter.startSeconds); }}><span className={styles.chapterNumber}>{index + 1}</span><span className={styles.chapterCopy}><b>{chapter.title}</b></span><span className={styles.chapterMeta}>{Math.floor(chapter.startSeconds / 60)}:{String(chapter.startSeconds % 60).padStart(2, "0")}</span><span className={styles.chapterMark} /></button></li>)}</ol>
     </> : null}
-    {videos.length > 1 ? <section className={styles.episodeList} aria-labelledby="protocol-video-list-title"><div className={styles.episodeHeading}><h2 id="protocol-video-list-title">Les épisodes</h2><span>{videos.length} vidéo{videos.length > 1 ? "s" : ""}</span></div><div className={styles.episodeRows}>{videos.map((video) => <button className={`${styles.episodeRow} ${video.id === selected.id ? styles.episodeRowCurrent : ""}`} type="button" key={video.id} onClick={() => selectVideo(video.position)} aria-current={video.id === selected.id ? "true" : undefined}><span className={styles.episodeNumber}>{video.position}</span><span className={styles.episodeArtwork}><Image src={video.thumbnailUrl} alt="" fill unoptimized sizes="176px" /></span><span className={styles.episodeCopy}><strong>{video.title}</strong>{video.summary ? <span>{video.summary}</span> : null}</span></button>)}</div></section> : null}
+    {videos.length > 1 ? <section className={styles.episodeList} aria-labelledby="protocol-video-list-title"><div className={styles.episodeHeading}><h2 id="protocol-video-list-title">Les épisodes</h2><span>{videos.length} vidéo{videos.length > 1 ? "s" : ""}</span></div><div className={styles.episodeRows}>{videos.map((video) => <button className={`${styles.episodeRow} ${video.id === selected.id ? styles.episodeRowCurrent : ""}`} type="button" key={video.id} onClick={() => selectVideo(video.position)} aria-current={video.id === selected.id ? "true" : undefined}><span className={styles.episodeNumber}>{video.position}</span><span className={styles.episodeArtwork}><SafeThumbnail src={video.thumbnailUrl} alt="" unoptimized sizes="176px" /></span><span className={styles.episodeCopy}><strong>{video.title}</strong>{video.summary ? <span>{video.summary}</span> : null}</span></button>)}</div></section> : null}
   </div>;
 }

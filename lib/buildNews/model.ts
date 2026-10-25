@@ -56,4 +56,15 @@ export type BuildNewsRow = {
   internal_url: string | null;
   sentence: string;
   created_at: string;
+  /** Renseignée seulement pour une Nouveauté créée automatiquement à la publication. */
+  source_key?: string | null;
 };
+
+export const buildNewsUpdateSchema = z.object({
+  title: z.string().trim().min(1).max(160),
+  blocLabel: z.string().trim().min(1).max(120).nullable().optional(),
+  internalUrl: rootRelativeUrl.nullable().optional(),
+  sentence: z.string().trim().min(1).max(500),
+}).strict();
+
+export type BuildNewsUpdate = z.infer<typeof buildNewsUpdateSchema>;

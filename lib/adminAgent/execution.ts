@@ -8,6 +8,7 @@ import { assertBuildNewsThumbnail } from "@/lib/buildNews/thumbnail.server";
 import { createBuildNews } from "@/lib/buildNews/server";
 import { buildNewsInputSchema } from "@/lib/buildNews/model";
 import { displayLocationFromBlocId } from "@/lib/blocCatalog";
+import { recordVideoPublishedNews } from "@/lib/nouveautes/autoNews.server";
 import { videoChapterSchema, validateChapterTimeline } from "@/lib/mux/adminLessons";
 import { cleanupMuxAsset } from "@/lib/mux/assetCleanup.server";
 import { AgentToolError } from "./types";
@@ -128,6 +129,7 @@ export async function executeAgentPublication(videoId: string, actorUserId: stri
   if (published.error || !Array.isArray(published.data) || published.data.length !== 1) {
     throw new Error("La publication a échoué.");
   }
+  await recordVideoPublishedNews(videoId, { actorUserId });
   const previousAssetId = typeof published.data[0]?.previous_mux_asset_id === "string"
     ? published.data[0].previous_mux_asset_id
     : null;

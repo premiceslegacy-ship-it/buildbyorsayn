@@ -7,14 +7,18 @@ import { createClient } from "@/lib/supabase/client";
 import { playAppSound } from "@/lib/ui/sound";
 import { ToolLogo } from "@/components/ToolLogo";
 import { AccountIcon } from "./AccountIcon";
+import { BookCallLink } from "@/components/BookCallLink";
 import { UpgradeCard } from "./UpgradeCard";
 import { accountIncludedItems, accountTierLabel } from "./accountPresentation";
+import { MCP_ENTRY_VISIBLE } from "@/lib/mcp/entryVisibility";
 import styles from "./AccountClient.module.css";
 
 type Section = "profile" | "email" | "password" | "subscription" | "connections" | "devices";
 type Notice = { tone: "success" | "error"; text: string } | null;
 
-const SECTION_IDS: Section[] = ["profile", "email", "password", "subscription", "connections", "devices"];
+const SECTION_IDS: Section[] = MCP_ENTRY_VISIBLE
+  ? ["profile", "email", "password", "subscription", "connections", "devices"]
+  : ["profile", "email", "password", "subscription", "devices"];
 
 function passwordError(password: string) {
   if (password.length < 8) return "Utilise au moins 8 caractères.";
@@ -56,7 +60,7 @@ export function AccountClient({
     { id: "email" as const, icon: "mail" as const, label: "E‑mail", value: email },
     { id: "password" as const, icon: "key" as const, label: "Mot de passe", value: "••••••••" },
     { id: "subscription" as const, icon: "card" as const, label: "Abonnement", value: accountTierLabel(tier) },
-    { id: "connections" as const, icon: "plug" as const, label: "Connexions", value: connectionStatus === "connected" ? "Active" : connectionStatus === "disconnected" ? "À configurer" : "Indisponible" },
+    ...(MCP_ENTRY_VISIBLE ? [{ id: "connections" as const, icon: "plug" as const, label: "Connexions", value: connectionStatus === "connected" ? "Active" : connectionStatus === "disconnected" ? "À configurer" : "Indisponible" }] : []),
     { id: "devices" as const, icon: "devices" as const, label: "Appareils", value: "Cette session" },
   ], [connectionStatus, email, name, tier]);
 
@@ -118,7 +122,7 @@ export function AccountClient({
     finish(error ? { tone: "error", text: "La déconnexion a échoué. Réessaie." } : { tone: "success", text: "Les autres sessions ont été déconnectées." });
   }
 
-  const included = accountIncludedItems(tier);
+  const included = accountIncludedItems(tier, MCP_ENTRY_VISIBLE);
 
   return (
     <main className="ui3-account">
@@ -147,7 +151,7 @@ export function AccountClient({
 
           {activeSection === "password" ? <div className="ui3-pane-section"><h2>Mot de passe</h2><form className="ui3-form" onSubmit={savePassword}><label>Nouveau mot de passe<input name="password" type="password" autoComplete="new-password" /></label><p className="ui3-hint">Au moins 8 caractères, une majuscule, une minuscule et un chiffre.</p><label>Écris-le encore une fois<input name="confirmation" type="password" autoComplete="new-password" /></label><button className="btn btn--p" disabled={busy}>{busy ? "Enregistrement" : "Changer le mot de passe"}</button></form><Link className="ui3-text-link" href="/forgot-password">Mot de passe oublié ?</Link></div> : null}
 
-          {activeSection === "subscription" ? <div className="ui3-pane-section"><h2>Abonnement</h2><article className="ui3-subscription"><h3>{accountTierLabel(tier)}</h3><ul>{included.map((item) => <li key={item}><AccountIcon name="check" />{item}</li>)}</ul><Link className="btn btn--g" href="/checkout">Voir ce qui est inclus</Link></article><UpgradeCard tier={tier} /></div> : null}
+          {activeSection === "subscription" ? <div className="ui3-pane-section"><h2>Abonnement</h2><article className="ui3-subscription"><h3>{accountTierLabel(tier)}</h3><ul>{included.map((item) => <li key={item}><AccountIcon name="check" />{item}</li>)}</ul><Link className="btn btn--g" href="/checkout">Voir ce qui est inclus</Link></article><UpgradeCard tier={tier} /><article className="ui3-call"><div><h3>Un appel avec Samuel</h3><p>Une question sur ton projet ? Choisis ton créneau.</p></div><BookCallLink /></article></div> : null}
 
           {activeSection === "connections" ? <div className="ui3-pane-section"><h2>Connexions</h2><p>Relie ton assistant à BUILD pour retrouver uniquement les contenus inclus dans ton accès.</p><div className="ui3-connection"><span className={`ui3-logo-row ${styles.logos}`} aria-label="Claude, ChatGPT, Hermes, Oh My Pi et Cursor">{["Claude", "ChatGPT", "Hermes Agent", "Oh My Pi", "Cursor"].map((tool) => <span key={tool}><ToolLogo name={tool} size={104} /></span>)}</span><strong>{connectionStatus === "connected" ? "Connexion active" : connectionStatus === "disconnected" ? "À configurer" : "Vérification indisponible"}</strong></div><Link className="btn btn--p" href="/dashboard/mcp">Gérer la connexion</Link></div> : null}
 

@@ -25,6 +25,8 @@ type ResendMessage = {
   html: string;
   text: string;
   idempotencyKey: string;
+  /** Adresse qui reçoit les demandes de désinscription : ajoute l'en-tête List-Unsubscribe (diffusions). */
+  unsubscribeEmail?: string;
 };
 
 type ResendTransportOptions = {
@@ -46,6 +48,7 @@ type AdminBroadcastMessage = {
   subject: string;
   html: string;
   text: string;
+  unsubscribeEmail?: string;
 };
 
 type AdminBroadcastOptions = ResendTransportOptions & {
@@ -70,6 +73,7 @@ function resendRequest(message: ResendMessage, fetchImpl: typeof fetch, signal: 
       subject: message.subject,
       html: message.html,
       text: message.text,
+      ...(message.unsubscribeEmail ? { headers: { "List-Unsubscribe": `<mailto:${message.unsubscribeEmail}?subject=unsubscribe>` } } : {}),
     }),
     signal,
   });
@@ -125,6 +129,7 @@ export async function sendAdminBroadcast(
         subject: message.subject,
         html: message.html,
         text: message.text,
+        unsubscribeEmail: message.unsubscribeEmail,
         idempotencyKey: adminBroadcastIdempotencyKey(message.campaignId, recipient.id),
       }, fetchImpl, signal);
       return response.ok;

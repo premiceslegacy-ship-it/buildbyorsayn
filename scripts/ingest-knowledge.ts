@@ -15,7 +15,6 @@ import { collectObsidianDocuments, resolveObsidianSourceMode } from "@/lib/knowl
 import { collectDoctrineDocuments } from "@/lib/knowledge/doctrineSource";
 import { findKnowledgeSecretHazards } from "@/lib/knowledge/safety";
 import {
-  collectAccompagnementDocuments,
   collectBlocsDocuments,
   collectFondationsDocuments,
   collectProtocoleDocuments,
@@ -48,7 +47,6 @@ const ALWAYS_SCANNED_SOURCES = [
   "fondations",
   "blocs",
   "protocole",
-  "accompagnement",
   "skills-catalog",
   "skills-content",
   "doctrine",
@@ -71,7 +69,6 @@ async function collectAllDocuments(): Promise<{
   documents.push(...(await collectFondationsDocuments()));
   documents.push(...(await collectBlocsDocuments()));
   documents.push(...(await collectProtocoleDocuments()));
-  documents.push(...(await collectAccompagnementDocuments()));
   documents.push(...(await collectSkillsCatalogDocuments()));
   documents.push(...(await collectSkillsContentDocuments()));
   documents.push(...(await collectDoctrineDocuments()));

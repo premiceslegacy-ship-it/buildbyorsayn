@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { SafeThumbnail } from "@/components/media/SafeThumbnail";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { LessonPlayer, type LessonPlayerHandle } from "@/components/lessons/LessonPlayer";
@@ -116,7 +117,7 @@ function EpisodeList({
             {selected ? <span className={styles.episodeEqualizer}><i /><i /><i /></span> : video.position}
           </span>
           <span className={styles.episodeArtwork}>
-            <Image src={video.thumbnailUrl || "/da/mini/b1.jpg"} alt="" fill unoptimized loading="lazy" sizes="(min-width: 735px) 176px, 128px" />
+            <SafeThumbnail src={video.thumbnailUrl || "/da/mini/b1.jpg"} alt="" unoptimized loading="lazy" sizes="(min-width: 735px) 176px, 128px" />
             <span className={styles.videoTime}>{formatLessonDuration(video.durationSeconds)}</span>
             {progress > 0 && !video.completed ? <span className={styles.episodeProgress} aria-label={`${progress} % vu`}><i style={{ width: `${progress}%` }} /></span> : null}
           </span>
@@ -193,7 +194,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
             onEnded={() => setEndedVideoId(selectedPlayableVideo.id)}
             onTimeUpdate={(time) => setCurrentTime(time)}
           /> : <>
-            <Image src={selectedVideo?.thumbnailUrl || thumbnail} alt="" fill priority sizes="(min-width: 1200px) 1184px, 100vw" />
+            <SafeThumbnail src={selectedVideo?.thumbnailUrl || thumbnail} alt="" priority sizes="(min-width: 1200px) 1184px, 100vw" />
             <div className={styles.overviewStageShade} />
             {selectedVideo ? <div className={styles.overviewUpcoming} role="status"><h2>Lecture indisponible pour le moment.</h2></div> : null}
           </>}
@@ -223,7 +224,7 @@ export function BlocOverview({ blocId, title, displayNumber, sections, previewSe
 
       {selectedVideo && selectedVideo.chapters.length > 0 ? <VideoRail title="Dans cette vidéo" labelledBy="video-chapters-title" railRef={chapterRailRef}>
         {selectedVideo.chapters.map((chapter, index) => <button key={`${selectedVideo.id}-${chapter.startSeconds}`} type="button" className={`${styles.videoChapterCard} ${index === currentChapterIndex ? styles.videoChapterCurrent : ""}`} aria-label={`${chapter.title}, à ${formatStart(chapter.startSeconds)}`} aria-current={index === currentChapterIndex ? "true" : undefined} disabled={!selectedPlayableVideo} onClick={() => selectChapter(chapter.startSeconds)}>
-          <span className={styles.videoChapterArtwork}><Image src={chapter.thumbnailUrl || selectedVideo.thumbnailUrl || thumbnail} alt="" fill unoptimized loading="lazy" sizes="(min-width: 900px) 240px, 80vw" /><span className={styles.videoTime}>{formatStart(chapter.startSeconds)}</span>{index === currentChapterIndex ? <span className={styles.equalizer} aria-hidden="true"><i /><i /><i /></span> : null}</span>
+          <span className={styles.videoChapterArtwork}><SafeThumbnail src={chapter.thumbnailUrl || selectedVideo.thumbnailUrl || thumbnail} alt="" unoptimized loading="lazy" sizes="(min-width: 900px) 240px, 80vw" /><span className={styles.videoTime}>{formatStart(chapter.startSeconds)}</span>{index === currentChapterIndex ? <span className={styles.equalizer} aria-hidden="true"><i /><i /><i /></span> : null}</span>
           <strong>{chapter.title}</strong>
         </button>)}
       </VideoRail> : null}

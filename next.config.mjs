@@ -32,7 +32,12 @@ const nextConfig = {
 
   async redirects() {
     // Exact path only: /videos/tutos (Hermes Agent) keeps its own route.
-    return [{ source: "/videos", destination: "/nouveautes", permanent: true }];
+    return [
+      { source: "/videos", destination: "/nouveautes", permanent: true },
+      // L'accompagnement, l'espace accompagné et l'espace formateur n'existent plus : seul l'appel se réserve, depuis le tableau de bord.
+      { source: "/accompagnement", destination: "/dashboard", permanent: true },
+      { source: "/accompagnement/:path*", destination: "/dashboard", permanent: true },
+    ];
   },
 
   async headers() {

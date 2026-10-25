@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   Mail,
   Menu,
-  MessageSquareText,
   Newspaper,
   Users,
   Video,
@@ -18,11 +17,11 @@ import {
 import { animateAppElement, installAppMotionTokens } from "@/lib/ui/motion";
 import { playAppSound } from "@/lib/ui/sound";
 
-export type AdminViewKey = "overview" | "users" | "videos" | "agent" | "news" | "emails" | "accompaniment";
+export type AdminViewKey = "overview" | "users" | "videos" | "agent" | "news" | "emails";
 
 type Props = {
   userLabel: string;
-  counts: { users: number; accompaniment: number };
+  counts: { users: number };
   views: Record<AdminViewKey, ReactNode>;
 };
 
@@ -38,7 +37,6 @@ const NAV_ITEMS: Array<{
   { key: "agent", label: "Agent", icon: Bot, group: "Production" },
   { key: "news", label: "Nouveautés", icon: Newspaper, group: "Production" },
   { key: "emails", label: "E-mails", icon: Mail, group: "Communication" },
-  { key: "accompaniment", label: "Accompagnements", icon: MessageSquareText, group: "Communication" },
 ];
 
 const HASH_TO_VIEW: Record<string, AdminViewKey> = {
@@ -48,7 +46,6 @@ const HASH_TO_VIEW: Record<string, AdminViewKey> = {
   agent: "agent",
   nouveautes: "news",
   mails: "emails",
-  accompagnements: "accompaniment",
 };
 
 const VIEW_TO_HASH = Object.fromEntries(
@@ -143,11 +140,7 @@ export function AdminShell({ userLabel, counts, views }: Props) {
             <p>{group}</p>
             {NAV_ITEMS.filter((item) => item.group === group).map((item) => {
               const Icon = item.icon;
-              const badge = item.key === "users"
-                ? counts.users
-                : item.key === "accompaniment" && counts.accompaniment > 0
-                  ? counts.accompaniment
-                  : null;
+              const badge = item.key === "users" ? counts.users : null;
               return (
                 <button
                   type="button"

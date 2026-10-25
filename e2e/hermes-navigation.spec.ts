@@ -26,8 +26,8 @@ test.describe("Hermes Agent navigation", () => {
 test.describe("Hermes Agent, unauthenticated", () => {
   test("redirects away from the doctrine, never rendering its content, without a session", async ({ page }) => {
     // The proxy's default destination for a gated route without a login-redirect
-    // exception is "/" (see proxy.ts) - only /accompagnement/espace and
-    // /mcp/consent redirect to /login. What matters here is that the
+    // exception is "/" (see proxy.ts) - only /mcp/consent and
+    // /build-sync/consent redirect to /login. What matters here is that the
     // doctrine content is never reached, not the exact destination.
     await page.goto("/videos/tutos");
     await page.waitForURL((url) => url.pathname !== "/videos/tutos", { timeout: 10_000 });

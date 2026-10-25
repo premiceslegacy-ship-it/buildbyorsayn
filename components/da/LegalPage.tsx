@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { LiquidGlassHeader } from "@/components/ui/LiquidGlass";
+import { BARRE_VERRE } from "@/components/ui/liquidGlassPresets";
 import type { ReactNode } from "react";
 import { DaRoot } from "@/components/da/DaRoot";
 import type { LegalEntity } from "@/lib/legal/entity";
@@ -30,13 +32,13 @@ export function LegalPage({ href, intro, sections }: Props) {
 
   return (
     <DaRoot>
-      <header className="barre verre">
+      <LiquidGlassHeader className="barre" glass={BARRE_VERRE}>
         <Link className="barre__logo" href="/" aria-label="BUILD, accueil">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/da/logo-sombre.svg" alt="BUILD" width={104} height={30} />
         </Link>
         <Link className="lg-barre__retour" href="/">Accueil</Link>
-      </header>
+      </LiquidGlassHeader>
 
       <main className="lg-main" id="contenu">
         <div className="wrap">

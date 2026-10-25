@@ -470,13 +470,13 @@ const cases: BenchCase[] = [
     }, tools: [{ name: "search_knowledge", arguments: { query: "CRM doublons champs douteux diff origine date version approbation écriture", limit: 8 } }],
   },
   {
-    id: "full-12", split: "iteration", category: "accompagnement", tier: "full", language: "fr",
+    id: "full-12", split: "iteration", category: "fondations", tier: "full", language: "fr",
     question: "Pour remettre un site à un client, quels livrables et contrôles empêchent qu'il reste dépendant de moi ?",
     expected: {
       keyFacts: ["Remettre sources, dépôt, domaine, hébergement, données, assets, accès et propriétaires.", "Documenter publication, sauvegarde, restauration et reprise.", "Faire exécuter au client un changement ou contenu de test."],
-      sourceRefs: ["content/fondations/url.md", "accompagnement Site Web"], requiredAccess: "full",
-    }, tools: [{ name: "search_knowledge", arguments: { query: "remise site client dépôt domaine hébergement accès sauvegarde restauration autonomie", source: "accompagnement", limit: 8 } }],
-    retrieval: { source: "accompagnement", expectedInTop3: true },
+      sourceRefs: ["content/fondations/url.md"], requiredAccess: "full",
+    }, tools: [{ name: "search_knowledge", arguments: { query: "remise site client dépôt domaine hébergement accès sauvegarde restauration autonomie", source: "fondations", limit: 8 } }],
+    retrieval: { source: "fondations", expectedInTop3: true },
   },
   {
     id: "full-13", split: "iteration", category: "motion", tier: "full", language: "fr",

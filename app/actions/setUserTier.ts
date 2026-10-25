@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { isPlatformAdminUser } from "@/lib/accompanimentAccess";
+import { isPlatformAdminUser } from "@/lib/auth/platformAdmin";
 
 const userTierSchema = z.object({
   userId: z.string().uuid("Utilisateur invalide."),

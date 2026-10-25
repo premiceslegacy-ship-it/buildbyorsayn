@@ -3,9 +3,11 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { AdminMailComposer } from "@/components/AdminMailComposer";
+import { buildEmailCatalog } from "@/lib/email/catalog";
+import { getEmailContext } from "@/lib/email/context";
+import { getSiteOrigin } from "@/lib/siteOrigin";
 import { AdminUsersTable, type AdminUserRow } from "@/components/AdminUsersTable";
 import AgentView from "@/components/admin/AgentView";
-import { AccompanimentView } from "@/components/admin/AccompanimentView";
 import { AdminShell } from "@/components/admin/AdminShell";
 import NewsView from "@/components/admin/NewsView";
 import { OverviewView } from "@/components/admin/OverviewView";
@@ -42,14 +44,6 @@ type ActivityEvent = {
   created_at: string;
 };
 
-type AccompanimentRow = {
-  id: string;
-  status: string;
-  starts_on: string;
-  ends_on: string | null;
-  user_id: string;
-};
-
 function isInactiveForEmail(account: AdminUserRow, now: number) {
   return (account.tier === null || account.tier === "free")
     && now - new Date(account.createdAt).getTime() >= 14 * DAY_MS
@@ -73,6 +67,7 @@ export default async function AdminPage() {
   // Une page dynamique doit figer le même instant pour tous ses calculs de présence.
   // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
+  const emailContext = getEmailContext(getSiteOrigin());
   const since30Days = new Date(now - 30 * DAY_MS).toISOString();
   const [
     { data: profiles, error: profilesError },
@@ -80,7 +75,6 @@ export default async function AdminPage() {
     { data: presenceData, error: presenceError },
     { data: eventData, error: eventError },
     { data: videoData, error: videoError },
-    { data: accompanimentData, error: accompanimentError },
   ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id, tier, completed_blocks").order("id").limit(1000),
     supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
@@ -100,11 +94,6 @@ export default async function AdminPage() {
       .select("id,bloc_id,position,title,summary,transcript,transcript_segments,transcript_source,deliverables,chapters,thumbnail,tier_required,status,mux_upload_id,mux_asset_id,playback_id,duration_seconds,error_code,published_at,replaced_at,approved_at,created_at")
       .order("created_at", { ascending: false })
       .limit(100),
-    supabaseAdmin
-      .from("accompaniment_assignments")
-      .select("id,status,starts_on,ends_on,user_id")
-      .order("starts_on", { ascending: false })
-      .limit(1000),
   ]);
 
   const authUsers = authData?.users ?? [];
@@ -177,14 +166,12 @@ export default async function AdminPage() {
     ? users.reduce((total, account) => total + (account.completed_blocks?.length ?? 0), 0) / users.length
     : 0;
   const trackingSetupMissing = Boolean(profilesError || authError || presenceError || eventError);
-  const accompanimentRows = (accompanimentData as AccompanimentRow[] | null) ?? [];
-  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <DaRoot className="adm-root">
       <AdminShell
         userLabel="Samuel"
-        counts={{ users: users.length, accompaniment: accompanimentRows.length }}
+        counts={{ users: users.length }}
         views={{
           overview: (
             <OverviewView
@@ -238,6 +225,9 @@ export default async function AdminPage() {
           news: <NewsView youtubePanel={<YoutubeNewsPanel />} />,
           emails: (
             <AdminMailComposer
+              emailContext={emailContext}
+              catalog={buildEmailCatalog(emailContext)}
+              from={process.env.RESEND_FROM_EMAIL?.trim() || "BUILD"}
               dataWarning={authError || profilesError ? "Les destinataires sont momentanément indisponibles. Aucun envoi n'est proposé." : null}
               users={interactiveUsers.map((account) => ({
                 id: account.id,
@@ -245,17 +235,6 @@ export default async function AdminPage() {
                 tier: account.tier,
                 inactiveForEmail: isInactiveForEmail(account, now),
               }))}
-            />
-          ),
-          accompaniment: (
-            <AccompanimentView
-              summary={{
-                total: accompanimentRows.length,
-                active: accompanimentRows.filter((row) => row.status === "active" && row.starts_on <= today && (!row.ends_on || row.ends_on >= today)).length,
-                planned: accompanimentRows.filter((row) => row.status === "planned").length,
-                completed: accompanimentRows.filter((row) => row.status === "completed").length,
-              }}
-              dataWarning={accompanimentError ? "Le suivi des accompagnements est momentanément indisponible." : null}
             />
           ),
         }}

@@ -76,8 +76,8 @@ export default function ConfidentialitePage() {
           <Traitement
             titre="Le suivi d'activité des membres"
             donnees="Quand tu es connecté, on enregistre ton adresse e-mail, la page que tu consultes et son titre, la date et l'heure, et ton navigateur. On enregistre aussi le type d'événement (arrivée sur une page, onglet affiché ou masqué) et un signal de présence envoyé toutes les 30 secondes tant que l'onglet est ouvert."
-            pourquoi="Voir si BUILD fonctionne et comment il est utilisé, repérer les membres qui n'ont pas ouvert BUILD depuis longtemps, aider les membres que nous suivons en accompagnement."
-            base="Notre intérêt légitime à faire fonctionner, améliorer et accompagner BUILD (article 6.1.f du RGPD). Tu peux t'y opposer en nous écrivant. Ce suivi ne dépose aucun cookie et ne sert à aucune publicité."
+            pourquoi="Voir si BUILD fonctionne et comment il est utilisé, repérer les membres qui n'ont pas ouvert BUILD depuis longtemps."
+            base="Notre intérêt légitime à faire fonctionner et améliorer BUILD (article 6.1.f du RGPD). Tu peux t'y opposer en nous écrivant. Ce suivi ne dépose aucun cookie et ne sert à aucune publicité."
             duree="Tant que ton compte existe. Ces données sont supprimées avec lui."
           />
 
@@ -106,9 +106,9 @@ export default function ConfidentialitePage() {
           />
 
           <Traitement
-            titre="Les accompagnements"
+            titre="Les anciens accompagnements"
             donnees="Si tu suis un accompagnement : sa période et son parcours, le nom de ton entreprise, ton projet, l'adresse de ton site et les notes partagées avec ton accompagnateur."
-            pourquoi="Te suivre pendant l'accompagnement."
+            pourquoi="Conserver l'historique de ton accompagnement terminé."
             base="L'exécution du contrat."
             duree="Tant que ton compte existe. Ces données sont supprimées avec lui."
           />
@@ -150,7 +150,7 @@ export default function ConfidentialitePage() {
             </tbody>
           </table>
           <p>Ton assistant IA (Claude, ChatGPT ou un autre) n&apos;est pas notre sous-traitant. Quand tu le connectes à BUILD, ce que tu lui écris reste dans son service, avec ses propres règles.</p>
-          <p>Si tu prends un rendez-vous d&apos;accompagnement, tu passes par le service de réservation Cal.com, un site qui a ses propres règles.</p>
+          <p>Si tu réserves un appel avec Samuel, tu passes par le service de réservation Cal.com, un site qui a ses propres règles.</p>
         </>
       ),
     },

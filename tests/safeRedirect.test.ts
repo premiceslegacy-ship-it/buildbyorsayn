@@ -4,8 +4,8 @@ import { sanitizeInternalRedirect } from "../lib/safeRedirect";
 
 test("sanitizeInternalRedirect accepts only same-origin paths", () => {
   assert.equal(
-    sanitizeInternalRedirect("/accompagnement/espace?tab=design#phase"),
-    "/accompagnement/espace?tab=design#phase"
+    sanitizeInternalRedirect("/compte?tab=design#phase"),
+    "/compte?tab=design#phase"
   );
   assert.equal(sanitizeInternalRedirect("/dashboard"), "/dashboard");
 });
@@ -23,7 +23,7 @@ test("sanitizeInternalRedirect rejects external and backslash destinations", () 
     "/%00evil",
     "dashboard",
     "",
-    ["/accompagnement/espace", "/dashboard"],
+    ["/compte", "/dashboard"],
   ];
 
   for (const value of rejected) {

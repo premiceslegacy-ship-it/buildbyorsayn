@@ -1,4 +1,4 @@
-import { test, expect, type Locator, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { test as authedTest, expect as authedExpect, hasBeginnerE2eAccount, hasE2eAccount } from "./fixtures/auth";
 
 async function waitForStableCardGrid(page: Page, grid: Locator) {
@@ -40,16 +40,6 @@ authedTest.describe("IllustratedCard visual regression (skills, requires a sessi
     // La barre fixe se recolle à l'endroit du défilement : elle masque la grille selon la hauteur.
     await page.addStyleTag({ content: ".navbar { visibility: hidden !important; }" });
     await authedExpect(grid).toHaveScreenshot("skills-card-grid.png");
-  });
-});
-
-test.describe("IllustratedCard visual regression (accompagnement, public page)", () => {
-  test("accompagnement page renders on mobile width", async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 800 });
-    await page.goto("/accompagnement");
-    const pageMain = page.getByRole("main");
-    await pageMain.scrollIntoViewIfNeeded();
-    await expect(pageMain).toHaveScreenshot("accompagnement-grid-mobile.png");
   });
 });
 

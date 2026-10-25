@@ -60,9 +60,9 @@ test("la CSP des API n'autorise rien", () => {
 });
 
 test("le garde du proxy couvre les mêmes chemins que l'ancien matcher, y compris encodés", () => {
-  const guarded = ["/dashboard", "/dashboard/mcp", "/programme", "/blocs/1", "/sources", "/skills", "/fin", "/intro", "/videos/tutos", "/videos/tutos/learn/x", "/admin", "/admin/x", "/beginner", "/beginner/s1", "/protocole", "/accompagnement/espace", "/accompagnement/espace/guide", "/mcp/consent", "/build-sync/consent", "/%66in", "/%61dmin/x", "/f%69n"];
+  const guarded = ["/dashboard", "/dashboard/mcp", "/programme", "/blocs/1", "/sources", "/skills", "/fin", "/intro", "/videos/tutos", "/videos/tutos/learn/x", "/admin", "/admin/x", "/beginner", "/beginner/s1", "/protocole", "/mcp/consent", "/build-sync/consent", "/%66in", "/%61dmin/x", "/f%69n"];
   for (const path of guarded) assert.equal(isGuardedPath(path), true, path);
-  const open = ["/", "/login", "/checkout", "/checkout/upgrade", "/cgv", "/nouveautes", "/accompagnement", "/accompagnement/site-web", "/skillset", "/dashboards", "/%zz"];
+  const open = ["/", "/login", "/checkout", "/checkout/upgrade", "/cgv", "/nouveautes", "/skillset", "/dashboards", "/%zz"];
   for (const path of open) assert.equal(isGuardedPath(path), false, path);
 });
 

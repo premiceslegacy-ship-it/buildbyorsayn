@@ -16,16 +16,6 @@ test("the member MCP entry resolves an honest state for every access and connect
   assert.equal(resolveMcpDashboardEntryState({ visible: true, profileReady: true, tier: "admin", status: "unknown" }), "unknown");
 });
 
-test("the account menu keeps the existing MCP connection route", async () => {
-  const dashboard = await readFile("app/dashboard/page.tsx", "utf8");
-  const nav = await readFile("components/NavBar.tsx", "utf8");
-
-  assert.match(dashboard, /loadTodayProgress/);
-  assert.match(nav, /href="\/dashboard\/mcp"/);
-  assert.match(nav, />Connexion IA</);
-  assert.doesNotMatch(dashboard, /McpDashboardEntry|LiquidCard/);
-});
-
 test("the MCP setup page gates instructions by paid access and uses a focused layout", async () => {
   const page = await readFile("app/dashboard/mcp/page.tsx", "utf8");
 

@@ -1,6 +1,6 @@
 # BUILD by Orsayn
 
-BUILD est une plateforme de formation et d'accompagnement pour construire une activité vendable avec l'IA, puis livrer un travail réutilisable sans repartir de zéro.
+BUILD est une plateforme de formation pour construire une activité vendable avec l'IA, puis livrer un travail réutilisable sans repartir de zéro.
 
 L'application contient le parcours Fondations, les blocs du système BUILD, le catalogue de skills, la bibliothèque Hermes Agent et le connecteur MCP soumis à des contrôles d'accès.
 

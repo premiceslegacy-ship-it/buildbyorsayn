@@ -4,7 +4,7 @@ import Mux from "@mux/ts";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { isPlatformAdminUser } from "@/lib/accompanimentAccess";
+import { isPlatformAdminUser } from "@/lib/auth/platformAdmin";
 
 export type AdminVideoLessonRow = {
   id: string;

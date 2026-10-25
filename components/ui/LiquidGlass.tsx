@@ -1,27 +1,36 @@
 "use client";
 
-import { useEffect, useRef, type ComponentPropsWithoutRef } from "react";
+import { createElement, useEffect, useRef, type ComponentPropsWithoutRef, type ReactNode } from "react";
 import { applyLiquidGlass, type LiquidGlassOptions } from "@/lib/ui/liquidGlass";
 
-type LiquidGlassProps = ComponentPropsWithoutRef<"nav"> & { glass?: LiquidGlassOptions };
+type Tag = "nav" | "header";
+type LiquidGlassProps<T extends Tag> = Omit<ComponentPropsWithoutRef<T>, "children"> & { glass?: LiquidGlassOptions; children?: ReactNode };
 
-/**
- * Barre flottante en verre liquide (réfraction de bord, dispersion, arêtes lumineuses).
- * Le verre se réserve à ce qui flotte au-dessus du contenu : barre d'onglets mobile, pas les cartes ni le texte.
- */
-export function LiquidGlassNav({ glass, children, ...props }: LiquidGlassProps) {
+function useLiquidGlass(glass: LiquidGlassOptions | undefined) {
   const ref = useRef<HTMLElement>(null);
-  const teinte = glass?.teinte;
-  const bord = glass?.bord;
-  const force = glass?.force;
-  const flou = glass?.flou;
-  const dispersion = glass?.dispersion;
-  const reflet = glass?.reflet;
-  const angle = glass?.angle;
+  const { teinte, bord, force, flou, dispersion, reflet, angle, saturation, luminosite, flouRepli } = glass ?? {};
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    return applyLiquidGlass(element, { teinte, bord, force, flou, dispersion, reflet, angle });
-  }, [teinte, bord, force, flou, dispersion, reflet, angle]);
-  return <nav ref={ref} {...props}>{children}</nav>;
+    return applyLiquidGlass(element, { teinte, bord, force, flou, dispersion, reflet, angle, saturation, luminosite, flouRepli });
+  }, [teinte, bord, force, flou, dispersion, reflet, angle, saturation, luminosite, flouRepli]);
+  return ref;
+}
+
+function glassClass(className: string | undefined) {
+  return className ? `verre-liquide ${className}` : "verre-liquide";
+}
+
+/**
+ * Barres flottantes en verre liquide (réfraction de bord, dispersion, arêtes lumineuses).
+ * Le verre se réserve à ce qui flotte au-dessus du contenu : navbar de l'accueil, barre d'onglets mobile.
+ */
+export function LiquidGlassNav({ glass, className, children, ...props }: LiquidGlassProps<"nav">) {
+  const ref = useLiquidGlass(glass);
+  return createElement("nav", { ref, className: glassClass(className), ...props }, children);
+}
+
+export function LiquidGlassHeader({ glass, className, children, ...props }: LiquidGlassProps<"header">) {
+  const ref = useLiquidGlass(glass);
+  return createElement("header", { ref, className: glassClass(className), ...props }, children);
 }

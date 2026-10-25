@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { isJsonMediaType, readBoundedBody } from "@/lib/mcp/http";
 import { createClient } from "@/lib/supabase/server";
-import { buildEmailHtml } from "@/lib/adminEmailHtml";
+import { getEmailContext } from "@/lib/email/context";
+import { buildBroadcastEmail } from "@/lib/email/templates";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import {
   MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS,
@@ -233,13 +234,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const html = buildEmailHtml({
-    preheader,
-    body: messageBody,
-    ctaLabel,
-    ctaUrl,
-  });
-  const text = `${messageBody}${ctaUrl ? `\n\n${ctaLabel}: ${ctaUrl}` : ""}`;
+  const emailContext = getEmailContext();
+  const { html, text } = buildBroadcastEmail(emailContext, { subject, preheader, body: messageBody, ctaLabel, ctaUrl });
   const result = await sendAdminBroadcast({
     apiKey: resendApiKey,
     from,
@@ -248,6 +244,7 @@ export async function POST(req: NextRequest) {
     subject,
     html,
     text,
+    unsubscribeEmail: emailContext.seller.contactEmail,
   }, { signal: routeSignal });
 
   if (result.ok === false) {

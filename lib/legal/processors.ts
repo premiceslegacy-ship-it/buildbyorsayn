@@ -54,8 +54,8 @@ export const PROCESSORS: readonly Processor[] = [
     seat: "États-Unis",
     // Région eu-west-1 du projet Supabase de BUILD, relevée en lecture seule avec la CLI Supabase.
     dataLocation: "Irlande",
-    role: "Il gère les comptes et les connexions, la base de données (profils, progression, suivi d'activité, accompagnements, connexions du connecteur) et le stockage des fichiers de skills.",
-    data: "Ton adresse e-mail, ton mot de passe sous une forme qui ne peut pas être relue, ton niveau d'accès, ta progression, ton suivi d'activité et les données de tes accompagnements.",
+    role: "Il gère les comptes et les connexions, la base de données (profils, progression, suivi d'activité, anciens accompagnements, connexions du connecteur) et le stockage des fichiers de skills.",
+    data: "Ton adresse e-mail, ton mot de passe sous une forme qui ne peut pas être relue, ton niveau d'accès, ta progression, ton suivi d'activité et les données de tes anciens accompagnements.",
     hosts: ["supabase.co"],
     evidence: [
       { file: "lib/supabase/server.ts", needle: "createServerClient" },
@@ -137,7 +137,7 @@ export const PROCESSORS: readonly Processor[] = [
 export const NON_PERSONAL_HOSTS: Readonly<Record<string, string>> = {
   "fonts.googleapis.com": "Autorisation de feuille de style dans la politique de sécurité. Les polices du site sont servies par le site lui-même.",
   "fonts.gstatic.com": "Autorisation de polices dans la politique de sécurité. Les polices du site sont servies par le site lui-même.",
-  "cal.com": "Lien vers le service de réservation des accompagnements. BUILD ne lui envoie aucune donnée : la personne quitte le site.",
+  "cal.com": "Lien vers le service de réservation d'un appel avec Samuel. BUILD ne lui envoie aucune donnée : la personne quitte le site.",
   "hermes-agent.nousresearch.com": "Lien de téléchargement affiché dans un guide. BUILD ne lui envoie aucune donnée.",
 };
 

@@ -28,7 +28,7 @@ function faqItems() {
     },
     {
       q: "Je peux utiliser BUILD dans mon assistant ?",
-      a: "Oui, avec Claude, ChatGPT, Hermes Agent, Oh My Pi et Cursor. Le connecteur MCP limite l'assistant aux contenus inclus dans ton accès BUILD.",
+      a: "Pas encore. Le connecteur pour Claude, ChatGPT, Hermes Agent, Oh My Pi et Cursor arrive bientôt. Il limitera l'assistant aux contenus inclus dans ton accès BUILD.",
     },
     {
       q: "BUILD garantit des clients ou des revenus ?",

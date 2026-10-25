@@ -27,7 +27,6 @@ export const KNOWLEDGE_SOURCES = [
   "fondations",
   "blocs",
   "protocole",
-  "accompagnement",
   "skills-catalog",
   "skills-content",
   "obsidian",
@@ -220,7 +219,7 @@ export function createBuildMcpServer(
     {
       title: "Rechercher dans le savoir-faire BUILD",
       description:
-        "Cherche un passage de savoir-faire BUILD quand la personne demande une explication, un choix, une méthode ou un plan. Donne une phrase autonome avec le contexte utile et conserve les termes métier concrets, pas une liste de mots génériques. Utilise source seulement si tu sais où se trouve la réponse : fondations pour le parcours Fondations, blocs pour le programme, protocole pour les trois phases, accompagnement pour la remise d'un site, skills-catalog pour choisir un skill, skills-content pour le texte markdown publié, doctrine pour LE COFFRE. Pour le palier, les prix et la liste des skills accessibles, appelle plutôt list_available_content.",
+        "Cherche un passage de savoir-faire BUILD quand la personne demande une explication, un choix, une méthode ou un plan. Donne une phrase autonome avec le contexte utile et conserve les termes métier concrets, pas une liste de mots génériques. Utilise source seulement si tu sais où se trouve la réponse : fondations pour le parcours Fondations, blocs pour le programme, protocole pour les trois phases, skills-catalog pour choisir un skill, skills-content pour le texte markdown publié, doctrine pour LE COFFRE. Pour le palier, les prix et la liste des skills accessibles, appelle plutôt list_available_content.",
       inputSchema: SEARCH_KNOWLEDGE_INPUT_SHAPE,
       annotations: READ_ONLY_TOOL_ANNOTATIONS,
     },

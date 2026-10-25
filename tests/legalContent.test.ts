@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { LEGAL_LINKS } from "../lib/legal/links";
 import { legalMetadata, legalTitle, legalUpdatedAt } from "../lib/legal/documents";
 import { NON_PERSONAL_HOSTS, PROCESSORS, processorHostCovered } from "../lib/legal/processors";
-import { buildPurchaseConfirmation, CHECKOUT_CONSENT_TEXT } from "../lib/legal/consent";
+import { CHECKOUT_CONSENT_TEXT } from "../lib/legal/consent";
 import { PRICE_NET_MENTION } from "../lib/legal/identity";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -159,40 +159,6 @@ test("les prix sont présentés nets, avec la mention de franchise de TVA, et ja
     assert.ok(!/\bTTC\b|toutes taxes comprises/i.test(read(file)), `${file} parle de TTC`);
   }
   assert.equal(PRICE_NET_MENTION, "Prix nets, TVA non applicable, article 293 B du CGI");
-});
-
-test("l'e-mail de confirmation d'achat reprend le contrat, le prix, l'accès immédiat et la renonciation, sans tiret long", () => {
-  const email = buildPurchaseConfirmation({
-    offerName: "LE\u00a0COFFRE",
-    amountCents: 26700,
-    purchasedAt: new Date("2026-10-22T10:30:00Z"),
-    baseUrl: "https://build.example.test",
-    seller: { fullName: "Samuel Mbeboura", tradeName: "Orsayn", siret: "98920815200011", address: "1 rue des héraults, 75010 Paris", contactEmail: "contact@orsayn.fr", vatMention: "TVA non applicable, article 293 B du CGI" },
-  });
-  for (const body of [email.text, email.html]) {
-    assert.ok(body.includes("267\u00a0€"));
-    assert.ok(body.includes("(prix net, TVA non applicable, article 293 B du CGI)"));
-    assert.ok(body.includes("LE\u00a0COFFRE"));
-    assert.ok(body.includes("SIRET 98920815200011"));
-    assert.ok(body.includes("accès est ouvert dès maintenant"));
-    assert.ok(body.includes("https://build.example.test/cgv"));
-    assert.ok(body.replace(/&#039;/g, "'").includes(CHECKOUT_CONSENT_TEXT));
-    assert.ok(!/[\u2014\u2013\u2022\u00b7]/.test(body));
-  }
-  assert.ok(!email.subject.includes("\u2014"));
-  assert.throws(() => buildPurchaseConfirmation({ ...{ offerName: "x", purchasedAt: new Date(), baseUrl: "", seller: {} as never }, amountCents: 0 }));
-});
-
-test("l'e-mail de confirmation neutralise le HTML dans les valeurs reçues", () => {
-  const email = buildPurchaseConfirmation({
-    offerName: "<img src=x onerror=alert(1)>",
-    amountCents: 9700,
-    purchasedAt: new Date("2026-10-22T10:30:00Z"),
-    baseUrl: "https://build.example.test",
-    seller: { fullName: "A", tradeName: "B", siret: "1", address: "C", contactEmail: "contact@orsayn.fr", vatMention: "TVA non applicable" },
-  });
-  assert.ok(!email.html.includes("<img"));
-  assert.ok(email.html.includes("&lt;img"));
 });
 
 test("les mentions légales indiquent un hébergeur applicatif prouvé par le dépôt, et la région des données quand elle est vérifiée", () => {

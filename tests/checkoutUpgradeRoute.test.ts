@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { resolveUpgradeRedirect } from "../lib/checkoutUpgrade";
-import { buildUpgradeRefusalEmail, refuseUpgradePurchase, type RefundRequest } from "../lib/stripeUpgradeRefusal";
+import { refuseUpgradePurchase, type RefundRequest } from "../lib/stripeUpgradeRefusal";
 
 const STRIPE = "https://checkout.stripe.com/c/pay/cs_test_123";
 
@@ -146,17 +146,4 @@ test("un retry rafraîchit le remboursement idempotent avant d'envoyer la confir
   });
   assert.deepEqual(result, { outcome: "refunded" });
   assert.deepEqual(f.emails, ["a@b.fr"]);
-});
-
-test("l'e-mail de refus tutoie, donne le lien /checkout et n'a aucun tiret long", () => {
-  const withUrl = buildUpgradeRefusalEmail("https://build.example/");
-  const without = buildUpgradeRefusalEmail(undefined);
-  for (const mail of [withUrl, without]) {
-    for (const part of [mail.subject, mail.text, mail.html]) {
-      assert.equal(/[\u2013\u2014]/.test(part), false);
-    }
-    assert.match(mail.text, /Ton paiement vient d'être remboursé/);
-  }
-  assert.match(withUrl.text, /https:\/\/build\.example\/checkout/);
-  assert.equal(without.text.includes("undefined"), false);
 });

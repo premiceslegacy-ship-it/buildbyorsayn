@@ -147,43 +147,12 @@
 .da .ui3-access-row dd { font: 600 17px/1.3 var(--font); color: var(--encre); }
 .da .ui3-status-ok { color: var(--menthe) !important; }
 
-/* Accompagnement */
-.da .ui3-rdv { min-height: 100svh; display: grid; align-content: center; justify-items: center; gap: clamp(40px, 7vw, 88px); padding: calc(68px + clamp(24px, 5vw, 64px)) var(--gutter) clamp(48px, 8vw, 96px); background: radial-gradient(48% 38% at 50% 30%, rgba(34,217,110,.14), transparent 72%), var(--nuit); }
-.da .ui3-rdv-hero { display: grid; justify-items: center; text-align: center; width: min(100%, 52rem); }
-.da .ui3-rdv-art { width: clamp(200px, 34vw, 380px); aspect-ratio: 1; margin-bottom: clamp(-24px, -2vw, -8px); filter: drop-shadow(0 32px 48px rgba(0,0,0,.5)); }
-.da .ui3-rdv-art img { width: 100%; height: 100%; object-fit: contain; }
-.da.da-app .ui3-rdv-title { width: min(100%, 760px); max-width: none; font-size: 40px; text-wrap: balance; }
-.da .ui3-rdv-hero .t-lede { margin-top: 20px; max-width: 28em; }
-.da .ui3-rdv-hero .btn { margin-top: 36px; min-width: 220px; height: 52px; }
-.da .ui3-rdv-note { margin-top: 14px; font: 400 14px/1.4 var(--font); color: var(--t3); }
-.da .ui3-rdv-soon { display: flex; gap: 16px; align-items: baseline; padding: 18px 22px; border-radius: var(--r-m); background: var(--carte); text-align: left; }
-.da .ui3-rdv-soon strong { color: var(--t2); }
-.da .ui3-rdv-soon span { color: var(--t3); font-size: 14px; }
-.da .ui3-accompaniment-detail { min-height: 100svh; padding-bottom: clamp(80px, 10vw, 140px); }
-.da .ui3-accompaniment-intro { display: grid; justify-items: center; width: min(100%, 58rem); margin-inline: auto; padding: calc(68px + 40px) var(--gutter) clamp(64px, 8vw, 104px); text-align: center; }
-.da .ui3-accompaniment-art { width: clamp(180px, 28vw, 320px); aspect-ratio: 1; margin-bottom: -24px; filter: drop-shadow(0 28px 44px rgba(0,0,0,.48)); }
-.da .ui3-accompaniment-art img { width: 100%; height: 100%; object-fit: contain; }
-.da .ui3-accompaniment-intro h1 { max-width: 14em; text-wrap: balance; }
-.da .ui3-accompaniment-intro .t-lede { max-width: 32em; margin-top: 20px; }
-.da .ui3-accompaniment-intro .btn { min-width: 220px; height: 52px; margin-top: 32px; }
-.da .ui3-accompaniment-themes { width: min(calc(100% - 2 * var(--gutter)), 1120px); margin-inline: auto; }
-.da .ui3-accompaniment-themes .ui3-section-head > p { max-width: 28rem; color: var(--t2); }
-.da .ui3-theme-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.da .ui3-theme-grid li { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 16px; padding: 22px; border-radius: var(--r-m); background: var(--carte); }
-.da .ui3-theme-grid li > span { color: var(--menthe); font: 600 14px/1.3 var(--font-t); }
-.da .ui3-theme-grid h3 { color: var(--encre); font: 600 19px/1.25 var(--font-t); }
-.da .ui3-theme-grid p { margin-top: 7px; color: var(--t2); font: 400 14px/1.45 var(--font); }
-.da.ui3-accompaniment-workspace > main { min-height: 100svh; background: var(--nuit) !important; color: var(--encre) !important; font-family: var(--font); }
-.da.ui3-accompaniment-workspace [class*="border-l-"] { border-left-width: 0 !important; padding-left: 0 !important; }
-.da.da-app .foot--public { margin-top: clamp(48px, 7vw, 110px); padding: 40px var(--gutter) 56px; box-shadow: 0 -.5px 0 var(--trait); }
-.da.da-app .foot--public img { width: auto; height: 22px; opacity: 1; }
-
-@media (min-width: 735px) {
-  .da.da-app .ui3-rdv-title { font-size: 56px; }
-}
-@media (min-width: 1100px) {
-  .da.da-app .ui3-rdv-title { font-size: 64px; }
-}
+/* Appel avec Samuel */
+.da.da-app .appel__in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 32px; margin-inline: var(--gutter); padding: clamp(22px, 3vw, 32px); border-radius: var(--r-l); background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); }
+.da.da-app .appel__t { display: grid; gap: 4px; min-width: 0; }
+.da .ui3-call { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin-top: 16px; padding: clamp(20px, 2.4vw, 28px); border-radius: var(--r-l); background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .ui3-call h3 { font: 600 20px/1.2 var(--font-t); letter-spacing: -.02em; color: var(--encre); }
+.da .ui3-call p { margin-top: 4px; font: 400 15px/1.4 var(--font); color: var(--t2); }
 
 /* Hermes */
 .da .ui3-hermes-face { width: clamp(200px, 24vw, 320px); aspect-ratio: 1; object-fit: contain; margin-block: -18px -34px; }
@@ -217,10 +186,8 @@
   .da .ui3-auth-card { padding: 24px 20px; }
   .da .ui3-prompt { grid-template-columns: 1fr; }
   .da .ui3-prompt button { justify-self: start; }
-  .da .ui3-rdv-soon { display: grid; gap: 2px; text-align: center; }
   .da .ui3-hermes-row { grid-template-columns: 32px minmax(0,1fr); padding-inline: 10px; }
   .da .ui3-hermes-open { grid-column: 2; }
-  .da .ui3-theme-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 699px) {
   .da .ui3-auth .ui3-text-link,

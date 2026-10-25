@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { LiquidGlassHeader } from "@/components/ui/LiquidGlass";
+import { BARRE_VERRE } from "@/components/ui/liquidGlassPresets";
 
 const LIENS = [
   { id: "pourquoi", label: "Pourquoi BUILD" },
@@ -13,7 +15,7 @@ const LIENS = [
  */
 export function DaNav({ loggedIn, homeBase = "" }: { loggedIn: boolean; homeBase?: string }) {
   return (
-    <header className="barre verre">
+    <LiquidGlassHeader className="barre" glass={BARRE_VERRE}>
       <Link className="barre__logo" href="/" aria-label="BUILD, accueil">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/da/logo-sombre.svg" alt="BUILD" width={104} height={30} />
@@ -28,6 +30,6 @@ export function DaNav({ loggedIn, homeBase = "" }: { loggedIn: boolean; homeBase
       ) : (
         <Link className="btn btn--p btn--s" href="/login?mode=signup">Commencer</Link>
       )}
-    </header>
+    </LiquidGlassHeader>
   );
 }

@@ -9,13 +9,14 @@ import { SearchDialog } from "@/components/da/SearchDialog";
 import { MEMBER_NAV, MemberTabbar } from "@/components/da/MemberTabbar";
 import { useNouveautesUnseenCount } from "@/components/nouveautes/useNouveautesUnseenCount";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
+import { MCP_ENTRY_VISIBLE } from "@/lib/mcp/entryVisibility";
 import { finishPressFeedback, pulsePressFeedback, soundKindFor, startPressFeedback } from "@/lib/ui/feedback";
 import { formatNouveautesBadge } from "@/lib/nouveautes/seen";
 import { animateAppElement, installAppMotionTokens, motionAllowed } from "@/lib/ui/motion";
 import { playAppSound, useAppSound } from "@/lib/ui/sound";
 
 interface NavBarProps {
-  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "nouveautes" | "protocole" | "videos-tutos" | "accompagnement";
+  activeLink?: "dashboard" | "beginner" | "sources" | "skills" | "nouveautes" | "protocole" | "videos-tutos";
   tier?: string | null;
   isAdmin?: boolean;
   displayName?: string;
@@ -177,7 +178,7 @@ export function NavBar({ tier, isAdmin = false, displayName, displayEmail, initi
         <div className="amenu__l">
           <Link role="menuitem" href="/compte"><DaIcon name="user" />Compte</Link>
           <Link role="menuitem" href="/checkout"><DaIcon name="creditCard" />Abonnement</Link>
-          <Link role="menuitem" href="/dashboard/mcp"><DaIcon name="plug" />Connexion IA</Link>
+          {MCP_ENTRY_VISIBLE && <Link role="menuitem" href="/dashboard/mcp"><DaIcon name="plug" />Connexion IA</Link>}
           {isAdmin && <Link role="menuitem" href="/admin"><DaIcon name="grid" />Administration</Link>}
           <button role="menuitemcheckbox" aria-checked={enabled} type="button" onClick={() => setEnabled(!enabled)}><DaIcon name={enabled ? "volume" : "mute"} />Sons<span className="amenu__sw" /></button>
         </div>

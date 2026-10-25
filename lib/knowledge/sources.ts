@@ -111,32 +111,6 @@ export async function collectProtocoleDocuments(): Promise<KnowledgeDocument[]> 
   }));
 }
 
-export async function collectAccompagnementDocuments(): Promise<KnowledgeDocument[]> {
-  const { THEMES, THEME_GUIDANCE } = await import("@/lib/siteWebAccompagnement");
-  const documents: KnowledgeDocument[] = [];
-
-  for (const theme of THEMES) {
-    const guidance = THEME_GUIDANCE[theme.id];
-    documents.push({
-      source: "accompagnement",
-      sourceId: theme.id,
-      title: `Accompagnement Site Web - ${theme.title}`,
-      content: [
-        `Promesse : ${theme.promise}`,
-        `Pourquoi : ${theme.why}`,
-        `Livrables : ${theme.deliverables.join(", ")}`,
-        `Ligne d'arrivee : ${theme.finishLine}`,
-        guidance ? `Guidance : ${JSON.stringify(guidance)}` : null,
-      ]
-        .filter(Boolean)
-        .join("\n\n"),
-      tier: "full" as const,
-    });
-  }
-
-  return documents;
-}
-
 export async function collectSkillsCatalogDocuments(): Promise<KnowledgeDocument[]> {
   const { SKILLS_CATALOG } = await import("@/lib/skillsCatalog");
   return SKILLS_CATALOG.map((skill) => ({

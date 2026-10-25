@@ -5,7 +5,7 @@ import { createAdminSupabase } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
 import { removeBuildNewsThumbnail } from "./thumbnail.server";
-import { buildNewsInputSchema, type BuildNewsInput, type BuildNewsRow } from "./model";
+import { buildNewsInputSchema, buildNewsUpdateSchema, type BuildNewsInput, type BuildNewsRow, type BuildNewsUpdate } from "./model";
 
 const buildNewsColumns = "id,title,published_at,thumbnail,bloc_label,internal_url,sentence,created_at";
 const storagePathSchema = z.string().regex(/^news\/[0-9a-f-]{36}\/[0-9a-f]{12}\.(?:jpg|png|webp)$/i);
@@ -38,7 +38,7 @@ export async function listAdminBuildNews(): Promise<BuildNewsRow[]> {
   if (!user) throw new Error("Accès refusé.");
   const { data, error } = await createAdminSupabase()
     .from("build_news")
-    .select(buildNewsColumns)
+    .select(`${buildNewsColumns},source_key`)
     .order("published_at", { ascending: false })
     .order("id", { ascending: false })
     .limit(100);
@@ -89,6 +89,31 @@ export async function createBuildNews(
     }
     throw auditError;
   }
+  return data as BuildNewsRow;
+}
+
+/** Modifie le texte d'une entrée, notamment une Nouveauté automatique. La clé de source ne change jamais. */
+export async function updateBuildNews(newsId: string, input: BuildNewsUpdate): Promise<BuildNewsRow> {
+  const user = await getVerifiedAdmin();
+  if (!user) throw new Error("Accès refusé.");
+  const id = z.string().uuid().parse(newsId);
+  const parsed = buildNewsUpdateSchema.parse(input);
+  const { data, error } = await createAdminSupabase().from("build_news").update({
+    title: parsed.title,
+    sentence: parsed.sentence,
+    bloc_label: parsed.blocLabel || null,
+    internal_url: parsed.internalUrl || null,
+  }).eq("id", id).select(`${buildNewsColumns},source_key`).maybeSingle();
+  if (error || !data) throw new Error("La nouveauté n'a pas pu être modifiée.");
+  await recordAdminAction({
+    actorUserId: user.id,
+    action: "build_news.update",
+    targetType: "build_news",
+    targetId: id,
+    result: "completed",
+    approved: true,
+    details: { hasBloc: Boolean(parsed.blocLabel), hasLink: Boolean(parsed.internalUrl) },
+  });
   return data as BuildNewsRow;
 }
 

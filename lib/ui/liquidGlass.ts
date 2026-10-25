@@ -6,7 +6,8 @@
  *
  * Chromium applique la réfraction. Ailleurs (Safari, Firefox), le filtre de déplacement n'existe pas sur le fond :
  * il reste la lumière calculée et un flou léger, comme dans le script d'origine.
- * La forme vient de `border-radius` ; l'élément ne porte ni ombre ni bordure, le verre tient par sa réfraction.
+ * La forme vient de `border-radius` ; l'ombre portée, le reflet au défilement et le mode « transparence réduite »
+ * viennent de la classe `.verre-liquide` (app/da.css).
  */
 export type LiquidGlassOptions = {
   /** Largeur du bord bombé, part du petit côté. */
@@ -21,6 +22,12 @@ export type LiquidGlassOptions = {
   reflet?: number;
   /** D'où vient la lumière, en degrés : 0 du haut, -37 du haut à gauche. */
   angle?: number;
+  /** Saturation du fond vu à travers le verre. */
+  saturation?: number;
+  /** Luminosité du fond vu à travers le verre. */
+  luminosite?: number;
+  /** Flou en pixels du repli sans réfraction (Safari, Firefox, iOS). */
+  flouRepli?: number;
   /** Teinte du verre ; sur fond sombre : rgba(0,0,0,.18). */
   teinte?: string;
 };
@@ -28,8 +35,14 @@ export type LiquidGlassOptions = {
 const NS = "http://www.w3.org/2000/svg";
 let counter = 0;
 
-function isChromium() {
-  return /Chrome\/|Chromium\//.test(navigator.userAgent);
+/**
+ * `url(#filtre)` dans `backdrop-filter` : seul Chromium l'applique vraiment. Safari et Firefox acceptent parfois la syntaxe
+ * (CSS.supports répond oui) puis ignorent le filtre : on exige donc en plus une propriété que seul le moteur Blink connaît.
+ * Détection par capacité CSS, jamais par user agent.
+ */
+function supportsRefraction() {
+  if (typeof CSS === "undefined" || !CSS.supports) return false;
+  return CSS.supports("backdrop-filter", "url(#v) blur(1px)") && CSS.supports("-webkit-app-region", "none");
 }
 
 function render(el: HTMLElement, opts: LiquidGlassOptions, previous: SVGSVGElement | null): SVGSVGElement | null {
@@ -132,10 +145,11 @@ function render(el: HTMLElement, opts: LiquidGlassOptions, previous: SVGSVGEleme
   svg.innerHTML = `<filter id="${id}" color-interpolation-filters="sRGB" primitiveUnits="objectBoundingBox" x="0" y="0" width="1" height="1">${corps}</filter>`;
   document.body.appendChild(svg);
 
-  let filter = `url(#${id}) saturate(1.35) brightness(1.06)`;
-  if (!isChromium()) {
-    // Hors Chromium, le filtre de déplacement n'existe pas sur le fond : on garde la lumière et un flou léger.
-    filter = `blur(${Math.max(6, Math.round(petit * 0.16))}px) saturate(1.6) brightness(1.08)`;
+  // Le flou est dans le filtre SVG (réfraction + flou léger) : les formes du dessous restent lisibles, le texte non.
+  let filter = `url(#${id}) saturate(${opts.saturation ?? 1.8}) brightness(${opts.luminosite ?? 1.1})`;
+  if (!supportsRefraction()) {
+    // Repli sans réfraction : flou, saturation et lumière interne (les arêtes viennent du calque spéculaire ci-dessous).
+    filter = `blur(${opts.flouRepli ?? 10}px) saturate(${opts.saturation ?? 1.8}) brightness(${opts.luminosite ?? 1.1})`;
     svg.remove();
     svg = null;
   }
@@ -145,8 +159,6 @@ function render(el: HTMLElement, opts: LiquidGlassOptions, previous: SVGSVGEleme
   el.style.backgroundSize = "100% 100%";
   el.style.backgroundRepeat = "no-repeat";
   el.style.backgroundColor = opts.teinte ?? "rgba(255,255,255,.05)";
-  el.style.boxShadow = "none";
-  el.style.border = "0";
   return svg;
 }
 
@@ -168,7 +180,7 @@ export function applyLiquidGlass(el: HTMLElement, opts: LiquidGlassOptions = {})
     observer.disconnect();
     if (frame) cancelAnimationFrame(frame);
     svg?.remove();
-    for (const property of ["backdropFilter", "backgroundImage", "backgroundSize", "backgroundRepeat", "backgroundColor", "boxShadow", "border"] as const) el.style[property] = "";
+    for (const property of ["backdropFilter", "backgroundImage", "backgroundSize", "backgroundRepeat", "backgroundColor"] as const) el.style[property] = "";
     el.style.removeProperty("-webkit-backdrop-filter");
   };
 }

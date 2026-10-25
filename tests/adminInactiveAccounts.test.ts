@@ -73,17 +73,15 @@ test("les confirmations PUBLIER et ENVOYER restent saisies avant les actions", a
 });
 
 test("la coque refuse le non admin et expose chargement, erreur et vues vides", async () => {
-  const [page, loading, error, overview, accompaniment] = await Promise.all([
+  const [page, loading, error, overview] = await Promise.all([
     readFile("app/admin/page.tsx", "utf8"),
     readFile("app/admin/loading.tsx", "utf8"),
     readFile("app/admin/error.tsx", "utf8"),
     readFile("components/admin/OverviewView.tsx", "utf8"),
-    readFile("components/admin/AccompanimentView.tsx", "utf8"),
   ]);
   assert.match(page, /app_metadata\?\.role !== "admin"/);
   assert.match(page, /redirect\("\/dashboard"\)/);
   assert.match(loading, /aria-busy="true"/);
   assert.match(error, /role="alert"/);
   assert.match(overview, /Personne n'est en ligne/);
-  assert.match(accompaniment, /Aucun accompagnement/);
 });

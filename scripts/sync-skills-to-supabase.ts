@@ -5,6 +5,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { SKILLS_CATALOG } from "../lib/skillsCatalog";
 import { SKILLS_MANIFEST_PATH, SKILLS_CATALOG_VERSION, parseCurrentSkillsPublicationManifest } from "../lib/skills/publication";
+import { diffSkillsManifests, recordAutoNews, skillsNewsEntry } from "../lib/nouveautes/autoNews";
 import {
   createSkillsPublicationManifest,
   type SkillsPublicationArtifact,
@@ -297,6 +298,66 @@ async function buildSkillArtifact(fileName: string) {
   return Buffer.from(normalizeNotionMarkdown(raw), "utf8");
 }
 
+// Les zips embarquent la date de modification des fichiers : leur sha256 change
+// sans que le contenu change. La comparaison "ajouté / modifié" des Nouveautés
+// s'appuie donc sur un condensé du contenu, indépendant des dates.
+const CONTENT_DIGESTS_PATH = "catalogs/v4/content-digests.json";
+
+async function contentDigest(fileName: string, body: Buffer) {
+  if (!fileName.endsWith(".zip")) return sha256(body);
+  const packageName = fileName.replace(/\.zip$/i, "");
+  const rootDir = path.join(process.cwd(), "docs", packageName);
+  const hash = createHash("sha256");
+  for (const file of await listFiles(rootDir)) {
+    hash.update(`${file.relativePath}\0`);
+    hash.update(await readFile(file.absolutePath));
+    hash.update("\0");
+  }
+  return hash.digest("hex");
+}
+
+async function readPreviousContentDigests(): Promise<Record<string, string> | null> {
+  try {
+    const { data, error } = await supabase.storage.from(bucketName).download(CONTENT_DIGESTS_PATH);
+    if (error || !data) return null;
+    const parsed: unknown = JSON.parse(await data.text());
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+    return parsed as Record<string, string>;
+  } catch {
+    return null;
+  }
+}
+
+async function recordSkillsReleaseNews(
+  releaseId: string,
+  publishedAt: string,
+  digests: Record<string, string>,
+  previous: Record<string, string> | null
+) {
+  if (previous) {
+    const toRefs = (map: Record<string, string>) =>
+      Object.entries(map).map(([fileName, sha256]) => ({ fileName, sha256 }));
+    const { added, changed } = diffSkillsManifests(toRefs(previous), toRefs(digests));
+    const titleOf = (fileName: string) =>
+      SKILLS_CATALOG.find((skill) => skill.fileName === fileName)?.title ?? fileName;
+    const entry = skillsNewsEntry({
+      releaseId,
+      publishedAt,
+      added: added.map(titleOf),
+      changed: changed.map(titleOf),
+    });
+    if (entry) {
+      const result = await recordAutoNews(supabase, entry);
+      console.log(`Nouveauté skills : ${result.status}`);
+    } else {
+      console.log("Nouveauté skills : aucun pack ajouté ou modifié.");
+    }
+  } else {
+    console.log("Nouveauté skills : première référence enregistrée, aucune Nouveauté créée.");
+  }
+  await uploadAndVerify(CONTENT_DIGESTS_PATH, `${JSON.stringify(digests, null, 2)}\n`, true);
+}
+
 async function main() {
   await ensurePrivateBucket();
   const releaseLock = await acquirePublicationLock();
@@ -305,12 +366,15 @@ async function main() {
     const releaseStartedAt = new Date();
     const releaseId = createReleaseId(releaseStartedAt);
     const releaseArtifacts: SkillsPublicationArtifact[] = [];
+    const contentDigests: Record<string, string> = {};
+    const previousDigests = await readPreviousContentDigests();
 
     for (const skill of SKILLS_CATALOG) {
       const body = await buildSkillArtifact(skill.fileName);
       const storagePath = `releases/${releaseId}/${skill.fileName}`;
 
       await uploadAndVerify(storagePath, body);
+      contentDigests[skill.fileName] = await contentDigest(skill.fileName, body);
       releaseArtifacts.push({
         fileName: skill.fileName,
         storagePath,
@@ -331,6 +395,16 @@ async function main() {
     // Preserve legacy manifest.json and all releases it references for old apps.
     await uploadAndVerify(SKILLS_MANIFEST_PATH, manifestBody, true);
     console.log(`Published immutable skills release ${releaseId}`);
+
+    // La publication est faite : l'enregistrement de la Nouveauté ne peut jamais la faire échouer.
+    try {
+      await recordSkillsReleaseNews(releaseId, manifest.publishedAt, contentDigests, previousDigests);
+    } catch (error) {
+      console.warn(
+        "Avertissement : la Nouveauté « Skills mis à jour » n'a pas été enregistrée.",
+        error instanceof Error ? error.message : error
+      );
+    }
   } finally {
     await releaseLock();
   }

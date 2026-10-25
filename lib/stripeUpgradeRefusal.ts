@@ -2,7 +2,6 @@
  * Refus d'un complément payé par un compte sans Fondations : remboursement automatique et prévenance du client.
  * Les dépendances (Stripe, e-mail) sont injectées pour que le chemin de refus soit testable sans réseau.
  */
-import { COFFRE_LABEL, UPGRADE_PRICE, formatEuro } from "@/lib/pricing";
 
 export type RefundRequest = {
   payment_intent: string;
@@ -106,23 +105,4 @@ export async function refuseUpgradePurchase(
     }
   }
   return { outcome: "refunded" };
-}
-
-/** Contenu de l'e-mail de refus : tutoiement, aucun tiret long. */
-export function buildUpgradeRefusalEmail(appUrl: string | undefined): { subject: string; text: string; html: string } {
-  const checkoutUrl = appUrl ? `${appUrl.replace(/\/+$/, "")}/checkout` : null;
-  const where = checkoutUrl ? ` ici : ${checkoutUrl}` : " depuis ton espace BUILD";
-  const text = [
-    "Bonjour,",
-    "",
-    `Le complément à ${formatEuro(UPGRADE_PRICE)} est réservé aux comptes Fondations. Ton compte n'a pas Fondations, donc nous n'avons pas pu activer ${COFFRE_LABEL}.`,
-    "Ton paiement vient d'être remboursé en totalité. Tu le verras sur ton relevé sous quelques jours.",
-    `Pour entrer dans BUILD, tu peux prendre Fondations ou ${COFFRE_LABEL}${where}.`,
-    "",
-    "L'équipe BUILD",
-  ].join("\n");
-  const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  const link = checkoutUrl ? ` <a href="${esc(checkoutUrl)}">ici</a>` : " depuis ton espace BUILD";
-  const html = `<p>Bonjour,</p><p>Le complément à ${formatEuro(UPGRADE_PRICE)} est réservé aux comptes Fondations. Ton compte n'a pas Fondations, donc nous n'avons pas pu activer ${COFFRE_LABEL}.</p><p>Ton paiement vient d'être remboursé en totalité. Tu le verras sur ton relevé sous quelques jours.</p><p>Pour entrer dans BUILD, tu peux prendre Fondations ou ${COFFRE_LABEL}${link}.</p><p>L'équipe BUILD</p>`;
-  return { subject: "Ton complément a été remboursé", text, html };
 }

@@ -15,145 +15,33 @@ import {
     isPaidCheckoutSession,
     secureUpgradeUserId,
 } from "@/lib/stripeCheckout";
-import { buildUpgradeRefusalEmail, createConfirmedRefund, paymentIntentId, refuseUpgradePurchase } from "@/lib/stripeUpgradeRefusal";
+import { createConfirmedRefund, paymentIntentId, refuseUpgradePurchase } from "@/lib/stripeUpgradeRefusal";
 import { processPaidUpgrade, type UpgradeClaimResult } from "@/lib/stripeUpgradeProcessing";
 import { sendResendMessage, stripeEmailIdempotencyKey } from "@/lib/resendTransport";
 import { optionalSiteOrigin, requireSiteOrigin } from "@/lib/siteOrigin";
-import { getLegalEntity } from "@/lib/legal/entity";
-import { buildPurchaseConfirmation } from "@/lib/legal/consent";
+import { getEmailContext } from "@/lib/email/context";
+import { buildPurchaseConfirmationEmail, buildUpgradeRefusalEmail, buildWelcomeEmail } from "@/lib/email/templates";
 import { COFFRE_LABEL, FONDATIONS_LABEL } from "@/lib/pricing";
 import { readBoundedBody } from "@/lib/mcp/http";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const MAX_STRIPE_WEBHOOK_BODY_BYTES = 512 * 1024;
 
-function escapeHtml(value: string) {
-    return value
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function buildWelcomeEmailHtml(actionLink: string) {
-    const safeLink = escapeHtml(actionLink);
-
-    return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bienvenue dans BUILD</title>
-</head>
-<body style="margin:0;padding:0;background-color:#0e0e0f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0e0e0f;padding:40px 16px;">
-    <tr>
-      <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
-          <tr>
-            <td align="center" style="padding-bottom:40px;">
-              <table cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="padding-right:12px;vertical-align:middle;">
-                    <svg width="32" height="32" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g transform="translate(0,55)">
-                        <path fill="#e8d5b0" d="M50 25 L100 0 L150 25 L100 50 Z"/>
-                        <path fill="#30261c" d="M50 25 L100 50 V110 L50 85 Z"/>
-                        <path fill="#c9b48a" d="M150 25 L100 50 V110 L150 85 Z"/>
-                      </g>
-                      <g transform="translate(10,80)">
-                        <path fill="#e8d5b0" d="M0 25 L45 2.5 L90 25 L45 47.5 Z"/>
-                        <path fill="#30261c" d="M0 25 L45 47.5 V100 L0 77.5 Z"/>
-                        <path fill="#c9b48a" d="M90 25 L45 47.5 V100 L90 77.5 Z"/>
-                      </g>
-                      <g transform="translate(55,57)">
-                        <path fill="#e8d5b0" d="M0 25 L45 2.5 L90 25 L45 47.5 Z"/>
-                        <path fill="#30261c" d="M0 25 L45 47.5 V100 L0 77.5 Z"/>
-                        <path fill="#c9b48a" d="M90 25 L45 47.5 V100 L90 77.5 Z"/>
-                      </g>
-                      <g transform="translate(100,34)">
-                        <path fill="#e8d5b0" d="M0 25 L45 2.5 L90 25 L45 47.5 Z"/>
-                        <path fill="#30261c" d="M0 25 L45 47.5 V100 L0 77.5 Z"/>
-                        <path fill="#c9b48a" d="M90 25 L45 47.5 V100 L90 77.5 Z"/>
-                      </g>
-                    </svg>
-                  </td>
-                  <td style="vertical-align:middle;">
-                    <span style="font-size:22px;font-weight:800;letter-spacing:4px;color:#f0ede8;text-transform:uppercase;">BUILD</span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="background:linear-gradient(180deg,rgba(255,255,255,0.05) 0%,rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:40px 36px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
-                <tr>
-                  <td style="height:1px;background:linear-gradient(90deg,transparent,rgba(232,213,176,0.3),transparent);"></td>
-                </tr>
-              </table>
-              <p style="margin:0 0 16px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c9b48a;">BUILD BY ORSAYN</p>
-              <h1 style="margin:0 0 20px;font-size:26px;font-weight:700;line-height:1.2;color:#f0ede8;">
-                Bienvenue dans<br/>
-                <span style="color:#c9b48a;">ton espace BUILD.</span>
-              </h1>
-              <p style="margin:0 0 12px;font-size:15px;line-height:1.75;color:#8a8070;">
-                Ton paiement est confirmé. Il ne reste qu'une étape pour activer ton compte et accéder à ton espace membre.
-              </p>
-              <p style="margin:0 0 32px;font-size:15px;line-height:1.75;color:#8a8070;">
-                Clique sur le bouton ci-dessous, choisis ton mot de passe, puis tu seras redirigé vers BUILD.
-              </p>
-              <table cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
-                <tr>
-                  <td>
-                    <a href="${safeLink}" style="display:inline-block;background:#c9b48a;color:#0e0e0f;text-decoration:none;font-size:14px;font-weight:800;border-radius:12px;padding:15px 20px;">
-                      Activer mon compte
-                    </a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin:0 0 24px;font-size:12px;line-height:1.6;color:rgba(240,237,232,0.25);">
-                Si le bouton ne fonctionne pas, copie ce lien dans ton navigateur :<br/>
-                <span style="color:rgba(201,180,138,0.55);word-break:break-all;">${safeLink}</span>
-              </p>
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
-                <tr>
-                  <td style="height:1px;background:rgba(255,255,255,0.06);"></td>
-                </tr>
-              </table>
-              <p style="margin:0;font-size:11px;line-height:1.6;color:rgba(240,237,232,0.2);">
-                Si tu n'es pas à l'origine de cet achat, tu peux ignorer cet email.
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="padding-top:28px;">
-              <p style="margin:0;font-size:11px;color:rgba(240,237,232,0.18);line-height:1.6;">BUILD by Orsayn</p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-}
-
 async function sendWelcomeEmail(email: string, actionLink: string, checkoutSessionId: string) {
+    const { subject, html, text } = buildWelcomeEmail(getEmailContext(), actionLink);
     return sendResendMessage({
         apiKey: process.env.RESEND_API_KEY,
         from: process.env.RESEND_FROM_EMAIL,
         to: email,
-        subject: "Bienvenue dans BUILD - active ton compte",
-        html: buildWelcomeEmailHtml(actionLink),
-        text: `Bienvenue dans BUILD.\n\nTon paiement est confirmé. Active ton compte et choisis ton mot de passe ici : ${actionLink}`,
+        subject,
+        html,
+        text,
         idempotencyKey: stripeEmailIdempotencyKey("welcome", checkoutSessionId),
     });
 }
 
 async function sendUpgradeRefusalEmail(email: string, checkoutSessionId: string) {
-    const { subject, text, html } = buildUpgradeRefusalEmail(optionalSiteOrigin());
+    const { subject, text, html } = buildUpgradeRefusalEmail(getEmailContext());
     return sendResendMessage({
         apiKey: process.env.RESEND_API_KEY,
         from: process.env.RESEND_FROM_EMAIL,
@@ -182,20 +70,10 @@ async function sendPurchaseConfirmationEmail(
             console.error("[Webhook] Purchase confirmation skipped (missing configuration or amount)");
             return "not_configured";
         }
-        const entity = getLegalEntity();
-        const { subject, text, html } = buildPurchaseConfirmation({
+        const { subject, text, html } = buildPurchaseConfirmationEmail(getEmailContext(baseUrl), {
             offerName,
             amountCents,
             purchasedAt: new Date(createdSeconds * 1000),
-            baseUrl,
-            seller: {
-                fullName: entity.fullName,
-                tradeName: entity.tradeName,
-                siret: entity.siret,
-                address: entity.address,
-                contactEmail: entity.contactEmail,
-                vatMention: entity.vatMention,
-            },
         });
         return await sendResendMessage({
             apiKey: process.env.RESEND_API_KEY,

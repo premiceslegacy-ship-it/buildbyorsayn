@@ -35,7 +35,7 @@ export default async function McpDashboardPage({ searchParams }: { searchParams:
 
   const connectorLaunched = process.env.NEXT_PUBLIC_MCP_CONNECTOR_LAUNCHED === "true";
   const connectorVisible = connectorLaunched || process.env.NEXT_PUBLIC_MCP_CONNECTOR_BETA_VISIBLE === "true";
-  if (!connectorVisible) return <Shell identity={identity}><ClientLogos /><div><h1 className="t-2">La connexion aux assistants n’est pas encore ouverte</h1><p>Les essais réels sont encore en cours. Aucun réglage n’est nécessaire.</p></div><Link className="btn btn--p" href="/dashboard">Revenir à mon espace</Link></Shell>;
+  if (!connectorVisible) return <Shell identity={identity}><div><h1 className="t-2">Bientôt disponible</h1><p>La connexion de BUILD à ton assistant n’est pas encore ouverte. Tu n’as rien à faire : tout le reste de ton accès fonctionne déjà depuis ton tableau de bord.</p></div><Link className="btn btn--p" href="/dashboard">Aller au tableau de bord</Link></Shell>;
 
   const { data: profile, error: profileError } = await supabase.from("profiles").select("tier").eq("id", user.id).single();
   const tier = normalizeProfileTier(profile?.tier ?? null);

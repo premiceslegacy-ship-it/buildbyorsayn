@@ -1,25 +1,28 @@
 "use client";
 
 import { AlertCircle, ChevronDown, Search } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { buildEmailHtml } from "@/lib/adminEmailHtml";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { MailCatalog } from "@/components/admin/MailCatalog";
+import { MailPreview } from "@/components/admin/MailPreview";
+import type { EmailCatalogEntry } from "@/lib/email/catalog";
+import { buildBroadcastEmail, type EmailContext } from "@/lib/email/templates";
+import { COFFRE_LABEL, FONDATIONS_LABEL } from "@/lib/pricing";
 import { countMailRecipients, type Audience, type MailUser } from "@/lib/adminMailAudience";
 import { MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS } from "@/lib/resendTransport";
-import { resolveSiteOrigin } from "@/lib/siteOrigin";
 import { playAppSound } from "@/lib/ui/sound";
 import "./admin/mail.css";
 
 type TemplateKey = "blank" | "video" | "update";
 type SendResult = { ok: boolean; accepted?: number; total?: number; error?: string };
-type Device = "desktop" | "phone";
+type Mode = "write" | "catalog";
 
 const CONFIRM_WORD = "ENVOYER";
 
 const AUDIENCE_LABELS: Record<Audience, string> = {
   all: "Tous les membres",
   free: "Gratuits",
-  beginner: "Fondations",
-  full: "Complet",
+  beginner: FONDATIONS_LABEL,
+  full: COFFRE_LABEL,
   selected: "Choisir à la main",
 };
 
@@ -29,29 +32,39 @@ const TEMPLATES: Record<TemplateKey, { label: string; hint: string }> = {
   update: { label: "Mise à jour BUILD", hint: "Explique ce qui a changé et renvoie vers ton espace." },
 };
 
-function templateContent(key: TemplateKey, values: { videoTitle: string; videoUrl: string; updateTitle: string; updateDesc: string }) {
+function templateContent(key: TemplateKey, baseUrl: string | null, values: { videoTitle: string; videoUrl: string; updateTitle: string; updateDesc: string }) {
   if (key === "video") return {
     subject: `Nouvelle vidéo : ${values.videoTitle || "Titre de la vidéo"}`,
     preheader: "Disponible maintenant dans ta bibliothèque BUILD.",
-    body: `Une nouvelle vidéo vient d'être ajoutée à BUILD.\n\n${values.videoTitle || "Titre de la vidéo"}\n\nTu peux la regarder dès maintenant depuis ton espace.`,
+    body: "Une nouvelle vidéo vient d'être ajoutée à BUILD. Tu peux la regarder dès maintenant depuis ton espace.",
     ctaLabel: "Regarder la vidéo",
     ctaUrl: values.videoUrl,
   };
   if (key === "update") return {
     subject: `Mise à jour BUILD : ${values.updateTitle || "Titre de la mise à jour"}`,
     preheader: "Le contenu vient d'être mis à jour.",
-    body: `BUILD vient d'être mis à jour.\n\n${values.updateTitle || "Titre de la mise à jour"}\n\n${values.updateDesc || "Décris ici ce qui a changé."}\n\nConnecte-toi pour voir les changements.`,
+    body: `${values.updateDesc || "Décris ici ce qui a changé."}\n\nConnecte-toi pour voir ce qui a changé.`,
     ctaLabel: "Voir la mise à jour",
-    ctaUrl: `${resolveSiteOrigin(process.env.NEXT_PUBLIC_APP_URL, process.env.NODE_ENV)}/dashboard`,
+    ctaUrl: baseUrl ? `${baseUrl}/dashboard` : "",
   };
   return { subject: "", preheader: "", body: "", ctaLabel: "", ctaUrl: "" };
+}
+
+function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (mode: Mode) => void }) {
+  return (
+    <div className="ml-segments ml-modeswitch" role="group" aria-label="Que veux-tu faire ?">
+      <button type="button" aria-pressed={mode === "write"} onClick={() => onChange("write")}>Écrire un message</button>
+      <button type="button" aria-pressed={mode === "catalog"} onClick={() => onChange("catalog")}>E-mails automatiques</button>
+    </div>
+  );
 }
 
 function plural(count: number, one: string, many: string) {
   return count > 1 ? many : one;
 }
 
-export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; dataWarning: string | null }) {
+export function AdminMailComposer({ users, dataWarning, emailContext, catalog, from }: { users: MailUser[]; dataWarning: string | null; emailContext: EmailContext; catalog: EmailCatalogEntry[]; from: string }) {
+  const [mode, setMode] = useState<Mode>("write");
   const [audience, setAudience] = useState<Audience>("selected");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [search, setSearch] = useState("");
@@ -67,17 +80,6 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
   const [ctaUrl, setCtaUrl] = useState("");
   const [buttonOpen, setButtonOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
-  const [device, setDevice] = useState<Device>("desktop");
-  const [frameHeight, setFrameHeight] = useState(0);
-  const frameRef = useRef<HTMLIFrameElement>(null);
-  const measureFrame = useCallback(() => {
-    const mailBody = frameRef.current?.contentDocument?.body;
-    if (mailBody) setFrameHeight(mailBody.offsetHeight);
-  }, []);
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(measureFrame);
-    return () => window.cancelAnimationFrame(frame);
-  }, [device, measureFrame]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [confirmation, setConfirmation] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -96,9 +98,15 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
     return term ? users.filter((account) => account.email.toLowerCase().includes(term)) : users;
   }, [search, users]);
 
-  const previewHtml = useMemo(
-    () => buildEmailHtml({ preheader, body: body || "Ton message apparaîtra ici.", ctaLabel, ctaUrl }),
-    [preheader, body, ctaLabel, ctaUrl],
+  const preview = useMemo(
+    () => buildBroadcastEmail(emailContext, {
+      subject: subject || "L'objet de ton e-mail",
+      preheader,
+      body: body || "Ton message apparaîtra ici.",
+      ctaLabel,
+      ctaUrl,
+    }),
+    [emailContext, subject, preheader, body, ctaLabel, ctaUrl],
   );
 
   const closeSheet = () => {
@@ -122,7 +130,7 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
   }, [sheetOpen, isSending]);
 
   const applyTemplate = (key: TemplateKey) => {
-    const next = templateContent(key, { videoTitle, videoUrl, updateTitle, updateDesc });
+    const next = templateContent(key, emailContext.baseUrl, { videoTitle, videoUrl, updateTitle, updateDesc });
     setActiveTemplate(key);
     setSubject(next.subject);
     setPreheader(next.preheader);
@@ -199,8 +207,18 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
 
   const excerpt = body.trim().length > 160 ? `${body.trim().slice(0, 160)}…` : body.trim();
 
+  if (mode === "catalog") {
+    return (
+      <div className="ml-modes">
+        <ModeSwitch mode={mode} onChange={setMode} />
+        <MailCatalog entries={catalog} from={from} />
+      </div>
+    );
+  }
+
   return (
     <section className="ml-root" aria-labelledby="admin-mail-title">
+      <ModeSwitch mode={mode} onChange={setMode} />
       {dataWarning ? <div className="adm-notice adm-notice-error" role="alert"><AlertCircle aria-hidden="true" /><p>{dataWarning}</p></div> : null}
       <header className="ml-head">
         <h2 id="admin-mail-title">Écrire à tes membres</h2>
@@ -244,6 +262,7 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
             </label>
             <label className="ml-field">
               <span>Message</span>
+              <small>Une ligne vide sépare les paragraphes. Des lignes qui commencent par &gt; forment une citation. Trois tirets seuls sur une ligne tracent un séparateur.</small>
               <textarea value={body} maxLength={20000} rows={8} onChange={(event) => setBody(event.target.value)} />
             </label>
 
@@ -287,7 +306,7 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
                       <label key={account.id} data-disabled={account.inactiveForEmail || undefined}>
                         <input type="checkbox" checked={checked} onChange={() => toggleUser(account.id)} disabled={account.inactiveForEmail || (!checked && selectedIds.length >= MAX_SYNC_ADMIN_BROADCAST_RECIPIENTS)} />
                         <span>{account.email}</span>
-                        <small>{account.inactiveForEmail ? "Inactif" : account.tier === "full" ? "Complet" : account.tier === "beginner" ? "Fondations" : "Gratuit"}</small>
+                        <small>{account.inactiveForEmail ? "Inactif" : account.tier === "full" ? COFFRE_LABEL : account.tier === "beginner" ? FONDATIONS_LABEL : "Gratuit"}</small>
                       </label>
                     );
                   })}
@@ -315,23 +334,7 @@ export function AdminMailComposer({ users, dataWarning }: { users: MailUser[]; d
         </div>
 
         <aside className="ml-preview" aria-label="Aperçu de l'e-mail">
-          <div className="ml-preview-bar">
-            <h3>Aperçu</h3>
-            <div className="ml-device" role="group" aria-label="Taille de l'aperçu">
-              <button type="button" aria-pressed={device === "desktop"} onClick={() => setDevice("desktop")}>Ordinateur</button>
-              <button type="button" aria-pressed={device === "phone"} onClick={() => setDevice("phone")}>Téléphone</button>
-            </div>
-          </div>
-          <div className="ml-window">
-            <div className="ml-window-head">
-              <i aria-hidden="true" /><i aria-hidden="true" /><i aria-hidden="true" />
-            </div>
-            <dl className="ml-window-meta">
-              <div><dt>De</dt><dd>BUILD by Orsayn</dd></div>
-              <div><dt>Objet</dt><dd>{subject || "L'objet de ton e-mail"}</dd></div>
-            </dl>
-            <iframe ref={frameRef} className="ml-frame" data-device={device} style={frameHeight ? { height: frameHeight } : undefined} title="Aperçu du mail tel qu'il sera reçu" sandbox="allow-same-origin" srcDoc={previewHtml} onLoad={measureFrame} />
-          </div>
+          <MailPreview subject={preview.subject} html={preview.html} text={preview.text} from={from} />
         </aside>
       </div>
 

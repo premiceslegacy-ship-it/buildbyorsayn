@@ -95,7 +95,6 @@ export function HeroScene() {
                 </div>
               </div>
             </div>
-            <p className="hs__fiction">Illustration : identités fictives</p>
           </div>
         </div>
       </div>

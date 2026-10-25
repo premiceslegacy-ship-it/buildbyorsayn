@@ -5,6 +5,7 @@ import { isJsonMediaType, readBoundedBody } from "@/lib/mcp/http";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { publishVideoSchema, validateChapterTimeline, videoChapterSchema } from "@/lib/mux/adminLessons";
 import { cleanupMuxAsset, cleanupQueuedAssetsForSlot } from "@/lib/mux/assetCleanup.server";
+import { recordVideoPublishedNews } from "@/lib/nouveautes/autoNews.server";
 import { getVerifiedAdmin, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
 type VideoPublishRouteContext = { params: Promise<{ id: string }> };
 
@@ -69,6 +70,7 @@ export async function POST(request: NextRequest, context: VideoPublishRouteConte
   if (error || !Array.isArray(data) || data.length !== 1) {
     return NextResponse.json({ ok: false, error: "La publication a échoué." }, { status: 503 });
   }
+  await recordVideoPublishedNews(id, { actorUserId: user.id });
   const previousAssetId = typeof data[0]?.previous_mux_asset_id === "string"
     ? data[0].previous_mux_asset_id
     : null;

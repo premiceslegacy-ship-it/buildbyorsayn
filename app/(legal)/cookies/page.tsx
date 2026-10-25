@@ -37,10 +37,6 @@ export default function CookiesPage() {
               <th scope="row">Compteur de la séance</th>
               <td>Enregistré dans le stockage de séance de ton navigateur sous le nom <strong>build_session_advances</strong>. Il compte les étapes que tu valides pendant que ton onglet est ouvert, pour ton tableau de bord. Il disparaît quand tu fermes l&apos;onglet.</td>
             </tr>
-            <tr>
-              <th scope="row">Brouillons d&apos;accompagnement</th>
-              <td>Si tu suis un accompagnement, ton espace garde dans le stockage local de ton navigateur ton profil, tes thèmes compris et tes pistes de suivi, sous des noms qui commencent par <strong>build:site-web</strong>. Ces informations restent sur ton appareil.</td>
-            </tr>
           </tbody>
         </table>
       ),

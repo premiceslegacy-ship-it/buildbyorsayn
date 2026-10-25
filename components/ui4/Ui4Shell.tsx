@@ -5,7 +5,7 @@ import { DaRoot } from "@/components/da/DaRoot";
 import type { NavIdentity } from "@/lib/auth/navIdentity.server";
 import styles from "./ui4.module.css";
 
-type Ui4ActiveLink = "dashboard" | "beginner" | "sources" | "skills" | "nouveautes" | "protocole" | "videos-tutos" | "accompagnement";
+type Ui4ActiveLink = "dashboard" | "beginner" | "sources" | "skills" | "nouveautes" | "protocole" | "videos-tutos";
 
 export function Ui4Shell({
   children,

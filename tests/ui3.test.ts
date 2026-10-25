@@ -112,8 +112,8 @@ test("les écrans d’accès MCP ferment la porte avant de charger les instructi
   assert.match(page, /revocation === "error"/);
 });
 
-test("Accompagnement et Hermes ont leurs états de chargement et d’erreur", async () => {
-  for (const route of ["accompagnement", "videos/tutos"]) {
+test("Hermes a ses états de chargement et d’erreur", async () => {
+  for (const route of ["videos/tutos"]) {
     const [loading, error] = await Promise.all([readFile(`app/${route}/loading.tsx`, "utf8"), readFile(`app/${route}/error.tsx`, "utf8")]);
     assert.match(loading, /PageLoading/, route);
     assert.match(error, /reset/, route);
@@ -121,29 +121,6 @@ test("Accompagnement et Hermes ont leurs états de chargement et d’erreur", as
   const hermes = await readFile("app/videos/tutos/page.tsx", "utf8");
   assert.match(hermes, /files\.length === 0/);
   assert.match(hermes, /CHAPTER_META/);
-});
-
-test("Accompagnement garde ses données et ses portes d’accès réelles", async () => {
-  const [landing, detail, member, trainer, css] = await Promise.all([
-    readFile("app/accompagnement/page.tsx", "utf8"),
-    readFile("app/accompagnement/site-web/page.tsx", "utf8"),
-    readFile("app/accompagnement/espace/page.tsx", "utf8"),
-    readFile("app/accompagnement/formateur/page.tsx", "utf8"),
-    readFile("app/ui3.css", "utf8"),
-  ]);
-  assert.match(landing, /ACCOMPANIMENT_CAL_URL/);
-  assert.match(landing, /ACCOMPANIMENT_ACCESS_STATUSES/);
-  assert.match(detail, /THEMES\.map/);
-  assert.match(detail, /accompaniment_assignments/);
-  assert.match(landing, /foot foot--public/);
-  assert.match(detail, /foot foot--public/);
-  assert.match(css, /\.ui3-rdv-title[^}]*width: min\(100%, 760px\)[^}]*font-size: 40px[^}]*text-wrap: balance/);
-  assert.match(css, /@media \(min-width: 735px\)[\s\S]*\.ui3-rdv-title \{ font-size: 56px; \}/);
-  assert.match(css, /@media \(min-width: 1100px\)[\s\S]*\.ui3-rdv-title \{ font-size: 64px; \}/);
-  assert.match(member, /if \(!user\) redirect/);
-  assert.match(member, /if \(error \|\| !data\) redirect/);
-  assert.match(trainer, /if \(!user \|\| !isAccompanimentAdminUser\(user\)\) redirect/);
-  assert.match(trainer, /ui3-accompaniment-workspace/);
 });
 
 test("les styles UI-3 respectent les largeurs et les garde-fous visuels", async () => {
