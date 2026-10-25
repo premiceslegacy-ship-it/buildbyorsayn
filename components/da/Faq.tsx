@@ -28,7 +28,7 @@ function faqItems() {
     },
     {
       q: "Je peux utiliser BUILD dans mon assistant ?",
-      a: "Oui. Tu peux utiliser BUILD dans Claude et ChatGPT. Le connecteur limite l'assistant aux contenus inclus dans ton accès BUILD.",
+      a: "Pas encore. Le connecteur pour Claude et ChatGPT arrive bientôt. Il limitera l'assistant aux contenus inclus dans ton accès BUILD.",
     },
     {
       q: "BUILD garantit des clients ou des revenus ?",
