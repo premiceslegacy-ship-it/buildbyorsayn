@@ -14,7 +14,7 @@ import {
 
 const ctx: EmailContext = {
   baseUrl: "https://build.example.test",
-  seller: { fullName: "A B", tradeName: "Orsayn", siret: "98920815200011", address: "1 rue des héraults, 37550 Saint-Avertin", contactEmail: "contact@orsayn.fr", vatMention: "TVA non applicable, article 293 B du CGI" },
+  seller: { contactEmail: "contact@orsayn.fr" },
 };
 
 test("tous les e-mails passent par le gabarit : fond noir, un seul bouton blanc, 600 px, texte brut, aucun tiret long", () => {
@@ -40,12 +40,18 @@ test("sans adresse de site, le logo devient du texte et aucun lien ne part de ri
   assert.ok(!mail.html.includes("/checkout"));
 });
 
-test("la confirmation d'achat donne le prix payé, l'accès immédiat et refuse un montant invalide", () => {
+test("la confirmation d'achat reste courte et contient le prix, la date et l'accès", () => {
   const mail = buildPurchaseConfirmationEmail(ctx, { offerName: "LE\u00a0COFFRE", amountCents: 26700, purchasedAt: new Date("2026-10-22T10:30:00Z") });
   for (const body of [mail.text, mail.html]) {
     assert.ok(body.includes("267\u00a0€"));
-    assert.ok(body.includes("SIRET 98920815200011"));
+    assert.ok(body.includes("Offre"));
+    assert.ok(body.includes("Prix payé"));
+    assert.ok(body.includes("Date"));
     assert.ok(body.includes("https://build.example.test/cgv"));
+    assert.ok(body.includes("https://build.example.test/mentions-legales"));
+    assert.ok(!body.includes("Vendeur"));
+    assert.ok(!body.includes("Je demande l'accès immédiat"));
+    assert.ok(!/\b\d{14}\b/.test(body));
   }
   assert.throws(() => buildPurchaseConfirmationEmail(ctx, { offerName: "x", amountCents: 0, purchasedAt: new Date() }));
 });

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 
-const EXPECTED_TOOLS = ["get_skill", "list_available_content", "search_knowledge"] as const;
+const EXPECTED_TOOLS = ["get_skill", "get_video", "list_available_content", "list_videos", "search_knowledge"] as const;
 
 export function assertMcpSuccess(payload: unknown, expectedId: string | number): Record<string, unknown> {
   assert.equal(typeof payload, "object");

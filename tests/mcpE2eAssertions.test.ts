@@ -17,7 +17,7 @@ test("MCP success assertion binds the JSON-RPC ID and rejects both error channel
 });
 
 test("tools/list must expose exactly the expected tool names", () => {
-  const expected = ["get_skill", "list_available_content", "search_knowledge"];
+  const expected = ["get_skill", "get_video", "list_available_content", "list_videos", "search_knowledge"];
   assert.deepEqual(assertToolsList({ tools: expected.map((name) => ({ name })) }), expected);
   assert.throws(() => assertToolsList({ tools: [{ name: "search_knowledge" }] }));
   assert.throws(() => assertToolsList({ tools: [...expected.map((name) => ({ name })), { name: "admin" }] }));
@@ -56,6 +56,9 @@ test("the executable E2E gate validates every MCP response and proves revocation
   assert.match(script, /assertTextToolResult\(assertMcpSuccess\(getSkill\.payload, 4\)\)/);
   assert.match(script, /name: "list_available_content"/);
   assert.match(script, /assertTextToolResult\(\s*assertMcpSuccess\(availableContent\.payload, 5\)\s*\)/);
+  assert.match(script, /name: "list_videos"[\s\S]*Vidéo E2E brouillon/);
+  assert.match(script, /name: "get_video"[\s\S]*publishedVideoId/);
+  assert.match(script, /videoTools/);
   assert.match(script, /availableContentText[\s\S]*oracle-site-web/);
   assert.match(script, /availableContentText[\s\S]*doesNotMatch[\s\S]*oracle-by-orsayn/);
   assert.match(script, /foundationSlugs/);
@@ -70,6 +73,8 @@ test("the executable E2E gate validates every MCP response and proves revocation
   assert.equal((script.match(/\bfetch\(/g) ?? []).length, 1, "only the timeout wrapper may call fetch directly");
   assert.match(script, /next\/dist\/bin\/next"\), "start"/);
   assert.doesNotMatch(script, /next\/dist\/bin\/next"\), "dev"/);
+  assert.match(script, /loadEnv\(\{ path: "\.env\.e2e\.local"/);
+  assert.doesNotMatch(script, /loadEnv\(\{ path: "\.env\.local"/);
 
   const clientAssignment = script.indexOf("clientId = registration.client_id");
   const registrationAssertion = script.indexOf("assert.equal(registrationResponse.status, 201)");

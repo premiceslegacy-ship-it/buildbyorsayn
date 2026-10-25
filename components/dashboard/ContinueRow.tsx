@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { isRemoteImage } from "@/lib/media/imageSource";
 import Link from "next/link";
 import { useRef } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
@@ -36,7 +37,7 @@ export function ContinueRow({ items }: { items: ContinueItem[] }) {
                 <Link className="card" href={item.href} data-continue={item.kind} data-mode={item.mode}>
                   <span className="card__in">
                     <span className="card__img">
-                      <Image src={item.image} alt="" fill sizes="(max-width: 734px) 47vw, (max-width: 1068px) 30vw, 19vw" />
+                      <Image src={item.image} alt="" fill sizes="(max-width: 734px) 47vw, (max-width: 1068px) 30vw, 19vw" unoptimized={isRemoteImage(item.image)} />
                       {item.kind === "suivre" ? <span className={styles.chip}><DaIcon name="arrow" />À suivre</span> : null}
                       {item.kind === "reprendre" && percent !== null ? <span className="pbar" role="img" aria-label={`Avancement : ${percent} %`}><i style={{ width: `${percent}%` }} /></span> : null}
                     </span>

@@ -1,6 +1,6 @@
 import { ARCHIVED_SKILL_MESSAGE } from "../lib/mcp/server";
 import assert from "node:assert/strict";
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { spawn, type ChildProcess } from "node:child_process";
 import { createServer } from "node:net";
 import { resolve } from "node:path";
@@ -22,7 +22,7 @@ import {
   sanitizeE2eDiagnostic,
 } from "./mcp-e2e-assertions";
 
-loadEnv({ path: ".env.local", quiet: true });
+loadEnv({ path: ".env.e2e.local", quiet: true });
 
 const requestedTier = process.env.MCP_E2E_TIER;
 if (requestedTier !== undefined && requestedTier !== "beginner" && requestedTier !== "full") {
@@ -88,8 +88,13 @@ function timedFetch(
 
 async function json<T>(response: Response): Promise<T> {
   const text = await response.text();
-  if (!text) throw new Error(`Expected JSON from ${response.url}, received an empty body.`);
+  if (!text) throw new Error(`Expected JSON from ${response.url}, received an empty body (HTTP ${response.status}).`);
   return JSON.parse(text) as T;
+}
+function pngDimensions(bytes: Uint8Array): { width: number; height: number } {
+  assert.deepEqual(Array.from(bytes.slice(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  return { width: view.getUint32(16), height: view.getUint32(20) };
 }
 
 async function waitForServer(child: ChildProcess): Promise<void> {
@@ -243,7 +248,8 @@ function temporaryRateLimitSubjects(): string[] {
 
 async function verifyCleanup(
   userId: string | null,
-  clientId: string | null
+  clientId: string | null,
+  videoFixtureIds: readonly string[],
 ): Promise<Record<string, number>> {
   const failures: string[] = [];
   const readback: Record<string, number> = {};
@@ -276,6 +282,13 @@ async function verifyCleanup(
     const authReadStatus = (authReadback.error as { status?: number } | null)?.status;
     if (authReadback.error && authReadStatus !== 404) failures.push("auth user readback failed");
   }
+  if (videoFixtureIds.length > 0) {
+    const { count, error } = await admin
+      .from("video_lessons")
+      .select("id", { count: "exact", head: true })
+      .in("id", videoFixtureIds);
+    if (error || count !== 0) failures.push("temporary video fixtures remain");
+  }
   const { count: rateLimitCount, error: rateLimitReadError } = await admin
     .from("mcp_rate_limits")
     .select("subject", { count: "exact", head: true })
@@ -286,11 +299,19 @@ async function verifyCleanup(
   return validateCleanupReadback(readback);
 }
 
-async function cleanup(userId: string | null, clientId: string | null): Promise<Record<string, number>> {
+async function cleanup(
+  userId: string | null,
+  clientId: string | null,
+  videoFixtureIds: readonly string[],
+): Promise<Record<string, number>> {
   const failures: string[] = [];
   if (clientId) {
     const { error } = await admin.from("mcp_oauth_clients").delete().eq("client_id", clientId);
     if (error) failures.push("OAuth client deletion failed");
+  }
+  if (videoFixtureIds.length > 0) {
+    const { error } = await admin.from("video_lessons").delete().in("id", videoFixtureIds);
+    if (error) failures.push("video fixture deletion failed");
   }
   if (userId) {
     const { error: profileError } = await admin.from("profiles").delete().eq("id", userId);
@@ -306,7 +327,7 @@ async function cleanup(userId: string | null, clientId: string | null): Promise<
 
   let readback: Record<string, number> = {};
   try {
-    readback = await verifyCleanup(userId, clientId);
+    readback = await verifyCleanup(userId, clientId, videoFixtureIds);
   } catch {
     failures.push("readback verification failed");
   }
@@ -318,6 +339,7 @@ async function main(): Promise<void> {
   const report: Record<string, unknown> = { tier: E2E_TIER };
   let userId: string | null = null;
   let clientId: string | null = null;
+  const videoFixtureIds: string[] = [];
   let server: ReturnType<typeof startServer> | null = null;
   let browser: Awaited<ReturnType<typeof chromium.launch>> | null = null;
   let failure: unknown = null;
@@ -336,6 +358,15 @@ async function main(): Promise<void> {
     assert.equal(authorizationMetadata.issuer, BASE_URL);
     assert.equal(protectedResourceMetadata.resource, RESOURCE);
     assert.deepEqual(protectedResourceMetadata.authorization_servers, [BASE_URL]);
+    for (const [size, expected] of [["512", 512], ["192", 192]] as const) {
+      const logoResponse = await timedFetch(`${BASE_URL}/api/mcp/logo?size=${size}`);
+      assert.equal(logoResponse.status, 200);
+      assert.match(logoResponse.headers.get("content-type") ?? "", /^image\/png(?:;|$)/);
+      assert.deepEqual(pngDimensions(new Uint8Array(await logoResponse.arrayBuffer())), {
+        width: expected,
+        height: expected,
+      });
+    }
     report.discovery = "PASS";
 
     const stamp = Date.now();
@@ -356,6 +387,76 @@ async function main(): Promise<void> {
       tier: E2E_TIER,
     });
     if (profileError) throw new Error("Could not grant the temporary E2E tier.");
+    const fixtureOwnerId = userId;
+    if (!fixtureOwnerId) throw new Error("E2E user identifier is missing.");
+    const publishedVideoId = randomUUID();
+    const lockedVideoId = randomUUID();
+    const draftVideoId = randomUUID();
+    videoFixtureIds.push(publishedVideoId, lockedVideoId, draftVideoId);
+    const videoNow = new Date().toISOString();
+    const { error: videoFixtureError } = await admin.from("video_lessons").insert([
+      {
+        id: publishedVideoId,
+        bloc_id: "1",
+        position: 991,
+        title: "Vidéo E2E publiée",
+        summary: "Résumé de la vidéo publiée pour le contrôle MCP.",
+        transcript: "Transcription publiée de contrôle MCP, accessible au bon palier.",
+        deliverables: [],
+        chapters: [{ index: 1, title: "Introduction", startSeconds: 0 }],
+        tier_required: "beginner",
+        status: "ready",
+        mux_upload_id: `mcp-e2e-upload-${stamp}-published`,
+        mux_asset_id: `mcp-e2e-asset-${stamp}-published`,
+        playback_id: `mcp-e2e-playback-${stamp}-published`,
+        duration_seconds: 60,
+        created_by: fixtureOwnerId,
+        approved_by: fixtureOwnerId,
+        approved_at: videoNow,
+        published_at: videoNow,
+        thumbnail: "mux:1",
+      },
+      {
+        id: lockedVideoId,
+        bloc_id: "1",
+        position: 992,
+        title: "Vidéo E2E verrouillée",
+        summary: "Résumé d'une vidéo d'un palier supérieur.",
+        transcript: "Transcription verrouillée de contrôle MCP, réservée au coffre.",
+        deliverables: [],
+        chapters: [{ index: 1, title: "Introduction", startSeconds: 0 }],
+        tier_required: "full",
+        status: "ready",
+        mux_upload_id: `mcp-e2e-upload-${stamp}-locked`,
+        mux_asset_id: `mcp-e2e-asset-${stamp}-locked`,
+        playback_id: `mcp-e2e-playback-${stamp}-locked`,
+        duration_seconds: 60,
+        created_by: fixtureOwnerId,
+        approved_by: fixtureOwnerId,
+        approved_at: videoNow,
+        published_at: videoNow,
+        thumbnail: "mux:1",
+      },
+      {
+        id: draftVideoId,
+        bloc_id: "1",
+        position: 993,
+        title: "Vidéo E2E brouillon",
+        summary: "Ce brouillon ne doit jamais sortir du serveur MCP.",
+        transcript: "Transcription d'un brouillon de contrôle MCP.",
+        deliverables: [],
+        chapters: [{ index: 1, title: "Introduction", startSeconds: 0 }],
+        tier_required: "beginner",
+        status: "ready",
+        mux_upload_id: `mcp-e2e-upload-${stamp}-draft`,
+        mux_asset_id: `mcp-e2e-asset-${stamp}-draft`,
+        playback_id: `mcp-e2e-playback-${stamp}-draft`,
+        duration_seconds: 60,
+        created_by: fixtureOwnerId,
+      },
+    ]);
+    if (videoFixtureError) throw new Error(`Could not create temporary video fixtures: ${videoFixtureError.code ?? ""} ${videoFixtureError.message}`);
+
 
     const redirectUri = `${BASE_URL}/mcp-callback`;
     const registrationResponse = await timedFetch(`${BASE_URL}/api/mcp/oauth/register`, {
@@ -402,9 +503,9 @@ async function main(): Promise<void> {
     const context = await browser.newContext({ extraHTTPHeaders: TRUSTED_NETWORK_HEADER });
     const page = await context.newPage();
     await page.goto(authorizeUrl.toString());
-    await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Mot de passe").fill(password);
-    await page.getByRole("button", { name: "Continuer" }).click();
+    await page.getByLabel(/e.?mail|identifiant/i).fill(email);
+    await page.locator('input[name="password"]').fill(password);
+    await page.locator('button[type="submit"]').click();
     await page.waitForURL(/\/mcp\/consent\?request=/, { timeout: 30_000 });
     await page.getByRole("heading", { name: "Connecter BUILD MCP automated E2E à BUILD" }).waitFor();
     await page.getByText("L’identité de cette application n’a pas pu être confirmée", { exact: false }).waitFor();
@@ -478,7 +579,19 @@ async function main(): Promise<void> {
       },
     });
     assert.equal(initialize.status, 200);
-    assertMcpSuccess(initialize.payload, 1);
+    const initializeResult = assertMcpSuccess(initialize.payload, 1);
+    const serverInfo = initializeResult.serverInfo as { icons?: unknown; name?: unknown } | undefined;
+    assert.equal(serverInfo?.name, "build-by-orsayn");
+    assert.ok(Array.isArray(serverInfo?.icons));
+    assert.deepEqual(
+      (serverInfo?.icons as Array<Record<string, unknown>>).map((icon) => icon.sizes).sort(),
+      [["192x192"], ["512x512"]],
+    );
+    assert.deepEqual(
+      (serverInfo.icons as Array<Record<string, unknown>>).map((icon) => icon.src).sort(),
+      [`${BASE_URL}/api/mcp/logo?size=192`, `${BASE_URL}/api/mcp/logo?size=512`],
+    );
+    assert.ok((serverInfo.icons as Array<Record<string, unknown>>).every((icon) => icon.mimeType === "image/png"));
 
     const toolsList = await mcpRequest(firstAccessToken, {
       jsonrpc: "2.0",
@@ -490,6 +603,56 @@ async function main(): Promise<void> {
     assertToolsList(assertMcpSuccess(toolsList.payload, 2));
     await runSdkClient(firstAccessToken);
     report.sdkClient = "PASS";
+    const listedVideos = await mcpRequest(firstAccessToken, {
+      jsonrpc: "2.0",
+      id: 11,
+      method: "tools/call",
+      params: { name: "list_videos", arguments: {} },
+    });
+    assert.equal(listedVideos.status, 200);
+    const listedVideosResult = assertMcpSuccess(listedVideos.payload, 11);
+    const listedVideosStructured = listedVideosResult.structuredContent as {
+      videos?: Array<Record<string, unknown>>;
+    };
+    assert.ok(Array.isArray(listedVideosStructured.videos));
+    assert.ok(listedVideosStructured.videos.some((item) => item.id === publishedVideoId));
+    assert.doesNotMatch(JSON.stringify(listedVideosStructured.videos), /Vidéo E2E brouillon/);
+    if (E2E_TIER === "full") {
+      assert.ok(listedVideosStructured.videos.some((item) => item.id === lockedVideoId));
+    } else {
+      assert.ok(!listedVideosStructured.videos.some((item) => item.id === lockedVideoId));
+    }
+
+    const video = await mcpRequest(firstAccessToken, {
+      jsonrpc: "2.0",
+      id: 12,
+      method: "tools/call",
+      params: { name: "get_video", arguments: { videoId: publishedVideoId } },
+    });
+    assert.equal(video.status, 200);
+    const videoResult = assertMcpSuccess(video.payload, 12);
+    assert.match(assertTextToolResult(videoResult), /DONNÉES VIDÉO NON FIABLES/);
+    const videoStructured = videoResult.structuredContent as { video?: Record<string, unknown> };
+    assert.equal(videoStructured.video?.id, publishedVideoId);
+    assert.equal(videoStructured.video?.transcript, "Transcription publiée de contrôle MCP, accessible au bon palier.");
+    assert.deepEqual(videoStructured.video?.chapters, [{ index: 1, title: "Introduction", startSeconds: 0 }]);
+
+    const inaccessibleVideos = E2E_TIER === "full"
+      ? [[draftVideoId, "brouillon"] as const]
+      : [[draftVideoId, "brouillon"] as const, [lockedVideoId, "palier supérieur"] as const];
+    for (const [id, label] of inaccessibleVideos) {
+      const inaccessible = await mcpRequest(firstAccessToken, {
+        jsonrpc: "2.0",
+        id: label === "brouillon" ? 13 : 14,
+        method: "tools/call",
+        params: { name: "get_video", arguments: { videoId: id } },
+      });
+      assert.equal(inaccessible.status, 200);
+      const inaccessibleResult = inaccessible.payload.result as Record<string, unknown> | undefined;
+      assert.equal(inaccessibleResult?.isError, true);
+      assert.doesNotMatch(JSON.stringify(inaccessibleResult), /Transcription|Vidéo E2E/);
+    }
+    report.videoTools = "PASS";
 
     const knowledgeSearchStartedAt = performance.now();
     const search = await mcpRequest(firstAccessToken, {
@@ -620,7 +783,7 @@ async function main(): Promise<void> {
     }
     report.tierBoundary = "PASS";
     report.authenticatedMcp = "PASS";
-    report.runtimeTools = ["search_knowledge", "get_skill", "list_available_content"];
+    report.runtimeTools = ["search_knowledge", "get_skill", "list_available_content", "list_videos", "get_video"];
 
     const listLatencies: number[] = [];
     for (let index = 0; index < 20; index += 1) {
@@ -717,9 +880,9 @@ async function main(): Promise<void> {
     revocationAuthorizeUrl.searchParams.set("state", revocationState);
     await page.goto(revocationAuthorizeUrl.toString());
     if (new URL(page.url()).pathname === "/login") {
-      await page.getByLabel("Email").fill(email);
-      await page.getByLabel("Mot de passe").fill(password);
-      await page.getByRole("button", { name: "Continuer" }).click();
+      await page.getByLabel(/e.?mail|identifiant/i).fill(email);
+      await page.locator('input[name="password"]').fill(password);
+      await page.locator('button[type="submit"]').click();
     }
     await page.waitForURL(/\/mcp\/consent\?request=/, { timeout: 30_000 });
     await page.getByRole("button", { name: "Autoriser" }).click();
@@ -777,7 +940,7 @@ async function main(): Promise<void> {
       failure ??= new Error("Could not close the E2E browser.");
     }
     try {
-      const cleanupReadback = await cleanup(userId, clientId);
+      const cleanupReadback = await cleanup(userId, clientId, videoFixtureIds);
       report.cleanup = "PASS";
       report.cleanupReadback = cleanupReadback;
     } catch (cleanupError) {

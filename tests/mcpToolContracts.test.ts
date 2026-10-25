@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   GET_SKILL_INPUT_SCHEMA,
+  GET_VIDEO_INPUT_SCHEMA,
   KNOWLEDGE_SOURCES,
+  LIST_VIDEOS_INPUT_SCHEMA,
   SEARCH_KNOWLEDGE_INPUT_SCHEMA,
   formatUntrustedKnowledgeResults,
   validateKnowledgeMatches,
@@ -41,6 +43,16 @@ test("get_skill uses the production strict slug contract", () => {
   assert.throws(() => GET_SKILL_INPUT_SCHEMA.parse({ slug: "../secret" }));
   assert.throws(() => GET_SKILL_INPUT_SCHEMA.parse({ slug: "a".repeat(101) }));
   assert.doesNotThrow(() => GET_SKILL_INPUT_SCHEMA.parse({ slug: "oracle-site-web" }));
+});
+test("video tools accept only bounded published-video selectors", () => {
+  assert.doesNotThrow(() => LIST_VIDEOS_INPUT_SCHEMA.parse({}));
+  assert.doesNotThrow(() => LIST_VIDEOS_INPUT_SCHEMA.parse({ blocId: "protocole", limit: 50 }));
+  assert.throws(() => LIST_VIDEOS_INPUT_SCHEMA.parse({ blocId: "8" }));
+  assert.throws(() => LIST_VIDEOS_INPUT_SCHEMA.parse({ limit: 51 }));
+  assert.throws(() => LIST_VIDEOS_INPUT_SCHEMA.parse({ extra: true }));
+  assert.doesNotThrow(() => GET_VIDEO_INPUT_SCHEMA.parse({ videoId: "00000000-0000-4000-8000-000000000000" }));
+  assert.throws(() => GET_VIDEO_INPUT_SCHEMA.parse({ videoId: "draft-video" }));
+  assert.throws(() => GET_VIDEO_INPUT_SCHEMA.parse({}));
 });
 
 test("knowledge results fail closed on unknown, malformed or locked rows", () => {

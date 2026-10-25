@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
 import { LiquidGlassNav } from "@/components/ui/LiquidGlass";
-import { TABBAR_VERRE } from "@/components/ui/liquidGlassPresets";
 
 export const MEMBER_NAV = [
   { label: "Aujourd'hui", href: "/dashboard", icon: "home" as const },
@@ -88,7 +87,7 @@ export function MemberTabbar({ unseen }: { unseen?: { label: string; count: numb
   }, [active]);
 
   return (
-    <LiquidGlassNav className="tabbar" aria-label="Navigation mobile" glass={TABBAR_VERRE}>
+    <LiquidGlassNav className="tabbar" aria-label="Navigation mobile">
       <span className="slider" ref={slider} aria-hidden="true" />
       {MEMBER_NAV.map((item) => (
         <Link

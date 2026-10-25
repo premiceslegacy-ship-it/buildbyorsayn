@@ -24,15 +24,15 @@ test("OAuth discovery does not expose the MCP icon as an OAuth endpoint", async 
 });
 
 test("the MCP branding route serves the new BUILD PNG at the size the server declares", async () => {
-  const response = await getMcpLogo();
+  const response = await getMcpLogo(new Request("https://buildbyorsayn.com/api/mcp/logo?size=512"));
   const bytes = new Uint8Array(await response.arrayBuffer());
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
 
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("content-type"), "image/png");
-  assert.equal(response.headers.get("cache-control"), "public, max-age=300");
+  assert.equal(response.headers.get("cache-control"), "public, max-age=3600, immutable");
   assert.deepEqual(Array.from(bytes.slice(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
-  assert.equal(`${view.getUint32(16)}x${view.getUint32(20)}`, "1024x1024");
+  assert.equal(`${view.getUint32(16)}x${view.getUint32(20)}`, "512x512");
 });
 
 test("the MCP branding route fails closed with a 404 and a log when the file is missing", async () => {
@@ -44,7 +44,7 @@ test("the MCP branding route fails closed with a 404 and a log when the file is 
 
   try {
     process.chdir(emptyDirectory);
-    const response = await getMcpLogo();
+    const response = await getMcpLogo(new Request("https://buildbyorsayn.com/api/mcp/logo"));
     assert.equal(response.status, 404);
     assert.equal(response.headers.get("cache-control"), "no-store");
     assert.equal(await response.text(), "");
@@ -99,11 +99,18 @@ test("the MCP initialize response exposes the official BUILD icon", async () => 
     assert.equal(response.status, 200);
     assert.equal(serverInfo?.title, "BUILD by Orsayn");
     assert.equal(serverInfo?.websiteUrl, "https://buildbyorsayn.com");
-    assert.deepEqual(serverInfo?.icons?.[0], {
-      src: "https://buildbyorsayn.com/api/mcp/logo",
-      mimeType: "image/png",
-      sizes: ["1024x1024"],
-    });
+    assert.deepEqual(serverInfo?.icons, [
+      {
+        src: "https://buildbyorsayn.com/api/mcp/logo?size=512",
+        mimeType: "image/png",
+        sizes: ["512x512"],
+      },
+      {
+        src: "https://buildbyorsayn.com/api/mcp/logo?size=192",
+        mimeType: "image/png",
+        sizes: ["192x192"],
+      },
+    ]);
   } finally {
     await server.close();
   }

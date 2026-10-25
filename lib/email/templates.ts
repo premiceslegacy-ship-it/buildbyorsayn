@@ -1,4 +1,3 @@
-import { CHECKOUT_CONSENT_TEXT } from "@/lib/legal/consent";
 import { COFFRE_LABEL, FONDATIONS_LABEL, UPGRADE_PRICE, formatEuro } from "@/lib/pricing";
 import { renderEmail, type EmailBlock, type EmailFooter, type RenderedEmail } from "./layout";
 
@@ -7,15 +6,11 @@ import { renderEmail, type EmailBlock, type EmailFooter, type RenderedEmail } fr
  * Les fonctions sont pures : aucune lecture d'environnement, le pied et l'origine du site arrivent en paramètres.
  */
 
-/** Identité du vendeur, telle que la donne lib/legal/entity.ts. */
+/** Coordonnées utilisées uniquement pour le contact du pied de page. */
 export type EmailSeller = {
-  fullName: string;
-  tradeName: string;
-  siret: string;
-  address: string;
   contactEmail: string;
-  vatMention: string;
 };
+
 
 export type EmailContext = {
   /** Origine publique du site sans barre finale, ou null quand elle n'est pas configurée. */
@@ -26,11 +21,16 @@ export type EmailContext = {
 const NBSP = "\u00a0";
 
 function footerFor(ctx: EmailContext, reason: string, extra: Partial<EmailFooter> = {}): EmailFooter {
+  const links = ctx.baseUrl
+    ? [
+        ["Conditions générales de vente", `${ctx.baseUrl}/cgv`],
+        ["Mentions légales", `${ctx.baseUrl}/mentions-legales`],
+      ] as const
+    : [];
   return {
     reason,
-    publisher: `${ctx.seller.tradeName}, ${ctx.seller.fullName}, SIRET ${ctx.seller.siret}`,
-    address: ctx.seller.address,
     contactEmail: ctx.seller.contactEmail,
+    links,
     ...extra,
   };
 }
@@ -66,40 +66,31 @@ export type PurchaseConfirmationInput = {
   purchasedAt: Date;
 };
 
-/**
- * Confirmation d'achat sur support durable (Code de la consommation, L221-13) : reprend l'accord à l'exécution
- * immédiate et la renonciation au droit de rétractation (L221-28, 13°). Sert aussi de reçu.
- */
+/** Confirmation d'achat et reçu : offre, prix payé, date et accès BUILD. */
 export function buildPurchaseConfirmationEmail(ctx: EmailContext, input: PurchaseConfirmationInput): RenderedEmail {
   const { offerName, amountCents, purchasedAt } = input;
   if (!Number.isInteger(amountCents) || amountCents <= 0) throw new Error("Montant de l'achat invalide.");
-  const { seller, baseUrl } = ctx;
+  const { baseUrl } = ctx;
   const date = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(purchasedAt);
   const blocks: EmailBlock[] = [
     { type: "heading", text: "Ton achat est confirmé." },
-    { type: "paragraph", text: "Ton paiement est bien arrivé. Voici la confirmation de ton achat : garde cet e-mail, il te sert de reçu." },
+    { type: "paragraph", text: "Ton paiement est bien arrivé. Voici la confirmation de ton achat." },
     {
       type: "facts",
       rows: [
         ["Offre", offerName],
-        ["Prix payé", `${formatAmount(amountCents)} (prix net, ${seller.vatMention})`],
+        ["Prix payé", formatAmount(amountCents)],
         ["Date", date],
-        ["Vendeur", `${seller.fullName}, entrepreneur individuel exerçant sous le nom commercial ${seller.tradeName}, SIRET ${seller.siret}, ${seller.address}`],
       ],
     },
-    { type: "paragraph", text: "Ton accès est ouvert dès maintenant, sans délai. C'est un paiement unique : pas d'abonnement, aucun prélèvement à venir." },
     ...(baseUrl ? [{ type: "button", label: "Ouvrir BUILD", url: `${baseUrl}/dashboard` } as const] : []),
-    { type: "paragraph", text: "Ce que tu as demandé et reconnu au moment de payer :" },
-    { type: "quote", text: CHECKOUT_CONSENT_TEXT },
   ];
   return renderEmail({
     subject: `Ton achat BUILD est confirmé${NBSP}: ${offerName}`,
     preheader: `${offerName}, ${formatAmount(amountCents)}. Ton accès est ouvert.`,
     baseUrl,
     blocks,
-    footer: footerFor(ctx, "Tu reçois ce message parce que tu viens d'acheter BUILD.", {
-      links: baseUrl ? [["Conditions générales de vente", `${baseUrl}/cgv`]] : [],
-    }),
+    footer: footerFor(ctx, "Tu reçois ce message parce que tu viens d'acheter BUILD."),
   });
 }
 

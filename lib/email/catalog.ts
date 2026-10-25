@@ -117,7 +117,7 @@ export function buildEmailCatalog(ctx: EmailContext): EmailCatalogEntry[] {
       name: "Changement d'adresse e-mail",
       trigger: "Quand un membre change son adresse depuis son compte.",
       sender: "Supabase",
-      mail: buildAuthEmail(ctx, "email-change", { link: DEMO_ACTION_LINK, newEmail: "camille.durand@example.com" }),
+      mail: buildAuthEmail(ctx, "email-change", { link: DEMO_ACTION_LINK, newEmail: "member@example.com" }),
     },
   ];
   return entries.map(({ mail, ...entry }) => ({ ...entry, ...mail }));

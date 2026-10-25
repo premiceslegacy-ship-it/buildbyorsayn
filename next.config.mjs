@@ -25,7 +25,7 @@ const nextConfig = {
 
   outputFileTracingIncludes: {
     "/api/mcp/showcase-asset": ["./private/brand-assets/build-mcp-connector-characters.webp"],
-    "/api/mcp/logo": ["./public/mcp/build-logo.png"],
+    "/api/mcp/logo": ["./public/mcp/build-logo.png", "./public/mcp/build-logo-192.png"],
     "/api/search": ["./content/fondations/*.md"],
     "/beginner/*": ["./content/fondations/*.md"],
   },

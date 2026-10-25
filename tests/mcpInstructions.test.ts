@@ -119,7 +119,7 @@ test("tool descriptions and tool messages are accented, clean and honest about g
     }));
     const payload = await response.json() as { result: { tools: Array<{ name: string; title?: string; description?: string }> } };
     const tools = payload.result.tools;
-    assert.deepEqual(tools.map((tool) => tool.name).sort(), ["get_skill", "list_available_content", "search_knowledge"]);
+    assert.deepEqual(tools.map((tool) => tool.name).sort(), ["get_skill", "get_video", "list_available_content", "list_videos", "search_knowledge"]);
 
     for (const tool of tools) {
       const text = `${tool.title ?? ""} ${tool.description ?? ""}`;

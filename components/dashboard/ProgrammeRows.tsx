@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import Image from "next/image";
+import { isRemoteImage } from "@/lib/media/imageSource";
 import Link from "next/link";
 import { useRef } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
@@ -19,7 +20,7 @@ function ProgrammeCardView({ card, progress, showProgress }: { card: ProgrammeSe
       <Link className={`card ${styles.card}`} href={card.locked ? "/checkout" : card.href} data-sfx={card.locked ? "error" : undefined}>
         <span className="card__in">
           <span className={`card__img ${card.locked ? styles.lockedImage : ""}`}>
-            <Image src={card.image} alt="" fill sizes="(max-width: 734px) 47vw, (max-width: 1068px) 30vw, 23vw" />
+            <Image src={card.image} alt="" fill sizes="(max-width: 734px) 47vw, (max-width: 1068px) 30vw, 23vw" unoptimized={isRemoteImage(card.image)} />
             {card.locked ? <span className={styles.accessLabel}><DaIcon name="lock" />Voir l’accès</span> : null}
             {showProgress && !card.locked && clampedProgress > 0 ? <span className="pbar" aria-hidden="true"><i style={{ width: `${clampedProgress}%` }} /></span> : null}
           </span>

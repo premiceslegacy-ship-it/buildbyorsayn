@@ -132,11 +132,12 @@ async function handleRefreshToken(params: RefreshTokenRequest) {
     .eq("token_hash", hashToken(refreshToken))
     .eq("client_id", clientId)
     .eq("resource", resource)
-    .is("revoked_at", null)
-    .gt("expires_at", new Date().toISOString())
     .maybeSingle();
   if (ownerError) return oauthError("server_error", "Could not rotate refresh token.", 500);
-  if (!owner || !isMcpConnectorAccountAllowed(owner.user_id)) {
+  // Le jeton est cherché même s'il est déjà tourné ou révoqué : sa réutilisation doit atteindre la fonction de
+  // rotation, qui la détecte et révoque toute la famille. Inconnu : invalid_grant, sans révéler le connecteur.
+  if (!owner) return oauthError("invalid_grant", "The refresh token is invalid or expired.");
+  if (!isMcpConnectorAccountAllowed(owner.user_id)) {
     return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
   }
 

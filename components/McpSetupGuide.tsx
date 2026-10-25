@@ -92,7 +92,7 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
     auth: oauth
     trust: untrusted
     tools:
-      include: [search_knowledge, get_skill, list_available_content]`;
+      include: [search_knowledge, get_skill, list_available_content, list_videos, get_video]`;
   const ompConfig = JSON.stringify(
     {
       mcpServers: {

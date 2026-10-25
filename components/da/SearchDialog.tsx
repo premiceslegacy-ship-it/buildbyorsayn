@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { isRemoteImage } from "@/lib/media/imageSource";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { DaIcon } from "@/components/da/DaIcon";
@@ -115,7 +116,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
           {status === "error" && <AppState compact headingLevel={2} tone="alert" object="bloc" title="La recherche ne répond pas." detail="Rien n’est perdu. Réessaie dans un instant." action={{ label: "Réessayer", onClick: () => setRetryKey((value) => value + 1) }} />}
           {status === "ready" && results.length === 0 && <AppState compact headingLevel={2} object="offre" title="Rien avec ces mots." detail="Essaie un sujet plus simple, comme prix, vendre ou skill." action={{ label: "Effacer", onClick: () => updateQuery("") }} />}
           {status === "idle" && <p className="srch__empty">Écris un sujet, un chapitre ou le nom d’un skill.</p>}
-          {displayedResults.map((result, index) => <Link id={`search-${result.id}`} key={result.id} href={result.locked ? "/checkout" : result.href} className="srch__r" role="option" aria-selected={selected === index} data-sfx={result.locked ? "error" : undefined} onMouseEnter={() => setSelected(index)} onClick={onClose}><Image src={result.image} alt="" width={96} height={54} /><span><span className="srch__k">{result.locked ? `${result.kind}, accès requis` : result.kind}</span><span className="srch__t">{result.title}</span><span className="srch__s">{result.context}</span></span></Link>)}
+          {displayedResults.map((result, index) => <Link id={`search-${result.id}`} key={result.id} href={result.locked ? "/checkout" : result.href} className="srch__r" role="option" aria-selected={selected === index} data-sfx={result.locked ? "error" : undefined} onMouseEnter={() => setSelected(index)} onClick={onClose}><Image src={result.image} alt="" width={96} height={54} unoptimized={isRemoteImage(result.image)} /><span><span className="srch__k">{result.locked ? `${result.kind}, accès requis` : result.kind}</span><span className="srch__t">{result.title}</span><span className="srch__s">{result.context}</span></span></Link>)}
         </div>
       </div>
     </div>

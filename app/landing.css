@@ -12,9 +12,9 @@
 /* premier écran : la même scène que les réels (agent qui construit, site de l'artisan, téléphone de suivi).
    La scène est dessinée à taille fixe (1000 x 640) puis réduite par zoom selon la largeur. */
 .da .hs-wrap { position: relative; display: flex; justify-content: center; margin: clamp(28px, 4vw, 56px) auto 0; }
-.da .hs-wrap::before { content: ""; position: absolute; left: 50%; top: 46%; width: min(1100px, 120%); aspect-ratio: 1.8; translate: -50% -50%; border-radius: 50%; background: radial-gradient(closest-side, rgba(34,217,110,.3), rgba(34,217,110,0)); filter: blur(30px); pointer-events: none; }
+.da .hs-wrap::before { content: ""; position: absolute; left: 50%; top: 46%; width: min(900px, 110%); aspect-ratio: 1.8; translate: -50% -50%; border-radius: 50%; background: radial-gradient(closest-side, rgba(34,217,110,.2), rgba(34,217,110,0) 72%); filter: blur(48px); pointer-events: none; }
 .da .hs { --encre: #0B0F0C; --brume: #F1F5F2; --gris: #676A67; --gris2: #9A9E9B; --filet: rgba(11,15,12,.09); --vtexte: #0A7A3A;
-  position: relative; width: 1000px; height: 620px; text-align: left; zoom: .62; -webkit-mask-image: linear-gradient(#000 84%, transparent 100%); mask-image: linear-gradient(#000 84%, transparent 100%); }
+  position: relative; width: 1000px; height: 620px; text-align: left; zoom: .62; }
 @media (min-width: 760px) { .da .hs { zoom: .74; } }
 @media (min-width: 900px) { .da .hs { zoom: .88; } }
 @media (min-width: 1100px) { .da .hs { zoom: 1; } }
@@ -67,7 +67,7 @@
 
 /* iPhone : cadre métal, île, barre d'état, écran verrouillé */
 .da .hs .tel { position: absolute; z-index: 3; right: 8px; top: 0; width: 280px; height: 576px; border-radius: 57px; padding: 4px; background: linear-gradient(135deg, #9CA19E 0%, #4A4F4C 9%, #232624 26%, #151716 50%, #2A2E2C 76%, #5E6360 92%, #A7ACA9 100%);
-  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.35), inset 1px 1px 0 rgba(255,255,255,.28), 0 60px 90px -26px rgba(0,0,0,.9), 0 0 0 .5px rgba(0,0,0,.8), 0 0 100px -20px rgba(34,217,110,.35); }
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.35), inset 1px 1px 0 rgba(255,255,255,.28), 0 60px 90px -26px rgba(0,0,0,.9), 0 0 0 .5px rgba(0,0,0,.8); }
 .da .hs .tel::before { content: ""; position: absolute; inset: 1.5px; border-radius: 55.5px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.55); pointer-events: none; }
 .da .hs .bt { position: absolute; width: 3px; border-radius: 2px; background: linear-gradient(90deg, #1C1F1D, #5A5F5C 60%, #2A2D2B); }
 .da .hs .bt.g1 { left: -2.5px; top: 110px; height: 28px; } .da .hs .bt.g2 { left: -2.5px; top: 154px; height: 48px; } .da .hs .bt.g3 { left: -2.5px; top: 212px; height: 48px; }

@@ -40,9 +40,6 @@ export type EmailBlock =
 export type EmailFooter = {
   /** Pourquoi le destinataire reçoit ce message. */
   reason: string;
-  /** Vendeur ou éditeur sur une ligne (nom, statut, SIRET). */
-  publisher: string;
-  address: string;
   contactEmail: string;
   /** Diffusions : ligne de désinscription (réponse à l'adresse de contact). */
   unsubscribe?: boolean;
@@ -152,7 +149,6 @@ function renderFooter(footer: EmailFooter): string {
     footer.unsubscribe
       ? `Pour ne plus recevoir ces messages, écris à <a href="mailto:${mail}?subject=${encodeURIComponent("Ne plus recevoir les e-mails BUILD")}" style="${link}">${mail}</a>, c'est pris en compte à la main.`
       : `Une question ? Écris à <a href="mailto:${mail}" style="${link}">${mail}</a>.`,
-    `${escapeEmailHtml(footer.publisher)}, ${escapeEmailHtml(footer.address)}.`,
   ];
   const links = (footer.links ?? [])
     .map(([label, url]) => ({ label, url: safeUrl(url) }))
@@ -209,7 +205,6 @@ function renderText(doc: EmailDocument): string {
       ? `Pour ne plus recevoir ces messages, écris à ${f.contactEmail}.`
       : `Une question ? Écris à ${f.contactEmail}.`,
   );
-  parts.push(`${f.publisher}, ${f.address}.`);
   for (const [label, url] of f.links ?? []) if (safeUrl(url)) parts.push(`${label} : ${url}`);
   return french(parts.join("\n"));
 }
