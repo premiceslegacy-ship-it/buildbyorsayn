@@ -63,6 +63,8 @@ Les invitations envoyées après paiement reviennent sur `/update-password` avec
 
 Une session absente ou un lien refusé propose un nouveau code via `/forgot-password`. Les erreurs distinguent mot de passe faible ou identique, identifiants incorrects, limitation des tentatives, panne du service et problème réseau. Un échec d’envoi du code n’affiche pas de confirmation d’envoi.
 
+Le code de récupération doit être saisi en entier : le formulaire accepte 6 à 10 chiffres, sans imposer une longueur dans les indications ; Supabase vérifie sa validité. La régression navigateur `e2e/password-recovery.spec.ts` couvre un code de huit chiffres commençant par zéro, un code refusé puis la création du mot de passe, sur desktop et mobile, avec un transport Auth isolé.
+
 Les champs de connexion, inscription, activation et Compte disposent d’un bouton afficher/masquer, utilisable au clavier. Le mot de passe reste masqué initialement ; ce contrôle ne l’enregistre ni ne le transmet.
 
 Régression ciblée : `node --import tsx --test tests/passwordSession.test.ts`. Elle exerce le SDK Supabase réel avec un transport fournisseur isolé, sans compte client ni envoi d’e-mail. Après publication, vérifier le nouveau déploiement et les contrôles visibles ; ne pas confondre le push GitHub avec la mise en service.
