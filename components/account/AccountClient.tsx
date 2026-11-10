@@ -12,6 +12,8 @@ import { UpgradeCard } from "./UpgradeCard";
 import { accountIncludedItems, accountTierLabel } from "./accountPresentation";
 import { MCP_ENTRY_VISIBLE } from "@/lib/mcp/entryVisibility";
 import styles from "./AccountClient.module.css";
+import { PasswordInput } from "@/components/PasswordInput";
+import { authErrorMessage } from "@/lib/auth/errorMessage";
 
 type Section = "profile" | "email" | "password" | "subscription" | "connections" | "devices";
 type Notice = { tone: "success" | "error"; text: string } | null;
@@ -106,8 +108,12 @@ export function AccountClient({
     if (invalid) return finish({ tone: "error", text: invalid });
     if (password !== confirmation) return finish({ tone: "error", text: "Les deux mots de passe ne correspondent pas." });
     setBusy(true);
-    const { error } = await createClient().auth.updateUser({ password });
-    finish(error ? { tone: "error", text: "Le mot de passe n’a pas pu être modifié. Réessaie." } : { tone: "success", text: "Mot de passe changé." });
+    try {
+      const { error } = await createClient().auth.updateUser({ password });
+      finish(error ? { tone: "error", text: authErrorMessage(error, "password") } : { tone: "success", text: "Mot de passe changé." });
+    } catch (failure) {
+      finish({ tone: "error", text: authErrorMessage(failure, "password") });
+    }
   }
 
   async function signOutEverywhere() {
@@ -149,7 +155,7 @@ export function AccountClient({
 
           {activeSection === "email" ? <div className="ui3-pane-section"><h2>E‑mail</h2><p>Ton adresse actuelle : <strong>{email}</strong></p><form className="ui3-form" onSubmit={saveEmail}><label>Nouvelle adresse<input name="email" type="email" autoComplete="email" placeholder="toi@exemple.com" /></label><p className="ui3-hint">Supabase envoie les confirmations nécessaires. L’adresse ne change qu’après validation.</p><button className="btn btn--p" disabled={busy}>{busy ? "Envoi" : "Changer mon e‑mail"}</button></form></div> : null}
 
-          {activeSection === "password" ? <div className="ui3-pane-section"><h2>Mot de passe</h2><form className="ui3-form" onSubmit={savePassword}><label>Nouveau mot de passe<input name="password" type="password" autoComplete="new-password" /></label><p className="ui3-hint">Au moins 8 caractères, une majuscule, une minuscule et un chiffre.</p><label>Écris-le encore une fois<input name="confirmation" type="password" autoComplete="new-password" /></label><button className="btn btn--p" disabled={busy}>{busy ? "Enregistrement" : "Changer le mot de passe"}</button></form><Link className="ui3-text-link" href="/forgot-password">Mot de passe oublié ?</Link></div> : null}
+          {activeSection === "password" ? <div className="ui3-pane-section"><h2>Mot de passe</h2><form className="ui3-form" onSubmit={savePassword}><div className="ui3-field"><label htmlFor="account-password">Nouveau mot de passe</label><PasswordInput id="account-password" name="password" autoComplete="new-password" /></div><p className="ui3-hint">Au moins 8 caractères, une majuscule, une minuscule et un chiffre.</p><div className="ui3-field"><label htmlFor="account-confirmation">Écris-le encore une fois</label><PasswordInput id="account-confirmation" visibilityLabel="la confirmation du mot de passe" name="confirmation" autoComplete="new-password" /></div><button className="btn btn--p" disabled={busy}>{busy ? "Enregistrement" : "Changer le mot de passe"}</button></form><Link className="ui3-text-link" href="/forgot-password">Mot de passe oublié ?</Link></div> : null}
 
           {activeSection === "subscription" ? <div className="ui3-pane-section"><h2>Abonnement</h2><article className="ui3-subscription"><h3>{accountTierLabel(tier)}</h3><ul>{included.map((item) => <li key={item}><AccountIcon name="check" />{item}</li>)}</ul><Link className="btn btn--g" href="/checkout">Voir ce qui est inclus</Link></article><UpgradeCard tier={tier} /><BookCallCard /></div> : null}
 

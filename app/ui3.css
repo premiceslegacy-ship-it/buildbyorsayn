@@ -16,6 +16,12 @@
 .da .ui3-field input::placeholder, .da .ui3-form input::placeholder { color: var(--t3); }
 .da .ui3-field input:hover, .da .ui3-form input:hover { box-shadow: inset 0 0 0 1px rgba(241,245,242,.4); }
 .da .ui3-field[data-invalid="true"] input { box-shadow: inset 0 0 0 1.5px #ff6b63; }
+.da .ui3-password-input { position: relative; display: block; min-width: 0; }
+.da .ui3-password-input input { padding-right: 60px; }
+.da .ui3-password-toggle { position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 0; border-radius: var(--r-s); background: transparent; color: var(--t2); cursor: pointer; }
+.da .ui3-password-toggle:hover { color: var(--encre); background: var(--carte); }
+.da .ui3-password-toggle:focus-visible { outline: 2px solid var(--menthe); outline-offset: 1px; }
+.da .ui3-password-toggle:disabled { opacity: .5; cursor: default; }
 .da .ui3-field-error { display: flex; gap: 8px; align-items: flex-start; font: 500 14px/1.4 var(--font); color: #ff817a; }
 .da .ui3-field-error .ui3-icon { margin-top: 1px; width: 18px; height: 18px; }
 .da .ui3-auth-alert { padding: 12px 14px; border-radius: var(--r-s); font: 500 14px/1.4 var(--font); }

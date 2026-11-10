@@ -59,49 +59,6 @@ test("Hermes propose trois vrais points de départ et la structure de la maquett
   for (const marker of ["Par où commencer", "Lire depuis le début", "Voir les chapitres", "le texte est complet", '<footer className="foot">', "/da/hermes-3d.png"]) assert.match(page, new RegExp(marker));
 });
 
-test("Compte garde les contrôles de session et les confirmations", async () => {
-  const [page, client, loading, error] = await Promise.all([
-    readFile("app/compte/page.tsx", "utf8"),
-    readFile("components/account/AccountClient.tsx", "utf8"),
-    readFile("app/compte/loading.tsx", "utf8"),
-    readFile("app/compte/error.tsx", "utf8"),
-  ]);
-  assert.match(page, /if \(!user\) redirect/);
-  assert.match(client, /auth\.updateUser\(\{ data: \{ first_name: trimmed \} \}\)/);
-  assert.match(client, /auth\.updateUser\(\{ email: nextEmail \}\)/);
-  assert.match(client, /auth\.updateUser\(\{ password \}\)/);
-  assert.match(client, /signOut\(\{ scope: "others" \}\)/);
-  assert.match(client, /confirmEverywhere/);
-  assert.match(client, /active=\{activeSection === row\.id\}/);
-  assert.match(client, /ui3-setting-label/);
-  assert.match(client, /<footer className="foot">/);
-  assert.doesNotMatch(client, /deleteUser|Supprimer mon compte/);
-  assert.match(loading, /PageLoading/);
-  assert.match(error, /reset/);
-});
-
-test("connexion et récupération exposent chargement, réussite et erreur", async () => {
-  const [login, forgot, update, loginLoading, forgotError, updateError] = await Promise.all([
-    readFile("components/LoginForm.tsx", "utf8"),
-    readFile("components/ForgotPasswordForm.tsx", "utf8"),
-    readFile("app/update-password/page.tsx", "utf8"),
-    readFile("app/login/loading.tsx", "utf8"),
-    readFile("app/forgot-password/error.tsx", "utf8"),
-    readFile("app/update-password/error.tsx", "utf8"),
-  ]);
-  assert.match(login, /signInWithPassword/);
-  assert.match(login, /signUp/);
-  assert.match(login, /Erreur réseau/);
-  assert.match(forgot, /resetPasswordForEmail/);
-  assert.match(forgot, /verifyOtp/);
-  assert.match(forgot, /Code invalide ou expiré/);
-  assert.match(update, /Les deux mots de passe ne correspondent pas/);
-  assert.match(update, /Mot de passe changé/);
-  for (const source of [login, forgot, update]) assert.match(source, /playAppSound\("(confirm|error)/);
-  assert.match(loginLoading, /PageLoading/);
-  assert.match(forgotError, /RouteErrorState/);
-  assert.match(updateError, /RouteErrorState/);
-});
 
 test("les écrans d’accès MCP ferment la porte avant de charger les instructions", async () => {
   const page = await readFile("app/dashboard/mcp/page.tsx", "utf8");

@@ -7,6 +7,7 @@ import { FormEvent, useState } from "react";
 import { DaRoot } from "@/components/da/DaRoot";
 import { createClient } from "@/lib/supabase/client";
 import { playAppSound } from "@/lib/ui/sound";
+import { authErrorMessage } from "@/lib/auth/errorMessage";
 import "@/app/ui3.css";
 
 type Step = "email" | "otp";
@@ -26,10 +27,16 @@ export function ForgotPasswordForm() {
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) return fail("Cette adresse e‑mail n’a pas l’air correcte.");
     setError("");
     setIsLoading(true);
-    await createClient().auth.resetPasswordForEmail(email.trim());
-    setIsLoading(false);
-    setStep("otp");
-    void playAppSound("confirm");
+    try {
+      const { error: sendError } = await createClient().auth.resetPasswordForEmail(email.trim());
+      if (sendError) return fail(authErrorMessage(sendError, "recovery"));
+      setStep("otp");
+      void playAppSound("confirm");
+    } catch (failure) {
+      fail(authErrorMessage(failure, "recovery"));
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function verifyCode(event: FormEvent<HTMLFormElement>) {
@@ -37,10 +44,16 @@ export function ForgotPasswordForm() {
     if (otp.length !== 6) return fail("Saisis le code reçu par e‑mail : 6 chiffres.");
     setError("");
     setIsLoading(true);
-    const { error: verifyError } = await createClient().auth.verifyOtp({ email: email.trim(), token: otp, type: "recovery" });
-    if (verifyError) return fail("Code invalide ou expiré. Vérifie ton e‑mail et réessaie.");
-    void playAppSound("confirm");
-    router.push("/update-password");
+    try {
+      const { error: verifyError } = await createClient().auth.verifyOtp({ email: email.trim(), token: otp, type: "recovery" });
+      if (verifyError) return fail(authErrorMessage(verifyError, "verify"));
+      void playAppSound("confirm");
+      router.push("/update-password");
+    } catch (failure) {
+      fail(authErrorMessage(failure, "verify"));
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (

@@ -57,6 +57,17 @@ La publication des skills est une opération séparée. Lire `SKILLS-PUBLICATION
 
 La synchronisation locale destinée aux utilisateurs est documentée dans `BUILD-SYNC.md`. Elle utilise une portée OAuth `skills:read` distincte du MCP, vérifie les SHA-256 publiés et conserve les adaptations dans `CUSTOM.md`.
 
+### Activation après achat et récupération
+
+Les invitations envoyées après paiement reviennent sur `/update-password` avec les jetons Supabase dans le fragment de l’URL. Cette page les efface de l’adresse puis établit la session avec `auth.setSession` avant d’autoriser l’enregistrement du mot de passe. Le client partagé reste en PKCE pour les autres parcours. La récupération par code conserve sa session lors du passage vers cette page.
+
+Une session absente ou un lien refusé propose un nouveau code via `/forgot-password`. Les erreurs distinguent mot de passe faible ou identique, identifiants incorrects, limitation des tentatives, panne du service et problème réseau. Un échec d’envoi du code n’affiche pas de confirmation d’envoi.
+
+Les champs de connexion, inscription, activation et Compte disposent d’un bouton afficher/masquer, utilisable au clavier. Le mot de passe reste masqué initialement ; ce contrôle ne l’enregistre ni ne le transmet.
+
+Régression ciblée : `node --import tsx --test tests/passwordSession.test.ts`. Elle exerce le SDK Supabase réel avec un transport fournisseur isolé, sans compte client ni envoi d’e-mail. Après publication, vérifier le nouveau déploiement et les contrôles visibles ; ne pas confondre le push GitHub avec la mise en service.
+
+
 ## Qualité avant livraison
 
 Avant un commit ou une mise en ligne, rejouer les tests, le lint, TypeScript, le build, l'audit des dépendances et les E2E pertinents. Vérifier aussi le diff, les snapshots, les secrets, les routes protégées et les readbacks des systèmes externes lorsqu'une publication ou une mutation a été autorisée.

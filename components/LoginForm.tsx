@@ -6,6 +6,8 @@ import { AccountIcon } from "@/components/account/AccountIcon";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeInternalRedirect } from "@/lib/safeRedirect";
 import { playAppSound } from "@/lib/ui/sound";
+import { PasswordInput } from "@/components/PasswordInput";
+import { authErrorMessage } from "@/lib/auth/errorMessage";
 
 type Mode = "login" | "signup";
 type Errors = { email: string; password: string; auth: string };
@@ -52,13 +54,7 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
       if (isSignup) {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) {
-          const auth = error.message.includes("already registered") || error.message.includes("user_already_exists")
-            ? "Un compte existe déjà avec cet e‑mail. Connecte‑toi."
-            : error.message.includes("disabled") || error.message.includes("not allowed")
-              ? "Les inscriptions sont désactivées. Contacte l’administrateur."
-              : error.message.includes("rate limit") || error.message.includes("too many")
-                ? "Trop de tentatives. Réessaie dans quelques minutes."
-                : "La création du compte a échoué. Réessaie.";
+          const auth = authErrorMessage(error, "signup");
           setIsLoading(false);
           return reportError({ ...EMPTY_ERRORS, auth });
         }
@@ -72,11 +68,7 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
         await supabase.auth.signOut({ scope: "local" });
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
-          const auth = error.message.includes("Email not confirmed")
-            ? "Ton adresse e‑mail n’est pas encore confirmée. Regarde ta boîte mail."
-            : error.message.includes("rate limit") || error.message.includes("too many")
-              ? "Trop de tentatives. Réessaie dans quelques minutes."
-              : "E‑mail ou mot de passe incorrect.";
+          const auth = authErrorMessage(error, "login");
           setIsLoading(false);
           return reportError({ ...EMPTY_ERRORS, auth });
         }
@@ -106,12 +98,12 @@ export function LoginForm({ initialMode = "login", redirectTo = "/dashboard" }: 
           <input name="email" type="email" autoComplete="username" inputMode="email" placeholder="toi@exemple.com" aria-invalid={Boolean(errors.email)} />
           {errors.email ? <span className="ui3-field-error"><AccountIcon name="mail" />{errors.email}</span> : null}
         </label>
-        <label className="ui3-field" data-invalid={Boolean(errors.password)}>
-          <span className="ui3-field-head"><span>Mot de passe</span>{!isSignup ? <Link href="/forgot-password">Mot de passe oublié ?</Link> : null}</span>
-          <input name="password" type="password" autoComplete={isSignup ? "new-password" : "current-password"} aria-invalid={Boolean(errors.password)} />
+        <div className="ui3-field" data-invalid={Boolean(errors.password)}>
+          <span className="ui3-field-head"><label htmlFor="login-password">Mot de passe</label>{!isSignup ? <Link href="/forgot-password">Mot de passe oublié ?</Link> : null}</span>
+          <PasswordInput key={mode} id="login-password" name="password" autoComplete={isSignup ? "new-password" : "current-password"} aria-invalid={Boolean(errors.password)} />
           {isSignup ? <span className="ui3-password-rules">8 caractères, une majuscule, une minuscule et un chiffre.</span> : null}
           {errors.password ? <span className="ui3-field-error"><AccountIcon name="key" />{errors.password}</span> : null}
-        </label>
+        </div>
         <div className="ui3-auth-actions"><button className="btn btn--p" type="submit" disabled={isLoading}>{isLoading ? (isSignup ? "Création" : "Connexion") : (isSignup ? "Créer mon compte" : "Se connecter")}</button></div>
       </form>
       {isSignup ? <p className="ui3-auth-legal">En créant ton compte, tu acceptes les <Link href="/cgv">conditions générales de vente</Link> et la <Link href="/confidentialite">politique de confidentialité</Link>.</p> : null}
