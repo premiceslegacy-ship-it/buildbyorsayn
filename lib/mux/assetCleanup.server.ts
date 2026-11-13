@@ -13,14 +13,21 @@ export async function cleanupMuxAsset(muxAssetId: string, signal?: AbortSignal):
     .maybeSingle();
   if (error) throw new Error("La file de nettoyage vidéo est indisponible.");
   if (!row || row.status === "completed") return true;
+  // Fresh processing rows belong to another worker. A stale lease may be
+  // reclaimed, but only if the exact row snapshot is still current.
+  const updatedAt = Date.parse(row.updated_at);
+  if (row.status === "processing" && (!Number.isFinite(updatedAt) || Date.now() - updatedAt < STALE_PROCESSING_MS)) return false;
 
   const attempts = Number.isInteger(row.attempts) ? row.attempts + 1 : 1;
-  const { error: processingError } = await admin.from("video_asset_cleanup").update({
+  const claimedAt = new Date().toISOString();
+  const { data: claimed, error: processingError } = await admin.from("video_asset_cleanup").update({
     status: "processing",
     attempts,
-    updated_at: new Date().toISOString(),
-  }).eq("id", row.id).in("status", ["pending", "failed", "processing"]);
+    updated_at: claimedAt,
+  }).eq("id", row.id).eq("status", row.status).eq("attempts", row.attempts)
+    .eq("updated_at", row.updated_at).select("id").maybeSingle();
   if (processingError) throw new Error("Le nettoyage Mux n'a pas pu être réservé.");
+  if (!claimed) return false;
 
   try {
     await createMuxAdminClient().video.assets.delete(muxAssetId);
@@ -34,7 +41,7 @@ export async function cleanupMuxAsset(muxAssetId: string, signal?: AbortSignal):
         status: "failed",
         last_error: message,
         updated_at: new Date().toISOString(),
-      }).eq("id", row.id);
+      }).eq("id", row.id).eq("status", "processing").eq("attempts", attempts).eq("updated_at", claimedAt);
       if (failedError) throw new Error("Le nettoyage Mux n'a pas pu être journalisé.");
       return false;
     }
@@ -49,18 +56,19 @@ export async function cleanupMuxAsset(muxAssetId: string, signal?: AbortSignal):
       status: "failed",
       last_error: message,
       updated_at: new Date().toISOString(),
-    }).eq("id", row.id);
+    }).eq("id", row.id).eq("status", "processing").eq("attempts", attempts).eq("updated_at", claimedAt);
     if (failedError) throw new Error("Le nettoyage de la miniature n'a pas pu être journalisé.");
     return false;
   }
-  const { error: completedError } = await admin.from("video_asset_cleanup").update({
+  const { data: completedRow, error: completedError } = await admin.from("video_asset_cleanup").update({
     status: "completed",
     last_error: null,
     completed_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  }).eq("id", row.id);
+  }).eq("id", row.id).eq("status", "processing").eq("attempts", attempts)
+    .eq("updated_at", claimedAt).select("id").maybeSingle();
   if (completedError) throw new Error("Le nettoyage Mux n'a pas pu être confirmé.");
-  return true;
+  return Boolean(completedRow);
 }
 
 const MAX_CLEANUP_PER_RUN = 20;

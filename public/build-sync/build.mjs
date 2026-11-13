@@ -336,6 +336,7 @@ async function requestTokens(baseUrl, params) {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(params),
+    redirect: "error",
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok || typeof body.access_token !== "string" || typeof body.refresh_token !== "string") {
@@ -409,6 +410,7 @@ async function authorizedFetch(config, paths, input, init = {}, quiet = false) {
   const accessToken = await getAccessToken(config, paths, quiet);
   return fetch(target, {
     ...init,
+    redirect: "error",
     headers: { ...init.headers, Authorization: `Bearer ${accessToken}` },
   });
 }
@@ -438,10 +440,33 @@ async function fetchCatalog(config, paths, quiet) {
 async function downloadArtifact(config, paths, artifact, quiet) {
   const response = await authorizedFetch(config, paths, artifact.downloadUrl, {}, quiet);
   if (!response.ok) fail(`Téléchargement impossible : ${artifact.title}.`);
+  const reader = response.body?.getReader();
+  if (!reader) fail(`Archive vide : ${artifact.title}.`);
   const declared = Number(response.headers.get("content-length") || 0);
-  if (declared > MAX_ARTIFACT_BYTES) fail(`Archive trop volumineuse : ${artifact.title}.`);
-  const bytes = Buffer.from(await response.arrayBuffer());
-  if (bytes.length > MAX_ARTIFACT_BYTES) fail(`Archive trop volumineuse : ${artifact.title}.`);
+  let bytes = Buffer.alloc(0);
+  let length = 0;
+  try {
+    if (declared > MAX_ARTIFACT_BYTES) fail(`Archive trop volumineuse : ${artifact.title}.`);
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value.byteLength > MAX_ARTIFACT_BYTES - length) fail(`Archive trop volumineuse : ${artifact.title}.`);
+      const required = length + value.byteLength;
+      if (required > bytes.length) {
+        const grown = Buffer.allocUnsafe(Math.min(MAX_ARTIFACT_BYTES, Math.max(required, bytes.length * 2, 64 * 1024)));
+        bytes.copy(grown, 0, 0, length);
+        bytes = grown;
+      }
+      bytes.set(value, length);
+      length = required;
+    }
+  } catch (error) {
+    void reader.cancel().catch(() => undefined);
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+  bytes = bytes.subarray(0, length);
   if (sha256(bytes) !== artifact.sha256) fail(`Empreinte invalide : ${artifact.title}.`);
   return bytes;
 }

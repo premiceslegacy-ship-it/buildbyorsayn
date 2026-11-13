@@ -21,7 +21,7 @@ const DOCUMENTS: Record<LegalHref, LegalDocumentMeta> = {
   },
   "/confidentialite": {
     description: "Quelles données BUILD collecte, pourquoi, combien de temps, qui les traite pour nous, et comment exercer tes droits.",
-    updatedAt: "2026-10-22",
+    updatedAt: "2026-11-13",
   },
   "/cookies": {
     description: "Ce que BUILD enregistre dans ton navigateur : uniquement ce qui sert à te connecter et à faire fonctionner le site.",

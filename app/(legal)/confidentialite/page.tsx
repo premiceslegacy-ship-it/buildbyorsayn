@@ -91,10 +91,10 @@ export default function ConfidentialitePage() {
 
           <Traitement
             titre="Les skills et la synchronisation"
-            donnees="Ton niveau d'accès, vérifié à chaque téléchargement. Quand tu connectes la commande de synchronisation à ton compte : une autorisation, avec des jetons que nous ne gardons que sous une forme qui ne peut pas être relue. La liste des skills que tu as téléchargés reste dans ton navigateur, pas chez nous."
-            pourquoi="Te donner les skills de ton offre et garder ton ordinateur à jour."
+            donnees="Ton niveau d'accès, vérifié à chaque téléchargement. Quand tu connectes la commande de synchronisation à ton compte : une autorisation et des jetons que nous ne gardons que sous une forme qui ne peut pas être relue. La liste des skills payants téléchargés reste dans ton navigateur. Pour les ressources gratuites, nous enregistrons aussi ton identifiant de compte, la ressource demandée, la date et la provenance du lien : accès direct, TikTok, Instagram, YouTube ou LinkedIn."
+            pourquoi="Te donner les skills de ton offre, garder ton ordinateur à jour, retrouver les ressources gratuites demandées et mesurer leur provenance."
             base="L'exécution du contrat."
-            duree="Les autorisations expirées ou retirées sont supprimées automatiquement chaque jour, quelques jours après leur fin."
+            duree="Les autorisations expirées ou retirées sont supprimées automatiquement chaque jour, quelques jours après leur fin. Les traces de téléchargement des ressources gratuites sont conservées tant que ton compte existe et sont supprimées avec lui."
           />
 
           <Traitement

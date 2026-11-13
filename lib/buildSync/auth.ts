@@ -32,6 +32,8 @@ export async function resolveBuildSyncAuth(
     .maybeSingle();
 
   if (error || !stored || stored.revoked_at) return null;
+  const expiresAtMs = Date.parse(stored.expires_at);
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) return null;
   if (!isMcpConnectorAccountAllowed(stored.user_id)) return null;
   if (stored.scope !== BUILD_SYNC_SCOPE || stored.resource !== getBuildSyncResourceUrl()) return null;
 

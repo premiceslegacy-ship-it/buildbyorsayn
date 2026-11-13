@@ -111,7 +111,6 @@ async function rotateRefreshToken(
     .eq("token_hash", hashToken(params.refresh_token))
     .eq("client_id", BUILD_SYNC_CLIENT_ID)
     .eq("resource", params.resource)
-    .is("revoked_at", null)
     .gt("expires_at", new Date().toISOString())
     .maybeSingle();
   if (ownerError) return oauthError("server_error", "Could not rotate refresh token.", 500);
