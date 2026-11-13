@@ -15,8 +15,8 @@ import { normalizeProfileTier } from "@/lib/mcpAccess";
 import { getCheckoutLinks } from "@/lib/checkoutLinks";
 import { getSiteOrigin } from "@/lib/siteOrigin";
 
-const PAGE_TITLE = "Ton business avec l'IA, sans prise de tête | BUILD";
-const PAGE_DESCRIPTION = "Choisis une piste, construis le dossier et le site qui la présentent avec les skills d'une agence. Sans être ingénieur.";
+const PAGE_TITLE = "Construis un vrai projet avec l'IA, puis apprends à le refaire | BUILD";
+const PAGE_DESCRIPTION = "Des vidéos, des skills et un assistant qui connaît la méthode. Tu pars d'une idée et tu finis avec une offre, un site en ligne et la façon de recommencer.";
 const SITE_URL = getSiteOrigin();
 
 // Une `openGraph` définie ici remplace celle du layout en entier : on remet donc le site, l'image et la langue.
@@ -80,10 +80,10 @@ export default async function HomePage() {
         <section className="hero">
           <div className="wrap hero__txt">
             <h1 className="t-aff t-center">
-              Ton business avec l&apos;IA, <span className="mot">sans prise de tête.</span>
+              Construis un vrai projet avec l&apos;IA, <span className="mot">puis apprends à le refaire.</span>
             </h1>
             <p className="t-lede t-center">
-              Choisis une piste, <span className="whitespace-nowrap">construis le dossier</span> et le site qui la présentent avec les skills d&apos;une agence. Sans&nbsp;être&nbsp;ingénieur.
+              Des vidéos, des skills et un assistant qui connaît la méthode. Tu pars d&apos;une idée et tu finis avec une offre, un site en ligne et la façon de&nbsp;recommencer.
             </p>
             <div className="hero__act">
               <Link className="btn btn--p" href={start.href}>{start.label}</Link>
