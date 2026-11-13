@@ -9,8 +9,8 @@ import { DaFooter } from "@/components/da/DaFooter";
 import { DaIcon } from "@/components/da/DaIcon";
 import { PricingSection } from "@/components/da/PricingSection";
 import { NavBar } from "@/components/NavBar";
-import { ToolLogo } from "@/components/ToolLogo";
 import { ResourceCatalog } from "@/components/ressources/ResourceCatalog";
+import { SkillSchema } from "@/components/ressources/SkillSchema";
 import { UpgradeLadder } from "@/components/ressources/UpgradeLadder";
 import { createClient } from "@/lib/supabase/server";
 import { navIdentity } from "@/lib/auth/navIdentity.server";
@@ -29,7 +29,7 @@ export const dynamic = "force-dynamic";
 
 const NB = "\u00a0";
 const TITLE = "Ressources gratuites pour ton IA | BUILD";
-const DESCRIPTION = "Des skills et des schémas à télécharger avec un compte gratuit : écrire sans que ça sonne IA, faire parler un personnage IA, et la suite.";
+const DESCRIPTION = "Des skills gratuits à télécharger avec un compte BUILD. Le rendu est visible avant de t'inscrire.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -45,8 +45,6 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
-
-const HERO_LOGOS = ["Claude", "Codex", "ChatGPT", "Instagram", "TikTok", "YouTube"] as const;
 
 const STEPS = [
   ["Télécharge", "Un clic, une fois connecté. Le dossier arrive en .zip."],
@@ -102,7 +100,7 @@ export default async function RessourcesPage({ searchParams }: { searchParams: P
         <header className="ui3-page-head">
           <div>
             <h1 className="t-1">Ressources <span className="mot">gratuites.</span></h1>
-            <p className="t-lede">Un clone IA qui parle, des textes qui sonnent comme toi. Tout est débloqué avec ton compte.</p>
+            <p className="t-lede">Des skills à télécharger. Tout est débloqué avec ton compte.</p>
           </div>
         </header>
       ) : (
@@ -113,14 +111,12 @@ export default async function RessourcesPage({ searchParams }: { searchParams: P
               Ton clone IA et tes textes qui sonnent humains, <span className="mot">gratuits.</span>
             </h1>
             <p className="t-lede t-center">
-              Un avatar IA qui parle avec ta voix, et un skill qui retire ce qui fait robot dans tes textes. Tu vois le rendu avant de créer ton compte, sans carte bancaire.
+              Des skills à copier dans ton IA. Tu vois le rendu avant de créer ton compte.
             </p>
             <div className="hero__act">
               <Link className="btn btn--p" href={heroAction.href}>{heroAction.label}</Link>
             </div>
-            <ul className="rs-hero-logos" aria-label="Pensé pour les outils que tu utilises déjà">
-              {HERO_LOGOS.map((name) => <li key={name}><ToolLogo name={name} size={56} /></li>)}
-            </ul>
+            <SkillSchema />
           </div>
         </section>
       )}
@@ -129,8 +125,8 @@ export default async function RessourcesPage({ searchParams }: { searchParams: P
         <div className="wrap">
           {!loggedIn ? (
             <div className="sec__tete">
-              <h2 className="t-1" id="rs-titre">Vois le rendu, <span className="mot">puis télécharge.</span></h2>
-              <p className="t-lede">Un compte gratuit débloque tout le catalogue.</p>
+              <h2 className="t-1" id="rs-titre">Tout le catalogue, <span className="mot">gratuit avec un compte.</span></h2>
+              <p className="t-lede">Le rendu de chaque skill est visible avant de t'inscrire.</p>
             </div>
           ) : <h2 className="sr" id="rs-titre">Le catalogue</h2>}
           <ResourceCatalog loggedIn={loggedIn} source={source} highlighted={highlighted} downloaded={downloaded} />

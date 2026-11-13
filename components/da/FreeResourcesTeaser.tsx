@@ -13,7 +13,7 @@ export function FreeResourcesTeaser({ loggedIn }: { loggedIn: boolean }) {
       <div className="wrap">
         <div className="sec__tete">
           <h2 className="t-1" id="ressources-titre">Essaie d&apos;abord, <span className="mot">avec des ressources gratuites.</span></h2>
-          <p className="t-lede">Un clone IA qui parle avec ta voix, des textes d&apos;IA qui sonnent comme toi. Deux skills à télécharger avec un compte gratuit, et tu vois le rendu avant de t&apos;inscrire.</p>
+          <p className="t-lede">Des skills à télécharger avec un compte gratuit. Le rendu est visible avant de t&apos;inscrire.</p>
         </div>
         <ul className="rt-cartes">
           {FREE_RESOURCES.map((resource) => (
