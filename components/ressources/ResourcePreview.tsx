@@ -59,7 +59,7 @@ function Noeud({ x, y, nom, role, children }: { x: number; y: number; nom: strin
 /** Les outils reliés par des traits, sans cases : Claude orchestre, Codex et Sume produisent, le plan Wan au centre, toi qui valides. */
 function VideoScene({ compact }: { compact: boolean }) {
   return (
-    <div className={`rs-scene rs-scene--video${compact ? " rs-scene--compact" : ""}`} role="img" aria-label={`Le résultat obtenu avec le skill : Claude orchestre, Codex prépare les images, Sume génère les plans. Un personnage généré, une scène muette en mouvement au centre, puis la vidéo finale. Tu valides chaque étape${NB}: le lip-sync vient ensuite.`}>
+    <div className={`rs-scene rs-scene--video${compact ? " rs-scene--compact" : ""}`} role="img" aria-label={`Le résultat obtenu avec le skill${NB}: un clone IA filmé dans un fauteuil, avec Claude, Codex et Sume reliés entre eux, et toi qui valides.`}>
       <div className="rs-diag" aria-hidden="true">
         <svg className="rs-fils" viewBox="0 0 1000 420" fill="none" preserveAspectRatio="xMidYMid meet">
           <defs>
@@ -84,20 +84,16 @@ function VideoScene({ compact }: { compact: boolean }) {
           <Noeud x={27} y={76} nom="Sume" role="génère les plans"><Image className="rs-logo__sume" src="/da/ressources/sume.png" alt="" width={72} height={72} /></Noeud>
           <Noeud x={91} y={50} nom="Toi" role="valides chaque étape"><i className="rs-logo__toi"><DaIcon name="check" /></i></Noeud>
         </div>
-        <span className="rs-fils__etiq" aria-hidden="true">puis le lip-sync</span>
 
         <div className="rs-tels">
           <figure className="rs-tel rs-tel--g">
             <Image src="/da/ressources/wan-personnage.jpg" alt="" width={480} height={853} sizes="(max-width: 720px) 30vw, 180px" />
-            <figcaption>Personnage</figcaption>
           </figure>
           <figure className="rs-tel rs-tel--c">
             <LoopVideo src="/da/ressources/wan-scene-muette.mp4" poster="/da/ressources/wan-scene-muette.jpg" />
-            <figcaption>Scène muette, générée avec Wan</figcaption>
           </figure>
           <figure className="rs-tel rs-tel--d">
             <Image src="/da/ressources/wan-resultat.jpg" alt="" width={480} height={853} sizes="(max-width: 720px) 30vw, 180px" />
-            <figcaption>Vidéo finale</figcaption>
           </figure>
         </div>
       </div>
