@@ -6,7 +6,7 @@ L'application contient le parcours Fondations, les blocs du système BUILD, le c
 
 ## Démarrer en local
 
-Prérequis : Node.js et npm.
+Prérequis : Node.js 24.x et npm (voir `engines` dans `package.json`).
 
 ```bash
 npm ci
@@ -73,3 +73,15 @@ Régression ciblée : `node --import tsx --test tests/passwordSession.test.ts`. 
 ## Qualité avant livraison
 
 Avant un commit ou une mise en ligne, rejouer les tests, le lint, TypeScript, le build, l'audit des dépendances et les E2E pertinents. Vérifier aussi le diff, les snapshots, les secrets, les routes protégées et les readbacks des systèmes externes lorsqu'une publication ou une mutation a été autorisée.
+
+### Audit backend local du 13 novembre 2026
+
+Les régressions ci-dessous couvrent les correctifs de sécurité exercés en local. Le rapport détaillé et les preuves d'exploitation sont conservés hors du dépôt public. Les contrôles locaux ne constituent pas une validation de production. L'auto-déploiement Vercel est désactivé uniquement pour la branche `audit/backend-local-20261113` dans `vercel.json`.
+
+Régressions de sécurité ajoutées, sans compte réel ni fournisseur payant :
+
+```bash
+node --import tsx --test --test-concurrency=1 tests/buildSyncSecurity.test.ts tests/buildSyncAuthorization.test.ts tests/muxCleanupClaims.test.ts tests/freeResourceIsolation.test.ts
+```
+
+Ces tests utilisent le SDK Supabase et les migrations SQL avec PGlite, une dépendance de développement épinglée. Le transport HTTP est isolé ; les règles SQL sont réellement exécutées. Ce harnais ne remplace pas un readback des politiques du projet Supabase déployé ni un essai de concurrence multiconnexion PostgreSQL natif.

@@ -11,8 +11,6 @@ export const dynamic = "force-dynamic";
  * Le fichier vit dans public/mcp pour rester versionné avec les autres marques, et
  * next.config.mjs (outputFileTracingIncludes) l'embarque dans la fonction déployée.
  */
-const BUILD_LOGO_RELATIVE_PATH = path.join("public", "mcp", "build-logo.png");
-const BUILD_LOGO_192_RELATIVE_PATH = path.join("public", "mcp", "build-logo-192.png");
 
 export async function GET(request: Request) {
   if (!isMcpConnectorLaunched()) {
@@ -23,9 +21,9 @@ export async function GET(request: Request) {
   }
   const requestedSize = new URL(request.url).searchParams.get("size");
   const logoPath = requestedSize === "192"
-    ? BUILD_LOGO_192_RELATIVE_PATH
+    ? "build-logo-192.png"
     : requestedSize === null || requestedSize === "512"
-      ? BUILD_LOGO_RELATIVE_PATH
+      ? "build-logo.png"
       : null;
   if (!logoPath) {
     return new Response(null, {
@@ -36,7 +34,7 @@ export async function GET(request: Request) {
 
   let logo: Buffer;
   try {
-    logo = await readFile(path.join(process.cwd(), logoPath));
+    logo = await readFile(path.join(process.cwd(), "public", "mcp", logoPath));
   } catch (error) {
     console.error("[mcp-logo] asset unavailable", (error as NodeJS.ErrnoException).code ?? "unknown");
     return new Response(null, {
