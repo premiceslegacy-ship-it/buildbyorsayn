@@ -29,7 +29,7 @@ export const dynamic = "force-dynamic";
 
 const NB = "\u00a0";
 const TITLE = "Ressources gratuites pour ton IA | BUILD";
-const DESCRIPTION = "Des skills gratuits à télécharger avec un compte BUILD. Le rendu est visible avant de t'inscrire.";
+const DESCRIPTION = "Des skills gratuits à copier dans ton IA pour lui donner un nouveau savoir-faire. Tu vois ce qu'ils font avant de t'inscrire.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -108,10 +108,10 @@ export default async function RessourcesPage({ searchParams }: { searchParams: P
           <div className="wrap hero__txt">
             <span className="pastille"><b aria-hidden="true" />Ressources gratuites</span>
             <h1 className="t-aff t-center">
-              Ton clone IA et tes textes qui sonnent humains, <span className="mot">gratuits.</span>
+              Donne un nouveau savoir-faire à ton IA, <span className="mot">en copiant un dossier.</span>
             </h1>
             <p className="t-lede t-center">
-              Des skills à copier dans ton IA. Tu vois le rendu avant de créer ton compte.
+              Chaque skill est un dossier gratuit. Tu vois ce qu'il fait avant de créer ton compte.
             </p>
             <div className="hero__act">
               <Link className="btn btn--p" href={heroAction.href}>{heroAction.label}</Link>
