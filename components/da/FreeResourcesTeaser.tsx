@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ToolLogo } from "@/components/ToolLogo";
+import { ResourcePreview } from "@/components/ressources/ResourcePreview";
 import { FREE_RESOURCES } from "@/lib/freeResources";
 
 /**
@@ -13,16 +13,16 @@ export function FreeResourcesTeaser({ loggedIn }: { loggedIn: boolean }) {
       <div className="wrap">
         <div className="sec__tete">
           <h2 className="t-1" id="ressources-titre">Essaie d&apos;abord, <span className="mot">avec des ressources gratuites.</span></h2>
-          <p className="t-lede">Des skills et des schémas à télécharger avec un compte gratuit. Tu vois le rendu avant de t&apos;inscrire.</p>
+          <p className="t-lede">Un clone IA qui parle avec ta voix, des textes d&apos;IA qui sonnent comme toi. Deux skills à télécharger avec un compte gratuit, et tu vois le rendu avant de t&apos;inscrire.</p>
         </div>
         <ul className="rt-cartes">
           {FREE_RESOURCES.map((resource) => (
             <li key={resource.slug}>
               <Link className="rt-carte" href={`/ressources?r=${resource.slug}`}>
-                <Image className="rt-objet" src={resource.object} alt="" width={256} height={256} />
-                <span className="rt-mot">{resource.word}</span>
-                <h3 className="t-3">{resource.title}</h3>
-                <span className="rt-logos" aria-hidden="true">{resource.logos.map((name) => <ToolLogo key={name} name={name} size={32} />)}</span>
+                <span className="rt-vis"><ResourcePreview resource={resource} compact /></span>
+                <span className="rt-corps">
+                  <h3 className="t-3">{resource.title}</h3>
+                </span>
               </Link>
             </li>
           ))}

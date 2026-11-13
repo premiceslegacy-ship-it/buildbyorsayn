@@ -29,16 +29,11 @@
 .da .rs-hero-logos { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(10px, 1.6vw, 18px); margin-top: 12px; }
 .da .rs-hero-logos li { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 20px; background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); }
 .da .rs-catalogue { display: grid; gap: clamp(20px, 2.6vw, 32px); }
-.da .rs-carte { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 44px); align-items: center; padding: clamp(20px, 3vw, 36px); background: var(--carte); border-radius: var(--r-l); box-shadow: inset 0 0 0 1px var(--trait); }
 .da .rs-carte--vise { box-shadow: inset 0 0 0 1px rgba(34,217,110,.55); }
-.da .rs-carte__vis { min-width: 0; }
-.da .rs-carte__corps { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 16px; min-width: 0; }
-.da .rs-carte__corps .btn { justify-self: start; max-width: 100%; height: auto; min-height: 48px; padding-block: 12px; white-space: normal; text-align: center; line-height: 1.25; }
 .da .rs-carte__tete { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 .da .rs-cat { font: 600 13px/1 var(--font); color: var(--t3); }
 .da .rs-titre { display: flex; align-items: center; gap: 14px; }
 .da .rs-objet-s { width: 56px; height: 56px; flex: none; }
-.da .rs-logos { display: flex; gap: 10px; flex-wrap: wrap; }
 .da .rs-carte--bientot { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; padding-block: clamp(28px, 4vw, 48px); background: transparent; box-shadow: inset 0 0 0 1px var(--trait); border-style: dashed; }
 .da .rs-carte--bientot .rs-objet { width: 96px; height: 96px; }
 .da .rs-marches { display: grid; grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1.1fr) 32px minmax(0, 1.2fr); align-items: end; gap: clamp(8px, 1.4vw, 16px); }
@@ -57,10 +52,41 @@
 .da .rs-points .ic { width: 18px; height: 18px; color: var(--em); }
 .da .rs-echelle__act { display: flex; justify-content: center; margin-top: clamp(28px, 4vw, 48px); }
 @media (max-width: 960px) {
-  .da .rs-carte { grid-template-columns: minmax(0, 1fr); }
   .da .rs-marches { grid-template-columns: minmax(0, 1fr); }
   .da .rs-fleche { transform: rotate(90deg); }
   .da .rs-marche--2, .da .rs-marche--3 { padding-block: clamp(20px, 2.4vw, 28px); }
 }
 .da .rs-suite-ligne { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; padding-top: 14px; border-top: 1px solid var(--trait); color: var(--t3); font: 400 14px/1.45 var(--font); }
 .da .rs-suite-ligne .ic { width: 18px; height: 18px; color: var(--em); }
+
+/* ───────── cartes visuelles : la scène d'abord, le texte dessous ───────── */
+.da .rs-catalogue { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.da .rs-carte { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 0; padding: 0; overflow: hidden; background: var(--carte); border-radius: 36px; box-shadow: inset 0 0 0 1px var(--trait), 0 28px 60px -32px rgba(0,0,0,.7); }
+.da .rs-carte--large { grid-column: 1 / -1; }
+.da .rs-carte__vis { position: relative; min-width: 0; }
+.da .rs-carte__vis::after { content: ""; position: absolute; inset: auto 0 0; height: 72px; background: linear-gradient(180deg, transparent, var(--carte)); pointer-events: none; }
+.da .rs-carte__corps { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 20px; min-width: 0; padding: clamp(22px, 3vw, 40px); padding-top: 4px; }
+.da .rs-carte--large .rs-carte__corps { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 64px); align-items: start; }
+.da .rs-carte__texte, .da .rs-carte__contenu { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 16px; min-width: 0; }
+.da .rs-carte__texte .btn { justify-self: start; max-width: 100%; height: auto; min-height: 48px; padding-block: 12px; white-space: normal; text-align: center; line-height: 1.25; }
+.da .rs-carte--bientot { grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: center; gap: 12px; text-align: center; padding: clamp(28px, 4vw, 48px); background: transparent; border: 1px dashed var(--trait-f); box-shadow: none; }
+
+
+@media (max-width: 960px) {
+  .da .rs-catalogue { grid-template-columns: minmax(0, 1fr); }
+  .da .rs-carte--large .rs-carte__corps { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+}
+@media (max-width: 560px) { .da .rs-carte { border-radius: 28px; } }
+
+/* espacement régulier : un seul rythme (24 px entre blocs, 16 px dans un bloc) */
+.da .rs-carte__corps { gap: 24px; padding: clamp(24px, 3vw, 40px); padding-top: 8px; }
+.da .rs-carte--large .rs-carte__corps { align-items: start; gap: clamp(24px, 4vw, 64px); }
+.da .rs-carte__texte, .da .rs-carte__contenu { gap: 16px; align-content: start; }
+.da .rs-titre { align-items: center; }
+.da .rs-angle { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; padding: 14px 16px; border-radius: 16px; background: rgba(34,217,110,.09); color: var(--t1); font: 500 15px/1.45 var(--font); }
+.da .rs-angle .ic { width: 18px; height: 18px; color: var(--em); margin-top: 1px; }
+.da .rs-fait { display: inline-flex; align-items: center; gap: 8px; }
+.da .rs-carte__contenu .rs-suite-ligne { margin-top: 0; padding-top: 16px; }
+.da .rs-carte__contenu .btn { justify-self: start; max-width: 100%; height: auto; min-height: 48px; padding-block: 12px; white-space: normal; text-align: center; line-height: 1.25; }
+.da .rs-carte--bientot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 280px; }
+.da .rs-carte--bientot .rs-objet { margin: 0; }

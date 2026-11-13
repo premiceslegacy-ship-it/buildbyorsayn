@@ -23,10 +23,14 @@ export type FreeResource = {
   object: string;
   /** Ce qu'on montre : le rendu de la ressource, jamais seulement sa description. */
   preview: FreeResourcePreview;
+  /** Place dans la grille : « wide » prend toute la largeur, « half » la moitié. */
+  layout: "wide" | "half";
   /** Le mot écrit en commentaire sous la vidéo. */
   word: string;
   title: string;
   promise: string;
+  /** Ce que la compétence permet de faire ensuite (proposer un service, publier plus vite) : une idée, jamais une promesse de revenu. */
+  angle: string;
   includes: readonly string[];
   meta: string;
   /** Nom du fichier dans le dépôt privé et nom proposé au téléchargement. */
@@ -42,10 +46,13 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     logos: ["Claude", "ChatGPT"],
     object: "/da/objets/vente.png",
     preview: "compare",
+    layout: "half",
     word: "SLOP",
-    title: "Écrire sans que ça sonne IA",
+    title: "Écris avec l'IA, sonne comme toi",
     promise:
-      "Un skill qui apprend ta voix, relit chaque texte que Claude te rend, retire les formules d'une IA et te demande les faits qui manquent.",
+      "Claude apprend ta façon de parler, puis relit chaque texte qu'il te rend. Il retire les formules d'IA («\u00a0dans un monde où…\u00a0») et te demande le fait qui manque, une date, un nom, un chiffre.",
+    angle:
+      "Savoir relire un texte d'IA se propose à ceux qui publient chaque semaine\u00a0: posts, newsletters, fiches produit.",
     includes: [
       "Le skill, prêt à copier dans Claude",
       "Un profil de ta voix, posée ou expressive, pour que le texte reste le tien",
@@ -68,15 +75,18 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     logos: ["Claude", "Codex", "Kling"],
     object: "/da/objets/video.png",
     preview: "workflow",
+    layout: "wide",
     word: "SKILL",
-    title: "Une vidéo avec un personnage IA qui parle",
+    title: "Ton clone IA qui parle à la caméra",
     promise:
-      "Le workflow de tes premières prises\u00a0: texte, voix, personnage, scènes muettes, lip-sync. Claude orchestre, tu valides chaque étape.",
+      "Ton avatar IA s'assoit dans un fauteuil de podcast et dit ton script avec ta voix. Le skill guide Claude de la voix clonée au lip-sync, étape par étape, jusqu'à ta première prise sans avoir allumé une caméra.",
+    angle:
+      "Si tu sais le faire pour toi, tu peux le proposer à un coach, une marque ou un artisan qui n'a pas le temps de filmer.",
     includes: [
-      "Le workflow en sept étapes, écrit pour Claude",
+      "Le workflow complet en sept étapes, de la voix clonée au montage",
       "Trois modèles de prompts, du personnage au clip muet",
       "Un script pour couper la voix aux silences, un autre pour le lip-sync",
-      "Les erreurs fréquentes et comment les éviter",
+      "Les erreurs qui trahissent un avatar IA (clignements, gestes figés) et comment les éviter",
     ],
     meta: "Pour Claude. Les modèles d'image et de vidéo se paient chez leurs fournisseurs",
     fileName: "video-personnage-ia.zip",

@@ -1,0 +1,100 @@
+/* Scènes d'aperçu des ressources gratuites (page /ressources et accueil). S'appuie sur la direction artistique « Émeraude sur noir ». */
+.da .rs-scene { position: relative; display: grid; align-items: center; min-height: 330px; padding: clamp(20px, 3vw, 36px); overflow: hidden; isolation: isolate;
+  background-color: var(--carte-2);
+  background-image: linear-gradient(rgba(241,245,242,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(241,245,242,.045) 1px, transparent 1px), linear-gradient(180deg, rgba(34,217,110,.08), transparent 70%);
+  background-size: 32px 32px, 32px 32px, 100% 100%; }
+
+/* fragments d'interface */
+.da .rs-f { position: absolute; display: grid; gap: 10px; padding: 18px 20px; border-radius: 22px; background: var(--carte-3); box-shadow: inset 0 0 0 1px var(--trait-f), 0 26px 44px -22px rgba(0,0,0,.75); }
+.da .rs-f p { font: 500 clamp(15px, 1.4vw, 17px)/1.42 var(--font); color: var(--t1); text-wrap: pretty; }
+.da .rs-f__eti { font: 600 12px/1 var(--font); letter-spacing: .06em; text-transform: uppercase; color: var(--t3); }
+.da .rs-f__eti--em { color: var(--em); }
+.da .rs-f--avant { left: -3%; top: 12%; width: 54%; transform: rotate(-4deg); opacity: .7; }
+.da .rs-f--avant p { color: var(--t3); text-decoration: line-through; text-decoration-color: rgba(241,245,242,.35); }
+.da .rs-f__ligne { display: block; height: 8px; width: 92%; border-radius: 4px; background: rgba(241,245,242,.12); }
+.da .rs-f__ligne--c { width: 58%; }
+.da .rs-f--apres { left: 24%; top: 34%; width: 58%; background: #fff; box-shadow: 0 30px 50px -22px rgba(0,0,0,.8); }
+.da .rs-f--apres p { color: #111413; }
+.da .rs-f--apres .rs-f__eti { color: #0c8a43; }
+.da .rs-f__ok { display: inline-flex; align-items: center; gap: 8px; justify-self: start; padding: 6px 12px 6px 8px; border-radius: 999px; background: rgba(34,217,110,.16); color: #0a6b34; font: 600 13px/1 var(--font); }
+.da .rs-f__ok i { width: 16px; height: 16px; border-radius: 50%; background: var(--em); box-shadow: inset 0 0 0 4px var(--em), inset 0 0 0 8px #fff; }
+.da .rs-f--voix { right: -4%; bottom: 8%; width: 40%; transform: rotate(3deg); }
+.da .rs-f--voix ul { display: flex; flex-wrap: wrap; gap: 6px; }
+.da .rs-f--voix li { padding: 6px 10px; border-radius: 999px; background: rgba(241,245,242,.1); color: var(--t1); font: 500 13px/1 var(--font); }
+.da .rs-scene--slop { min-height: clamp(340px, 34vw, 420px); }
+
+/* pastilles inclinées */
+.da .rs-tag { position: absolute; z-index: 2; padding: 9px 14px; border-radius: 12px; font: 650 14px/1 var(--font-t); letter-spacing: -.01em; box-shadow: 0 16px 30px -14px rgba(0,0,0,.8); white-space: nowrap; }
+.da .rs-tag--ivoire { background: var(--ivoire); color: var(--sur-em); }
+.da .rs-tag--em { background: var(--em); color: var(--sur-em); }
+.da .rs-tag--a { left: 6%; bottom: 20%; transform: rotate(-6deg); }
+.da .rs-tag--b { right: 8%; top: 10%; transform: rotate(5deg); }
+.da .rs-tag--c { right: 6%; top: 8%; transform: rotate(4deg); }
+
+/* scène vidéo : un organigramme, sans cases. Les outils sont reliés par des traits fins, le plan Wan est au centre. */
+.da .rs-scene--video { display: block; min-height: 0; padding: clamp(18px, 3vw, 40px) clamp(12px, 2vw, 28px) clamp(28px, 3.4vw, 48px); }
+.da .rs-diag { position: relative; width: 100%; max-width: 1060px; margin-inline: auto; aspect-ratio: 1000 / 420; container-type: inline-size; }
+.da .rs-fils { position: absolute; inset: 0; width: 100%; height: 100%; color: rgba(241,245,242,.42); overflow: visible; }
+.da .rs-fils__g { stroke: currentColor; }
+.da .rs-fils__em { stroke: var(--em); }
+.da .rs-fils__pt { fill: rgba(241,245,242,.7); }
+.da .rs-noeuds { display: contents; }
+.da .rs-noeud { position: absolute; width: 0; height: 0; }
+.da .rs-logo { position: absolute; left: 0; top: 0; translate: -50% -50%; display: grid; place-items: center; width: clamp(44px, 7.2cqw, 76px); height: clamp(44px, 7.2cqw, 76px); filter: drop-shadow(0 14px 18px rgba(0,0,0,.55)); }
+.da .rs-logo .tlg { display: grid; place-items: center; width: 100%; height: 100%; margin: 0; top: 0; line-height: 0; filter: none; background: none; padding: 0; }
+.da .rs-logo .tlg img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.da .rs-logo__sume { width: 100%; height: 100%; border-radius: 22%; background: #fff; object-fit: contain; padding: 6%; }
+.da .rs-logo__toi { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--em); color: var(--sur-em); }
+.da .rs-logo__toi .ic { width: 46%; height: 46%; }
+.da .rs-noeud__lib { position: absolute; left: 0; top: calc(clamp(44px, 7.2cqw, 76px) / 2 + 10px); translate: -50% 0; display: grid; justify-items: center; gap: 3px; text-align: center; white-space: nowrap; }
+.da .rs-noeud__lib b { font: 650 max(13px, 1.6cqw)/1.1 var(--font-t); color: var(--encre); letter-spacing: -.01em; }
+.da .rs-noeud__lib em { font: 400 max(11.5px, 1.3cqw)/1.2 var(--font); font-style: normal; color: var(--t3); }
+.da .rs-fils__etiq { position: absolute; left: 82%; top: 41%; translate: -50% 0; font: 600 max(11px, 1.25cqw)/1 var(--font); color: var(--dense); white-space: nowrap; }
+.da .rs-tels { position: absolute; left: 58%; top: 50%; translate: -50% -50%; display: flex; align-items: center; justify-content: center; gap: 1.3cqw; }
+.da .rs-tel { position: relative; margin: 0; width: 9.4cqw; aspect-ratio: 9 / 16; border-radius: 24px; overflow: hidden; background: #0b0d0c; box-shadow: 0 0 0 5px #0b0d0c, 0 0 0 6px var(--trait-f), 0 34px 54px -24px rgba(0,0,0,.9); }
+.da .rs-tel img, .da .rs-tel video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.da .rs-tel figcaption { position: absolute; inset: auto 8px 8px; padding: 7px 8px; border-radius: 10px; background: rgba(5,8,6,.72); color: var(--t1); font: 600 11px/1.2 var(--font); text-align: center; backdrop-filter: blur(8px); }
+.da .rs-tel--g { transform: translateY(-6px) rotate(-5deg); }
+.da .rs-tel--d { transform: translateY(-6px) rotate(5deg); }
+.da .rs-tel--c { width: 13.6cqw; z-index: 1; box-shadow: 0 0 0 6px #0b0d0c, 0 0 0 7px rgba(34,217,110,.6), 0 44px 70px -26px rgba(0,0,0,.95); }
+.da .rs-tel--c figcaption { font-size: 12px; }
+
+@media (max-width: 960px) {
+  .da .rs-scene--video { padding-bottom: 8px; }
+  .da .rs-diag { display: grid; grid-template-columns: minmax(0, 1fr); gap: 30px; aspect-ratio: auto; container-type: normal; }
+  .da .rs-fils, .da .rs-fils__etiq { display: none; }
+  .da .rs-tels { position: static; translate: none; order: -1; gap: 12px; }
+  .da .rs-tel { width: min(22vw, 130px); }
+  .da .rs-tel--c { width: min(31vw, 180px); }
+  .da .rs-noeuds { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding-bottom: 24px; }
+  .da .rs-noeud { position: relative; left: auto !important; top: auto !important; width: auto; height: auto; display: grid; justify-items: center; gap: 10px; }
+  .da .rs-noeud:not(:last-child)::after { content: ""; position: absolute; top: 24px; right: -6%; width: 10px; height: 10px; border-top: 1.5px solid rgba(241,245,242,.45); border-right: 1.5px solid rgba(241,245,242,.45); rotate: 45deg; }
+  .da .rs-logo { position: static; translate: none; width: clamp(44px, 12vw, 68px); height: clamp(44px, 12vw, 68px); }
+  .da .rs-noeud__lib { position: static; translate: none; }
+  .da .rs-noeud__lib b { font-size: 14px; }
+  .da .rs-noeud__lib em { font-size: 12px; white-space: normal; }
+}
+@media (max-width: 560px) {
+  .da .rs-noeud__lib em { display: none; }
+  .da .rs-tel figcaption { display: none; }
+  .da .rs-tel { border-radius: 18px; }
+  .da .rs-tag--c, .da .rs-tag--a { display: none; }
+  .da .rs-scene--slop { min-height: 440px; }
+  .da .rs-f--avant { width: 74%; left: -6%; top: 8%; }
+  .da .rs-f--apres { left: 8%; width: 84%; top: 30%; }
+  .da .rs-f--voix { width: 70%; right: -6%; bottom: 3%; }
+}
+@media (prefers-reduced-motion: reduce) { .da .rs-tel, .da .rs-f { transition: none; } }
+
+/* version compacte, pour l'accueil : seul le plan central et les fragments clés restent */
+.da .rs-scene--compact.rs-scene--video { padding: 20px 16px 0; }
+.da .rs-scene--compact .rs-diag { display: grid; aspect-ratio: auto; container-type: normal; }
+.da .rs-scene--compact .rs-fils, .da .rs-scene--compact .rs-noeuds, .da .rs-scene--compact .rs-fils__etiq { display: none; }
+.da .rs-scene--compact .rs-tels { position: static; translate: none; gap: 10px; }
+.da .rs-scene--compact .rs-tel { width: clamp(80px, 9vw, 108px); }
+.da .rs-scene--compact .rs-tel--c { width: clamp(112px, 13vw, 150px); }
+.da .rs-scene--compact .rs-tel figcaption { display: none; }
+.da .rs-scene--compact.rs-scene--slop { min-height: 300px; }
+.da .rs-scene--compact .rs-f--voix, .da .rs-scene--compact .rs-tag--a { display: none; }
+.da .rs-scene--compact .rs-f--apres { left: 14%; width: 80%; top: 36%; }
+.da .rs-scene--compact .rs-f--avant { width: 76%; top: 12%; }

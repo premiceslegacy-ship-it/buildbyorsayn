@@ -58,6 +58,7 @@ const FAQ = [
   [`C'est vraiment gratuit${NB}?`, "Oui. Le compte est gratuit, les ressources aussi. Pour le workflow vidéo, les générateurs d'images et de vidéos se paient chez leurs fournisseurs, après que ton IA t'a annoncé le prix."],
   [`Avec quelle IA ça marche${NB}?`, "Les skills sont écrits pour Claude. SLOP existe aussi en version à coller dans les instructions de n'importe quelle IA."],
   [`Pourquoi un compte${NB}?`, "Tu retrouves tes téléchargements au même endroit, et le bloc 1 de BUILD est ouvert pour toi. Rien d'autre n'est demandé."],
+  [`Puis-je proposer ça à d'autres${NB}?`, "Oui, les skills sont à toi. Faire parler un avatar pour un coach, une marque ou un artisan qui n'a pas le temps de filmer se propose comme un service. L'avatar d'une personne se fait avec son accord écrit."],
   [`Qu'est-ce qui change avec BUILD${NB}?`, "Ces ressources sont des exemples. BUILD t'apprend à construire les tiennes, te donne les skills de l'agence et un parcours en plusieurs blocs, avec un projet réel à la fin."],
 ] as const;
 
@@ -101,7 +102,7 @@ export default async function RessourcesPage({ searchParams }: { searchParams: P
         <header className="ui3-page-head">
           <div>
             <h1 className="t-1">Ressources <span className="mot">gratuites.</span></h1>
-            <p className="t-lede">Des skills et des schémas à télécharger. Tout est débloqué avec ton compte.</p>
+            <p className="t-lede">Un clone IA qui parle, des textes qui sonnent comme toi. Tout est débloqué avec ton compte.</p>
           </div>
         </header>
       ) : (
@@ -109,10 +110,10 @@ export default async function RessourcesPage({ searchParams }: { searchParams: P
           <div className="wrap hero__txt">
             <span className="pastille"><b aria-hidden="true" />Ressources gratuites</span>
             <h1 className="t-aff t-center">
-              Des skills pour ton IA, <span className="mot">gratuits.</span>
+              Ton clone IA et tes textes qui sonnent humains, <span className="mot">gratuits.</span>
             </h1>
             <p className="t-lede t-center">
-              Regarde le rendu, crée ton compte, télécharge. Essaie-les ce soir sur un vrai texte et une vraie vidéo. Sans carte bancaire.
+              Un avatar IA qui parle avec ta voix, et un skill qui retire ce qui fait robot dans tes textes. Tu vois le rendu avant de créer ton compte, sans carte bancaire.
             </p>
             <div className="hero__act">
               <Link className="btn btn--p" href={heroAction.href}>{heroAction.label}</Link>
