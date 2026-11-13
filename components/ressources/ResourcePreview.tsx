@@ -17,15 +17,22 @@ export function ResourcePreview({ resource, compact = false }: { resource: FreeR
 
 function SlopScene({ compact }: { compact: boolean }) {
   return (
-    <div className={`rs-scene rs-scene--slop${compact ? " rs-scene--compact" : ""}`} role="img" aria-label="Une phrase d'IA creuse passe derrière, la même phrase réécrite avec un fait daté passe devant, et le profil de ta voix guide la réécriture.">
+    <div className={`rs-scene rs-scene--slop${compact ? " rs-scene--compact" : ""}`} role="img" aria-label="Une newsletter dans Gmail commence par une formule d'IA creuse. Le même texte devient un post LinkedIn qui s'ouvre sur un fait daté, et le profil de ta voix guide la réécriture.">
       <div className="rs-f rs-f--avant" aria-hidden="true">
-        <span className="rs-f__eti">Sans SLOP</span>
+        <div className="rs-f__tete">
+          <span className="rs-f__logo"><ToolLogo name="Gmail" size={30} /></span>
+          <span className="rs-f__qui"><b>Ta newsletter du jeudi</b><em>Sans SLOP</em></span>
+        </div>
         <p>Dans un monde où l&apos;attention est rare, il est essentiel de se démarquer.</p>
         <i className="rs-f__ligne" /><i className="rs-f__ligne rs-f__ligne--c" />
       </div>
       <span className="rs-tag rs-tag--ivoire rs-tag--a" aria-hidden="true">Formule d&apos;IA</span>
       <div className="rs-f rs-f--apres" aria-hidden="true">
-        <span className="rs-f__eti rs-f__eti--em">Avec SLOP</span>
+        <div className="rs-f__tete">
+          <span className="rs-f__avatar" />
+          <span className="rs-f__qui"><b>Ton nom</b><em>Avec SLOP, il y a 1 h</em></span>
+          <span className="rs-f__logo rs-f__logo--d"><ToolLogo name="LinkedIn" size={28} /></span>
+        </div>
         <p>Mardi, une cliente m&apos;a demandé le prix d&apos;une cuisine. Il n&apos;était nulle part sur mon site.</p>
         <span className="rs-f__ok"><i />Un fait, une date</span>
       </div>

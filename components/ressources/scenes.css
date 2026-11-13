@@ -9,7 +9,7 @@
 .da .rs-f p { font: 500 clamp(15px, 1.4vw, 17px)/1.42 var(--font); color: var(--t1); text-wrap: pretty; }
 .da .rs-f__eti { font: 600 12px/1 var(--font); letter-spacing: .06em; text-transform: uppercase; color: var(--t3); }
 .da .rs-f__eti--em { color: var(--em); }
-.da .rs-f--avant { left: -3%; top: 12%; width: 54%; transform: rotate(-4deg); opacity: .7; }
+.da .rs-f--avant { left: -3%; top: 8%; width: 56%; transform: rotate(-4deg); opacity: .7; }
 .da .rs-f--avant p { color: var(--t3); text-decoration: line-through; text-decoration-color: rgba(241,245,242,.35); }
 .da .rs-f__ligne { display: block; height: 8px; width: 92%; border-radius: 4px; background: rgba(241,245,242,.12); }
 .da .rs-f__ligne--c { width: 58%; }
@@ -98,3 +98,22 @@
 .da .rs-scene--compact .rs-f--voix, .da .rs-scene--compact .rs-tag--a { display: none; }
 .da .rs-scene--compact .rs-f--apres { left: 14%; width: 80%; top: 36%; }
 .da .rs-scene--compact .rs-f--avant { width: 76%; top: 12%; }
+
+/* surfaces connues : en-tête de newsletter (Gmail) et de post (LinkedIn) */
+.da .rs-f__tete { display: flex; align-items: center; gap: 10px; }
+.da .rs-f__qui { display: grid; gap: 2px; min-width: 0; }
+.da .rs-f__qui b { font: 650 14px/1.15 var(--font-t); color: var(--t1); }
+.da .rs-f__qui em { font: 500 12px/1.2 var(--font); font-style: normal; color: var(--t3); }
+.da .rs-f--apres .rs-f__qui b { color: #111413; }
+.da .rs-f--apres .rs-f__qui em { color: #5c6660; }
+.da .rs-f__logo { display: grid; place-items: center; flex: none; width: 30px; height: 30px; }
+.da .rs-f__logo--d { margin-left: auto; }
+.da .rs-f__logo .tlg { display: grid; place-items: center; width: 100%; height: 100%; margin: 0; top: 0; line-height: 0; filter: none; }
+.da .rs-f__logo .tlg img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.da .rs-f__avatar { flex: none; width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(160deg, #cfd6d2, #9aa59f); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.da .rs-f--apres { top: 33%; }
+.da .rs-scene--slop { min-height: clamp(380px, 36vw, 440px); }
+@media (max-width: 560px) {
+  .da .rs-scene--slop { min-height: 470px; }
+  .da .rs-f--apres { top: 33%; }
+}
