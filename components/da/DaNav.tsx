@@ -23,6 +23,7 @@ export function DaNav({ loggedIn, homeBase = "" }: { loggedIn: boolean; homeBase
         {LIENS.map((l) => (
           <a key={l.id} href={`${homeBase}#${l.id}`}>{l.label}</a>
         ))}
+        <Link href="/ressources">Ressources</Link>
       </nav>
       {loggedIn ? (
         <Link className="btn btn--p btn--s" href="/dashboard">Mon espace</Link>

@@ -8,6 +8,7 @@ import { DaIcon } from "@/components/da/DaIcon";
 import { HeroScene } from "@/components/da/HeroScene";
 import { LandingBento } from "@/components/da/LandingBento";
 import { PricingSection } from "@/components/da/PricingSection";
+import { FreeResourcesTeaser } from "@/components/da/FreeResourcesTeaser";
 import { Faq } from "@/components/da/Faq";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileTier } from "@/lib/mcpAccess";
@@ -121,6 +122,8 @@ export default async function HomePage() {
         </section>
 
         <LandingBento />
+
+        <FreeResourcesTeaser loggedIn={loggedIn} />
 
         <PricingSection tier={tier} links={links} id="prix" unverified={accessUnverified} />
 

@@ -1,3 +1,4 @@
+import { FONDATIONS_THEMES } from "@/lib/themes";
 import { ANGLE_MORT, SECTIONS } from "@/app/beginner/sections.data";
 import { CHAPTER_META, CURRICULUM_SECTIONS, chapterSlug, orderCurriculumFiles } from "@/app/videos/tutos/chapters";
 import { BLOCS_DATA } from "@/lib/blocCatalog";
@@ -53,7 +54,7 @@ const FOUNDATION_COURSE: Course = {
   chapters: [...SECTIONS, ANGLE_MORT].map((section, index) => ({
     id: section.id,
     title: section.label,
-    partTitle: index < 5 ? "Ce qui ne change pas" : "De l'idée à l'URL",
+    partTitle: index < 5 ? FONDATIONS_THEMES["fondations-1"].theme : FONDATIONS_THEMES["fondations-2"].theme,
     image: index < 5 ? "/da/mini/fondations-1.jpg" : "/da/mini/fondations-2.jpg",
   })),
   canRead: (tier) => {

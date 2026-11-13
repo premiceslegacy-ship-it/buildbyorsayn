@@ -11,6 +11,7 @@ export const MEMBER_NAV = [
   { label: "Programme", href: "/programme", icon: "grid" as const },
   { label: "Skills", href: "/skills", icon: "skill" as const },
   { label: "Nouveautés", href: "/nouveautes", icon: "news" as const },
+  { label: "Ressources", href: "/ressources", icon: "gift" as const },
 ];
 
 type Rect = { left: number; top: number; width: number; height: number };

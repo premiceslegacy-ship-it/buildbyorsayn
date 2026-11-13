@@ -1,3 +1,5 @@
+import { BLOC_THEMES } from "@/lib/themes";
+
 // Public navigation metadata only. Never import the private corpus here.
 export type SectionLesson = {
   durationSeconds: number;
@@ -22,7 +24,7 @@ const entries: [string, string, [string, string][]][] = [
 export const BLOC_SOURCE_ORDER = entries.map(([id]) => id);
 
 export const BLOCS_DATA = entries.map(([id, title, sections], index) => ({
-  id, titre: `Bloc ${index + 1} : ${title}`, displayNumber: index + 1,
+  id, titre: `Bloc ${index + 1} : ${BLOC_THEMES[id]?.theme ?? title}`, displayNumber: index + 1,
   sections: sections.map(([id, title]) => ({ id, title })),
 }));
 

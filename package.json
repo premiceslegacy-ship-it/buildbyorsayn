@@ -46,7 +46,8 @@
     "verify:stripe-pricing": "tsx scripts/verify-stripe-pricing.ts",
     "backfill:stripe-ledger": "tsx scripts/backfill-stripe-ledger.ts",
     "copy:check": "tsx scripts/check-copy.ts",
-    "content:private-check": "tsx scripts/check-private-content.ts"
+    "content:private-check": "tsx scripts/check-private-content.ts",
+    "resources:publish": "tsx scripts/publish-free-resources.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",

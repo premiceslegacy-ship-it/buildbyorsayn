@@ -19,6 +19,7 @@ export function DaFooter({ homeBase = "", loggedIn = false }: { homeBase?: strin
               <li><a href={`${homeBase}#contenu`}>Ce que tu reçois</a></li>
               <li><a href={`${homeBase}#prix`}>Prix</a></li>
               <li><a href={`${homeBase}#faq`}>Questions</a></li>
+              <li><Link href="/ressources">Ressources gratuites</Link></li>
             </ul>
           </nav>
           <nav aria-label="Compte">

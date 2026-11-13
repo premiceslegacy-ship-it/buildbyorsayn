@@ -1,0 +1,66 @@
+/* Ressources gratuites : s'appuie sur la direction artistique « Émeraude sur noir » (app/da.css). Rien de nouveau dans la palette. */
+.da .rs .hero__txt { display: grid; gap: 24px; justify-items: center; }
+.da .rs .hero__act { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.da .rs-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2vw, 24px); }
+.da .rs-card { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 18px; padding: clamp(24px, 3vw, 36px); background: var(--carte); border-radius: var(--r-l); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .rs-card--vise { box-shadow: inset 0 0 0 1px rgba(34,217,110,.55); }
+.da .rs-card .btn { justify-self: start; max-width: 100%; height: auto; min-height: 48px; padding-block: 12px; white-space: normal; text-align: center; line-height: 1.25; }
+.da .rs-card__tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.da .rs-mot { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; background: rgba(34,217,110,.14); color: var(--menthe); font: 700 13px/1 var(--font); letter-spacing: .08em; }
+.da .rs-fait { display: inline-flex; align-items: center; gap: 6px; font: 600 14px/1 var(--font); color: var(--dense); }
+.da .rs-fait .ic { width: 1.1em; height: 1.1em; }
+.da .rs-promesse { font: 400 17px/1.5 var(--font); color: var(--t2); text-wrap: pretty; }
+.da .rs-liste { display: grid; gap: 12px; }
+.da .rs-liste li { display: grid; grid-template-columns: 24px 1fr; gap: 12px; align-items: start; color: var(--t1); font: 400 16px/1.45 var(--font); }
+.da .rs-liste i { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(34,217,110,.16); color: var(--em); font-style: normal; }
+.da .rs-liste i .ic { width: 14px; height: 14px; }
+.da .rs-etapes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2vw, 24px); counter-reset: rs; }
+.da .rs-etapes li { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 10px; padding: clamp(20px, 2.4vw, 28px); background: var(--carte); border-radius: var(--r-m); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .rs-num { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--carte-3); color: var(--encre); font: 700 15px/1 var(--font-t); }
+.da .rs-suite { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: clamp(16px, 2vw, 24px); }
+.da .rs-pas { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; justify-items: start; gap: 12px; padding: clamp(20px, 2.4vw, 28px); background: var(--carte); border-radius: var(--r-m); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .rs-pas .pastille { background: rgba(241,245,242,.1); }
+.da .rs-pas .btn { margin-top: 6px; max-width: 100%; height: auto; min-height: 44px; padding-block: 10px; white-space: normal; text-align: center; line-height: 1.25; }
+@media (max-width: 860px) {
+  .da .rs-cards, .da .rs-etapes { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ───────── visuel : logos, aperçus, échelle ───────── */
+.da .rs-hero-logos { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(10px, 1.6vw, 18px); margin-top: 12px; }
+.da .rs-hero-logos li { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 20px; background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .rs-catalogue { display: grid; gap: clamp(20px, 2.6vw, 32px); }
+.da .rs-carte { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 44px); align-items: center; padding: clamp(20px, 3vw, 36px); background: var(--carte); border-radius: var(--r-l); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .rs-carte--vise { box-shadow: inset 0 0 0 1px rgba(34,217,110,.55); }
+.da .rs-carte__vis { min-width: 0; }
+.da .rs-carte__corps { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 16px; min-width: 0; }
+.da .rs-carte__corps .btn { justify-self: start; max-width: 100%; height: auto; min-height: 48px; padding-block: 12px; white-space: normal; text-align: center; line-height: 1.25; }
+.da .rs-carte__tete { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.da .rs-cat { font: 600 13px/1 var(--font); color: var(--t3); }
+.da .rs-titre { display: flex; align-items: center; gap: 14px; }
+.da .rs-objet-s { width: 56px; height: 56px; flex: none; }
+.da .rs-logos { display: flex; gap: 10px; flex-wrap: wrap; }
+.da .rs-carte--bientot { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; padding-block: clamp(28px, 4vw, 48px); background: transparent; box-shadow: inset 0 0 0 1px var(--trait); border-style: dashed; }
+.da .rs-carte--bientot .rs-objet { width: 96px; height: 96px; }
+.da .rs-marches { display: grid; grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1.1fr) 32px minmax(0, 1.2fr); align-items: end; gap: clamp(8px, 1.4vw, 16px); }
+.da .rs-marche { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: start; align-content: start; gap: 12px; padding: clamp(20px, 2.4vw, 28px); background: var(--carte); border-radius: var(--r-m); box-shadow: inset 0 0 0 1px var(--trait); }
+.da .rs-marche--2 { padding-block: clamp(28px, 3.2vw, 40px); background: var(--carte-2); }
+.da .rs-marche--3 { padding-block: clamp(36px, 4vw, 52px); background: var(--carte-2); box-shadow: inset 0 0 0 1px rgba(34,217,110,.5); }
+.da .rs-objet { width: 88px; height: 88px; }
+.da .rs-prix { font: 700 clamp(28px, 3vw, 40px)/1 var(--font-t); letter-spacing: -.03em; color: var(--encre); }
+.da .rs-fleche { display: grid; place-items: center; align-self: center; color: var(--t3); }
+.da .rs-miniatures { display: flex; gap: 8px; flex-wrap: wrap; }
+.da .rs-miniatures li { width: 44px; height: 44px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--trait); }
+.da .rs-miniatures img { width: 100%; height: 100%; object-fit: cover; }
+.da .rs-miniatures__plus { display: grid; place-items: center; background: var(--carte-3); color: var(--t1); font: 600 13px/1 var(--font); }
+.da .rs-points { display: grid; gap: 8px; }
+.da .rs-points li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; color: var(--t2); font: 400 15px/1.4 var(--font); }
+.da .rs-points .ic { width: 18px; height: 18px; color: var(--em); }
+.da .rs-echelle__act { display: flex; justify-content: center; margin-top: clamp(28px, 4vw, 48px); }
+@media (max-width: 960px) {
+  .da .rs-carte { grid-template-columns: minmax(0, 1fr); }
+  .da .rs-marches { grid-template-columns: minmax(0, 1fr); }
+  .da .rs-fleche { transform: rotate(90deg); }
+  .da .rs-marche--2, .da .rs-marche--3 { padding-block: clamp(20px, 2.4vw, 28px); }
+}
+.da .rs-suite-ligne { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; padding-top: 14px; border-top: 1px solid var(--trait); color: var(--t3); font: 400 14px/1.45 var(--font); }
+.da .rs-suite-ligne .ic { width: 18px; height: 18px; color: var(--em); }

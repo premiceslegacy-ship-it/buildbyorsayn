@@ -216,3 +216,14 @@
 @media (max-width: 699px) { .da .sec__tete .t-lede { display: none; } .da .sec__tete { margin-bottom: 32px; } }
 @media (max-width: 520px) { .da .skl .ui__pill u { display: none; } .da .skl .ui__pill { padding: 0; width: 26px; height: 26px; justify-content: center; } .da .skl li { gap: 12px; } .da .skl li span { font-size: 15px; } }
 .da .ui__pill u { text-decoration: none; }
+
+/* Ressources gratuites sur l'accueil */
+.da .rt-cartes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); }
+.da .rt-carte { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: start; align-content: start; gap: 12px; height: 100%; padding: clamp(20px, 2.4vw, 30px); background: var(--carte); border-radius: var(--r-m); box-shadow: inset 0 0 0 1px var(--trait); transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
+.da .rt-carte:hover { transform: translateY(-3px); box-shadow: inset 0 0 0 1px var(--trait-f); }
+.da .rt-objet { width: 88px; height: 88px; }
+.da .rt-mot { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 999px; background: rgba(34,217,110,.14); color: var(--menthe); font: 700 12px/1 var(--font); letter-spacing: .08em; }
+.da .rt-logos { display: flex; gap: 8px; }
+.da .rt-carte--plus { background: transparent; border: 1px dashed var(--trait-f); box-shadow: none; }
+@media (max-width: 860px) { .da .rt-cartes { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .da .rt-carte { transition: none; } .da .rt-carte:hover { transform: none; } }

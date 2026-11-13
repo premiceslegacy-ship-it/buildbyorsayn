@@ -139,7 +139,7 @@ test("la navigation anonyme ne propose que des destinations publiques réelles",
   assert.doesNotMatch(legalHeader, /\/(dashboard|programme|skills|nouveautes)/);
   assert.doesNotMatch(login, /\/(dashboard|programme|skills|nouveautes)/);
 
-  assert.deepEqual(navItemsFor(true).map(({ href }) => href), ["/dashboard", "/programme", "/skills", "/nouveautes"]);
+  assert.deepEqual(navItemsFor(true).map(({ href }) => href), ["/dashboard", "/programme", "/skills", "/nouveautes", "/ressources"]);
 });
 
 test("chaque page portée a un état de chargement, d'erreur et de reprise", async () => {

@@ -83,7 +83,7 @@ html.r2-reader-open .da.da-app.has-tabbar {
 .da.da-app .avatar[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--em); }
 @media (min-width: 735px) { .da.da-app .navbar__nav { display: flex; } }
 
-.da.da-app .tabbar { position: fixed; z-index: 70; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom)); margin-inline: auto; width: min(402px, calc(100% - 32px)); height: 64px; border-radius: 999px; display: flex; padding: 6px; view-transition-name: tabbar; }
+.da.da-app .tabbar { position: fixed; z-index: 70; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom)); margin-inline: auto; width: min(470px, calc(100% - 32px)); height: 64px; border-radius: 999px; display: flex; padding: 6px; view-transition-name: tabbar; }
 .da.da-app .tabbar a { position: relative; z-index: 1; flex: 1; display: grid; place-items: center; align-content: center; gap: 3px; border-radius: 999px; font: 600 10px/1 var(--font); color: #fff; min-width: 0; text-shadow: 0 1px 6px rgba(0, 0, 0, .55); }
 .da.da-app .tabbar a .ic { width: 22px; height: 22px; }
 .da.da-app .tabbar a.on { color: var(--em); }

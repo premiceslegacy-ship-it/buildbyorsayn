@@ -11,5 +11,5 @@ test("la navigation BUILD reste compacte sur tablette", async () => {
   assert.match(tabbar, /className="tabbar"/);
   assert.match(styles, /@media \(min-width: 735px\)[^}]*navbar__nav \{ display: flex; \}/);
   assert.match(styles, /@media \(min-width: 735px\)[^}]*tabbar \{ display: none; \}/);
-  assert.match(styles, /width: min\(402px, calc\(100% - 32px\)\)/);
+  assert.match(styles, /width: min\(470px, calc\(100% - 32px\)\)/);
 });

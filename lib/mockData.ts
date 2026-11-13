@@ -18,7 +18,7 @@ function lessonFor(sectionId: string): SectionLesson | undefined {
 const BLOCS_DATA_SOURCE = [
   {
     id: "1",
-    titre: "Bloc 1 : Lire l'opportunité et choisir une ligne",
+    titre: "Bloc 1 : L'opportunité",
     introduction: coffreIntroductionMarkdown("1"),
     sections: [
       { id: "b1-s0", title: "Le décalage se creuse déjà", content: coffreChapterMarkdown("b1-s0") },
@@ -31,7 +31,7 @@ const BLOCS_DATA_SOURCE = [
   },
   {
     id: "2",
-    titre: "Bloc 2 : La stack",
+    titre: "Bloc 2 : Les outils",
     introduction: coffreIntroductionMarkdown("2"),
     sections: [
       { id: "b2-s1", title: "Pourquoi une stack par défaut", content: coffreChapterMarkdown("b2-s1") },
@@ -41,7 +41,7 @@ const BLOCS_DATA_SOURCE = [
   },
   {
     id: "3",
-    titre: "Bloc 3 : Les frameworks",
+    titre: "Bloc 3 : La méthode",
     introduction: coffreIntroductionMarkdown("3"),
     sections: [
       { id: "b3-s1", title: "Le bon ordre avant de construire", content: coffreChapterMarkdown("b3-s1") },
@@ -51,7 +51,7 @@ const BLOCS_DATA_SOURCE = [
   },
   {
     id: "4",
-    titre: "Bloc 4 : Les skills comme second cerveau",
+    titre: "Bloc 4 : Les skills",
     introduction: coffreIntroductionMarkdown("4"),
     sections: [
       { id: "b4-s1", title: "Un skill, c'est quoi exactement", content: coffreChapterMarkdown("b4-s1") },
@@ -62,7 +62,7 @@ const BLOCS_DATA_SOURCE = [
   },
   {
     id: "5",
-    titre: "Bloc 5 : La logique business",
+    titre: "Bloc 5 : Le client",
     introduction: coffreIntroductionMarkdown("5"),
     sections: [
       { id: "b5-s1", title: "L'orientation client", content: coffreChapterMarkdown("b5-s1") },
@@ -73,7 +73,7 @@ const BLOCS_DATA_SOURCE = [
   },
   {
     id: "6",
-    titre: "Bloc 6 : Construire pour de vrai",
+    titre: "Bloc 6 : La construction",
     introduction: coffreIntroductionMarkdown("6"),
     sections: [
       { id: "b6-s1", title: "Ce qu'est vraiment ORACLE by Orsayn", content: coffreChapterMarkdown("b6-s1") },
@@ -112,7 +112,7 @@ const BLOCS_DATA_SOURCE = [
   },
   {
     id: "7",
-    titre: "Bloc 7 : Récapitulatif",
+    titre: "Bloc 7 : Le système",
     introduction: coffreIntroductionMarkdown("7"),
     sections: [
       { id: "b7-s1", title: "Tout processiser", content: coffreChapterMarkdown("b7-s1") },
