@@ -7,7 +7,7 @@ import { displayLocationFromBlocId } from "@/lib/blocCatalog";
 import { getVerifiedAdmin, recordAdminAction } from "@/lib/mux/adminServer";
 import { withAdminThumbnailUrls } from "@/lib/mux/adminThumbnails.server";
 import { removeBuildNewsThumbnail } from "@/lib/buildNews/thumbnail.server";
-import { executeAgentPublication, executePreparedMail, executePreparedNews, preparedMailSchema, preparedNewsSchema } from "./execution";
+import { closePublicationRequests, executeAgentPublication, executePreparedMail, executePreparedNews, isVideoPublished, preparedMailSchema, preparedNewsSchema } from "./execution";
 import {
   AGENT_PERMISSION_VALUES,
   type AgentMode,
@@ -194,12 +194,13 @@ async function enrichPendingRequests(admin: ReturnType<typeof createAdminSupabas
     duration_seconds: number | null;
     status: string;
     published_at: string | null;
+    replaced_at: string | null;
     thumbnailUrl: string | null;
   }>();
   if (videoIds.length > 0) {
     const { data, error } = await admin
       .from("video_lessons")
-      .select("id,title,bloc_id,position,summary,chapters,transcript,transcript_segments,thumbnail,playback_id,duration_seconds,status,published_at")
+      .select("id,title,bloc_id,position,summary,chapters,transcript,transcript_segments,thumbnail,playback_id,duration_seconds,status,published_at,replaced_at")
       .in("id", videoIds);
     if (error) throw new Error("Les détails des vidéos sont indisponibles.");
     const withThumbnails = await withAdminThumbnailUrls(admin, (data ?? []) as Array<{
@@ -216,6 +217,7 @@ async function enrichPendingRequests(admin: ReturnType<typeof createAdminSupabas
       duration_seconds: number | null;
       status: string;
       published_at: string | null;
+      replaced_at: string | null;
     }>);
     for (const video of withThumbnails) videos.set(video.id, video);
   }
@@ -238,6 +240,8 @@ async function enrichPendingRequests(admin: ReturnType<typeof createAdminSupabas
           thumbnail: Boolean(video.thumbnail?.trim()),
           transcript: video.transcript.trim().length >= 20 || (Array.isArray(video.transcript_segments) && video.transcript_segments.length > 0),
         },
+        published: Boolean(video.published_at && !video.replaced_at),
+        replaced: Boolean(video.replaced_at),
         reviewUrl: `/admin#/videos?videoId=${encodeURIComponent(video.id)}`,
       } : null,
       mailPreview: mail?.success ? {
@@ -264,7 +268,15 @@ export async function listPendingRequests() {
     .order("created_at", { ascending: true })
     .limit(100);
   if (error) throw new Error("Les demandes sont indisponibles.");
-  return enrichPendingRequests(admin, (data ?? []) as PendingRequestRow[]);
+  const enriched = await enrichPendingRequests(admin, (data ?? []) as PendingRequestRow[]);
+  // Une demande de publication dont la vidéo est déjà en ligne (ou remplacée) n'a plus lieu d'être :
+  // on la clôt au lieu de demander une validation inutile.
+  const moot = enriched.filter((request) => request.kind === "publication" && request.videoPreview && (request.videoPreview.published || request.videoPreview.replaced));
+  await Promise.all(moot.map((request) => request.videoPreview?.published
+    ? closePublicationRequests(request.target_id, user.id)
+    : closePublicationRequests(request.target_id, null, undefined, "expired")));
+  const mootIds = new Set(moot.map((request) => request.id));
+  return enriched.filter((request) => !mootIds.has(request.id));
 }
 
 export async function listAgentJournal(limit = 100) {
@@ -329,7 +341,10 @@ export async function decideRequest(requestId: string, decision: AgentRequestDec
 
   let executed = false;
   try {
-    const result = claimed.request_kind === "publication"
+    const alreadyOnline = claimed.request_kind === "publication" && await isVideoPublished(claimed.request_target_id);
+    const result = alreadyOnline
+      ? { alreadyPublished: true as const }
+      : claimed.request_kind === "publication"
       ? await executeAgentPublication(claimed.request_target_id, user.id)
       : claimed.request_kind === "nouveaute"
         ? await executePreparedNews(claimed.request_payload, user.id)

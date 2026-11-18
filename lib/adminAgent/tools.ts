@@ -32,7 +32,9 @@ import { syncMuxTranscriptForReadyAsset } from "@/lib/mux/transcript.server";
 import { readVideoThumbnail, removeBuildNewsRequestThumbnails, storeBuildNewsThumbnail } from "@/lib/buildNews/thumbnail.server";
 import { buildNewsInputSchema } from "@/lib/buildNews/model";
 import {
+  closePublicationRequests,
   executeAgentPublication,
+  isVideoPublished,
   preparedMailSchema,
   preparedNewsSchema,
   validateAgentPublicationTarget,
@@ -603,11 +605,15 @@ export const ADMIN_AGENT_TOOLS = {
   },
   demander_publication: {
     title: "Demander la publication",
-    description: "Crée une demande à valider, sauf si l'admin a confirmé le mode de publication autonome.",
+    description: "Crée une demande de publication à valider, sauf si l'admin a confirmé le mode de publication autonome. Sans effet si la vidéo est déjà en ligne.",
     permission: "demander_publication",
     schema: videoIdInput,
     async run(rawInput, context) {
       const input = videoIdInput.parse(rawInput);
+      if (await isVideoPublished(input.videoId)) {
+        await closePublicationRequests(input.videoId, context.createdBy);
+        return { status: "already_published", videoId: input.videoId };
+      }
       const video = await validateAgentPublicationTarget(input.videoId);
       await assertBlocExists(video.bloc_id as string);
       const { data } = await createAdminSupabase().from("admin_agent_settings").select("mode").eq("singleton", true).maybeSingle();
@@ -620,6 +626,24 @@ export const ADMIN_AGENT_TOOLS = {
       return createRequest(context, "publication", input.videoId, {
         videoId: input.videoId,
       });
+    },
+  },
+  publier_video: {
+    title: "Publier une vidéo",
+    description: "Publie tout de suite une vidéo prête (résumé, chapitres, miniature et transcription présents). Réservé aux accès à qui l'admin a donné cette permission. Sans effet si la vidéo est déjà en ligne.",
+    permission: "publier_video",
+    schema: videoIdInput,
+    async run(rawInput, context) {
+      const input = videoIdInput.parse(rawInput);
+      if (await isVideoPublished(input.videoId)) {
+        await closePublicationRequests(input.videoId, context.createdBy);
+        return { status: "already_published", videoId: input.videoId };
+      }
+      const video = await validateAgentPublicationTarget(input.videoId);
+      await assertBlocExists(video.bloc_id as string);
+      const result = await executeAgentPublication(input.videoId, context.createdBy);
+      await auditTool(context, "publier_video", input.videoId);
+      return { status: "published", ...result };
     },
   },
   preparer_mail: {
@@ -713,6 +737,20 @@ export const ADMIN_AGENT_TOOLS = {
         published: Boolean(data.published_at),
         errorCode: data.error_code,
       };
+      const missing = [
+        !result.hasTranscript ? "transcription" : null,
+        !result.hasSummary ? "résumé" : null,
+        result.chapterCount === 0 ? "chapitres" : null,
+        !result.hasThumbnail ? "miniature" : null,
+      ].filter((value): value is string => Boolean(value));
+      const pending = await createAdminSupabase().from("admin_agent_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("kind", "publication").eq("target_id", input.videoId).eq("status", "pending");
+      Object.assign(result, {
+        missing,
+        readyToPublish: !result.published && data.status === "ready" && missing.length === 0,
+        pendingPublicationRequest: !result.published && (pending.count ?? 0) > 0,
+      });
       await auditTool(context, "statut_video", input.videoId);
       return result;
     },

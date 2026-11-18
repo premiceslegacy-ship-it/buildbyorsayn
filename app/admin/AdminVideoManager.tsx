@@ -87,14 +87,28 @@ function displayChapters(value: unknown): VideoChapter[] {
 function videoStatus(video: AdminVideoRow) {
   return video.published_at ? "En ligne" : STATUS_LABELS[video.status];
 }
+type SectionId = "thumbnail" | "summary" | "chapters" | "transcript";
+const SECTION_ORDER: SectionId[] = ["thumbnail", "summary", "chapters", "transcript"];
+const SECTION_LABELS: Record<SectionId, string> = { thumbnail: "Miniature", summary: "Résumé", chapters: "Chapitres", transcript: "Transcription" };
+
+function chaptersToText(value: unknown) {
+  return displayChapters(value).map((chapter) => `${formatChapterTime(chapter.startSeconds)} ${chapter.title}`).join("\n");
+}
+function sectionsReady(video: AdminVideoRow): Record<SectionId, boolean> {
+  return {
+    thumbnail: Boolean(video.thumbnail),
+    summary: Boolean(video.summary.trim()),
+    chapters: hasChapters(video.chapters),
+    transcript: Boolean(video.transcript.trim()),
+  };
+}
+function missingSections(video: AdminVideoRow) {
+  const ready = sectionsReady(video);
+  return SECTION_ORDER.filter((section) => !ready[section]);
+}
 function publishReason(video: AdminVideoRow) {
-  const missing = [
-    !video.summary.trim() ? "un résumé" : null,
-    !hasChapters(video.chapters) ? "au moins un chapitre" : null,
-    !video.thumbnail ? "une miniature" : null,
-    !video.transcript.trim() ? "une transcription relue" : null,
-  ].filter((value): value is string => Boolean(value));
-  return missing.length ? `Publication indisponible : ajoute ${missing.join(", ")}.` : null;
+  const missing = missingSections(video).map((section) => ({ thumbnail: "une miniature", summary: "un résumé", chapters: "au moins un chapitre", transcript: "une transcription relue" })[section]);
+  return missing.length ? `Pour publier, ajoute ${missing.join(", ")}.` : null;
 }
 
 export function AdminVideoManager({
@@ -123,12 +137,11 @@ export function AdminVideoManager({
   const [busy, setBusy] = useState(false);
   const [contentBusy, setContentBusy] = useState(false);
   const [summaryDraft, setSummaryDraft] = useState(initialDetail?.summary ?? "");
-  const [chaptersDraft, setChaptersDraft] = useState(() => displayChapters(initialDetail?.chapters).map((chapter) => `${formatChapterTime(chapter.startSeconds)} ${chapter.title}`).join("\n"));
+  const [chaptersDraft, setChaptersDraft] = useState(() => chaptersToText(initialDetail?.chapters));
   const [transcriptDraft, setTranscriptDraft] = useState(initialDetail?.transcript ?? "");
   const [detailId, setDetailId] = useState<string | null>(initialDetail?.id ?? null);
-  const [publishId, setPublishId] = useState<string | null>(null);
+  const [openSection, setOpenSection] = useState<SectionId | null>(null);
   const [removeId, setRemoveId] = useState<string | null>(null);
-  const [confirmation, setConfirmation] = useState("");
   const uploadAbort = useRef<AbortController | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const selected = blocs.find((bloc) => bloc.displayNumber === location);
@@ -170,8 +183,9 @@ export function AdminVideoManager({
       if (!video || detailId === video.id) return;
       window.setTimeout(() => {
         setSummaryDraft(video.summary);
-        setChaptersDraft(displayChapters(video.chapters).map((chapter) => `${formatChapterTime(chapter.startSeconds)} ${chapter.title}`).join("\n"));
+        setChaptersDraft(chaptersToText(video.chapters));
         setTranscriptDraft(video.transcript);
+        setOpenSection(missingSections(video)[0] ?? null);
         setDetailId(video.id);
       }, 0);
     };
@@ -186,15 +200,27 @@ export function AdminVideoManager({
     void playAppSound(error ? "error" : "confirm");
   }, []);
 
-  const refreshVideos = useCallback(async () => {
+  const videosRef = useRef(videos);
+  const detailIdRef = useRef(detailId);
+  useEffect(() => { videosRef.current = videos; detailIdRef.current = detailId; }, [videos, detailId]);
+
+  const refreshVideos = useCallback(async (quiet = false) => {
     if (demo) return;
     try {
       const response = await fetch("/api/admin/videos", { cache: "no-store" });
       const payload = await response.json().catch(() => null) as { ok?: boolean; videos?: AdminVideoRow[] } | null;
       if (!response.ok || !payload?.ok || !Array.isArray(payload.videos)) throw new Error("refresh_failed");
+      // Ce qu'un agent a écrit pendant que la fiche est ouverte apparaît dans les champs qu'on n'a pas touchés.
+      const before = videosRef.current.find((item) => item.id === detailIdRef.current);
+      const after = payload.videos.find((item) => item.id === detailIdRef.current);
+      if (before && after) {
+        if (before.summary !== after.summary) setSummaryDraft((draft) => draft === before.summary ? after.summary : draft);
+        if (chaptersToText(before.chapters) !== chaptersToText(after.chapters)) setChaptersDraft((draft) => draft === chaptersToText(before.chapters) ? chaptersToText(after.chapters) : draft);
+        if (before.transcript !== after.transcript) setTranscriptDraft((draft) => draft === before.transcript ? after.transcript : draft);
+      }
       setVideos(payload.videos);
     } catch {
-      announce("Les statuts ne se sont pas actualisés. Réessaie.", true);
+      if (!quiet) announce("Les statuts ne se sont pas actualisés. Réessaie.", true);
     }
   }, [announce, demo]);
 
@@ -203,6 +229,20 @@ export function AdminVideoManager({
     const poll = window.setInterval(() => { void refreshVideos(); }, 3_000);
     return () => window.clearInterval(poll);
   }, [demo, hasProcessingVideo, refreshVideos]);
+
+  // La liste suit ce que fait l'agent (miniature, chapitres, publication) sans recharger la page.
+  useEffect(() => {
+    if (demo) return;
+    const refresh = () => { if (document.visibilityState === "visible") void refreshVideos(true); };
+    const timer = window.setInterval(refresh, 20_000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [demo, refreshVideos]);
 
   const chooseFile = (nextFile: File | null) => {
     setFile(nextFile);
@@ -345,14 +385,12 @@ export function AdminVideoManager({
 
   const publish = async (video: AdminVideoRow) => {
     if (demo) { announce("La démonstration ne modifie rien."); return; }
-    if (confirmation !== ADMIN_VIDEO_CONFIRMATION || !video.thumbnail) return;
+    if (video.published_at || publishReason(video)) return;
     setBusy(true);
     try {
-      const response = await fetch(`/api/admin/videos/${video.id}/publish`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ approved: true, confirmation }) });
+      const response = await fetch(`/api/admin/videos/${video.id}/publish`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ approved: true, confirmation: ADMIN_VIDEO_CONFIRMATION }) });
       const payload = await response.json().catch(() => ({})) as ApiResult;
       if (!response.ok || !payload.ok) throw new Error(payload.error ?? "La publication a échoué.");
-      setPublishId(null);
-      setConfirmation("");
       announce("Vidéo publiée en ligne.");
       await refreshVideos();
     } catch (error) {
@@ -391,8 +429,9 @@ export function AdminVideoManager({
 
   const openDetail = (video: AdminVideoRow) => {
     setSummaryDraft(video.summary);
-    setChaptersDraft(displayChapters(video.chapters).map((chapter) => `${formatChapterTime(chapter.startSeconds)} ${chapter.title}`).join("\n"));
+    setChaptersDraft(chaptersToText(video.chapters));
     setTranscriptDraft(video.transcript);
+    setOpenSection(missingSections(video)[0] ?? null);
     setDetailId(video.id);
   };
   const grouped = blocs.map((bloc) => ({ bloc, videos: videos.filter((video) => video.bloc_id === bloc.id).sort((left, right) => left.position - right.position) }));
@@ -421,65 +460,139 @@ export function AdminVideoManager({
       <section className="vd-library" aria-labelledby="vd-library-title"><div className="vd-section-intro"><h3 id="vd-library-title">Par emplacement</h3><p>{videos.length ? `${videos.length} épisode${videos.length > 1 ? "s" : ""} au total` : "Tes épisodes apparaîtront ici."}</p></div><div className="vd-groups">{grouped.map(({ bloc, videos: groupVideos }) => <details className="vd-location" key={bloc.id} open={groupVideos.length > 0}><summary><span><strong>{locationLabel(bloc.displayNumber)}</strong>{locationTitle(bloc) ? <small>{locationTitle(bloc)}</small> : null}</span><em>{groupVideos.length ? `${groupVideos.length} épisode${groupVideos.length > 1 ? "s" : ""}` : "Aucune vidéo"}</em><ChevronDown aria-hidden="true" /></summary>{groupVideos.length ? <div className="vd-episodes">{groupVideos.map((video) => <button className="vd-episode" type="button" key={video.id} onClick={() => openDetail(video)}><span className="vd-episode-art">{video.thumbnailUrl ? <SafeThumbnail src={video.thumbnailUrl} alt="" unoptimized sizes="112px" /> : <ImageIcon aria-hidden="true" />}</span><span className="vd-episode-number">{video.position}</span><span className="vd-episode-copy"><strong>{video.title}</strong><small>{formatDuration(video.duration_seconds)}</small></span><span className={`vd-status vd-status-${video.published_at ? "online" : video.status}`}><i aria-hidden="true" />{videoStatus(video)}</span></button>)}</div> : null}</details>)}</div></section>
 
 
-      {detail ? <><div className="vd-detail-backdrop" aria-hidden="true" onClick={() => setDetailId(null)} /><aside ref={detailPanel} className="vd-detail" role="dialog" aria-modal="true" aria-labelledby="vd-detail-title" tabIndex={-1}><div className="vd-detail-head"><div><p className="vd-detail-kicker">{locationLabel(detail.bloc_id === "protocole" ? "protocole" : Number(detail.bloc_id))}, épisode {detail.position}</p><h3 id="vd-detail-title">{detail.title}</h3><span className={`vd-status vd-status-${detail.published_at ? "online" : detail.status}`}><i aria-hidden="true" />{videoStatus(detail)}</span></div><button className="vd-icon-button" type="button" onClick={() => setDetailId(null)} aria-label="Fermer le détail"><X aria-hidden="true" /></button></div>{detail.thumbnailUrl ? <div className="vd-detail-art"><SafeThumbnail src={detail.thumbnailUrl} alt={`Miniature de ${detail.title}`} unoptimized sizes="640px" /></div> : null}<VideoDetailSteps video={detail} busy={busy} contentBusy={contentBusy} summaryDraft={summaryDraft} chaptersDraft={chaptersDraft} transcriptDraft={transcriptDraft} setSummaryDraft={setSummaryDraft} setChaptersDraft={setChaptersDraft} setTranscriptDraft={setTranscriptDraft} onSaveSummary={() => { void saveSummary(detail); }} onSaveChapters={() => { void saveChapters(detail); }} onSaveTranscript={() => { void saveTranscript(detail); }} onThumbnailTime={(ratio) => chooseThumbnail(detail, ratio)} onThumbnailFile={(image) => chooseThumbnailFile(detail, image)} /><div className="vd-detail-actions">{detail.status === "ready" && !detail.published_at && !detail.replaced_at ? publishId === detail.id ? <div className="vd-confirm"><p>Écris <b>{ADMIN_VIDEO_CONFIRMATION}</b> pour publier cette vidéo en ligne.</p><input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} autoComplete="off" /><div><button className="vd-secondary" type="button" onClick={() => { setPublishId(null); setConfirmation(""); }}>Annuler</button><button className="vd-primary" type="button" disabled={busy || confirmation !== ADMIN_VIDEO_CONFIRMATION} onClick={() => { void publish(detail); }}>Publier</button></div></div> : <><button className="vd-primary vd-publish" type="button" disabled={busy || Boolean(publishReason(detail))} onClick={() => { setPublishId(detail.id); setConfirmation(""); }}>Publier</button>{publishReason(detail) ? <p className="vd-publish-reason" role="status">{publishReason(detail)}</p> : null}</> : null}<div className="vd-secondary-actions"><button className="vd-secondary" type="button" onClick={() => replaceVideo(detail)}>Remplacer la vidéo</button>{detail.status === "waiting" ? <button className="vd-danger-link" type="button" onClick={() => setRemoveId(detail.id)}>Retirer</button> : null}</div></div></aside></> : null}
+      {detail ? <><div className="vd-detail-backdrop" aria-hidden="true" onClick={() => setDetailId(null)} /><aside ref={detailPanel} className="vd-detail" role="dialog" aria-modal="true" aria-labelledby="vd-detail-title" tabIndex={-1}>
+        <VideoDetailPanel
+          video={detail}
+          busy={busy}
+          contentBusy={contentBusy}
+          openSection={openSection}
+          setOpenSection={setOpenSection}
+          summaryDraft={summaryDraft}
+          chaptersDraft={chaptersDraft}
+          transcriptDraft={transcriptDraft}
+          setSummaryDraft={setSummaryDraft}
+          setChaptersDraft={setChaptersDraft}
+          setTranscriptDraft={setTranscriptDraft}
+          onClose={() => setDetailId(null)}
+          onSaveSummary={() => { void saveSummary(detail); }}
+          onSaveChapters={() => { void saveChapters(detail); }}
+          onSaveTranscript={() => { void saveTranscript(detail); }}
+          onThumbnailTime={(ratio) => chooseThumbnail(detail, ratio)}
+          onThumbnailFile={(image) => chooseThumbnailFile(detail, image)}
+          onPublish={() => { void publish(detail); }}
+          onReplace={() => replaceVideo(detail)}
+          onRemove={() => setRemoveId(detail.id)}
+        />
+      </aside></> : null}
       {removeId ? <div className="vd-confirm-layer" role="presentation"><section className="vd-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="vd-remove-title"><h3 id="vd-remove-title">Retirer cette vidéo ?</h3><p>L'envoi sera annulé et la vidéo disparaîtra de la liste.</p><div><button className="vd-secondary" type="button" onClick={() => setRemoveId(null)}>Garder</button><button className="vd-primary vd-danger" type="button" onClick={() => { const video = videos.find((item) => item.id === removeId); if (video) void removeWaiting(video); }}>Retirer</button></div></section></div> : null}
       {message ? <p className={messageError ? "vd-message vd-message-error" : "vd-message"} role={messageError ? "alert" : "status"}>{message}</p> : null}
     </div>
   );
 }
 
-function VideoDetailSteps({
-  video,
-  busy,
-  contentBusy,
-  summaryDraft,
-  chaptersDraft,
-  transcriptDraft,
-  setSummaryDraft,
-  setChaptersDraft,
-  setTranscriptDraft,
-  onSaveSummary,
-  onSaveChapters,
-  onSaveTranscript,
-  onThumbnailTime,
-  onThumbnailFile,
-}: {
+type DetailPanelProps = {
   video: AdminVideoRow;
   busy: boolean;
   contentBusy: boolean;
+  openSection: SectionId | null;
+  setOpenSection: (section: SectionId | null) => void;
   summaryDraft: string;
   chaptersDraft: string;
   transcriptDraft: string;
   setSummaryDraft: (value: string) => void;
   setChaptersDraft: (value: string) => void;
   setTranscriptDraft: (value: string) => void;
+  onClose: () => void;
   onSaveSummary: () => void;
   onSaveChapters: () => void;
   onSaveTranscript: () => void;
   onThumbnailTime: (ratio: number) => void;
   onThumbnailFile: (image: File | undefined) => void;
-}) {
-  const summaryReady = Boolean(summaryDraft.trim());
-  const chaptersParsed = parseChapterLines(chaptersDraft, video.duration_seconds);
-  const chaptersReady = !chaptersParsed.error;
-  const thumbnailReady = Boolean(video.thumbnail);
-  const transcriptReady = Boolean(transcriptDraft.trim());
-  return <div className="vd-detail-steps">
-    <details open={!summaryReady}>
-      <summary><span className="vd-step-heading"><span className={summaryReady ? "vd-step-check vd-step-done" : "vd-step-check"}>{summaryReady ? <Check aria-hidden="true" /> : null}</span><strong>Résumé</strong></span><small>{summaryReady ? "Prêt" : "À compléter"}</small></summary>
-      <div className="vd-step-content"><textarea value={summaryDraft} onChange={(event) => setSummaryDraft(event.target.value)} maxLength={2_000} rows={4} placeholder="Écris le résumé de cette vidéo." /><div className="vd-step-footer"><small>{summaryDraft.length} / 2 000</small><button className="vd-secondary" type="button" disabled={contentBusy || !summaryDraft.trim()} onClick={onSaveSummary}>Enregistrer</button></div></div>
-    </details>
-    <details open={summaryReady && !chaptersReady}>
-      <summary><span className="vd-step-heading"><span className={chaptersReady ? "vd-step-check vd-step-done" : "vd-step-check"}>{chaptersReady ? <Check aria-hidden="true" /> : null}</span><strong>Chapitres</strong></span><small>{chaptersReady ? "Prêts" : "À compléter"}</small></summary>
-      <div className="vd-step-content"><textarea value={chaptersDraft} onChange={(event) => setChaptersDraft(event.target.value)} rows={5} placeholder={"Une ligne par chapitre : 0:00 Titre"} aria-label="Chapitres, une ligne par chapitre" />{chaptersDraft.trim() && chaptersParsed.error ? <p className="vd-form-error" role="alert">{chaptersParsed.error}</p> : null}{chaptersReady ? <ol>{chaptersParsed.chapters.map((chapter) => <li key={`${chapter.index}-${chapter.startSeconds}`}>{chapter.title}</li>)}</ol> : null}<div className="vd-step-footer"><small>Une ligne par chapitre</small><button className="vd-secondary" type="button" disabled={contentBusy || Boolean(chaptersParsed.error)} onClick={onSaveChapters}>Enregistrer</button></div></div>
-    </details>
-    <details open={summaryReady && chaptersReady && !thumbnailReady}>
-      <summary><span className="vd-step-heading"><span className={thumbnailReady ? "vd-step-check vd-step-done" : "vd-step-check"}>{thumbnailReady ? <Check aria-hidden="true" /> : null}</span><strong>Miniature</strong></span><small>{thumbnailReady ? "Prête" : "À compléter"}</small></summary>
-      <div className="vd-step-content"><p>Choisis un instant de la vidéo ou dépose une image 16:9.</p><div className="vd-thumbnail-tools"><label className="vd-secondary">Dépose ta propre image<input type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={busy} onChange={(event) => { onThumbnailFile(event.target.files?.[0]); event.currentTarget.value = ""; }} /></label>{[0.25, 0.5, 0.75].map((ratio) => <button className="vd-thumbnail-time" type="button" key={ratio} disabled={busy} onClick={() => onThumbnailTime(ratio)}>{Math.round(ratio * 100)} %<small>{formatDuration(video.duration_seconds ? Math.round(video.duration_seconds * ratio) : null)}</small></button>)}</div></div>
-    </details>
-    <details open={summaryReady && chaptersReady && thumbnailReady && !transcriptReady}>
-      <summary><span className="vd-step-heading"><span className={transcriptReady ? "vd-step-check vd-step-done" : "vd-step-check"}>{transcriptReady ? <Check aria-hidden="true" /> : null}</span><strong>Relire ou corriger la transcription</strong></span><small>{transcriptReady ? "Prête" : "À compléter"}</small></summary>
-      <div className="vd-step-content"><textarea value={transcriptDraft} onChange={(event) => setTranscriptDraft(event.target.value)} maxLength={250_000} rows={9} placeholder="Colle ou relis la transcription, avec ou sans repères [0:00]." aria-label="Transcription relue" /><div className="vd-step-footer"><small>{transcriptDraft.length} / 250 000</small><button className="vd-secondary" type="button" disabled={contentBusy || !transcriptDraft.trim()} onClick={onSaveTranscript}>Enregistrer</button></div></div>
-    </details>
-  </div>;
+  onPublish: () => void;
+  onReplace: () => void;
+  onRemove: () => void;
+};
+
+function excerpt(value: string, max = 64) {
+  const clean = value.replace(/\s+/g, " ").trim();
+  return clean.length > max ? `${clean.slice(0, max - 1).trimEnd()}…` : clean;
+}
+
+function VideoDetailPanel(props: DetailPanelProps) {
+  const { video, busy, contentBusy, openSection, setOpenSection } = props;
+  const online = Boolean(video.published_at) && !video.replaced_at;
+  const locked = online || Boolean(video.replaced_at);
+  const ready = sectionsReady(video);
+  const total = SECTION_ORDER.length;
+  const done = SECTION_ORDER.filter((section) => ready[section]).length;
+  const reason = publishReason(video);
+  const processing = video.status === "waiting" || video.status === "preparing";
+  const canPublish = video.status === "ready" && !online && !video.replaced_at;
+  const chaptersParsed = parseChapterLines(props.chaptersDraft, video.duration_seconds);
+  const chapterCount = displayChapters(video.chapters).length;
+  const segmentCount = Array.isArray(video.transcript_segments) ? video.transcript_segments.length : 0;
+  const summaryDirty = props.summaryDraft.trim() !== video.summary.trim();
+  const chaptersDirty = props.chaptersDraft.trim() !== chaptersToText(video.chapters).trim();
+  const transcriptDirty = props.transcriptDraft.trim() !== video.transcript.trim();
+  const toggle = (section: SectionId) => setOpenSection(openSection === section ? null : section);
+  const meta: Record<SectionId, string> = {
+    thumbnail: ready.thumbnail ? "Prête" : "À ajouter",
+    summary: ready.summary ? excerpt(video.summary) : "À écrire",
+    chapters: ready.chapters ? `${chapterCount} chapitre${chapterCount > 1 ? "s" : ""}` : "À ajouter",
+    transcript: ready.transcript ? (segmentCount > 0 ? `${segmentCount} passages${video.transcript_source === "manual" ? ", relue" : ""}` : "Prête") : "À relire",
+  };
+  const section = (id: SectionId, body: React.ReactNode) => <section className={`vd-section${openSection === id ? " is-open" : ""}`} key={id}>
+    <button type="button" className="vd-section-head" aria-expanded={openSection === id} aria-controls={`vd-section-${id}`} onClick={() => toggle(id)}>
+      <span className={`vd-dot${ready[id] ? " is-done" : ""}`} aria-hidden="true">{ready[id] ? <Check /> : null}</span>
+      <span className="vd-section-title"><strong>{SECTION_LABELS[id]}</strong><small>{meta[id]}</small></span>
+      <ChevronDown className="vd-chevron" aria-hidden="true" />
+    </button>
+    {openSection === id ? <div className="vd-section-body" id={`vd-section-${id}`}>{body}</div> : null}
+  </section>;
+
+  return <>
+    <div className="vd-detail-head">
+      <div>
+        <p className="vd-detail-kicker">{locationLabel(video.bloc_id === "protocole" ? "protocole" : Number(video.bloc_id))}, épisode {video.position}</p>
+        <h3 id="vd-detail-title">{video.title}</h3>
+        <span className={`vd-status vd-status-${online ? "online" : video.status}`}><i aria-hidden="true" />{videoStatus(video)}</span>
+      </div>
+      <button className="vd-icon-button" type="button" onClick={props.onClose} aria-label="Fermer le détail"><X aria-hidden="true" /></button>
+    </div>
+
+    <div className="vd-detail-art">{video.thumbnailUrl ? <SafeThumbnail src={video.thumbnailUrl} alt={`Miniature de ${video.title}`} unoptimized sizes="640px" /> : <button type="button" className="vd-art-empty" onClick={() => setOpenSection("thumbnail")}><ImageIcon aria-hidden="true" /><span>Ajouter une miniature</span></button>}</div>
+
+    {online ? <p className="vd-banner vd-banner-online" role="status"><Check aria-hidden="true" />En ligne. Le contenu n'est plus modifiable ici.</p> : <div className="vd-progress-card" role="status">
+      <div><strong>{done === total ? "Prête à publier" : `${done} sur ${total} prêts`}</strong><small>{processing ? "La vidéo est en cours de traitement." : done === total ? "Tout est en place." : `Il manque ${missingSections(video).map((id) => SECTION_LABELS[id].toLowerCase()).join(", ")}.`}</small></div>
+      <ol className="vd-meter" aria-label="Étapes de préparation">{SECTION_ORDER.map((id) => <li key={id} className={ready[id] ? "is-done" : ""}><button type="button" onClick={() => setOpenSection(id)}>{SECTION_LABELS[id]}</button></li>)}</ol>
+    </div>}
+
+    <div className="vd-sections">
+      {section("thumbnail", <>
+        <p>Choisis un instant de la vidéo ou dépose une image 16:9.</p>
+        {locked ? null : <div className="vd-thumbnail-tools">
+          <label className="vd-secondary">Déposer une image<input type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={busy} onChange={(event) => { props.onThumbnailFile(event.target.files?.[0]); event.currentTarget.value = ""; }} /></label>
+          {[0.25, 0.5, 0.75].map((ratio) => <button className="vd-thumbnail-time" type="button" key={ratio} disabled={busy || !video.duration_seconds} onClick={() => props.onThumbnailTime(ratio)}>{Math.round(ratio * 100)} %<small>{formatDuration(video.duration_seconds ? Math.round(video.duration_seconds * ratio) : null)}</small></button>)}
+        </div>}
+      </>)}
+      {section("summary", <>
+        <textarea value={props.summaryDraft} readOnly={locked} onChange={(event) => props.setSummaryDraft(event.target.value)} maxLength={2_000} rows={5} placeholder="Écris le résumé de cette vidéo." aria-label="Résumé" />
+        {locked ? null : <div className="vd-section-foot"><small>{props.summaryDraft.length} / 2 000</small><button className="vd-secondary" type="button" disabled={contentBusy || !summaryDirty || !props.summaryDraft.trim()} onClick={props.onSaveSummary}>Enregistrer</button></div>}
+      </>)}
+      {section("chapters", <>
+        <textarea value={props.chaptersDraft} readOnly={locked} onChange={(event) => props.setChaptersDraft(event.target.value)} rows={8} placeholder={"Une ligne par chapitre\n0:00 Introduction"} aria-label="Chapitres, une ligne par chapitre" spellCheck={false} />
+        {props.chaptersDraft.trim() && chaptersParsed.error ? <p className="vd-form-error" role="alert">{chaptersParsed.error}</p> : null}
+        {locked ? null : <div className="vd-section-foot"><small>{chaptersParsed.error || !props.chaptersDraft.trim() ? "Une ligne par chapitre : 0:00 Titre" : `${chaptersParsed.chapters.length} chapitre${chaptersParsed.chapters.length > 1 ? "s" : ""} valide${chaptersParsed.chapters.length > 1 ? "s" : ""}`}</small><button className="vd-secondary" type="button" disabled={contentBusy || !chaptersDirty || Boolean(chaptersParsed.error)} onClick={props.onSaveChapters}>Enregistrer</button></div>}
+      </>)}
+      {section("transcript", <>
+        <textarea value={props.transcriptDraft} readOnly={locked} onChange={(event) => props.setTranscriptDraft(event.target.value)} maxLength={250_000} rows={10} placeholder="Colle ou relis la transcription, avec ou sans repères [0:00]." aria-label="Transcription relue" />
+        {locked ? null : <div className="vd-section-foot"><small>{props.transcriptDraft.length.toLocaleString("fr-FR")} / 250 000</small><button className="vd-secondary" type="button" disabled={contentBusy || !transcriptDirty || !props.transcriptDraft.trim()} onClick={props.onSaveTranscript}>Enregistrer</button></div>}
+      </>)}
+    </div>
+
+    <div className="vd-actions">
+      {canPublish ? <button className="vd-primary vd-publish" type="button" disabled={busy || Boolean(reason)} onClick={props.onPublish}>{busy ? "Publication en cours" : "Publier la vidéo"}</button> : null}
+      {!video.replaced_at ? <div className="vd-secondary-actions"><button className="vd-secondary" type="button" onClick={props.onReplace}>Remplacer la vidéo</button>{video.status === "waiting" ? <button className="vd-danger-link" type="button" onClick={props.onRemove}>Retirer</button> : null}</div> : null}
+    </div>
+  </>;
 }

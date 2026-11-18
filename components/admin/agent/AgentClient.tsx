@@ -35,6 +35,7 @@ const permissionCopy: Record<AgentPermission, { label: string; description: stri
   choisir_miniature: { label: "Choisir une image de vidéo", description: "Choisir l'image d'un instant précis de la vidéo." },
   deposer_miniature: { label: "Ajouter une miniature", description: "Ajouter une image JPEG, PNG ou WebP au format 16:9." },
   demander_publication: { label: "Préparer une publication", description: "Préparer une demande que tu valides avant sa mise en ligne." },
+  publier_video: { label: "Publier directement", description: "Mettre une vidéo prête en ligne tout de suite, sans ta validation." },
   synchroniser_video: { label: "Actualiser une vidéo", description: "Récupérer l'état et les sous-titres d'une vidéo." },
   preparer_mail: { label: "Préparer un message", description: "Préparer un message qui attend toujours ton accord." },
   lister_nouveautes: { label: "Consulter les nouveautés", description: "Voir les publications récentes et les propositions en attente." },
@@ -43,7 +44,8 @@ const permissionCopy: Record<AgentPermission, { label: string; description: stri
   journal: { label: "Consulter l'historique", description: "Voir les actions réalisées avec ce jeton." },
 };
 
-const PREPARE_PERMISSIONS: AgentPermission[] = [...AGENT_PERMISSION_VALUES];
+const PREPARE_PERMISSIONS: AgentPermission[] = AGENT_PERMISSION_VALUES.filter((permission) => permission !== "publier_video");
+const PUBLISH_PERMISSIONS: AgentPermission[] = [...AGENT_PERMISSION_VALUES];
 const READ_ONLY_PERMISSIONS: AgentPermission[] = ["liste_blocs", "lister_videos", "lire_transcription", "lister_nouveautes", "statut_video", "journal"];
 
 const DEMO_AGENT_DATA: AgentViewData = {
@@ -110,6 +112,7 @@ const journalLabels: Record<string, string> = {
   "agent.choisir_miniature": "Ton agent a choisi une image de vidéo.",
   "agent.deposer_miniature": "Ton agent a déposé une miniature personnalisée.",
   "agent.demander_publication": "Ton agent a demandé une publication.",
+  "agent.publier_video": "Ton agent a publié une vidéo.",
   "agent.synchroniser_video": "Ton agent a synchronisé une vidéo.",
   "agent.deposer_sous_titres": "Ton agent a ajouté des sous-titres.",
   "agent.preparer_mail": "Ton agent a préparé un mail.",
@@ -148,7 +151,7 @@ const permissionGroups: Array<{ label: string; permissions: AgentPermission[] }>
   { label: "Vidéos", permissions: ["envoyer_video", "synchroniser_video", "choisir_miniature", "deposer_miniature"] },
   { label: "Texte", permissions: ["ecrire_chapitres", "ecrire_resume", "deposer_sous_titres"] },
   { label: "Nouveautés", permissions: ["preparer_nouveaute"] },
-  { label: "Publication", permissions: ["demander_publication"] },
+  { label: "Publication", permissions: ["demander_publication", "publier_video"] },
   { label: "Mails", permissions: ["preparer_mail"] },
 ];
 
@@ -194,7 +197,7 @@ export function AgentClient() {
   const [permissionDrafts, setPermissionDrafts] = useState<Record<string, AgentPermission[]>>({});
   const [freshToken, setFreshToken] = useState<string | null>(null);
   const [client, setClient] = useState<ClientName>("Claude Code");
-  const [preset, setPreset] = useState<"prepare" | "read" | "custom">("prepare");
+  const [preset, setPreset] = useState<"prepare" | "publish" | "read" | "custom">("prepare");
   const [openStep, setOpenStep] = useState<"create" | "link" | "mode">("create");
   const [journalOpen, setJournalOpen] = useState(false);
   const [journalPage, setJournalPage] = useState(0);
@@ -290,7 +293,7 @@ export function AgentClient() {
         <button type="button" className={cn("ag-step-trigger", openStep === "create" && "is-open")} aria-expanded={openStep === "create"} onClick={() => setOpenStep("create")}><span className="ag-step-number">1</span><span><b>Créer un accès</b><small>Nom, durée et permissions</small></span><span aria-hidden="true">⌄</span></button>
         {openStep === "create" && <div className="ag-step-body">
           <div className="ag-form-row"><label className="ag-label">Nom<input value={name} maxLength={80} onChange={(event) => setName(event.target.value)} /></label><label className="ag-label">Durée<select value={expiresInDays} onChange={(event) => setExpiresInDays(Number(event.target.value))}><option value={30}>30 jours</option><option value={90}>90 jours</option><option value={180}>180 jours</option><option value={365}>365 jours</option></select></label></div>
-          <div className="ag-presets" role="group" aria-label="Choisir un niveau d'accès"><button type="button" className={cn("ag-preset", preset === "prepare" && "is-selected")} onClick={() => { setPreset("prepare"); setNewPermissions(PREPARE_PERMISSIONS); }}><b>Préparer</b><small>Tu valides</small></button><button type="button" className={cn("ag-preset", preset === "read" && "is-selected")} onClick={() => { setPreset("read"); setNewPermissions(READ_ONLY_PERMISSIONS); }}><b>Lecture seule</b><small>Rien modifier</small></button><button type="button" className={cn("ag-preset", preset === "custom" && "is-selected")} onClick={() => setPreset("custom")}><b>Personnalisé</b><small>Choisir les droits</small></button></div>
+          <div className="ag-presets" role="group" aria-label="Choisir un niveau d'accès"><button type="button" className={cn("ag-preset", preset === "prepare" && "is-selected")} onClick={() => { setPreset("prepare"); setNewPermissions(PREPARE_PERMISSIONS); }}><b>Préparer</b><small>Tu valides</small></button><button type="button" className={cn("ag-preset", preset === "publish" && "is-selected")} onClick={() => { setPreset("publish"); setNewPermissions(PUBLISH_PERMISSIONS); }}><b>Publier</b><small>Sans validation</small></button><button type="button" className={cn("ag-preset", preset === "read" && "is-selected")} onClick={() => { setPreset("read"); setNewPermissions(READ_ONLY_PERMISSIONS); }}><b>Lecture seule</b><small>Rien modifier</small></button><button type="button" className={cn("ag-preset", preset === "custom" && "is-selected")} onClick={() => setPreset("custom")}><b>Personnalisé</b><small>Choisir les droits</small></button></div>
           <details className="ag-details"><summary>Voir les permissions</summary><PermissionList selected={newPermissions} onToggle={(permission) => { setPreset("custom"); setNewPermissions((current) => toggle(current, permission)); }} /></details>
           <button type="button" disabled={busy || !name.trim()} onClick={() => void mutation(() => createAgentTokenAction({ name, permissions: newPermissions, expiresInDays }), ({ token }) => setFreshToken(token))} className="ag-button ag-button-primary ag-main-action"><KeyRound size={17} />Créer cet accès</button>
           {freshToken && <div className="ag-secret" role="status"><p className="ag-secret-title">Accès créé</p><code>{freshToken}</code><div className="ag-actions"><button type="button" className="ag-button ag-button-quiet" onClick={() => { void navigator.clipboard.writeText(freshToken); void playAppSound("confirm"); }}><Clipboard size={16} />Copier</button><button type="button" className="ag-button ag-button-quiet" onClick={() => setFreshToken(null)}>Fermer</button></div></div>}
@@ -319,6 +322,6 @@ export function AgentClient() {
 
     {confirm?.type === "mode" && <Confirmation title="Laisser ton agent publier seul ?" description="Il pourra publier une vidéo prête sans nouvelle demande. Les messages restent soumis à ton accord." expected="AUTORISER" confirmLabel="Autoriser" onCancel={() => setConfirm(null)} onConfirm={(value) => void mutation(() => setAgentModeAction("autopublish", value)).then((ok) => { if (ok) setConfirm(null); })} />}
     {confirm?.type === "revoke" && <Confirmation title="Révoquer cet accès ?" description="Ton agent perd l'accès immédiatement. Ce qu'il a déjà fait reste dans le journal." confirmLabel="Révoquer" danger onCancel={() => setConfirm(null)} onConfirm={() => void mutation(() => revokeAgentTokenAction(confirm.tokenId)).then((ok) => { if (ok) setConfirm(null); })} />}
-    {confirm?.type === "request" && <Confirmation title={confirm.request.kind === "publication" ? "Publier cette vidéo ?" : confirm.request.kind === "nouveaute" ? "Publier cette nouveauté ?" : "Envoyer ce message ?"} description="Cette action sera effectuée maintenant. Vérifie une dernière fois avant de confirmer." expected={confirm.request.kind === "publication" || confirm.request.kind === "nouveaute" ? "PUBLIER" : "ENVOYER"} confirmLabel={confirm.request.kind === "publication" || confirm.request.kind === "nouveaute" ? "Publier" : "Envoyer"} onCancel={() => setConfirm(null)} onConfirm={(value) => void mutation(() => decideAgentRequestAction(confirm.request.id, "approve", value)).then((ok) => { if (ok) setConfirm(null); })} />}
+    {confirm?.type === "request" && <Confirmation title={confirm.request.kind === "publication" ? "Publier cette vidéo ?" : confirm.request.kind === "nouveaute" ? "Publier cette nouveauté ?" : "Envoyer ce message ?"} description={confirm.request.kind === "publication" ? "La vidéo sera visible tout de suite par les membres concernés." : "Cette action sera effectuée maintenant. Vérifie une dernière fois avant de confirmer."} expected={confirm.request.kind === "publication" ? undefined : confirm.request.kind === "nouveaute" ? "PUBLIER" : "ENVOYER"} confirmLabel={confirm.request.kind === "publication" || confirm.request.kind === "nouveaute" ? "Publier" : "Envoyer"} onCancel={() => setConfirm(null)} onConfirm={(value) => void mutation(() => decideAgentRequestAction(confirm.request.id, "approve", value)).then((ok) => { if (ok) setConfirm(null); })} />}
   </div>;
 }

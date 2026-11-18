@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AdminVideoManager } from "@/app/admin/AdminVideoManager";
+import { DaRoot } from "@/components/da/DaRoot";
 import "@/app/admin/videos.css";
 
 export const dynamic = "force-dynamic";
@@ -56,5 +57,5 @@ export default async function AdminVideosDemoPage({ searchParams }: { searchPara
   const videos = only ? all.filter((video) => video.status === only || (only === "online" && video.published_at)) : all;
   const openRaw = typeof query.ouvert === "string" ? Number(query.ouvert) : NaN;
   const initialOpenIndex = Number.isInteger(openRaw) && openRaw >= 0 && openRaw < videos.length ? openRaw : undefined;
-  return <main style={{ minHeight: "100vh", padding: "clamp(20px, 4vw, 64px)", background: "#0e1110" }}><h1 style={{ margin: "0 0 20px", color: "#f4f5f2", font: "600 clamp(32px, 4vw, 48px)/1.08 var(--font-t)", letterSpacing: "-.045em" }}>Vidéos</h1><AdminVideoManager blocs={locations} initialVideos={videos} initialOpenIndex={initialOpenIndex} setupMissing={false} demo /></main>;
+  return <DaRoot className="adm-root"><main style={{ minHeight: "100vh", padding: "clamp(20px, 4vw, 64px)", background: "#0e1110" }}><h1 style={{ margin: "0 0 20px", color: "#f4f5f2", font: "600 clamp(32px, 4vw, 48px)/1.08 var(--font-t)", letterSpacing: "-.045em" }}>Vidéos</h1><AdminVideoManager blocs={locations} initialVideos={videos} initialOpenIndex={initialOpenIndex} setupMissing={false} demo /></main></DaRoot>;
 }

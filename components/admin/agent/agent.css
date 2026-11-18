@@ -62,7 +62,7 @@
 .ag-shell summary:focus-visible,
 .ag-shell pre:focus-visible { outline: 3px solid color-mix(in srgb, var(--ag-green) 75%, white); outline-offset: 3px; }
 
-.ag-presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ag-presets { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; }
 .da.adm-root .ag-preset { display: grid; min-height: 98px; align-content: center; gap: 7px; box-sizing: border-box; border: 1px solid var(--ag-line); border-radius: 14px; padding: 14px 16px; background: transparent; color: var(--ag-text); font: 600 13px/1.25 var(--font); text-align: left; cursor: pointer; }
 .da.adm-root .ag-preset b { display: block; }
 .da.adm-root .ag-preset small { display: block; color: var(--ag-dim); font-size: 11px; line-height: 1.35; }
@@ -182,7 +182,7 @@
 .ag-form-row { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(120px, .7fr); gap: 12px; }
 .ag-form-row .ag-label { gap: 6px; }
 .ag-form-row input, .ag-form-row select { min-height: 42px; }
-.ag-presets { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ag-presets { grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; }
 .da.adm-root .ag-preset { min-height: 62px; padding: 10px 12px; }
 .da.adm-root .ag-preset small { font-size: 11px; }
 .ag-step-body .ag-details { padding-top: 4px; }

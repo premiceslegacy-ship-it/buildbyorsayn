@@ -6,6 +6,7 @@ import { createAdminSupabase } from "@/lib/supabase/admin";
 import { publishVideoSchema, validateChapterTimeline, videoChapterSchema } from "@/lib/mux/adminLessons";
 import { cleanupMuxAsset, cleanupQueuedAssetsForSlot } from "@/lib/mux/assetCleanup.server";
 import { recordVideoPublishedNews } from "@/lib/nouveautes/autoNews.server";
+import { closePublicationRequests } from "@/lib/adminAgent/execution";
 import { getVerifiedAdmin, type AdminVideoLessonRow } from "@/lib/mux/adminServer";
 type VideoPublishRouteContext = { params: Promise<{ id: string }> };
 
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest, context: VideoPublishRouteConte
     return NextResponse.json({ ok: false, error: "La file de nettoyage Mux est indisponible." }, { status: 503 });
   }
   if (video.published_at) {
+    await closePublicationRequests(id, user.id, request.signal);
     revalidatePath("/admin");
     revalidatePath(`/blocs/${video.bloc_id}`);
     return NextResponse.json({ ok: true, resumedCleanup: true });
@@ -71,6 +73,7 @@ export async function POST(request: NextRequest, context: VideoPublishRouteConte
     return NextResponse.json({ ok: false, error: "La publication a échoué." }, { status: 503 });
   }
   await recordVideoPublishedNews(id, { actorUserId: user.id });
+  await closePublicationRequests(id, user.id, request.signal);
   const previousAssetId = typeof data[0]?.previous_mux_asset_id === "string"
     ? data[0].previous_mux_asset_id
     : null;

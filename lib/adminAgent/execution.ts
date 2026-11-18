@@ -118,6 +118,38 @@ export async function validateAgentPublicationTarget(videoId: string, signal?: A
   return data as PublishableVideo & { replaced_at?: string | null; created_by_agent_token_id?: string | null };
 }
 
+/**
+ * Une vidéo publiée (par l'admin, par un agent ou par validation d'une demande) ne doit plus
+ * laisser de demande de publication en attente : on les clôt, sinon l'admin se voit demander
+ * de valider ce qui est déjà en ligne. Sans effet si rien n'attend.
+ */
+export async function closePublicationRequests(
+  videoId: string,
+  actorUserId: string | null,
+  signal?: AbortSignal,
+  outcome: "approved" | "expired" = "approved",
+) {
+  const now = new Date().toISOString();
+  const { error } = await createAdminSupabase({ signal })
+    .from("admin_agent_requests")
+    .update(outcome === "approved"
+      ? { status: "approved", decided_by: actorUserId, decided_at: now, executed_at: now, updated_at: now }
+      : { status: "expired", updated_at: now })
+    .eq("kind", "publication")
+    .eq("target_id", videoId)
+    .eq("status", "pending");
+  if (error) console.error("admin_agent.close_publication_requests_failed");
+}
+
+export async function isVideoPublished(videoId: string, signal?: AbortSignal) {
+  const { data } = await createAdminSupabase({ signal })
+    .from("video_lessons")
+    .select("published_at,replaced_at")
+    .eq("id", videoId)
+    .maybeSingle();
+  return Boolean(data?.published_at && !data.replaced_at);
+}
+
 export async function executeAgentPublication(videoId: string, actorUserId: string, signal?: AbortSignal, expectedTokenId?: string) {
   const data = await validateAgentPublicationTarget(videoId, signal, expectedTokenId);
   const admin = createAdminSupabase({ signal });
@@ -130,6 +162,7 @@ export async function executeAgentPublication(videoId: string, actorUserId: stri
     throw new Error("La publication a échoué.");
   }
   await recordVideoPublishedNews(videoId, { actorUserId });
+  await closePublicationRequests(videoId, actorUserId, signal);
   const previousAssetId = typeof published.data[0]?.previous_mux_asset_id === "string"
     ? published.data[0].previous_mux_asset_id
     : null;

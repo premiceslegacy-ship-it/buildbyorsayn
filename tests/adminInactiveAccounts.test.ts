@@ -60,12 +60,14 @@ test("les actions sensibles vérifient l'admin, recalculent et journalisent sans
   assert.match(source, /max\(MAX_INACTIVE_ACCOUNT_BATCH\)/);
 });
 
-test("les confirmations PUBLIER et ENVOYER restent saisies avant les actions", async () => {
+test("publier une vidéo se fait en un clic, l'envoi d'un mail garde sa confirmation saisie", async () => {
   const [video, mail] = await Promise.all([
     readFile("app/admin/AdminVideoManager.tsx", "utf8"),
     readFile("components/AdminMailComposer.tsx", "utf8"),
   ]);
-  assert.match(video, /confirmation !== ADMIN_VIDEO_CONFIRMATION/);
+  assert.doesNotMatch(video, /confirmation !== ADMIN_VIDEO_CONFIRMATION/);
+  assert.doesNotMatch(video, /Écris <b>/);
+  assert.match(video, /confirmation: ADMIN_VIDEO_CONFIRMATION/);
   assert.match(video, /thumbnail/);
   assert.match(mail, /confirmation !== CONFIRM_WORD/);
   assert.match(mail, /CONFIRM_WORD = "ENVOYER"/);

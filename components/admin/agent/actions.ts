@@ -129,9 +129,10 @@ export async function decideAgentRequestAction(
   try {
     const request = (await listPendingRequests()).find((candidate) => candidate.id === requestId);
     if (!request) return { ok: false, error: "Demande introuvable." };
-    let expected = request.kind === "publication" ? "PUBLIER" : "ENVOYER";
-    if (request.kind === "nouveaute") expected = "PUBLIER";
-    if (decision === "approve" && confirmation !== expected) {
+    // Publier une vidéo prête ne demande plus de saisie : le bouton « Publier » suffit.
+    // Les nouveautés et les mails (envoi à de vrais destinataires) gardent leur mot de confirmation.
+    const expected = request.kind === "publication" ? null : request.kind === "nouveaute" ? "PUBLIER" : "ENVOYER";
+    if (decision === "approve" && expected && confirmation !== expected) {
       return { ok: false, error: `Saisis ${expected} pour valider.` };
     }
     const result = await decideRequest(requestId, decision);

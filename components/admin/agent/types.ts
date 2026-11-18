@@ -32,6 +32,8 @@ export type AgentRequestView = {
     durationSeconds: number | null;
     thumbnailUrl: string | null;
     steps: { summary: boolean; chapters: boolean; thumbnail: boolean; transcript: boolean };
+    published?: boolean;
+    replaced?: boolean;
     reviewUrl: string;
   } | null;
   mailPreview?: {

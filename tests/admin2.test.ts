@@ -121,7 +121,7 @@ test("la vue Agent masque le jeton après sa seule réponse et exige les confirm
   assert.match(client, /visibilitychange/);
   assert.match(client, /setFreshToken\(null\)/);
   assert.match(client, /btv_agt_xxxx/);
-  assert.match(actions, /request\.kind === "publication" \? "PUBLIER" : "ENVOYER"/);
+  assert.match(actions, /request\.kind === "publication" \? null : request\.kind === "nouveaute" \? "PUBLIER" : "ENVOYER"/);
   assert.match(actions, /listPendingRequests\(\)/);
   assert.match(actions, /confirmation !== expected/);
   assert.match(actions, /decideRequest\(requestId, decision\)/);
