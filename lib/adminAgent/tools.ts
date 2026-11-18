@@ -11,6 +11,7 @@ import {
   MAX_VIDEO_TRANSCRIPT_CHARACTERS,
   VIDEO_LOCATION_SCHEMA,
   VIDEO_MIME_TYPES,
+  SubtitleFormatError,
   buildMuxPassthrough,
   formatTimecode,
   parseSubtitleSegments,
@@ -452,9 +453,18 @@ export const ADMIN_AGENT_TOOLS = {
     schema: depositSubtitlesInput,
     async run(rawInput, context) {
       const input = depositSubtitlesInput.parse(rawInput);
-      const segments = parseSubtitleSegments(input.content);
+      let segments: ReturnType<typeof parseSubtitleSegments>;
+      try {
+        segments = parseSubtitleSegments(input.content);
+      } catch (error) {
+        if (error instanceof SubtitleFormatError) throw new AgentToolError(error.message);
+        throw error;
+      }
       const transcript = segments.map((segment) => `[${formatTimecode(segment.startSeconds)}] ${segment.text}`).join("\n");
       if (transcript.length < 20) throw new AgentToolError("La transcription est trop courte.");
+      if (transcript.length > MAX_VIDEO_TRANSCRIPT_CHARACTERS) {
+        throw new AgentToolError(`La transcription ne peut pas dépasser ${MAX_VIDEO_TRANSCRIPT_CHARACTERS} caractères.`);
+      }
       const updated = await createAdminSupabase().from("video_lessons")
         .update({
           transcript,

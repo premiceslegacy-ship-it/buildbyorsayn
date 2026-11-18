@@ -169,26 +169,48 @@ function subtitleTimestampToSeconds(raw: string): number | null {
   return hours * 3600 + minutes * 60 + seconds;
 }
 
-/** Parses reviewed WebVTT or SubRip captions into the MCP's paginable shape. */
+/** Erreur de contenu d'un fichier de sous-titres : son message est destiné à être lu par l'appelant. */
+export class SubtitleFormatError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SubtitleFormatError";
+  }
+}
+
+/**
+ * Parses reviewed WebVTT or SubRip captions into the MCP's paginable shape.
+ *
+ * Le stockage garde des repères en secondes entières (`transcriptSegmentSchema`) :
+ * les repères à la milliseconde sont arrondis à la seconde inférieure, et les
+ * sous-titres qui tombent dans la même seconde sont regroupés au lieu d'être
+ * refusés. Un fichier dont la première réplique démarre après 0 s (silence au
+ * début, cas normal) est accepté : la première ligne est rattachée à 0 s.
+ */
 export function parseSubtitleSegments(content: string): TranscriptSegment[] {
   const blocks = content.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").split(/\n{2,}/);
   const segments: TranscriptSegment[] = [];
+  let lastRawStart = -1;
   for (const block of blocks) {
     const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
     const timingIndex = lines.findIndex((line) => line.includes("-->"));
     if (timingIndex < 0) continue;
-    const startSeconds = subtitleTimestampToSeconds(lines[timingIndex].split("-->")[0] ?? "");
-    const text = lines.slice(timingIndex + 1).join(" ").replace(/<[^>]*>/g, "").trim();
-    if (startSeconds === null || !text) continue;
-    const previous = segments.at(-1);
-    if (previous && startSeconds <= previous.startSeconds) {
-      throw new Error("Les repères de transcription doivent être strictement croissants.");
+    const rawStart = subtitleTimestampToSeconds(lines[timingIndex].split("-->")[0] ?? "");
+    const text = lines.slice(timingIndex + 1).join(" ").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+    if (rawStart === null || !text) continue;
+    if (rawStart < lastRawStart) {
+      throw new SubtitleFormatError("Les repères de transcription doivent suivre l'ordre de la vidéo.");
     }
-    segments.push({ startSeconds, text });
+    lastRawStart = rawStart;
+    const startSeconds = Math.floor(rawStart);
+    if (startSeconds > 43_200) throw new SubtitleFormatError("Un repère de transcription dépasse 12 heures.");
+    const previous = segments.at(-1);
+    if (previous && startSeconds === previous.startSeconds) previous.text = `${previous.text} ${text}`;
+    else segments.push({ startSeconds, text });
   }
-  if (segments[0]?.startSeconds !== 0) {
-    throw new Error("La transcription doit commencer à 0 seconde.");
+  if (segments.length === 0) {
+    throw new SubtitleFormatError("Aucun sous-titre lisible : le fichier doit être au format VTT ou SRT avec des lignes « 00:00:01.000 --> 00:00:03.000 ».");
   }
+  segments[0].startSeconds = 0;
   return segments;
 }
 
